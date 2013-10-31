@@ -368,7 +368,8 @@
                                 <li>
                                     <xf:trigger appearance="minimal">
                                         <xf:label ref="$fr-resources/home/buttons/all"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin'] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                                 <li>
@@ -382,39 +383,45 @@
                                 <li class="{if (xxf:readonly(local-unpublish-select)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="local-unpublish-select">
                                         <xf:label ref="$fr-resources/home/buttons/unpublished-local"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms[frf:isLocalUnavailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalUnavailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                                 <li class="{if (xxf:readonly(local-publish-select)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="local-publish-select">
                                         <xf:label ref="$fr-resources/home/buttons/published-local"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms[frf:isLocalAvailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalAvailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                                 <li class="divider"/>
                                 <li class="{if (xxf:readonly(remote-unpublish-select)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="remote-unpublish-select">
                                         <xf:label ref="$fr-resources/home/buttons/unpublished-remote"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms[frf:isRemoteUnavailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteUnavailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                                 <li class="{if (xxf:readonly(remote-publish-select)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="remote-publish-select">
                                         <xf:label ref="$fr-resources/home/buttons/published-remote"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms[frf:isRemoteAvailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteAvailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                                 <li class="divider"/>
                                 <li class="{if (xxf:readonly(local-newer-select)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="local-newer-select">
                                         <xf:label ref="$fr-resources/home/buttons/newer-local"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms[frf:isLocalNewer(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalNewer(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                                 <li class="{if (xxf:readonly(remote-newer-select)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="remote-newer-select">
                                         <xf:label ref="$fr-resources/home/buttons/newer-remote"/>
-                                        <xf:setvalue event="DOMActivate" ref="instance()/selection" value="string-join(for $f in $forms[frf:isRemoteNewer(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
+                                        <xf:setvalue event="DOMActivate" ref="instance()/selection"
+                                            value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteNewer(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
                             </ul>

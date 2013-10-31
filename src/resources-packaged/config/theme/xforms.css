@@ -17,18 +17,12 @@
      * XForms switch/case
      * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
      */
-
   /* ***** Label, hint, help, alert *********************************************************************************** */
-
   /* ***** Controls *********************************************************************************** */
-
   /* ***** Indicators and messages ************************************************************************************ */
-
   /* ***** Tree ******************************************************************************************************* */
-
   /* Fix for Firefox issue when clicking on the first "-" in span mode
        http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
-
 }
 .orbeon #xforms-form {
   /**
@@ -37,7 +31,6 @@
          * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
          * doesn't require us to update disabled attributes on controls during the life of the page.
          */
-
 }
 .orbeon #xforms-form .xforms-repeat-template,
 .orbeon #xforms-form .xforms-template,
@@ -78,15 +71,16 @@
   /* Prevent links from being able to get the focus. See bug:
                [ #315198 ] Non-relevant links and minimal triggers can get the focus
                http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
-
   display: none;
 }
 .orbeon #xforms-form .xforms-disabled input,
+.orbeon #xforms-form .xforms-disabled textarea,
 .orbeon #xforms-form .xforms-disabled select,
 .orbeon #xforms-form .xforms-disabled button {
   visibility: hidden;
 }
 .orbeon #xforms-form .xforms-case-deselected input,
+.orbeon #xforms-form .xforms-case-deselected textarea,
 .orbeon #xforms-form .xforms-case-deselected select,
 .orbeon #xforms-form .xforms-case-deselected button {
   visibility: hidden;

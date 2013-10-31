@@ -29,6 +29,9 @@ trait FormRunnerHome {
     private case class AvailableAndTime(available: Boolean, time: Long)
 
     private case class Form(app: String, form: String, local: Option[AvailableAndTime], remote: Option[AvailableAndTime], ops: Set[String]) {
+        
+        import Form._
+        
         def isLocalAvailable    = local  exists (_.available)
         def isRemoteAvailable   = remote exists (_.available)
         def isLocalUnavailable  = local  exists (! _.available)
@@ -39,9 +42,18 @@ trait FormRunnerHome {
 
         def isLocalNewer  = isLocal && isRemote && local.get.time  > remote.get.time
         def isRemoteNewer = isLocal && isRemote && remote.get.time > local.get.time
+        
+        def isSummaryAllowed = ops intersect SummaryOps nonEmpty
+        def isNewAllowed     = ops intersect NewOps nonEmpty
+        def isAdmin          = ops(AdminOp)
     }
 
     private object Form {
+        
+        private val SummaryOps = Set("*", "update", "read", "delete")
+        private val NewOps     = Set("*", "create")
+        private val AdminOp    = "admin"
+        
         def apply(form: NodeInfo): Form = {
             val localTime  = form / "last-modified-time"
             val remoteTime = form / "remote-last-modified-time"
@@ -84,22 +96,22 @@ trait FormRunnerHome {
     def isRemoteNewer(form: NodeInfo) = Form(form).isRemoteNewer
 
     def canSelectUnpublishedLocal(selection: String, forms: SequenceIterator) =
-        collectForms(forms) exists (_.isLocalUnavailable)
+        collectForms(forms) exists (f ⇒ f.isAdmin && f.isLocalUnavailable)
 
     def canSelectPublishedLocal(selection: String, forms: SequenceIterator) =
-        collectForms(forms) exists (_.isLocalAvailable)
+        collectForms(forms) exists (f ⇒ f.isAdmin && f.isLocalAvailable)
 
     def canSelectUnpublishedRemote(selection: String, forms: SequenceIterator) =
-        collectForms(forms) exists (_.isRemoteUnavailable)
+        collectForms(forms) exists (f ⇒ f.isAdmin && f.isRemoteUnavailable)
 
     def canSelectPublishedRemote(selection: String, forms: SequenceIterator) =
-        collectForms(forms) exists (_.isRemoteAvailable)
+        collectForms(forms) exists (f ⇒ f.isAdmin && f.isRemoteAvailable)
 
     def canSelectLocalNewer(selection: String, forms: SequenceIterator) =
-        collectForms(forms) exists (_.isLocalNewer)
+        collectForms(forms) exists (f ⇒ f.isAdmin && f.isLocalNewer)
 
     def canSelectRemoteNewer(selection: String, forms: SequenceIterator) =
-        collectForms(forms) exists (_.isRemoteNewer)
+        collectForms(forms) exists (f ⇒ f.isAdmin && f.isRemoteNewer)
 
     def canPublishLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalUnavailable)
@@ -119,14 +131,11 @@ trait FormRunnerHome {
     def canPublishRemoteToLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemote)
 
-    private val SummaryOps = Set("*", "update", "read", "delete")
-    private val NewOps     = Set("*", "create")
-
     def canNavigateSummary(selection: String, forms: SequenceIterator) =
-        formsForSelection(selection, forms) exists (f ⇒ f.isLocal && (f.ops intersect SummaryOps nonEmpty))
+        formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isSummaryAllowed)
     
     def canNavigateNew(selection: String, forms: SequenceIterator) =
-        formsForSelection(selection, forms) exists (f ⇒ f.isLocal && (f.ops intersect NewOps nonEmpty))
+        formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isNewAllowed)
 
     def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(

@@ -114,7 +114,7 @@ public class XFormsProperties {
 
     private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
-    // TODO: Make these global properties
+    // TODO: Make these global properties, see https://github.com/orbeon/orbeon-forms/issues/1391
     private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
     public static final String RETRY_DELAY_INCREMENT = "retry.delay-increment";
     public static final String RETRY_MAX_DELAY = "retry.max-delay";
@@ -355,7 +355,7 @@ public class XFormsProperties {
         return Properties.instance().getPropertySet().getBoolean
                 (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT);
     }
-    
+
     public static String[] getAdditionalAvtElementNamespaces() {
     	final String additionalElementNamespacesStr = Properties.instance().getPropertySet().getString
     			(ADDITIONAL_AVT_ELEMENT_NAMESPACES);
@@ -368,7 +368,7 @@ public class XFormsProperties {
     			(ADDITIONAL_REF_ID_ATTRIBUTE_NAMES);
 		return additionalRefIdAttributeNames != null?additionalRefIdAttributeNames.split("\\s"):EMPTY_STRING_ARRAY;
     }
-    
+
     public static boolean isMinimalResources() {
         return Properties.instance().getPropertySet().getBoolean
                 (MINIMAL_RESOURCES_PROPERTY, MINIMAL_RESOURCES_PROPERTY_DEFAULT);

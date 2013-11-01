@@ -20,7 +20,7 @@
 
     <xbl:script src="/xbl/orbeon/number/number.js"/>
     <xbl:script src="/xbl/orbeon/currency/currency.js"/>
-    <xbl:binding id="fr-currency" element="fr|currency, xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')" xxbl:mode="lhha binding value">
+    <xbl:binding id="fr-currency" element="fr|currency, xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')" xxbl:mode="lhha binding value focus">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -49,11 +49,6 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/currency/currency.css"/>
         </xbl:resources>
-        <xbl:handlers>
-            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <xxf:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxf:script>
-            </xbl:handler>
-        </xbl:handlers>
         <!-- Delegate to fr:number -->
         <xi:include href="/xbl/orbeon/number/number.xbl" xpointer="xpath(/xbl:xbl/xbl:binding/xbl:template)"/>
     </xbl:binding>

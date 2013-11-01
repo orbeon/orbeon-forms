@@ -87,10 +87,6 @@
             AS.nextAjaxResponse(formId).then(_.bind(this.update, this));
         },
 
-        setfocus: function() {
-            this.visibleInputElement.focus();
-        },
-
         numberToEditString: function(number) {
             var cleaned = number;
 

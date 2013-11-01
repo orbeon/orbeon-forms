@@ -26,7 +26,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/xbl/orbeon/number/number.js"/>
-    <xbl:binding id="fr-number" element="fr|number, xf|input:xxf-type('xs:decimal')" xxbl:mode="lhha binding value">
+    <xbl:binding id="fr-number" element="fr|number, xf|input:xxf-type('xs:decimal')" xxbl:mode="lhha binding value focus">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -57,11 +57,6 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/number/number.css"/>
         </xbl:resources>
-        <xbl:handlers>
-            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <xxf:script id="xf-sf">YAHOO.xbl.fr.Number.instance(this).setfocus();</xxf:script>
-            </xbl:handler>
-        </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>

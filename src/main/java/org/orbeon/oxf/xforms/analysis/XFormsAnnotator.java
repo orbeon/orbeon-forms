@@ -182,7 +182,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                 startPrefixMapping2("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 stackElement.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
-            } else if (("group".equals(localname) || "switch".equals(localname)) && doesParentRequireSeparatorAppearance()) {
+            } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
 
                 // Append the new xxf:separator appearance
@@ -193,7 +193,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 stackElement.startElement(uri, localname, qName, attributes);
             } else if (stackElement.isXForms() && "repeat".equals(localname)) {
                 // Add separator appearance
-                if (doesParentRequireSeparatorAppearance()) {
+                if (doesClosestXHTMLRequireSeparatorAppearance()) {
                     final String existingAppearance = attributes.getValue("appearance");
                     attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
                             (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());

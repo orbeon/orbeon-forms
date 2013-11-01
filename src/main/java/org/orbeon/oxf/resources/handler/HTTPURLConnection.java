@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.resources.handler;
 
+import org.apache.log4j.Logger;
 import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CookieStore;
@@ -22,12 +23,13 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -44,9 +46,8 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
+import org.orbeon.oxf.util.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,10 +61,13 @@ import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
 
+    private static Logger logger = LoggerFactory.createLogger(HTTPURLConnection.class);
+	
     public static String STALE_CHECKING_ENABLED_PROPERTY = "oxf.http.stale-checking-enabled";
     public static String SO_TIMEOUT_PROPERTY = "oxf.http.so-timeout";
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
+    public static String PROXY_EXCLUDE_PROPERTY = "oxf.http.proxy.exclude";
     public static String SSL_HOSTNAME_VERIFIER = "oxf.http.ssl.hostname-verifier";
     public static String SSL_KEYSTORE_URI = "oxf.http.ssl.keystore.uri";
     public static String SSL_KEYSTORE_PASSWORD = "oxf.http.ssl.keystore.password";
@@ -77,7 +81,24 @@ public class HTTPURLConnection extends URLConnection {
     private static ClientConnectionManager connectionManager;
     private static HttpParams httpParams;
     private static PreemptiveAuthHttpRequestInterceptor preemptiveAuthHttpRequestInterceptor = new PreemptiveAuthHttpRequestInterceptor();
+
     private static AuthState proxyAuthState = null;
+    private static HttpHost httpProxy = null;
+    private static String proxyExclude = null;
+
+    private final HttpRoutePlanner routePlanner = new HttpRoutePlanner() {
+
+        public HttpRoute determineRoute(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
+
+            if (proxyExclude == null || target == null || ! target.getHostName().matches(proxyExclude)) {
+                logger.debug((target == null ? "NULL" : target.getHostName()) + " does not match " + (proxyExclude == null ? "NULL" : proxyExclude) + " and will be proxied");
+                return new HttpRoute(target, null, httpProxy, "https".equalsIgnoreCase(target.getSchemeName()));
+            } else {
+                logger.debug((target == null ? "NULL" : target.getHostName()) + " does match " + (proxyExclude == null ? "NULL" : proxyExclude) + " and will be excluded from proxy");
+                return new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName()));
+            }
+        }
+    };
 
     static {
         try {
@@ -126,7 +147,8 @@ public class HTTPURLConnection extends URLConnection {
             final Integer proxyPort = propertySet.getInteger(PROXY_PORT_PROPERTY);
             if (proxyHost != null && proxyPort != null) {
                 final boolean useTLS = propertySet.getBoolean(PROXY_SSL_PROPERTY, false);
-                basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
+                httpProxy = new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http");
+                proxyExclude = propertySet.getString(PROXY_EXCLUDE_PROPERTY);
 
                 // Proxy authentication
                 final String proxyUsername = propertySet.getString(PROXY_USERNAME_PROPERTY);
@@ -200,6 +222,11 @@ public class HTTPURLConnection extends URLConnection {
             final DefaultHttpClient httpClient = new DefaultHttpClient(connectionManager, httpParams);
             final HttpContext httpContext = new BasicHttpContext();
 
+            // Assign route planner for dynamic exclusion of hostnames from proxying
+            if (httpProxy != null) {
+                httpClient.setRoutePlanner(routePlanner);
+            }
+            
             // Set cookie store, creating a new one if none was provided to us
             if (cookieStore == null) cookieStore = new BasicCookieStore();
             httpClient.setCookieStore(cookieStore);
@@ -387,8 +414,8 @@ public class HTTPURLConnection extends URLConnection {
     }
 
     public void setDomain(String domain) {
-		this.domain = domain.trim();
-	}
+        this.domain = domain.trim();
+    }
 
     public void setPreemptiveAuthentication(String preemptiveAuthentication) {
         this.preemptiveAuthentication = preemptiveAuthentication;

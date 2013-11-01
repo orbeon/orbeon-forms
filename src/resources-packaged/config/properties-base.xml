@@ -56,6 +56,7 @@
     <!--<property as="xs:integer" name="oxf.http.proxy.port"                             value="8090"/>-->
     <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.host"                        value=""/>-->
     <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.domain"                      value=""/>-->
+    <!--<property as="xs:string"  name="oxf.http.proxy.exclude"                          value=""/>-->
 
     <!-- HTTP response -->
     <property as="xs:boolean" name="oxf.http.exceptions"                             value="false"/>

@@ -511,13 +511,11 @@
                         <xf:var name="show-partial-search" value="
                             instance('fr-paging-instance')/(search-total != total)
                             and not(xxf:get-request-parameter('drafts-for-never-saved-document') = 'true')"/>
-                        <xf:group ref=".[$show-partial-search]" class="fr-summary-search-count">
-                            <xf:output value="$fr-resources/summary/search/returned-1"/>
-                            <xf:output value="instance('fr-paging-instance')/search-total"/>
-                            <xf:output value="$fr-resources/summary/paging/of"/>
-                            <xf:output value="instance('fr-paging-instance')/total"/>
-                            <xf:output value="$fr-resources/summary/search/returned-2"/>
-                        </xf:group>
+                        <xf:output
+                            ref=".[$show-partial-search]"
+                            class="fr-summary-search-count"
+                            value="xxf:format-message($fr-resources/summary/search/returned,
+                                                      for $ v in (instance('fr-paging-instance')/search-total, instance('fr-paging-instance')/total) return xs:integer($v))"/>
 
                         <xf:var name="show-created" value="xxf:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
                         <xf:var name="show-last-modified" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>

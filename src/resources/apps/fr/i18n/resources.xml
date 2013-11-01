@@ -80,8 +80,7 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Search forms</search-forms>
                 <show-options>Show search options</show-options>
                 <close-options>Close search options</close-options>
-                <returned-1>Search returned</returned-1>
-                <returned-2>documents.</returned-2>
+                <returned>Search returned {0,number,integer} of {1,number,integer} documents.</returned>
             </search>
             <paging>
                 <to>to</to>
@@ -355,8 +354,7 @@
                 <search-forms>Rechercher</search-forms>
                 <show-options>Montrer les options de recherche</show-options>
                 <close-options>Cacher les options de recherche</close-options>
-                <returned-1>La recherche a retourné</returned-1>
-                <returned-2>documents.</returned-2>
+                <returned>La recherche a retourné {0,number,integer} sur {1,number,integer} documents.</returned>
             </search>
             <paging>
                 <to>à</to>
@@ -622,8 +620,7 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Buscar formulario</search-forms>
                 <show-options>Mostrar opciones de búsqueda</show-options>
                 <close-options>Cerrar opciones de búsqueda</close-options>
-                <returned-1>Resultado de la búsqueda</returned-1>
-                <returned-2>documentos.</returned-2>
+                <returned>Resultado de la búsqueda {0,number,integer} de {1,number,integer} documentos.</returned>
             </search>
             <paging>
                 <to>al</to>
@@ -883,8 +880,7 @@
                 <search-forms>Søk etter skjema</search-forms>
                 <show-options>Vis alternativer for søk</show-options>
                 <close-options>Lukk alternativer for søk</close-options>
-                <returned-1>Søk fant</returned-1>
-                <returned-2>skjema.</returned-2>
+                <returned>Søk fant {0,number,integer} til {1,number,integer} skjema.</returned>
             </search>
             <paging>
                 <to>til</to>
@@ -1143,8 +1139,7 @@
                 <search-forms>Поиск формы</search-forms>
                 <show-options>Показать настройки поиска</show-options>
                 <close-options>Закрыть настройки поиска</close-options>
-                <returned-1>Найдено</returned-1>
-                <returned-2>документов.</returned-2>
+                <returned>Найдено {0,number,integer} из {1,number,integer} документов.</returned>
             </search>
             <paging>
                 <to>до</to>
@@ -1407,8 +1402,7 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Cerca moduli</search-forms>
                 <show-options>Mostra opzioni di ricerca</show-options>
                 <close-options>Chiudi opzioni di ricerca</close-options>
-                <returned-1>Risultato della ricerca</returned-1>
-                <returned-2>documenti.</returned-2>
+                <returned>Risultato della ricerca {0,number,integer} di {1,number,integer} documenti.</returned>
             </search>
             <paging>
                 <to>a</to>
@@ -1678,8 +1672,7 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Suche Formular</search-forms>
                 <show-options>Zeige Suchoptionen an</show-options>
                 <close-options>Schließe Suchoptionen</close-options>
-                <returned-1>Suchergebnisse</returned-1>
-                <returned-2>Dokumente.</returned-2>
+                <returned>Suchergebnisse {0,number,integer} von {1,number,integer} Dokumente.</returned>
             </search>
             <paging>
                 <to>bis</to>
@@ -1949,8 +1942,7 @@
                 <search-forms>Etsi lomakkeita</search-forms>
                 <show-options>Näytä hakuvaihtoehdot</show-options>
                 <close-options>Sulje hakuvaihtoehdot</close-options>
-                <returned-1>Etsintä palautetaan</returned-1>
-                <returned-2>Dokumentit</returned-2>
+                <returned>Etsintä palautetaan {0,number,integer} / {1,number,integer} Dokumentit.</returned>
             </search>
             <paging>
                 <to>-</to>

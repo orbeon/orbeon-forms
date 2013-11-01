@@ -668,6 +668,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
                                     <xf:label ref="$form-resources/htmlarea/label"/>
                                     <xf:hint ref="$form-resources/htmlarea/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:tinymce>
                             </xh:td>
                         </xh:tr>
@@ -687,12 +688,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:us-phone bind="us-phone-bind" id="us-phone-control">
                                     <xf:label ref="$form-resources/us-phone/label"/>
                                     <xf:hint ref="$form-resources/us-phone/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:us-phone>
                             </xh:td>
                             <xh:td>
                                 <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" class="fr-width-10em" suffix="m/s">
                                     <xf:label ref="$form-resources/number/label"/>
                                     <xf:hint ref="$form-resources/number/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:number>
                             </xh:td>
                         </xh:tr>
@@ -701,12 +704,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:currency bind="currency-bind" id="currency-control" class="fr-width-10em">
                                     <xf:label ref="$form-resources/currency/label"/>
                                     <xf:hint ref="$form-resources/currency/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:currency>
                             </xh:td>
                             <xh:td>
                                 <fr:us-state bind="us-state-bind" id="us-state-control" class="fr-width-10em">
                                     <xf:label ref="$form-resources/us-state/label"/>
                                     <xf:hint ref="$form-resources/us-state/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:us-state>
                             </xh:td>
                             <xh:td/>
@@ -741,18 +746,21 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
                                     <xf:label ref="$form-resources/dropdown-date/label"/>
                                     <xf:hint ref="$form-resources/dropdown-date/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:dropdown-date>
                             </xh:td>
                             <xh:td>
                                 <fr:fields-date bind="fields-date-bind" id="fields-date-control">
                                     <xf:label ref="$form-resources/fields-date/label"/>
                                     <xf:hint ref="$form-resources/fields-date/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:fields-date>
                             </xh:td>
                             <xh:td>
                                 <fr:date-picker bind="date-picker-bind" id="date-picker-control">
                                     <xf:label ref="$form-resources/date-picker/label"/>
                                     <xf:hint ref="$form-resources/date-picker/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:date-picker>
                             </xh:td>
                         </xh:tr>
@@ -812,6 +820,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" bind="multiple-list-bind" id="multiple-list-control">
                                     <xf:label ref="$form-resources/multiple-list/label"/>
                                     <xf:hint ref="$form-resources/multiple-list/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:itemset ref="$form-resources/multiple-list/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
@@ -830,6 +839,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:autocomplete bind="autocomplete-bind" labelref="@label" id="autocomplete-control" dynamic-itemset="true" max-results-displayed="5">
                                     <xf:label ref="$form-resources/autocomplete/label"/>
                                     <xf:hint ref="$form-resources/autocomplete/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:itemset ref="instance('autocomplete-itemset-instance')/country">
                                         <xf:label ref="name"/>
                                         <xf:value ref="us-code"/>
@@ -853,6 +863,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                                       bind="dynamic-data-dropdown-bind">
                                     <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
                                     <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:itemset ref="/*/country">
                                         <xf:label ref="name"/>
                                         <xf:value ref="us-code"/>
@@ -875,6 +886,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:image-attachment bind="image-attachment-bind" id="image-attachment-control" class="fr-attachment">
                                     <xf:label ref="$form-resources/image-attachment/label"/>
                                     <xf:hint ref="$form-resources/image-attachment/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:filename ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
@@ -886,6 +898,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:wpaint bind="image-annotation-bind" id="image-annotation-control" class="fr-attachment">
                                     <xf:label ref="$form-resources/image-annotation/label"/>
                                     <xf:hint ref="$form-resources/image-annotation/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:filename ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
@@ -895,6 +908,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">
                                     <xf:label ref="$form-resources/file-attachment/label"/>
                                     <xf:hint ref="$form-resources/file-attachment/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:filename ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>

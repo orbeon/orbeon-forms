@@ -233,8 +233,8 @@
 
                     <fr:grid columns="3">
                         <xf:group ref="$tab/file[not(normalize-space())]">
-                            <fr:tr>
-                                <fr:td colspan="3">
+                            <xh:tr>
+                                <xh:td colspan="3">
 
                                     <xf:upload ref=".">
                                         <xf:label>Select a file to import:</xf:label>
@@ -250,29 +250,29 @@
 
                                     </xf:upload>
 
-                                </fr:td>
-                            </fr:tr>
+                                </xh:td>
+                            </xh:tr>
                         </xf:group>
 
                         <xf:group ref="$tab/file[normalize-space()]">
-                            <fr:tr>
-                                <fr:td>
+                            <xh:tr>
+                                <xh:td>
                                     <xf:output ref="@filename">
                                         <xf:label>File name:</xf:label>
                                     </xf:output>
-                                </fr:td>
-                                <fr:td>
+                                </xh:td>
+                                <xh:td>
                                     <xf:output value="format-number(@size, '#,###')">
                                         <xf:label>Size:</xf:label>
                                     </xf:output>
-                                </fr:td>
-                            </fr:tr>
+                                </xh:td>
+                            </xh:tr>
                         </xf:group>
 
                         <xf:group ref=".[$validating]">
 
-                            <fr:tr>
-                                <fr:td>
+                            <xh:tr>
+                                <xh:td>
                                     <!-- Progress status -->
                                     <xf:group>
                                         <xf:label>Validating:</xf:label>
@@ -280,8 +280,8 @@
                                             <xh:div class="bar" style="width: {format-number(instance('fr-batch-stats')/progress, '###%')}"/>
                                         </xh:div>
                                     </xf:group>
-                                </fr:td>
-                                <fr:td>
+                                </xh:td>
+                                <xh:td>
                                     <xf:output value="for $ds in instance('fr-batch-stats')/eta return
                                                       if ($ds castable as xs:dayTimeDuration)
                                                         then for $d in xs:dayTimeDuration($ds) return
@@ -290,8 +290,8 @@
                                                         else '-'">
                                         <xf:label>ETA:</xf:label>
                                     </xf:output>
-                                </fr:td>
-                                <fr:td>
+                                </xh:td>
+                                <xh:td>
                                     <!-- Cancel validation -->
                                     <xf:trigger>
                                         <xf:label>Cancel</xf:label>
@@ -299,9 +299,9 @@
                                             xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
                                         </xf:action>
                                     </xf:trigger>
-                                </fr:td>
-                                <fr:td/>
-                            </fr:tr>
+                                </xh:td>
+                                <xh:td/>
+                            </xh:tr>
                         </xf:group>
 
                         <!-- Validation results when available -->
@@ -313,34 +313,34 @@
 
                             <!-- No invalid documents -->
                             <xf:group ref=".[not($some-invalid) and not($validation-canceled)]">
-                                <fr:tr>
-                                    <fr:td colspan="2">
+                                <xh:tr>
+                                    <xh:td colspan="2">
                                         <xh:span class="fb-import-success">
                                             <xf:output value="xxf:format-message(
                                                                 '{0,number,integer} {0,choice,1#document|1&lt;documents}  {0,choice,1#has|1&lt;have} been validated and will be imported.',
                                                                 xs:integer(processed)
                                                               )"/>
                                         </xh:span>
-                                    </fr:td>
-                                </fr:tr>
+                                    </xh:td>
+                                </xh:tr>
                             </xf:group>
                             <!-- Warn user if there is any invalid documents -->
                             <xf:group ref=".[$some-invalid and not($validation-canceled)]">
-                                <fr:tr>
-                                    <fr:td colspan="2">
+                                <xh:tr>
+                                    <xh:td colspan="2">
                                         <xh:span class="fb-import-warning">
                                             <xf:output value="xxf:format-message(
                                                                 'NOTE: {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid. Only valid documents will be imported.',
                                                                 for $n in ($invalid, processed) return xs:integer($n)
                                                               )"/>
                                         </xh:span>
-                                    </fr:td>
-                                </fr:tr>
+                                    </xh:td>
+                                </xh:tr>
                             </xf:group>
                             <!-- Case where validation was canceled -->
                             <xf:group ref=".[$validation-canceled]">
-                                <fr:tr>
-                                    <fr:td colspan="2">
+                                <xh:tr>
+                                    <xh:td colspan="2">
                                         <xh:span class="fb-import-warning">
                                             Validation was canceled.
                                         </xh:span>
@@ -356,8 +356,8 @@
                                                 <xf:load resource="import"/>
                                             </xf:action>
                                         </xf:trigger>
-                                    </fr:td>
-                                </fr:tr>
+                                    </xh:td>
+                                </xh:tr>
                             </xf:group>
                         </xf:group>
                     </fr:grid>
@@ -379,8 +379,8 @@
 
                             <xf:group ref=".[not($importing or $import-done)]">
                                 <xf:group ref=".[$existing gt 0]">
-                                    <fr:tr>
-                                        <fr:td>
+                                    <xh:tr>
+                                        <xh:td>
                                             <xf:output value="xxf:format-message(
                                                                 'There {0,choice,1#is|1&lt;are} {0,number,integer}
                                                                  existing {0,choice,1#document|1&lt;documents} in the database for form
@@ -388,10 +388,10 @@
                                                                 ($existing, $app, $form)
                                                               )"/>
                                             Please choose whether to add to existing data, or to delete existing data first.
-                                        </fr:td>
-                                    </fr:tr>
-                                    <fr:tr>
-                                        <fr:td>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
                                             <xf:trigger>
                                                 <xf:label>Add</xf:label>
                                                 <!-- Start import -->
@@ -402,27 +402,27 @@
                                                 <!-- Delete data first -->
                                                 <xf:send ev:event="DOMActivate" submission="fr-import-delete-data-submission"/>
                                             </xf:trigger>
-                                        </fr:td>
-                                    </fr:tr>
+                                        </xh:td>
+                                    </xh:tr>
                                 </xf:group>
                                 <xf:group ref=".[$existing le 0]">
-                                    <fr:tr>
-                                        <fr:td>
+                                    <xh:tr>
+                                        <xh:td>
                                             <xf:trigger>
                                                 <xf:label>Import</xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <xf:send submission="fr-import-import-submission"/>
                                                 </xf:action>
                                             </xf:trigger>
-                                        </fr:td>
-                                    </fr:tr>
+                                        </xh:td>
+                                    </xh:tr>
                                 </xf:group>
                             </xf:group>
 
                             <xf:group ref=".[$importing]">
 
-                                <fr:tr>
-                                    <fr:td>
+                                <xh:tr>
+                                    <xh:td>
                                         <xf:group>
                                             <xf:label>Importing:</xf:label>
                                             <xh:div class="progress progress-striped">
@@ -431,8 +431,8 @@
                                                                                                  else 0, '###%')}"/>
                                             </xh:div>
                                         </xf:group>
-                                    </fr:td>
-                                    <fr:td>
+                                    </xh:td>
+                                    <xh:td>
                                         <xf:output value="for $ds in instance('fr-batch-stats')/eta return
                                                           if ($ds castable as xs:dayTimeDuration)
                                                             then for $d in xs:dayTimeDuration($ds) return
@@ -441,8 +441,8 @@
                                                             else '-'">
                                             <xf:label>ETA:</xf:label>
                                         </xf:output>
-                                    </fr:td>
-                                    <fr:td>
+                                    </xh:td>
+                                    <xh:td>
                                         <!-- Cancel import -->
                                         <xf:trigger>
                                             <xf:label>Cancel</xf:label>
@@ -450,8 +450,8 @@
                                                 xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
                                             </xf:action>
                                         </xf:trigger>
-                                    </fr:td>
-                                </fr:tr>
+                                    </xh:td>
+                                </xh:tr>
                             </xf:group>
 
                             <!-- Import results when available -->
@@ -461,8 +461,8 @@
                                 <xf:var name="skipped" value="xs:integer(processed) - succeeded"/>
 
                                 <xf:group ref=".[not($import-canceled)]">
-                                    <fr:tr>
-                                        <fr:td colspan="2">
+                                    <xh:tr>
+                                        <xh:td colspan="2">
                                             <xh:span class="fb-import-success">
                                                 <xf:output value="xxf:format-message(
                                                                     'Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete.
@@ -470,13 +470,13 @@
                                                                     (xs:integer(succeeded), $skipped)
                                                                   )"/>
                                             </xh:span>
-                                        </fr:td>
-                                    </fr:tr>
+                                        </xh:td>
+                                    </xh:tr>
                                 </xf:group>
                                 <!-- Case where validation was canceled -->
                                 <xf:group ref=".[$import-canceled]">
-                                    <fr:tr>
-                                        <fr:td colspan="2">
+                                    <xh:tr>
+                                        <xh:td colspan="2">
                                             <xh:span class="fb-import-warning">
                                                 Import was canceled.
                                             </xh:span>
@@ -492,8 +492,8 @@
                                                     <xf:load resource="import"/>
                                                 </xf:action>
                                             </xf:trigger>
-                                        </fr:td>
-                                    </fr:tr>
+                                        </xh:td>
+                                    </xh:tr>
                                 </xf:group>
 
                             </xf:group>

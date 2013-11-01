@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.resources.handler;
 
+import org.apache.log4j.Logger;
 import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CookieStore;
@@ -28,6 +29,8 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -44,6 +47,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
+import org.orbeon.oxf.util.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -59,10 +63,13 @@ import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
 
+    static private Logger logger = LoggerFactory.createLogger(HTTPURLConnection.class);
+	
     public static String STALE_CHECKING_ENABLED_PROPERTY = "oxf.http.stale-checking-enabled";
     public static String SO_TIMEOUT_PROPERTY = "oxf.http.so-timeout";
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
+    public static String PROXY_EXCLUDED_PROPERTY = "oxf.http.proxy.excluded";
     public static String SSL_HOSTNAME_VERIFIER = "oxf.http.ssl.hostname-verifier";
     public static String SSL_KEYSTORE_URI = "oxf.http.ssl.keystore.uri";
     public static String SSL_KEYSTORE_PASSWORD = "oxf.http.ssl.keystore.password";
@@ -77,6 +84,23 @@ public class HTTPURLConnection extends URLConnection {
     private static HttpParams httpParams;
     private static PreemptiveAuthHttpRequestInterceptor preemptiveAuthHttpRequestInterceptor = new PreemptiveAuthHttpRequestInterceptor();
     private static AuthState proxyAuthState = null;
+    private static HttpHost httpProxy = null;
+    private static String proxyExcluded = null; 
+
+    HttpRoutePlanner routePlanner = new HttpRoutePlanner() {
+
+      public HttpRoute determineRoute(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
+          
+           if (proxyExcluded == null || target == null || !target.getHostName().matches(proxyExcluded)) {
+              logger.debug((target == null ? "NULL" : target.getHostName()) + " does not match " + (proxyExcluded == null ? "NULL" : proxyExcluded) + " and will be proxied");
+              return new HttpRoute(target, null, httpProxy, "https".equalsIgnoreCase(target.getSchemeName()));
+            } else {
+              logger.debug((target == null ? "NULL" : target.getHostName()) + " does match " + (proxyExcluded == null ? "NULL" : proxyExcluded) + " and will be excluded from proxy");
+              return new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName()));            
+            } 
+      }
+
+    };
 
     static {
         final BasicHttpParams basicHttpParams = new BasicHttpParams();
@@ -131,7 +155,8 @@ public class HTTPURLConnection extends URLConnection {
         final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
         if (proxyHost != null && proxyPort != null) {
             final boolean useTLS = Properties.instance().getPropertySet().getBoolean(PROXY_SSL_PROPERTY, false);
-            basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
+      	    httpProxy = new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http");
+            proxyExcluded = Properties.instance().getPropertySet().getString(PROXY_EXCLUDED_PROPERTY);
 
             // Proxy authentication
             final String proxyUsername = Properties.instance().getPropertySet().getString(PROXY_USERNAME_PROPERTY);
@@ -202,6 +227,11 @@ public class HTTPURLConnection extends URLConnection {
             final DefaultHttpClient httpClient = new DefaultHttpClient(connectionManager, httpParams);
             final HttpContext httpContext = new BasicHttpContext();
 
+            //Assign route planner for dynamic exclusion of hostnames from proxing
+            if (httpProxy != null) {
+                httpClient.setRoutePlanner(routePlanner);
+            }
+            
             // Set cookie store, creating a new one if none was provided to us
             if (cookieStore == null) cookieStore = new BasicCookieStore();
             httpClient.setCookieStore(cookieStore);

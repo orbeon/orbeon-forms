@@ -30,6 +30,7 @@ abstract class XFormsAnnotatorBase(templateReceiver: XMLReceiver, extractorRecei
     def isInPreserve: Boolean
 
     // Name of container elements that require the use of separators for handling visibility
+    // Q: no "td"?
     private val SeparatorAppearanceElements = Set(
         "table",
         "tbody",
@@ -65,6 +66,9 @@ abstract class XFormsAnnotatorBase(templateReceiver: XMLReceiver, extractorRecei
             startElement2(uri, localname, qName, atts)
             endElement2(uri, localname, qName)
         }
+        
+        def ancestors =
+            Iterator.iterate(parent.orNull)(_.parent.orNull) takeWhile (_ ne null)
     }
 
     private var stack: List[StackElement] = Nil
@@ -91,9 +95,9 @@ abstract class XFormsAnnotatorBase(templateReceiver: XMLReceiver, extractorRecei
         stack = stack.tail
         stackElement
     }
-    
-    def doesParentRequireSeparatorAppearance =
-        currentStackElement.parent exists (p ⇒ p.isXHTML && SeparatorAppearanceElements(p.localname))
+
+    def doesClosestXHTMLRequireSeparatorAppearance =
+        currentStackElement.ancestors find (_.isXHTML) exists (p ⇒ SeparatorAppearanceElements(p.localname))
 
     override def setDocumentLocator(locator: Locator): Unit = {
         this._documentLocator = locator

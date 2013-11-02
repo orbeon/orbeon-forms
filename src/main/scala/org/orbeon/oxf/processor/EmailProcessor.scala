@@ -53,8 +53,8 @@ import org.xml.sax._
  * o build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
  */
 class EmailProcessor extends ProcessorImpl {
-    
-    
+
+
     addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA, ConfigNamespaceURI))
 
     override def start(pipelineContext: PipelineContext) {
@@ -63,7 +63,7 @@ class EmailProcessor extends ProcessorImpl {
         val messageElement = dataDocument.getRootElement
 
         // Get system id (will likely be null if document is generated dynamically)
-        val dataInputSystemId = messageElement.getData.asInstanceOf[LocationData].getSystemID
+        val dataInputSystemId = Option(messageElement.getData) map (_.asInstanceOf[LocationData].getSystemID) orNull
 
         implicit val propertySet = getPropertySet
 

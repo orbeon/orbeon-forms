@@ -23,7 +23,7 @@
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then xxf:instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="all">
     </xf:submission>
 
@@ -34,7 +34,7 @@
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then xxf:instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="none"/>
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
@@ -57,6 +57,6 @@
     <xf:setvalue
         event="xforms-submit-done xforms-submit-error"
         observer="fr-send-submission-all fr-send-submission-none"
-        ref="$persistence-instance/data-safe-override"/>
+        ref="xxf:instance('fr-persistence-instance')/data-safe-override"/>
 
 </xf:model>

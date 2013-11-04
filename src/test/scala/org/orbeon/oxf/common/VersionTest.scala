@@ -32,13 +32,13 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         if (Version.isPE) {
             assertEquals("PE", Version.Edition)
             assertTrue(Version.isPE)
-            assertFalse(Version.instance.isPEFeatureEnabled(false, "foobar"))
-            assertTrue(Version.instance.isPEFeatureEnabled(true, "foobar"))
+            assertFalse(Version.instance.isPEFeatureEnabled(featureRequested = false, "foobar"))
+            assertTrue(Version.instance.isPEFeatureEnabled(featureRequested = true, "foobar"))
         } else {
             assertEquals("CE", Version.Edition)
             assertFalse(Version.isPE)
-            assertFalse(Version.instance.isPEFeatureEnabled(false, "foobar"))
-            assertFalse(Version.instance.isPEFeatureEnabled(true, "foobar"))
+            assertFalse(Version.instance.isPEFeatureEnabled(featureRequested = false, "foobar"))
+            assertFalse(Version.instance.isPEFeatureEnabled(featureRequested = true, "foobar"))
         }
     }
 
@@ -84,7 +84,7 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         // Make sure the current build has a timestamp
         assert(PEVersion.dateFromVersionNumber(Version.VersionNumber).isDefined)
 
-        val TimeStamp = Some(1359356400000L)
+        val TimeStamp = Some(DateUtils.parseISODateOrDateTime("2013-01-28"))
 
         val expected = Seq(
             "201301281947"                → TimeStamp,
@@ -97,7 +97,7 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         )
 
         expected foreach { case (in, out) ⇒
-            (assert(out === PEVersion.dateFromVersionNumber(in)))
+            assert(out === PEVersion.dateFromVersionNumber(in))
         }
     }
 

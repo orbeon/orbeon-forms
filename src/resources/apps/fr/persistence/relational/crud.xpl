@@ -84,7 +84,7 @@
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
-        <p:output name="data" id="request-description" debug="request-description"/>
+        <p:output name="data" id="request-description"/>
     </p:processor>
 
     <p:processor name="oxf:null-serializer">

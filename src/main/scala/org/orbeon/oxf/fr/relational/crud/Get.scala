@@ -14,10 +14,12 @@
 package org.orbeon.oxf.fr.relational.crud
 
 import org.orbeon.oxf.fr.relational.RelationalUtils
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
+import org.orbeon.scaxon.XML._
 
-trait Get extends RequestResponse with Common {
+trait Get extends RequestResponse with Common with FormRunnerPersistence {
 
     def get(): Unit = {
         RelationalUtils.withConnection { connection ⇒
@@ -59,6 +61,21 @@ trait Get extends RequestResponse with Common {
             }
 
             if (resultSet.next()) {
+
+                // Set Orbeon-Operations header
+                if (req.forData) {
+                    val metadata    = readFormMetadata(req.app, req.form).ensuring(_.isDefined, "can't find form metadata for data").get
+                    val permissions = (metadata / "forms" / "form" / "permissions").headOption
+                    val operations  = permissions match {
+                        case None                ⇒ Seq("create", "read", "update", "delete")
+                        case Some(permissionsEl) ⇒
+                            val dataUsername  = resultSet.getString("username")
+                            val dataGroupname = resultSet.getString("groupname")
+                            FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname)
+                    }
+                    httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))
+                }
+
                 val xml = resultSet.getClob("xml")
                 val response = NetUtils.getExternalContext.getResponse
                 NetUtils.copyStream(xml.getCharacterStream, response.getWriter)

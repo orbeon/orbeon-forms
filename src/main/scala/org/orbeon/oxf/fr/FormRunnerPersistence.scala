@@ -29,7 +29,8 @@ trait FormRunnerPersistence {
 
     import FormRunner._
 
-    val PersistenceBasePath                = "/fr/service/persistence/crud"
+    val CRUDBasePath                       = "/fr/service/persistence/crud"
+    val FormMetadataBasePath               = "/fr/service/persistence/form"
     val PersistencePropertyPrefix          = "oxf.fr.persistence"
     val PersistenceProviderPropertyPrefix  = PersistencePropertyPrefix + ".provider"
 
@@ -45,13 +46,14 @@ trait FormRunnerPersistence {
     def isUploadedFileURL(value: String): Boolean =
         value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
-    // Base path for form data
     def createFormDataBasePath(app: String, form: String, isDraft: Boolean, document: String): String =
-        PersistenceBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
+        CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
 
-    // Base path for form definition
     def createFormDefinitionBasePath(app: String, form: String) =
-        PersistenceBasePath :: app :: form :: "form" :: "" :: Nil mkString "/"
+        CRUDBasePath :: app :: form :: "form" :: "" :: Nil mkString "/"
+
+    def createFormMetadataPath(app: String, form: String) =
+        FormMetadataBasePath :: app :: form :: Nil mkString "/"
 
     // Whether the given path is an attachment path (ignoring an optional query string)
     def isAttachmentURLFor(basePath: String, url: String) =
@@ -125,9 +127,8 @@ trait FormRunnerPersistence {
         TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, headersXML, false, false)
     }
 
-    // Retrieves a form from the persistence layer
-    def readPublishedForm(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
-        val uri = createFormDefinitionBasePath(appName, formName) + "form.xhtml"
+    // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
+    def readDocument(uri: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
         val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
         val url = URLFactory.createURL(urlString)
 
@@ -143,6 +144,14 @@ trait FormRunnerPersistence {
                 TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, true, false)
             }
     }
+
+    // Retrieves a form definition from the persistence layer
+    def readPublishedForm(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] =
+        readDocument(createFormDefinitionBasePath(appName, formName) + "form.xhtml")
+
+    // Retrieves the metadata for a form from the persistence layer
+    def readFormMetadata(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] =
+        readDocument(createFormMetadataPath(appName, formName))
 
     // Whether the form data is valid as per the error summary
     // We use instance('fr-error-summary-instance')/valid and not xxf:valid() because the instance validity may not be

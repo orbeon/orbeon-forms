@@ -25,10 +25,12 @@ import org.scalatest.junit.AssertionsForJUnit
 import util.Try
 import ScalaUtils._
 import org.orbeon.oxf.fr.relational.{Specific, Next, Latest, Version}
+import scala.xml.Elem
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
     val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql"
+    val AllOperations = Some("create read update delete")
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     def withOrbeonTables[T](block: java.sql.Connection ⇒ T) {
@@ -76,83 +78,119 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         code
     }
 
-    private def httpGet(url: String, version: Version): (Integer, Try[Document]) =
+    private def httpGet(url: String, version: Version): (Integer, Map[String, Seq[String]], Try[Document]) =
         useAndClose(http(url, "GET", version, None)) { connectionResult ⇒
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                (connectionResult.statusCode, Try(Dom4jUtils.readDom4j(inputStream)))
+                val statusCode = connectionResult.statusCode
+                val headers = connectionResult.responseHeaders.toMap
+                val body = Try(Dom4jUtils.readDom4j(inputStream))
+                (statusCode, headers, body)
             }
         }
 
     sealed trait Expected
-    case   class ExpectedDoc (doc: Document) extends Expected
+    case   class ExpectedDoc (doc:  Elem, operations: Option[String]) extends Expected
     case   class ExpectedCode(code: Integer) extends Expected
 
     private def assertGet(url: String, version: Version, expected: Expected): Unit = {
-        val (resultCode, resultDoc) = httpGet(url, version)
+        val (resultCode, headers, resultDoc) = httpGet(url, version)
         expected match {
-            case ExpectedDoc(expectedDoc) ⇒
+            case ExpectedDoc(expectedDoc, expectedOperations) ⇒
                 assert(resultCode === 200)
                 assertXMLDocuments(resultDoc.get, expectedDoc)
+                val resultOperations = headers.get("orbeon-operations").map(_.head)
+                assert(expectedOperations === resultOperations)
             case ExpectedCode(expectedCode) ⇒
                 assert(resultCode === expectedCode)
         }
     }
 
-    private def assertPut(url: String, version: Version, body: Document, expectedCode: Integer): Unit = {
+    private def assertPut(url: String, version: Version, body: Elem, expectedCode: Integer): Unit = {
         val actualCode = httpPut(url, version, body)
         assert(actualCode === expectedCode)
     }
 
+    private def formDefinitonWithPermissions(permissions: Option[Elem]): Elem =
+        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+            <xh:head>
+                <xf:model id="fr-form-model">
+                    <xf:instance id="fr-form-metadata">
+                        <metadata>
+                            { permissions }
+                        </metadata>
+                    </xf:instance>
+                </xf:model>
+            </xh:head>
+        </xh:html>
+
+    /**
+     * Test new form versioning introduced in 4.5, for form definitions.
+     */
     @Test def formDefinitionVersionTest(): Unit = {
         withOrbeonTables { connection =>
             val FormURL = "/crud-ng/acme/address/form/form.xml"
 
             // First time we put with "latest"
-            val first: Document = <gaga1/>
+            val first = <gaga1/>
             assertPut(FormURL, Latest, first, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc (first))
-            assertGet(FormURL, Latest     , ExpectedDoc (first))
+            assertGet(FormURL, Specific(1), ExpectedDoc (first, None))
+            assertGet(FormURL, Latest     , ExpectedDoc (first, None))
             assertGet(FormURL, Specific(2), ExpectedCode(404))
 
             // Put again with "latest" updates the current version
-            val second: Document = <gaga2/>
+            val second = <gaga2/>
             assertPut(FormURL, Latest, second, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(second))
-            assertGet(FormURL, Latest     , ExpectedDoc(second))
+            assertGet(FormURL, Specific(1), ExpectedDoc(second, None))
+            assertGet(FormURL, Latest     , ExpectedDoc(second, None))
             assertGet(FormURL, Specific(2), ExpectedCode(404))
 
             // Put with "next" to get two versions
-            val third: Document = <gaga3/>
+            val third = <gaga3/>
             assertPut(FormURL, Next, third, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(second))
-            assertGet(FormURL, Specific(2), ExpectedDoc(third))
-            assertGet(FormURL, Latest     , ExpectedDoc(third))
+            assertGet(FormURL, Specific(1), ExpectedDoc(second, None))
+            assertGet(FormURL, Specific(2), ExpectedDoc(third,  None))
+            assertGet(FormURL, Latest     , ExpectedDoc(third,  None))
             assertGet(FormURL, Specific(3), ExpectedCode(404))
 
             // Put a specific version
-            val fourth: Document = <gaga4/>
+            val fourth = <gaga4/>
             assertPut(FormURL, Specific(1), fourth, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(fourth))
-            assertGet(FormURL, Specific(2), ExpectedDoc(third))
-            assertGet(FormURL, Latest     , ExpectedDoc(third))
+            assertGet(FormURL, Specific(1), ExpectedDoc(fourth, None))
+            assertGet(FormURL, Specific(2), ExpectedDoc(third,  None))
+            assertGet(FormURL, Latest     , ExpectedDoc(third,  None))
             assertGet(FormURL, Specific(3), ExpectedCode(404))
         }
     }
 
+    /**
+     * Test new form versioning introduced in 4.5, for form data.
+     */
     @Test def formDataVersionTest(): Unit = {
         withOrbeonTables { connection =>
             val DataURL = "/crud-ng/acme/address/data/123/data.xml"
 
             // Storing for specific form version
-            val first: Document = <gaga1/>
+            val first = <gaga1/>
             assertPut(DataURL, Specific(1), first, 201)
-            assertGet(DataURL, Specific(1), ExpectedDoc(first))
-            assertGet(DataURL, Latest     , ExpectedDoc(first))
+            assertGet(DataURL, Specific(1), ExpectedDoc(first, AllOperations))
+            assertGet(DataURL, Latest     , ExpectedDoc(first, AllOperations))
 
             // Version must be specified when storing data
             assertPut(DataURL, Latest            , first, 400)
             assertPut(DataURL, Next              , first, 400)
             assertPut(DataURL, ForDocument("123"), first, 400)
+        }
+    }
+
+    /**
+     *
+     */
+    @Test def orbeonOperationsHeaderTest(): Unit = {
+        withOrbeonTables { connection =>
+            val FormURL = "/crud-ng/acme/address/form/form.xml"
+            val DataURL = "/crud-ng/acme/address/data/123/data.xml"
+
+            assertPut(FormURL, Latest, formDefinitonWithPermissions(None), 201)
         }
     }
 }

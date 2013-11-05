@@ -16,8 +16,11 @@ package org.orbeon.oxf.fr.relational.crud
 import java.sql.Connection
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.fr.relational.{ForDocument, Specific, Next, Latest}
+import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 
 trait Common extends RequestResponse {
+
+    implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[CRUD]), "")
 
     def latestNonDeletedFormVersion(connection: Connection, app: String, form: String): Option[Int] = {
         val maxVersion = {

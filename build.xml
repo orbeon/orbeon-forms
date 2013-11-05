@@ -590,6 +590,9 @@
                 <include name="commons-fileupload-*.jar"/>
                 <include name="commons-lang3-*.jar"/>
                 <include name="log4j-*.jar"/>
+                <include name="httpclient-4.2.3.jar"/>
+                <include name="httpcore-4.2.2.jar"/>
+                <include name="httpmime-4.2.3.jar"/>
             </lib>
         </war>
     </target>

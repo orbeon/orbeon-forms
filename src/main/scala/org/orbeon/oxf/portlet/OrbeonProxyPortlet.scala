@@ -17,9 +17,14 @@ import collection.JavaConverters._
 import collection.breakOut
 import com.liferay.portal.util.PortalUtil
 import java.io._
-import java.net.{HttpURLConnection, URL}
-import java.util.{Enumeration ⇒ JEnumeration}
+import java.net.{URI, HttpURLConnection, URL}
+import java.{util ⇒ ju}
 import javax.portlet._
+import org.apache.http.client.CookieStore
+import org.apache.http.cookie.CookieOrigin
+import org.apache.http.impl.client.BasicCookieStore
+import org.apache.http.impl.cookie.BrowserCompatSpec
+import org.apache.http.message.BasicHeader
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.portlet.liferay.LiferaySupport
 import org.orbeon.oxf.util.Headers._
@@ -85,8 +90,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             def headerPairs =
                 for {
                     servletRequest ← findServletRequest(request).toList
-                    name           ← servletRequest.getHeaderNames.asInstanceOf[JEnumeration[String]].asScala
-                    values         = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].asScala.toList
+                    name           ← servletRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala
+                    values         = servletRequest.getHeaders(name).asInstanceOf[ju.Enumeration[String]].asScala.toList
                 } yield
                     name → values
 
@@ -281,7 +286,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         }
 
         propagateRequestHeaders(requestDetails.headers, connection)
-        setRequestRemoteSessionIdAndHeaders(requestDetails.session, connection)
+        setRequestRemoteSessionIdAndHeaders(requestDetails.session, connection, newURL)
 
         connection.connect()
         try {
@@ -297,7 +302,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 }
             }
 
-            handleResponseRemoteSessionId(requestDetails.session, connection)
+            CookieManager.processResponseSetCookieHeaders(requestDetails.session, connection, newURL)
 
             connection
         } catch{
@@ -322,7 +327,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             NetUtils.copyStream(is, response.getPortletOutputStream)
         }
 
-    private val REMOTE_SESSION_ID_KEY = "org.orbeon.oxf.xforms.portlet.remote-session-id"
+    private val RemoteSessionIdKey = "org.orbeon.oxf.xforms.portlet.remote-session-id"
 
     // Propagate useful headers from Form Runner to the client
     private def propagateResponseHeaders(connection: HttpURLConnection, response: MimeResponse): Unit =
@@ -337,30 +342,69 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         for ((name, value) ← headers)
             connection.addRequestProperty(name, value)
 
-    // If we know about the remote session id, set it on the connection to Form Runner
-    private def setRequestRemoteSessionIdAndHeaders(session: PortletSession, connection: HttpURLConnection): Unit = {
+    private def setRequestRemoteSessionIdAndHeaders(session: PortletSession, connection: HttpURLConnection, url: String): Unit = {
         // Tell Orbeon Forms explicitly that we are in fact in a portlet environment. This causes the server to use
         // WSRP URL rewriting for the resulting HTML and CSS.
         connection.addRequestProperty("Orbeon-Client", "portlet")
-        // Set session cookie
-        session.getAttribute(REMOTE_SESSION_ID_KEY) match {
-            case remoteSessionCookie: String ⇒ connection.setRequestProperty("Cookie", remoteSessionCookie)
-            case _ ⇒
-        }
+        // Set Cookie header
+        CookieManager.processRequestCookieHeaders(session, connection, url)
     }
 
-    // If Form Runner sets a remote session id, remember it
-    private def handleResponseRemoteSessionId(session: PortletSession, connection: HttpURLConnection): Unit =
-        // Set session cookie
-        connection.getHeaderField("Set-Cookie") match {
-            case setCookieHeader: String if setCookieHeader contains "JSESSIONID" ⇒
-                setCookieHeader split ';' find (_ contains "JSESSIONID") match {
-                    case Some(remoteSessionCookie) ⇒
-                        session.setAttribute(REMOTE_SESSION_ID_KEY, remoteSessionCookie.trim)
-                    case _ ⇒
-                }
-            case _ ⇒
+    // Simple cookie manager using HttpClient classes
+    // It doesn't look like we can use the built-in Java classes, which only seem to allow for a "system wide" cookie
+    // manager, and which has non-serializable classes.
+    // See https://github.com/orbeon/orbeon-forms/issues/1412
+    private object CookieManager {
+
+        def processRequestCookieHeaders(session: PortletSession, connection: HttpURLConnection, url: String): Unit = {
+
+            val cookieSpec   = new BrowserCompatSpec // because not thread-safe
+            val cookieOrigin = getCookieOrigin(url)
+            val cookieStore  = getCookieStore(session)
+
+            cookieStore.clearExpired(new ju.Date)
+
+            val relevantCookies =
+                for {
+                    cookie ← cookieStore.getCookies.asScala.toList
+                    if cookieSpec.`match`(cookie, cookieOrigin)
+                } yield
+                    cookie
+
+            if (relevantCookies.nonEmpty)
+                for (header ← cookieSpec.formatCookies(relevantCookies.asJava).asScala)
+                    connection.setRequestProperty(header.getName, header.getValue)
         }
+
+        def processResponseSetCookieHeaders(session: PortletSession, connection: HttpURLConnection, url: String): Unit = {
+
+            val cookieSpec   = new BrowserCompatSpec // because not thread-safe
+            val cookieOrigin = getCookieOrigin(url)
+            val cookieStore  = getCookieStore(session)
+
+            for {
+                (name, values) ← connection.getHeaderFields.asScala.toList
+                if (name ne null) && name.toLowerCase == "set-cookie" // Yes, name can be null! Crazy.
+                value          ← values.asScala
+                cookie         ← cookieSpec.parse(new BasicHeader(name, value), cookieOrigin).asScala
+            } locally {
+                cookieStore.addCookie(cookie)
+            }
+        }
+
+        def getCookieOrigin(url: String) = {
+            val uri = new URI(url)
+            new CookieOrigin(uri.getHost, uri.getPort, uri.getPath, uri.getScheme == "https")
+        }
+
+        def getCookieStore(session: PortletSession) = {
+            Option(session.getAttribute(RemoteSessionIdKey).asInstanceOf[CookieStore]) getOrElse {
+                val newCookieStore = new BasicCookieStore
+                session.setAttribute(RemoteSessionIdKey, newCookieStore)
+                newCookieStore
+            }
+        }
+    }
 
     private def buildFormRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
         NetUtils.appendQueryString("/fr/" + app + "/" + form + "/" + action + (documentId map ("/" +) getOrElse ""), query getOrElse "")

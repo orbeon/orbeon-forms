@@ -127,18 +127,18 @@ public class HTTPURLConnection extends URLConnection {
         connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);
 
         // Set proxy if defined in properties
-        final String proxyHost = Properties.instance().getPropertySet().getString(PROXY_HOST_PROPERTY);
-        final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
+        final String proxyHost = propertySet.getString(PROXY_HOST_PROPERTY);
+        final Integer proxyPort = propertySet.getInteger(PROXY_PORT_PROPERTY);
         if (proxyHost != null && proxyPort != null) {
-            final boolean useTLS = Properties.instance().getPropertySet().getBoolean(PROXY_SSL_PROPERTY, false);
+            final boolean useTLS = propertySet.getBoolean(PROXY_SSL_PROPERTY, false);
             basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
 
             // Proxy authentication
-            final String proxyUsername = Properties.instance().getPropertySet().getString(PROXY_USERNAME_PROPERTY);
-            final String proxyPassword = Properties.instance().getPropertySet().getString(PROXY_PASSWORD_PROPERTY);
+            final String proxyUsername = propertySet.getString(PROXY_USERNAME_PROPERTY);
+            final String proxyPassword = propertySet.getString(PROXY_PASSWORD_PROPERTY);
             if (proxyUsername != null && proxyPassword != null) {
-                final String ntlmHost = Properties.instance().getPropertySet().getString(PROXY_NTLM_HOST_PROPERTY);
-                final String ntlmDomain = Properties.instance().getPropertySet().getString(PROXY_NTLM_DOMAIN_PROPERTY);
+                final String ntlmHost = propertySet.getString(PROXY_NTLM_HOST_PROPERTY);
+                final String ntlmDomain = propertySet.getString(PROXY_NTLM_DOMAIN_PROPERTY);
                 final Credentials proxyCredentials = ntlmHost != null && ntlmDomain != null
                         ? new NTCredentials(proxyUsername, proxyPassword,ntlmHost,ntlmDomain)
                         : new UsernamePasswordCredentials(proxyUsername, proxyPassword);

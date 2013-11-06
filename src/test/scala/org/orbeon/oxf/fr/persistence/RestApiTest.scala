@@ -192,18 +192,25 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val DataURL = "/crud/acme/address/data/123/data.xml"
             val data    = <data/>
 
+            def assertPutFormWithOperations(operations: String): Unit =
+                assertPut(FormURL, Latest, formDefinitionWithPermissions(Some(
+                    <permissions>
+                        <permission operations={operations}/>
+                    </permissions>
+                )), 201)
+
             // Anonymous: no permission defined
             assertPut(FormURL, Latest, formDefinitionWithPermissions(None), 201)
             assertPut(DataURL, Specific(1), data, 201)
             assertGet(DataURL, Latest, ExpectedDoc(data, AllOperations))
 
             // Anonymous: create and read
-            assertPut(FormURL, Latest, formDefinitionWithPermissions(Some(
-                <permissions>
-                    <permission operations="read create"/>
-                </permissions>
-            )), 201)
+            assertPutFormWithOperations("read create")
             assertGet(DataURL, Latest, ExpectedDoc(data, Set("create", "read")))
+
+            // Anonymous: just create, then can't read data
+            assertPutFormWithOperations("create")
+            assertGet(DataURL, Latest, ExpectedCode(403))
         }
     }
 }

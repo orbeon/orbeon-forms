@@ -73,6 +73,8 @@ trait Get extends RequestResponse with Common with FormRunnerPersistence {
                             val dataGroupname = resultSet.getString("groupname")
                             FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname)
                     }
+                    if (! operations.contains("read"))
+                        throw new HttpStatusCodeException(403)
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))
                 }
 

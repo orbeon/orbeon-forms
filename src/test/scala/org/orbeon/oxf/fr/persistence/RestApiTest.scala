@@ -29,7 +29,7 @@ import scala.xml.Elem
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
-    val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql"
+    val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql-ng"
     val AllOperations = Some("create read update delete")
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
@@ -55,7 +55,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     private def http(url: String, method: String, version: Version, body: Option[Document]): ConnectionResult = {
         val documentUrl = URLFactory.createURL(MySQLBase + url)
         val headers = {
-            val dataSourceHeader  = Some("Orbeon-Datasource" → Array("mysql_test"))
+            val dataSourceHeader  = Some("Orbeon-Datasource" → Array("mysql_tomcat"))
             val contentTypeHeader = body map (_ ⇒ "Content-Type" → Array("application/xml"))
             val versionHeader =  version match {
                 case Latest                  ⇒ None
@@ -110,13 +110,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         assert(actualCode === expectedCode)
     }
 
-    private def formDefinitonWithPermissions(permissions: Option[Elem]): Elem =
+    private def formDefinitionWithPermissions(permissions: Option[Elem]): Elem =
         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
             <xh:head>
                 <xf:model id="fr-form-model">
                     <xf:instance id="fr-form-metadata">
                         <metadata>
-                            { permissions }
+                            { permissions.getOrElse("") }
                         </metadata>
                     </xf:instance>
                 </xf:model>
@@ -128,7 +128,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
      */
     @Test def formDefinitionVersionTest(): Unit = {
         withOrbeonTables { connection =>
-            val FormURL = "/crud-ng/acme/address/form/form.xml"
+            val FormURL = "/crud/acme/address/form/form.xml"
 
             // First time we put with "latest"
             val first = <gaga1/>
@@ -167,7 +167,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
      */
     @Test def formDataVersionTest(): Unit = {
         withOrbeonTables { connection =>
-            val DataURL = "/crud-ng/acme/address/data/123/data.xml"
+            val DataURL = "/crud/acme/address/data/123/data.xml"
 
             // Storing for specific form version
             val first = <gaga1/>
@@ -187,10 +187,22 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
      */
     @Test def orbeonOperationsHeaderTest(): Unit = {
         withOrbeonTables { connection =>
-            val FormURL = "/crud-ng/acme/address/form/form.xml"
-            val DataURL = "/crud-ng/acme/address/data/123/data.xml"
+            val FormURL = "/crud/acme/address/form/form.xml"
+            val DataURL = "/crud/acme/address/data/123/data.xml"
+            val data    = <data/>
 
-            assertPut(FormURL, Latest, formDefinitonWithPermissions(None), 201)
+            // Anonymous: no permission defined
+            assertPut(FormURL, Latest, formDefinitionWithPermissions(None), 201)
+            assertPut(DataURL, Specific(1), data, 201)
+            assertGet(DataURL, Latest, ExpectedDoc(data, AllOperations))
+
+            // Anonymous: create and read
+            assertPut(FormURL, Latest, formDefinitionWithPermissions(Some(
+                <permissions>
+                    <permission operations="read create"/>
+                </permissions>
+            )), 201)
+            //assertGet(DataURL, Latest, ExpectedDoc(data, Some("create read")))
         }
     }
 }

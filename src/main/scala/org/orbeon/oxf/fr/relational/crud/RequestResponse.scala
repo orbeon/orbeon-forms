@@ -41,8 +41,8 @@ trait RequestResponse {
     def requestUsername : Option[String] = headerValue("orbeon-username")
     def requestGroupname: Option[String] = headerValue("orbeon-groupname")
 
-    val CrudFormPath = "/fr/service/([^/]+)/crud-ng/([^/]+)/([^/]+)/form/([^/]+)".r
-    val CrudDataPath = "/fr/service/([^/]+)/crud-ng/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
+    val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
+    val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
     def request: Request = {
 
         val version = {

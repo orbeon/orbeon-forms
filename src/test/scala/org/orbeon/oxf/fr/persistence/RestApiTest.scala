@@ -52,64 +52,71 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         }
     }
 
-    private def http(url: String, method: String, version: Version, body: Option[Document]): ConnectionResult = {
-        val documentUrl = URLFactory.createURL(MySQLBase + url)
-        val headers = {
-            val dataSourceHeader  = Some("Orbeon-Datasource" → Array("mysql_tomcat"))
-            val contentTypeHeader = body map (_ ⇒ "Content-Type" → Array("application/xml"))
-            val versionHeader =  version match {
-                case Latest                  ⇒ None
-                case Next                    ⇒ Some("Orbeon-Form-Definition-Version" → Array("next"))
-                case Specific(version)       ⇒ Some("Orbeon-Form-Definition-Version" → Array(version.toString))
-                case ForDocument(documentId) ⇒ Some("Orbeon-For-Document-Id" → Array(documentId))
+    private object Http {
+
+        private def request(url: String, method: String, version: Version, body: Option[Document]): ConnectionResult = {
+            val documentUrl = URLFactory.createURL(MySQLBase + url)
+            val headers = {
+                val dataSourceHeader  = Some("Orbeon-Datasource" → Array("mysql_tomcat"))
+                val contentTypeHeader = body map (_ ⇒ "Content-Type" → Array("application/xml"))
+                val versionHeader =  version match {
+                    case Latest                  ⇒ None
+                    case Next                    ⇒ Some("Orbeon-Form-Definition-Version" → Array("next"))
+                    case Specific(version)       ⇒ Some("Orbeon-Form-Definition-Version" → Array(version.toString))
+                    case ForDocument(documentId) ⇒ Some("Orbeon-For-Document-Id" → Array(documentId))
+                }
+                val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader).flatten.toMap
+                Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
             }
-            val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader).flatten.toMap
-            Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
+            val messageBody = body map Dom4jUtils.domToString map (_.getBytes)
+            Connection(method, documentUrl, credentials = None, messageBody = messageBody, headers = headers,
+                loadState = true, logBody = false).connect(saveState = true)
         }
-        val messageBody = body map Dom4jUtils.domToString map (_.getBytes)
-        Connection(method, documentUrl, credentials = None, messageBody = messageBody, headers = headers,
-            loadState = true, logBody = false).connect(saveState = true)
+
+        def put(url: String, version: Version, body: Document): Integer = {
+            val result = request(url, "PUT", version, Some(body))
+            val code = result.statusCode
+            result.close()
+            code
+        }
+
+        def get(url: String, version: Version): (Integer, Map[String, Seq[String]], Try[Document]) =
+            useAndClose(request(url, "GET", version, None)) { connectionResult ⇒
+                useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
+                    val statusCode = connectionResult.statusCode
+                    val headers = connectionResult.responseHeaders.toMap
+                    val body = Try(Dom4jUtils.readDom4j(inputStream))
+                    (statusCode, headers, body)
+                }
+            }
     }
 
-    private def httpPut(url: String, version: Version, body: Document): Integer = {
-        val result = http(url, "PUT", version, Some(body))
-        val code = result.statusCode
-        result.close()
-        code
-    }
+    private object Assert {
 
-    private def httpGet(url: String, version: Version): (Integer, Map[String, Seq[String]], Try[Document]) =
-        useAndClose(http(url, "GET", version, None)) { connectionResult ⇒
-            useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                val statusCode = connectionResult.statusCode
-                val headers = connectionResult.responseHeaders.toMap
-                val body = Try(Dom4jUtils.readDom4j(inputStream))
-                (statusCode, headers, body)
+        sealed trait Expected
+        case   class ExpectedDoc (doc:  Elem, operations: Set[String]) extends Expected
+        case   class ExpectedCode(code: Integer) extends Expected
+
+        def get(url: String, version: Version, expected: Expected): Unit = {
+            val (resultCode, headers, resultDoc) = Http.get(url, version)
+            expected match {
+                case ExpectedDoc(expectedDoc, expectedOperations) ⇒
+                    assert(resultCode === 200)
+                    assertXMLDocuments(resultDoc.get, expectedDoc)
+                    val resultOperationsString = headers.get("orbeon-operations").map(_.head)
+                    val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
+                    assert(expectedOperations === resultOperationsSet)
+                case ExpectedCode(expectedCode) ⇒
+                    assert(resultCode === expectedCode)
             }
         }
 
-    sealed trait Expected
-    case   class ExpectedDoc (doc:  Elem, operations: Set[String]) extends Expected
-    case   class ExpectedCode(code: Integer) extends Expected
-
-    private def assertGet(url: String, version: Version, expected: Expected): Unit = {
-        val (resultCode, headers, resultDoc) = httpGet(url, version)
-        expected match {
-            case ExpectedDoc(expectedDoc, expectedOperations) ⇒
-                assert(resultCode === 200)
-                assertXMLDocuments(resultDoc.get, expectedDoc)
-                val resultOperationsString = headers.get("orbeon-operations").map(_.head)
-                val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
-                assert(expectedOperations === resultOperationsSet)
-            case ExpectedCode(expectedCode) ⇒
-                assert(resultCode === expectedCode)
+        def put(url: String, version: Version, body: Elem, expectedCode: Integer): Unit = {
+            val actualCode = Http.put(url, version, body)
+            assert(actualCode === expectedCode)
         }
     }
 
-    private def assertPut(url: String, version: Version, body: Elem, expectedCode: Integer): Unit = {
-        val actualCode = httpPut(url, version, body)
-        assert(actualCode === expectedCode)
-    }
 
     private def formDefinitionWithPermissions(permissions: Option[Elem]): Elem =
         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
@@ -133,33 +140,33 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
 
             // First time we put with "latest"
             val first = <gaga1/>
-            assertPut(FormURL, Latest, first, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc (first, Set.empty))
-            assertGet(FormURL, Latest     , ExpectedDoc (first, Set.empty))
-            assertGet(FormURL, Specific(2), ExpectedCode(404))
+            Assert.put(FormURL, Latest, first, 201)
+            Assert.get(FormURL, Specific(1), Assert.ExpectedDoc (first, Set.empty))
+            Assert.get(FormURL, Latest     , Assert.ExpectedDoc (first, Set.empty))
+            Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
 
             // Put again with "latest" updates the current version
             val second = <gaga2/>
-            assertPut(FormURL, Latest, second, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(second, Set.empty))
-            assertGet(FormURL, Latest     , ExpectedDoc(second, Set.empty))
-            assertGet(FormURL, Specific(2), ExpectedCode(404))
+            Assert.put(FormURL, Latest, second, 201)
+            Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(second, Set.empty))
+            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(second, Set.empty))
+            Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
 
             // Put with "next" to get two versions
             val third = <gaga3/>
-            assertPut(FormURL, Next, third, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(second, Set.empty))
-            assertGet(FormURL, Specific(2), ExpectedDoc(third,  Set.empty))
-            assertGet(FormURL, Latest     , ExpectedDoc(third,  Set.empty))
-            assertGet(FormURL, Specific(3), ExpectedCode(404))
+            Assert.put(FormURL, Next, third, 201)
+            Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(second, Set.empty))
+            Assert.get(FormURL, Specific(2), Assert.ExpectedDoc(third,  Set.empty))
+            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(third,  Set.empty))
+            Assert.get(FormURL, Specific(3), Assert.ExpectedCode(404))
 
             // Put a specific version
             val fourth = <gaga4/>
-            assertPut(FormURL, Specific(1), fourth, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(fourth, Set.empty))
-            assertGet(FormURL, Specific(2), ExpectedDoc(third,  Set.empty))
-            assertGet(FormURL, Latest     , ExpectedDoc(third,  Set.empty))
-            assertGet(FormURL, Specific(3), ExpectedCode(404))
+            Assert.put(FormURL, Specific(1), fourth, 201)
+            Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(fourth, Set.empty))
+            Assert.get(FormURL, Specific(2), Assert.ExpectedDoc(third,  Set.empty))
+            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(third,  Set.empty))
+            Assert.get(FormURL, Specific(3), Assert.ExpectedCode(404))
         }
     }
 
@@ -172,14 +179,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
 
             // Storing for specific form version
             val first = <gaga1/>
-            assertPut(DataURL, Specific(1), first, 201)
-            assertGet(DataURL, Specific(1), ExpectedDoc(first, AllOperations))
-            assertGet(DataURL, Latest     , ExpectedDoc(first, AllOperations))
+            Assert.put(DataURL, Specific(1), first, 201)
+            Assert.get(DataURL, Specific(1), Assert.ExpectedDoc(first, AllOperations))
+            Assert.get(DataURL, Latest     , Assert.ExpectedDoc(first, AllOperations))
 
             // Version must be specified when storing data
-            assertPut(DataURL, Latest            , first, 400)
-            assertPut(DataURL, Next              , first, 400)
-            assertPut(DataURL, ForDocument("123"), first, 400)
+            Assert.put(DataURL, Latest            , first, 400)
+            Assert.put(DataURL, Next              , first, 400)
+            Assert.put(DataURL, ForDocument("123"), first, 400)
         }
     }
 
@@ -192,25 +199,27 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val DataURL = "/crud/acme/address/data/123/data.xml"
             val data    = <data/>
 
-            def assertPutFormWithOperations(operations: String): Unit =
-                assertPut(FormURL, Latest, formDefinitionWithPermissions(Some(
+            def putFormWithOperations(operations: String): Unit =
+                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(
                     <permissions>
                         <permission operations={operations}/>
                     </permissions>
                 )), 201)
 
             // Anonymous: no permission defined
-            assertPut(FormURL, Latest, formDefinitionWithPermissions(None), 201)
-            assertPut(DataURL, Specific(1), data, 201)
-            assertGet(DataURL, Latest, ExpectedDoc(data, AllOperations))
+            Assert.put(FormURL, Latest, formDefinitionWithPermissions(None), 201)
+            Assert.put(DataURL, Specific(1), data, 201)
+            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, AllOperations))
 
             // Anonymous: create and read
-            assertPutFormWithOperations("read create")
-            assertGet(DataURL, Latest, ExpectedDoc(data, Set("create", "read")))
+            putFormWithOperations("read create")
+            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")))
 
             // Anonymous: just create, then can't read data
-            assertPutFormWithOperations("create")
-            assertGet(DataURL, Latest, ExpectedCode(403))
+            putFormWithOperations("create")
+            Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
+
+
         }
     }
 }

@@ -54,6 +54,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
 
     private object Http {
 
+        case class Credentials(username: String, roles: Set[String], group: String)
+
         private def request(url: String, method: String, version: Version, body: Option[Document]): ConnectionResult = {
             val documentUrl = URLFactory.createURL(MySQLBase + url)
             val headers = {
@@ -73,14 +75,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 loadState = true, logBody = false).connect(saveState = true)
         }
 
-        def put(url: String, version: Version, body: Document): Integer = {
+        def put(url: String, version: Version, body: Document, credentials: Option[Credentials] = None): Integer = {
             val result = request(url, "PUT", version, Some(body))
             val code = result.statusCode
             result.close()
             code
         }
 
-        def get(url: String, version: Version): (Integer, Map[String, Seq[String]], Try[Document]) =
+        def get(url: String, version: Version, credentials: Option[Credentials] = None): (Integer, Map[String, Seq[String]], Try[Document]) =
             useAndClose(request(url, "GET", version, None)) { connectionResult ⇒
                 useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                     val statusCode = connectionResult.statusCode
@@ -97,8 +99,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         case   class ExpectedDoc (doc:  Elem, operations: Set[String]) extends Expected
         case   class ExpectedCode(code: Integer) extends Expected
 
-        def get(url: String, version: Version, expected: Expected): Unit = {
-            val (resultCode, headers, resultDoc) = Http.get(url, version)
+        def get(url: String, version: Version, expected: Expected, credentials: Option[Http.Credentials] = None): Unit = {
+            val (resultCode, headers, resultDoc) = Http.get(url, version, credentials)
             expected match {
                 case ExpectedDoc(expectedDoc, expectedOperations) ⇒
                     assert(resultCode === 200)
@@ -111,25 +113,12 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             }
         }
 
-        def put(url: String, version: Version, body: Elem, expectedCode: Integer): Unit = {
-            val actualCode = Http.put(url, version, body)
+        def put(url: String, version: Version, body: Elem, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
+            val actualCode = Http.put(url, version, body, credentials)
             assert(actualCode === expectedCode)
         }
     }
 
-
-    private def formDefinitionWithPermissions(permissions: Option[Elem]): Elem =
-        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
-            <xh:head>
-                <xf:model id="fr-form-model">
-                    <xf:instance id="fr-form-metadata">
-                        <metadata>
-                            { permissions.getOrElse("") }
-                        </metadata>
-                    </xf:instance>
-                </xf:model>
-            </xh:head>
-        </xh:html>
 
     /**
      * Test new form versioning introduced in 4.5, for form definitions.
@@ -193,18 +182,27 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     /**
      *
      */
-    @Test def orbeonOperationsHeaderTest(): Unit = {
+    @Test def permissionsTest(): Unit = {
+
         withOrbeonTables { connection =>
+            import Permissions._
+
+            def formDefinitionWithPermissions(permissions: Permissions): Elem =
+                <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+                    <xh:head>
+                        <xf:model id="fr-form-model">
+                            <xf:instance id="fr-form-metadata">
+                                <metadata>
+                                    { serialize(permissions).getOrElse("") }
+                                </metadata>
+                            </xf:instance>
+                        </xf:model>
+                    </xh:head>
+                </xh:html>
+
             val FormURL = "/crud/acme/address/form/form.xml"
             val DataURL = "/crud/acme/address/data/123/data.xml"
             val data    = <data/>
-
-            def putFormWithOperations(operations: String): Unit =
-                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(
-                    <permissions>
-                        <permission operations={operations}/>
-                    </permissions>
-                )), 201)
 
             // Anonymous: no permission defined
             Assert.put(FormURL, Latest, formDefinitionWithPermissions(None), 201)
@@ -212,13 +210,12 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, AllOperations))
 
             // Anonymous: create and read
-            putFormWithOperations("read create")
+            Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create"))))), 201)
             Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")))
 
             // Anonymous: just create, then can't read data
-            putFormWithOperations("create")
+            Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create"))))), 201)
             Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
-
 
         }
     }

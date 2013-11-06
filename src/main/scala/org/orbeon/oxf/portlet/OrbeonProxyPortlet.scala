@@ -351,9 +351,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     }
 
     // Simple cookie manager using HttpClient classes
-    // It doesn't look like we can use the built-in Java classes, which only seem to allow for a "system wide" cookie
-    // manager, and which has non-serializable classes.
-    // See https://github.com/orbeon/orbeon-forms/issues/1412
+    // See https://github.com/orbeon/orbeon-forms/issues/1413
+    // See also https://github.com/orbeon/orbeon-forms/issues/1412
+    // It doesn't look like we can use the built-in Java classes, which only seem to allow for a "system-wide" cookie
+    // manager, and has non-serializable classes.
     private object CookieManager {
 
         def processRequestCookieHeaders(session: PortletSession, connection: HttpURLConnection, url: String): Unit = {
@@ -371,6 +372,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 } yield
                     cookie
 
+            // NOTE: BrowserCompatSpec always only return a single Cookie header
             if (relevantCookies.nonEmpty)
                 for (header ← cookieSpec.formatCookies(relevantCookies.asJava).asScala)
                     connection.setRequestProperty(header.getName, header.getValue)

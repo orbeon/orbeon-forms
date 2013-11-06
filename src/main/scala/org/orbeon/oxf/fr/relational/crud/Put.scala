@@ -64,8 +64,8 @@ trait Put extends RequestResponse with Common {
         // Build case case with first row of result
         if (resultSet.next()) {
             val row = new Row(resultSet.getTimestamp("created"),
-                              if (req.forData) Some(resultSet.getString("username")) else None,
-                              if (req.forData) Some(resultSet.getString("group"   )) else None)
+                              if (req.forData) Some(resultSet.getString("username" )) else None,
+                              if (req.forData) Some(resultSet.getString("groupname")) else None)
             // Query should return at most one row
             assert(! resultSet.next())
             Some(row)

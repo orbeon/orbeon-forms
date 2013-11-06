@@ -56,18 +56,23 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
 
         case class Credentials(username: String, roles: Set[String], group: String)
 
-        private def request(url: String, method: String, version: Version, body: Option[Document]): ConnectionResult = {
+        private def request(url: String, method: String, version: Version, body: Option[Document], credentials: Option[Credentials]): ConnectionResult = {
             val documentUrl = URLFactory.createURL(MySQLBase + url)
             val headers = {
-                val dataSourceHeader  = Some("Orbeon-Datasource" → Array("mysql_tomcat"))
-                val contentTypeHeader = body map (_ ⇒ "Content-Type" → Array("application/xml"))
+                val dataSourceHeader  = Seq("Orbeon-Datasource" → Array("mysql_tomcat"))
+                val contentTypeHeader = body.map(_ ⇒ "Content-Type" → Array("application/xml")).toSeq
                 val versionHeader =  version match {
-                    case Latest                  ⇒ None
-                    case Next                    ⇒ Some("Orbeon-Form-Definition-Version" → Array("next"))
-                    case Specific(version)       ⇒ Some("Orbeon-Form-Definition-Version" → Array(version.toString))
-                    case ForDocument(documentId) ⇒ Some("Orbeon-For-Document-Id" → Array(documentId))
+                    case Latest                  ⇒ Nil
+                    case Next                    ⇒ Seq("Orbeon-Form-Definition-Version" → Array("next"))
+                    case Specific(version)       ⇒ Seq("Orbeon-Form-Definition-Version" → Array(version.toString))
+                    case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id" → Array(documentId))
                 }
-                val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader).flatten.toMap
+                val credentialHeaders = credentials.map( c ⇒ Seq(
+                    "Orbeon-Username" → Array(c.username),
+                    "Orbeon-Group"    → Array(c.group),
+                    "Orbeon-Roles"    → Array(c.roles.mkString(" "))
+                )).toSeq.flatten
+                val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
                 Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
             }
             val messageBody = body map Dom4jUtils.domToString map (_.getBytes)
@@ -76,14 +81,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         }
 
         def put(url: String, version: Version, body: Document, credentials: Option[Credentials] = None): Integer = {
-            val result = request(url, "PUT", version, Some(body))
+            val result = request(url, "PUT", version, Some(body), credentials)
             val code = result.statusCode
             result.close()
             code
         }
 
         def get(url: String, version: Version, credentials: Option[Credentials] = None): (Integer, Map[String, Seq[String]], Try[Document]) =
-            useAndClose(request(url, "GET", version, None)) { connectionResult ⇒
+            useAndClose(request(url, "GET", version, None, credentials)) { connectionResult ⇒
                 useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                     val statusCode = connectionResult.statusCode
                     val headers = connectionResult.responseHeaders.toMap
@@ -203,6 +208,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val FormURL = "/crud/acme/address/form/form.xml"
             val DataURL = "/crud/acme/address/data/123/data.xml"
             val data    = <data/>
+            val clerk   = Some(Http.Credentials("tom", Set("clerk"  ), "clerk"))
+            val manager = Some(Http.Credentials("jim", Set("manager"), "manager"))
+            val admin   = Some(Http.Credentials("tim", Set("admin"  ), "admin"))
 
             // Anonymous: no permission defined
             Assert.put(FormURL, Latest, formDefinitionWithPermissions(None), 201)
@@ -217,6 +225,18 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create"))))), 201)
             Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
 
+            // More complex permissions based on roles
+            Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(
+                Permission(Anyone,          Set("create")),
+                Permission(Role("clerk"),   Set("read")),
+                Permission(Role("manager"), Set("read update")),
+                Permission(Role("admin"),   Set("read update delete"))
+            ))), 201)
+            Assert.put(DataURL, Specific(1), data, 201)
+            Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
+            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")), clerk)
+            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update")), manager)
+            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update", "delete")), admin)
         }
     }
 }

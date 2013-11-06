@@ -30,7 +30,7 @@ import scala.xml.Elem
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
     val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql-ng"
-    val AllOperations = Some("create read update delete")
+    val AllOperations = Set("create", "read", "update", "delete")
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     def withOrbeonTables[T](block: java.sql.Connection ⇒ T) {
@@ -89,7 +89,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         }
 
     sealed trait Expected
-    case   class ExpectedDoc (doc:  Elem, operations: Option[String]) extends Expected
+    case   class ExpectedDoc (doc:  Elem, operations: Set[String]) extends Expected
     case   class ExpectedCode(code: Integer) extends Expected
 
     private def assertGet(url: String, version: Version, expected: Expected): Unit = {
@@ -98,8 +98,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             case ExpectedDoc(expectedDoc, expectedOperations) ⇒
                 assert(resultCode === 200)
                 assertXMLDocuments(resultDoc.get, expectedDoc)
-                val resultOperations = headers.get("orbeon-operations").map(_.head)
-                assert(expectedOperations === resultOperations)
+                val resultOperationsString = headers.get("orbeon-operations").map(_.head)
+                val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
+                assert(expectedOperations === resultOperationsSet)
             case ExpectedCode(expectedCode) ⇒
                 assert(resultCode === expectedCode)
         }
@@ -133,31 +134,31 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             // First time we put with "latest"
             val first = <gaga1/>
             assertPut(FormURL, Latest, first, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc (first, None))
-            assertGet(FormURL, Latest     , ExpectedDoc (first, None))
+            assertGet(FormURL, Specific(1), ExpectedDoc (first, Set.empty))
+            assertGet(FormURL, Latest     , ExpectedDoc (first, Set.empty))
             assertGet(FormURL, Specific(2), ExpectedCode(404))
 
             // Put again with "latest" updates the current version
             val second = <gaga2/>
             assertPut(FormURL, Latest, second, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(second, None))
-            assertGet(FormURL, Latest     , ExpectedDoc(second, None))
+            assertGet(FormURL, Specific(1), ExpectedDoc(second, Set.empty))
+            assertGet(FormURL, Latest     , ExpectedDoc(second, Set.empty))
             assertGet(FormURL, Specific(2), ExpectedCode(404))
 
             // Put with "next" to get two versions
             val third = <gaga3/>
             assertPut(FormURL, Next, third, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(second, None))
-            assertGet(FormURL, Specific(2), ExpectedDoc(third,  None))
-            assertGet(FormURL, Latest     , ExpectedDoc(third,  None))
+            assertGet(FormURL, Specific(1), ExpectedDoc(second, Set.empty))
+            assertGet(FormURL, Specific(2), ExpectedDoc(third,  Set.empty))
+            assertGet(FormURL, Latest     , ExpectedDoc(third,  Set.empty))
             assertGet(FormURL, Specific(3), ExpectedCode(404))
 
             // Put a specific version
             val fourth = <gaga4/>
             assertPut(FormURL, Specific(1), fourth, 201)
-            assertGet(FormURL, Specific(1), ExpectedDoc(fourth, None))
-            assertGet(FormURL, Specific(2), ExpectedDoc(third,  None))
-            assertGet(FormURL, Latest     , ExpectedDoc(third,  None))
+            assertGet(FormURL, Specific(1), ExpectedDoc(fourth, Set.empty))
+            assertGet(FormURL, Specific(2), ExpectedDoc(third,  Set.empty))
+            assertGet(FormURL, Latest     , ExpectedDoc(third,  Set.empty))
             assertGet(FormURL, Specific(3), ExpectedCode(404))
         }
     }
@@ -202,7 +203,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                     <permission operations="read create"/>
                 </permissions>
             )), 201)
-            //assertGet(DataURL, Latest, ExpectedDoc(data, Some("create read")))
+            assertGet(DataURL, Latest, ExpectedDoc(data, Set("create", "read")))
         }
     }
 }

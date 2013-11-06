@@ -48,7 +48,7 @@
              view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/(oracle|mysql|db2)/form(/([^/]+)(/([^/]+))?)?"
+    <service path="/fr/service/(oracle|mysql|mysql-ng|db2)/form(/([^/]+)(/([^/]+))?)?"
              default-submission="persistence/form-instance.xml"
              view="persistence/relational/form.xpl">
         <setvalue ref="/*/app" matcher-group="3"/>

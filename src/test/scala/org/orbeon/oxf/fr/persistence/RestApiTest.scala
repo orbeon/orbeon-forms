@@ -80,12 +80,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 loadState = true, logBody = false).connect(saveState = true)
         }
 
-        def put(url: String, version: Version, body: Document, credentials: Option[Credentials] = None): Integer = {
-            val result = request(url, "PUT", version, Some(body), credentials)
-            val code = result.statusCode
-            result.close()
-            code
-        }
+        def put(url: String, version: Version, body: Document, credentials: Option[Credentials] = None): Integer =
+            useAndClose(request(url, "PUT", version, Some(body), credentials))(_.statusCode)
+
+        def del(url: String, version: Version, credentials: Option[Credentials] = None): Integer =
+            useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
 
         def get(url: String, version: Version, credentials: Option[Credentials] = None): (Integer, Map[String, Seq[String]], Try[Document]) =
             useAndClose(request(url, "GET", version, None, credentials)) { connectionResult ⇒
@@ -122,6 +121,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val actualCode = Http.put(url, version, body, credentials)
             assert(actualCode === expectedCode)
         }
+
+        def del(url: String, version: Version, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
+            val actualCode = Http.del(url, version, credentials)
+            assert(actualCode === expectedCode)
+        }
     }
 
 
@@ -138,6 +142,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.get(FormURL, Specific(1), Assert.ExpectedDoc (first, Set.empty))
             Assert.get(FormURL, Latest     , Assert.ExpectedDoc (first, Set.empty))
             Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
+            Assert.del(FormURL, Specific(2), 404)
 
             // Put again with "latest" updates the current version
             val second = <gaga2/>
@@ -161,6 +166,19 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.get(FormURL, Specific(2), Assert.ExpectedDoc(third,  Set.empty))
             Assert.get(FormURL, Latest     , Assert.ExpectedDoc(third,  Set.empty))
             Assert.get(FormURL, Specific(3), Assert.ExpectedCode(404))
+
+            // Delete the latest version
+            Assert.del(FormURL, Latest, 204)
+            Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(fourth, Set.empty))
+            Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
+            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(fourth, Set.empty))
+
+            // After a delete the version number is reused
+            val fifth = <gaga5/>
+            Assert.put(FormURL, Next, fifth, 201)
+            Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(fourth, Set.empty))
+            Assert.get(FormURL, Specific(2), Assert.ExpectedDoc(fifth,  Set.empty))
+            Assert.get(FormURL, Specific(3), Assert.ExpectedCode(404))
         }
     }
 
@@ -176,6 +194,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.put(DataURL, Specific(1), first, 201)
             Assert.get(DataURL, Specific(1), Assert.ExpectedDoc(first, AllOperations))
             Assert.get(DataURL, Latest     , Assert.ExpectedDoc(first, AllOperations))
+            Assert.del(DataURL, Specific(1), 204)
+            Assert.get(DataURL, Specific(1), Assert.ExpectedCode(404))
 
             // Version must be specified when storing data
             Assert.put(DataURL, Latest            , first, 400)

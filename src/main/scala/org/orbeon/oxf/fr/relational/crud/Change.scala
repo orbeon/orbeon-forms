@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import java.io.ByteArrayOutputStream
+import java.io.{InputStream, ByteArrayOutputStream}
 import java.sql
-import java.sql.{Timestamp, Connection}
+import java.sql.{Types, Timestamp, Connection}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
@@ -24,15 +24,14 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
-import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 
-trait Put extends RequestResponse with Common {
+trait Change extends RequestResponse with Common {
 
-    private case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String])
-    private def existingRow(connection: Connection, req: Request): Option[Row] = {
+    case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String])
+    def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
         val table = tableName(req)
@@ -76,7 +75,7 @@ trait Put extends RequestResponse with Common {
         }
     }
 
-    def store(connection: Connection, req: Request, existingRow: Option[Row]): Unit = {
+    def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Unit = {
 
         val table = tableName(req)
         val ps = connection.prepareStatement(
@@ -96,7 +95,7 @@ trait Put extends RequestResponse with Common {
                                                ?, ?, ?
                                                , ?, ?, ?
                     ${if (req.forData)         ", ?"    else ""}
-                                                    , 'N'
+                                               , ${if (delete) "'Y'" else "'N'"}
                     ${if (req.forData)         ", ?"    else ""}
                     ${if (req.forAttachment)   ", ?, ?" else ""}
                     ${if (! req.forAttachment) ", ?"    else ""}
@@ -105,70 +104,95 @@ trait Put extends RequestResponse with Common {
 
         val position = Iterator.from(1)
         val now = new Timestamp(System.currentTimeMillis())
-        val requestInputStream = {
-            val bodyURL = RequestGenerator.getRequestBody(PipelineContext.get)
-            NetUtils.uriToInputStream(bodyURL)
+
+        // For put/update, reads the request either as bytes or XML
+        object RequestReader {
+            def requestInputStream(): InputStream = {
+                val bodyURL = RequestGenerator.getRequestBody(PipelineContext.get)
+                NetUtils.uriToInputStream(bodyURL)
+            }
+
+            def bytes(): Array[Byte] = {
+                val os = new ByteArrayOutputStream
+                NetUtils.copyStream(requestInputStream(), os)
+                os.toByteArray
+            }
+
+            def xml(): String = {
+                val transformer = TransformerUtils.getXMLIdentityTransformer
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+                val writer = new StringBuilderWriter()
+                val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
+                transformer.transform(source, new StreamResult(writer))
+                writer.toString
+            }
         }
 
-        def requestBytes(): Array[Byte] = {
-            val os = new ByteArrayOutputStream
-            NetUtils.copyStream(requestInputStream, os)
-            os.toByteArray
+                                     ps.setTimestamp(position.next(), existingRow.map(_.created).getOrElse(now))
+                                     ps.setTimestamp(position.next(), now)
+                                     ps.setString(position.next(), requestUsername.getOrElse(null))
+                                     ps.setString(position.next(), req.app)
+                                     ps.setString(position.next(), req.form)
+                                     ps.setInt   (position.next(), requestedFormVersion(connection, req))
+        if (req.forData)             ps.setString(position.next(), req.dataPart.get.documentId)
+        if (req.forData)             ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
+        if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
+        if (delete) {
+                                     ps.setNull(position.next(), if (req.forAttachment) Types.BLOB else Types.CLOB)
+        } else {
+            if (req.forAttachment)   ps.setBytes (position.next(), RequestReader.bytes())
+            if (! req.forAttachment) ps.setString(position.next(), RequestReader.xml())
         }
-
-        def requestXML(): String = {
-            val transformer = TransformerUtils.getXMLIdentityTransformer
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-            val writer = new StringBuilderWriter()
-            val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream))
-            transformer.transform(source, new StreamResult(writer))
-            writer.toString
+        if (req.forData) {
+                                     ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))
+                                     ps.setString(position.next(), existingRow.map(_.groupname).flatten.getOrElse(requestGroupname.getOrElse(null)))
         }
-
-                                 ps.setTimestamp(position.next(), existingRow.map(_.created).getOrElse(now))
-                                 ps.setTimestamp(position.next(), now)
-                                 ps.setString(position.next(), requestUsername.getOrElse(null))
-                                 ps.setString(position.next(), req.app)
-                                 ps.setString(position.next(), req.form)
-                                 ps.setInt   (position.next(), requestedFormVersion(connection, req))
-        if (req.forData)         ps.setString(position.next(), req.dataPart.get.documentId)
-        if (req.forData)         ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
-        if (req.forAttachment)   ps.setString(position.next(), req.filename.get)
-        if (req.forAttachment)   ps.setBytes (position.next(), requestBytes())
-        if (! req.forAttachment) ps.setString(position.next(), requestXML())
-        if (req.forData)         ps.setString(position.next(), existingRow.map(_.username .get).getOrElse(requestUsername .getOrElse(null)))
-        if (req.forData)         ps.setString(position.next(), existingRow.map(_.groupname.get).getOrElse(requestGroupname.getOrElse(null)))
 
         ps.executeUpdate()
     }
 
-    def put(): Unit = {
+    def change(delete: Boolean): Unit = {
         RelationalUtils.withConnection { connection ⇒
             val req = request
-            if (req.forData && ! req.version.isInstanceOf[Specific]) {
-                // When storing data, a form version must be provided
+
+            // For a put/delete on data, a form version must be provided
+            if (req.forData && ! req.version.isInstanceOf[Specific])
                 httpResponse.setStatus(400)
-            } else {
+            else {
                 val existing = existingRow(connection, req)
-                if (req.forData) {
-                    val authorized =
+
+                // Check permissions
+                val authorized =
+                    if (req.forData) {
                         if (existing.isDefined) {
-                            // Check we're allowed to update this resource
+                            // Check we're allowed to update or delete this resource
                             val username      = existing.get.username
                             val groupname     = existing.get.groupname
                             val dataUserGroup = if (username.isEmpty || groupname.isEmpty) None else Some(username.get, groupname.get)
-                            val operations    = authorizedOperations(req, dataUserGroup)
-                            operations.contains("update")
+                            val authorizedOps = authorizedOperations(req, dataUserGroup)
+                            val requiredOp    = if (delete) "delete" else "update"
+                            authorizedOps.contains(requiredOp)
                         } else {
-                            // Check we're allowed to create new data
-                            val operations = authorizedOperations(req, None)
-                            operations.contains("create")
+                            // For deletes, if there is no data to delete, it is a 403 if could not read, update,
+                            // or delete if it existed (otherwise code later will return a 404)
+                            val authorizedOps = authorizedOperations(req, None)
+                            val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
+                            authorizedOps.intersect(requiredOps).nonEmpty
                         }
-                    if (! authorized) throw new HttpStatusCodeException(403)
-                }
+                    } else {
+                        // Operations on deployed forms are always authorized
+                        true
+                    }
 
-                store(connection, req, existing)
-                httpResponse.setStatus(201)
+                if (! authorized)
+                    httpResponse.setStatus(403)
+                else if (delete && existing.isEmpty) {
+                    // We can't delete a document that doesn't exist
+                    httpResponse.setStatus(404)
+                } else {
+                    store(connection, req, existing, delete)
+                    httpResponse.setStatus(if (delete) 204 else 201)
+                }
             }
         }
     }

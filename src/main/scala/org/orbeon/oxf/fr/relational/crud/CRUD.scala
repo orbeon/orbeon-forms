@@ -22,13 +22,14 @@ class CRUD
         with RequestResponse
         with Common
         with Get
-        with Put {
+        with Change {
 
     override def start(pipelineContext: PipelineContext) {
         httpRequest.getMethod match {
-            case "GET" ⇒ get()
-            case "PUT" ⇒ put()
-            case _     ⇒ httpResponse.setStatus(405)
+            case "GET"    ⇒ get()
+            case "PUT"    ⇒ change(delete = false)
+            case "DELETE" ⇒ change(delete = true)
+            case _        ⇒ httpResponse.setStatus(405)
         }
     }
 }

@@ -206,37 +206,44 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 </xh:html>
 
             val FormURL = "/crud/acme/address/form/form.xml"
-            val DataURL = "/crud/acme/address/data/123/data.xml"
             val data    = <data/>
             val clerk   = Some(Http.Credentials("tom", Set("clerk"  ), "clerk"))
             val manager = Some(Http.Credentials("jim", Set("manager"), "manager"))
             val admin   = Some(Http.Credentials("tim", Set("admin"  ), "admin"))
 
-            // Anonymous: no permission defined
-            Assert.put(FormURL, Latest, formDefinitionWithPermissions(None), 201)
-            Assert.put(DataURL, Specific(1), data, 201)
-            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, AllOperations))
+            {
+                val DataURL = "/crud/acme/address/data/123/data.xml"
 
-            // Anonymous: create and read
-            Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create"))))), 201)
-            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")))
+                // Anonymous: no permission defined
+                Assert.put(FormURL, Latest, formDefinitionWithPermissions(None), 201)
+                Assert.put(DataURL, Specific(1), data, 201)
+                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, AllOperations))
 
-            // Anonymous: just create, then can't read data
-            Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create"))))), 201)
-            Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
+                // Anonymous: create and read
+                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create"))))), 201)
+                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")))
 
-            // More complex permissions based on roles
-            Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(
-                Permission(Anyone,          Set("create")),
-                Permission(Role("clerk"),   Set("read")),
-                Permission(Role("manager"), Set("read update")),
-                Permission(Role("admin"),   Set("read update delete"))
-            ))), 201)
-            Assert.put(DataURL, Specific(1), data, 201)
-            Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
-            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")), clerk)
-            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update")), manager)
-            Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update", "delete")), admin)
+                // Anonymous: just create, then can't read data
+                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create"))))), 201)
+                Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
+            }
+            {
+                val DataURL = "/crud/acme/address/data/456/data.xml"
+
+                // More complex permissions based on roles
+                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(
+                    Permission(Anyone,          Set("create")),
+                    Permission(Role("clerk"),   Set("read")),
+                    Permission(Role("manager"), Set("read update")),
+                    Permission(Role("admin"),   Set("read update delete"))
+                ))), 201)
+                Assert.put(DataURL, Specific(1), data, 201)
+                Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
+                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")), clerk)
+                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update")), manager)
+                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update", "delete")), admin)
+                Assert.put(DataURL, Specific(1), data, 403)
+            }
         }
     }
 }

@@ -17,7 +17,6 @@ import org.orbeon.oxf.fr.relational.RelationalUtils
 import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
-import org.orbeon.scaxon.XML._
 
 trait Get extends RequestResponse with Common with FormRunnerPersistence {
 
@@ -62,17 +61,14 @@ trait Get extends RequestResponse with Common with FormRunnerPersistence {
 
             if (resultSet.next()) {
 
-                // Set Orbeon-Operations header
+                // Check user can read and set Orbeon-Operations header
                 if (req.forData) {
-                    val metadata    = readFormMetadata(req.app, req.form).ensuring(_.isDefined, "can't find form metadata for data").get
-                    val permissions = (metadata / "forms" / "form" / "permissions").headOption
-                    val operations  = permissions match {
-                        case None                ⇒ Seq("create", "read", "update", "delete")
-                        case Some(permissionsEl) ⇒
-                            val dataUsername  = resultSet.getString("username")
-                            val dataGroupname = resultSet.getString("groupname")
-                            FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname)
+                    val dataUserGroup = {
+                        val username      = resultSet.getString("username")
+                        val groupname     = resultSet.getString("groupname")
+                        if (username == null || groupname == null) None else Some(username, groupname)
                     }
+                    val operations = authorizedOperations(req, dataUserGroup)
                     if (! operations.contains("read"))
                         throw new HttpStatusCodeException(403)
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))

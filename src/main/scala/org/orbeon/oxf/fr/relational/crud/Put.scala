@@ -26,6 +26,8 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
+import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 trait Put extends RequestResponse with Common {
 
@@ -64,8 +66,8 @@ trait Put extends RequestResponse with Common {
         // Build case case with first row of result
         if (resultSet.next()) {
             val row = new Row(resultSet.getTimestamp("created"),
-                              if (req.forData) Some(resultSet.getString("username" )) else None,
-                              if (req.forData) Some(resultSet.getString("groupname")) else None)
+                              if (req.forData) Option(resultSet.getString("username" )) else None,
+                              if (req.forData) Option(resultSet.getString("groupname")) else None)
             // Query should return at most one row
             assert(! resultSet.next())
             Some(row)
@@ -80,10 +82,10 @@ trait Put extends RequestResponse with Common {
         val ps = connection.prepareStatement(
             s"""insert into $table
                 (
-                                                    created, last_modified_time, last_modified_by
-                                                    , app, form, form_version
+                                                 created, last_modified_time, last_modified_by
+                                               , app, form, form_version
                     ${if (req.forData)         ", document_id"             else ""}
-                                                    , deleted
+                                               , deleted
                     ${if (req.forData)         ", draft"                   else ""}
                     ${if (req.forAttachment)   ", file_name, file_content" else ""}
                     ${if (! req.forAttachment) ", xml"                     else ""}
@@ -91,8 +93,8 @@ trait Put extends RequestResponse with Common {
                 )
                 values
                 (
-                                                    ?, ?, ?
-                                                    , ?, ?, ?
+                                               ?, ?, ?
+                                               , ?, ?, ?
                     ${if (req.forData)         ", ?"    else ""}
                                                     , 'N'
                     ${if (req.forData)         ", ?"    else ""}
@@ -148,6 +150,23 @@ trait Put extends RequestResponse with Common {
                 httpResponse.setStatus(400)
             } else {
                 val existing = existingRow(connection, req)
+                if (req.forData) {
+                    val authorized =
+                        if (existing.isDefined) {
+                            // Check we're allowed to update this resource
+                            val username      = existing.get.username
+                            val groupname     = existing.get.groupname
+                            val dataUserGroup = if (username.isEmpty || groupname.isEmpty) None else Some(username.get, groupname.get)
+                            val operations    = authorizedOperations(req, dataUserGroup)
+                            operations.contains("update")
+                        } else {
+                            // Check we're allowed to create new data
+                            val operations = authorizedOperations(req, None)
+                            operations.contains("create")
+                        }
+                    if (! authorized) throw new HttpStatusCodeException(403)
+                }
+
                 store(connection, req, existing)
                 httpResponse.setStatus(201)
             }

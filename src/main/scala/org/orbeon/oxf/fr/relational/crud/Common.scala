@@ -17,8 +17,11 @@ import java.sql.Connection
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.fr.relational.{ForDocument, Specific, Next, Latest}
 import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
+import org.orbeon.oxf.fr.{FormRunnerPersistence, FormRunner}
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.scaxon.XML._
 
-trait Common extends RequestResponse {
+trait Common extends RequestResponse with FormRunnerPersistence {
 
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[CRUD]), "")
 
@@ -72,4 +75,19 @@ trait Common extends RequestResponse {
             req.forAttachment option "file_name"
         ).flatten.mkString(", ")
 
+    // Given a user/group name coming from the data, tells us what operations we can do in this data, assuming that
+    // it is for the current request app/form
+    def authorizedOperations(req: Request, dataUserGroup: Option[(String, String)]): Set[String] = {
+        val metadata    = readFormMetadata(req.app, req.form).ensuring(_.isDefined, "can't find form metadata for data").get
+        val permissions = (metadata / "forms" / "form" / "permissions").headOption
+        permissions match {
+            case None                ⇒ Set("create", "read", "update", "delete")
+            case Some(permissionsEl) ⇒
+                if (dataUserGroup.isDefined) {
+                    val (username, groupname) = dataUserGroup.get
+                    FormRunner.allAuthorizedOperations(permissionsEl, username, groupname).toSet
+                } else
+                    FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet
+        }
+    }
 }

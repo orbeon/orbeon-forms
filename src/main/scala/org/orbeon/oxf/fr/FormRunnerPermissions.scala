@@ -152,6 +152,11 @@ trait FormRunnerPermissions {
 
     def allAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
 
+        // Both username and groupname must be specified; if we don't have a username/groupname, instead,
+        // authorizedOperationsBasedOnRoles() should be called
+        assert(dataUsername != null)
+        assert(dataGroupname != null)
+
         def operations(header: String, dataUserInfo: String, condition: String): Seq[String] = {
             val request = NetUtils.getExternalContext.getRequest
             val headerValue = request.getHeaderValuesMap.asScala.get(header).toSeq.flatten.headOption

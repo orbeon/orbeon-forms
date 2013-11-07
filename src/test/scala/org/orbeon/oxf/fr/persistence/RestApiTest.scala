@@ -258,11 +258,30 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                     Permission(Role("admin"),   Set("read update delete"))
                 ))), 201)
                 Assert.put(DataURL, Specific(1), data, 201)
+
+                // Everyone can read
                 Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
                 Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")), clerk)
                 Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update")), manager)
                 Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update", "delete")), admin)
+
+                // Only managers and admins can update
                 Assert.put(DataURL, Specific(1), data, 403)
+                Assert.put(DataURL, Specific(1), data, 403, clerk)
+                Assert.put(DataURL, Specific(1), data, 201, manager)
+                Assert.put(DataURL, Specific(1), data, 201, admin)
+
+                // Only admins can delete
+                Assert.del(DataURL, Specific(1), 403)
+                Assert.del(DataURL, Specific(1), 403, clerk)
+                Assert.del(DataURL, Specific(1), 403, manager)
+                Assert.del(DataURL, Specific(1), 204, admin)
+
+                // Status code when deleting non-existent data depends on permissions
+                Assert.del(DataURL, Specific(1), 403)
+                Assert.del(DataURL, Specific(1), 404, clerk)
+                Assert.del(DataURL, Specific(1), 404, manager)
+                Assert.del(DataURL, Specific(1), 404, admin)
             }
         }
     }

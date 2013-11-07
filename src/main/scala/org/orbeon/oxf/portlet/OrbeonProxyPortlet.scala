@@ -360,7 +360,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
             val cookieSpec   = new BrowserCompatSpec // because not thread-safe
             val cookieOrigin = getCookieOrigin(url)
-            val cookieStore  = getCookieStore(session)
+            val cookieStore  = getOrCreateCookieStore(session)
 
             cookieStore.clearExpired(new ju.Date)
 
@@ -380,7 +380,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
             val cookieSpec   = new BrowserCompatSpec // because not thread-safe
             val cookieOrigin = getCookieOrigin(url)
-            val cookieStore  = getCookieStore(session)
+            val cookieStore  = getOrCreateCookieStore(session)
 
             for {
                 (name, values) ← connection.getHeaderFields.asScala.toList
@@ -397,13 +397,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             new CookieOrigin(uri.getHost, uri.getPort, uri.getPath, uri.getScheme == "https")
         }
 
-        def getCookieStore(session: PortletSession) = {
+        def getOrCreateCookieStore(session: PortletSession) =
             Option(session.getAttribute(RemoteSessionIdKey).asInstanceOf[CookieStore]) getOrElse {
                 val newCookieStore = new BasicCookieStore
                 session.setAttribute(RemoteSessionIdKey, newCookieStore)
                 newCookieStore
             }
-        }
     }
 
     private def buildFormRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =

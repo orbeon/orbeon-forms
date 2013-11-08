@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
 
@@ -154,14 +153,9 @@ trait Change extends RequestResponse with Common {
     def change(delete: Boolean): Unit = {
         RelationalUtils.withConnection { connection ⇒
             val req = request
+            val existing = existingRow(connection, req)
 
-            // For a put/delete on data, a form version must be provided
-            if (req.forData && ! req.version.isInstanceOf[Specific])
-                httpResponse.setStatus(400)
-            else {
-                val existing = existingRow(connection, req)
-
-                // Check permissions
+            def checkAuthorized(): Boolean = {
                 val authorized =
                     if (req.forData) {
                         if (existing.isDefined) {
@@ -183,16 +177,35 @@ trait Change extends RequestResponse with Common {
                         // Operations on deployed forms are always authorized
                         true
                     }
+                if (! authorized) httpResponse.setStatus(403)
+                authorized
+            }
 
-                if (! authorized)
-                    httpResponse.setStatus(403)
-                else if (delete && existing.isEmpty) {
-                    // We can't delete a document that doesn't exist
-                    httpResponse.setStatus(404)
-                } else {
-                    store(connection, req, existing, delete)
-                    httpResponse.setStatus(if (delete) 204 else 201)
-                }
+            def checkSpecifiedVersion(): Boolean = {
+                val badVersion = req.forData && (
+                        // Create: a specific version number is required
+                        (! delete && existing.isEmpty && ! req.version.isInstanceOf[Specific]) ||
+                        // Update: no version can be specified
+                        (! delete && existing.isDefined && ! (req.version == Unspecified)) ||
+                        // Delete: no version can be specified
+                        (delete && ! (req.version == Unspecified)))
+                if (badVersion) httpResponse.setStatus(400)
+                ! badVersion
+            }
+
+            def checkDocExistsForDelete(): Boolean = {
+                // We can't delete a document that doesn't exist
+                val nothingToDelete = delete && existing.isEmpty
+                if (nothingToDelete) httpResponse.setStatus(404)
+                ! nothingToDelete
+            }
+
+            val passChecks = checkAuthorized() &&
+                             checkSpecifiedVersion() &&
+                             checkDocExistsForDelete()
+            if (passChecks) {
+                store(connection, req, existing, delete)
+                httpResponse.setStatus(if (delete) 204 else 201)
             }
         }
     }

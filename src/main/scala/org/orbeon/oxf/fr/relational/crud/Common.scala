@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.relational.crud
 
 import java.sql.Connection
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.relational.{ForDocument, Specific, Next, Latest}
+import org.orbeon.oxf.fr.relational.{ForDocument, Specific, Next, Unspecified}
 import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 import org.orbeon.oxf.fr.{FormRunnerPersistence, FormRunner}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
@@ -58,10 +58,10 @@ trait Common extends RequestResponse with FormRunnerPersistence {
     def requestedFormVersion(connection: Connection, req: Request): Int = {
         def latest = latestNonDeletedFormVersion(connection, req.app, req.form)
         request.version match {
-            case Latest         ⇒ latest.getOrElse(1)
+            case Unspecified    ⇒ latest.getOrElse(1)
             case Next           ⇒ latest.map(_ + 1).getOrElse(1)
             case Specific(v)    ⇒ v
-            case ForDocument(_) ⇒ ??? // NYI
+            case ForDocument(_) ⇒ 1 // NYI
         }
     }
 

@@ -52,7 +52,7 @@ trait RequestResponse {
                 case None ⇒
                     val versionHeader = headerValue("orbeon-form-definition-version")
                     versionHeader match {
-                        case None ⇒ Latest
+                        case None ⇒ Unspecified
                         case Some("next") ⇒ Next
                         case Some(v) ⇒ Specific(Integer.parseInt(v))
                     }

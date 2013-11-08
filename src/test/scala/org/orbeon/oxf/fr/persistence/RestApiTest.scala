@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
 import util.Try
 import ScalaUtils._
-import org.orbeon.oxf.fr.relational.{Specific, Next, Latest, Version}
+import org.orbeon.oxf.fr.relational.{Specific, Next, Unspecified, Version}
 import scala.xml.Elem
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
@@ -62,7 +62,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 val dataSourceHeader  = Seq("Orbeon-Datasource" → Array("mysql_tomcat"))
                 val contentTypeHeader = body.map(_ ⇒ "Content-Type" → Array("application/xml")).toSeq
                 val versionHeader =  version match {
-                    case Latest                  ⇒ Nil
+                    case Unspecified             ⇒ Nil
                     case Next                    ⇒ Seq("Orbeon-Form-Definition-Version" → Array("next"))
                     case Specific(version)       ⇒ Seq("Orbeon-Form-Definition-Version" → Array(version.toString))
                     case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id" → Array(documentId))
@@ -138,17 +138,17 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
 
             // First time we put with "latest"
             val first = <gaga1/>
-            Assert.put(FormURL, Latest, first, 201)
+            Assert.put(FormURL, Unspecified, first, 201)
             Assert.get(FormURL, Specific(1), Assert.ExpectedDoc (first, Set.empty))
-            Assert.get(FormURL, Latest     , Assert.ExpectedDoc (first, Set.empty))
+            Assert.get(FormURL, Unspecified, Assert.ExpectedDoc (first, Set.empty))
             Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
             Assert.del(FormURL, Specific(2), 404)
 
             // Put again with "latest" updates the current version
             val second = <gaga2/>
-            Assert.put(FormURL, Latest, second, 201)
+            Assert.put(FormURL, Unspecified, second, 201)
             Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(second, Set.empty))
-            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(second, Set.empty))
+            Assert.get(FormURL, Unspecified, Assert.ExpectedDoc(second, Set.empty))
             Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
 
             // Put with "next" to get two versions
@@ -156,7 +156,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.put(FormURL, Next, third, 201)
             Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(second, Set.empty))
             Assert.get(FormURL, Specific(2), Assert.ExpectedDoc(third,  Set.empty))
-            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(third,  Set.empty))
+            Assert.get(FormURL, Unspecified, Assert.ExpectedDoc(third,  Set.empty))
             Assert.get(FormURL, Specific(3), Assert.ExpectedCode(404))
 
             // Put a specific version
@@ -164,14 +164,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             Assert.put(FormURL, Specific(1), fourth, 201)
             Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(fourth, Set.empty))
             Assert.get(FormURL, Specific(2), Assert.ExpectedDoc(third,  Set.empty))
-            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(third,  Set.empty))
+            Assert.get(FormURL, Unspecified, Assert.ExpectedDoc(third,  Set.empty))
             Assert.get(FormURL, Specific(3), Assert.ExpectedCode(404))
 
             // Delete the latest version
-            Assert.del(FormURL, Latest, 204)
+            Assert.del(FormURL, Unspecified, 204)
             Assert.get(FormURL, Specific(1), Assert.ExpectedDoc(fourth, Set.empty))
             Assert.get(FormURL, Specific(2), Assert.ExpectedCode(404))
-            Assert.get(FormURL, Latest     , Assert.ExpectedDoc(fourth, Set.empty))
+            Assert.get(FormURL, Unspecified, Assert.ExpectedDoc(fourth, Set.empty))
 
             // After a delete the version number is reused
             val fifth = <gaga5/>
@@ -193,12 +193,12 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val first = <gaga1/>
             Assert.put(DataURL, Specific(1), first, 201)
             Assert.get(DataURL, Specific(1), Assert.ExpectedDoc(first, AllOperations))
-            Assert.get(DataURL, Latest     , Assert.ExpectedDoc(first, AllOperations))
-            Assert.del(DataURL, Specific(1), 204)
+            Assert.get(DataURL, Unspecified, Assert.ExpectedDoc(first, AllOperations))
+            Assert.del(DataURL, Unspecified, 204)
             Assert.get(DataURL, Specific(1), Assert.ExpectedCode(404))
 
             // Version must be specified when storing data
-            Assert.put(DataURL, Latest            , first, 400)
+            Assert.put(DataURL, Unspecified       , first, 400)
             Assert.put(DataURL, Next              , first, 400)
             Assert.put(DataURL, ForDocument("123"), first, 400)
         }
@@ -235,23 +235,23 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 val DataURL = "/crud/acme/address/data/123/data.xml"
 
                 // Anonymous: no permission defined
-                Assert.put(FormURL, Latest, formDefinitionWithPermissions(None), 201)
+                Assert.put(FormURL, Unspecified, formDefinitionWithPermissions(None), 201)
                 Assert.put(DataURL, Specific(1), data, 201)
-                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, AllOperations))
+                Assert.get(DataURL, Unspecified, Assert.ExpectedDoc(data, AllOperations))
 
                 // Anonymous: create and read
-                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create"))))), 201)
-                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")))
+                Assert.put(FormURL, Unspecified, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create"))))), 201)
+                Assert.get(DataURL, Unspecified, Assert.ExpectedDoc(data, Set("create", "read")))
 
                 // Anonymous: just create, then can't read data
-                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create"))))), 201)
-                Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
+                Assert.put(FormURL, Unspecified, formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create"))))), 201)
+                Assert.get(DataURL, Unspecified, Assert.ExpectedCode(403))
             }
             {
                 val DataURL = "/crud/acme/address/data/456/data.xml"
 
                 // More complex permissions based on roles
-                Assert.put(FormURL, Latest, formDefinitionWithPermissions(Some(Seq(
+                Assert.put(FormURL, Unspecified, formDefinitionWithPermissions(Some(Seq(
                     Permission(Anyone,          Set("create")),
                     Permission(Role("clerk"),   Set("read")),
                     Permission(Role("manager"), Set("read update")),
@@ -260,28 +260,28 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 Assert.put(DataURL, Specific(1), data, 201)
 
                 // Everyone can read
-                Assert.get(DataURL, Latest, Assert.ExpectedCode(403))
-                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read")), clerk)
-                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update")), manager)
-                Assert.get(DataURL, Latest, Assert.ExpectedDoc(data, Set("create", "read", "update", "delete")), admin)
+                Assert.get(DataURL, Unspecified, Assert.ExpectedCode(403))
+                Assert.get(DataURL, Unspecified, Assert.ExpectedDoc(data, Set("create", "read")), clerk)
+                Assert.get(DataURL, Unspecified, Assert.ExpectedDoc(data, Set("create", "read", "update")), manager)
+                Assert.get(DataURL, Unspecified, Assert.ExpectedDoc(data, Set("create", "read", "update", "delete")), admin)
 
                 // Only managers and admins can update
-                Assert.put(DataURL, Specific(1), data, 403)
-                Assert.put(DataURL, Specific(1), data, 403, clerk)
-                Assert.put(DataURL, Specific(1), data, 201, manager)
-                Assert.put(DataURL, Specific(1), data, 201, admin)
+                Assert.put(DataURL, Unspecified, data, 403)
+                Assert.put(DataURL, Unspecified, data, 403, clerk)
+                Assert.put(DataURL, Unspecified, data, 201, manager)
+                Assert.put(DataURL, Unspecified, data, 201, admin)
 
                 // Only admins can delete
-                Assert.del(DataURL, Specific(1), 403)
-                Assert.del(DataURL, Specific(1), 403, clerk)
-                Assert.del(DataURL, Specific(1), 403, manager)
-                Assert.del(DataURL, Specific(1), 204, admin)
+                Assert.del(DataURL, Unspecified, 403)
+                Assert.del(DataURL, Unspecified, 403, clerk)
+                Assert.del(DataURL, Unspecified, 403, manager)
+                Assert.del(DataURL, Unspecified, 204, admin)
 
                 // Status code when deleting non-existent data depends on permissions
-                Assert.del(DataURL, Specific(1), 403)
-                Assert.del(DataURL, Specific(1), 404, clerk)
-                Assert.del(DataURL, Specific(1), 404, manager)
-                Assert.del(DataURL, Specific(1), 404, admin)
+                Assert.del(DataURL, Unspecified, 403)
+                Assert.del(DataURL, Unspecified, 404, clerk)
+                Assert.del(DataURL, Unspecified, 404, manager)
+                Assert.del(DataURL, Unspecified, 404, admin)
             }
         }
     }

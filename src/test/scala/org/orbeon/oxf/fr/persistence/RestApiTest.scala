@@ -13,25 +13,16 @@
  */
 package org.orbeon.oxf.fr.persistence
 
-import org.dom4j.Document
 import org.junit.Test
 import org.orbeon.oxf.fr.relational._
-import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.fr.relational.{Specific, Next, Unspecified}
 import org.orbeon.oxf.test.{TestSupport, ResourceManagerTestBase}
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
-import util.Try
-import ScalaUtils._
-import org.orbeon.oxf.fr.relational.{Specific, Next, Unspecified, Version}
 import scala.xml.Elem
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
-    val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql-ng"
     val AllOperations = Set("create", "read", "update", "delete")
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     def withOrbeonTables[T](block: java.sql.Connection ⇒ T) {
         asTomcat { connection ⇒
@@ -51,83 +42,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             }
         }
     }
-
-    private object Http {
-
-        case class Credentials(username: String, roles: Set[String], group: String)
-
-        private def request(url: String, method: String, version: Version, body: Option[Document], credentials: Option[Credentials]): ConnectionResult = {
-            val documentUrl = URLFactory.createURL(MySQLBase + url)
-            val headers = {
-                val dataSourceHeader  = Seq("Orbeon-Datasource" → Array("mysql_tomcat"))
-                val contentTypeHeader = body.map(_ ⇒ "Content-Type" → Array("application/xml")).toSeq
-                val versionHeader =  version match {
-                    case Unspecified             ⇒ Nil
-                    case Next                    ⇒ Seq("Orbeon-Form-Definition-Version" → Array("next"))
-                    case Specific(version)       ⇒ Seq("Orbeon-Form-Definition-Version" → Array(version.toString))
-                    case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id" → Array(documentId))
-                }
-                val credentialHeaders = credentials.map( c ⇒ Seq(
-                    "Orbeon-Username" → Array(c.username),
-                    "Orbeon-Group"    → Array(c.group),
-                    "Orbeon-Roles"    → Array(c.roles.mkString(" "))
-                )).toSeq.flatten
-                val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
-                Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
-            }
-            val messageBody = body map Dom4jUtils.domToString map (_.getBytes)
-            Connection(method, documentUrl, credentials = None, messageBody = messageBody, headers = headers,
-                loadState = true, logBody = false).connect(saveState = true)
-        }
-
-        def put(url: String, version: Version, body: Document, credentials: Option[Credentials] = None): Integer =
-            useAndClose(request(url, "PUT", version, Some(body), credentials))(_.statusCode)
-
-        def del(url: String, version: Version, credentials: Option[Credentials] = None): Integer =
-            useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
-
-        def get(url: String, version: Version, credentials: Option[Credentials] = None): (Integer, Map[String, Seq[String]], Try[Document]) =
-            useAndClose(request(url, "GET", version, None, credentials)) { connectionResult ⇒
-                useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                    val statusCode = connectionResult.statusCode
-                    val headers = connectionResult.responseHeaders.toMap
-                    val body = Try(Dom4jUtils.readDom4j(inputStream))
-                    (statusCode, headers, body)
-                }
-            }
-    }
-
-    private object Assert {
-
-        sealed trait Expected
-        case   class ExpectedDoc (doc:  Elem, operations: Set[String]) extends Expected
-        case   class ExpectedCode(code: Integer) extends Expected
-
-        def get(url: String, version: Version, expected: Expected, credentials: Option[Http.Credentials] = None): Unit = {
-            val (resultCode, headers, resultDoc) = Http.get(url, version, credentials)
-            expected match {
-                case ExpectedDoc(expectedDoc, expectedOperations) ⇒
-                    assert(resultCode === 200)
-                    assertXMLDocuments(resultDoc.get, expectedDoc)
-                    val resultOperationsString = headers.get("orbeon-operations").map(_.head)
-                    val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
-                    assert(expectedOperations === resultOperationsSet)
-                case ExpectedCode(expectedCode) ⇒
-                    assert(resultCode === expectedCode)
-            }
-        }
-
-        def put(url: String, version: Version, body: Elem, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
-            val actualCode = Http.put(url, version, body, credentials)
-            assert(actualCode === expectedCode)
-        }
-
-        def del(url: String, version: Version, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
-            val actualCode = Http.del(url, version, credentials)
-            assert(actualCode === expectedCode)
-        }
-    }
-
 
     /**
      * Test new form versioning introduced in 4.5, for form definitions.

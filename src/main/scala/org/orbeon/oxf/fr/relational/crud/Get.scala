@@ -29,23 +29,23 @@ trait Get extends RequestResponse with Common with FormRunnerPersistence {
             val resultSet = {
                 val ps = connection.prepareStatement(
                     s"""select
-                      |    last_modified_time,
-                      |    ${if (req.forAttachment) "file_content" else "t.xml xml"}
-                      |    ${if (req.forData)       ", username, groupname" else ""}
-                      |from $table t
-                      |    where (last_modified_time, $idCols)
-                      |          in
-                      |          (
-                      |              select max(last_modified_time) last_modified_time, $idCols
-                      |                from $table
-                      |               where app  = ?
-                      |                     and form = ?
-                      |                     ${if (req.forForm)       "and form_version = ?"              else ""}
-                      |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
-                      |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
-                      |          )
-                      |    and deleted = 'N'
-                      |""".stripMargin)
+                       |    last_modified_time,
+                       |    ${if (req.forAttachment) "file_content" else "t.xml xml"}
+                       |    ${if (req.forData)       ", username, groupname" else ""}
+                       |from $table t
+                       |    where (last_modified_time, $idCols)
+                       |          in
+                       |          (
+                       |              select max(last_modified_time) last_modified_time, $idCols
+                       |                from $table
+                       |               where app  = ?
+                       |                     and form = ?
+                       |                     ${if (req.forForm)       "and form_version = ?"              else ""}
+                       |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
+                       |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
+                       |          )
+                       |    and deleted = 'N'
+                       |""".stripMargin)
 
                 val position = Iterator.from(1)
                 ps.setString(position.next(), req.app)
@@ -82,5 +82,4 @@ trait Get extends RequestResponse with Common with FormRunnerPersistence {
             }
         }
     }
-
 }

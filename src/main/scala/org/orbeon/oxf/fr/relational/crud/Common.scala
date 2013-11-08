@@ -25,28 +25,31 @@ trait Common extends RequestResponse with FormRunnerPersistence {
 
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[CRUD]), "")
 
-    def latestNonDeletedFormVersion(connection: Connection, app: String, form: String): Option[Int] = {
-        val maxVersion = {
+    def formVersion(connection: Connection, app: String, form: String, docId: Option[String]): Option[Int] = {
+        val versionResult = {
+            val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
             val ps = connection.prepareStatement(
-                """select max(form_version)
-                  |  from orbeon_form_definition
-                  | where (last_modified_time, app, form, form_version) in
-                  |       (
-                  |             select max(last_modified_time) last_modified_time, app, form, form_version
-                  |               from orbeon_form_definition
-                  |              where app = ?
-                  |                    and form = ?
-                  |           group by app, form, form_version
-                  |       )
-                  |   and deleted = 'N'
-                """.stripMargin)
-            ps.setString(1, app)
-            ps.setString(2, form)
+                s"""select max(form_version)
+                   |  from $table
+                   | where (last_modified_time, app, form, form_version) in
+                   |       (
+                   |             select max(last_modified_time) last_modified_time, app, form, form_version
+                   |               from $table
+                   |              where app = ?
+                   |                    and form = ?
+                   |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
+                   |           group by app, form, form_version
+                   |       )
+                   |   and deleted = 'N'
+                 """.stripMargin)
+                          ps.setString(1, app)
+                          ps.setString(2, form)
+            docId.foreach(ps.setString(3, _))
             val rs = ps.executeQuery()
             rs.next(); rs
         }
-        val version = maxVersion.getInt(1)
-        if (maxVersion.wasNull()) None else Some(version)
+        val version = versionResult.getInt(1)
+        if (versionResult.wasNull()) None else Some(version)
     }
 
     /**
@@ -56,12 +59,13 @@ trait Common extends RequestResponse with FormRunnerPersistence {
      * the request.
      */
     def requestedFormVersion(connection: Connection, req: Request): Int = {
-        def latest = latestNonDeletedFormVersion(connection, req.app, req.form)
-        request.version match {
-            case Unspecified    ⇒ latest.getOrElse(1)
-            case Next           ⇒ latest.map(_ + 1).getOrElse(1)
-            case Specific(v)    ⇒ v
-            case ForDocument(_) ⇒ 1 // NYI
+        def latest = formVersion(connection, req.app, req.form, None)
+        req.version match {
+            case Unspecified        ⇒ latest.getOrElse(1)
+            case Next               ⇒ latest.map(_ + 1).getOrElse(1)
+            case Specific(v)        ⇒ v
+            case ForDocument(docId) ⇒ formVersion(connection, req.app, req.form, Some(docId))
+                                           .getOrElse(throw new HttpStatusCodeException(404))
         }
     }
 

@@ -183,7 +183,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     }
 
     /**
-     * Test new form versioning introduced in 4.5, for form data.
+     * Test new form versioning introduced in 4.5, for form data
      */
     @Test def formDataVersionTest(): Unit = {
         withOrbeonTables { connection =>
@@ -205,7 +205,29 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     }
 
     /**
-     *
+     * Get form definition corresponding to a document
+     */
+    @Test def formForDataTest(): Unit = {
+        withOrbeonTables { connection =>
+            val FormURL       = "/crud/acme/address/form/form.xml"
+            val FirstDataURL  = "/crud/acme/address/data/123/data.xml"
+            val SecondDataURL = "/crud/acme/address/data/456/data.xml"
+            val first         = <gaga1/>
+            val second        = <gaga2/>
+            val data          = <gaga/>
+
+            Assert.put(FormURL, Unspecified, first, 201)
+            Assert.put(FormURL, Next, second, 201)
+            Assert.put(FirstDataURL, Specific(1), data, 201)
+            Assert.put(SecondDataURL, Specific(2), data, 201)
+            Assert.get(FormURL, ForDocument("123"), Assert.ExpectedDoc(first, Set.empty))
+            Assert.get(FormURL, ForDocument("456"), Assert.ExpectedDoc(second, Set.empty))
+            Assert.get(FormURL, ForDocument("789"), Assert.ExpectedCode(404))
+        }
+    }
+
+    /**
+     * Data permissions
      */
     @Test def permissionsTest(): Unit = {
 

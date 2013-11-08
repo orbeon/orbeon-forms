@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.relational.crud
 
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 
 class CRUD
@@ -25,11 +26,16 @@ class CRUD
         with Change {
 
     override def start(pipelineContext: PipelineContext) {
-        httpRequest.getMethod match {
-            case "GET"    ⇒ get()
-            case "PUT"    ⇒ change(delete = false)
-            case "DELETE" ⇒ change(delete = true)
-            case _        ⇒ httpResponse.setStatus(405)
+        try
+            httpRequest.getMethod match {
+                case "GET"    ⇒ get()
+                case "PUT"    ⇒ change(delete = false)
+                case "DELETE" ⇒ change(delete = true)
+                case _        ⇒ httpResponse.setStatus(405)
+            }
+        catch {
+            case e: HttpStatusCodeException ⇒
+                httpResponse.setStatus(e.code)
         }
     }
 }

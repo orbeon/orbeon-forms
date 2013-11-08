@@ -24,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
 
@@ -153,9 +154,21 @@ trait Change extends RequestResponse with Common {
     def change(delete: Boolean): Unit = {
         RelationalUtils.withConnection { connection ⇒
             val req = request
-            val existing = existingRow(connection, req)
 
-            def checkAuthorized(): Boolean = {
+            // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
+            // - For efficiency: when we can, it's better to 400 right away without accessing the database.
+            // - For correctness: e.g., a  put for a document id is an invalid request, but if we start by checking
+            //   permissions, we might not find the document and return a 400 instead.
+            def checkVersionInitial(): Unit = {
+                val badVersion =
+                    // Only GET for form definitions can request a version for a given document
+                    req.version.isInstanceOf[ForDocument] ||
+                    // Delete: no version can be specified
+                    req.forData && delete && ! (req.version == Unspecified)
+                if (badVersion) throw HttpStatusCodeException(400)
+            }
+
+            def checkAuthorized(existing: Option[Row]): Unit = {
                 val authorized =
                     if (req.forData) {
                         if (existing.isDefined) {
@@ -177,36 +190,31 @@ trait Change extends RequestResponse with Common {
                         // Operations on deployed forms are always authorized
                         true
                     }
-                if (! authorized) httpResponse.setStatus(403)
-                authorized
+                if (! authorized) throw HttpStatusCodeException(403)
             }
 
-            def checkSpecifiedVersion(): Boolean = {
+            def checkVersionWithExisting(existing: Option[Row]): Unit = {
                 val badVersion = req.forData && (
                         // Create: a specific version number is required
                         (! delete && existing.isEmpty && ! req.version.isInstanceOf[Specific]) ||
                         // Update: no version can be specified
-                        (! delete && existing.isDefined && ! (req.version == Unspecified)) ||
-                        // Delete: no version can be specified
-                        (delete && ! (req.version == Unspecified)))
-                if (badVersion) httpResponse.setStatus(400)
-                ! badVersion
+                        (! delete && existing.isDefined && ! (req.version == Unspecified)))
+                if (badVersion) throw HttpStatusCodeException(400)
             }
 
-            def checkDocExistsForDelete(): Boolean = {
+            def checkDocExistsForDelete(existing: Option[Row]): Unit = {
                 // We can't delete a document that doesn't exist
                 val nothingToDelete = delete && existing.isEmpty
-                if (nothingToDelete) httpResponse.setStatus(404)
-                ! nothingToDelete
+                if (nothingToDelete) throw HttpStatusCodeException(404)
             }
 
-            val passChecks = checkAuthorized() &&
-                             checkSpecifiedVersion() &&
-                             checkDocExistsForDelete()
-            if (passChecks) {
-                store(connection, req, existing, delete)
-                httpResponse.setStatus(if (delete) 204 else 201)
-            }
+            checkVersionInitial()
+            val existing = existingRow(connection, req)
+            checkAuthorized(existing)
+            checkVersionWithExisting(existing)
+            checkDocExistsForDelete(existing)
+            store(connection, req, existing, delete)
+            httpResponse.setStatus(if (delete) 204 else 201)
         }
     }
 }

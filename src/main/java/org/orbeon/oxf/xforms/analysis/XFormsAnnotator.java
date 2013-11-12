@@ -180,7 +180,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             if (inTitle && "output".equals(localname)) {
                 // Special case of xf:output within title, which produces an xxf:text control
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
-                startPrefixMapping2("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 stackElement.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
             } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
@@ -275,7 +275,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex));
                 newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxf:element", XMLReceiverHelper.CDATA, qName);
 
-                startPrefixMapping2("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 stackElement.startElement(XFormsConstants.XFORMS_NAMESPACE_URI, "group", "xf:group", newAttributes);
             } else if (hostLanguageAVTs) {
                 // This is a non-XForms element and we allow AVTs
@@ -330,9 +330,9 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                                         newAttributes.addAttribute("", "window-state", "window-state", XMLReceiverHelper.CDATA, "window-state");
                                 }
 
-                                startPrefixMapping2("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                                startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                                 stackElement.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxf:attribute", newAttributes);
-                                endPrefixMapping2("xxforms");
+                                endPrefixMapping2("xxf");
                             }
                         }
                     }
@@ -453,7 +453,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         stackElement.endElement();
 
         if (inTitle && stackElement.isXForms() && "output".equals(localname)) {
-            endPrefixMapping2("xxforms");// for resolving appearance
+            endPrefixMapping2("xxf");// for resolving appearance
         }
 
         namespaceContext.endElement();

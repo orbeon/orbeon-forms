@@ -28,7 +28,7 @@ import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
 
-trait Change extends RequestResponse with Common {
+trait CreateUpdateDelete extends RequestResponse with Common {
 
     case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String])
     def existingRow(connection: Connection, req: Request): Option[Row] = {

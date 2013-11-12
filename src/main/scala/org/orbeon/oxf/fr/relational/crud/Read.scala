@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
 
-trait Get extends RequestResponse with Common with FormRunnerPersistence {
+trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
     def get(): Unit = {
         RelationalUtils.withConnection { connection ⇒

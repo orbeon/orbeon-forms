@@ -22,8 +22,8 @@ class CRUD
         extends ProcessorImpl
         with RequestResponse
         with Common
-        with Get
-        with Change {
+        with Read
+        with CreateUpdateDelete {
 
     override def start(pipelineContext: PipelineContext) {
         try

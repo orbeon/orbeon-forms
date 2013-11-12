@@ -56,7 +56,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(STRING, EXACTLY_ONE)
         )
     
-        Fun("repeat-nodeset", classOf[XXFormsRepeatNodeset], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("repeat-items", classOf[XXFormsRepeatItems], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
+
+        // Backward compatibility, use repeat-items() instead
+        Fun("repeat-nodeset", classOf[XXFormsRepeatItems], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
@@ -99,6 +104,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
 
         Fun("value", classOf[XXFormsValue], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
+
+        Fun("avt-value", classOf[XXFormsAVTValue], op = 0, min = 2, STRING, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
     

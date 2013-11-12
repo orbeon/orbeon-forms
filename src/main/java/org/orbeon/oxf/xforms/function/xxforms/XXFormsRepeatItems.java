@@ -22,9 +22,9 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * The xxf:repeat-nodeset() function returns the current node-set for a given enclosing repeat.
+ * The xxf:repeat-items() function returns the current items for an enclosing repeat.
  */
-public class XXFormsRepeatNodeset extends XFormsFunction {
+public class XXFormsRepeatItems extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
@@ -40,6 +40,6 @@ public class XXFormsRepeatNodeset extends XFormsFunction {
         }
 
         // Get repeat node-set for given id
-        return new ListIterator(contextStack.getRepeatNodeset(repeatId));
+        return new ListIterator(contextStack.getRepeatItems(repeatId));
     }
 }

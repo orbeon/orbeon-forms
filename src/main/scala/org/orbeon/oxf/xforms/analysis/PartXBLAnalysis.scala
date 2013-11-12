@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings}
@@ -73,6 +73,9 @@ trait PartXBLAnalysis extends TransientState {
             case component: ComponentControl ⇒
                 xblBindings.removeBinding(component.prefixedId)
                 deregisterScope(component.binding.innerScope)
+            case attribute: AttributeControl ⇒
+                control.scope -= attribute.forStaticId
+                prefixedIdToXBLScopeMap -= attribute.forPrefixedId
             case _ ⇒
         }
         control.scope -= control.staticId

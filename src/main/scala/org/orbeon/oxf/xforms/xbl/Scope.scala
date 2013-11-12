@@ -37,6 +37,9 @@ class Scope(val parent: Scope, val scopeId: String) {
     def prefixedIdForStaticId(staticId: String) =
         idMap.get(staticId).orNull
 
+    def prefixedIdForStaticIdOpt(staticId: String) =
+        idMap.get(staticId)
+
     def contains(staticId: String) = idMap.contains(staticId)
 
     // Add a static id → prefixed id mapping

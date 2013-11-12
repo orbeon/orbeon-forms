@@ -767,7 +767,7 @@ public class XFormsContextStack {
      * @param repeatId  existing repeat id
      * @return          node-set
      */
-    public List getRepeatNodeset(String repeatId) {
+    public List<Item> getRepeatItems(String repeatId) {
         BindingContext currentBindingContext = this.head;
         do {
             final Element bindingElement = currentBindingContext.getControlElement();

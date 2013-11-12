@@ -82,23 +82,14 @@
 }
 .orbeon {
   /* ***** Utilities ************************************************************************************************** */
-
   /* ***** Portlet reset *********************************************************************************************** */
-
   /* ***** XForms Controls ******************************************************************************************** */
-
   /* ***** General Layout ********************************************************************************************* */
-
   /* ***** Repeats **************************************************************************************************** */
-
   /* ***** Dialogs **************************************************************************************************** */
-
   /* ***** Sections *************************************************************************************************** */
-
   /* ***** Grids ****************************************************************************************************** */
-
   /* ***** View, PDF, email ******************************************************************************************* */
-
 }
 .orbeon .navbar .fr-status-icons {
   display: block;
@@ -281,7 +272,6 @@
   padding-right: 10px;
   /* Space between the image and the text in a button, only for the buttons bar
            (not other buttons in the form which might contain just an image) */
-
 }
 .orbeon .fr-buttons .fr-buttons-message div {
   display: inline;
@@ -323,13 +313,13 @@
   margin-top: 4px;
 }
 .orbeon .fr-repeat-table .fr-repeat-column-trigger {
-  width: 25px;
-  text-align: center;
-  vertical-align: middle;
+  width: 35px;
+  text-align: left;
 }
 .orbeon .fr-repeat-table .fr-repeat-column-trigger i {
   margin: 0;
   display: block;
+  margin: auto;
 }
 .orbeon .fr-repeat-table .fr-repeat-column-trigger span i {
   *margin-left: 0px;
@@ -337,6 +327,23 @@
 .orbeon .fr-repeat-table .fr-repeat-column-trigger button {
   display: block;
   margin: auto;
+}
+.orbeon .fr-repeat-table .fr-repeat-column-trigger .dropdown-menu i {
+  display: inline-block;
+  margin-right: 5px;
+}
+.orbeon .fr-repeat-table .xforms-repeat-selected-item-1 .fr-repeat-column-trigger {
+  background-color: #eeeeee;
+}
+.orbeon .fr-repeat-table .fr-repeat-column-trigger .dropdown {
+  display: none;
+}
+.orbeon .fr-repeat-table .can-remove .dropdown,
+.orbeon .fr-repeat-table .can-move-up .dropdown,
+.orbeon .fr-repeat-table .can-move-down .dropdown,
+.orbeon .fr-repeat-table .can-insert-above .dropdown,
+.orbeon .fr-repeat-table .can-insert-below .dropdown {
+  display: block;
 }
 .orbeon .fr-repeat-table i.disabled {
   opacity: 0.4;
@@ -444,7 +451,6 @@
   /*overflow: hidden*/
   /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
                                                                        absolute positioning of the cell editors, this crops overlays, in particular the date picker */
-
 }
 .orbeon .fr-grid .xforms-help {
   float: left;
@@ -547,7 +553,6 @@
   margin-bottom: 10px;
   /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
            http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
-
 }
 .orbeon #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
   *width: 13em;
@@ -652,9 +657,9 @@
 .orbeon .xforms-form .fr-mode-email .fr-repeat-multiple-rows {
   border-top: none;
 }
-.orbeon .xforms-form .fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row,
-.orbeon .xforms-form .fr-mode-pdf .fr-repeat-multiple-rows .fr-dt-master-row,
-.orbeon .xforms-form .fr-mode-email .fr-repeat-multiple-rows .fr-dt-master-row {
+.orbeon .xforms-form .fr-mode-view .fr-repeat-multiple-rows .fr-grid-master-row,
+.orbeon .xforms-form .fr-mode-pdf .fr-repeat-multiple-rows .fr-grid-master-row,
+.orbeon .xforms-form .fr-mode-email .fr-repeat-multiple-rows .fr-grid-master-row {
   display: none;
 }
 @media print {
@@ -731,7 +736,7 @@
     font-size: .5px;
   }
 }
-@page  {
+@page {
   @bottom-center {
     content: counter(page) " / " counter(pages);
   }

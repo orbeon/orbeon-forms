@@ -255,13 +255,33 @@
         }
 
         .fr-repeat-column-trigger {
-            width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
-            text-align: center;
-            vertical-align: middle;
+            //width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
+            width: 35px;
+            text-align: left;
 
-            i { margin: 0; display: block }                     // For the Bootstrap icon
+            i { margin: 0; display: block; margin: auto }       // For the Bootstrap icon
             span i { *margin-left: 0px }                        // IE buttons depress; is there a way to remove their 1px 3px padding?
             button { display: block; margin: auto }
+
+            .dropdown-menu i {
+                display: inline-block;
+                margin-right: 5px;
+            }
+        }
+
+        // Highlight the current grid row
+        .xforms-repeat-selected-item-1 .fr-repeat-column-trigger {
+            background-color: @grayLighter;
+        }
+
+        .fr-repeat-column-trigger .dropdown {
+            display: none;
+        }
+
+        .can-remove, .can-move-up, .can-move-down, .can-insert-above, .can-insert-below {
+            .dropdown {
+                display: block;
+            }
         }
 
         i.disabled {
@@ -544,7 +564,7 @@
             // For those controls that still have a display: block in view mode, make sure there is no top margin
             .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
             .fr-repeat-multiple-rows {
-                .fr-dt-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
+                .fr-grid-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
                 border-top: none;                           // Avoid double border at the top
             }
         }

@@ -1007,6 +1007,21 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
+             * For example: getRepeatIndexes("foo⊙1-2") returns ["1", "2"]
+             */
+            getRepeatIndexes: function(effectiveId) {
+                if (effectiveId == null)
+                    return null;
+
+                var suffixIndex = effectiveId.indexOf(XF_REPEAT_SEPARATOR);
+                if (suffixIndex != -1) {
+                    return effectiveId.substring(suffixIndex + 1).split(XF_REPEAT_INDEX_SEPARATOR);
+                } else {
+                    return "";
+                }
+            },
+
+            /**
              * For example: getEffectiveIdNoSuffix("foo⊙1-2") returns "⊙1-2"
              */
             getEffectiveIdSuffixWithSeparator: function(effectiveId) {

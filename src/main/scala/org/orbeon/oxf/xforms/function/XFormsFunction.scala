@@ -66,10 +66,12 @@ abstract class XFormsFunction extends SystemFunction {
     }
 
     def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext) = {
-        val scope = getXBLContainer.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
-        val prefixedId = scope.prefixedIdForStaticId(staticId)
+        val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
         getXBLContainer.partAnalysis.getControlAnalysisOption(prefixedId)
     }
+
+    def sourceScope(implicit xpathContext: XPathContext) =
+        getXBLContainer.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
 
     def getContainingDocument(implicit xpathContext: XPathContext) =
         Option(context) map (_.container.getContainingDocument) orNull

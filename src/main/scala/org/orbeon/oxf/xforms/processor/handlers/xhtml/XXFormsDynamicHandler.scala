@@ -56,10 +56,11 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                         handlerContext.pushPartAnalysis(nested.partAnalysis)
                         processShadowTree(controller, nested.template)
 
-                        // Add part globals
-                        nested.partAnalysis.getGlobals.values foreach { global ⇒
-                            XXFormsComponentHandler.processShadowTree(handlerContext.getController, global.templateTree)
-                        }
+                        // Add part globals for top-level part only (see comments in PartAnalysisImpl)
+                        if (nested.partAnalysis.isTopLevel)
+                            nested.partAnalysis.getGlobals.values foreach { global ⇒
+                                XXFormsComponentHandler.processShadowTree(handlerContext.getController, global.templateTree)
+                            }
 
                         handlerContext.popPartAnalysis()
                     }

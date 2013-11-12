@@ -186,10 +186,10 @@ class PartAnalysisImpl(
             initializeScopes()
 
             // Global lists LHHA and handlers
-            val lhhas = Buffer[LHHAAnalysis]()
+            val lhhas         = Buffer[LHHAAnalysis]()
             val eventHandlers = Buffer[EventHandlerImpl]()
-            val models = Buffer[Model]()
-            val attributes = Buffer[AttributeControl]()
+            val models        = Buffer[Model]()
+            val attributes    = Buffer[AttributeControl]()
 
             // Create and index root control
             val rootControlAnalysis = new RootControl(StaticStateContext(this, 0), staticStateDocument.rootControl, startScope)
@@ -199,24 +199,33 @@ class PartAnalysisImpl(
             val buildGatherLHHAAndHandlers: ChildrenBuilderTrait#Builder = build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes))
             rootControlAnalysis.build(buildGatherLHHAAndHandlers)
 
-            // Gather new global XBL controls introduced above
-            // Q: should recursively check?
-            // NOTE: For now we don't set the `preceding` value. The main impact is no resolution of variables. It might be
-            // desirable not to scope them anyway.
-            val globalsOptions =
-                for {
-                    shadowTree ← xblBindings.allGlobals.values
-                    globalElement ← Dom4jUtils.elements(shadowTree.compactShadowTree.getRootElement).asScala
-                } yield
-                    buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
-                        case childrenBuilder: ChildrenBuilderTrait ⇒
-                            childrenBuilder.build(buildGatherLHHAAndHandlers)
-                            childrenBuilder
-                        case other ⇒ other
-                    }
+            // Issues with xxbl:global
+            //
+            // 1. It's unclear what should happen with nested parts if they have globals. Without the condition below,
+            //    globals can be duplicated, once per part. This can cause issues in Form Builder for example, where a
+            //    global can assume visibility on top-level Form Runner resources. As of 2013-11-14, only outputting
+            //    globals at the top-level.
+            // 2. Global controls are placed in the part's start scope. Is there an alternative?
+            // 3. Should we allow for recursive globals?
+            // 4. The code below doesn't set the `preceding` value. The main impact is no resolution of variables.
+            //    It might be desirable not to scope them anyway.
+            if (isTopLevel) {
+                val globalsOptions =
+                    for {
+                        global        ← xblBindings.allGlobals.values
+                        globalElement ← Dom4jUtils.elements(global.compactShadowTree.getRootElement).asScala // children of xxbl:global
+                    } yield
+                        buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
+                            case childrenBuilder: ChildrenBuilderTrait ⇒
+                                childrenBuilder.build(buildGatherLHHAAndHandlers)
+                                childrenBuilder
+                            case other ⇒ other
+                        }
 
-            // Add globals to the root analysis
-            rootControlAnalysis.addChildren(globalsOptions.flatten.toSeq)
+                // Add globals to the root analysis
+                rootControlAnalysis.addChildren(globalsOptions.flatten.toSeq)
+            } else if (xblBindings.allGlobals.nonEmpty)
+                warn(s"There are ${xblBindings.allGlobals.size} xxbl:global in a child part. Those won't be processed.")
 
             // Attach LHHA
             for (lhha ← lhhas)

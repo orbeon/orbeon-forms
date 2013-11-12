@@ -17,7 +17,7 @@ import analysis._
 import collection.JavaConversions._
 import collection.JavaConverters._
 import org.orbeon.oxf.xml._
-import dom4j.{LocationDocumentResult, Dom4jUtils, LocationData}
+import dom4j.{LocationDocumentResult, LocationData}
 import org.orbeon.oxf.xml.XMLConstants._
 import java.util.{List ⇒ JList, Set ⇒ JSet, Map ⇒ JMap}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -185,7 +185,7 @@ object XFormsStaticStateImpl {
 
         // Extractor with prefix
         class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractor(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
-            override def startXFormsOrExtension(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
+            override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
                 val staticId = attributes.getValue("id")
                 if (staticId ne null) {
                     val prefixedId = prefix + staticId
@@ -193,6 +193,12 @@ object XFormsStaticStateImpl {
                         if (startScope.contains(staticId))
                             throw new OXFException("Duplicate id found for static id: " + staticId)
                         startScope += staticId → prefixedId
+
+                        if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
+                            val forStaticId = attributes.getValue("for")
+                            val forPrefixedId = prefix + forStaticId
+                            startScope += forStaticId → forPrefixedId
+                        }
                     }
                 }
             }
@@ -285,8 +291,8 @@ object XFormsStaticStateImpl {
         // NOTE: XFormsExtractorContentHandler takes care of propagating only non-default properties
         val nonDefaultProperties = {
             for {
-                element       ← Dom4jUtils.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME).asScala
-                attribute     ← Dom4jUtils.attributes(element).asScala
+                element       ← Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
+                attribute     ← Dom4j.attributes(element)
                 propertyName  = attribute.getName
                 propertyValue = P.parseProperty(propertyName, attribute.getValue)
             } yield

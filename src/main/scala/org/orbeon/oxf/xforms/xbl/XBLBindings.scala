@@ -210,7 +210,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 compactShadowTree)
 
         // Process globals here as the component is in use
-        processGlobals(abstractBinding, locationData)
+        processGlobalsIfNeeded(abstractBinding, locationData)
 
         // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
         // TODO: should do this here, in order to include only the scripts and resources actually used
@@ -285,8 +285,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 val extractorOutput = TransformerUtils.getIdentityTransformerHandler
                 val extractorDocument = new LocationDocumentResult
                 extractorOutput.setResult(extractorDocument)
-                
-                // FIXME: this adds xml:base on root element
+
                 TransformerUtils.writeDom4j(rawTree,
                     new WhitespaceXMLReceiver(
                         new XFormsAnnotator(
@@ -326,7 +325,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         }
     }
 
-    private def processGlobals(abstractBinding: AbstractBinding, locationData: LocationData) {
+    private def processGlobalsIfNeeded(abstractBinding: AbstractBinding, locationData: LocationData) {
         abstractBinding.global match {
             case Some(globalDocument) if ! allGlobals.contains(abstractBinding.qNameMatch) ⇒
 
@@ -337,14 +336,14 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         
                         // TODO: in script mode, XHTML elements in template should only be kept during page generation
                         annotateAndExtractSubtree(
-                            None,
-                            globalDocument,
-                            topLevelScopeForGlobals,
-                            topLevelScopeForGlobals,
-                            XXBLScope.inner,
-                            topLevelScopeForGlobals,
-                            hasFullUpdate = hasFullUpdate(globalDocument),
-                            ignoreRoot = true
+                            boundElement   = None,
+                            rawTree        = globalDocument,
+                            innerScope     = topLevelScopeForGlobals,
+                            outerScope     = topLevelScopeForGlobals,
+                            startScope     = XXBLScope.inner,
+                            containerScope = topLevelScopeForGlobals,
+                            hasFullUpdate  = hasFullUpdate(globalDocument),
+                            ignoreRoot     = true
                         )
                     }
 
@@ -448,7 +447,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         assert(innerScope ne null)
         assert(outerScope ne null)
 
-        override def startXFormsOrExtension(uri: String, localname: String, attributes: Attributes, currentScope: XXBLScope) {
+        override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, currentScope: XXBLScope) {
 
             // Index prefixed id ⇒ scope
             val staticId = attributes.getValue("id")
@@ -465,6 +464,12 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
                     // Index scope
                     partAnalysis.mapScopeIds(staticId, prefixedId, scope)
+
+                    if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
+                        val forStaticId = attributes.getValue("for")
+                        val forPrefixedId = prefix + forStaticId
+                        partAnalysis.mapScopeIds(forStaticId, forPrefixedId, scope)
+                    }
                 }
             }
         }

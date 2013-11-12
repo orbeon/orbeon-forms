@@ -56,17 +56,20 @@ abstract class ElementAnalysis(
     // xml:lang, inherited from parent unless overridden locally
     lazy val lang: Option[LangRef] = {
         val v = element.attributeValue(XML_LANG_QNAME)
-        if (v ne null) {
-            if (! v.startsWith("#"))
-                Some(LiteralLangRef(v))
-            else {
-                val staticId   = v.substring(1)
-                val prefixedId = scope.prefixedIdForStaticId(staticId)
-                Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
-            }
-        } else
+        if (v ne null)
+            extractXMLLang(v)
+        else
             parent flatMap (_.lang)
     }
+
+    protected def extractXMLLang(lang: String): Some[LangRef] =
+        if (! lang.startsWith("#"))
+            Some(LiteralLangRef(lang))
+        else {
+            val staticId   = lang.substring(1)
+            val prefixedId = scope.prefixedIdForStaticId(staticId)
+            Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
+        }
 
     val namespaceMapping: NamespaceMapping
 

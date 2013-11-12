@@ -300,7 +300,6 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
 
         final XMLElementDetails parentElementDetails = elementStack.peek();
 
-        // Handle outer xml:base and xml:lang
         if (! inPreserve && ! inForeign) {
             final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
             final String xmlLangAttribute = attributes.getValue(XMLConstants.XML_URI, "lang");
@@ -308,7 +307,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
 
             final String id = attributes.getValue("", "id");
 
-            // Extract xbl:base
+            // xbl:base
             final URI newBase;
             if (xmlBaseAttribute != null) {
                 try {
@@ -321,7 +320,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
                 newBase = parentElementDetails.xmlBase;
             }
 
-            // Extract xml:lang
+            // xml:lang
             final String newLang;
             final String xmlLangAvtId;
             if (xmlLangAttribute != null) {
@@ -335,6 +334,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
                 xmlLangAvtId =  parentElementDetails.xmlLangAvtId;
             }
 
+            // xxbl:scope
             final XFormsConstants.XXBLScope newScope;
             if (xblScopeAttribute != null) {
                 newScope = XFormsConstants.XXBLScope.valueOf(xblScopeAttribute);
@@ -426,7 +426,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
                 // Callback for elements of interest
                 if (isXFormsOrExtension || inLHHA) {
                     // NOTE: We call this also for HTML elements within LHHA so we can gather scope information for AVTs
-                    startXFormsOrExtension(uri, localname, attributes, elementStack.peek().scope);
+                    indexElementWithScope(uri, localname, attributes, elementStack.peek().scope);
                 }
             }
 
@@ -497,13 +497,6 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
                 inLHHA = false;
             }
 
-            if (inXFormsOrExtension && ! inPreserve && ! inForeign) {
-                // Callback for elements of interest
-                if (isXFormsOrExtension || inLHHA) {
-                    endXFormsOrExtension(uri, localname, qName);
-                }
-            }
-
             if (inXFormsOrExtension && level == xformsLevel) {
                 // Leaving model or controls
                 inXFormsOrExtension = false;
@@ -557,11 +550,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
         super.setDocumentLocator(locator);
     }
 
-    protected void startXFormsOrExtension(String uri, String localname, Attributes attributes, XFormsConstants.XXBLScope scope) {
-        // NOP
-    }
-
-    protected void endXFormsOrExtension(String uri, String localname, String qName) {
+    protected void indexElementWithScope(String uri, String localname, Attributes attributes, XFormsConstants.XXBLScope scope) {
         // NOP
     }
 

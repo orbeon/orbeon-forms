@@ -125,7 +125,7 @@ $ ->
                 grid =  f$.closest '.fr-grid', container
                 if f$.is '.fr-repeat-single-row', grid
                     position = 1 + f$.length f$.prevAll container
-                    thContainer = f$.nth position, f$.children f$.find 'tr.fr-dt-master-row', grid
+                    thContainer = f$.nth position, f$.children f$.find 'tr.fr-grid-master-row', grid
                     f$.add thContainer, container
                 else container
             elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), adjustContainerForRepeat container

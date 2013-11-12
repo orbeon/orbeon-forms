@@ -26,6 +26,13 @@
                 <close-section>Hide Section</close-section>
                 <section-name>Section Name</section-name>
             </labels>
+            <grid>
+                <insert-above>Insert Above</insert-above>
+                <insert-below>Insert Below</insert-below>
+                <move-up>Move Up</move-up>
+                <move-down>Move Down</move-down>
+                <remove>Remove</remove>
+            </grid>
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
@@ -297,6 +304,13 @@
                 <close-section>Cacher section</close-section>
                 <section-name>Nom de la section</section-name>
             </labels>
+            <grid>
+                <insert-above>Insérer dessus</insert-above>
+                <insert-below>Insérer dessous</insert-below>
+                <move-up>Déplacer vers le haut</move-up>
+                <move-down>Déplacer vers le bas</move-down>
+                <remove>Supprimer</remove>
+            </grid>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
@@ -572,6 +586,13 @@
                 <close-section>Ocultar Sección</close-section>
                 <section-name>Nombre de Sección</section-name>
             </labels>
+            <grid>
+                <insert-above>[Insert Above]</insert-above>
+                <insert-below>[Insert Below]</insert-below>
+                <move-up>[Move Up]</move-up>
+                <move-down>[Move Down]</move-down>
+                <remove>[Remove]</remove>
+            </grid>
         </components>
         <untitled-form>[Untitled Form]</untitled-form>
         <errors>
@@ -832,6 +853,13 @@
                 <close-section>Lukk seksjon</close-section>
                 <section-name>Seksjonsnavn</section-name>
             </labels>
+            <grid>
+                <insert-above>[Insert Above]</insert-above>
+                <insert-below>[Insert Below]</insert-below>
+                <move-up>[Move Up]</move-up>
+                <move-down>[Move Down]</move-down>
+                <remove>[Remove]</remove>
+            </grid>
         </components>
         <untitled-form>[Untitled Form]</untitled-form>
         <errors>
@@ -1091,6 +1119,13 @@
                 <close-section>Свернуть раздел</close-section>
                 <section-name>Название раздела</section-name>
             </labels>
+            <grid>
+                <insert-above>[Insert Above]</insert-above>
+                <insert-below>[Insert Below]</insert-below>
+                <move-up>[Move Up]</move-up>
+                <move-down>[Move Down]</move-down>
+                <remove>[Remove]</remove>
+            </grid>
         </components>
         <untitled-form>[Untitled Form]</untitled-form>
         <errors>
@@ -1348,6 +1383,13 @@
                 <close-section>Nascondi sezione</close-section>
                 <section-name>Nome della sezione</section-name>
             </labels>
+            <grid>
+                <insert-above>[Insert Above]</insert-above>
+                <insert-below>[Insert Below]</insert-below>
+                <move-up>[Move Up]</move-up>
+                <move-down>[Move Down]</move-down>
+                <remove>[Remove]</remove>
+            </grid>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
         <errors>
@@ -1618,6 +1660,13 @@
                 <close-section>Abschnitt verstecken</close-section>
                 <section-name>Abschnittsname</section-name>
             </labels>
+            <grid>
+                <insert-above>[Insert Above]</insert-above>
+                <insert-below>[Insert Below]</insert-below>
+                <move-up>[Move Up]</move-up>
+                <move-down>[Move Down]</move-down>
+                <remove>[Remove]</remove>
+            </grid>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
@@ -1888,6 +1937,13 @@
                 <close-section>Piilota lohko</close-section>
                 <section-name>Lohkon nimi</section-name>
             </labels>
+            <grid>
+                <insert-above>[Insert Above]</insert-above>
+                <insert-below>[Insert Below]</insert-below>
+                <move-up>[Move Up]</move-up>
+                <move-down>[Move Down]</move-down>
+                <remove>[Remove]</remove>
+            </grid>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
         <errors>

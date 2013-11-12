@@ -22,6 +22,7 @@ import scala.xml.Elem
 import scala.util.Random
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
@@ -226,16 +227,30 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     }
 
 
+    // Try uploading files of 1 KB, 1 MB, and 10 MB
     @Test def attachmentsTest(): Unit = {
         withOrbeonTables { connection =>
-            val AttachmentURL = "/crud/acme/address/data/123/file"
-
-            // Try uploading files of 1 KB, 1 MB, and 10 MB
             for ((size, position) ← Seq(1024, 1024*1024, 10*1024*1024).zipWithIndex) {
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> Http.Binary
-                val url = AttachmentURL + position
+                val url = s"/crud/acme/address/data/123/file$position"
                 Assert.put(url, Specific(1), bytes, 201)
                 Assert.get(url, Specific(1), Assert.ExpectedBody(bytes, AllOperations))
+            }
+        }
+    }
+
+    // Try uploading files of 1 KB, 1 MB, and 5 MB
+    @Test def largeXMLDocumentsTest(): Unit = {
+        withOrbeonTables { connection =>
+            for ((size, position) ← Seq(1024, 1024*1024, 5*1024*1024).zipWithIndex) {
+                val string = new Array[Char](size)
+                for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
+                val text = Dom4jUtils.createText(new String(string))
+                val element = Dom4jUtils.createElement("gaga") |!> (_.add(text))
+                val document = Dom4jUtils.createDocument |!> (_.add(element)) |> Http.XML
+                val url = s"/crud/acme/address/data/$position/data.xml"
+                Assert.put(url, Specific(1), document, 201)
+                Assert.get(url, Specific(1), Assert.ExpectedBody(document, AllOperations))
             }
         }
     }

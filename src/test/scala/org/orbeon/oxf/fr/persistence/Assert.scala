@@ -13,24 +13,30 @@
  */
 package org.orbeon.oxf.fr.persistence
 
-import scala.xml.Elem
 import org.orbeon.oxf.fr.relational.Version
-import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.test.TestSupport
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import java.io.ByteArrayInputStream
 
 private object Assert extends TestSupport {
 
     sealed trait Expected
-    case   class ExpectedDoc (doc:  Elem, operations: Set[String]) extends Expected
+    case   class ExpectedBody(body: Http.Body, operations: Set[String]) extends Expected
     case   class ExpectedCode(code: Integer) extends Expected
 
     def get(url: String, version: Version, expected: Expected, credentials: Option[Http.Credentials] = None): Unit = {
-        val (resultCode, headers, resultDoc) = Http.get(url, version, credentials)
+        val (resultCode, headers, resultBody) = Http.get(url, version, credentials)
         expected match {
-            case ExpectedDoc(expectedDoc, expectedOperations) ⇒
+            case ExpectedBody(body, expectedOperations) ⇒
                 assert(resultCode === 200)
-                assertXMLDocuments(resultDoc.get, expectedDoc)
+                body match {
+                    case Http.XML(expectedDoc) ⇒
+                        val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
+                        assertXMLDocuments(resultDoc, expectedDoc)
+                    case Http.Binary(expectedFile) ⇒
+                        assert(resultBody.get === expectedFile)
+                }
                 val resultOperationsString = headers.get("orbeon-operations").map(_.head)
                 val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
                 assert(expectedOperations === resultOperationsSet)
@@ -39,7 +45,7 @@ private object Assert extends TestSupport {
         }
     }
 
-    def put(url: String, version: Version, body: Elem, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
+    def put(url: String, version: Version, body: Http.Body, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
         val actualCode = Http.put(url, version, body, credentials)
         assert(actualCode === expectedCode)
     }

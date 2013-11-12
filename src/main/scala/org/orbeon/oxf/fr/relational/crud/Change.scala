@@ -108,8 +108,10 @@ trait Change extends RequestResponse with Common {
         // For put/update, reads the request either as bytes or XML
         object RequestReader {
             def requestInputStream(): InputStream = {
-                val bodyURL = RequestGenerator.getRequestBody(PipelineContext.get)
-                NetUtils.uriToInputStream(bodyURL)
+                RequestGenerator.getRequestBody(PipelineContext.get) match {
+                    case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
+                    case _ ⇒ httpRequest.getInputStream
+                }
             }
 
             def bytes(): Array[Byte] = {

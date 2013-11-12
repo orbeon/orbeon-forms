@@ -74,9 +74,15 @@ trait Get extends RequestResponse with Common with FormRunnerPersistence {
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))
                 }
 
-                val xml = resultSet.getClob("xml")
-                val response = NetUtils.getExternalContext.getResponse
-                NetUtils.copyStream(xml.getCharacterStream, response.getWriter)
+                // Write content (XML / file)
+                if (req.forAttachment) {
+                    val blob = resultSet.getBlob("file_content")
+                    NetUtils.copyStream(blob.getBinaryStream, httpResponse.getOutputStream)
+                } else {
+                    val clob = resultSet.getClob("xml")
+                    NetUtils.copyStream(clob.getCharacterStream, httpResponse.getWriter)
+                }
+
             } else {
                 throw new HttpStatusCodeException(404)
             }

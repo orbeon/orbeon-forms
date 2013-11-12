@@ -20,9 +20,9 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.Element
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData, Dom4jUtils}
+import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}
 import collection.mutable.Buffer
-import org.orbeon.oxf.common.{Version, ValidationException}
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper, XMLUtils}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.Logging
@@ -183,7 +183,6 @@ class PartAnalysisImpl(
         implicit val logger = getIndentedLogger
         withDebug("performing static analysis") {
 
-            // Initialize scopes
             initializeScopes()
 
             // Global lists LHHA and handlers

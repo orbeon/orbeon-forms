@@ -11,17 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms
+package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.RuntimeBind
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
-/**
- * The xxf:bind() function.
- */
-class XXFormsBind extends XFormsFunction with FunctionSupport {
+class Bind extends XFormsFunction with FunctionSupport {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

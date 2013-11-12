@@ -54,5 +54,10 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
+
+        // XForms 2.0
+        Fun("bind", classOf[Bind], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
     }
 }

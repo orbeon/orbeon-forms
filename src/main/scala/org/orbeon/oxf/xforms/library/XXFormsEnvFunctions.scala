@@ -18,7 +18,7 @@ import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.oxf.xforms.function.xxforms._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.function.{XXFormsValid, Event, If}
+import org.orbeon.oxf.xforms.function.{Bind, XXFormsValid, Event, If}
 import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP
 
 /*
@@ -57,10 +57,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
     
         Fun("repeat-nodeset", classOf[XXFormsRepeatNodeset], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE)
-        )
-
-        Fun("bind", classOf[XXFormsBind], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
@@ -217,6 +213,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         // NOTE: also from exforms
         Fun("required", classOf[EXFormsMIP], 2, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+        )
+
+        // Now available in XForms 2.0
+        Fun("bind", classOf[Bind], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
         )
     }
 }

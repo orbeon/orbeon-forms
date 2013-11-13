@@ -110,10 +110,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             // Storing for specific form version
             val first = <gaga1/>
             Assert.put(DataURL, Specific(1), Http.XML(first), 201)
-            Assert.get(DataURL, Specific(1), Assert.ExpectedBody(Http.XML(first), AllOperations))
+            Assert.get(DataURL, Unspecified, Assert.ExpectedBody(Http.XML(first), AllOperations))
             Assert.get(DataURL, Unspecified, Assert.ExpectedBody(Http.XML(first), AllOperations))
             Assert.del(DataURL, Unspecified, 204)
-            Assert.get(DataURL, Specific(1), Assert.ExpectedCode(404))
+            Assert.get(DataURL, Unspecified, Assert.ExpectedCode(404))
 
             // Version must be specified when storing data
             Assert.put(DataURL, Unspecified       , Http.XML(first), 400)
@@ -233,7 +233,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> Http.Binary
                 val url = s"/crud/acme/address/data/123/file$position"
                 Assert.put(url, Specific(1), bytes, 201)
-                Assert.get(url, Specific(1), Assert.ExpectedBody(bytes, AllOperations))
+                Assert.get(url, Unspecified, Assert.ExpectedBody(bytes, AllOperations))
             }
         }
     }
@@ -249,7 +249,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 val document = Dom4jUtils.createDocument |!> (_.add(element)) |> Http.XML
                 val url = s"/crud/acme/address/data/$position/data.xml"
                 Assert.put(url, Specific(1), document, 201)
-                Assert.get(url, Specific(1), Assert.ExpectedBody(document, AllOperations))
+                Assert.get(url, Unspecified, Assert.ExpectedBody(document, AllOperations))
             }
         }
     }
@@ -264,8 +264,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val DraftURL = "/crud/acme/address/draft/123/data.xml"
             Assert.put(DataURL,  Specific(1), first, 201)
             Assert.put(DraftURL, Unspecified, second, 201)
-            Assert.get(DataURL,  Specific(1), Assert.ExpectedBody(first, AllOperations))
-            Assert.get(DraftURL, Specific(1), Assert.ExpectedBody(second, AllOperations))
+            Assert.get(DataURL,  Unspecified, Assert.ExpectedBody(first, AllOperations))
+            Assert.get(DraftURL, Unspecified, Assert.ExpectedBody(second, AllOperations))
         }
     }
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import org.orbeon.oxf.fr.relational.RelationalUtils
+import org.orbeon.oxf.fr.relational.{Next, Unspecified, Specific, RelationalUtils}
 import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
@@ -23,10 +23,17 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
     def get(): Unit = {
         RelationalUtils.withConnection { connection ⇒
             val req = request
-            val table = tableName(request)
-            val idCols = idColumns(request)
+
+            val badVersion =
+                // For data, version must be left unspecified
+                (req.forData && req.version != Unspecified) ||
+                // For form definition, everything is valid except Next
+                (req.forForm && req.version == Next)
+            if (badVersion) throw HttpStatusCodeException(400)
 
             val resultSet = {
+                val table = tableName(request)
+                val idCols = idColumns(request)
                 val ps = connection.prepareStatement(
                     s"""select
                        |    last_modified_time,

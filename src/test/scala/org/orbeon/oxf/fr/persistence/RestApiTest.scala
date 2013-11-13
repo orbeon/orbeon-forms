@@ -226,7 +226,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         }
     }
 
-
     // Try uploading files of 1 KB, 1 MB, and 10 MB
     @Test def attachmentsTest(): Unit = {
         withOrbeonTables { connection =>
@@ -252,6 +251,21 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
                 Assert.put(url, Specific(1), document, 201)
                 Assert.get(url, Specific(1), Assert.ExpectedBody(document, AllOperations))
             }
+        }
+    }
+
+    @Test def draftsTest(): Unit = {
+        withOrbeonTables { connection =>
+
+            // Draft and non-draft are different
+            val first  = Http.XML(<gaga1/>)
+            val second = Http.XML(<gaga2/>)
+            val DataURL  = "/crud/acme/address/data/123/data.xml"
+            val DraftURL = "/crud/acme/address/draft/123/data.xml"
+            Assert.put(DataURL,  Specific(1), first, 201)
+            Assert.put(DraftURL, Unspecified, second, 201)
+            Assert.get(DataURL,  Specific(1), Assert.ExpectedBody(first, AllOperations))
+            Assert.get(DraftURL, Specific(1), Assert.ExpectedBody(second, AllOperations))
         }
     }
 }

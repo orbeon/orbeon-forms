@@ -26,8 +26,7 @@ import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.AtomicValue;
 
 import java.util.ArrayList;
@@ -195,7 +194,7 @@ public class XFormsInsertAction extends XFormsAction {
                 if (isEmptyNodesetBinding) {
                     if (indentedLogger != null && indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xf:insert", "origin node-set from node-set binding is empty, terminating");
-                    return Collections.EMPTY_LIST;
+                    return Collections.emptyList();
                 }
 
                 // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
@@ -213,7 +212,7 @@ public class XFormsInsertAction extends XFormsAction {
                 if (originItems.size() == 0) {
                     if (indentedLogger != null && indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xf:insert", "origin node-set is empty, terminating");
-                    return Collections.EMPTY_LIST;
+                    return Collections.emptyList();
                 }
 
                 // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
@@ -286,6 +285,7 @@ public class XFormsInsertAction extends XFormsAction {
         final XFormsInstance modifiedInstance;
         // Find actual insertion point and insert
         final NodeInfo insertLocationNodeInfo;
+        final int insertLocationIndexWithinParentBeforeUpdate;
         final List<Node> insertedNodes;
         final String beforeAfterInto;
         if (isEmptyNodesetBinding) {
@@ -301,6 +301,8 @@ public class XFormsInsertAction extends XFormsAction {
 
             modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertContextNodeInfo) : null;
             insertLocationNodeInfo = insertContextNodeInfo;
+            insertLocationIndexWithinParentBeforeUpdate = findNodeIndexRewrapIfNeeded(insertLocationNodeInfo);
+
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstance, doDispatch);
             beforeAfterInto = "into";
@@ -317,8 +319,11 @@ public class XFormsInsertAction extends XFormsAction {
         } else {
             // Insert BEFORE or AFTER a node
             insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
+
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertLocationNodeInfo) : null;
+
+            insertLocationIndexWithinParentBeforeUpdate = findNodeIndexRewrapIfNeeded(insertLocationNodeInfo);
 
             final Document insertLocationNodeDocument = insertLocationNode.getDocument();
             if (insertLocationNodeDocument != null && insertLocationNodeDocument.getRootElement() == insertLocationNode) {
@@ -419,7 +424,7 @@ public class XFormsInsertAction extends XFormsAction {
         // Gather list of modified nodes
         final List<NodeInfo> insertedNodeInfos;
         if (didInsertNodes && modifiedInstance != null) {
-            // Can be null if document into which delete is performed is not in an instance, e.g. in a variable
+            // Instance can be null if document into which delete is performed is not in an instance, e.g. in a variable
             final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.documentInfo();
             insertedNodeInfos = new ArrayList<NodeInfo>(insertedNodes.size());
             for (Object insertedNode : insertedNodes)
@@ -442,15 +447,49 @@ public class XFormsInsertAction extends XFormsAction {
                 adjustedInsertLocationNodeInfo = parent.getDocumentRoot();
                 adjustedBeforeAfterInto = "into";
             } else {
-                adjustedInsertLocationNodeInfo = insertLocationNodeInfo;
+                adjustedInsertLocationNodeInfo = rewrapIfNeeded(insertLocationNodeInfo);
                 adjustedBeforeAfterInto = beforeAfterInto;
             }
 
             Dispatch.dispatchEvent(
-                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, adjustedInsertLocationNodeInfo, adjustedBeforeAfterInto));
+                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, adjustedInsertLocationNodeInfo, adjustedBeforeAfterInto, insertLocationIndexWithinParentBeforeUpdate));
         }
 
         return insertedNodeInfos;
+    }
+
+    public static int findNodeIndexRewrapIfNeeded(NodeInfo node) {
+        return findNodeIndex(rewrapIfNeeded(node));
+    }
+
+    public static NodeInfo rewrapIfNeeded(NodeInfo node) {
+        if (node instanceof VirtualNode) {
+            final DocumentWrapper doc = (DocumentWrapper) node.getDocumentRoot();
+            final Object underlying = ((VirtualNode) node).getUnderlyingNode();
+            if (doc != null)
+                return doc.wrap(underlying);
+            else
+                return DocumentWrapper.makeWrapper(underlying);
+        } else
+            return node;
+    }
+
+    public static int findNodeIndex(NodeInfo node) {
+
+        if (node.getParent() == null)
+            return 0;
+
+        final AxisIterator it = node.iterateAxis(Axis.PRECEDING_SIBLING);
+        int result = 0;
+
+        Item i = it.next();
+
+        while (i != null) {
+            result++;
+            i = it.next();
+        }
+
+        return result;
     }
 
     private static List<Node> doInsert(Node insertionNode, List<Node> clonedNodes, XFormsInstance modifiedInstance, boolean doDispatch) {

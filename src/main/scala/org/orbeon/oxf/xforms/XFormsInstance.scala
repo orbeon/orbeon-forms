@@ -335,9 +335,10 @@ class XFormsInstance(
                 new XFormsInsertEvent(
                     this,
                     Seq[NodeInfo](currentRoot).asJava,
-                    null, // CHECK
+                    null,   // CHECK
                     currentRoot.getDocumentRoot,
-                    "into") // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
+                    "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
+                    0)
             )
         }
     }

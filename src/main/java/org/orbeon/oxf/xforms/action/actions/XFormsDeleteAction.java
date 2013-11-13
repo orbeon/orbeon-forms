@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -188,18 +189,23 @@ public class XFormsDeleteAction extends XFormsAction {
         final List contentToUpdate;
         final int indexInContentToUpdate;
         final Element parentElement = nodeToRemove.getParent();
+        final boolean mustNormalize;
         if (parentElement != null) {
             // Regular case
             if (nodeToRemove instanceof Attribute) {
                 contentToUpdate = parentElement.attributes();
+                mustNormalize = false;
             } else {
                 contentToUpdate = parentElement.content();
+                mustNormalize = true;
             }
             indexInContentToUpdate = contentToUpdate.indexOf(nodeToRemove);
+
         } else if (nodeToRemove.getDocument() != null && nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
             // Case of root element where parent is Document
             contentToUpdate = nodeToRemove.getDocument().content();
             indexInContentToUpdate = contentToUpdate.indexOf(nodeToRemove);
+            mustNormalize = false;
         } else if (nodeToRemove instanceof Document) {
             // Case where node to remove is Document
 
@@ -219,6 +225,10 @@ public class XFormsDeleteAction extends XFormsAction {
         // Actually perform the deletion
         // "The node at the delete location in the Node Set Binding node-set is deleted"
         contentToUpdate.remove(indexInContentToUpdate);
+
+        // Removing a node can cause non-adjacent text nodes to become adjacent
+        if (mustNormalize)
+            Dom4jUtils.normalizeTextNodes(parentElement);
 
         return new DeleteInfo(parentNodeInfo, nodeInfoToRemove, indexInContentToUpdate);
     }

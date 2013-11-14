@@ -70,10 +70,6 @@ object XPath {
             throw new IllegalStateException("Global XPath configuration is read-only")
     }
 
-    // Global document wrapper
-    // NOTE: Not ideal to require this. See also XML.
-    val DocumentWrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
-
     // Create and compile an expression
     def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean)(implicit logger: IndentedLogger): CompiledExpression = {
         val staticContext = new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary)

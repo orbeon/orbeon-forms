@@ -22,7 +22,7 @@ import XFormsElement._
 import org.orbeon.saxon.om.{EmptyIterator, NodeInfo, Item}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
+import org.orbeon.saxon.dom4j.DocumentWrapper
 
 /**
  * xxf:element()
@@ -44,7 +44,7 @@ class XFormsElement extends XFormsFunction {
         if (hasNewText)
             Dom4jUtils.normalizeTextNodes(element)
 
-        OrbeonXPath.DocumentWrapper.wrap(element)
+        DocumentWrapper.makeWrapper(element)
     }
 }
 

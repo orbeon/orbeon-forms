@@ -188,8 +188,12 @@
                 <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
                 <xxf:script ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
                     if (history &amp;&amp; history.replaceState) {
-                        if (location.href.lastIndexOf("/new") == location.href.length - 4)
-                            history.replaceState(null, "", "edit/" + ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
+                        var hashIndex = location.href.indexOf("#");
+                        var hrefWithoutHash = hashIndex != -1 ? location.href.substring(0, hashIndex) : location.href;
+                        if (hrefWithoutHash.lastIndexOf("/new") == hrefWithoutHash.length - 4) {
+                            var hash = hashIndex != -1 ? location.href.substring(hashIndex) : "";
+                            history.replaceState(null, "", "edit/" + ORBEON.xforms.Document.getValue("fr-parameters-instance-document") + hash);
+                        }
                     }
                 </xxf:script>
             </xf:var>

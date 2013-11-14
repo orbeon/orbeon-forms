@@ -22,14 +22,15 @@ import java.io.ByteArrayInputStream
 private object Assert extends TestSupport {
 
     sealed trait Expected
-    case   class ExpectedBody(body: Http.Body, operations: Set[String]) extends Expected
+    case   class ExpectedBody(body: Http.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
     case   class ExpectedCode(code: Integer) extends Expected
 
     def get(url: String, version: Version, expected: Expected, credentials: Option[Http.Credentials] = None): Unit = {
         val (resultCode, headers, resultBody) = Http.get(url, version, credentials)
         expected match {
-            case ExpectedBody(body, expectedOperations) ⇒
+            case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
                 assert(resultCode === 200)
+                // Check body
                 body match {
                     case Http.XML(expectedDoc) ⇒
                         val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
@@ -37,9 +38,13 @@ private object Assert extends TestSupport {
                     case Http.Binary(expectedFile) ⇒
                         assert(resultBody.get === expectedFile)
                 }
+                // Check operations
                 val resultOperationsString = headers.get("orbeon-operations").map(_.head)
                 val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
                 assert(expectedOperations === resultOperationsSet)
+                // Check form version
+                val resultFormVersion = headers.get("orbeon-form-definition-version").map(_.head).map(Integer.parseInt)
+                assert(expectedFormVersion === resultFormVersion)
             case ExpectedCode(expectedCode) ⇒
                 assert(resultCode === expectedCode)
         }

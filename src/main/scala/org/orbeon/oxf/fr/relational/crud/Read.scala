@@ -36,9 +36,10 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 val idCols = idColumns(request)
                 val ps = connection.prepareStatement(
                     s"""select
-                       |    last_modified_time,
-                       |    ${if (req.forAttachment) "file_content" else "t.xml xml"}
-                       |    ${if (req.forData)       ", username, groupname" else ""}
+                       |    last_modified_time
+                       |    ${if (req.forAttachment) ", file_content"          else ", t.xml xml"}
+                       |    ${if (req.forData)       ", username, groupname"   else ""}
+                       |    ${if (req.forForm)       ", form_version"          else ""}
                        |from $table t
                        |    where (last_modified_time, $idCols)
                        |          in
@@ -79,6 +80,12 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                     if (! operations.contains("read"))
                         throw new HttpStatusCodeException(403)
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))
+                }
+
+                // Set form version header
+                if (req.forForm) {
+                    val formVersion = resultSet.getInt("form_version")
+                    httpResponse.setHeader("Orbeon-Form-Definition-Version", formVersion.toString)
                 }
 
                 // Write content (XML / file)

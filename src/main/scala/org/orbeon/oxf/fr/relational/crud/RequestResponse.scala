@@ -61,7 +61,7 @@ trait RequestResponse {
 
         NetUtils.getExternalContext.getRequest.getRequestPath match {
             case CrudFormPath(_, app, form, filename) ⇒
-                val file = if (filename == "form.xml") None else Some(filename)
+                val file = if (filename == "form.xhtml") None else Some(filename)
                 new Request(app, form, file, version, None)
             case CrudDataPath(_, app, form, dataOrDraft, documentId, filename) ⇒
                 val file = if (filename == "data.xml") None else Some(filename)

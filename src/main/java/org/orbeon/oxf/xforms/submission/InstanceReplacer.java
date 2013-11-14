@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
@@ -78,7 +79,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // TODO: What about configuring validation? And what default to choose?
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                resultingDocument = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(),
+                resultingDocument = TransformerUtils.readTinyTree(XPath.GlobalConfiguration(),
                         connectionResult.getResponseInputStream(), connectionResult.resourceURI(), isHandleXInclude, true);
 
                 if (indentedLogger.isDebugEnabled())

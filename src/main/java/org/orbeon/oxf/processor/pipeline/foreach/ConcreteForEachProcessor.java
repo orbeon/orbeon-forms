@@ -243,7 +243,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
     private PooledXPathExpression createExpression(PipelineContext pipelineContext) {
         // Read special "$data" input
         final Document dataInput = readInputAsDOM4J(pipelineContext, getInputByName(AbstractForEachProcessor.FOR_EACH_DATA_INPUT));
-        final DocumentInfo document = new DocumentWrapper(dataInput, null, XPathCache.getGlobalConfiguration());
+        final DocumentInfo document = new DocumentWrapper(dataInput, null, org.orbeon.oxf.util.XPath.GlobalConfiguration());
         return XPathCache.getXPathExpression(
                 document.getConfiguration(), document,
                 select, namespaceContext, getLocationData());

@@ -30,7 +30,7 @@ import javax.xml.transform.stream.StreamResult
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.externalcontext.URLRewriter
 import collection.JavaConverters._
-import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
+import org.orbeon.oxf.util.{XPath, URLRewriterUtils, NetUtils}
 
 /**
  * The persistence proxy processor:
@@ -163,7 +163,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
             // TODO: Handle connection.getResponseCode.
             useAndClose(proxyEstablishConnection(request, serviceURI, headers).getInputStream) { is ⇒
-                val forms = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, is, serviceURI, false, false)
+                val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
                 forms \\ "forms" \\ "form"
             }
         }

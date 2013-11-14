@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import collection.mutable.Stack
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
+import org.orbeon.oxf.util.{XPath, ScalaUtils, XPathCache}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
@@ -34,7 +34,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
-    val hasStaticItemset = ! XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration).wrap(element),
+    val hasStaticItemset = ! XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPath.GlobalConfiguration).wrap(element),
             "exists((xf:choices | xf:item | xf:itemset)/(., .//xf:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData, null).asInstanceOf[Boolean]
 

@@ -19,6 +19,7 @@ import org.dom4j.tree.DefaultProcessingInstruction;
 import org.dom4j.tree.DefaultText;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -76,7 +77,7 @@ public class XPathProcessor extends ProcessorImpl {
                     }
                 });
 
-                final DocumentInfo documentInfo = readCacheInputAsTinyTree(context, XPathCache.getGlobalConfiguration(), INPUT_DATA);
+                final DocumentInfo documentInfo = readCacheInputAsTinyTree(context, XPath.GlobalConfiguration(), INPUT_DATA);
                 PooledXPathExpression xpath = null;
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();

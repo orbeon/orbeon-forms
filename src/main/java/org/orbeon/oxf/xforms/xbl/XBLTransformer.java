@@ -43,7 +43,7 @@ public class XBLTransformer {
      */
     public static Document transform(final Document shadowTreeDocument, final Element boundElement, final boolean excludeNestedHandlers, final boolean excludeNestedLHHA) {
 
-        final DocumentWrapper documentWrapper = new DocumentWrapper(boundElement.getDocument(), null, XPathCache.getGlobalConfiguration());
+        final DocumentWrapper documentWrapper = new DocumentWrapper(boundElement.getDocument(), null, org.orbeon.oxf.util.XPath.GlobalConfiguration());
 
         Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
 

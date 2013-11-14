@@ -65,7 +65,7 @@ private object SubmitResponseEvent {
                 sb.append("</header>")
             }
             sb.append("</headers>")
-            TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
+            TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
         }
 
     def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = headersDocument(e.headers) map { document: Item ⇒
@@ -120,7 +120,7 @@ private object SubmitResponseEvent {
                         // Read stream into Document
                         // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
                         try useAndClose(new URL(tempURI).openStream()) { is ⇒
-                            val document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, is, connectionResult.resourceURI, false, true)
+                            val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.resourceURI, false, true)
                             if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
                                 logger.logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(document))
                             Some(document)

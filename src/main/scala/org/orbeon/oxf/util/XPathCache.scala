@@ -48,9 +48,6 @@ object XPathCache {
         functionContext: FunctionContext,
         baseURI: String,
         locationData: LocationData)
-    
-    // FIXME: Directly use GlobalConfiguration
-    def getGlobalConfiguration = GlobalConfiguration
 
     def isDynamicXPathError(t: Throwable) = t match {
         case e: XPathException if ! e.isStaticError ⇒ true
@@ -98,7 +95,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
@@ -126,7 +123,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
@@ -150,7 +147,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
@@ -174,7 +171,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap,
                 functionLibrary, baseURI, isAVT = false, locationData)
 
@@ -217,7 +214,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap,
                 functionLibrary, baseURI, isAVT = false, locationData)
 
@@ -266,7 +263,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap,
                 functionLibrary, baseURI, isAVT = true, locationData)
 
@@ -307,7 +304,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, "string((" + xpathString + ")[1])",
+                XPath.GlobalConfiguration, contextItems, contextPosition, "string((" + xpathString + ")[1])",
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
@@ -446,7 +443,7 @@ object XPathCache {
 
     // Not sure if/when configuration can be null, but it shouldn't be
     private def configurationOrDefault(configuration: Configuration) =
-        Option(configuration) getOrElse getGlobalConfiguration
+        Option(configuration) getOrElse XPath.GlobalConfiguration
 
     private class XPathCachePoolableObjectFactory(
             xpathConfiguration: Configuration,

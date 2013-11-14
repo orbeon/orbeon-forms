@@ -20,7 +20,7 @@ import model.DataModel.Reason
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.XPath
 import collection.JavaConverters._
 import org.orbeon.oxf.xml._
 import dom4j.LocationData
@@ -115,7 +115,7 @@ object XFormsError {
 
             // Read the template
             val resourcePath = XHTMLBodyHandler.getIncludedResourcePath(containingDocument.getRequestPath, "error-dialog-noscript.xml")
-            val template = new DocumentWrapper(ResourceManagerWrapper.instance().getContentAsDOM4J(resourcePath), null, XPathCache.getGlobalConfiguration)
+            val template = new DocumentWrapper(ResourceManagerWrapper.instance().getContentAsDOM4J(resourcePath), null, XPath.GlobalConfiguration)
 
             // Find insertion point and insert list of errors
             // NOTE: This is a poor man's template system. Ideally, we would use XForms or XSLT for this.

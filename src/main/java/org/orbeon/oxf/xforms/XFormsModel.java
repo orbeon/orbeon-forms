@@ -687,7 +687,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 if (!instance.readonly()) {
                     instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), false, true);
                 } else {
-                    instanceDocument = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(),
+                    instanceDocument = TransformerUtils.readTinyTree(XPath.GlobalConfiguration(),
                             connectionResult.getResponseInputStream(), connectionResult.resourceURI(), false, true);
                 }
             } finally {
@@ -707,7 +707,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                         absoluteURLString, instance.credentialsOrNull(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(XPathCache.getGlobalConfiguration(),
+                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(XPath.GlobalConfiguration(),
                         absoluteURLString, instance.credentialsOrNull(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }

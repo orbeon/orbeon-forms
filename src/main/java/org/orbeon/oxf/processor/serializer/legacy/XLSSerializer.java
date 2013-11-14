@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
@@ -57,7 +58,7 @@ public class XLSSerializer extends HttpBinarySerializer {
     protected void readInput(final PipelineContext pipelineContext, ProcessorInput input, Config config, OutputStream outputStream) {
         try {
             Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
-            final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null, XPathCache.getGlobalConfiguration());
+            final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null, XPath.GlobalConfiguration());
 
             Document configDocument = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 

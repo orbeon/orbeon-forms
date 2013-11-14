@@ -66,7 +66,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
                     Document instance = ( Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
                     DocumentWrapper instanceWrapper = new DocumentWrapper(instance,
-                            ((LocationData) instance.getRootElement().getData()).getSystemID(), XPathCache.getGlobalConfiguration());
+                            ((LocationData) instance.getRootElement().getData()).getSystemID(), org.orbeon.oxf.util.XPath.GlobalConfiguration());
 
                     // Mark all nodes referenced by XPath expressions
                     final Set<Object> markedNodes = new HashSet<Object>();

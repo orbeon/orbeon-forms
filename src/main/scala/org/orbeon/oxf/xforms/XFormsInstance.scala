@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import analysis.model.Instance
 import model.DataModel
-import org.dom4j._
+import org.dom4j.{XPath ⇒ _, _}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
@@ -498,7 +498,7 @@ object XFormsInstance extends Logging {
 
     def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean) =
         if (readonly)
-            TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, xmlString, false, true)
+            TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
         else
             wrapDocument(Dom4jUtils.readDom4j(xmlString), exposeXPathTypes)
 

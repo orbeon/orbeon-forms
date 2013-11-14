@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor
 
 import org.dom4j.Document
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.DocumentInfo
 import org.w3c.dom.{Document ⇒ W3CDocument }
 
@@ -49,5 +49,5 @@ class DOMSerializer extends ProcessorImpl {
         readCacheInputAsDOM4J(pipelineContext, INPUT_DATA)
 
     def runGetTinyTree(pipelineContext: PipelineContext): DocumentInfo =
-        readCacheInputAsTinyTree(pipelineContext, XPathCache.getGlobalConfiguration, INPUT_DATA)
+        readCacheInputAsTinyTree(pipelineContext, XPath.GlobalConfiguration, INPUT_DATA)
 }

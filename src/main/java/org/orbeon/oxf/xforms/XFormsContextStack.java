@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
@@ -50,7 +51,7 @@ public class XFormsContextStack {
     static {
         try {
             final TinyBuilder treeBuilder = new TinyBuilder();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(XPathCache.getGlobalConfiguration());
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration());
             identity.setResult(treeBuilder);
 
             identity.startDocument();

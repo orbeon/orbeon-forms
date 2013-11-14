@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -71,7 +72,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
             Object result = XPathUtils.selectObjectValue(interpreterContext.getCurrentNode(), selectString,
                     interpreterContext.getPrefixesMap(), variableContext, interpreterContext.getFunctionContext());
             if (wrapper == null)
-                wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPathCache.getGlobalConfiguration());
+                wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPath.GlobalConfiguration());
 
             if ("value-of".equals(localname) || "copy-of".equals(localname)) {
                 // Case of Number and String

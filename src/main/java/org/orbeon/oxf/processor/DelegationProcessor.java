@@ -23,6 +23,7 @@ import org.dom4j.io.DOMReader;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.*;
@@ -302,7 +303,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     ? ("document".equals(service.style) ? DEFAULT_SELECT_WEB_SERVICE_DOCUMENT : DEFAULT_SELECT_WEB_SERVICE_RPC)
                                                     : DEFAULT_SELECT_BUS;
 
-                                            final DocumentInfo documentInfo = new DocumentWrapper(resultEnvelopeDOM4j, null, XPathCache.getGlobalConfiguration());
+                                            final DocumentInfo documentInfo = new DocumentWrapper(resultEnvelopeDOM4j, null, XPath.GlobalConfiguration());
                                             final PooledXPathExpression expr = XPathCache.getXPathExpression(
                                                     documentInfo.getConfiguration(), documentInfo, xpathString,
                                                     operation != null && operation.select != null

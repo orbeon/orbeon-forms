@@ -117,7 +117,7 @@ class ReindexProcessor extends ProcessorImpl {
                 lazy val dataRootElement: NodeInfo = {
                     val dataClob = currentData.getClob("xml")
                     val source = new StreamSource(dataClob.getCharacterStream)
-                    val document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, source, false)
+                    val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)
                     document \\ * head
                 }
 

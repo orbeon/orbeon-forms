@@ -24,9 +24,8 @@ import org.orbeon.oxf.xforms.control.Controls._
 import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.util.XPathCache
 import java.lang.IllegalArgumentException
-import org.dom4j._
+import org.dom4j.{XPath ⇒ _, _}
 import org.orbeon.scaxon.XML._
 import collection.mutable.Buffer
 import XXFormsDynamicControl._
@@ -37,6 +36,7 @@ import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import InstanceMirror._
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
+import org.orbeon.oxf.util.XPath
 
 /**
  * xxf:dynamic control
@@ -175,7 +175,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         )
 
         // Add listener to the single outer instance
-        val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
+        val docWrapper = new DocumentWrapper(element.getDocument, null, XPath.GlobalConfiguration)
 
         // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
         val outerListener: EventListener = {

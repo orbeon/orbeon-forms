@@ -21,12 +21,9 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XLSUtils;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -64,7 +61,7 @@ public class XLSGenerator extends ProcessorImpl {
                     {
                         final String NO_FILE = "No file was uploaded";
                         final DocumentInfo requestDocument = readInputAsTinyTree(context, getInputByName(INPUT_REQUEST),
-                                XPathCache.getGlobalConfiguration());
+                                XPath.GlobalConfiguration());
 
                         final PooledXPathExpression expr = XPathCache.getXPathExpression(
                                 requestDocument.getConfiguration(), requestDocument,

@@ -17,7 +17,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.ExceptionGenerator
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, SAXStore}
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.XPath
 import org.orbeon.scaxon.XML
 import org.orbeon.saxon.value.BooleanValue
 import scala.util.control.NonFatal
@@ -42,7 +42,7 @@ class ExceptionCatcher extends ProcessorImpl {
                     if (getConnectedInputs.get(INPUT_CONFIG) ne null) {
                         readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader[Boolean] {
                             def read(pipelineContext: PipelineContext, input: ProcessorInput) = {
-                                val doc = readInputAsTinyTree(context, input, XPathCache.getGlobalConfiguration)
+                                val doc = readInputAsTinyTree(context, input, XPath.GlobalConfiguration)
                                 XML.evalOne(doc, "not(/*/stack-trace = 'false')").asInstanceOf[BooleanValue].getBooleanValue
                             }
                         })

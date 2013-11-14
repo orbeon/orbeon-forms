@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.{Logging, XPathCache, NetUtils}
+import org.orbeon.oxf.util.{XPath, Logging, NetUtils}
 import org.orbeon.oxf.xforms._
 import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import xbl.Scope
@@ -196,14 +196,14 @@ object Instance {
             }
 
         if (readonly)
-            TransformerUtils.dom4jToTinyTree(XPathCache.getGlobalConfiguration, extractDocument, false)
+            TransformerUtils.dom4jToTinyTree(XPath.GlobalConfiguration, extractDocument, false)
         else
             wrapDocument(if (removeInstanceData) InstanceData.remove(extractDocument) else extractDocument, exposeXPathTypes)
     }
 
     def wrapDocument(document: Document, exposeXPathTypes: Boolean) =
         if (exposeXPathTypes)
-            new TypedDocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPathCache.getGlobalConfiguration)
+            new TypedDocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPath.GlobalConfiguration)
         else
-            new DocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPathCache.getGlobalConfiguration)
+            new DocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPath.GlobalConfiguration)
 }

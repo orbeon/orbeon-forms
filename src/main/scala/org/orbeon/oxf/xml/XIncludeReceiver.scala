@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.processor.transformer.XPathProcessor
-import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
+import org.orbeon.oxf.util.{XPath, LoggerFactory, XPathCache}
 import org.orbeon.oxf.xml.XMLUtils.addOrReplaceAttribute
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
@@ -152,7 +152,7 @@ class XIncludeReceiver(
                         // xpath() scheme
 
                         // Document is read entirely in memory for XPath processing
-                        val document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, source, false)
+                        val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)
 
                         val result =
                             XPathCache.evaluate(

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j._
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
 import analysis._
@@ -164,7 +164,7 @@ object LHHAAnalysis {
 
     // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
-        XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPathCache.getGlobalConfiguration).wrap(lhhaElement),
+        XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPath.GlobalConfiguration).wrap(lhhaElement),
             "not(exists(descendant-or-self::xf:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement), null).asInstanceOf[Boolean]
     }

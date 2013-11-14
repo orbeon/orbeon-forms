@@ -124,7 +124,7 @@ trait FormRunnerPersistence {
             }</headers>.toString
 
         // Convert to TinyTree
-        TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, headersXML, false, false)
+        TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, headersXML, false, false)
     }
 
     // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
@@ -141,7 +141,7 @@ trait FormRunnerPersistence {
         connectionResult.statusCode == 200 && connectionResult.hasContent option
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                 // do process XInclude, so FB's model gets included
-                TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, true, false)
+                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, inputStream, url.toString, true, false)
             }
     }
 

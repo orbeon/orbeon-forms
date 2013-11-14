@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -172,7 +173,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 
             // Lazily read input in case there is only a p:otherwise
             if (hrefDocumentInfo == null) {
-                final Configuration configuration = XPathCache.getGlobalConfiguration();
+                final Configuration configuration = XPath.GlobalConfiguration();
                 hrefDocumentInfo = readCacheInputAsTinyTree(pipelineContext, configuration, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
             }
 

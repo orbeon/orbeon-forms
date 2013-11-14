@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.relational
 
 import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.orbeon.oxf.processor.{ProcessorOutput, ProcessorImpl}
-import org.orbeon.oxf.util.{XPathCache, NetUtils}
+import org.orbeon.oxf.util.{XPath, NetUtils}
 import org.orbeon.oxf.util.DateUtils.DateTime
 import org.orbeon.oxf.fr.relational.RelationalUtils._
 import org.orbeon.scaxon.XML._
@@ -42,7 +42,7 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                     // <query> elements from request
                     val requestQueries = {
                         val searchRequest = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA),
-                            XPathCache.getGlobalConfiguration)
+                            XPath.GlobalConfiguration)
                         searchRequest \ "search" \ "query"
                     }
 

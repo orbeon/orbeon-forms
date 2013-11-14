@@ -25,22 +25,19 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils, TransformerUtils, NamespaceMapping}
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.dom4j._
+import org.dom4j.{XPath ⇒ _, _}
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.tinytree.TinyTree
-import org.orbeon.oxf.util.XPathCache
 import annotation.tailrec
 import collection._
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+import org.orbeon.oxf.util.XPath
 
 object XML {
-
-    // TODO: Like for XFSS, this should not be global
-    private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, getGlobalConfiguration)
 
     // Convenience methods for the XPath API
     def evalOne(
@@ -80,16 +77,16 @@ object XML {
     // Element and attribute creation
     def element(name: QName): Element = Dom4jUtils.createElement(name)
     def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
-        val newElement = wrapper.wrap(element(qName))
+        val newElement = DocumentWrapper.makeWrapper(element(qName))
         insert(into = Seq(newElement), origin = content)
         newElement
     }
 
     def attribute(name: QName, value: String = ""): Attribute = Dom4jUtils.createAttribute(name, value)
-    def attributeInfo(name: QName, value: String = ""): NodeInfo = wrapper.wrap(attribute(name, value))
+    def attributeInfo(name: QName, value: String = ""): NodeInfo = DocumentWrapper.makeWrapper(attribute(name, value))
 
     def namespace(prefix: String, uri: String): Namespace = Dom4jUtils.createNamespace(prefix, uri)
-    def namespaceInfo(prefix: String, uri: String): NodeInfo = wrapper.wrap(namespace(prefix, uri))
+    def namespaceInfo(prefix: String, uri: String): NodeInfo = DocumentWrapper.makeWrapper(namespace(prefix, uri))
 
     // Parse the given qualified name and return the separated prefix and local name
     def parseQName(lexicalQName: String) = {
@@ -457,7 +454,7 @@ object XML {
 
     // Convert a Java object to a Saxon Item using the Saxon API
     val anyToItem = new StandardObjectConverter(new SaxonXQDataFactory {
-        def getConfiguration = XPathCache.getGlobalConfiguration
+        def getConfiguration = XPath.GlobalConfiguration
     }).convertToItem(_: Any)
 
     // Convert a Java object to a Saxon Item but keep unchanged if already an Item
@@ -496,9 +493,9 @@ object XML {
 
     def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
         if (readonly)
-            TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, e.toString, false, false)
+            TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, e.toString, false, false)
         else
-            new DocumentWrapper(elemToDom4j(e), null, XPathCache.getGlobalConfiguration)
+            new DocumentWrapper(elemToDom4j(e), null, XPath.GlobalConfiguration)
 
     implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) / * head
     implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) / *

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
@@ -21,7 +20,6 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel, XFormsProperties}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
-import collection.JavaConverters._
 import scala.util.control.NonFatal
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
@@ -35,7 +33,7 @@ object SubmissionUtils {
     def readTinyTree(model: XFormsModel, resolvedURL: String, handleXInclude: Boolean): DocumentInfo =
         processGETConnection(model, resolvedURL) { result ⇒
             TransformerUtils.readTinyTree(
-                XPathCache.getGlobalConfiguration,
+                XPath.GlobalConfiguration,
                 result.getResponseInputStream,
                 result.resourceURI,
                 handleXInclude,

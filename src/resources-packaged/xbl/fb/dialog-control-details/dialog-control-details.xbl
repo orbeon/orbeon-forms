@@ -220,7 +220,7 @@
                     <!-- Keep copy of default alert, whether default for control or global default -->
                     <xf:bind
                         ref="@readonly-alert-message"
-                        calculate="xxf:bind('default-alert')"/>
+                        calculate="bind('default-alert')"/>
                 </xf:bind>
 
                 <xf:bind ref="validations/validation">

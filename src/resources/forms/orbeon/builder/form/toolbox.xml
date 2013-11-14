@@ -67,8 +67,8 @@
                     <!-- Invalidate and reload the toolbox -->
                     <xf:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
                     <xf:send submission="fb-load-toolbox">
-                        <xf:property name="app"  value="xxf:bind('application-name-bind')"/>
-                        <xf:property name="form" value="xxf:bind('form-name-bind')"/>
+                        <xf:property name="app"  value="bind('application-name-bind')"/>
+                        <xf:property name="form" value="bind('form-name-bind')"/>
                     </xf:send>
                 </xf:action>
             </xf:trigger>
@@ -181,7 +181,7 @@
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/silk/css.png" alt=""/>
                             <xh:span>
-                                <xf:output value="if (xxf:bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
+                                <xf:output value="if (bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
                             </xh:span>
                         </xf:label>
                         <xxf:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
@@ -193,7 +193,7 @@
                         <xf:label>
                             <xh:img src="/apps/fr/style/pdf.png" alt=""/>
                             <xh:span>
-                                <xf:output value="if (xxf:bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
+                                <xf:output value="if (bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
                             </xh:span>
                         </xf:label>
                         <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>

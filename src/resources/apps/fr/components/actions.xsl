@@ -126,7 +126,7 @@
                  autocomplete, which is also a single selection control. -->
             <xf:var name="element-name" value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
             <xf:action if="$element-name = 'select' or ends-with($element-name, '-select')">
-                <xf:action iterate="xxf:bind(concat($control-name, '-bind'))">
+                <xf:action iterate="bind(concat($control-name, '-bind'))">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         ref="$bind"
@@ -134,7 +134,7 @@
                 </xf:action>
             </xf:action>
             <xf:action if="$element-name = ('select1', 'autocomplete') or ends-with($element-name, '-select1')">
-                <xf:action iterate="xxf:bind(concat($control-name, '-bind'))">
+                <xf:action iterate="bind(concat($control-name, '-bind'))">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         if="not(string($bind) = $resource-holders[1]/item/value)"

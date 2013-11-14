@@ -42,8 +42,8 @@
             <xf:label ref="$form-resources/apply/label"/>
             <!-- Commit PDF information -->
             <xf:action ev:event="DOMActivate">
-                <xf:setvalue ref="xxf:bind('pdf-attachment-bind')"     value="instance()/pdf"/>
-                <xf:insert   context="xxf:bind('pdf-attachment-bind')" origin="instance()/pdf/@*"/>
+                <xf:setvalue ref="bind('pdf-attachment-bind')"     value="instance()/pdf"/>
+                <xf:insert   context="bind('pdf-attachment-bind')" origin="instance()/pdf/@*"/>
             </xf:action>
         </xf:trigger>
         <xf:output value="$form-resources/or/label"/>
@@ -54,8 +54,8 @@
 
     <!-- Read PDF information upon dialog open -->
     <xf:action ev:event="xxforms-dialog-open">
-        <xf:setvalue ref="pdf"     value="xxf:bind('pdf-attachment-bind')"/>
-        <xf:insert   context="pdf" origin="xxf:bind('pdf-attachment-bind')/@*"/>
+        <xf:setvalue ref="pdf"     value="bind('pdf-attachment-bind')"/>
+        <xf:insert   context="pdf" origin="bind('pdf-attachment-bind')/@*"/>
     </xf:action>
 
     <!-- Hide dialog for any button -->

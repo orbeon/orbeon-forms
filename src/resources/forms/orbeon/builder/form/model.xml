@@ -163,8 +163,8 @@
         <!-- Check permissions if there are roles -->
         <xf:var name="has-roles" value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
         <xf:action if="$has-roles">
-            <xf:var name="metadata-app"  value="xxf:bind('application-name-bind')"/>
-            <xf:var name="metadata-form" value="xxf:bind('form-name-bind')"/>
+            <xf:var name="metadata-app"  value="bind('application-name-bind')"/>
+            <xf:var name="metadata-form" value="bind('form-name-bind')"/>
             <xf:var name="permissions"   value="xxf:instance('fb-permissions')"/>
 
             <xf:action if="$mode = 'new'">
@@ -222,8 +222,8 @@
         <!-- Open form settings if mode is "new" -->
         <xxf:show if="$mode = 'new'" dialog="dialog-form-settings">
             <xf:property name="mode"        value="'new'"/>
-            <xf:property name="title"       value="xxf:bind('title-bind')"/>
-            <xf:property name="description" value="xxf:bind('description-bind')"/>
+            <xf:property name="title"       value="bind('title-bind')"/>
+            <xf:property name="description" value="bind('description-bind')"/>
         </xxf:show>
     </xf:action>
 
@@ -316,7 +316,7 @@
                   'data')"
             method="post"
             replace="all"
-            resource="/fr/{xxf:bind('application-name-bind')}/{xxf:bind('form-name-bind')}/test"
+            resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test"
             xxf:target="fb-test-iframe"
             xxf:show-progress="false"/>
 

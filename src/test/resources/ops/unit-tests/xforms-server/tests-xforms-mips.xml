@@ -1256,10 +1256,10 @@
 
                         <xf:action ev:event="xforms-ready">
                             <!-- Copy first initial value -->
-                            <xf:setvalue ref="date1" value="xxf:bind('date-bind')"/>
+                            <xf:setvalue ref="date1" value="bind('date-bind')"/>
                             <!-- Override initial value and copy it -->
                             <xf:setvalue bind="date-bind" value="xs:date('2010-05-28')"/>
-                            <xf:setvalue ref="date2" value="xxf:bind('date-bind')"/>
+                            <xf:setvalue ref="date2" value="bind('date-bind')"/>
                             <!-- Recalculate must restore initial value -->
                             <xf:recalculate xxf:defaults="true"/>
                         </xf:action>

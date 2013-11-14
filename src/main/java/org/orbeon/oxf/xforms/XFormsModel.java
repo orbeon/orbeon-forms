@@ -738,7 +738,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
                 binds.rebuild();
 
-                // Controls may have @bind or xxf:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+                // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
                 // TODO: Handle XPathDependencies
                 container().requireRefresh();
             }

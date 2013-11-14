@@ -92,7 +92,7 @@
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
 
-                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('xxf:bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
 
                 <xsl:template match="/*">
 

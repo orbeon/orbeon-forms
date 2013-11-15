@@ -222,7 +222,7 @@
                                                             'can-move-up'     [$repeat-position gt {$freeze} + 1],
                                                             'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
                                                             'can-insert-above'[$can-add and not($frozen)],
-                                                            'can-insert-below'[$can-add and not($frozen)]"/>
+                                                            'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"/>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <xf:var name="can-classes"/>

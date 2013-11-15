@@ -15,13 +15,14 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.NodeInfo
 
 class XXFormsControlElement extends XFormsFunction with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) = {
+    override def evaluateItem(xpathContext: XPathContext): NodeInfo = {
         implicit val ctx = xpathContext
-        relevantControl(0) map
-            (control ⇒ DocumentWrapper.makeWrapper(control.element)) orNull
+        relevantControl(0) flatMap { control ⇒
+            control.staticControl.part.controlElement(control.prefixedId)
+        } orNull
     }
 }

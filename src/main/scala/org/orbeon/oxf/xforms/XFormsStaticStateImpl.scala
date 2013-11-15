@@ -29,8 +29,9 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{Whitespace, StringReplacer, NumberUtils}
+import org.orbeon.oxf.util.{XPath, Whitespace, StringReplacer, NumberUtils}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.saxon.dom4j.DocumentWrapper
 
 class XFormsStaticStateImpl(
         val encodedState: String,
@@ -259,9 +260,11 @@ object XFormsStaticStateImpl {
     //   mode, it is stored in the dynamic state.
     class StaticStateDocument(val xmlDocument: Document) {
 
+        require(xmlDocument ne null)
+
         private def staticStateElement = xmlDocument.getRootElement
 
-        require(xmlDocument ne null)
+        val documentWrapper = new DocumentWrapper(xmlDocument, null, XPath.GlobalConfiguration)
 
         // Pointers to nested elements
         def rootControl = staticStateElement.element("root")

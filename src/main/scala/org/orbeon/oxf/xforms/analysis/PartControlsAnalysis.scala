@@ -25,11 +25,9 @@ trait PartControlsAnalysis extends TransientState {
 
     self: PartAnalysisImpl ⇒
 
-    protected val controlAnalysisMap = new LinkedHashMap[String, ElementAnalysis]
-    // type → Map of prefixedId → ElementAnalysis
-    protected val controlTypes = HashMap[String, LinkedHashMap[String, ElementAnalysis]]()
-    // type → Set of appearances
-    private val controlAppearances = HashMap[String, HashSet[QName]]()
+    protected val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
+    protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type → Map of prefixedId → ElementAnalysis
+    private val controlAppearances   = HashMap[String, HashSet[QName]]()                         // type → Set of appearances
 
     // Special handling of attributes
     private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
@@ -115,7 +113,14 @@ trait PartControlsAnalysis extends TransientState {
         for (control ← controlAnalysisMap.values)
             control.analyzeXPath()
 
-    def getControlAnalysis(prefixedId: String) = controlAnalysisMap.get(prefixedId) orNull
+    def getControlAnalysisOpt(prefixedId: String) =
+        controlAnalysisMap.get(prefixedId)
+
+    def getControlAnalysis(prefixedId: String) =
+        controlAnalysisMap.get(prefixedId) orNull
+
+    def controlElement(prefixedId: String) =
+        getControlAnalysisOpt(prefixedId) map (control ⇒ staticStateDocument.documentWrapper.wrap(control.element))
 
     def hasAttributeControl(prefixedForAttribute: String) =
         _attributeControls.get(prefixedForAttribute).isDefined

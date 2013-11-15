@@ -29,9 +29,9 @@ trait FormRunnerHome {
     private case class AvailableAndTime(available: Boolean, time: Long)
 
     private case class Form(app: String, form: String, local: Option[AvailableAndTime], remote: Option[AvailableAndTime], ops: Set[String]) {
-        
+
         import Form._
-        
+
         def isLocalAvailable    = local  exists (_.available)
         def isRemoteAvailable   = remote exists (_.available)
         def isLocalUnavailable  = local  exists (! _.available)
@@ -42,18 +42,18 @@ trait FormRunnerHome {
 
         def isLocalNewer  = isLocal && isRemote && local.get.time  > remote.get.time
         def isRemoteNewer = isLocal && isRemote && remote.get.time > local.get.time
-        
+
         def isSummaryAllowed = ops intersect SummaryOps nonEmpty
         def isNewAllowed     = ops intersect NewOps nonEmpty
         def isAdmin          = ops(AdminOp)
     }
 
     private object Form {
-        
+
         private val SummaryOps = Set("*", "update", "read", "delete")
         private val NewOps     = Set("*", "create")
         private val AdminOp    = "admin"
-        
+
         def apply(form: NodeInfo): Form = {
             val localTime  = form / "last-modified-time"
             val remoteTime = form / "remote-last-modified-time"
@@ -82,16 +82,16 @@ trait FormRunnerHome {
 
         collectForms(forms, formIsSelected)
     }
-    
+
     def isLocal(form: NodeInfo)  = Form(form).local.isDefined
     def isRemote(form: NodeInfo) = Form(form).remote.isDefined
-    
+
     def isLocalAvailable(form: NodeInfo)    = Form(form).local  exists(_.available)
     def isRemoteAvailable(form: NodeInfo)   = Form(form).remote exists(_.available)
-    
+
     def isLocalUnavailable(form: NodeInfo)  = Form(form).local  exists(! _.available)
     def isRemoteUnavailable(form: NodeInfo) = Form(form).remote exists(! _.available)
-    
+
     def isLocalNewer(form: NodeInfo) = Form(form).isLocalNewer
     def isRemoteNewer(form: NodeInfo) = Form(form).isRemoteNewer
 
@@ -115,13 +115,13 @@ trait FormRunnerHome {
 
     def canPublishLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalUnavailable)
-    
+
     def canUnpublishLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalAvailable)
-    
+
     def canPublishRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemoteUnavailable)
-    
+
     def canUnpublishRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemoteAvailable)
 
@@ -133,20 +133,22 @@ trait FormRunnerHome {
 
     def canNavigateSummary(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isSummaryAllowed)
-    
+
     def canNavigateNew(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isNewAllowed)
 
     def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(
-            data              = xhtml.root,
-            toBaseURI         = toBaseURI,
-            fromBasePath      = createFormDefinitionBasePath(app, form),
-            toBasePath        = createFormDefinitionBasePath(app, form),
-            filename          = "form.xhtml",
-            commonQueryString = "",
-            forceAttachments  = forceAttachments,
-            username          = nonEmptyOrNone(username),
-            password          = nonEmptyOrNone(password)
+            data                   = xhtml.root,
+            toBaseURI              = toBaseURI,
+            fromBasePath           = createFormDefinitionBasePath(app, form),
+            toBasePath             = createFormDefinitionBasePath(app, form),
+            filename               = "form.xhtml",
+            commonQueryString      = "",
+            forceAttachments       = forceAttachments,
+            username               = nonEmptyOrNone(username),
+            password               = nonEmptyOrNone(password),
+            dataFormVersion        = Some("next"),
+            attachmentsFormVersion = Some("next")
         )
 }

@@ -197,7 +197,9 @@ trait FormRunnerPersistence {
             commonQueryString: String,
             forceAttachments: Boolean,
             username: Option[String] = None,
-            password: Option[String] = None) = {
+            password: Option[String] = None,
+            dataFormVersion: Option[String] = None,
+            attachmentsFormVersion: Option[String] = None) = {
 
         // Find all instance nodes containing file URLs we need to upload
         val (uploadHolders, beforeURLs, afterURLs) =
@@ -207,10 +209,11 @@ trait FormRunnerPersistence {
         def saveAttachments(): Unit =
             uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
                 sendThrowOnError("fr-create-update-attachment-submission", Map(
-                    "holder"   → Some(holder),
-                    "resource" → Some(appendQueryString(toBaseURI + resource, commonQueryString)),
-                    "username" → username,
-                    "password" → password)
+                    "holder"       → Some(holder),
+                    "resource"     → Some(appendQueryString(toBaseURI + resource, commonQueryString)),
+                    "username"     → username,
+                    "password"     → password,
+                    "form-version" → attachmentsFormVersion)
                 )
             }
 
@@ -223,10 +226,11 @@ trait FormRunnerPersistence {
         // Save XML document
         def saveData() =
             sendThrowOnError("fr-create-update-submission", Map(
-                "holder"   → Some(data.rootElement),
-                "resource" → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
-                "username" → username,
-                "password" → password)
+                "holder"       → Some(data.rootElement),
+                "resource"     → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
+                "username"     → username,
+                "password"     → password,
+                "form-version" → dataFormVersion)
             )
 
         // Do things in order, so we don't update path or save the data if any the upload fails

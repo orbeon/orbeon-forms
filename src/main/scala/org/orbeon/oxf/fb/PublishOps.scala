@@ -28,13 +28,15 @@ trait PublishOps {
         try {
             val attachments =
                 putWithAttachments(
-                    data              = xhtml.root,
-                    toBaseURI         = "", // local publish
-                    fromBasePath      = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
-                    toBasePath        = createFormDefinitionBasePath(app, form),
-                    filename          = "form.xhtml",
-                    commonQueryString = s"document=$document",
-                    forceAttachments  = false
+                    data                   = xhtml.root,
+                    toBaseURI              = "", // local publish
+                    fromBasePath           = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
+                    toBasePath             = createFormDefinitionBasePath(app, form),
+                    filename               = "form.xhtml",
+                    commonQueryString      = s"document=$document",
+                    forceAttachments       = false,
+                    dataFormVersion        = Some("next"),
+                    attachmentsFormVersion = Some("next")
                 )
             setvalue(instanceRoot("fb-publish-instance").get / "attachments", attachments._1.size.toString)
             toggle("fb-publish-dialog-success")

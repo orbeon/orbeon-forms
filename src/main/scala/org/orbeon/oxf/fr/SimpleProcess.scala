@@ -198,21 +198,25 @@ trait FormRunnerActions {
             // Notify that the data is about to be saved
             dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
+            val modeElement = parametersInstance.rootElement \ "mode"
+            val isNew = modeElement.stringValue == "new"
+            val formVersion = (parametersInstance.rootElement \ "form-version").stringValue
+
             // Save
             val (beforeURLs, afterURLs) = putWithAttachments(
-                data              = formInstance.root,
-                toBaseURI         = "", // local save
-                fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
-                toBasePath        = createFormDataBasePath(app, form, isDraft, document),
-                filename          = "data.xml",
-                commonQueryString = s"valid=$dataValid",
-                forceAttachments  = false
+                data                   = formInstance.root,
+                toBaseURI              = "", // local save
+                fromBasePath           = createFormDataBasePath(app, form, ! isDraft, document),
+                toBasePath             = createFormDataBasePath(app, form, isDraft, document),
+                filename               = "data.xml",
+                commonQueryString      = s"valid=$dataValid",
+                forceAttachments       = false,
+                dataFormVersion        = isNew option formVersion,
+                attachmentsFormVersion = Some(formVersion)
             )
 
             // If we were in new mode, now we must be in edit mode
-            val modeElement = parametersInstance.rootElement \ "mode"
-            if (modeElement.stringValue == "new")
-                setvalue(modeElement, "edit")
+            if (isNew) setvalue(modeElement, "edit")
 
             // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
             // before calling the submission

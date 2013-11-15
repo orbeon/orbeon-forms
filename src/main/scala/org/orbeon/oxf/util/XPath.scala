@@ -21,7 +21,7 @@ import org.orbeon.saxon.expr.{XPathContextMajor, ExpressionTool, ExpressionVisit
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.value.{Value, AtomicValue}
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.saxon.Configuration
@@ -29,7 +29,6 @@ import javax.xml.transform.{TransformerException, Source, URIResolver}
 import org.orbeon.oxf.resources.URLFactory
 import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
-import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import util.Try

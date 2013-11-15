@@ -469,7 +469,7 @@ public class XFormsInsertAction extends XFormsAction {
             if (doc != null)
                 return doc.wrap(underlying);
             else
-                return DocumentWrapper.makeWrapper(underlying);
+                return DocumentWrapper.makeWrapper(underlying); // unclear whether NodeWrappers are created with a null doc, but if so rewrapping this way should be ok
         } else
             return node;
     }

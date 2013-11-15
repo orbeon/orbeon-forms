@@ -39,6 +39,11 @@ import org.orbeon.oxf.util.XPath
 
 object XML {
 
+    // This should ideally not be global. Tried 2013-11-14 to use DocumentWrapper.makeWrapper instead, see
+    // 2263a3f7b9565fa2102a7cc56ecb007a5c881312 and 0d7bc1fda0a121b2c107adc15a92cba67a09984f, but this is not good
+    // enough as NodeWrapper does need a Configuration to operate properly. So for now we keep this wrapper.
+    private val Wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPath.GlobalConfiguration)
+
     // Convenience methods for the XPath API
     def evalOne(
             item: Item,
@@ -77,16 +82,16 @@ object XML {
     // Element and attribute creation
     def element(name: QName): Element = Dom4jUtils.createElement(name)
     def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
-        val newElement = DocumentWrapper.makeWrapper(element(qName))
+        val newElement = Wrapper.wrap(element(qName))
         insert(into = Seq(newElement), origin = content)
         newElement
     }
 
     def attribute(name: QName, value: String = ""): Attribute = Dom4jUtils.createAttribute(name, value)
-    def attributeInfo(name: QName, value: String = ""): NodeInfo = DocumentWrapper.makeWrapper(attribute(name, value))
+    def attributeInfo(name: QName, value: String = ""): NodeInfo = Wrapper.wrap(attribute(name, value))
 
     def namespace(prefix: String, uri: String): Namespace = Dom4jUtils.createNamespace(prefix, uri)
-    def namespaceInfo(prefix: String, uri: String): NodeInfo = DocumentWrapper.makeWrapper(namespace(prefix, uri))
+    def namespaceInfo(prefix: String, uri: String): NodeInfo = Wrapper.wrap(namespace(prefix, uri))
 
     // Parse the given qualified name and return the separated prefix and local name
     def parseQName(lexicalQName: String) = {

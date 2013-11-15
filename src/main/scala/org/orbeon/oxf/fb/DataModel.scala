@@ -20,10 +20,9 @@ import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xforms.{BindNode, InstanceData}
 import scala.util.control.NonFatal
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.scaxon.XML
 
 object DataModel {
 
@@ -38,9 +37,6 @@ object DataModel {
 
     private def childrenBindsWithNames(bind: NodeInfo) =
         bind \ (XF → "bind") collect bindWithName
-
-    private def ancestorOrSelfBindsWithNames(bind: NodeInfo) =
-        bind ancestorOrSelf (XF → "bind") collect bindWithName
 
     // Create a new data model from the binds
     def dataModelFromBinds(inDoc: NodeInfo): NodeInfo = {
@@ -83,6 +79,9 @@ object DataModel {
         // support sections without bindings (and possibly other controls like triggers) to nodes. Also, if we do this,
         // we must modify insertNewSection and dialog-section-details.xml.
 
+//        def ancestorOrSelfBindsWithNames(bind: NodeInfo) =
+//            bind ancestorOrSelf (XF → "bind") collect bindWithName
+//
 //        val allContainerNames = getAllContainerControlsWithIds(inDoc) map (e ⇒ controlName(e attValue "id")) toSet
 //
 //        foreachBindWithName(inDoc) { child ⇒
@@ -128,9 +127,8 @@ object DataModel {
         if (isAllowedBoundItem(controlName(bindId), asScalaSeq(i).headOption))
             i.getAnother
         else {
-            // Create and wrap the dangling element
-            val newElement = Dom4jUtils.createElement("orbeon-dangling-element")
-            val newElementInfo = DocumentWrapper.makeWrapper(newElement)
+            // Create dangling element
+            val newElementInfo = XML.elementInfo("orbeon-dangling-element")
             // Then attach a readonly bind node to it. This is as if there was a <bind readonly="true" for the node>
             val bindNode = new BindNode(bindId, newElementInfo, null)
             bindNode.setReadonly(value = true)

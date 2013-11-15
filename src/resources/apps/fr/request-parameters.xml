@@ -16,6 +16,7 @@
     <app/>
     <!-- Name of the form within the application -->
     <form/>
+    <form-version/>
     <!-- Document id -->
     <document/>
     <!-- Mode (new, edit, view, etc.) -->

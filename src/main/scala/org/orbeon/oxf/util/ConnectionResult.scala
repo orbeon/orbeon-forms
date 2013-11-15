@@ -63,6 +63,8 @@ class ConnectionResult(val resourceURI: String) extends Logging {
     }
 
     def responseHeaders = _responseHeaders
+    def jResponseHeaders: JMap[String, JList[String]] =
+        responseHeaders.toMap.map{ case (k, v) ⇒ k → v.asJava }.asJava
 
     def responseHeaders_= (headers: JMap[String, JList[String]]): Unit =
         _responseHeaders = headers.asScala.toMap map { case (k, v) ⇒ k → v.asScala.to[List] }

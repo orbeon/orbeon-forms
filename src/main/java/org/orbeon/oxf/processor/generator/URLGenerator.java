@@ -29,6 +29,7 @@ import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.HttpStatusCodeException;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
@@ -40,11 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Generates SAX events from a document fetched from an URL.
@@ -114,11 +111,11 @@ public class URLGenerator extends ProcessorImpl {
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical,
-                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache,
-                      boolean enableConditionalGET) {
+                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, List<String> readHeaders,
+                      boolean cacheUseLocalCache, boolean enableConditionalGET) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
                 forceEncoding, ignoreConnectionEncoding, parserConfiguration, handleLexical, mode,
-                headerNameValues, forwardHeaders,
+                headerNameValues, forwardHeaders, readHeaders,
                 cacheUseLocalCache, enableConditionalGET, null, null, DEFAULT_PREEMPTIVE_AUTHENTICATION, null, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -132,6 +129,7 @@ public class URLGenerator extends ProcessorImpl {
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
         private Map<String, String[]> headerNameValues;
         private String forwardHeaders;
+        private List<String> readHeaders;
         private XMLUtils.ParserConfiguration parserConfiguration = null;
         private boolean handleLexical = DEFAULT_HANDLE_LEXICAL;
 
@@ -170,8 +168,8 @@ public class URLGenerator extends ProcessorImpl {
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration,
                       boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
-                      boolean cacheUseLocalCache, boolean enableConditionalGET, String username, String password,
-                      boolean preemptiveAuthentication, String domain, TidyConfig tidyConfig) {
+                      List<String> readHeaders, boolean cacheUseLocalCache, boolean enableConditionalGET, String username,
+                      String password, boolean preemptiveAuthentication, String domain, TidyConfig tidyConfig) {
 
             this.url = url;
             this.contentType = contentType;
@@ -181,6 +179,7 @@ public class URLGenerator extends ProcessorImpl {
             this.ignoreConnectionEncoding = ignoreConnectionEncoding;
             this.headerNameValues = headerNameValues;
             this.forwardHeaders = forwardHeaders;
+            this.readHeaders = readHeaders;
             this.parserConfiguration = parserConfiguration;
             this.handleLexical = handleLexical;
 
@@ -250,6 +249,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public String getForwardHeaders() {
             return forwardHeaders;
+        }
+
+        public List<String> getReadHeaders() {
+            return readHeaders;
         }
 
         public boolean isCacheUseLocalCache() {
@@ -358,6 +361,12 @@ public class URLGenerator extends ProcessorImpl {
                                 forwardHeaders = configForwardHeaders != null ? XPathUtils.selectStringValue(configForwardHeaders, ".") : Connection.getForwardHeaders();
                             }
 
+                            final List<String> readHeaders = new LinkedList<String>();
+                            for (Object o: configElement.selectNodes("/config/read-header")) {
+                                final Element el = (Element) o;
+                                readHeaders.add(el.getStringValue());
+                            }
+
                             // Validation setting: local, then properties, then hard-coded default
                             final boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING);
                             final boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
@@ -401,7 +410,7 @@ public class URLGenerator extends ProcessorImpl {
                             // Create configuration
                             final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
                                     ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
-                                    headerNameValues, forwardHeaders,
+                                    headerNameValues, forwardHeaders, readHeaders,
                                     cacheUseLocalCache, enableConditionalGET,
                                     username, password, preemptiveAuthentication, domain,
                                     tidyConfig);
@@ -900,6 +909,19 @@ public class URLGenerator extends ProcessorImpl {
                     Connection.jApply("GET", url, credentials, null, headers, true, false, indentedLogger).connect(true);
                 inputStream =
                     connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
+
+                // Save headers as request attributes
+                if (! config.getReadHeaders().isEmpty()) {
+                    Map<String, List<String>> responseHeaders = connectionResult.jResponseHeaders();
+                    Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
+                    for (String nameMixed: config.getReadHeaders()) {
+                        // We only support headers with one value
+                        String nameLower = nameMixed.toLowerCase();
+                        // Only support headers with one value
+                        String value = responseHeaders.get(nameLower).get(0);
+                        requestAttributes.put("oxf.url-generator.header." + nameLower, value);
+                    }
+                }
             }
         }
 

@@ -27,6 +27,8 @@
     <p:param type="input" name="instance"/>
     <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
     <p:param type="output" name="data"/>
+    <!-- Parameters, to which we added the form version -->
+    <p:param type="output" name="instance"/>
 
     <!-- Call up persistence layer to obtain XHTML+XForms -->
     <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
@@ -51,9 +53,32 @@
                 <handle-xinclude>false</handle-xinclude>
                 <!-- Enable conditional GET -->
                 <cache-control><use-local-cache>true</use-local-cache><conditional-get>true</conditional-get></cache-control>
+                <!-- Read the Orbeon-Form-Definition-Version, if provided -->
+                <read-header>orbeon-form-definition-version</read-header>
             </config>
         </p:input>
         <p:output name="data" id="document"/>
+    </p:processor>
+
+    <!-- Her we read the document to be sure the URL generator runs before the XSLT stylesheet below,
+         which read a request attribute set by the URL generator -->
+    <p:processor name="oxf:null-serializer">
+        <p:input name="data" href="#document"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#instance"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:template match="form-version">
+                    <xsl:copy>
+                        <xsl:value-of select="p:get-request-attribute('oxf.url-generator.header.orbeon-form-definition-version', 'text/plain')"/>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" ref="instance"/>
     </p:processor>
 
     <!-- Handle XInclude (mainly for "resource" type of persistence) -->

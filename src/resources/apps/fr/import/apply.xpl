@@ -92,12 +92,13 @@
         <p:input name="config" href="../detail/read-form.xpl"/>
         <p:input name="instance" href="#parameters"/>
         <p:output name="data" id="xhtml-fr-xforms"/>
+        <p:output name="instance" id="parameters-with-version"/>
     </p:processor>
 
     <!-- Unroll the form (theme, components, inclusions) -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../unroll-form.xpl"/>
-        <p:input name="instance" href="#parameters"/>
+        <p:input name="instance" href="#parameters-with-version"/>
         <p:input name="data" href="#xhtml-fr-xforms"/>
         <p:output name="data" id="unrolled-form"/>
     </p:processor>
@@ -125,7 +126,7 @@
     <!-- Process -->
     <p:processor name="oxf:xforms-to-xhtml">
         <p:input name="annotated-document" href="#full-form"/>
-        <p:input name="instance" href="#parameters"/>
+        <p:input name="instance" href="#parameters-with-version"/>
         <p:input name="data" href="#rows"/>
         <p:output name="document" id="binary-document" ref="data"/>
     </p:processor>

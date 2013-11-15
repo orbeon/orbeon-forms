@@ -48,6 +48,7 @@
             <request xsl:version="2.0">
                 <app><xsl:value-of select="/result/group[2]"/></app>
                 <form><xsl:value-of select="/result/group[3]"/></form>
+                <form-version/> <!-- Populated by read-form.xpl -->
                 <document><xsl:value-of select="/result/group[6]"/></document>
                 <mode><xsl:value-of select="/result/group[4]"/></mode>
                 <uuid><xsl:value-of select="/result/group[8]"/></uuid>

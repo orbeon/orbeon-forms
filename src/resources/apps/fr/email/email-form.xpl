@@ -46,12 +46,13 @@
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../detail/read-form.xpl"/>
         <p:input name="instance" href="#parameters"/>
+        <p:output name="instance" id="parameters-with-version"/>
         <p:output name="data" id="xhtml-fr-xforms"/>
     </p:processor>
 
     <!-- Retrieve Form Runner resources -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters-with-version">
             <config xsl:version="2.0">
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
@@ -69,7 +70,7 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="xhtml" href="#xhtml-fr-xforms"/>
-        <p:input name="parameters" href="#parameters"/>
+        <p:input name="parameters" href="#parameters-with-version"/>
         <p:input name="config">
             <attachments xsl:version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
@@ -122,7 +123,7 @@
         <p:input name="data" href="#instance"/>
         <p:input name="xhtml" href="#xhtml-fr-xforms"/>
         <p:input name="request" href="#request"/>
-        <p:input name="parameters" href="#parameters"/>
+        <p:input name="parameters" href="#parameters-with-version"/>
         <p:input name="fr-resources" href="#fr-resources"/>
         <p:input name="attachments" href="#attachments"/>
         <p:input name="config">
@@ -252,7 +253,7 @@
     </p:processor>
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../print/pdf-view.xpl"/>
-        <p:input name="instance" href="#parameters"/>
+        <p:input name="instance" href="#parameters-with-version"/>
         <p:input name="data" href="#xhtml"/>
         <p:output name="data" id="form-pdf"/>
     </p:processor>

@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.junit.Test;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
@@ -73,7 +74,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         final Metadata metadata = new Metadata();
         final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.logger, ""), null, metadata)
                 .annotateShadowTree(document, "");
-        final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
+        final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPath.GlobalConfiguration());
 
         // Check there is an xxf:attribute for "html" with correct name
         List<Object> result = XPathCache.evaluate(documentWrapper, "//xxf:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null, null);

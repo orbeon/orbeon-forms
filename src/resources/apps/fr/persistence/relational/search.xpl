@@ -133,7 +133,7 @@
 
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="form" href="#form-metadata"/>
+        <p:input name="form-metadata" href="#form-metadata"/>
         <p:input name="data" href="#search"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
@@ -393,7 +393,7 @@
     <!-- Transform output from SQL processor into the XML form the caller expects -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#sql-output"/>
-        <p:input name="form" href="#form-metadata"/>
+        <p:input name="form-metadata" href="#form-metadata"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>

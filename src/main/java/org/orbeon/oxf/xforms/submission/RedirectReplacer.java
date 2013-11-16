@@ -33,21 +33,17 @@ public class RedirectReplacer extends BaseReplacer {
        // NOP
     }
 
-    //private void doReplaceAll(PipelineContext pipelineContext, ConnectionResult connectionResult, boolean deferredSubmissionSecondPassReplaceAll) throws IOException {
-
     public Runnable replace(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         final ExternalContext.Response response = NetUtils.getExternalContext().getResponse();
-
-        // Remember that we got a redirect
         containingDocument.setGotSubmissionRedirect();
-
-        // Forward headers to response
-        connectionResult.forwardHeaders(response);
-
-        // Forward redirect
-        response.setStatus(connectionResult.statusCode());
+        replace(connectionResult, response);
 
         return null;
+    }
+
+    public static void replace(ConnectionResult connectionResult, final ExternalContext.Response response) throws IOException {
+        connectionResult.forwardHeaders(response);
+        response.setStatus(connectionResult.statusCode());
     }
 }

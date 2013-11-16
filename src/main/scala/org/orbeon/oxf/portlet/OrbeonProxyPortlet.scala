@@ -256,8 +256,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     private def callService(requestDetails: RequestDetails): ContentOrRedirect = {
         val connection = connectURL(requestDetails)
         useAndClose(connection.getInputStream) { is ⇒
-            //propagateResponseHeaders(response, connection)
-            Content(Right(NetUtils.inputStreamToByteArray(is)), Option(connection.getHeaderField("Content-Type")), None)
+            if (NetUtils.isRedirectCode(connection.getResponseCode))
+                Redirect(connection.getHeaderField("Location"), exitPortal = true) // we could consider an option for intra-portlet redirection
+            else
+                Content(Right(NetUtils.inputStreamToByteArray(is)), Option(connection.getHeaderField("Content-Type")), None)
         }
     }
 
@@ -277,6 +279,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
         val connection = new URL(newURL).openConnection.asInstanceOf[HttpURLConnection]
 
+        connection.setInstanceFollowRedirects(false)
         connection.setDoInput(true)
 
         requestDetails.content foreach { content ⇒

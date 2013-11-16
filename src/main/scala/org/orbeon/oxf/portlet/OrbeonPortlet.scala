@@ -159,7 +159,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
     private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): ContentOrRedirect =
         if (bufferedResponse.isRedirect)
-            Redirect(bufferedResponse.getRedirectPathInfo, toScalaMap(bufferedResponse.getRedirectParameters), bufferedResponse.isRedirectIsExitPortal)
+            Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
         else
             Content(getResponseData(bufferedResponse), Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
 

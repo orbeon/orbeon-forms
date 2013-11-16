@@ -14,7 +14,6 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.NetUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Wrap an ExternalContext.Response into an HttpServletResponse.
@@ -107,19 +105,8 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
         response.sendError(i);
     }
 
-    public void sendRedirect(String path) throws IOException {
-        final String pathInfo;
-        final Map<String, String[]> parameters;
-
-        final int qmIndex = path.indexOf('?');
-        if (qmIndex != -1) {
-            pathInfo = path.substring(0, qmIndex);
-            parameters = NetUtils.decodeQueryString(path.substring(qmIndex + 1));
-        } else {
-            pathInfo = path;
-            parameters = null;
-        }
-        response.sendRedirect(pathInfo, parameters, false, false);
+    public void sendRedirect(String location) throws IOException {
+        response.sendRedirect(location, false, false);
     }
 
     public void setDateHeader(String clazz, long l) {

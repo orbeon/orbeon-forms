@@ -17,6 +17,7 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class RedirectProcessor extends ProcessorImpl {
             final boolean isExitPortal = "true".equals(exitPortalString);
 
             // Build parameters
-            final String pathInfo = XPathUtils.selectStringValueNormalize(node, "normalize-space(redirect-url/path-info)");
+            final String path = XPathUtils.selectStringValueNormalize(node, "normalize-space(redirect-url/path-info)");
             final Map<String, String[]> parameters = new HashMap<String, String[]>();
 
             for (Iterator i = XPathUtils.selectIterator(node, "redirect-url/parameters/parameter"); i.hasNext();) {
@@ -67,8 +68,8 @@ public class RedirectProcessor extends ProcessorImpl {
             final ExternalContext.Response response = externalContext.getResponse();
 
             // Don't rewrite the path if doing a server-side redirect, because the forward expects a URL without the servlet context
-            final String redirectURL = isServerSide ? pathInfo : response.rewriteRenderURL(pathInfo);
-            response.sendRedirect(redirectURL, parameters, isServerSide, isExitPortal);
+            final String pathMaybeRewritten = isServerSide ? path : response.rewriteRenderURL(path);
+            response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(pathMaybeRewritten, parameters), isServerSide, isExitPortal);
         } catch (Exception e) {
             throw new OXFException(e);
         }

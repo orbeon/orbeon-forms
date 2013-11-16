@@ -78,10 +78,10 @@ public class XFormsToXHTML extends XFormsToSomething {
             final XFormsContainingDocument.Load load = loads.get(0);
 
             // Send redirect
-            final String redirectResource = load.getResource();
-            indentedLogger.logDebug("", "handling redirect response for xf:load", "url", redirectResource);
+            final String location = load.getResource();
+            indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-            externalContext.getResponse().sendRedirect(redirectResource, null, false, false);
+            externalContext.getResponse().sendRedirect(location, false, false);
 
             // Still send out a null document to signal that no further processing must take place
             XMLUtils.streamNullDocument(xmlReceiver);

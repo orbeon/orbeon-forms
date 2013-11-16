@@ -111,7 +111,7 @@ public interface ExternalContext {
         void sendError(int code) throws IOException;
         String getCharacterEncoding();
 
-        void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException;
+        void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException;
 
         void setPageCaching(long lastModified);
 

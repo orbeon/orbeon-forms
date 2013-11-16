@@ -473,7 +473,7 @@ class ResponseAdapter implements ExternalContext.Response {
         this.status = sc;
     }
 
-    public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
     }
 
     public void setPageCaching(long lastModified) {

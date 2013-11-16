@@ -59,7 +59,7 @@ public class ResponseAdapter implements ExternalContext.Response {
         return null;
     }
 
-    public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
     }
 
     public void setPageCaching(long lastModified) {

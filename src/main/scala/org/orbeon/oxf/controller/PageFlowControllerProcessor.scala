@@ -166,7 +166,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 try route.process(pc, ec, matchResult)
                 catch { case NonFatal(t) ⇒
                     getRootThrowable(t) match {
-                        case e: HttpRedirectException                            ⇒ ec.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
+                        case e: HttpRedirectException                            ⇒ ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
                         case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
                         case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
                         case e: ResourceNotFoundException                        ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))

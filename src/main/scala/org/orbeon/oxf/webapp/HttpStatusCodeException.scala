@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.exception.OrbeonFormatter
 
 trait HttpStatusCode extends RuntimeException { def code: Int }
@@ -24,9 +22,7 @@ case class HttpStatusCodeException(code: Int, resource: Option[String] = None, t
 }
 
 case class HttpRedirectException(location: String, serverSide: Boolean = false, exitPortal: Boolean = false) extends HttpStatusCode {
-    val code = 302
-    def path = splitQuery(location)._1
-    def jParameters = splitQuery(location)._2 map NetUtils.decodeQueryString
+    val code = 302 // using 302 instead of 303 as 302 is still the de facto standard
 
     override def toString = s"HttpRedirectException(location = $location, serverSide = $serverSide, exitPortal = $exitPortal)"
 }

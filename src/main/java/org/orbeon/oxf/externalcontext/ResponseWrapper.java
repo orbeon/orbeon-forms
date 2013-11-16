@@ -16,7 +16,6 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 import java.io.*;
-import java.util.Map;
 
 public class ResponseWrapper implements ExternalContext.Response {
     private ExternalContext.Response _response;
@@ -79,8 +78,8 @@ public class ResponseWrapper implements ExternalContext.Response {
         _response.sendError(len);
     }
 
-    public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
-        _response.sendRedirect(pathInfo, parameters, isServerSide, isExitPortal);
+    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
+        _response.sendRedirect(location, isServerSide, isExitPortal);
     }
 
     public void setPageCaching(long lastModified) {

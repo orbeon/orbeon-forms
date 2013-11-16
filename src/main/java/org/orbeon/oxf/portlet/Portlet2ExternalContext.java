@@ -480,8 +480,7 @@ public class Portlet2ExternalContext implements ExternalContext {
     public static class BufferedResponse extends BaseResponse {
 
         private String contentType;
-        private String redirectPathInfo;
-        private Map<String, String[]> redirectParameters;
+        private String redirectLocation;
         private boolean redirectIsExitPortal;
         private StringBuilderWriter stringBuilderWriter;
         private PrintWriter printWriter;
@@ -496,12 +495,8 @@ public class Portlet2ExternalContext implements ExternalContext {
             return contentType;
         }
 
-        public String getRedirectPathInfo() {
-            return redirectPathInfo;
-        }
-
-        public Map<String, String[]> getRedirectParameters() {
-            return redirectParameters != null ? redirectParameters : Collections.<String, String[]>emptyMap();
+        public String getRedirectLocation() {
+            return redirectLocation;
         }
 
         public StringBuilderWriter getStringBuilderWriter() {
@@ -541,11 +536,10 @@ public class Portlet2ExternalContext implements ExternalContext {
          * @param isServerSide  this is ignored for portlets
          * @param isExitPortal  if this is true, the redirect will exit the portal
          */
-        public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) {
+        public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) {
             if (isCommitted())
                 throw new IllegalStateException("Cannot call sendRedirect if response is already committed.");
-            this.redirectPathInfo = pathInfo;
-            this.redirectParameters = parameters;
+            this.redirectLocation= location;
             this.redirectIsExitPortal = isExitPortal;
         }
 
@@ -566,7 +560,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public boolean isRedirect() {
-            return redirectPathInfo != null;
+            return redirectLocation != null;
         }
 
         public boolean hasContent() {

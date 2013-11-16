@@ -434,12 +434,12 @@ public class NetUtils {
     }
 
     /**
-     * Combine a path info and a parameters map to form a path info with a query string.
+     * Combine a path (possibly with parameters) and a parameters map to form a path info with a query string.
      */
-    public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map<String, String[]> parameters) throws IOException {
-        final StringBuilder redirectURL = new StringBuilder(pathInfo);
+    public static String pathInfoParametersToPathInfoQueryString(String path, Map<String, String[]> parameters) throws IOException {
+        final StringBuilder redirectURL = new StringBuilder(path);
         if (parameters != null) {
-            boolean first = true;
+            boolean first = ! path.contains("?");
             for (String name : parameters.keySet()) {
                 final String[] values = parameters.get(name);
                 for (final String currentValue : values) {
@@ -951,6 +951,10 @@ public class NetUtils {
     public static boolean isSuccessCode(int code) {
         // Accept any success code (in particular "201 Resource Created")
         return code >= 200 && code < 300;
+    }
+    
+    public static boolean isRedirectCode(int code) {
+        return (code >= 301 && code <= 303) || code == 307;
     }
 
     /**

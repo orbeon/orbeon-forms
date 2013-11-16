@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.portlet
 
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{ScalaUtils, NetUtils}
 import BufferedPortlet._
 import javax.portlet._
-import java.util.{Map ⇒ JMap}
 import collection.JavaConverters._
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.processor.serializer.CachedSerializer
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
+import java.{util ⇒ ju}
+import ScalaUtils._
 
 // Abstract portlet logic including buffering of portlet actions
 // This doesn't deal direct with ProcessorService or HTTP proxying
@@ -32,7 +33,9 @@ trait BufferedPortlet {
     // Immutable responses
     sealed trait ContentOrRedirect
     case class Content(body: String Either Array[Byte], contentType: Option[String], title: Option[String]) extends ContentOrRedirect
-    case class Redirect(path: String, parameters: Map[String, List[String]], exitPortal: Boolean = false) extends ContentOrRedirect
+    case class Redirect(location: String, exitPortal: Boolean = false) extends ContentOrRedirect {
+        require(location ne null, "Missing Location header in redirect response")
+    }
 
     // Immutable response with parameters
     case class ResponseWithParameters(response: ContentOrRedirect, parameters: Map[String, List[String]])
@@ -62,14 +65,22 @@ trait BufferedPortlet {
         clearResponseWithParameters(request)
 
         action match {
-            case Redirect(path, parameters, true) ⇒
-                response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(path, toJavaMap(parameters)))
-            case Redirect(path, parameters, false) ⇒
+            case Redirect(location, true) ⇒
+                response.sendRedirect(location)
+            case Redirect(location, false) ⇒
                 // Just update the render parameters to simulate a redirect within the portlet
-                val redirectParameters = parameters + (PathParameter → List(path))
+                val (path, queryOpt) = splitQuery(location)
+                val parameters = queryOpt match {
+                    case (Some(query)) ⇒
+                        val m = NetUtils.decodeQueryString(query)
+                        m.put(PathParameter, Array(path))
+                        ju.Collections.unmodifiableMap[String, Array[String]](m)
+                    case None ⇒
+                        ju.Collections.singletonMap(PathParameter, Array(path))
+                }
 
                 // Set the new parameters for the subsequent render requests
-                response.setRenderParameters(toJavaMap(redirectParameters))
+                response.setRenderParameters(parameters)
 
             case content: Content ⇒
                 // Content was written, keep it in the session for subsequent render requests with the current action parameters
@@ -138,7 +149,7 @@ object BufferedPortlet {
     val ResponseSessionKey = "org.orbeon.oxf.response"
 
     // Convert to immutable String → List[String] so that map equality works as expected
-    def toScalaMap(m: JMap[String, Array[String]]) =
+    def toScalaMap(m: ju.Map[String, Array[String]]) =
         m.asScala map { case (k, v) ⇒ k → v.toList } toMap
 
     // Convert back an immutable String → List[String] to a Java String → Array[String] map

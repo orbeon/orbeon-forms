@@ -39,17 +39,9 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
     override def performDefaultAction(event: XFormsEvent): Unit = event match {
         case load: XXFormsLoadEvent ⇒
             // Internal load event
-            try {
-                val resource = load.resource
-                val qmIndex = resource.indexOf('?')
-                val (pathInfo, parameters) =
-                    if (qmIndex != -1) {
-                        (resource.substring(0, qmIndex),
-                         NetUtils.decodeQueryString(resource.substring(qmIndex + 1)))
-                    } else
-                        (resource, null)
-                NetUtils.getExternalContext.getResponse.sendRedirect(pathInfo, parameters, false, false)
-            } catch {
+            try
+                NetUtils.getExternalContext.getResponse.sendRedirect(load.resource, false, false)
+            catch {
                 case e: IOException ⇒ throw new ValidationException(e, getLocationData)
             }
         case _ ⇒

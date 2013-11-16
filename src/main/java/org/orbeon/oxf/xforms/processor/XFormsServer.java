@@ -237,7 +237,8 @@ public class XFormsServer extends ProcessorImpl {
                                 if (xmlReceiver != null) {
                                     // Create resulting document if there is a receiver
                                     if (containingDocument.isGotSubmissionRedirect()) {
-                                        // Redirect already sent, output a null document is output so that rest of pipeline doesn't fail
+                                        // Redirect already sent
+                                        // Output null document so that rest of pipeline doesn't fail and no further processing takes place
                                         indentedLogger.logDebug("response", "handling submission with replace=\"all\" with redirect");
                                         XMLUtils.streamNullDocument(xmlReceiver);
                                     } else if (!isNoscript) {
@@ -357,8 +358,10 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             // Check and run submission with replace="all"
-            // NOTE: Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
-            // hit the document
+            //
+            // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
+            //   hit the document.
+            // - No need to output a null document here, xmlReceiver is null anyway.
             XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
         } else {
             indentedLogger.logInfo("", "Ajax update lock timeout exceeded, returning");
@@ -388,12 +391,12 @@ public class XFormsServer extends ProcessorImpl {
             final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
 
             // Send redirect
-            final String redirectResource = load.getResource();
-            indentedLogger.logDebug("response", "handling noscript redirect response for xf:load", "url", redirectResource);
+            final String location = load.getResource();
+            indentedLogger.logDebug("response", "handling noscript redirect response for xf:load", "url", location);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-            externalContext.getResponse().sendRedirect(redirectResource, null, false, false);
+            externalContext.getResponse().sendRedirect(location, false, false);
 
-            // Still send out a null document to signal that no further processing must take place
+            // Output null document so that rest of pipeline doesn't fail and no further processing takes place
             XMLUtils.streamNullDocument(xmlReceiver);
         } else {
             // The template is stored either in the static state or in the dynamic state

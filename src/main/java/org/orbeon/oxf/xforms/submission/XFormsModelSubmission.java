@@ -599,6 +599,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                         // Replacer provided, perform replacement
                         if (result.getReplacer() instanceof AllReplacer)
                             AllReplacer.replace(result.getConnectionResult(), response);
+                        else if (result.getReplacer() instanceof RedirectReplacer)
+                            RedirectReplacer.replace(result.getConnectionResult(), response);
                         else
                             assert result.getReplacer() instanceof NoneReplacer;
                     } else if (result.getThrowable() != null) {
@@ -716,7 +718,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     // xforms-submit-done"
                     replacer = new NoneReplacer(this, containingDocument);
                 }
-            } else if (connectionResult.statusCode() == 302 || connectionResult.statusCode() == 301) {
+            } else if (NetUtils.isRedirectCode(connectionResult.statusCode())) {
                 // Got a redirect
 
                 // Currently we don't know how to handle a redirect for replace != "all"

@@ -464,26 +464,25 @@ public class ServletExternalContext implements ExternalContext  {
             nativeResponse.addHeader(name, value);
         }
 
-        public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+        public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
             // Create URL
             if (isServerSide) {
                 // Server-side redirect: do a forward
-                final javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(pathInfo);
+                final javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(location);
                 // TODO: handle isNoRewrite like in XFormsSubmissionUtils.openOptimizedConnection(): absolute path can then be used to redirect to other servlet context
                 try {
                     // Destroy the pipeline context before doing the forward. Nothing significant
                     // should be allowed on "this side" of the forward after the forward return.
                     pipelineContext.destroy(true);
                     // Execute the forward
-                    final ForwardServletRequestWrapper wrappedRequest = new ForwardServletRequestWrapper(nativeRequest, pathInfo, parameters);
+                    final ForwardServletRequestWrapper wrappedRequest = new ForwardServletRequestWrapper(nativeRequest, location);
                     requestDispatcher.forward(wrappedRequest, nativeResponse);
                 } catch (ServletException e) {
                     throw new OXFException(e);
                 }
             } else {
                 // Client-side redirect: send the redirect to the client
-                final String redirectURLString = NetUtils.pathInfoParametersToPathInfoQueryString(pathInfo, parameters);
-                nativeResponse.sendRedirect(redirectURLString);
+                nativeResponse.sendRedirect(location);
             }
         }
 

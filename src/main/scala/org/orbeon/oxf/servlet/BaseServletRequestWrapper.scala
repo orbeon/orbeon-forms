@@ -25,8 +25,7 @@ import org.orbeon.oxf.util.DateUtils
 // Request wrapper for forwarding a request which simulates a server-side redirect.
 class ForwardServletRequestWrapper(
         request: HttpServletRequest,
-        pathQuery: String,
-        extraQueryParameters: JMap[String, Array[String]])
+        pathQuery: String)
     extends BaseServletRequestWrapper(request)
     with RequestPathQuery
     with RequestRemoveHeaders
@@ -35,8 +34,8 @@ class ForwardServletRequestWrapper(
     import BaseServletRequestWrapper._
 
     // "Constructors" for traits
-    def overriddenPathQuery = appendExtraQueryParameters(pathQuery, extraQueryParameters)
-    def headersToRemove      = HeadersToFilter
+    def overriddenPathQuery = pathQuery
+    def headersToRemove     = HeadersToFilter
 
     override def getMethod = "GET"
 }

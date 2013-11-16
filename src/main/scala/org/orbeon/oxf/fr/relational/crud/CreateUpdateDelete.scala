@@ -46,7 +46,6 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                    |               from $table
                    |              where app  = ?
                    |                    and form = ?
-                   |                    and form_version = ?
                    |                    ${if (req.forData)       "and document_id = ?" else ""}
                    |                    ${if (req.forAttachment) "and file_name   = ?" else ""}
                    |           group by $idCols
@@ -56,7 +55,6 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             val position = Iterator.from(1)
             ps.setString(position.next(), req.app)
             ps.setString(position.next(), req.form)
-            ps.setInt(position.next(), requestedFormVersion(connection, req))
             if (req.forData)       ps.setString(position.next(), req.dataPart.get.documentId)
             if (req.forAttachment) ps.setString(position.next(), req.filename.get)
             ps.executeQuery()

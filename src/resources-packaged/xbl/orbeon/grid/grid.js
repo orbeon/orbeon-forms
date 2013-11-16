@@ -53,6 +53,7 @@
                 eventName: 'fr-' + eventName,
                 properties: { row: gridIteration(e) }
             });
+            e.preventDefault();
             return true;
         }
     }

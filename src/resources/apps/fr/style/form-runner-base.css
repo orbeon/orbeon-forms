@@ -345,10 +345,6 @@
 .orbeon .fr-repeat-table .can-insert-below .dropdown {
   display: block;
 }
-.orbeon .fr-repeat-table i.disabled {
-  opacity: 0.4;
-  filter: alpha(opacity=40);
-}
 .orbeon .xforms-dialog {
   width: 500px;
 }

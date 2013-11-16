@@ -203,6 +203,11 @@ body.orbeon {
         background-image: url(bootstrap/img/glyphicons-halflings-white.png)
     }
 
+    // Make disabled icons a bit opaque
+    .disabled[class^="icon-"], .disabled [class^="icon-"] {
+        .opacity(40)
+    }
+
     // NAV LIST
     // --------
 
@@ -246,15 +251,27 @@ body.orbeon {
     // Dropdowns
     // ---------
 
-    .dropdown-menu > li > span > a {
-        display: block;
-        padding: 3px 20px;
-        clear: both;
-        font-weight: normal;
-        line-height: @baseLineHeight;
-        color: @dropdownLinkColor;
-        white-space: nowrap;
-        text-decoration: none;
+    .dropdown-menu {
+        // <a> nested one more level
+        > li > span > a {
+            display: block;
+            padding: 3px 20px;
+            clear: both;
+            font-weight: normal;
+            line-height: @baseLineHeight;
+            color: @dropdownLinkColor;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        // Restore regular icons for disabled menu items (they are opacified instead, see .opacity() above)
+        > li.disabled > a:hover > [class^="icon-"] {
+            background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings.png);
+        }
     }
 
     // Hover state

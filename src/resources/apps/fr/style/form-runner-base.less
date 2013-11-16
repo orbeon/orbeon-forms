@@ -274,18 +274,16 @@
             background-color: @grayLighter;
         }
 
+        // Hide menu button...
         .fr-repeat-column-trigger .dropdown {
             display: none;
         }
 
+        // ... but show it if there is at least one operation
         .can-remove, .can-move-up, .can-move-down, .can-insert-above, .can-insert-below {
             .dropdown {
                 display: block;
             }
-        }
-
-        i.disabled {
-            .opacity(40)
         }
     }
 

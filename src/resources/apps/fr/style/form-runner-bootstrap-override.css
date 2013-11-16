@@ -252,6 +252,11 @@ body.orbeon {
 .orbeon .navbar-inverse i {
   background-image: url(bootstrap/img/glyphicons-halflings-white.png);
 }
+.orbeon .disabled[class^="icon-"],
+.orbeon .disabled [class^="icon-"] {
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+}
 .orbeon .nav > li > span > a {
   display: block;
 }
@@ -291,6 +296,12 @@ body.orbeon {
   color: #333333;
   white-space: nowrap;
   text-decoration: none;
+}
+.orbeon .dropdown-menu a {
+  text-decoration: none;
+}
+.orbeon .dropdown-menu > li.disabled > a:hover > [class^="icon-"] {
+  background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings.png);
 }
 .orbeon .dropdown-menu > li > span > a:hover,
 .orbeon .dropdown-menu > li > span > a:focus,

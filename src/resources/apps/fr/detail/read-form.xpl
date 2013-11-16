@@ -45,6 +45,12 @@
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
                 </url>
+                <xsl:if test="$document != ''">
+                    <header>
+                        <name>Orbeon-For-Document-Id</name>
+                        <value><xsl:value-of select="$document"/></value>
+                    </header>
+                </xsl:if>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                 <!-- Form definitions are always in XML format -->

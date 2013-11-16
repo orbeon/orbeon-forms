@@ -35,6 +35,9 @@ trait PublishOps {
                     filename               = "form.xhtml",
                     commonQueryString      = s"document=$document",
                     forceAttachments       = false,
+                    // Using "next" for attachments works as attachments are saved first, and the persistence layer
+                    // uses the latest version of the published forms (not attachments) to figure what the next
+                    // version is
                     dataFormVersion        = Some("next"),
                     attachmentsFormVersion = Some("next")
                 )

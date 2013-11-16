@@ -169,29 +169,58 @@
                                                 </xf:group>
                                             </xh:th>
                                         </xsl:if>
-                                        <xf:group xxbl:scope="outer" appearance="xxf:internal" context="{$repeat-expression}">
-                                            <xsl:for-each select="$grid-rows[1]/*:td">
-                                                <xsl:variable name="control" select="*[1]"/>
-                                                <xh:th>
-                                                    <xsl:if test="$is-editable">
-                                                        <xsl:attribute name="class"       select="'fb-grid-th', 'xforms-activable'"/>
-                                                        <xsl:attribute name="xxf:control" select="'true'"/>
-                                                    </xsl:if>
-                                                    <xsl:copy-of select="@colspan"/>
-                                                    <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
-                                                        <!-- XPath expressions on LHH elements can't be relative to the controls in case there is no iteration
-                                                             - it seems we won't be able to lift that restriction even once labels outside repeats are supported,
-                                                               see https://github.com/orbeon/orbeon-forms/issues/241 -->
-                                                        <!-- We try to bind the group the first node, so we show the required "star" next to the header
-                                                             - this is not an ideal solution, as it only works if there is at least one iteration
-                                                             - arguably, if there are no iteration, whether a control is required or not doesn't matter -->
-                                                        <xf:group xxbl:scope="outer">
-                                                            <xsl:apply-templates select="$control/(@bind, @model, @context, @ref, xf:label, xf:help, xf:hint)"/>
-                                                        </xf:group>
-                                                    </xsl:if>
-                                                </xh:th>
-                                            </xsl:for-each>
-                                        </xf:group>
+                                        <xsl:for-each select="$grid-rows[1]/*:td">
+                                            <xsl:variable name="control" select="*[1]"/>
+                                            <xh:th>
+                                                <xsl:if test="$is-editable">
+                                                    <xsl:attribute name="class"       select="'fb-grid-th', 'xforms-activable'"/>
+                                                    <xsl:attribute name="xxf:control" select="'true'"/>
+                                                </xsl:if>
+                                                <xsl:copy-of select="@colspan"/>
+                                                <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
+                                                    <!--
+                                                        1. See also https://github.com/orbeon/orbeon-forms/issues/241
+                                                        2. In order to determine an LHH when there is no iteration,
+                                                           XPath expressions on LHH elements can't be relative to
+                                                           control binding, as the context will be empty. This works
+                                                           for Form Runner though, as LHH point to resources and are not
+                                                           relative.
+                                                        3. The bind attribute and bind() function return an empty
+                                                           sequence when the repeat is empty or when not in the context
+                                                           of the repeat (the latter is arguably wrong or at the very
+                                                           least unhelpful!).
+                                                        4. So what we do is this: we try to obtain the binding for the
+                                                           control in the first iteration, within the context of the
+                                                           repeat expression, by copying all binding attributes on a
+                                                           variable. This will return the empty sequence if there is no
+                                                           iteration.
+                                                        5. We can't simply use an enclosing group, otherwise the group
+                                                           will be non-relevant when no binding is found.
+                                                        6. We can't use the xxf:control-binding() function to obtain the
+                                                           binding, because the repeat is further below and might not be
+                                                           up to date.
+                                                        7. If there is no iteration, we cannot determine the binding,
+                                                           so we cannot determine whether the control is required or
+                                                           not.
+                                                        8. Arguably, if there are no iteration, whether a control is
+                                                           required or not doesn't matter ;)
+                                                        9. Even though, in most cases, we *could* know whether the
+                                                           control is required, because if the expression says
+                                                           `required="true()"`, the result is constant. But we don't
+                                                           have a good solution for that.
+                                                    -->
+                                                    <xf:var xxbl:scope="outer" name="control-binding" context="{$repeat-expression}">
+                                                        <xxf:sequence value=".">
+                                                            <xsl:apply-templates select="$control/(@bind, @model, @context, @ref)"/>
+                                                        </xxf:sequence>
+                                                    </xf:var>
+                                                    <!-- Point to control binding if any, dummy value otherwise -->
+                                                    <xf:group xxbl:scope="outer" ref="$control-binding, ''">
+                                                        <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
+                                                    </xf:group>
+                                                </xsl:if>
+                                            </xh:th>
+                                        </xsl:for-each>
                                     </xh:tr>
                                     <!-- Optional row(s) shown before the repeated rows -->
                                     <!--<xsl:for-each select="fr:header">-->

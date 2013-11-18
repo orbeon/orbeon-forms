@@ -14,16 +14,21 @@
 package org.orbeon.oxf.processor.sql.delegates;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.processor.sql.DatabaseDelegate;
+import org.w3c.dom.Node;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * Custom Delegate that uses the standard JDBC API which works fine with MySQL and DB2.
  */
-public class SQLProcessorStandardDelegate extends SQLProcessorGenericDelegate {
+public class SQLProcessorStandardDelegate implements DatabaseDelegate {
+
     public OutputStream getBlobOutputStream(final PreparedStatement stmt, final int index) throws SQLException {
         return new ByteArrayOutputStream() {
             public void close() {
@@ -38,5 +43,21 @@ public class SQLProcessorStandardDelegate extends SQLProcessorGenericDelegate {
 
     public void setBlob(PreparedStatement stmt, int index, byte[] value) throws SQLException {
         stmt.setBytes(index,value);
+    }
+
+    public void setClob(PreparedStatement stmt, int index, String value) throws SQLException {
+        stmt.setCharacterStream(index, new StringReader(value), value.length());
+    }
+
+    public boolean isXMLType(int columnType, String columnTypeName) throws SQLException {
+        return false;
+    }
+
+    public Node getDOM(ResultSet resultSet, String columnName) throws SQLException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setDOM(PreparedStatement stmt, int index, String document) throws SQLException {
+        throw new UnsupportedOperationException();
     }
 }

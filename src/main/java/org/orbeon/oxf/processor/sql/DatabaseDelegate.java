@@ -27,6 +27,5 @@ public interface DatabaseDelegate {
     public OutputStream getBlobOutputStream(PreparedStatement stmt, int index) throws SQLException;
     public boolean isXMLType(int columnType, String columnTypeName) throws SQLException;
     public org.w3c.dom.Node getDOM(ResultSet resultSet, String columnName) throws SQLException;
-//        public void setDOM(PreparedStatement stmt, int index, org.w3c.dom.Document node);
     public void setDOM(PreparedStatement stmt, int index, String document) throws SQLException;
 }

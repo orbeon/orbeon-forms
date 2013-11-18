@@ -111,7 +111,6 @@
         <include name="axis_1_2_1-saaj.jar"/>
         <include name="axis_1_2_1-wsdl4j-1.5.1.jar"/>
 
-        <include name="hsqldb-1_8_0_7.jar"/>
         <include name="jfreechart-1.0.9.jar"/>
         <include name="jfreechart-dependency-jcommon-1.0.12.jar"/>
         <include name="activation-1.1.1.jar"/>

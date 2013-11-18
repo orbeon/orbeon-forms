@@ -56,7 +56,6 @@
 	<classpathentry kind="lib" path="lib/exist-optional-1_4_1_dev_orbeon_20110104.jar"/>
 	<classpathentry kind="lib" path="lib/flyingsaucer-20100212-itext-2_1_7.jar"/>
 	<classpathentry kind="lib" path="lib/flyingsaucer-core-renderer_orbeon_20100512.jar"/>
-	<classpathentry kind="lib" path="lib/hsqldb-1_8_0_7.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient-cache-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.1.jar"/>

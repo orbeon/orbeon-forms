@@ -169,7 +169,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
             if (!hasReplaceOrSeparator) {
                 final String queryString = query.toString();
                 if (type != CALL) {
-                    // TODO: see how we can support this: Statement.RETURN_GENERATED_KEYS (won't work with hsqldb)
+                    // TODO: see how we can support this: Statement.RETURN_GENERATED_KEYS
                     stmt = getInterpreterContext().getConnection().prepareStatement(queryString);
                 } else
                     stmt = getInterpreterContext().getConnection().prepareCall(queryString);

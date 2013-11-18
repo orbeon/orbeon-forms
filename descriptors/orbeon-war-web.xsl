@@ -378,21 +378,6 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'SQL examples'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
-                <xsl:with-param name="content">
-                    <servlet>
-                        <servlet-name>hsqldb-servlet</servlet-name>
-                        <servlet-class>org.hsqldb.Servlet</servlet-class>
-                        <init-param>
-                            <param-name>hsqldb.server.database</param-name>
-                            <param-value>orbeondb</param-value>
-                        </init-param>
-                    </servlet>
-                </xsl:with-param>
-            </xsl:call-template>
-
             <servlet-mapping>
                 <servlet-name>orbeon-main-servlet</servlet-name>
                 <url-pattern>/</url-pattern>
@@ -442,17 +427,6 @@
                     <servlet-mapping>
                         <servlet-name>exist-webdav-servlet</servlet-name>
                         <url-pattern>/exist/webdav/*</url-pattern>
-                    </servlet-mapping>
-                </xsl:with-param>
-            </xsl:call-template>
-
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'SQL examples'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
-                <xsl:with-param name="content">
-                    <servlet-mapping>
-                        <servlet-name>hsqldb-servlet</servlet-name>
-                        <url-pattern>/db</url-pattern>
                     </servlet-mapping>
                 </xsl:with-param>
             </xsl:call-template>

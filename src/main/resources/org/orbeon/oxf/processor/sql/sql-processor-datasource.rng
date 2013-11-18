@@ -15,13 +15,13 @@
     datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <interleave>
         <optional>
-            <!-- Driver class name, for example "org.hsqldb.jdbcDriver" -->
+            <!-- Driver class name -->
             <element name="driver-class-name">
                 <data type="string"/>
             </element>
         </optional>
         <optional>
-            <!-- Driver URI, for example "jdbc:hsqldb:file:/opt/db/testdb" -->
+            <!-- Driver URI -->
             <element name="uri">
                 <data type="anyURI"/>
             </element>

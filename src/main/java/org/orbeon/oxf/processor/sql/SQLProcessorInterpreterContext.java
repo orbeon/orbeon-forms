@@ -21,7 +21,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
-import org.orbeon.oxf.processor.sql.delegates.SQLProcessorGenericDelegate;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJDBC4Delegate;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorStandardDelegate;
 import org.orbeon.oxf.properties.PropertySet;
@@ -171,15 +170,6 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                     if (clazz == null) {
                         clazz = SQLProcessorOracleJDBC4Delegate.class;
                         SQLProcessor.logger.info("Using Oracle JDBC4 delegate.");
-                    }
-                } else if ("HSQL Database Engine".equalsIgnoreCase(productName)) {
-                    // HSQLDB
-                    try {
-                    clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorHSQLDBDelegate");
-                        SQLProcessor.logger.info("Using HSQLDB delegate.");
-                    } catch (Throwable t) {
-                        clazz = SQLProcessorGenericDelegate.class;
-                        SQLProcessor.logger.info("Could not load HSQLDB database delegate. Using generic delegate.");
                     }
 				} else {
                     // For JDBC drivers that properly implement the API

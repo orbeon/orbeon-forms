@@ -149,7 +149,6 @@ In addition, this product includes the following software:
 - Ehcache (<http://ehcache.org/>)
 - eXist (<http://exist.sourceforge.net/>)
 - Flying Saucer (<http://code.google.com/p/flying-saucer/>)
-- hsqldb (<http://hsqldb.sourceforge.net/>)
 - iText (<http://itextpdf.com/>)
 - Jaxen (<http://jaxen.org/>)
 - JCIFS (<http://jcifs.samba.org/>)

@@ -215,6 +215,8 @@
                     <!-- Non-relevant group -->
                     <xf:group ref="()">
                         <xsl:apply-templates select="$resources/*/xbl:binding/fb:metadata/(fb:template | fb:templates/fb:view)/*" mode="filter-fb-template"/>
+                        <!-- So that the xxbl:global for repeated sections is included -->
+                        <fr:repeater/>
                     </xf:group>
                 </xsl:if>
             </xsl:if>

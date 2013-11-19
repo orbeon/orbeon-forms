@@ -201,7 +201,7 @@ object ToolboxOps {
         val (into, after) = findSectionInsertionPoint(inDoc)
 
         val newSectionName = controlName(nextId(inDoc, "section"))
-        val precedingSectionName = after flatMap getControlNameOption
+        val precedingSectionName = after flatMap getControlNameOpt
 
         // Obtain ids first
         val ids = nextIds(inDoc, "tmp", 2).toIterator
@@ -235,7 +235,7 @@ object ToolboxOps {
         insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
 
         // Insert the bind element
-        ensureBinds(inDoc, findContainerNames(newSectionElement) :+ newSectionName)
+        ensureBinds(inDoc, findContainerNames(newSectionElement, includeSelf = true))
 
         // Select first grid cell
         if (withGrid)
@@ -257,6 +257,8 @@ object ToolboxOps {
         val templateInstanceId = templateId(newGridName)
 
         // Handle data template
+        ensureTemplateReplaceContent(inDoc, newGridName, <dummy/>.copy(label = newGridName))
+
         val modelElement = findModelElement(inDoc)
         modelElement \ "*:instance" find (hasIdValue(_, templateInstanceId)) match {
             case Some(templateInstance) ⇒
@@ -279,7 +281,7 @@ object ToolboxOps {
                      id={gridId(newGridName)}
                      repeat="true"
                      bind={bindId(newGridName)}
-                     origin={makeInstanceExpression(templateInstanceId)}
+                     template={makeInstanceExpression(templateInstanceId)}
                      min="1"
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xh="http://www.w3.org/1999/xhtml">
@@ -300,7 +302,7 @@ object ToolboxOps {
         )
 
         // Make sure binds are created
-        ensureBinds(inDoc, findContainerNames(newGridElement) :+ newGridName)
+        ensureBinds(inDoc, findContainerNames(newGridElement, includeSelf = true))
 
         // Select new td
         selectTd(newGridElement \\ "*:td" head)
@@ -388,7 +390,7 @@ object ToolboxOps {
                             (rename(_, newName))
 
                         (xvc \ "bind" \ * headOption) foreach
-                            (renameBindByElement(_, newName))
+                            (renameBindElement(_, newName))
 
                         newName
                     } else

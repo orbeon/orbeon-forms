@@ -98,9 +98,6 @@
                         <xsl:if test="$is-editable">
                             <!-- Point to the design-time source -->
                             <xf:var name="grid" value="{$edit-ref}"/>
-
-                            <!-- Form Builder resources -->
-                            <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
                         </xsl:if>
 
                         <xsl:if test="$is-repeat">
@@ -110,15 +107,15 @@
                             <xf:var name="repeat-sequence">
                                 <xxf:sequence value="{$repeat-expression}" xxbl:scope="outer"/>
                             </xf:var>
-                            <xf:var name="repeat-origin">
-                                <xxf:sequence value="{if (@origin) then @origin else '()'}" xxbl:scope="outer"/>
+                            <xf:var name="repeat-template">
+                                <xxf:sequence value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
                             </xf:var>
                             <xf:var name="repeat-index">
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
                                 <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
                             <!-- NOTE: We need a better way to get the Form Runner mode. See also #673 and #629. -->
-                            <xf:var name="view-mode" value="xxf:readonly($repeat-context)"/>
+                            <xf:var name="view-mode" value="xxf:readonly($repeat-context) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
                         </xsl:if>
 
                         <!-- Grid table -->
@@ -136,7 +133,7 @@
                             <!-- Colgroup to make column sizing with CSS easier -->
                             <xh:colgroup>
                                 <xsl:if test="$is-repeat and not($readonly)">
-                                    <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not($view-mode)]"/>
+                                    <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]"/>
                                 </xsl:if>
                                 <xsl:for-each select="$grid-rows[1]/*:td">
                                     <xh:col class="fr-grid-col-{position()}"/>
@@ -151,14 +148,14 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-grid-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not($view-mode)]">
+                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]">
                                                 <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1">
                                                     <xf:label><xh:i class="icon-plus-sign"/></xf:label>
                                                     <xf:action event="DOMActivate">
                                                         <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
                                                         <xf:insert context="$repeat-context"
                                                                    ref="$repeat-sequence"
-                                                                   origin="$repeat-origin"
+                                                                   origin="$repeat-template"
                                                                    at="$p"/>
                                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
                                                         <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
@@ -263,7 +260,7 @@
 
                                                 <xh:tr>
                                                     <xsl:choose>
-                                                        <xsl:when test="position() = 1">
+                                                        <xsl:when test="$static-row-pos = 1">
                                                             <xsl:attribute name="class" select="string-join(('fb-grid-tr', @class, '{$can-classes}'), ' ')"/>
                                                             <xsl:attribute name="id">fr-tr</xsl:attribute>
                                                         </xsl:when>
@@ -276,7 +273,7 @@
 
                                                     <!-- Repeat buttons/menu -->
                                                     <xsl:if test="$is-repeat and not($readonly) and $static-row-pos = 1">
-                                                        <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not($view-mode)]">
+                                                        <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
                                                             <div class="dropdown" xmlns="http://www.w3.org/1999/xhtml">
                                                                 <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown" tabindex="-1">
                                                                     <span class="caret"/>
@@ -428,7 +425,7 @@
                                                             <xf:insert
                                                                 context="$context"
                                                                 ref="$items[$p - 1]"
-                                                                origin="$repeat-origin, $source"
+                                                                origin="$repeat-template, $source"
                                                                 position="after"/>
 
                                                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
@@ -441,7 +438,7 @@
                                                             <xf:insert
                                                                 context="$context"
                                                                 ref="$items[$p - 1]"
-                                                                origin="$source, $repeat-origin"
+                                                                origin="$source, $repeat-template"
                                                                 position="after"/>
 
                                                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->

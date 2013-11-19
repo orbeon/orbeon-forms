@@ -53,24 +53,26 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
     // Find control holders (there can be more than one with repeats)
-    // Don't return anything if isCustomInstance is true
-    def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
-        if (! isCustomInstance)
-            findBindByName(inDoc, controlName) map { bind ⇒
-                // From bind, infer path by looking at ancestor-or-self binds
-                val bindRefs = (bind ancestorOrSelf "*:bind" flatMap bindRefOrNodeset).reverse.tail
+    def findDataHolders(inDoc: NodeInfo, controlName: String, withIterations: Boolean = false): Seq[NodeInfo] =
+        findBindByName(inDoc, controlName) map { bind ⇒
+            // From bind, infer path by looking at ancestor-or-self binds
+            val bindRefs = (bind ancestorOrSelf "*:bind" flatMap bindRefOrNodeset).reverse.tail
 
-                val path = bindRefs map ("(" + _ + ")") mkString "/"
+            val path = bindRefs map ("(" + _ + ")") mkString "/"
 
-                // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
-                val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
+            // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
+            val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
 
-                // Evaluate path from instance root element
-                val instanceElements = eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat)
-                instanceElements.asInstanceOf[Seq[NodeInfo]]
-            } getOrElse Seq()
-        else
-            Seq()
+            // Evaluate path from instance root element
+            val holders = eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat).asInstanceOf[Seq[NodeInfo]]
+            
+            if (withIterations)
+                (holders / iterationName(controlName)) ++ holders
+            else
+                holders
+            
+        } getOrElse
+            Seq.empty
 
     def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 
@@ -84,7 +86,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
         val nameInGridOption = precedingInGrid :+ grid flatMap
             { case td if td.localname == "td" ⇒ td \ *; case other ⇒ other } flatMap
-                (getControlNameOption(_).toSeq) headOption
+                (getControlNameOpt(_).toSeq) headOption
 
         // Return that if found, otherwise find before the current grid
         nameInGridOption orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
@@ -98,18 +100,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         // with a name (there might not be one).
         val controlsWithName =
             precedingOrSelfContainers flatMap {
-                case grid if getControlNameOption(grid).isEmpty ⇒ grid \\ "*:td" \ * filter hasName lastOption
+                case grid if getControlNameOpt(grid).isEmpty ⇒ grid \\ "*:td" \ * filter hasName lastOption
                 case other ⇒ Some(other)
             }
 
         // Take the first result
-        controlsWithName.headOption flatMap getControlNameOption
+        controlsWithName.headOption flatMap getControlNameOpt
     }
 
-    // Ensure that a tree of bind exists
+    // Ensure that a tree of bind exists, search the tree of controls
     def ensureBindsByName(inDoc: NodeInfo, name: String) =
         findControlByName(inDoc, name) foreach { control ⇒
-            ensureBinds(inDoc, findContainerNames(control) :+ name)
+            ensureBinds(inDoc, findContainerNames(control, includeSelf = true))
         }
 
     // Ensure that a tree of bind exists
@@ -147,6 +149,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         ensureBind(topLevelBind, names.toIterator)
     }
 
+    // Create an instance template based on a hierarchy of binds rooted at the given bind
+    def templateFromBind(bind: NodeInfo): NodeInfo = {
+        val e = elementInfo(findBindName(bind))
+        // TODO: Insert instance template as is done in insertNewControl
+        insert(into = e, origin = bind / "*:bind" map templateFromBind)
+        e
+    }
+
     // Delete the controls in the given grid cell, if any
     def deleteCellContent(td: NodeInfo) =
         td \ * flatMap controlElementsToDelete foreach (delete(_))
@@ -157,16 +167,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val doc = control.getDocumentRoot
 
         // Holders, bind, templates, resources if the control has a name
-        val holders = getControlNameOption(control).toList flatMap { controlName ⇒
+        val holders = getControlNameOpt(control).toList flatMap { controlName ⇒
 
             val result = mutable.Buffer[NodeInfo]()
 
             result ++=
-                findDataHolders(doc, controlName)             ++=
-                findBindByName(doc, controlName)              ++=
-                findTemplateHolder(control, controlName)      ++=
-                instanceElement(doc, templateId(controlName)) ++=
-                findResourceHolders(controlName)
+                findDataHolders     (doc, controlName) ++=
+                findBindByName      (doc, controlName) ++=
+                findTemplateHolders (doc, controlName, withIterations = false) ++=
+                findTemplateInstance(doc, controlName) ++=
+                findResourceHolders  (controlName)
 
             result.toList
         }
@@ -176,23 +186,27 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Rename a control with its holders, binds, etc.
-    def findRenameControl(inDoc: NodeInfo, oldName: String, newName: String) =
+    def renameControlIfNeeded(inDoc: NodeInfo, oldName: String, newName: String): Unit =
         if (oldName != newName) {
-            findRenameHolders(inDoc, oldName, newName)
-            findRenameBind(inDoc, oldName, newName)
-            findControlByName(inDoc, oldName) foreach (renameControlByElement(_, newName))
-            renameTemplate(inDoc, oldName, newName)
+            renameDataTemplateAndResourceHolders(inDoc, oldName, newName)
+            renameBinds                         (inDoc, oldName, newName)
+            renameControl                       (inDoc, oldName, newName)
+            renameTemplate                      (inDoc, oldName, newName)
         }
 
+    def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
+        findControlByName(inDoc, oldName) foreach (renameControlByElement(_, newName))
+
     // Rename the control (but NOT its holders, binds, etc.)
-    def renameControlByElement(controlElement: NodeInfo, newName: String) {
+    def renameControlByElement(controlElement: NodeInfo, newName: String): Unit = {
 
         // Set @id in any case, @ref value if present, @bind value if present
         ensureAttribute(controlElement, "id", controlId(newName))
         ensureAttribute(controlElement, "bind", bindId(newName))
 
-        // Make the control point to its template if @origin is present
-        setvalue(controlElement \@ "origin", makeInstanceExpression(templateId(newName)))
+        // Make the control point to its template if @template (or legacy @origin) is present
+        for (attName ← List("template", "origin"))
+            setvalue(controlElement \@ attName, makeInstanceExpression(templateId(newName)))
 
         // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
         // FIXME: This code is particularly ugly!
@@ -212,22 +226,39 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Rename a bind
-    def renameBindByElement(bindElement: NodeInfo, newName: String) = {
-        ensureAttribute(bindElement, "id", bindId(newName))
+    def renameBindElement(bindElement: NodeInfo, newName: String) = {
+        ensureAttribute(bindElement, "id",   bindId(newName))
         ensureAttribute(bindElement, "name", newName)
-        ensureAttribute(bindElement, "ref", newName)
-        delete(bindElement \@ "nodeset")
+        ensureAttribute(bindElement, "ref",  newName)
+        delete(bindElement \@ "nodeset") // sanitize
     }
 
-    // Rename a bind
-    def findRenameBind(inDoc: NodeInfo, oldName: String, newName: String) =
-        findBindByName(inDoc, oldName) foreach
-            (renameBindByElement(_, newName))
+    // Rename a bind, including the associated iteration bind if any
+    def renameBinds(inDoc: NodeInfo, oldName: String, newName: String): Unit = {
+
+        val binds = findBindByName(inDoc, oldName).toList ::: findBind(inDoc, isBindForName(_, iterationName(oldName))).toList
+
+        binds foreach { bind ⇒
+            renameBindElement(bind, if (isIterationName(findBindName(bind))) iterationName(newName) else newName)
+        }
+    }
 
     // Rename holders with the given name
-    def findRenameHolders(inDoc: NodeInfo, oldName: String, newName: String) =
-        findHolders(inDoc, oldName) foreach
-            (rename(_, newName))
+    def renameDataTemplateAndResourceHolders(inDoc: NodeInfo, oldName: String, newName: String): Unit = {
+
+        def findHolders(inDoc: NodeInfo, holderName: String) = {
+            val result = mutable.Buffer[NodeInfo]()
+            result ++=
+                findDataHolders(inDoc, holderName, withIterations = true)     ++=
+                findResourceHolders(holderName)                               ++=
+                findTemplateHolders(inDoc, holderName, withIterations = true)
+            result
+        }
+
+        findHolders(inDoc, oldName) foreach { holder ⇒
+            rename(holder, if (isIterationName(holder.localname)) iterationName(newName) else newName)
+        }
+    }
 
     // Find or create a data holder for the given hierarchy of names
     private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
@@ -259,7 +290,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Insert data and resource holders for all languages
-    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
+    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]): Unit = {
 
         // Maybe add template items to the resource holder
         if (hasEditor(controlElement, "static-itemset")) {
@@ -273,15 +304,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Insert data and resource holders for all languages
-    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolders: Seq[(String, NodeInfo)], precedingControlName: Option[String]) {
+    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolders: Seq[(String, NodeInfo)], precedingControlName: Option[String]): Unit = {
         val doc = controlElement.getDocumentRoot
-        val containerNames = findContainerNames(controlElement)
 
         // Insert hierarchy of data holders
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
         // In practice, the ancestor holders should already exist.
-        if (! isCustomInstance)
+        locally {
+            val containerNames = findContainerNames(controlElement)
             ensureDataHolder(formInstanceRoot(doc), (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
+        }
 
         // Insert resources placeholders for all languages
         if (resourceHolders.nonEmpty) {
@@ -294,13 +326,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         }
 
         // Insert repeat template holder if needed
-        if (! isCustomInstance)
-            for {
-                grid ← findContainingRepeat(controlElement)
-                gridName ← getControlNameOption(grid)
-                root ← templateRoot(doc, gridName)
-            } yield
-                ensureDataHolder(root, Seq((() ⇒ dataHolder, precedingControlName)))
+        for {
+            repeat     ← findAncestorRepeats(controlElement)
+            repeatName ← getControlNameOpt(repeat)
+            root       ← templateRoot(doc, repeatName)
+        } locally {
+            val containerNames = findContainerNames(controlElement, fromParent = Some(repeatName))
+            ensureDataHolder(root, (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
+        }
     }
 
     // Update a mip for the given control, grid or section id
@@ -327,7 +360,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             // Create/update or remove attribute
             nonEmptyOrNone(mipValue) match {
                 case Some(value) if ! isStringType ⇒ ensureAttribute(bind, mipQName, value)
-                case _ ⇒ delete(bind \@ mipQName)
+                case _                             ⇒ delete(bind \@ mipQName)
             }
         }
     }

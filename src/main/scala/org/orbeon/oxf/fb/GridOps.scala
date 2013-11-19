@@ -33,13 +33,9 @@ trait GridOps extends ContainerOps {
         def originalRowspan_= (newRowSpan: Int): Unit = ensureAttribute(td, "rowspan", newRowSpan.toString)
     }
 
-    // Find the first enclosing repeated grid or legacy repeat if any
-    def findContainingRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) find IsRepeat
-
     // Get the first enclosing repeated grid or legacy repeat
     def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter (IsGrid(_)) head
+        findAncestorContainers(descendantOrSelf, includeSelf) filter IsGrid head
 
     // Extract the rowspan of a td (default is 1 if there is no attribute)
     private def getRowspan(td: NodeInfo) =  attValueOption(td \@ "rowspan") map (_.toInt) getOrElse 1
@@ -189,13 +185,13 @@ trait GridOps extends ContainerOps {
         }
 
         // Delete all controls in the row
-        tdsToDelete foreach (deleteCellContent(_))
+        tdsToDelete foreach deleteCellContent
 
         // Delete row and its content
         delete(tr)
 
         // Adjust selected td if needed
-        newTdToSelect foreach (selectTd(_))
+        newTdToSelect foreach selectTd
 
         debugDumpDocumentForGrids("delete row", tr)
     }
@@ -290,7 +286,7 @@ trait GridOps extends ContainerOps {
         }
 
         // Adjust selected td if needed
-        newTdToSelect foreach (selectTd(_))
+        newTdToSelect foreach selectTd
 
         debugDumpDocumentForGrids("delete col", grid)
     }
@@ -382,37 +378,6 @@ trait GridOps extends ContainerOps {
     // XForms callers: get the grid's max attribute or null (the empty sequence)
     def getMaxOrEmpty(doc: NodeInfo, gridName: String) = getMax(doc, gridName) map (_.toString) orNull
 
-    def setMinMax(doc: NodeInfo, gridName: String, min: Int, max: Int) = {
-
-        // A missing or invalid value is taken as the default value: 0 for min, unbounded for max. In both cases, we
-        // don't set the attribute value. This means that in the end we only set positive integer values.
-        def set(name: String, value: Int) =
-            findControlByName(doc, gridName) foreach { control ⇒
-                if (value > 0)
-                    ensureAttribute(control, name, value.toString)
-                else
-                    delete(control \@ name)
-            }
-
-        set("min", min)
-        set("max", max)
-    }
-
-    // Find template holder
-    def findTemplateHolder(descendantOrSelf: NodeInfo, controlName: String) =
-        for {
-            grid     ← findContainingRepeat(descendantOrSelf, includeSelf = true)
-            gridName ← getControlNameOption(grid)
-            root     ← templateRoot(descendantOrSelf, gridName)
-            holder   ← root descendantOrSelf * find (_.name == controlName)
-        } yield
-            holder
-
-    // Rename a bind
-    def renameTemplate(doc: NodeInfo, oldName: String, newName: String) =
-        templateRoot(doc, oldName) flatMap(_ parent * headOption) foreach
-            (template ⇒ ensureAttribute(template, "id", templateId(newName)))
-
     // Get the x/y position of a td given Cell information
     private def tdCoordinates(td: NodeInfo, cells: Seq[Seq[Cell]]): (Int, Int) = {
 
@@ -496,7 +461,7 @@ trait GridOps extends ContainerOps {
         annotate("tmp", bodyElement \\ "*:grid" filterNot hasId)
 
         // 2. Select the first td if any
-        bodyElement \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
+        bodyElement \\ "*:grid" \\ "*:td" take 1 foreach selectTd
     }
 
     def canDeleteGrid(grid: NodeInfo): Boolean = (grid sibling "*:grid").nonEmpty
@@ -546,17 +511,6 @@ trait GridOps extends ContainerOps {
         following intersect (findAncestorContainers(td).last descendant "*:td")
     }
 
-    // Find all data, resources, and template holders for the given name
-    def findHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] = {
-        val result = mutable.Buffer[NodeInfo]()
-        result ++=
-                findDataHolders(inDoc, holderName) ++=
-                findResourceHolders(holderName) ++=
-                (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName)))
-        result.toList
-    }
-
     def findResourceAndTemplateHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
-        (findResourceHolders(holderName) map (Option(_))) :+
-            (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+        findResourceHolders(holderName) ++ findTemplateHolders(inDoc, holderName, withIterations = false)
 }

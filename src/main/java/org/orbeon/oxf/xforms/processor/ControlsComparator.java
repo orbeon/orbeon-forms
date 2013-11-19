@@ -121,7 +121,6 @@ public class ControlsComparator {
                     ch = new XMLReceiverHelper(new SAXStore());
                 }
 
-
                 // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(control2.getEffectiveId());
                 if (control2.supportAjaxUpdates() && (!control2.equalsExternal(control1) || isValueChangeControl)) {

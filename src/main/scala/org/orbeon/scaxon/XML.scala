@@ -347,10 +347,12 @@ object XML {
         // Like XPath local-name(), name(), namespace-uri(), resolve-QName()
         def localname    = nodeInfo.getLocalPart
         def name         = nodeInfo.getDisplayName
+
         def namespaceURI = {
             val uri = nodeInfo.getURI
             if (uri eq null) "" else uri
         }
+
         def resolveQName(lexicalQName: String): QName = {
 
             val checker = Name10Checker.getInstance
@@ -501,6 +503,9 @@ object XML {
             TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, e.toString, false, false)
         else
             new DocumentWrapper(elemToDom4j(e), null, XPath.GlobalConfiguration)
+
+    def nodeInfoToElem(nodeInfo: NodeInfo): Elem =
+        scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))
 
     implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) / * head
     implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) / *

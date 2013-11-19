@@ -45,11 +45,13 @@
                 <xsl:template match="/*">
 
                     <!-- Section configuration -->
-                    <xsl:variable name="editable" select="exists(@edit-ref)"/>
-                    <xsl:variable name="mode" select="@mode"/>
+                    <xsl:variable name="editable"          select="exists(@edit-ref)"/>
+                    <xsl:variable name="mode"              select="@mode"/>
                     <xsl:variable name="ancestor-sections" select="count(ancestor::fr:section)"/><!-- TODO -->
-                    <xsl:variable name="collapse" select="not(@collapse = 'false')"/>
-                    <xsl:variable name="animate" select="not(@animate = 'false')"/>
+                    <xsl:variable name="collapse"          select="not(@collapse = 'false')"/>
+                    <xsl:variable name="animate"           select="not(@animate = 'false')"/>
+                    <xsl:variable name="readonly"          select="@readonly = 'true'"/>
+                    <xsl:variable name="is-repeat"         select="@repeat = 'true' or exists(minOccurs | @maxOccurs | @min | @max)"/>
 
                     <xsl:variable name="initially-open" as="xs:boolean" select="$mode = ('view', 'pdf') or not(@open = 'false')"/>
 
@@ -61,15 +63,14 @@
                             <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then fbf:sectionCanDoClasses($fb-section) else ()"/>
                         </xsl:if>
 
+                        <xf:var name="view-mode" value="xxf:readonly(xxf:component-context()) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+
                         <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
                             class="{@class}{if ($editable) then ' {$fb-can-do-classes}' else ''}"
                             xxf:element="div">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">
-
-                                <!-- Q: Is this the best way to get access to Form Runner resources? -->
-                                <xf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xf:var>
 
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">
@@ -119,8 +120,25 @@
                                             <xsl:attribute name="class">xxforms-animate</xsl:attribute>
                                         </xsl:if>
                                         <xf:group class="fr-section-content" xxbl:scope="outer" xxf:element="div">
-                                            <!-- Section content except label, event handlers, and buttons -->
-                                            <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
+                                            <xsl:choose>
+                                                <xsl:when test="$is-repeat">
+                                                    <fr:repeater ref="*" xbl:attr="template">
+                                                        <xsl:if test="not($readonly)">
+                                                            <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-repeat-menu dropdown">
+                                                                <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown" tabindex="-1" xmlns="http://www.w3.org/1999/xhtml">
+                                                                    <span class="caret"/>
+                                                                </button>
+                                                            </xh:div>
+                                                        </xsl:if>
+                                                        <xh:div class="fr-repeat-content">
+                                                            <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
+                                                        </xh:div>
+                                                    </fr:repeater>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </xf:group>
                                     </xf:case>
                                 </xf:switch>

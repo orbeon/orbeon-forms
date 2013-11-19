@@ -78,7 +78,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     @Test def sectionName(): Unit =
         withActionAndFBDoc(TemplateDoc) { doc ⇒
             assert(findSectionName(doc, Control1).get === Section1)
-            assert(getControlNameOption(doc \\ "*:section" head).get === Section1)
+            assert(getControlNameOpt(doc \\ "*:section" head).get === Section1)
         }
 
     @Test def newBinds(): Unit =
@@ -119,7 +119,6 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
 
     @Test def insertControl(): Unit = insertControl(isCustomInstance = false)
-    @Test def insertControlCustomXML(): Unit = insertControl(isCustomInstance = true)
 
     private def insertControl(isCustomInstance: Boolean): Unit =
         withActionAndFBDoc(TemplateDoc, isCustomInstance) { doc ⇒
@@ -157,7 +156,6 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def insertRepeat(): Unit = insertRepeat(isCustomInstance = false)
-    @Test def insertRepeatCustomXML(): Unit = insertRepeat(isCustomInstance = true)
 
     private def insertRepeat(isCustomInstance: Boolean): Unit =
         withActionAndFBDoc(TemplateDoc, isCustomInstance) { doc ⇒
@@ -306,7 +304,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         val controls = section \\ "*:td" \ * filter (_ \@ "id" nonEmpty)
 
         val expected = Seq(None, Some("grid-2"), Some("grid-2"))
-        val actual = controls map (precedingControlNameInSectionForControl(_))
+        val actual = controls map precedingControlNameInSectionForControl
 
         assert(actual === expected)
     }
@@ -423,21 +421,6 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(canInsertSection(doc) === true)
             assert(canInsertGrid(doc)    === false)
             assert(canInsertControl(doc) === false)
-        }
-
-    @Test def customXMLBindRef(): Unit =
-        withActionAndFBDoc(CustomXMLDoc, isCustomInstance = true) { doc ⇒
-
-            def rawBindRef(inDoc: NodeInfo, name: String) =
-                findBindByName(inDoc, name) flatMap
-                    bindRefOrNodeset
-
-            // Automatic de-annotation
-            assert(DataModel.getBindRef(doc, "control-1") === Some("control-1"))
-            // Raw bind ref is annotated
-            assert(Some(DataModel.annotatedBindRef(bindId("control-1"), "control-1")) === rawBindRef(doc, "control-1"))
-            // "Annotate if needed" works
-            assert(DataModel.annotatedBindRef(bindId("control-1"), "control-1") === DataModel.annotatedBindRefIfNeeded(bindId("control-1"), "control-1"))
         }
 
     @Test def allowedBindingExpressions(): Unit = {

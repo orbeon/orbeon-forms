@@ -36,8 +36,6 @@
             <xbl:handler event="xxforms-dialog-open" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
-                <xf:setvalue ref="$i/control-xpath" value="dataModel:getBindRefOrEmpty($form, $i/control-name)"/>
-                <xf:setvalue ref="$i/is-custom-instance" value="dataModel:isCustomInstance()"/>
                 <xf:setvalue ref="$i/control-names" value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
                 <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/classes" value="$control/@class"/>
@@ -121,12 +119,8 @@
                 <!-- Find reference to control -->
                 <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
                 <!-- Rename if needed -->
-                <xf:action if="$old-name != $new-name" type="xpath">
-                    fbf:findRenameControl($form, $old-name, $new-name)
-                </xf:action>
-                <!-- Update XPath on bind -->
-                <xf:action if="dataModel:isCustomInstance()" type="xpath">
-                    dataModel:setBindRef($form, $new-name, $i/control-xpath)
+                <xf:action type="xpath">
+                    fbf:renameControlIfNeeded($form, $old-name, $new-name)
                 </xf:action>
                 <!-- Set proper classes -->
                 <xf:var name="classes" value="xxf:split($i/classes)"/>
@@ -160,9 +154,7 @@
                     <local>
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
-                        <control-xpath/>            <!-- XPath expression to node might be editable if using custom XML -->
                         <classes/>                  <!-- fr-summary, fr-search... -->
-                        <is-custom-instance/>
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
                         <control-details/>          <!-- Sub-elements contain additional properties for this control -->
 
@@ -196,11 +188,6 @@
                     calculate="normalize-space()"
                     readonly="false()"
                     constraint=". = ../original-control-name or not(. = xxf:split(../control-names))"/>
-                <xf:bind ref="control-xpath"
-                    relevant="../is-custom-instance = 'true'"
-                    required="../is-custom-instance = 'true'"
-                    type="xxf:xpath2"
-                    fb:warning="not(normalize-space() and dataModel:isAllowedValueBindingExpression(../original-control-name, .))"/>
 
                 <xf:bind ref="default-alert">
                     <xf:bind
@@ -300,18 +287,6 @@
                                     </xf:repeat>
                                 </xh:td>
                             </xh:tr>
-                            <!-- XPath -->
-                            <!-- NIY
-                            <xh:tr>
-                                <xh:td>
-                                    <xf:input ref="$i/control-xpath" incremental="true" id="fb-edit-details-control-xpath">
-                                        <xf:label ref="$resources/dialog-control-details/control-xpath/label"/>
-                                        <xf:alert ref="$resources/dialog-control-details/control-xpath/alert"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/control-xpath/hint"/>
-                                    </xf:input>
-                                </xh:td>
-                            </xh:tr>
-                            -->
                             <xh:tr>
                                 <xh:td>
                                     <!-- Classes -->

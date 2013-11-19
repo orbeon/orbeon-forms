@@ -1,0 +1,236 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+
+    <xbl:script src="/xbl/orbeon/repeater/repeater.js"/>
+    <xbl:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js"/>
+
+    <xbl:binding id="fr-repeater-binding" element="fr|repeater" xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/repeater/repeater.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below" phase="target">
+                <xf:dispatch name="{event('xxf:type')}" targetid="repeat-group" xxf:repeat-indexes="{event('row')}"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <!-- Keep a single global copy of the repeat menu. It is moved around as needed. -->
+        <xxbl:global>
+            <ul class="dropdown-menu fr-repeat-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml" id="fr-repeat-dropdown-ul">
+                <li class="fr-insert-above">
+                    <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
+                </li>
+                <li class="fr-insert-below">
+                    <a tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
+                </li>
+                <li class="divider"/>
+                <li class="fr-move-up">
+                    <a tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
+                </li>
+                <li class="fr-move-down">
+                    <a tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                </li>
+                <li class="divider"/>
+                <li class="fr-remove">
+                    <a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
+                </li>
+            </ul>
+        </xxbl:global>
+
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+
+                <xsl:variable name="root" select="/*[1]"/>
+
+                <xsl:variable name="freeze"             select="(xs:integer($root/@freeze[. castable as xs:integer]), 0)[1]"/>
+
+                <xsl:variable name="min-occurs"         select="($root/@min, $root/@minOccurs, 0)[1]"/>
+                <xsl:variable name="max-occurs"         select="($root/@max, $root/@maxOccurs, 'none')[1]"/>
+                <xsl:variable name="readonly"           select="$root/@readonly = 'true'"/>
+                <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
+                <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
+
+                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+
+                <xsl:template match="/*">
+
+                    <!-- Root element -->
+                    <xh:div xxf:control="true" class="{'fr-repeat', @class}">
+
+                        <xf:var name="repeat-context">
+                            <xxf:sequence value="." xxbl:scope="outer"/>
+                        </xf:var>
+                        <xf:var name="repeat-sequence">
+                            <xxf:sequence value="{$repeat-expression}" xxbl:scope="outer"/>
+                        </xf:var>
+                        <xf:var name="repeat-template">
+                            <xxf:sequence value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
+                        </xf:var>
+                        <xf:var name="repeat-index">
+                            <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
+                            <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
+                        </xf:var>
+                        <!-- NOTE: We need a better way to get the Form Runner mode. See also #673 and #629. -->
+                        <!--<xf:var name="view-mode" value="xxf:readonly($repeat-context) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>-->
+
+                        <xf:var name="can-add"
+                                value="{if ($max-occurs = ('none', 'unbounded')) then 'true()'
+                                        else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
+
+                        <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
+                            <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
+
+                                <!-- Run row operations, checking that they are allowed first -->
+                                <xf:action
+                                    event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
+                                    target="#observer"
+                                    if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-repeat-iteration', 'class'))">
+
+                                    <!-- Make sure we have stable references -->
+                                    <xf:var name="context" value="$repeat-context"/>
+                                    <xf:var name="items"   value="xxf:repeat-items()"/>
+                                    <xf:var name="p"       value="xxf:repeat-position()"/>
+                                    <xf:var name="source"  value="$items[$p]"/>
+
+                                    <!-- Delete source node in any case. It's ok because we have a
+                                         reference to it for operations that still require it. -->
+                                    <xf:delete ref="$source"/>
+
+                                    <!-- NOTES:
+
+                                         1. In actions below, we try to restore focus explicitly
+                                            as we don't have an xf:move action. See:
+
+                                            https://github.com/orbeon/orbeon-forms/issues/1426
+
+                                         2. When the repeat sequence updates immediately, focus
+                                            handling tends to work, but when the repeat sequence
+                                            updates upon refresh, information about the order of
+                                            operations is lost and the focus is not set to the last
+                                            inserted row.
+
+                                         3. The client dispatches xxforms-repeat-activate after the
+                                            operation has run. That event happens to be ignored as
+                                            we delete the current iteration first.
+                                     -->
+
+                                    <xf:action if="event('xxf:type') = 'fr-move-up'">
+
+                                        <xf:insert
+                                            context="$context"
+                                            ref="$items[$p - 1]"
+                                            origin="$source"
+                                            position="before"/>
+
+                                        <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1"/>
+
+                                    </xf:action>
+
+                                    <xf:action if="event('xxf:type') = 'fr-move-down'">
+
+                                        <xf:insert
+                                            context="$context"
+                                            ref="$items[$p + 1]"
+                                            origin="$source"
+                                            position="after"/>
+
+                                        <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2"/>
+
+                                    </xf:action>
+
+                                    <xf:action if="event('xxf:type') = 'fr-insert-above'">
+
+                                        <xf:insert
+                                            context="$context"
+                                            ref="$items[$p - 1]"
+                                            origin="$repeat-template, $source"
+                                            position="after"/>
+
+                                        <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3"/>
+
+                                    </xf:action>
+
+                                    <xf:action if="event('xxf:type') = 'fr-insert-below'">
+
+                                        <xf:insert
+                                            context="$context"
+                                            ref="$items[$p - 1]"
+                                            origin="$source, $repeat-template"
+                                            position="after"/>
+
+                                        <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4"/>
+
+                                    </xf:action>
+                                </xf:action>
+
+                                <xsl:choose>
+                                    <xsl:when test="not($readonly)">
+
+                                        <xf:var name="repeat-position" value="xxf:repeat-position()"/>
+                                        <xf:var name="frozen"          value="$repeat-position le {$freeze}"/>
+
+                                        <xf:var name="remove-constraint">
+                                            <!-- Evaluate the constraint in the context of the iteration -->
+                                            <xxf:sequence value="{$remove-constraint}" xxbl:scope="outer"/>
+                                        </xf:var>
+
+                                        <xf:var name="can-classes" value="
+                                                'can-remove'      [$remove-constraint and count($repeat-sequence) gt {$min-occurs} and not($frozen)],
+                                                'can-move-up'     [$repeat-position gt {$freeze} + 1],
+                                                'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
+                                                'can-insert-above'[$can-add and not($frozen)],
+                                                'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xf:var name="can-classes"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+
+                                <xh:div>
+                                    <xsl:attribute name="class" select="string-join((@class, 'fr-repeat-iteration', '{$can-classes}'), ' ')"/>
+                                    <xsl:attribute name="id">fr-repeat-iteration</xsl:attribute>
+                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                        <xsl:apply-templates select="*"/>
+                                    </xf:group>
+                                </xh:div>
+                            </xf:group>
+                        </xf:repeat>
+                    </xh:div>
+                </xsl:template>
+
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -45,8 +45,8 @@ trait ContainerOps extends ControlOps {
     // Various counts
     def countSections(inDoc: NodeInfo)         = getAllControlsWithIds(inDoc)          count IsSection
     def countAllGrids(inDoc: NodeInfo)         = findFRBodyElement(inDoc) descendant * count IsGrid
-    def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count IsRepeat // includes repeated grids
-    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count IsSectionTemplateContent // non-repeated grids
+    def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count IsRepeat
+    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count IsSectionTemplateContent
 
     def countGrids(inDoc: NodeInfo)            = countAllGrids(inDoc) - countRepeats(inDoc)
     def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
@@ -98,8 +98,8 @@ trait ContainerOps extends ControlOps {
     def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo) {
 
         // Get names before moving the container
-        val nameOption = getControlNameOption(container)
-        val otherNameOption = getControlNameOption(otherContainer)
+        val nameOption      = getControlNameOpt(container)
+        val otherNameOption = getControlNameOpt(otherContainer)
 
         val doc = container.getDocumentRoot
 
@@ -112,14 +112,14 @@ trait ContainerOps extends ControlOps {
 
                 // Move data holder only
                 for {
-                    holder ← findDataHolders(doc, name)
+                    holder      ← findDataHolders(doc, name)
                     otherHolder ← findDataHolders(doc, otherName)
                 } yield
                     move(holder, otherHolder)
 
                 // Move bind
                 for {
-                    bind ← findBindByName(doc, name)
+                    bind      ← findBindByName(doc, name)
                     otherBind ← findBindByName(doc, otherName)
                 } yield
                     move(bind, otherBind)
@@ -127,7 +127,7 @@ trait ContainerOps extends ControlOps {
                 // Try to move resource and template elements to a good place
                 // TODO: We move the container resource holder, but we should also move together the contained controls' resource holders
                 def firstControl(s: Seq[NodeInfo]) =
-                    s find (getControlNameOption(_).isDefined)
+                    s find (getControlNameOpt(_).isDefined)
 
                 def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo) =
                     findResourceAndTemplateHolders(doc, name) foreach {
@@ -164,7 +164,7 @@ trait ContainerOps extends ControlOps {
         val holders =
             for {
                 section     ← sectionsWithTemplates(inDoc)
-                controlName ← getControlNameOption(section).toList
+                controlName ← getControlNameOpt(section).toList
                 holder      ← findDataHolders(inDoc, controlName)
             } yield
                 holder
@@ -172,6 +172,116 @@ trait ContainerOps extends ControlOps {
         // Delete all elements underneath those holders
         holders foreach { holder ⇒
             delete(holder \ *)
+        }
+    }
+
+    def setRepeatProperties(doc: NodeInfo, controlName: String, repeat: Boolean, min: Int, max: Int): Unit = {
+
+        val controlOpt     = findControlByName(doc, controlName)
+        val wasRepeat      = controlOpt exists (_.attValue("repeat") == "true")
+
+        // Update control attributes first
+        controlOpt foreach { control ⇒
+            // A missing or invalid value is taken as the default value: 0 for min, unbounded for max. In both cases, we
+            // don't set the attribute value. This means that in the end we only set positive integer values.
+            toggleAttribute(control, "repeat",   "true",       repeat)
+            toggleAttribute(control, "template", makeInstanceExpression(templateId(controlName)), repeat)
+            toggleAttribute(control, "min",      min.toString, repeat && min > 0)
+            toggleAttribute(control, "max",      max.toString, repeat && max > 0)
+
+            if (! wasRepeat && repeat) {
+                // Insert new bind and template
+
+                // Insert nested iteration bind
+                val oldNestedBinds = findBindByName(doc, controlName).toList / *
+                delete(oldNestedBinds)
+                ensureBindsByName(doc, controlName) // uses the new `repeat="true"` attribute which implies the nested iteration element
+                val controlBind   = findBindByName(doc, controlName)
+                val iterationBind = controlBind.toList / *
+                insert(into = iterationBind, origin = oldNestedBinds)
+
+                // Insert nested iteration data holders
+                // NOTE: There can be multiple existing data holders due to enclosing repeats
+                findDataHolders(doc, controlName, withIterations = false) ++ findTemplateHolders(doc, controlName, withIterations = false) foreach { holder ⇒
+                    val nestedHolders = holder / *
+                    delete(nestedHolders)
+                    insert(into = holder, origin = elementInfo(iterationName(controlName), nestedHolders))
+                }
+
+                // Ensure new template rooted at iteration
+                ensureTemplateReplaceContent(doc, controlName, templateFromBind(iterationBind.head))
+
+            } else if (wasRepeat && ! repeat) {
+                // Remove bind, holders and template
+
+                val controlBind = findBindByName(doc, controlName).toList
+                val dataHolders = findDataHolders(doc, controlName, withIterations = false) ++ findTemplateHolders(doc, controlName, withIterations = false)
+
+                // Move bind up
+                val oldNestedBinds = controlBind / * / *
+                delete(controlBind / *)
+                insert(into = controlBind, origin = oldNestedBinds)
+
+                // Mover data holders up and keep only the first iteration
+                dataHolders foreach { holder ⇒
+                    val nestedHolders = holder / * take 1 child *
+                    delete(holder / *)
+                    insert(into = holder, origin = nestedHolders)
+                }
+
+                // Remove template
+                findTemplateInstance(doc, controlName) foreach (delete(_))
+            } else if (repeat) {
+                // Template should already exists an should have already been renamed if needed
+                // MAYBE: Ensure template just in case.
+            } else if (! repeat) {
+                // Template should not exist
+                // MAYBE: Delete template just in case.
+            }
+        }
+    }
+
+    def renameTemplate(doc: NodeInfo, oldName: String, newName: String): Unit =
+        for {
+            root     ← templateRoot(doc, oldName)
+            instance ← root.parentOption
+        } locally {
+            ensureAttribute(instance, "id", templateId(newName))
+        }
+
+    def findTemplateHolders(doc: NodeInfo, controlName: String, withIterations: Boolean): List[NodeInfo] =
+        for {
+            control    ← findControlByName(doc, controlName).toList
+            repeat     ← findAncestorRepeats(control, includeSelf = true)
+            repeatName ← getControlNameOpt(repeat).toList
+            root       ← templateRoot(doc, repeatName).toList
+            matches    = if (withIterations) Set(repeatName, iterationName(repeatName)) else Set(repeatName)
+            holder     ← root descendantOrSelf * filter (e ⇒ matches(e.name))
+        } yield
+            holder
+
+    def findTemplateInstance(doc: NodeInfo, controlName: String) =
+        instanceElement(doc, templateId(controlName))
+
+    def ensureTemplateReplaceContent(inDoc: NodeInfo, controlName: String, content: NodeInfo): Unit = {
+
+        val templateInstanceId = templateId(controlName)
+        val modelElement = findModelElement(inDoc)
+        modelElement \ "*:instance" find (hasIdValue(_, templateInstanceId)) match {
+            case Some(templateInstance) ⇒
+                // clear existing template instance content
+                delete(templateInstance \ *)
+                insert(into = templateInstance , origin = content)
+
+            case None ⇒
+                // Insert template instance if not present
+                val template: NodeInfo =
+                    <xf:instance xmlns:xf="http://www.w3.org/2002/xforms"
+                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                 id={templateInstanceId}
+                                 fb:readonly="true">{nodeInfoToElem(content)}</xf:instance>
+
+                insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
         }
     }
 }

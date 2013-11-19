@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.util.ScalaUtils._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
@@ -27,11 +28,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     def isFBBody(node: NodeInfo) = (node self GroupElementTest) && node.attClasses("fb-body")
 
     // Predicates
-    val IsGrid: NodeInfo ⇒ Boolean = _ self GridElementTest
+    val IsGrid:    NodeInfo ⇒ Boolean = _ self GridElementTest
     val IsSection: NodeInfo ⇒ Boolean = _ self SectionElementTest
-    val IsRepeat: NodeInfo ⇒ Boolean = node ⇒ IsGrid(node) && node.attValue("repeat") == "true"
+    val IsRepeat:  NodeInfo ⇒ Boolean = node ⇒ (IsGrid(node) || IsSection(node)) && node.attValue("repeat") == "true"
 
-    def isRepeat(node: NodeInfo) = IsRepeat(node) // for Java callers
+    def isRepeat(node: NodeInfo) = IsRepeat(node) // for Java/XSLT callers
 
     val IsContainer: NodeInfo ⇒ Boolean =
         node ⇒ (node self ContainerElementTest) || isFBBody(node)
@@ -43,15 +44,42 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
         container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
-    def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
+    def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
 
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
         (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
     // Find ancestor section and grid names from root to leaf
-    def findContainerNames(descendant: NodeInfo): Seq[String] =
-        findAncestorContainers(descendant).reverse map (getControlNameOption(_)) flatten
+    def findContainerNames(descendant: NodeInfo, includeSelf: Boolean = false, fromParent: Option[String] = None): Seq[String] = {
+        
+        val allNamesWithContainers =
+            for {
+                container ← findAncestorContainers(descendant, includeSelf)
+                name      ← getControlNameOpt(container)
+            } yield
+                name → container
+        
+        val namesWithContainers =
+            fromParent match {
+                case Some(parentName) ⇒
+                    val matches = Set(parentName, iterationName(parentName))
+                    allNamesWithContainers takeWhile {
+                        case (name, _) ⇒ ! matches(name)
+                    }
+                case None ⇒
+                    allNamesWithContainers
+            }
+
+        // Repeated sections add an intermediary iteration element
+        val namesFromLeaf =
+            namesWithContainers flatMap {
+                case (name, container) ⇒
+                    (IsRepeat(container) && IsSection(container) list iterationName(name)) ::: name :: Nil
+            }
+
+        namesFromLeaf.reverse
+    }
 
     // A container's children containers
     def childrenContainers(container: NodeInfo) =
@@ -60,4 +88,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     // A container's children grids (including repeated grids)
     def childrenGrids(container: NodeInfo) =
         container \ * filter IsGrid
+
+    // Find all ancestor repeats from leaf to root
+    def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+        findAncestorContainers(descendantOrSelf, includeSelf) filter IsRepeat
 }

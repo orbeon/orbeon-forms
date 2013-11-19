@@ -188,6 +188,12 @@ object XFormsAPI {
             case Seq(att, _*) ⇒ setvalue(att, value)
         }
 
+    def toggleAttribute(element: NodeInfo, attName: QName, value: String, set: Boolean): Unit =
+        if (set)
+            ensureAttribute(element, attName, value.toString)
+        else
+            delete(element \@ attName)
+
     // Return an instance's root element in the current action context as per xxf:instance()
     def instanceRoot(staticId: String): Option[NodeInfo] =
         XXFormsInstance.findInAncestorScopes(actionInterpreter.container, staticId)

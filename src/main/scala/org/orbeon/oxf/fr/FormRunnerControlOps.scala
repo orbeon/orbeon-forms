@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.util.ScalaUtils._
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
@@ -36,12 +37,18 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     // Whether the give node corresponds to a control
     // TODO: should be more restrictive
-    val IsControl: NodeInfo ⇒ Boolean = hasName(_)
+    val IsControl: NodeInfo ⇒ Boolean = hasName
+
+    private val PossibleControlSuffixes = List("control", "grid", "section", "repeat")
 
     // Find a control by name (less efficient than searching by id)
-    def findControlByName(inDoc: NodeInfo, controlName: String) =
-        Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
-            (suffix ⇒ byId(inDoc, controlName + '-' + suffix)) headOption
+    def findControlByName(inDoc: NodeInfo, controlName: String) = (
+        for {
+            suffix  ← PossibleControlSuffixes.iterator
+            control ← byId(inDoc, controlName + '-' + suffix).iterator
+        } yield
+            control
+    ).headOption
 
     // Find a control id by name
     def findControlIdByName(inDoc: NodeInfo, controlName: String) =
@@ -52,31 +59,38 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         findControlByName(inDoc, controlName).orNull
 
     // Get the control's name based on the control element
-    def getControlName(control: NodeInfo) = getControlNameOption(control).get
+    def getControlName(control: NodeInfo) = getControlNameOpt(control).get
 
     // Get the control's name based on the control element
-    def getControlNameOption(control: NodeInfo) =
+    def getControlNameOpt(control: NodeInfo) =
         (control \@ "id" headOption) flatMap
             (id ⇒ Option(controlName(id.stringValue)))
 
-    def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
+    def hasName(control: NodeInfo) = getControlNameOpt(control).isDefined
 
     // Return a bind ref or nodeset attribute value if present
     def bindRefOrNodeset(bind: NodeInfo): Option[String] =
         bind \@ ("ref" || "nodeset") map (_.stringValue) headOption
 
     // Find a bind by name
-    def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] = findBind(inDoc, isBindForName(_, name))
+    def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
+        findBind(inDoc, isBindForName(_, name))
 
     // XForms callers: find a bind by name or null (the empty sequence)
-    def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) = findBindByName(inDoc, name).orNull
+    def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) =
+        findBindByName(inDoc, name).orNull
 
     // Find a bind by predicate
     def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
         findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
 
+    // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name
     def isBindForName(bind: NodeInfo, name: String) =
         hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
+
+    // Canonical way: use the `name` attribute
+    def findBindName(bind: NodeInfo) =
+        bind attValue "name"
 
     def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
         nodes exists (element ⇒ (element attValue "mediatype") == "text/html")

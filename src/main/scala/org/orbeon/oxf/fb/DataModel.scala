@@ -26,12 +26,6 @@ import org.orbeon.scaxon.XML
 
 object DataModel {
 
-    // Whether the current form has a custom instance
-    def isCustomInstance = {
-        val metadataInstance = topLevelModel("fr-form-model").get.getVariable("is-custom-instance")
-        (metadataInstance ne null) && effectiveBooleanValue(metadataInstance)
-    }
-
     private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
         { case bind if exists(bind \@ "name") ⇒ bind }
 
@@ -116,8 +110,7 @@ object DataModel {
     def annotatedBindRef(bindId: String, ref: String) = "dataModel:bindRef('" + bindId + "', " + ref + ")"
     def deAnnotatedBindRef(ref: String) = AnnotatedBindRef.replaceFirstIn(ref.trim, "$1").trim
 
-    def annotatedBindRefIfNeeded(bindId: String, ref: String) =
-        if (isCustomInstance) annotatedBindRef(bindId, ref) else ref
+    def annotatedBindRefIfNeeded(bindId: String, ref: String) = ref
 
     // Function called via `dataModel:bindRef()` from the binds to retrieve the adjusted bind node at design time. If
     // the bound item is non-empty and acceptable for the control, then it is returned. Otherwise, a pointer to

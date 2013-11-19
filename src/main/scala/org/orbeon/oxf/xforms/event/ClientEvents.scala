@@ -93,8 +93,12 @@ object ClientEvents extends Logging {
 
             def filterEvents(events: Seq[LocalEvent]) = events filter {
                 case a if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒ false
-                case a if (a.name eq null) && (a.targetEffectiveId eq null) ⇒
-                    throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.")
+                case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
+                    debug("ignoring invalid client event", Seq(
+                        "control id" → a.targetEffectiveId,
+                        "event name" → a.name)
+                    )(doc.indentedLogger)
+                    false
                 case _ ⇒ true
             }
 
@@ -403,11 +407,10 @@ object ClientEvents extends Logging {
             val newReference = doc.getObjectByEffectiveId(eventTarget.getEffectiveId)
 
             def warn(condition: String) = {
-                implicit val CurrentLogger = doc.indentedLogger
                 debug("ignoring invalid client event on " + condition, Seq(
                     "control id" → eventTarget.getEffectiveId,
                     "event name" → event.name)
-                )
+                )(doc.indentedLogger)
                 false
             }
 

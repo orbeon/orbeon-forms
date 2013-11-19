@@ -34,10 +34,11 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             val resultSet = {
                 val table = tableName(request)
                 val idCols = idColumns(request)
+                val xmlCol = if (req.provider == "oracle") "t.xml.getClobVal()" else "t.xml"
                 val ps = connection.prepareStatement(
                     s"""select
                        |    last_modified_time
-                       |    ${if (req.forAttachment) ", file_content"          else ", t.xml xml"}
+                       |    ${if (req.forAttachment) ", file_content"          else s", $xmlCol xml"}
                        |    ${if (req.forData)       ", username, groupname"   else ""}
                        |    ${if (req.forForm)       ", form_version"          else ""}
                        |from $table t
@@ -51,6 +52,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                        |                     ${if (req.forForm)       "and form_version = ?"              else ""}
                        |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
                        |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
+                       |            group by $idCols
                        |          )
                        |    and deleted = 'N'
                        |""".stripMargin)

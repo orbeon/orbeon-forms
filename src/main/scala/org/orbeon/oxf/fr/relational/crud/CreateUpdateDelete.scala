@@ -75,18 +75,19 @@ trait CreateUpdateDelete extends RequestResponse with Common {
 
     def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Unit = {
 
-        val table = tableName(req)
+        val table  = tableName(req)
+        val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
         val ps = connection.prepareStatement(
             s"""insert into $table
                 (
-                                                 created, last_modified_time, last_modified_by
-                                               , app, form, form_version
-                    ${if (req.forData)         ", document_id"             else ""}
-                                               , deleted
-                    ${if (req.forData)         ", draft"                   else ""}
-                    ${if (req.forAttachment)   ", file_name, file_content" else ""}
-                    ${if (! req.forAttachment) ", xml"                     else ""}
-                    ${if (req.forData)         ", username, groupname"     else ""}
+                                                   created, last_modified_time, last_modified_by
+                                                 , app, form, form_version
+                    ${if (req.forData)          ", document_id"             else ""}
+                                                 , deleted
+                    ${if (req.forData)          ", draft"                   else ""}
+                    ${if (req.forAttachment)    ", file_name, file_content" else ""}
+                    ${if (! req.forAttachment) s", $xmlCol"                 else ""}
+                    ${if (req.forData)          ", username, groupname"     else ""}
                 )
                 values
                 (
@@ -96,7 +97,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                                                , ${if (delete) "'Y'" else "'N'"}
                     ${if (req.forData)         ", ?"    else ""}
                     ${if (req.forAttachment)   ", ?, ?" else ""}
-                    ${if (! req.forAttachment) ", ?"    else ""}
+                    ${if (! req.forAttachment) ", ?" else ""}
                     ${if (req.forData)         ", ?, ?" else ""}
                 )""".stripMargin)
 

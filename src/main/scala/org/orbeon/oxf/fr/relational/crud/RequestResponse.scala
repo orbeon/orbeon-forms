@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 trait RequestResponse {
 
     case class DataPart(isDraft: Boolean, documentId: String)
-    case class Request(app: String, form: String, filename: Option[String], version: Version, dataPart: Option[DataPart]) {
+    case class Request(provider: String, app: String, form: String, filename: Option[String], version: Version, dataPart: Option[DataPart]) {
         def forForm = ! dataPart.isDefined
         def forData =   dataPart.isDefined
         def forAttachment = filename.isDefined
@@ -60,13 +60,13 @@ trait RequestResponse {
         }
 
         NetUtils.getExternalContext.getRequest.getRequestPath match {
-            case CrudFormPath(_, app, form, filename) ⇒
+            case CrudFormPath(provider, app, form, filename) ⇒
                 val file = if (filename == "form.xhtml") None else Some(filename)
-                new Request(app, form, file, version, None)
-            case CrudDataPath(_, app, form, dataOrDraft, documentId, filename) ⇒
+                new Request(provider, app, form, file, version, None)
+            case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
                 val file = if (filename == "data.xml") None else Some(filename)
                 val dataPart = new DataPart(dataOrDraft == "draft", documentId)
-                new Request(app, form, file, version, Some(dataPart))
+                new Request(provider, app, form, file, version, Some(dataPart))
         }
 
     }

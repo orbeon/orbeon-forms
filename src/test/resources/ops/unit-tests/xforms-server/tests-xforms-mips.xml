@@ -465,7 +465,7 @@
                         <xxf:control id="output-readonly-1">I am readonly</xxf:control>
                         <xxf:control id="output-readonly-2" readonly="true">I am readonly</xxf:control>
                         <xxf:control id="output-required-1">I am required</xxf:control>
-                        <xxf:control id="output-required-2" required="true" level="error">I am required</xxf:control>
+                        <xxf:control id="output-required-2" required="true" level="error" empty="false">I am required</xxf:control>
                         <xxf:control id="output-relevant">I am not relevant</xxf:control>
                         <xxf:control id="output-valid-1">I am not valid</xxf:control>
                         <xxf:control id="output-valid-2" level="error">I am not valid</xxf:control>
@@ -758,7 +758,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" required="true">42</xxf:control>
+                        <xxf:control id="my-input" required="true" empty="false">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.{XMLReceiverHelper, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
+import org.xml.sax.helpers.AttributesImpl
 
 // For Java classes that can't directly implement XFormsValueControl
 abstract class XFormsValueControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
@@ -231,6 +232,26 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
         if (isRequired)
             write("required-and-empty", XFormsModelBinds.isEmptyValue(getValue).toString)
+    }
+
+    override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {
+        var added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+
+        // NOTE: We should really have a general mechanism to add/remove/diff classes.
+        if (isRequired) {
+
+            val control1 = other.asInstanceOf[XFormsValueControl]
+            val control2 = this
+
+            val empty = control2.isEmpty
+
+            if (isNewlyVisibleSubtree || ! control1.isRequired || empty != control1.isEmpty) {
+                attributesImpl.addAttribute("", "empty", "empty", XMLReceiverHelper.CDATA, empty.toString)
+                added = true
+            }
+        }
+
+        added
     }
 }
 

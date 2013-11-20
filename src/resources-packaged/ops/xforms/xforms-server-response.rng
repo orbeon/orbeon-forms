@@ -440,6 +440,14 @@
         <optional>
             <attribute name="type"/>
         </optional>
+        <optional>
+            <attribute name="empty">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </attribute>
+        </optional>
     </define>
 
 </grammar>

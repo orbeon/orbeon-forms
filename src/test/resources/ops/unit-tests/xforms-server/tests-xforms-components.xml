@@ -463,11 +463,11 @@
                         <xxf:control id="my-summary≡xf-119⊙2" class="fr-error-label" relevant="false"/>
                         <xxf:control id="my-summary≡xf-120⊙2" class="fr-error-label" label="Last name"/>
                         <xxf:control id="my-summary≡ao⊙2" class="fr-error-alert fr-error-alert-error">Invalid last name</xxf:control>
-                        <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error"/>
-                        <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error"/>
-                        <xxf:control id="note-control⊙2" label="Note" alert="Invalid note" required="true" level="error"/>
-                        <xxf:control id="note-control⊙3" label="Note" alert="Invalid note" visited="true" required="true" level="error"/>
-                        <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" visited="true" required="true" level="error"/>
+                        <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error" empty="true"/>
+                        <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
+                        <xxf:control id="note-control⊙2" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
+                        <xxf:control id="note-control⊙3" label="Note" alert="Invalid note" visited="true" required="true" level="error" empty="true"/>
+                        <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" visited="true" required="true" level="error" empty="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

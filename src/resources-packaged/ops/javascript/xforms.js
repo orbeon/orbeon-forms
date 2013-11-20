@@ -2273,12 +2273,11 @@ ORBEON.xforms.Controls = {
     /**
      * Update the xforms-empty/filled classes as necessary.
      */
-    updateRequiredEmpty: function(control, newValue) {
+    updateRequiredEmpty: function(control, emptyAttr) {
         var isRequired = $(control).hasClass("xforms-required");
-        var isEmpty    = newValue == "";
 
-        $(control).toggleClass("xforms-empty", isRequired && isEmpty);
-        $(control).toggleClass("xforms-filled", isRequired && ! isEmpty);
+        $(control).toggleClass("xforms-empty", isRequired  && emptyAttr == "true");
+        $(control).toggleClass("xforms-filled", isRequired && emptyAttr == "false");
     },
 
     autosizeTextarea: function(textarea) {

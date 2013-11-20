@@ -729,12 +729,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-control⊙1" label="Title" required="true">Don Quixote de la Mancha</xxf:control>
-                        <xxf:control id="author-control⊙1" label="Author" required="true">Miguel de Cervantes Saavedra</xxf:control>
-                        <xxf:control id="title-control⊙2" label="Title" required="true">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="author-control⊙2" label="Author" required="true">Denis Diderot</xxf:control>
-                        <xxf:control id="title-control⊙3" label="Title" required="true">Childhood's End</xxf:control>
-                        <xxf:control id="author-control⊙3" label="Author" required="true">Arthur C. Clarke</xxf:control>
+                        <xxf:control id="title-control⊙1" label="Title" required="true" empty="false">Don Quixote de la Mancha</xxf:control>
+                        <xxf:control id="author-control⊙1" label="Author" required="true" empty="false">Miguel de Cervantes Saavedra</xxf:control>
+                        <xxf:control id="title-control⊙2" label="Title" required="true" empty="false">Jacques le fataliste et son maître</xxf:control>
+                        <xxf:control id="author-control⊙2" label="Author" required="true" empty="false">Denis Diderot</xxf:control>
+                        <xxf:control id="title-control⊙3" label="Title" required="true" empty="false">Childhood's End</xxf:control>
+                        <xxf:control id="author-control⊙3" label="Author" required="true" empty="false">Arthur C. Clarke</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

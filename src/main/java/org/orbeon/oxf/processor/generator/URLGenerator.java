@@ -912,14 +912,14 @@ public class URLGenerator extends ProcessorImpl {
 
                 // Save headers as request attributes
                 if (! config.getReadHeaders().isEmpty()) {
-                    Map<String, List<String>> responseHeaders = connectionResult.jResponseHeaders();
-                    Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
-                    for (String nameMixed: config.getReadHeaders()) {
+                    final Map<String, List<String>> responseHeaders = connectionResult.jResponseHeaders();
+                    final Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
+                    for (final String nameMixed : config.getReadHeaders()) {
                         // We only support headers with one value
-                        String nameLower = nameMixed.toLowerCase();
-                        // Only support headers with one value
-                        String value = responseHeaders.get(nameLower).get(0);
-                        requestAttributes.put("oxf.url-generator.header." + nameLower, value);
+                        final String nameLower = nameMixed.toLowerCase();
+                        final List<String> list = responseHeaders.get(nameLower);
+                        if (list != null && ! list.isEmpty())
+                            requestAttributes.put("oxf.url-generator.header." + nameLower, list.get(0));
                     }
                 }
             }

@@ -41,14 +41,19 @@
             // Create TinyMCE editor instance
             var tinyMceConfig = typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ? TINYMCE_CUSTOM_CONFIG : YAHOO.xbl.fr.Tinymce.DefaultConfig;
             var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
+            var tabindex = $(tinyMceDiv).attr('tabindex');
             this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig);
             var xformsValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
             this.onInit(_.bind(function() {
+                // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
+                $(this.container).find('a[accesskey]').detach();
                 this.myEditor.setContent(xformsValue);
-                // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
                 var iframe = $(this.container).find('iframe');
+                // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
                 iframe.contents().on('click', _.bind(function() { this.container.click(); }, this));
                 $(iframe[0].contentWindow).on('focus', _.bind(this.focus, this));
+                // Copy the tabindex on the iframe
+                if (!_.isUndefined(tabindex)) iframe.attr('tabindex', tabindex);
                 this.tinymceInitialized = true;
             }, this));
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));

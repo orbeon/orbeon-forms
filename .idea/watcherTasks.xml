@@ -7,7 +7,7 @@
       <option name="description" value="Compiles .less files into .css files" />
       <option name="exitCodeBehavior" value="ALWAYS" />
       <option name="fileExtension" value="less" />
-      <option name="immediateSync" value="false" />
+      <option name="immediateSync" value="true" />
       <option name="name" value="LESS" />
       <option name="output" value="$FileNameWithoutExtension$.css" />
       <option name="outputFilters">

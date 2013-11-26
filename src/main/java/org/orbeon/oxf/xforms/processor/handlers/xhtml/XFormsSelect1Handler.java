@@ -34,6 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Option;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -377,10 +378,32 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         {
             // Create separate id for select/select1
             final String itemEffectiveId = "$xforms-item-id-select" + (isMultiple? "" : "1") + "$";
-            handleItemFull(baseHandler, contentHandler, reusableAttributes, attributes,
-                    xhtmlPrefix, spanQName, containingDocument, null, itemName, itemEffectiveId, isMultiple, fullItemType,
-                    Item.apply(0, isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
-                            new Item.Label("$xforms-template-label$", false), "$xforms-template-value$"), true, false);
+            handleItemFull(
+                baseHandler,
+                contentHandler,
+                reusableAttributes,
+                attributes,
+                xhtmlPrefix,
+                spanQName,
+                containingDocument,
+                null,
+                itemName,
+                itemEffectiveId,
+                isMultiple,
+                fullItemType,
+                Item.apply(
+                    0,
+                    isMultiple,
+                    false,
+                    null, // make sure the value "$xforms-template-value$" is not encrypted
+                    new Item.Label("$xforms-template-label$", false),
+                    Option.apply(new Item.Label("$xforms-template-help$", false)),
+                    Option.apply(new Item.Label("$xforms-template-hint$", false)),
+                    "$xforms-template-value$"
+                ),
+                true,
+                false
+            );
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
@@ -456,7 +479,40 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             }
 
             if (! isBooleanInput) {
-                outputLabelForEnd(handlerContext, "label", itemLabel.label(), itemLabel.isHTML());
+
+                // <span class="xforms-hint-region"> or plain <span>
+                reusableAttributes.clear();
+                if (item.hint().isDefined())
+                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint-region");
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+                outputLabelText(handlerContext.getController().getOutput(), null, itemLabel.label(), xhtmlPrefix, itemLabel.isHTML());
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+
+                // <span class="xforms-help">
+                {
+                    final Option<Item.Label> helpOpt = item.help();
+                    if (helpOpt.isDefined()) {
+                        final Item.Label help = helpOpt.get();
+
+                        reusableAttributes.clear();
+                        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help");
+                        outputLabelFor(handlerContext, reusableAttributes, null, null, LHHAC.HELP, "span", help.label(), help.isHTML(), false);
+                    }
+                }
+
+                // <span class="xforms-hint">
+                {
+                    final Option<Item.Label> hintOpt = item.hint();
+                    if (hintOpt.isDefined()) {
+                        final Item.Label hint = hintOpt.get();
+
+                        reusableAttributes.clear();
+                        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint");
+                        outputLabelFor(handlerContext, reusableAttributes, null, null, LHHAC.HINT, "span", hint.label(), hint.isHTML(), false);
+                    }
+                }
+
+                outputLabelForEnd(handlerContext, "label");
             }
         }
 

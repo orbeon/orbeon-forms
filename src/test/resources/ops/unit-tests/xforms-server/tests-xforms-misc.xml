@@ -716,19 +716,25 @@
                          <xh:span id="xforms-select-full-template" class="xforms-template">
                              <xh:span class="xforms-deselected">
                                 <xh:label class="checkbox" for="$xforms-item-id-select$">
-                                     <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>$xforms-template-label$
-                                 </xh:label>
-                             </xh:span>
-                         </xh:span>
-                         <xh:span id="xforms-select1-full-template" class="xforms-template">
-                             <xh:span class="xforms-deselected">
+                                    <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>
+                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
+                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
+                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
+                                </xh:label>
+                            </xh:span>
+                        </xh:span>
+                        <xh:span id="xforms-select1-full-template" class="xforms-template">
+                            <xh:span class="xforms-deselected">
                                 <xh:label class="radio" for="$xforms-item-id-select1$">
-                                     <xh:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>$xforms-template-label$
-                                 </xh:label>
-                             </xh:span>
-                         </xh:span>
-                         <xh:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
-                         <xh:span class="xforms-repeat-delimiter"/>
+                                    <xh:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>
+                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
+                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
+                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
+                                </xh:label>
+                            </xh:span>
+                        </xh:span>
+                        <xh:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
+                        <xh:span class="xforms-repeat-delimiter"/>
                          <xh:span class="xforms-repeat-selected-item-1"/>
                          <xh:span class="xforms-repeat-delimiter"/>
                          <xh:span/>

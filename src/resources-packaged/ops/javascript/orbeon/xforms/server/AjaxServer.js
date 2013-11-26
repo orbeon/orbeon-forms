@@ -1090,15 +1090,31 @@
                                             var itemElement = itemsetTree[k];
 
                                             var templateClone = template.cloneNode(true);
-                                            spanContainer.appendChild(templateClone);
-                                            templateClone.innerHTML = new String(templateClone.innerHTML).replace(new RegExp(ORBEON.util.Utils.escapeRegex("$xforms-template-label$"), "g"), itemElement.label.replace(new RegExp("\\$", "g"), "$$$$"));
+
+                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement.label);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement.value);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
                                             ORBEON.util.Utils.stringReplace(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-name$", controlId);
+
+                                            if (itemElement.help && itemElement.help != "") {
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-help$", itemElement.help);
+                                            } else {
+                                                $(templateClone).find('.xforms-help').remove();
+                                            }
+
+                                            if (itemElement.hint && itemElement.hint != "") {
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-hint$", itemElement.hint);
+                                            } else {
+                                                $(templateClone).find('.xforms-hint-region').removeAttr("class");
+                                                $(templateClone).find('.xforms-hint').remove();
+                                            }
+
                                             if (! _.isUndefined(itemElement.attributes) && ! _.isUndefined(itemElement.attributes["class"])) {
                                                 templateClone.className += " " + itemElement.attributes["class"];
                                             }
+
+                                            spanContainer.appendChild(templateClone);
 
                                             // Restore checked state after copy
                                             var inputCheckboxOrRadio = templateClone.getElementsByTagName("input")[0];

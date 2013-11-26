@@ -1343,6 +1343,20 @@
                             <xf:item>
                                 <xf:label>Orange</xf:label>
                                 <xf:value>orange</xf:value>
+                                <xf:help>Orange help</xf:help>
+                                <xf:hint>Orange hint</xf:hint>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>Blueberry</xf:label>
+                                <xf:value>blueberry</xf:value>
+                                <xf:help/>
+                                <xf:hint/>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>Pineapple</xf:label>
+                                <xf:value>pineapple</xf:value>
+                                <xf:help> </xf:help>
+                                <xf:hint> </xf:hint>
                             </xf:item>
                         </xf:select1>
                     </xf:repeat>
@@ -1359,12 +1373,28 @@
                     <xh:span class="xforms-items">
                         <xh:span class="xforms-selected">
                             <xh:label class="radio" for="my-new-select1≡≡e0⊙1">
-                                <xh:input id="my-new-select1≡≡e0⊙1" type="radio" name="my-new-select1⊙1" value="apple" checked="checked"/>Apple
+                                <xh:input id="my-new-select1≡≡e0⊙1" type="radio" name="my-new-select1⊙1" value="apple" checked="checked"/>
+                                <xh:span>Apple</xh:span>
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio" for="my-new-select1≡≡e1⊙1">
-                                <xh:input id="my-new-select1≡≡e1⊙1" type="radio" name="my-new-select1⊙1" value="orange"/>Orange
+                                <xh:input id="my-new-select1≡≡e1⊙1" type="radio" name="my-new-select1⊙1" value="orange"/>
+                                <xh:span class="xforms-hint-region">Orange</xh:span>
+                                <xh:span class="xforms-help">Orange help</xh:span>
+                                <xh:span class="xforms-hint">Orange hint</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio" for="my-new-select1≡≡e2⊙1">
+                                <xh:input id="my-new-select1≡≡e2⊙1" type="radio" name="my-new-select1⊙1" value="blueberry"/>
+                                <xh:span>Blueberry</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio" for="my-new-select1≡≡e3⊙1">
+                                <xh:input id="my-new-select1≡≡e3⊙1" type="radio" name="my-new-select1⊙1" value="pineapple"/>
+                                <xh:span>Pineapple</xh:span>
                             </xh:label>
                         </xh:span>
                     </xh:span>
@@ -1380,12 +1410,28 @@
                     <xh:span class="xforms-items">
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio" for="my-new-select1≡≡e0">
-                                <xh:input id="my-new-select1≡≡e0" type="radio" name="my-new-select1" value="apple"/>Apple
+                                <xh:input id="my-new-select1≡≡e0" type="radio" name="my-new-select1" value="apple"/>
+                                <xh:span>Apple</xh:span>
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio" for="my-new-select1≡≡e1">
-                                <xh:input id="my-new-select1≡≡e1" type="radio" name="my-new-select1" value="orange"/>Orange
+                                <xh:input id="my-new-select1≡≡e1" type="radio" name="my-new-select1" value="orange"/>
+                                <xh:span class="xforms-hint-region">Orange</xh:span>
+                                <xh:span class="xforms-help">Orange help</xh:span>
+                                <xh:span class="xforms-hint">Orange hint</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio" for="my-new-select1≡≡e2">
+                                <xh:input id="my-new-select1≡≡e2" type="radio" name="my-new-select1" value="blueberry"/>
+                                <xh:span>Blueberry</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio" for="my-new-select1≡≡e3">
+                                <xh:input id="my-new-select1≡≡e3" type="radio" name="my-new-select1" value="pineapple"/>
+                                <xh:span>Pineapple</xh:span>
                             </xh:label>
                         </xh:span>
                     </xh:span>

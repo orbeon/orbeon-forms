@@ -77,6 +77,9 @@
                     </controls>
                 </xsl:template>
 
+                <!-- Swallow item templates -->
+                <xsl:template match="xh:span[p:classes() = 'xforms-template']"/>
+
                 <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables
                      Also keep content of elements with class xxforms-test-preserve-content and content of repeats. -->
                 <xsl:template match="xh:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',

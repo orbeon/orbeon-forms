@@ -27,18 +27,27 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 /**
  * Represents an item (xf:item, xf:choice, or item in itemset).
  */
-case class Item(label: Label, value: String, attributes: Map[QName, String])(val position: Int, encode: Boolean)
-        extends ItemContainer {
+case class Item(
+    label: Label,
+    help: Option[Label],
+    hint: Option[Label],
+    value: String,
+    attributes: Map[QName, String])(val position: Int, encode: Boolean) extends ItemContainer {
 
-    assert(attributes ne null)
+    require(help.isEmpty || help.get.label.nonEmpty)
+    require(hint.isEmpty || hint.get.label.nonEmpty)
+    require(attributes ne null)
 
-    // NOTE: As of 2010-08-18, label can be null in these cases:
+    // FIXME 2013-11-26: value is null at least in some unit tests. It shouldn't be.
+    //require(value ne null)
+
+    // FIXME 2010-08-18: label can be null in these cases:
     //
     // - xf:choice with (see XFormsUtils.getElementValue())
     //   - single-node binding that doesn't point to an acceptable item
     //   - value attribute but the evaluation context is empty
     //   - exception when dereferencing an @src attribute
-    // - xf|input:xxforms-type(xs:boolean)
+    // - xf|input:xxf-type(xs:boolean)
 
     def jAttributes = attributes.asJava
 
@@ -48,12 +57,20 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
     def javaScriptLabel(locationData: LocationData) =
         Option(label) map (_.javaScriptValue(locationData)) getOrElse ""
 
+    def javaScriptHelp(locationData: LocationData) =
+        help map (_.javaScriptValue(locationData))
+
+    def javaScriptHint(locationData: LocationData) =
+        hint map (_.javaScriptValue(locationData))
+
     // Implement equals by hand because children are not part of the case class
     // NOTE: The compiler does not generate equals for case classes that come with an equals! So can't use super to
-    // reach compiler-generated case class equals.
+    // reach compiler-generated case class equals. Is there a better way?
     override def equals(other: Any) = other match {
         case other: Item ⇒
             label         == other.label         &&
+            help          == other.help          &&
+            hint          == other.hint          &&
             externalValue == other.externalValue &&
             attributes    == other.attributes    &&
             super.equals(other)
@@ -64,8 +81,8 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
 object Item {
 
     // Value is encrypted if requested, except with single selection if the value is empty [WHY?]
-    def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: Label, value: String): Item =
-        Item(label, value, if (attributes eq null) Map() else attributes.asScala.toMap)(position, encode)
+    def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: Label, help: Option[Label], hint: Option[Label], value: String): Item =
+        Item(label, help, hint, value, if (attributes eq null) Map.empty else attributes.asScala.toMap)(position, encode)
 
     // Represent a label
     case class Label(label: String, isHTML: Boolean) {

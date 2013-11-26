@@ -40,7 +40,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
     def jSelectedItems(value: String): JIterable[Item] =
         (allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList) asJava
 
-    // Return the list of items as a JSON tree.
+    // Return the list of items as a JSON tree
     def getJSONTreeInfo(controlValue: String, locationData: LocationData): String = {
         // Produce a JSON fragment with hierarchical information
 
@@ -57,9 +57,17 @@ class Itemset(multiple: Boolean) extends ItemContainer {
                     // Start object
                     sb.append("{")
 
-                    // Item label and value
+                    // Item LHH and value
                     sb.append(""""label":"""")
                     sb.append(item.javaScriptLabel(locationData))
+                    item.javaScriptHelp(locationData) foreach { h ⇒
+                        sb.append("""","help":"""")
+                        sb.append(h)
+                    }
+                    item.javaScriptHint(locationData) foreach { h ⇒
+                        sb.append("""","hint":"""")
+                        sb.append(h)
+                    }
                     sb.append("""","value":"""")
                     sb.append(item.javaScriptValue)
                     sb.append('"')
@@ -116,7 +124,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
         sb.toString
     }
 
-    // Return the list of items as an XML tree.
+    // Return the list of items as an XML tree
     def getXMLTreeInfo(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
         val treeBuilder = new TinyBuilder
         val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
@@ -150,6 +158,18 @@ class Itemset(multiple: Boolean) extends ItemContainer {
                     ch.startElement("label")
                     item.label.streamAsHTML(ch, locationData)
                     ch.endElement()
+
+                    item.help foreach { h ⇒
+                        ch.startElement("help")
+                        h.streamAsHTML(ch, locationData)
+                        ch.endElement()
+                    }
+
+                    item.hint foreach { h ⇒
+                        ch.startElement("hint")
+                        h.streamAsHTML(ch, locationData)
+                        ch.endElement()
+                    }
 
                     ch.startElement("value")
                     ch.text(itemValue)

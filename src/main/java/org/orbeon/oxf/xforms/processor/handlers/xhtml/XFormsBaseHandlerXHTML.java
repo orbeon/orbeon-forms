@@ -385,7 +385,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                                          String forEffectiveId, LHHAC lhha, String elementName, String labelValue,
                                          boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
         outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds);
-        outputLabelForEnd(handlerContext, elementName, labelValue, mustOutputHTMLFragment);
+        outputLabelText(handlerContext.getController().getOutput(), null, labelValue, handlerContext.findXHTMLPrefix(), mustOutputHTMLFragment);
+        outputLabelForEnd(handlerContext, elementName);
     }
 
     protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
@@ -416,27 +417,18 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttribute);
     }
 
-    protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName, String labelValue, boolean mustOutputHTMLFragment) throws SAXException {
+    protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName) throws SAXException {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
-        // Only output content when there value is non-empty
-        if (StringUtils.isNotEmpty(labelValue)) {
-            if (mustOutputHTMLFragment) {
-                XFormsUtils.streamHTMLFragment(xmlReceiver, labelValue, null, xhtmlPrefix);
-            } else {
-                xmlReceiver.characters(labelValue.toCharArray(), 0, labelValue.length());
-            }
-        }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);
     }
 
-    public static void outputLabelText(XMLReceiver xmlReceiver, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
-        // Only output content when there value is non-empty
-        if (value != null && !value.equals("")) {
-            if (mustOutputHTMLFragment)
+    public static void outputLabelText(XMLReceiver xmlReceiver, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean html) throws SAXException {
+        if (StringUtils.isNotEmpty(value)) {
+            if (html)
                 XFormsUtils.streamHTMLFragment(xmlReceiver, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
             else
                 xmlReceiver.characters(value.toCharArray(), 0, value.length());

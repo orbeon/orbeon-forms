@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import collection.mutable.Stack
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.util.{XPath, ScalaUtils, XPathCache}
 import org.apache.commons.lang3.StringUtils
@@ -67,13 +66,13 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
         Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
 
-            val stack: Stack[SimpleElementAnalysis] = Stack(SelectionControlTrait.this)
+            var stack: List[SimpleElementAnalysis] = SelectionControlTrait.this :: Nil
 
             def startElement(element: Element): Unit = {
 
                 // Make lazy as might not be used
                 lazy val itemElementAnalysis =
-                    new SimpleElementAnalysis(staticStateContext, element, Some(stack.top), None, stack.top.getChildElementScope(element))
+                    new SimpleElementAnalysis(staticStateContext, element, Some(stack.head), None, stack.head.getChildElementScope(element))
                         with ValueTrait with OptionalSingleNode with ViewTrait
 
                 def processElement(qName: QName, required: Boolean) {
@@ -113,6 +112,11 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         processElement(LABEL_QNAME, required = true)
                         processElement(XFORMS_VALUE_QNAME, required = true)
 
+                        if (isFull) {
+                            processElement(HELP_QNAME, required = false)
+                            processElement(HINT_QNAME, required = false)
+                        }
+
                     case XFORMS_CHOICES_QNAME ⇒
 
                         // Analyze container and add as a value dependency (see above)
@@ -122,7 +126,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         processElement(LABEL_QNAME, required = false) // label is optional on xf:choices
 
                         // Always push the container
-                        stack push itemElementAnalysis
+                        stack ::= itemElementAnalysis
 
                     case _ ⇒ // ignore
                 }
@@ -130,7 +134,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
             def endElement(element: Element): Unit =
                 if (element.getQName == XFORMS_CHOICES_QNAME)
-                    stack pop()
+                    stack = stack.tail
 
             def text(text: Text) = ()
         })
@@ -171,24 +175,43 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             private var currentContainer: ItemContainer = result
 
             def startElement(element: Element): Unit = {
+                
+                def findNestedLHHValue(qName: QName, required: Boolean) = {
+                    val nestedElementOpt = Option(element.element(qName))
+
+                    if (required && nestedElementOpt.isEmpty)
+                        throw new ValidationException(s"${XFORMS_ITEM_QNAME.getQualifiedName} must contain an ${qName.getQualifiedName} element.", ElementAnalysis.createLocationData(element))
+
+                    nestedElementOpt flatMap { nestedElement ⇒ 
+                        val containsHTML = Array(false)
+                                
+                        val valueOpt = Option(StringUtils.trimToNull(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML)))
+                        
+                        if (required)
+                            Some(Item.Label(valueOpt getOrElse "", containsHTML(0)))
+                        else
+                            valueOpt map (Item.Label(_, containsHTML(0)))
+                    }
+                }
 
                 element.getQName match {
 
                     case XFORMS_ITEM_QNAME ⇒ // xf:item
 
-                        val labelElement = element.element(LABEL_QNAME)
-                        if (labelElement eq null)
-                            throw new ValidationException("xf:item must contain an xf:label element.", ElementAnalysis.createLocationData(element))
-                        val containsHTML = Array(false)
-                        val label = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, labelElement, isFull, containsHTML)
+                        val label = findNestedLHHValue(LABEL_QNAME, required = true).get
+                        val help  = findNestedLHHValue(HELP_QNAME,  required = false)
+                        val hint  = findNestedLHHValue(HINT_QNAME,  required = false)
 
-                        val valueElement = element.element(XFORMS_VALUE_QNAME)
-                        if (valueElement eq null)
-                            throw new ValidationException("xf:item must contain an xf:value element.", ElementAnalysis.createLocationData(element))
-                        val value = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null)
+                        val value = {
+                            val valueElement = element.element(XFORMS_VALUE_QNAME)
+                            if (valueElement eq null)
+                                throw new ValidationException("xf:item must contain an xf:value element.", ElementAnalysis.createLocationData(element))
+                            
+                            StringUtils.defaultString(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null))
+                        }
 
                         val attributes = SelectionControlUtil.getAttributes(element)
-                        currentContainer.addChildItem(Item(position, isMultiple, isEncodeValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
+                        currentContainer.addChildItem(Item(position, isMultiple, isEncodeValues, attributes, label, help, hint, value))
                         position += 1
 
                     case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
@@ -197,14 +220,9 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
                     case XFORMS_CHOICES_QNAME ⇒ // xf:choices
 
-                        val labelElement = element.element(LABEL_QNAME)
-                        if (labelElement ne null) {
-                            val label = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, labelElement, false, null)
-
-                            assert(label ne null)
-
+                        findNestedLHHValue(LABEL_QNAME, required = false) foreach { label ⇒
                             val attributes = SelectionControlUtil.getAttributes(element)
-                            val newContainer = Item(position, isMultiple, isEncodeValues, attributes, new Item.Label(label, false), null)
+                            val newContainer = Item(position, isMultiple, isEncodeValues, attributes, label, None, None, null)
                             position += 1
                             currentContainer.addChildItem(newContainer)
                             currentContainer = newContainer

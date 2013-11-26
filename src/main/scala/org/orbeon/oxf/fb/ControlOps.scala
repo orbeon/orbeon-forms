@@ -149,17 +149,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         ensureBind(topLevelBind, names.toIterator)
     }
 
-    // Create an instance template based on a hierarchy of binds rooted at the given bind
-    def templateFromBind(bind: NodeInfo): NodeInfo = {
-        val e = elementInfo(findBindName(bind))
-        // TODO: Insert instance template as is done in insertNewControl
-        insert(into = e, origin = bind / "*:bind" map templateFromBind)
-        e
-    }
-
     // Delete the controls in the given grid cell, if any
-    def deleteCellContent(td: NodeInfo) =
+    def deleteCellContent(td: NodeInfo, updateTemplates: Boolean = false): Unit = {
         td \ * flatMap controlElementsToDelete foreach (delete(_))
+        if (updateTemplates)
+            self.updateTemplates(td)
+    }
 
     // Find all associated elements to delete for a given control element
     def controlElementsToDelete(control: NodeInfo): List[NodeInfo] = {
@@ -174,7 +169,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             result ++=
                 findDataHolders     (doc, controlName) ++=
                 findBindByName      (doc, controlName) ++=
-                findTemplateHolders (doc, controlName, withIterations = false) ++=
                 findTemplateInstance(doc, controlName) ++=
                 findResourceHolders  (controlName)
 
@@ -188,10 +182,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Rename a control with its holders, binds, etc.
     def renameControlIfNeeded(inDoc: NodeInfo, oldName: String, newName: String): Unit =
         if (oldName != newName) {
-            renameDataTemplateAndResourceHolders(inDoc, oldName, newName)
+            renameDataAndResourceHolders(inDoc, oldName, newName)
             renameBinds                         (inDoc, oldName, newName)
             renameControl                       (inDoc, oldName, newName)
             renameTemplate                      (inDoc, oldName, newName)
+
+            updateTemplates(inDoc)
         }
 
     def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
@@ -244,14 +240,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Rename holders with the given name
-    def renameDataTemplateAndResourceHolders(inDoc: NodeInfo, oldName: String, newName: String): Unit = {
+    def renameDataAndResourceHolders(inDoc: NodeInfo, oldName: String, newName: String): Unit = {
 
         def findHolders(inDoc: NodeInfo, holderName: String) = {
             val result = mutable.Buffer[NodeInfo]()
             result ++=
-                findDataHolders(inDoc, holderName, withIterations = true)     ++=
-                findResourceHolders(holderName)                               ++=
-                findTemplateHolders(inDoc, holderName, withIterations = true)
+                findDataHolders(inDoc, holderName, withIterations = true) ++=
+                findResourceHolders(holderName)
             result
         }
 
@@ -323,16 +318,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                 val holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
                 insert(into = resource, after = resource \ * filter (_.name == precedingControlName.getOrElse("")), origin = holder)
             })
-        }
-
-        // Insert repeat template holder if needed
-        for {
-            repeat     ← findAncestorRepeats(controlElement)
-            repeatName ← getControlNameOpt(repeat)
-            root       ← templateRoot(doc, repeatName)
-        } locally {
-            val containerNames = findContainerNames(controlElement, fromParent = Some(repeatName))
-            ensureDataHolder(root, (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
         }
     }
 

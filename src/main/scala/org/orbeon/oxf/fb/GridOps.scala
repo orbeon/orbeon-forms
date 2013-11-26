@@ -155,8 +155,12 @@ trait GridOps extends ContainerOps {
 
     // Delete a row and contained controls
 
-    def deleteRow(gridId: String, rowPos: Int): Unit = deleteRow(trAtRowPos(gridId, rowPos))
+    def deleteRow(gridId: String, rowPos: Int): Unit =
+        deleteRow(trAtRowPos(gridId, rowPos))
+
     def deleteRow(tr: NodeInfo): Unit = {
+
+        val doc = tr.getDocumentRoot
 
         val allRowCells  = getAllRowCells(getContainingGrid(tr))
 
@@ -185,10 +189,13 @@ trait GridOps extends ContainerOps {
         }
 
         // Delete all controls in the row
-        tdsToDelete foreach deleteCellContent
+        tdsToDelete foreach (deleteCellContent(_))
 
         // Delete row and its content
         delete(tr)
+
+        // Update templates
+        updateTemplates(doc)
 
         // Adjust selected td if needed
         newTdToSelect foreach selectTd
@@ -266,8 +273,12 @@ trait GridOps extends ContainerOps {
     }
 
     // Insert a column and contained controls
-    def deleteCol(gridId: String, colPos: Int): Unit = deleteCol(tdAtColPos(gridId, colPos))
+    def deleteCol(gridId: String, colPos: Int): Unit =
+        deleteCol(tdAtColPos(gridId, colPos))
+
     def deleteCol(firstRowTd: NodeInfo) {
+
+        val doc = firstRowTd.getDocumentRoot
 
         val grid = getContainingGrid(firstRowTd)
         val allRowCells = getAllRowCells(grid)
@@ -284,6 +295,9 @@ trait GridOps extends ContainerOps {
             deleteCellContent(td)
             delete(td)
         }
+
+        // Update templates
+        updateTemplates(doc)
 
         // Adjust selected td if needed
         newTdToSelect foreach selectTd
@@ -494,7 +508,7 @@ trait GridOps extends ContainerOps {
                 // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
                 // stay in section, etc.
                 (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
-                        (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
+                    (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
             case _ ⇒
                 None
         }
@@ -510,7 +524,4 @@ trait GridOps extends ContainerOps {
         val following = td following "*:td"
         following intersect (findAncestorContainers(td).last descendant "*:td")
     }
-
-    def findResourceAndTemplateHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
-        findResourceHolders(holderName) ++ findTemplateHolders(inDoc, holderName, withIterations = false)
 }

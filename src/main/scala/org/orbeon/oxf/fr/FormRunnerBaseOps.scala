@@ -43,6 +43,8 @@ trait FormRunnerBaseOps {
     val ErrorSummaryModel = "fr-error-summary-model"
     val SectionsModel     = "fr-sections-model"
 
+    val TemplateSuffix    = "-template"
+
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid
     // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
@@ -51,7 +53,7 @@ trait FormRunnerBaseOps {
     def bindId(controlName: String)    = controlName + "-bind"
     def gridId(gridName: String)       = gridName    + "-grid"
     def controlId(controlName: String) = controlName + "-control"
-    def templateId(gridName: String)   = gridName    + "-template"
+    def templateId(gridName: String)   = gridName    + TemplateSuffix
 
     def iterationName(repeatName: String) = repeatName + "-iteration"
     def isIterationName(name: String)     = name.endsWith("-iteration")
@@ -73,6 +75,10 @@ trait FormRunnerBaseOps {
     // Find an inline instance's root element
     def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =
         instanceElement(inDoc, id).toSeq \ * headOption
+
+    // Find all template instances
+    def templateInstanceElements(inDoc: NodeInfo) =
+        findModelElement(inDoc) \ "*:instance" filter (_ attValue "id" endsWith TemplateSuffix)
 
     // Get the root element of instances
     def formInstanceRoot(inDoc: NodeInfo)      = inlineInstanceRootElement(inDoc, "fr-form-instance").get

@@ -100,6 +100,9 @@ object ToolboxOps {
                 // Set bind attributes if any
                 insert(into = bind, origin = bindAttributesTemplate(binding))
 
+                // This can impact templates
+                updateTemplates(doc)
+
                 debugDumpDocumentForGrids("insert new control", doc)
 
                 Some(newControlName)
@@ -189,6 +192,9 @@ object ToolboxOps {
         // Insert after current level 2 if found, otherwise into level 1
         val newGrid = insert(into = into, after = after.toSeq, origin = gridTemplate)
 
+        // This can impact templates
+        updateTemplates(inDoc)
+
         // Select first grid cell
         selectTd(newGrid \\ "*:td" head)
 
@@ -227,7 +233,6 @@ object ToolboxOps {
 
         // Create and insert holders
         val resourceHolder = {
-
             val elementContent = Seq(elementInfo("label"), elementInfo("help"))
             elementInfo(newSectionName, elementContent)
         }
@@ -236,6 +241,9 @@ object ToolboxOps {
 
         // Insert the bind element
         ensureBinds(inDoc, findContainerNames(newSectionElement, includeSelf = true))
+
+        // This can impact templates
+        updateTemplates(inDoc)
 
         // Select first grid cell
         if (withGrid)
@@ -304,6 +312,9 @@ object ToolboxOps {
         // Make sure binds are created
         ensureBinds(inDoc, findContainerNames(newGridElement, includeSelf = true))
 
+        // This can impact templates
+        updateTemplates(inDoc)
+
         // Select new td
         selectTd(newGridElement \\ "*:td" head)
 
@@ -364,7 +375,7 @@ object ToolboxOps {
     // Cut control to the clipboard
     def cutToClipboard(td: NodeInfo): Unit = {
         copyToClipboard(td)
-        deleteCellContent(td)
+        deleteCellContent(td, updateTemplates = true)
     }
 
     // Paste control from the clipboard
@@ -416,6 +427,9 @@ object ToolboxOps {
                     if (bind \@ "nodeset" nonEmpty)
                         delete(bind \@ "ref")
                 }
+
+                // This can impact templates
+                updateTemplates(td)
             }
         }
     }

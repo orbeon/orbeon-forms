@@ -45,8 +45,18 @@ trait SectionOps extends ContainerOps {
 
     // Move the section right if possible
     def moveSectionRight(container: NodeInfo) =
-        if (canMoveRight(container))
-            moveContainer(container, precedingSection(container).get, moveElementIntoAsLast)
+        if (canMoveRight(container)) {
+
+            val otherContainer = precedingSection(container).get
+            val destIsRepeat   = IsRepeat(otherContainer)
+            
+            // If the destination is a repeat and is not the container itself (which doesn't have a nested iteration
+            // element), move into the first child instead.
+            def moveCheckIteration(source: NodeInfo, dest: NodeInfo) =
+                moveElementIntoAsLast(source, if (destIsRepeat && dest != otherContainer) dest child * head else dest)
+
+            moveContainer(container, otherContainer, moveCheckIteration)
+        }
 
     // Move the section left if possible
     def moveSectionLeft(container: NodeInfo) =
@@ -54,7 +64,7 @@ trait SectionOps extends ContainerOps {
             moveContainer(container, findAncestorContainers(container).head, moveElementAfter)
 
     // Find the section name given a descendant node
-    def findSectionName(descendant: NodeInfo): String  =
+    def findSectionName(descendant: NodeInfo): String =
         (descendant ancestor "*:section" map getControlNameOpt flatten).head
 
     // Find the section name for a given control name
@@ -75,7 +85,7 @@ trait SectionOps extends ContainerOps {
 
     // Whether the given container can be moved to the left
     def canMoveLeft(container: NodeInfo) =
-        findAncestorContainers(container).size >= 2
+        canDeleteSection(container) && findAncestorContainers(container).size >= 2
 
     private val DirectionCheck = List(
         "up"    → canMoveUp _,

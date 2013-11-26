@@ -62,6 +62,8 @@ trait ContainerOps extends ControlOps {
 
     def deleteContainer(container: NodeInfo) = {
 
+        val doc = container.getDocumentRoot
+
         // Find the new td to select if we are removing the currently selected td
         val newTdToSelect = findNewTdToSelect(container, container \\ "*:td")
 
@@ -90,11 +92,15 @@ trait ContainerOps extends ControlOps {
         //  Delete all controls in order
         controls flatMap controlElementsToDelete foreach (delete(_))
 
+        // Update templates
+        // NOTE: Could skip if top-level repeat
+        updateTemplates(doc)
+
         // Adjust selected td if needed
         newTdToSelect foreach selectTd
     }
 
-    // Move a container based on a move function (typically up or down)
+    // Move a container based on a move function
     def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo) {
 
         // Get names before moving the container
@@ -106,7 +112,7 @@ trait ContainerOps extends ControlOps {
         // Move container control itself
         move(container, otherContainer)
 
-        // Try to move based on name of other element
+        // Try to move holders and binds based on name of other element
         (nameOption, otherNameOption) match {
             case (Some(name), Some(otherName)) ⇒
 
@@ -124,13 +130,13 @@ trait ContainerOps extends ControlOps {
                 } yield
                     move(bind, otherBind)
 
-                // Try to move resource and template elements to a good place
+                // Try to move resource elements to a good place
                 // TODO: We move the container resource holder, but we should also move together the contained controls' resource holders
                 def firstControl(s: Seq[NodeInfo]) =
                     s find (getControlNameOpt(_).isDefined)
 
                 def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo) =
-                    findResourceAndTemplateHolders(doc, name) foreach {
+                    findResourceHolders(name) foreach {
                         holder ⇒
                             findSiblingsWithName(holder, siblingName).headOption foreach
                                     (moveOp(holder, _))
@@ -143,6 +149,9 @@ trait ContainerOps extends ControlOps {
                     case (_, Some(following)) ⇒ tryToMoveHolders(getControlName(following), moveElementBefore)
                     case _ ⇒
                 }
+
+                // Moving sections can impact templates
+                updateTemplates(doc)
 
             case _ ⇒
         }
@@ -175,9 +184,9 @@ trait ContainerOps extends ControlOps {
         }
     }
 
-    def setRepeatProperties(doc: NodeInfo, controlName: String, repeat: Boolean, min: Int, max: Int): Unit = {
+    def setRepeatProperties(inDoc: NodeInfo, controlName: String, repeat: Boolean, min: Int, max: Int): Unit = {
 
-        val controlOpt     = findControlByName(doc, controlName)
+        val controlOpt     = findControlByName(inDoc, controlName)
         val wasRepeat      = controlOpt exists (_.attValue("repeat") == "true")
 
         // Update control attributes first
@@ -193,44 +202,50 @@ trait ContainerOps extends ControlOps {
                 // Insert new bind and template
 
                 // Insert nested iteration bind
-                val oldNestedBinds = findBindByName(doc, controlName).toList / *
+                val oldNestedBinds = findBindByName(inDoc, controlName).toList / *
                 delete(oldNestedBinds)
-                ensureBindsByName(doc, controlName) // uses the new `repeat="true"` attribute which implies the nested iteration element
-                val controlBind   = findBindByName(doc, controlName)
+                ensureBindsByName(inDoc, controlName) // uses the new `repeat="true"` attribute which implies the nested iteration element
+                val controlBind   = findBindByName(inDoc, controlName)
                 val iterationBind = controlBind.toList / *
                 insert(into = iterationBind, origin = oldNestedBinds)
 
                 // Insert nested iteration data holders
                 // NOTE: There can be multiple existing data holders due to enclosing repeats
-                findDataHolders(doc, controlName, withIterations = false) ++ findTemplateHolders(doc, controlName, withIterations = false) foreach { holder ⇒
+                findDataHolders(inDoc, controlName, withIterations = false) foreach { holder ⇒
                     val nestedHolders = holder / *
                     delete(nestedHolders)
                     insert(into = holder, origin = elementInfo(iterationName(controlName), nestedHolders))
                 }
 
+                // Update existing templates
+                // NOTE: Could skip if top-level repeat
+                updateTemplates(inDoc)
+
                 // Ensure new template rooted at iteration
-                ensureTemplateReplaceContent(doc, controlName, templateFromBind(iterationBind.head))
+                ensureTemplateReplaceContent(inDoc, controlName, createTemplateContentFromBind(iterationBind.head))
 
             } else if (wasRepeat && ! repeat) {
                 // Remove bind, holders and template
 
-                val controlBind = findBindByName(doc, controlName).toList
-                val dataHolders = findDataHolders(doc, controlName, withIterations = false) ++ findTemplateHolders(doc, controlName, withIterations = false)
-
                 // Move bind up
+                val controlBind = findBindByName(inDoc, controlName).toList
                 val oldNestedBinds = controlBind / * / *
                 delete(controlBind / *)
                 insert(into = controlBind, origin = oldNestedBinds)
 
                 // Mover data holders up and keep only the first iteration
-                dataHolders foreach { holder ⇒
+                findDataHolders(inDoc, controlName, withIterations = false) foreach { holder ⇒
                     val nestedHolders = holder / * take 1 child *
                     delete(holder / *)
                     insert(into = holder, origin = nestedHolders)
                 }
 
                 // Remove template
-                findTemplateInstance(doc, controlName) foreach (delete(_))
+                findTemplateInstance(inDoc, controlName) foreach (delete(_))
+                
+                // Update existing templates
+                updateTemplates(inDoc)
+                
             } else if (repeat) {
                 // Template should already exists an should have already been renamed if needed
                 // MAYBE: Ensure template just in case.
@@ -248,17 +263,6 @@ trait ContainerOps extends ControlOps {
         } locally {
             ensureAttribute(instance, "id", templateId(newName))
         }
-
-    def findTemplateHolders(doc: NodeInfo, controlName: String, withIterations: Boolean): List[NodeInfo] =
-        for {
-            control    ← findControlByName(doc, controlName).toList
-            repeat     ← findAncestorRepeats(control, includeSelf = true)
-            repeatName ← getControlNameOpt(repeat).toList
-            root       ← templateRoot(doc, repeatName).toList
-            matches    = if (withIterations) Set(repeatName, iterationName(repeatName)) else Set(repeatName)
-            holder     ← root descendantOrSelf * filter (e ⇒ matches(e.name))
-        } yield
-            holder
 
     def findTemplateInstance(doc: NodeInfo, controlName: String) =
         instanceElement(doc, templateId(controlName))
@@ -284,4 +288,24 @@ trait ContainerOps extends ControlOps {
                 insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
         }
     }
+
+    // Create an instance template based on a hierarchy of binds rooted at the given bind
+    def createTemplateContentFromBind(bind: NodeInfo): NodeInfo = {
+        val e = elementInfo(findBindName(bind))
+        // TODO: Insert instance template as is done in insertNewControl
+        insert(into = e, origin = bind / "*:bind" map createTemplateContentFromBind)
+        e
+    }
+
+    // Make sure all template instances reflect the current bind structure
+    def updateTemplates(inDoc: NodeInfo): Unit =
+        for {
+            templateInstance ← templateInstanceElements(inDoc: NodeInfo)
+            name             = controlName(templateInstance attValue "id")
+            control          ← findControlByName(inDoc, name)
+            repeatedSection  = IsRepeat(control) && IsSection(control)
+            bind             ← findBindByName(inDoc, if (repeatedSection) iterationName(name) else name)
+        } locally {
+            ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
+        }
 }

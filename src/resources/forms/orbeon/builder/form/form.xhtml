@@ -451,7 +451,7 @@
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-delete-trigger">
                                         <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
                                         <xf:action ev:event="DOMActivate" type="xpath">
-                                            fbf:deleteCellContent($td)
+                                            fbf:deleteCellContent($td, true())
                                         </xf:action>
                                     </xf:trigger>
                                 </xh:span>

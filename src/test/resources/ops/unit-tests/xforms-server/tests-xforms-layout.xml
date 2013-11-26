@@ -1785,7 +1785,7 @@
         </output>
     </test>
 
-    <test description="oxf:resources-aggregator" name="oxf:pipeline">
+    <test description="oxf:resources-aggregator" name="oxf:pipeline" only="true">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param name="data" type="output"/>
@@ -1998,6 +1998,7 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Tree-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/action/Message-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/controls/Help-min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>

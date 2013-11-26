@@ -131,7 +131,8 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTE.js",                          "/ops/javascript/orbeon/xforms/control/RTE-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js",                         "/ops/javascript/orbeon/xforms/control/Tree-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",                       "/ops/javascript/orbeon/xforms/action/Message-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",                  "/ops/javascript/orbeon/xforms/control/Placeholder-min.js") {
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",                  "/ops/javascript/orbeon/xforms/control/Placeholder-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Help.js",                        "/ops/javascript/orbeon/xforms/controls/Help-min.js") {
                 @Override
                 public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
                     return staticStateGlobalOps == null || staticStateGlobalOps.hasInputPlaceholder();

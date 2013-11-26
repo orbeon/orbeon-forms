@@ -126,6 +126,25 @@
         background-position: left bottom;
     }
 
+    // Box that contains the Bootstrap popover used for help
+    .xforms-help-popover {
+        .popover {
+            max-width: 400px;
+        }
+
+        .popover .close {
+            // Positioning of the close 'x', using padding so this also extends the clickable area
+            padding: 5px 10px;
+        }
+
+        .popover .popover-content {
+            // So we have scrollbars when necessary
+            overflow: auto;
+            // So the height we set in JS is correct
+            box-sizing: border-box;
+        }
+    }
+
     .xforms-alert {
         display: none;
     }

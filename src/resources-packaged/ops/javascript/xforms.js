@@ -2350,92 +2350,6 @@ ORBEON.xforms.Controls = {
 
     },
 
-    showHelp: function(control) {
-        // Create help dialog if this hasn't been done already
-        var form = ORBEON.xforms.Controls.getForm(control);
-        if (ORBEON.xforms.Globals.formHelpPanel[form.id] == null) {
-            // Look for help div in the page under the form
-            for (var childIndex = 0; childIndex < form.childNodes.length; childIndex++) {
-                var formChild = form.childNodes[childIndex];
-                if (ORBEON.util.Dom.isElement(formChild) && YAHOO.util.Dom.hasClass(formChild, "xforms-help-panel")) {
-                    // Create YUI dialog for help based on template
-                    YAHOO.util.Dom.generateId(formChild);
-                    YAHOO.util.Dom.removeClass(formChild, "xforms-initially-hidden");
-                    ORBEON.xforms.Globals.lastDialogZIndex += 2;
-                    var helpPanel = new YAHOO.widget.Panel(formChild.id, {
-                        modal: true,
-                        fixedcenter: false,
-                        underlay: "shadow",
-                        visible: false,
-                        constraintoviewport: true,
-                        draggable: true,
-                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.3},
-                        zIndex: ORBEON.xforms.Globals.lastDialogZIndex
-                    });
-                    helpPanel.render();
-                    helpPanel.element.style.display = "none";
-                    ORBEON.xforms.Globals.formHelpPanel[form.id] = helpPanel;
-
-                    // Find div for help body
-                    var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
-                    ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id] =
-                        YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-message", null, bodyDiv)[0];
-
-                    // Get the close button and register listener on that button
-                    var closeDiv = YAHOO.util.Dom.getElementsByClassName("xforms-help-panel-close", null, bodyDiv)[0];
-                    var closeButton = ORBEON.util.Dom.getChildElementByIndex(closeDiv, 0);
-                    ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id] = closeButton;
-                    YAHOO.util.Event.addListener(closeButton, "click", ORBEON.xforms.Events.helpDialogButtonClose, form.id);
-
-                    // Register listener for when the panel is closed by a click on the "x"
-                    helpPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.helpDialogXClose, form.id);
-
-                    // We found what we were looking for, no need to continue searching
-                    break;
-                }
-            }
-        }
-
-        // Update message in help panel
-        ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].innerHTML = ORBEON.xforms.Controls.getHelpMessage(control);
-        // Check where and if the panel is showing on the page
-        var formHelpPanelRegion = YAHOO.util.Dom.getRegion(ORBEON.xforms.Globals.formHelpPanel[form.id].element);
-        var showAndRepositionPanel;
-        if (formHelpPanelRegion.top == null) {
-            // Panel is not open
-            showAndRepositionPanel = true;
-        } else {
-            // Panel is shown. Check if it is visible.
-            // Get information about viewport
-            var viewPortWidth = YAHOO.util.Dom.getViewportWidth();
-            var viewPortHeight = YAHOO.util.Dom.getViewportHeight();
-            var scrollX = document.body.scrollLeft;
-            var scrollY = document.body.scrollTop;
-            // Check that top left corner and bottom right corner of dialog is in viewport
-            var verticalConstraint = formHelpPanelRegion.top >= scrollY && formHelpPanelRegion.bottom <= scrollY + viewPortHeight;
-            var horizontalConstraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
-            // Reposition if any constraint is not met
-            showAndRepositionPanel = !verticalConstraint || !horizontalConstraint;
-        }
-
-        // Show and reposition dialog when needed
-        if (showAndRepositionPanel) {
-            var controlContainer = control;
-            var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help");
-            ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
-            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
-            ORBEON.xforms.Globals.formHelpPanel[form.id].show();
-            ORBEON.xforms.Globals.lastDialogZIndex += 2;
-            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex);
-        }
-
-        // Set focus on close button if visible (we don't want to set the focus on the close button if not
-        // visible as this would make the help panel scroll down to the close button)
-        var bdDiv = ORBEON.xforms.Globals.formHelpPanelMessageDiv[form.id].parentNode;
-        if (bdDiv.scrollHeight <= bdDiv.clientHeight)
-            ORBEON.xforms.Globals.formHelpPanelCloseButton[form.id].focus();
-    },
-
     showDialog: function(controlId, neighbor) {
         var divElement = ORBEON.util.Dom.get(controlId);
         var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
@@ -3275,7 +3189,6 @@ ORBEON.xforms.Events = {
                 // We are sending the xforms-help event to the server and the server will tell us what do to
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xforms-help");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-
             } else {
                 // If the servers tells us there are no event handlers for xforms-help in the page,
                 // we can avoid a round trip and show the help right away

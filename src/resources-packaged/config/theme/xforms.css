@@ -117,6 +117,16 @@
   background-repeat: no-repeat;
   background-position: left bottom;
 }
+.orbeon .xforms-help-popover .popover {
+  max-width: 400px;
+}
+.orbeon .xforms-help-popover .popover .close {
+  padding: 5px 10px;
+}
+.orbeon .xforms-help-popover .popover .popover-content {
+  overflow: auto;
+  box-sizing: border-box;
+}
 .orbeon .xforms-alert {
   display: none;
 }

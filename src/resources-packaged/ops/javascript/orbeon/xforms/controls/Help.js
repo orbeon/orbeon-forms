@@ -53,7 +53,7 @@
         var popover = popoverContainer.children('.popover');
         popover.data('xforms-for', firstContentEl); // [3]
         addClose(firstContentEl, popover);
-        positionPopover(popover, firstContentEl, placement, elPos);
+        positionPopover(popover, placement, elPos);
     };
 
     function hideAllHelpPopovers() {
@@ -85,7 +85,9 @@
             var originalStyle = el.attr('style');
             el.css('display', 'inline-block');
             pos = getElPosition();
-            el.attr('style', originalStyle);
+            (_.isUndefined(originalStyle))
+                ? el.removeAttr('style')
+                : el.attr('style', originalStyle);
         } else {
             pos = getElPosition();
         }
@@ -96,16 +98,17 @@
      * Figure where we want to place the popover: right, left, top, bottom, or over
      */
     function getPlacement(elPos) {
-        var RequiredSpace = 300;
+        var RequiredSpaceHorizontal = 420;
+        var RequiredSpaceVertical   = 300;
         var space = {
             left:   elPos.offset.left,
             right:  $(window).width() - (elPos.offset.left + elPos.width),
             top:    elPos.offset.top - elPos.scrollTop,
             bottom: $(window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height)
         };
-        return (space.right >= RequiredSpace || space.left >= RequiredSpace)
+        return (space.right >= RequiredSpaceHorizontal || space.left >= RequiredSpaceHorizontal)
              ?  space.right >= space.left ? 'right' : 'left'
-             : (space.top   >= RequiredSpace || space.bottom >= RequiredSpace)
+             : (space.top   >= RequiredSpaceVertical || space.bottom >= RequiredSpaceVertical)
              ?  space.top   >= space.bottom ? 'top' : 'bottom'
              : 'over';
     }
@@ -144,9 +147,8 @@
      * [3] It is unclear to my why we need to add the arrow width, as it should be counted in the width
      *     of the popover, which has a margin to reserve space for the arrow.
      */
-    function positionPopover(popover, firstContentEl, placement, elPos) {
+    function positionPopover(popover, placement, elPos) {
         var padding       = 20; // Space left between popover and document border
-        var controlOffset = firstContentEl.offset();
         var arrowWidth    = popover.children('.arrow').outerWidth(); // [3]
         var arrowHeight   = popover.children('.arrow').outerHeight();
 
@@ -174,19 +176,19 @@
             if (popoverOffset.top - elPos.scrollTop < padding) popoverOffset.top = elPos.scrollTop + padding;
             // Adjust horizontal position [2]
             popoverOffset.left =  placement == 'right'
-                ? controlOffset.left + firstContentEl.outerWidth() + arrowWidth
-                : controlOffset.left - (popover.outerWidth() + arrowWidth);
+                ? elPos.offset.left + elPos.width + arrowWidth
+                : elPos.offset.left - (popover.outerWidth() + arrowWidth);
         } else if (placement == 'top') {
             popoverOffset.top = elPos.offset.top - popover.outerHeight() - arrowHeight;
         } else if (placement == 'over') {
             popoverOffset.top  = elPos.scrollTop + padding;
-            popoverOffset.left = controlOffset.left + elPos.width/2 - popover.outerWidth()/2;
+            popoverOffset.left = elPos.offset.left + elPos.width/2 - popover.outerWidth()/2;
         }
         popover.offset(popoverOffset);
 
         // Adjust arrow height for right/left
         if (_.contains(['right', 'left'], placement)) {
-            var controlTopDoc = controlOffset.top + firstContentEl.outerHeight()/2;
+            var controlTopDoc = elPos.offset.top + elPos.height/2;
             var controlTopPopover = controlTopDoc - popoverOffset.top;
             var arrowTop = (controlTopPopover / popover.outerHeight()) * 100;
             popover.children('.arrow').css('top', arrowTop + '%');

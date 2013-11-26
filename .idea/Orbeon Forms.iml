@@ -35,7 +35,7 @@
     <orderEntry type="library" name="Saxon" level="application" />
     <orderEntry type="library" name="ScalaTest" level="application" />
     <orderEntry type="library" name="Rhino" level="application" />
-    <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="jQuery 1.8.2" level="application" />
   </component>
 </module>
 

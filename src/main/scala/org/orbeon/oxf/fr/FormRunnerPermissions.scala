@@ -92,7 +92,7 @@ trait FormRunnerPermissions {
                     case Some(propertyName) ⇒
                         value match {
                             case NameValueMatch(`propertyName`, value) ⇒ Seq(value)
-                            case _ ⇒ Seq()
+                            case _ ⇒ Seq.empty
                         }
                     case _ ⇒ Seq(value)
                 }

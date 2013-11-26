@@ -305,7 +305,7 @@ object ToolboxOps {
         insertHolders(
             newGridElement,
             elementInfo(newGridName),
-            Seq(),
+            Seq.empty,
             grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
         )
 

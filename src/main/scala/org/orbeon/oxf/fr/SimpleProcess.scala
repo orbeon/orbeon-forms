@@ -225,7 +225,7 @@ trait FormRunnerActions {
             refresh(PersistenceModel)
 
             // Mark data clean
-            val saveStatus = if (isDraft) Seq() else persistenceInstance.rootElement \ "data-status"
+            val saveStatus = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
             val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
             (saveStatus ++ autoSaveStatus) foreach (setvalue(_, "clean"))
 

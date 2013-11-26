@@ -69,7 +69,7 @@ trait BaseOps extends Logging {
             def canUseIndex = fbInstance.documentInfo == root
 
             val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (_.localname + suffix) else Seq()
+            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (_.localname + suffix) else Seq.empty
 
             elementIds ++ instanceIds
         }

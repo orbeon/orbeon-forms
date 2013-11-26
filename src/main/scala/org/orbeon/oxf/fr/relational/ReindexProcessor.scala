@@ -90,7 +90,7 @@ class ReindexProcessor extends ProcessorImpl {
                         FormRunner.readPublishedForm(app, form) match {
                             case None ⇒
                                 Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
-                                Seq()
+                                Seq.empty
                             case Some(formDefinition) ⇒
                                 Index.findIndexedControls(formDefinition)
                         }

@@ -85,7 +85,7 @@ trait ContainerOps extends ControlOps {
                 if (IsGrid(container))
                     container \\ "*:tr" \\ "*:td" \ * filter IsControl reverse
                 else
-                    Seq()
+                    Seq.empty
 
             children ++ gridContent :+ container
         }

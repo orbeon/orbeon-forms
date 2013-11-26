@@ -94,7 +94,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
 
-        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq()) ++ (grid precedingSibling * filter IsContainer)
+        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq.empty) ++ (grid precedingSibling * filter IsContainer)
 
         // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
         // with a name (there might not be one).

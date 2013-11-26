@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -47,7 +47,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     // This is a var just for getBackCopy
     private[XFormsSelect1Control] var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
 
-    def isEncryptValues  = staticControl.isEncryptValues
+    def isEncodeValues  = staticControl.isEncodeValues
     def isFullAppearance = staticControl.isFull
 
     override def onCreate() {

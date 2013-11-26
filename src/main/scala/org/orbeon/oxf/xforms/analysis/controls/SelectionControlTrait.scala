@@ -43,7 +43,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
     if  (element.attributeValue("selection") == "open")
         throw new ValidationException("Open selection is currently not supported.", locationData)
 
-    val isEncryptValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map
+    val isEncodeValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map
         (_.toBoolean) getOrElse
             part.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY)
 
@@ -188,7 +188,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         val value = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null)
 
                         val attributes = SelectionControlUtil.getAttributes(element)
-                        currentContainer.addChildItem(Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
+                        currentContainer.addChildItem(Item(position, isMultiple, isEncodeValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
                         position += 1
 
                     case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
@@ -204,7 +204,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                             assert(label ne null)
 
                             val attributes = SelectionControlUtil.getAttributes(element)
-                            val newContainer = Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
+                            val newContainer = Item(position, isMultiple, isEncodeValues, attributes, new Item.Label(label, false), null)
                             position += 1
                             currentContainer.addChildItem(newContainer)
                             currentContainer = newContainer

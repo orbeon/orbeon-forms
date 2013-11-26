@@ -103,7 +103,7 @@ public class XFormsItemUtils {
         contextStack.setBinding(select1Control.bindingContext());
 
         // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
-        final boolean isEncryptItemValues = select1Control.isEncryptValues();
+        final boolean isEncryptItemValues = select1Control.isEncodeValues();
         Dom4jUtils.visitSubtree(select1Control.element(), new Dom4jUtils.VisitorListener() {
 
             private int position = 0;

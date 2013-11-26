@@ -49,7 +49,7 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
             val newUIValues = valueAsSet(externalValue)
 
             val matches: Item ⇒ Boolean =
-                if (isEncryptValues)
+                if (isEncodeValues)
                     item ⇒ newUIValues(item.position.toString)
                 else
                     item ⇒ newUIValues(item.value)

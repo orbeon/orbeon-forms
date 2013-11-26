@@ -140,16 +140,16 @@
      * positioning and sizing, and we then adjust what Bootstrap did. Bootstrap code is in:
      * https://github.com/twbs/bootstrap/blob/v2.3.2/js/bootstrap-tooltip.js
      *
+     * [1] It is unclear to my why we need to add the arrow width, as it should be counted in the width
+     *     of the popover, which has a margin to reserve space for the arrow.
      * [2] Bootstrap already positioned the popover mostly correctly, but since we can reduced its
      *     height, in case we do this might remove the need to a scrollbar, which changes the right offset
      *     of the control (e.g. when they are centered), and consequently the right offset of the popover
      *     also needs to be adjusted.
-     * [3] It is unclear to my why we need to add the arrow width, as it should be counted in the width
-     *     of the popover, which has a margin to reserve space for the arrow.
      */
     function positionPopover(popover, placement, elPos) {
         var padding       = 20; // Space left between popover and document border
-        var arrowWidth    = popover.children('.arrow').outerWidth(); // [3]
+        var arrowWidth    = popover.children('.arrow').outerWidth(); // [1]
         var arrowHeight   = popover.children('.arrow').outerHeight();
 
         // Constraint height if taller than viewport
@@ -172,18 +172,21 @@
         // Adjust position
         var popoverOffset = popover.offset();
         if (_.contains(['right', 'left'], placement)) {
-            // Adjust vertical position
+            // Vertical position
             if (popoverOffset.top - elPos.scrollTop < padding) popoverOffset.top = elPos.scrollTop + padding;
-            // Adjust horizontal position [2]
+            // Horizontal position [2]
             popoverOffset.left =  placement == 'right'
                 ? elPos.offset.left + elPos.width + arrowWidth
                 : elPos.offset.left - (popover.outerWidth() + arrowWidth);
-        } else if (placement == 'top') {
-            popoverOffset.top = elPos.offset.top - popover.outerHeight() - arrowHeight;
-        } else if (placement == 'over') {
-            popoverOffset.top  = elPos.scrollTop + padding;
-            popoverOffset.left = elPos.offset.left + elPos.width/2 - popover.outerWidth()/2;
         }
+        if (_.contains(['top', 'bottom', 'over'], placement))
+            // Horizontal position: middle
+            popoverOffset.left = elPos.offset.left + elPos.width/2 - popover.outerWidth()/2;
+        if (placement == 'top')
+            // Vertical position
+            popoverOffset.top = elPos.offset.top - popover.outerHeight() - arrowHeight;
+        if (placement == 'over')
+            popoverOffset.top  = elPos.scrollTop + padding;
         popover.offset(popoverOffset);
 
         // Adjust arrow height for right/left

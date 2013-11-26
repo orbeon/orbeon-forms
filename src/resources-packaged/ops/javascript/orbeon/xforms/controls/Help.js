@@ -179,14 +179,16 @@
                 ? elPos.offset.left + elPos.width + arrowWidth
                 : elPos.offset.left - (popover.outerWidth() + arrowWidth);
         }
-        if (_.contains(['top', 'bottom', 'over'], placement))
+        if (_.contains(['top', 'bottom'], placement))
             // Horizontal position: middle
             popoverOffset.left = elPos.offset.left + elPos.width/2 - popover.outerWidth()/2;
         if (placement == 'top')
             // Vertical position
             popoverOffset.top = elPos.offset.top - popover.outerHeight() - arrowHeight;
-        if (placement == 'over')
-            popoverOffset.top  = elPos.scrollTop + padding;
+        if (placement == 'over') {
+            popoverOffset.left = elPos.offset.left + elPos.width - popover.outerWidth() - padding;
+            popoverOffset.top  = elPos.offset.top + padding;
+        }
         popover.offset(popoverOffset);
 
         // Adjust arrow height for right/left

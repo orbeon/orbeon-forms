@@ -25,13 +25,11 @@ trait SectionOps extends ContainerOps {
 
     self: GridOps ⇒ // funky dependency, to resolve at some point
 
-    def canDeleteSection(section: NodeInfo): Boolean = {
-        val isSubSection = (section ancestor "*:section").nonEmpty        // We can always delete a sub-section
-        val hasSiblingSection = (section sibling "*:section").nonEmpty    // We don't want to delete the last top-level section
-        isSubSection || hasSiblingSection
-    }
+    def canDeleteSection(section: NodeInfo): Boolean =
+        canDeleteContainer(section)
 
-    def deleteSectionById(sectionId: String): Unit = deleteContainerById(canDeleteSection, sectionId)
+    def deleteSectionById(sectionId: String): Unit =
+        deleteContainerById(canDeleteSection, sectionId)
 
     // Move the section up if possible
     def moveSectionUp(container: NodeInfo) =

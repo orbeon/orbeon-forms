@@ -20,10 +20,10 @@ import org.orbeon.oxf.util.ScalaUtils._
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     // Node tests
-    private val GridElementTest     : Test = FR → "grid"
-    private val SectionElementTest  : Test = FR → "section"
-    private val GroupElementTest    : Test = XF → "group"
-    private val ContainerElementTest       = SectionElementTest || GridElementTest
+    val GridElementTest     : Test = FR → "grid"
+    val SectionElementTest  : Test = FR → "section"
+    val GroupElementTest    : Test = XF → "group"
+    val ContainerElementTest       = SectionElementTest || GridElementTest
 
     def isFBBody(node: NodeInfo) = (node self GroupElementTest) && node.attClasses("fb-body")
 

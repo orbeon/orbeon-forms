@@ -53,6 +53,10 @@ trait ContainerOps extends ControlOps {
     def countAllContainers(inDoc: NodeInfo)    = getAllContainerControls(inDoc).size
     def countAllControls(inDoc: NodeInfo)      = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
+    // A container can be removed if it's not the last one at that level
+    def canDeleteContainer(container: NodeInfo): Boolean =
+        container sibling GridElementTest || SectionElementTest nonEmpty
+    
     // Delete the entire container and contained controls
     def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
         val container = containerById(containerId)

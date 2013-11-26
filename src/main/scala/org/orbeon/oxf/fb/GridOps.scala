@@ -478,8 +478,11 @@ trait GridOps extends ContainerOps {
         bodyElement \\ "*:grid" \\ "*:td" take 1 foreach selectTd
     }
 
-    def canDeleteGrid(grid: NodeInfo): Boolean = (grid sibling "*:grid").nonEmpty
-    def deleteGridById(gridId: String) = deleteContainerById(canDeleteGrid, gridId)
+    def canDeleteGrid(grid: NodeInfo): Boolean =
+        canDeleteContainer(grid)
+
+    def deleteGridById(gridId: String) =
+        deleteContainerById(canDeleteGrid, gridId)
 
     def canDeleteRow(grid: NodeInfo): Boolean = (grid \ "*:tr").length > 1
     def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").head \ "*:td").length > 1

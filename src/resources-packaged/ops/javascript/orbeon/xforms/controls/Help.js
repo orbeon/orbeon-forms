@@ -18,7 +18,7 @@
 
     /**
      * We're asked to show the help popover for a control, either because the user clicked on the help icon,
-     * or becauset the server asks us to do so.
+     * or because the server asks us to do so.
      *
      * [1] Using animation unnecessarily complicates things, by creating cases where we have two popovers
      *     in the DOM, when one is being hidden while the other is being shown, so we just disable animations.

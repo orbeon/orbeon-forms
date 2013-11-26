@@ -71,13 +71,17 @@
   border-bottom: 1px solid #ddddee;
 }
 .orbeon .fr-repeat .fr-repeat-menu {
-  width: 20px;
+  width: 22px;
   float: left;
-  padding: 8px 4px;
-}
-.orbeon .fr-repeat .xforms-repeat-selected-item-1.fr-repeat-iteration {
-  background-color: #eeeeee;
+  padding: 8px 4px 0 0;
 }
 .orbeon .fr-repeat .fr-repeat-content {
-  padding-left: 28px;
+  padding-left: 26px;
+}
+.orbeon .fr-repeat .fr-repeat-content > .xbl-fr-section > div > h2 > .fr-section-label {
+  padding-left: 0;
+  background-image: none;
+}
+.orbeon .fr-repeat .fr-repeat-content > .xbl-fr-section > div > div > .fr-section-content {
+  padding-left: 0;
 }

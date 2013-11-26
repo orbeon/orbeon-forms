@@ -151,7 +151,7 @@
                                             position="before"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1"/>
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1" input-only="true"/>
 
                                     </xf:action>
 
@@ -164,7 +164,7 @@
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2"/>
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2" input-only="true"/>
 
                                     </xf:action>
 
@@ -177,7 +177,7 @@
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3"/>
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3" input-only="true"/>
 
                                     </xf:action>
 
@@ -190,7 +190,7 @@
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4"/>
+                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4" input-only="true"/>
 
                                     </xf:action>
                                 </xf:action>

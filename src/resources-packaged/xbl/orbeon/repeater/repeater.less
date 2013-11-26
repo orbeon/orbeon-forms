@@ -8,17 +8,32 @@
         }
 
         .fr-repeat-menu {
-            width: 20px;
+            width: 22px;
             float:left;
-            padding: 8px 4px;
+            padding: 8px 4px 0 0;
         }
 
-        .xforms-repeat-selected-item-1.fr-repeat-iteration {
-            background-color: @grayLighter;
+        .xforms-repeat-selected-item-1, .xforms-repeat-selected-item-2, .xforms-repeat-selected-item-3, .xforms-repeat-selected-item-4 {
+            &.fr-repeat-iteration {
+            }
         }
 
         .fr-repeat-content {
-            padding-left: 28px;
+            padding-left: 26px;
+
+            // Fixup directly nested section
+            > .xbl-fr-section > div {
+                > h2 {
+                    > .fr-section-label {
+                        padding-left: 0;
+                        background-image: none;
+                    }
+                }
+
+                > div > .fr-section-content {
+                    padding-left: 0;
+                }
+            }
         }
     }
 }

@@ -29,37 +29,44 @@
     Controls.showHelp = function(controlEl) {
 
         controlEl = $(controlEl);
-        var labelText        = $(Controls.getControlLHHA(controlEl, 'label')).text();
-        var helpText         = $(Controls.getControlLHHA(controlEl, 'help' )).text();
-        var LhhaClasses      = '.xforms-label, .xforms-help, .xforms-hint, .xforms-alert';
-        var el               = controlEl.children().not(LhhaClasses).first(); // [1]
-        var elPos            = getPosition(el);
-        var placement        = getPlacement(elPos);
-        var popoverContainer = getOrCreatePopoverContainer(controlEl);
+        var labelText           = $(Controls.getControlLHHA(controlEl, 'label')).text();
+        var helpText            = $(Controls.getControlLHHA(controlEl, 'help' )).text();
+        var LhhaClasses         = '.xforms-label, .xforms-help, .xforms-hint, .xforms-alert';
+        var el                  = controlEl.children().not(LhhaClasses).first(); // [1]
+        var elPos               = getPosition(el);
+        var placement           = getPlacement(elPos);
+        var popoverContainer    = getOrCreatePopoverContainer(controlEl);
+        var previousPopover     = popoverContainer.children('.popover');
+        var popoverAlreadyShown = previousPopover.is('*') && previousPopover.data('xforms-for').is(controlEl);
 
-        // For top placement, popover must be above the label
-        if (placement == 'top') {
-            el = controlEl;
-            elPos = getPosition(el);
-        }
-
-        // Hide other help popovers before showing this one
+        // Hide other help popovers before (maybe) showing this one
         hideAllHelpPopovers();
-        el.popover({
-            placement: placement,
-            trigger:   'manual',
-            title:     labelText,
-            content:   helpText,
-            html:      true,
-            animation: false, // [2]
-            container: popoverContainer
-        }).popover('show');
 
-        // Decorate an position popover
-        var popover = popoverContainer.children('.popover');
-        popover.data('xforms-for', el); // [3]
-        addClose(el, popover);
-        positionPopover(popover, placement, elPos);
+        // We take users asking to show the popover when already shown as an order to hide it
+        if (! popoverAlreadyShown) {
+
+            // For top placement, popover must be above the label
+            if (placement == 'top') {
+                el = controlEl;
+                elPos = getPosition(el);
+            }
+
+            controlEl.popover({
+                placement: placement,
+                trigger:   'manual',
+                title:     labelText,
+                content:   helpText,
+                html:      true,
+                animation: false, // [2]
+                container: popoverContainer
+            }).popover('show');
+
+            // Decorate an position popover
+            var popover = popoverContainer.children('.popover');
+            popover.data('xforms-for', controlEl); // [3]
+            addClose(el, popover);
+            positionPopover(popover, placement, elPos);
+        }
     };
 
     function hideAllHelpPopovers() {

@@ -5,7 +5,7 @@
       <option name="arguments" value="--no-color $FileName$" />
       <option name="checkSyntaxErrors" value="false" />
       <option name="description" value="Compiles .less files into .css files" />
-      <option name="exitCodeBehavior" value="ALWAYS" />
+      <option name="exitCodeBehavior" value="ERROR" />
       <option name="fileExtension" value="less" />
       <option name="immediateSync" value="true" />
       <option name="name" value="LESS" />

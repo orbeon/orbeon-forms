@@ -171,24 +171,24 @@
 
         // Adjust position
         var popoverOffset = popover.offset();
-        if (_.contains(['right', 'left'], placement)) {
-            // Vertical position
-            if (popoverOffset.top - elPos.scrollTop < padding) popoverOffset.top = elPos.scrollTop + padding;
-            // Horizontal position [2]
-            popoverOffset.left =  placement == 'right'
-                ? elPos.offset.left + elPos.width + arrowWidth
-                : elPos.offset.left - (popover.outerWidth() + arrowWidth);
-        }
-        if (_.contains(['top', 'bottom'], placement))
-            // Horizontal position: middle
-            popoverOffset.left = elPos.offset.left + elPos.width/2 - popover.outerWidth()/2;
-        if (placement == 'top')
-            // Vertical position
-            popoverOffset.top = elPos.offset.top - popover.outerHeight() - arrowHeight;
-        if (placement == 'over') {
-            popoverOffset.left = elPos.offset.left + elPos.width - popover.outerWidth() - padding;
-            popoverOffset.top  = elPos.offset.top + padding;
-        }
+        popoverOffset.top =
+                (_.contains(['right', 'left'], placement) && (popoverOffset.top - elPos.scrollTop < padding))
+            ?   elPos.scrollTop + padding
+            :   placement == 'top'
+            ?   elPos.offset.top - popover.outerHeight() - arrowHeight
+            :   placement == 'over'
+            ?   elPos.offset.top + padding
+            :   popoverOffset.top;
+        popoverOffset.left =
+                placement == 'right'
+            ?   elPos.offset.left + elPos.width + arrowWidth
+            :   placement == 'left'
+            ?   elPos.offset.left - popover.outerWidth() - arrowWidth
+            :   _.contains(['top', 'bottom'], placement)
+            ?   elPos.offset.left + elPos.width/2 - popover.outerWidth()/2
+            :   placement == 'over'
+            ?   elPos.offset.left + elPos.width - popover.outerWidth() - padding
+            :   popoverOffset.top;
         popover.offset(popoverOffset);
 
         // Adjust arrow height for right/left

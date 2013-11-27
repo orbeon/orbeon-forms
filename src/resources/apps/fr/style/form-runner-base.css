@@ -604,6 +604,10 @@
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
   width: 43px;
 }
+.orbeon #fr-view .xforms-help-popover {
+  font-size: 13px;
+  line-height: 20px;
+}
 .orbeon .xforms-textarea pre {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   white-space: -moz-pre-wrap;

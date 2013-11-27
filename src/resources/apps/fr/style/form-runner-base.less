@@ -528,6 +528,13 @@
             .fr-width-2digits input.xforms-input-input, .fr-width-2digits select  { width: 29px }
             .fr-width-4digits input.xforms-input-input, .fr-width-4digits select  { width: 43px }
         }
+
+        .xforms-help-popover {
+            // Reset to Form Runner default, as those properties as otherwise influenced by the place where the popover
+            // is used, e.g. they won't be correct when the popover is for a section title
+            font-size:   @frFontSize;
+            line-height: @baseLineHeight;
+        }
     }
 
     /* ***** View, PDF, email ******************************************************************************************* */

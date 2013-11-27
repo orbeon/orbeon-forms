@@ -120,13 +120,14 @@
 .orbeon .xforms-hint-region {
   border-bottom: 1px dashed black;
 }
-.orbeon .xforms-help-popover .popover {
-  max-width: 400px;
+.orbeon .popover.xforms-help-popover {
+  width: 400px;
+  max-width: none;
 }
-.orbeon .xforms-help-popover .popover .close {
+.orbeon .popover.xforms-help-popover .close {
   padding: 5px 10px;
 }
-.orbeon .xforms-help-popover .popover .popover-content {
+.orbeon .popover.xforms-help-popover .popover-content {
   overflow: auto;
   box-sizing: border-box;
 }

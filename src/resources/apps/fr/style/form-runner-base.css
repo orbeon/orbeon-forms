@@ -604,19 +604,6 @@
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
   width: 43px;
 }
-.orbeon #fr-view .popover-container-right {
-  position: absolute;
-  left: -10000px;
-  right: 60px;
-}
-.orbeon #fr-view .popover-container-left {
-  position: absolute;
-  left: 60px;
-  right: -10000px;
-}
-.orbeon #fr-view .popover {
-  max-width: none;
-}
 .orbeon .xforms-textarea pre {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   white-space: -moz-pre-wrap;

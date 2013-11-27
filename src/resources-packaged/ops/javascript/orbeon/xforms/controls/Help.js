@@ -24,7 +24,6 @@
      *     hence here we look for the first element which is not an LHHA
      * [2] Using animation unnecessarily complicates things, by creating cases where we have two popovers
      *     in the DOM, when one is being hidden while the other is being shown, so we just disable animations.
-     * [3] Remember for which element this popover is; this will be used when destroying the popover.
      */
     Controls.showHelp = function(controlEl) {
 
@@ -37,7 +36,7 @@
         var placement           = getPlacement(elPos);
         var popoverContainer    = getOrCreatePopoverContainer(controlEl);
         var previousPopover     = popoverContainer.children('.popover');
-        var popoverAlreadyShown = previousPopover.is('*') && previousPopover.data('xforms-for').is(controlEl);
+        var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');
 
         // Hide other help popovers before (maybe) showing this one
         hideAllHelpPopovers();
@@ -57,26 +56,21 @@
                 title:     labelText,
                 content:   helpText,
                 html:      true,
-                animation: false, // [2]
-                container: popoverContainer
+                animation: false // [2]
             }).popover('show');
 
+
             // Decorate an position popover
-            var popover = popoverContainer.children('.popover');
-            popover.data('xforms-for', controlEl); // [3]
-            addClose(el, popover);
+            var popover = $(controlEl).next();
+            popover.addClass('xforms-help-popover');
+            addClose(controlEl, popover);
             positionPopover(popover, placement, elPos);
         }
     };
 
     function hideAllHelpPopovers() {
-        _.each($('form.xforms-form'), function(form) {
-            var popoverContainer = $(form).children('.xforms-help-popover');
-            var previousPopover = popoverContainer.children('.popover');
-            if (previousPopover.is('*')) {
-                var previousEl = previousPopover.data('xforms-for');
-                previousEl.popover('destroy');
-            }
+        _.each($('form.xforms-form .xforms-help-popover'), function(popover) {
+            $(popover).prev().popover('destroy');
         });
     }
 
@@ -104,6 +98,23 @@
         } else {
             pos = getElPosition();
         }
+
+        var overflowEl = $(_.find($(el).parents(), function(e) { return $(e).css('overflow') == 'auto'; }));
+        var overflowPos = {};
+        pos.margins = ! overflowEl.is('*')
+            ? { top: 0, right: 0, bottom: 0, left: 0 }
+            : (
+                overflowPos.offset = overflowEl.offset(),
+                overflowPos.width  = overflowEl.outerWidth(),
+                overflowPos.height = overflowEl.outerHeight(),
+                {
+                    top:    overflowPos.offset.top,
+                    right:  $(window).width()  - overflowPos.offset.left - overflowPos.width,
+                    bottom: $(window).height() - overflowPos.offset.top  - overflowPos.height,
+                    left:   overflowPos.offset.left
+                }
+              );
+
         return pos;
     }
 
@@ -139,11 +150,11 @@
     /**
      * Adds an "x" at the top right of the popover, so users can close it with a click
      */
-    function addClose(firstContentEl, popover) {
+    function addClose(controlEl, popover) {
         if (! popover.children('.close').is('*')) {
             var close = $('<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>');
             popover.prepend(close);
-            close.on('click', function() { firstContentEl.popover('destroy'); });
+            close.on('click', function() { controlEl.popover('destroy'); });
         }
     }
 
@@ -169,7 +180,7 @@
         var maxHeight =
             // When left/right, viewport height sets the limit
             _.contains(['right', 'left', 'over'], placement) ?
-                $(window).height() - 2*padding
+                $(window).height() - 2*padding - elPos.margins.top - elPos.margins.bottom
             // When bottom, space below
             : placement == 'bottom' ?
                 $(window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height + arrowHeight + padding)
@@ -186,7 +197,7 @@
         var popoverOffset = popover.offset();
         popoverOffset.top =
                 (_.contains(['right', 'left'], placement) && (popoverOffset.top - elPos.scrollTop < padding))
-            ?   elPos.scrollTop + padding
+            ?   elPos.margins.top + elPos.scrollTop + padding
             :   placement == 'top'
             ?   elPos.offset.top - popover.outerHeight() - arrowHeight
             :   placement == 'over'

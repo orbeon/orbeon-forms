@@ -911,7 +911,8 @@ public class URLGenerator extends ProcessorImpl {
                     connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
 
                 // Save headers as request attributes
-                if (! config.getReadHeaders().isEmpty()) {
+                final List<String> readHeader = config.getReadHeaders();
+                if (readHeader != null && ! readHeader.isEmpty()) {
                     final Map<String, List<String>> responseHeaders = connectionResult.jResponseHeaders();
                     final Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
                     for (final String nameMixed : config.getReadHeaders()) {

@@ -22,8 +22,8 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
+import org.orbeon.oxf.xforms.control.LHHAValue;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
-import org.orbeon.oxf.xforms.itemset.Item.Label;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -122,9 +122,9 @@ public class XFormsItemUtils {
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
 
-                    final Label label  = getLabelValue(element.element(XFormsConstants.LABEL_QNAME), true);
-                    final Label help   = getLabelValue(element.element(XFormsConstants.HELP_QNAME), false);
-                    final Label hint   = getLabelValue(element.element(XFormsConstants.HINT_QNAME), false);
+                    final LHHAValue label  = getLabelValue(element.element(XFormsConstants.LABEL_QNAME), true);
+                    final LHHAValue help   = getLabelValue(element.element(XFormsConstants.HELP_QNAME), false);
+                    final LHHAValue hint   = getLabelValue(element.element(XFormsConstants.HINT_QNAME), false);
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     final Map<QName, String> attributes = getAttributes(element);
@@ -162,9 +162,9 @@ public class XFormsItemUtils {
                                 // the nodeset.
                                 final boolean isRelevant = (!(currentNodeInfo instanceof NodeInfo)) || InstanceData.getInheritedRelevant((NodeInfo) currentNodeInfo);
                                 if (isRelevant) {
-                                    final Label label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME), true);
-                                    final Label help  = getLabelValue(element.element(XFormsConstants.HELP_QNAME), false);
-                                    final Label hint  = getLabelValue(element.element(XFormsConstants.HINT_QNAME), false);
+                                    final LHHAValue label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME), true);
+                                    final LHHAValue help  = getLabelValue(element.element(XFormsConstants.HELP_QNAME), false);
+                                    final LHHAValue hint  = getLabelValue(element.element(XFormsConstants.HINT_QNAME), false);
                                     final Element valueCopyElement;
                                     {
                                         final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
@@ -227,12 +227,12 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        final Label label = getLabelValue(labelElement, true);
+                        final LHHAValue label = getLabelValue(labelElement, true);
 
                         // NOTE: returned label can be null in some cases
 
                         final Map<QName, String> attributes = getAttributes(element);
-                        final Item newContainer = Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, Option.<Label>apply(null), Option.<Label>apply(null), null);
+                        final Item newContainer = Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, Option.<LHHAValue>apply(null), Option.<LHHAValue>apply(null), null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }
@@ -263,7 +263,7 @@ public class XFormsItemUtils {
                 return XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, valueElement, false, false, null);
             }
 
-            private Label getLabelValue(Element labelElement, boolean required) {
+            private LHHAValue getLabelValue(Element labelElement, boolean required) {
                 if (required && labelElement == null)
                     throw new ValidationException("xf:item or xf:itemset must contain an xf:label element.", select1Control.getLocationData());
 
@@ -280,10 +280,10 @@ public class XFormsItemUtils {
                 final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, defaultToHTML, containsHTML);
 
                 if (required) {
-                    return new Label(StringUtils.trimToEmpty(label), containsHTML[0]);
+                    return new LHHAValue(StringUtils.trimToEmpty(label), containsHTML[0]);
                 } else {
                     final String labelOrNull = StringUtils.trimToNull(label);
-                    return labelOrNull != null ? new Label(labelOrNull, containsHTML[0]) : null;
+                    return labelOrNull != null ? new LHHAValue(labelOrNull, containsHTML[0]) : null;
                 }
             }
 

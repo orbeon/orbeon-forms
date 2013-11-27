@@ -13,19 +13,20 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.util.{XPath, ScalaUtils, XPathCache}
-import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
-import org.dom4j.{QName, Text, Element}
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.apache.commons.lang3.StringUtils
+import org.dom4j.{QName, Text, Element}
+import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.{XPath, ScalaUtils, XPathCache}
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
+import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.control.LHHAValue
+import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
+import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.dom4j.DocumentWrapper
 import ScalaUtils._
 
 trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait with ChildrenLHHAItemsetsAndActionsTrait {
@@ -188,9 +189,9 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         val valueOpt = Option(StringUtils.trimToNull(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML)))
                         
                         if (required)
-                            Some(Item.Label(valueOpt getOrElse "", containsHTML(0)))
+                            Some(LHHAValue(valueOpt getOrElse "", containsHTML(0)))
                         else
-                            valueOpt map (Item.Label(_, containsHTML(0)))
+                            valueOpt map (LHHAValue(_, containsHTML(0)))
                     }
                 }
 

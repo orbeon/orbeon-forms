@@ -13,24 +13,20 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import Item._
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
-import org.apache.commons.lang3.StringUtils
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
+import org.orbeon.oxf.xforms.control.LHHAValue
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 /**
  * Represents an item (xf:item, xf:choice, or item in itemset).
  */
 case class Item(
-    label: Label,
-    help: Option[Label],
-    hint: Option[Label],
+    label: LHHAValue,
+    help: Option[LHHAValue],
+    hint: Option[LHHAValue],
     value: String,
     attributes: Map[QName, String])(val position: Int, encode: Boolean) extends ItemContainer {
 
@@ -80,23 +76,7 @@ case class Item(
 
 object Item {
 
-    // Value is encrypted if requested, except with single selection if the value is empty [WHY?]
-    def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: Label, help: Option[Label], hint: Option[Label], value: String): Item =
+    // Value is encoded if requested, except with single selection if the value is empty [WHY?]
+    def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: LHHAValue, help: Option[LHHAValue], hint: Option[LHHAValue], value: String): Item =
         Item(label, help, hint, value, if (attributes eq null) Map.empty else attributes.asScala.toMap)(position, encode)
-
-    // Represent a label
-    case class Label(label: String, isHTML: Boolean) {
-        def streamAsHTML(ch: XMLReceiverHelper, locationData: LocationData): Unit =
-            if (isHTML)
-                streamHTMLFragment(ch.getXmlReceiver, label, locationData, "")
-            else
-                ch.text(StringUtils.defaultString(label))
-
-        def javaScriptValue(locationData: LocationData) =
-            escapeJavaScript(
-                if (isHTML)
-                    getEscapedHTMLValue(locationData, label)
-                else
-                    escapeXMLMinimal(label))
-    }
 }

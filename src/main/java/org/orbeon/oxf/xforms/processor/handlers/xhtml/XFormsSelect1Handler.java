@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.SelectAppearanceTrait;
+import org.orbeon.oxf.xforms.control.LHHAValue;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -27,8 +27,9 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -396,9 +397,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     isMultiple,
                     false,
                     null, // make sure the value "$xforms-template-value$" is not encrypted
-                    new Item.Label("$xforms-template-label$", false),
-                    Option.apply(new Item.Label("$xforms-template-help$", false)),
-                    Option.apply(new Item.Label("$xforms-template-hint$", false)),
+                    new LHHAValue("$xforms-template-label$", false),
+                    Option.apply(new LHHAValue("$xforms-template-help$", false)),
+                    Option.apply(new LHHAValue("$xforms-template-hint$", false)),
                     "$xforms-template-value$"
                 ),
                 true,
@@ -437,7 +438,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
         {
-            final Item.Label itemLabel = item.label();
+            final LHHAValue itemLabel = item.label();
             final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
             if (! isBooleanInput) {
                 reusableAttributes.clear();
@@ -490,9 +491,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                 // <span class="xforms-help">
                 {
-                    final Option<Item.Label> helpOpt = item.help();
+                    final Option<LHHAValue> helpOpt = item.help();
                     if (helpOpt.isDefined()) {
-                        final Item.Label help = helpOpt.get();
+                        final LHHAValue help = helpOpt.get();
 
                         reusableAttributes.clear();
                         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help");
@@ -502,9 +503,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                 // <span class="xforms-hint">
                 {
-                    final Option<Item.Label> hintOpt = item.hint();
+                    final Option<LHHAValue> hintOpt = item.hint();
                     if (hintOpt.isDefined()) {
-                        final Item.Label hint = hintOpt.get();
+                        final LHHAValue hint = hintOpt.get();
 
                         reusableAttributes.clear();
                         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint");

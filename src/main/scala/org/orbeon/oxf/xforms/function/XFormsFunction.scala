@@ -13,21 +13,20 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import collection.JavaConverters._
 import java.util.{Iterator ⇒ JIterator}
-import org.dom4j.Element
 import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{XPath, PooledXPathExpression, XPathCache}
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsContextStack, XFormsModel}
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils, XFormsModel}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.value.QNameValue
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**
  * Base class for all XForms functions.
@@ -36,6 +35,8 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
  * TODO: context should contain BindingContext directly if any
  */
 abstract class XFormsFunction extends SystemFunction {
+
+    import XFormsFunction._
 
     // Public accessor for Scala traits
     def arguments: Seq[Expression] = argument
@@ -48,30 +49,23 @@ abstract class XFormsFunction extends SystemFunction {
      */
     override def preEvaluate(visitor: ExpressionVisitor) = this
 
-    def context(implicit xpathContext: XPathContext) =
-        XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
-
-    def getControls(implicit xpathContext: XPathContext)      = context.controls
-    def getXBLContainer(implicit xpathContext: XPathContext)  = context.container
-    def getSourceElement(implicit xpathContext: XPathContext) = context.sourceElement
-    def getModel(implicit xpathContext: XPathContext)         = context.model
-    def getContextStack(implicit xpathContext: XPathContext)  = context.contextStack
+    def bindingContext(implicit xpathContext: XPathContext) = context.bindingContext
 
     def getSourceEffectiveId(implicit xpathContext: XPathContext) =
         context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
     def elementAnalysisForSource(implicit xpathContext: XPathContext) = {
         val prefixedId = XFormsUtils.getPrefixedId(getSourceEffectiveId)
-        getXBLContainer.partAnalysis.getControlAnalysisOption(prefixedId)
+        context.container.partAnalysis.getControlAnalysisOption(prefixedId)
     }
 
     def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext) = {
         val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
-        getXBLContainer.partAnalysis.getControlAnalysisOption(prefixedId)
+        context.container.partAnalysis.getControlAnalysisOption(prefixedId)
     }
 
     def sourceScope(implicit xpathContext: XPathContext) =
-        getXBLContainer.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
+        context.container.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
 
     def getContainingDocument(implicit xpathContext: XPathContext) =
         Option(context) map (_.container.getContainingDocument) orNull
@@ -104,8 +98,7 @@ abstract class XFormsFunction extends SystemFunction {
                 else {
                     // QName-but-not-NCName
                     val prefix = qNameString.substring(0, colonIndex)
-                    val contextStack = getContextStack(xpathContext)
-                    val namespaceMapping = getXBLContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext.getControlElement)
+                    val namespaceMapping = context(xpathContext).container.getNamespaceMappings(bindingContext(xpathContext).controlElement)
 
                     // Get QName URI
                     val qNameURI = namespaceMapping.mapping.get(prefix)
@@ -128,9 +121,7 @@ abstract class XFormsFunction extends SystemFunction {
         staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
 
         // Propagate in-scope variable definitions since they are not copied automatically
-        val contextStack = getContextStack(initialXPathContext)
-
-        val inScopeVariables = contextStack.getCurrentBindingContext.getInScopeVariables
+        val inScopeVariables = bindingContext(initialXPathContext).getInScopeVariables
         val variableDeclarations =
             for {
                 (name, _) ← inScopeVariables.asScala
@@ -193,24 +184,13 @@ abstract class XFormsFunction extends SystemFunction {
 
 object XFormsFunction {
 
-    // NOTE: This is always constructed in XFormsContextStack
-    // Constructor for XBLContainer and XFormsActionInterpreter
-    class Context(val container: XBLContainer, val contextStack: XFormsContextStack) extends XPath.FunctionContext {
+    case class Context(
+        container: XBLContainer,
+        bindingContext: BindingContext,
+        sourceEffectiveId: String,
+        model: XFormsModel) extends XPath.FunctionContext {
 
-        // Constructor for XFormsModel
-        def this(containingModel: XFormsModel, contextStack: XFormsContextStack) =
-            this(containingModel.container, contextStack)
-
-        var sourceEffectiveId: String = _
-        var sourceElement: Element = _
-        var model: XFormsModel = _
-
-        def setSourceEffectiveId(sourceEffectiveId: String) = this.sourceEffectiveId = sourceEffectiveId
-        def setSourceElement(sourceElement: Element) = this.sourceElement = sourceElement
-        def setModel(model: XFormsModel) = this.model = model
-
-        def containingDocument = container.getContainingDocument
-        def controls = containingDocument.getControls
+        def containingDocument = container.containingDocument
     }
 
     def sourceElementAnalysis(pathMap: PathMap) =
@@ -218,4 +198,7 @@ object XFormsFunction {
             case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
             case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
         }
+
+    def context(implicit xpathContext: XPathContext) =
+        XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
 }

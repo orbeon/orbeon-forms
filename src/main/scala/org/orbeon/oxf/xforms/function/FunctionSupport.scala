@@ -22,6 +22,8 @@ import collection.JavaConverters._
 
 protected trait FunctionSupport extends XFormsFunction {
 
+    import XFormsFunction._
+
     def stringArgument(i: Int)(implicit xpathContext: XPathContext) =
         arguments(i).evaluateAsString(xpathContext).toString
 

@@ -44,7 +44,7 @@ class Instance extends XFormsFunction {
 
         // NOTE: Model can be null when there is no model in scope at all
         val iterator =
-            Option(context.model) match {
+            Option(XFormsFunction.context.model) match {
                 case Some(model) ⇒
 
                     // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
@@ -75,7 +75,7 @@ class Instance extends XFormsFunction {
             case Some(iterator) ⇒
                 iterator
             case None ⇒
-                context.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("instance()", "instance not found", "instance id", instanceId.orNull)
+                XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("instance()", "instance not found", "instance id", instanceId.orNull)
                 EmptyIterator.getInstance
         }
     }

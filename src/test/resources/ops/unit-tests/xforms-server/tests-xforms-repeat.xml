@@ -1706,7 +1706,7 @@
         </output>
     </test>
 
-    <test description="xxf:repeat-nodeset() function" name="oxf:pipeline">
+    <test description="xxf:repeat-items() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1733,22 +1733,22 @@
                 </xh:head>
                 <xh:body>
                     <xf:repeat id="department-repeat" ref="department">
-                        <xf:var name="department-nodeset-1" value="xxf:repeat-nodeset()" as="element*"/>
-                        <xf:var name="department-nodeset-2" value="xxf:repeat-nodeset('department-repeat')" as="element*"/>
+                        <xf:var name="department-nodeset-1" value="xxf:repeat-items()" as="element*"/>
+                        <xf:var name="department-nodeset-2" value="xxf:repeat-items('department-repeat')" as="element*"/>
                         <xf:output id="department-output-1" value="count($department-nodeset-1)"/>
                         <xf:output id="department-output-2" value="count($department-nodeset-2)"/>
                         <xf:repeat id="employee-repeat" ref="employee">
-                            <xf:var name="employee-nodeset-1" value="xxf:repeat-nodeset()" as="element*"/>
-                            <xf:var name="employee-nodeset-2" value="xxf:repeat-nodeset('employee-repeat')" as="element*"/>
+                            <xf:var name="employee-nodeset-1" value="xxf:repeat-items()" as="element*"/>
+                            <xf:var name="employee-nodeset-2" value="xxf:repeat-items('employee-repeat')" as="element*"/>
                             <xf:output id="employee-output-1" value="count($employee-nodeset-1)"/>
                             <xf:output id="employee-output-2" value="count($employee-nodeset-2)"/>
 
-                            <xf:var name="department-nodeset-3" value="xxf:repeat-nodeset('department-repeat')" as="element*"/>
+                            <xf:var name="department-nodeset-3" value="xxf:repeat-items('department-repeat')" as="element*"/>
                             <xf:output id="department-output-3" value="count($department-nodeset-3)"/>
 
                             <!-- Make sure the function work from within an action as well -->
                             <xf:action ev:event="xforms-enabled">
-                                <xf:var name="test-nodeset" value="xxf:repeat-nodeset()"/>
+                                <xf:var name="test-nodeset" value="xxf:repeat-items()"/>
                                 <xf:setvalue ref="." value="count($test-nodeset)"/>
                             </xf:action>
                         </xf:repeat>
@@ -2046,7 +2046,7 @@
                 <xh:body>
                     <xf:repeat ref="exf:sort(event, 'string(.)', 'text', instance('other')/order)" id="my-repeat">
                         <xf:action ev:event="xxforms-nodeset-changed">
-                            <xf:setvalue ref="instance('other')/selection" value="xxf:repeat-nodeset('my-repeat')[index('my-repeat')]"/>
+                            <xf:setvalue ref="instance('other')/selection" value="xxf:repeat-items('my-repeat')[index('my-repeat')]"/>
                             <xf:setvalue ref="instance('other')/index" value="index('my-repeat')"/>
                         </xf:action>
                         <xf:output ref="." id="my-output"/>

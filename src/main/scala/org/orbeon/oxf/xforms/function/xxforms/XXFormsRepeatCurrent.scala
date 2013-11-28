@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.saxon.expr._
-import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.oxf.xforms.function.{FunctionSupport, MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.orbeon.oxf.xforms.XFormsContextStack
+import org.orbeon.oxf.xforms.function.{FunctionSupport, MatchSimpleAnalysis, XFormsFunction}
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+import org.orbeon.saxon.expr._
 
 /**
  * Return the current node of one of the enclosing xf:repeat iteration, either the closest
@@ -27,9 +26,10 @@ import org.orbeon.oxf.xforms.XFormsContextStack
  */
 class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) =
-        getRepeatCurrentSingleNode(context(xpathContext).contextStack,
-            stringArgumentOpt(0)(xpathContext))
+    override def evaluateItem(xpathContext: XPathContext) = {
+        implicit val ctx = xpathContext
+        bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).getSingleItem
+    }
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
 
@@ -57,12 +57,4 @@ class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis with 
                 null
         }
     }
-
-    /**
-     * Return the single item associated with the iteration of the repeat specified. If a null
-     * repeat id is passed, return the single item associated with the closest enclosing repeat
-     * iteration.
-     */
-    private def getRepeatCurrentSingleNode(contextStack: XFormsContextStack, repeatId: Option[String]) =
-        XXFormsRepeatFunctions.getEnclosingRepeatIterationBindingContext(contextStack, repeatId).getSingleItem
 }

@@ -58,7 +58,7 @@ class ShareableXPathStaticContext(config: Configuration, namespaceMapping: Names
         // our approach below is ok.
         def evaluateVariable(context: XPathContext) = {
             val variableResolver = context.getController.getUserData(classOf[ShareableXPathStaticContext].getName, "variableResolver").asInstanceOf[VariableResolver]
-            variableResolver(qName, context.getContextItem)
+            variableResolver(qName, context)
         }
     }
 

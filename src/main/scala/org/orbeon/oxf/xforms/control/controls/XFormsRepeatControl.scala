@@ -67,7 +67,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
     // The repeat's sequence binding
-    override def binding = Option(bindingContext) filter (_.isNewBind) map (_.nodeset.asScala) getOrElse Seq()
+    override def binding = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Seq()
 
     // Store initial repeat index information
     private val startIndexString = element.attributeValue("startindex")
@@ -155,7 +155,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Find source information
         val (sourceNodeset, requestedSourceIndex) =
-            (bindingContext.getNodeset, Integer.parseInt(dndStart(dndStart.length - 1)))
+            (bindingContext.nodeset, Integer.parseInt(dndStart(dndStart.length - 1)))
 
         if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size)
             throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData)
@@ -171,7 +171,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // DnD destination is the current repeat control
                 this
 
-            (new ArrayList[Item](destinationControl.bindingContext.getNodeset), dndEnd(dndEnd.length - 1).toInt)
+            (new ArrayList[Item](destinationControl.bindingContext.nodeset), dndEnd(dndEnd.length - 1).toInt)
         }
 
         // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
@@ -258,7 +258,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             return
 
         // Get old nodeset
-        val oldRepeatNodeset = bindingContext.getNodeset.asScala
+        val oldRepeatNodeset = bindingContext.nodeset.asScala
 
         // Set new binding context on the repeat control
         locally {
@@ -280,7 +280,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
         // Move things around and create new iterations if needed
-        if (! Controls.compareNodesets(oldRepeatNodeset, bindingContext.getNodeset.asScala)) {
+        if (! Controls.compareNodesets(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
             // Update iterationsInitialStateIfNeeded()
 
             val focusedBefore = containingDocument.getControls.getFocusedControl
@@ -320,7 +320,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         val controls = containingDocument.getControls
 
         // Get current (new) nodeset
-        val newRepeatNodeset = bindingContext.getNodeset.asScala
+        val newRepeatNodeset = bindingContext.nodeset.asScala
 
         val isInsert = insertedItems ne null
 
@@ -602,7 +602,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Build one sub-tree per repeat iteration (iteration itself handles its own binding with pushBinding, depending on its index/suffix)
         val iterationAnalysis = staticControl.iteration.get
-        for (iterationIndex ← 1 to bindingContext.getNodeset.size)
+        for (iterationIndex ← 1 to bindingContext.nodeset.size)
             buildTree(container, bindingContext, iterationAnalysis, idSuffix :+ iterationIndex)
 
         // TODO LATER: handle isOptimizeRelevance()

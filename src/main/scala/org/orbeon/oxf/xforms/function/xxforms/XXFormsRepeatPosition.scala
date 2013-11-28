@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr._
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.common.ValidationException
 import org.orbeon.saxon.value.Int64Value
-import org.orbeon.oxf.xforms.{BindingContext, XFormsContextStack}
 
 /**
  * Return the current node of one of the enclosing xf:repeat iteration, either the closest
@@ -26,33 +24,10 @@ import org.orbeon.oxf.xforms.{BindingContext, XFormsContextStack}
  *
  * This function must be called from within an xf:repeat.
  */
-class XXFormsRepeatPosition extends XFormsFunction {
+class XXFormsRepeatPosition extends XFormsFunction with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) =
-        new Int64Value(getRepeatCurrentPosition(context(xpathContext).contextStack,
-            argument.headOption map (_.evaluateAsString(xpathContext).toString)))
-
-    private def getRepeatCurrentPosition(contextStack: XFormsContextStack, repeatId: Option[String]) =
-        XXFormsRepeatFunctions.getEnclosingRepeatIterationBindingContext(contextStack, repeatId).position
-}
-
-object XXFormsRepeatFunctions {
-
-    def getEnclosingRepeatIterationBindingContext(contextStack: XFormsContextStack, repeatId: Option[String]): BindingContext = {
-
-        val initialBindingContext = contextStack.getCurrentBindingContext
-        var currentBindingContext = initialBindingContext
-        do {
-            if (contextStack.isRepeatIterationBindingContext(currentBindingContext)
-                && (repeatId.isEmpty || currentBindingContext.parent.elementId == repeatId.get)) {
-                return currentBindingContext
-            }
-            currentBindingContext = currentBindingContext.parent
-        } while (currentBindingContext ne null)
-
-        repeatId match {
-            case Some(id) ⇒ throw new ValidationException("No enclosing xf:repeat found for repeat id: " + id, initialBindingContext.locationData)
-            case None ⇒throw new ValidationException("No enclosing xf:repeat found.", initialBindingContext.locationData)
-        }
+    override def evaluateItem(xpathContext: XPathContext) = {
+        implicit val ctx = xpathContext
+        new Int64Value(bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).position)
     }
 }

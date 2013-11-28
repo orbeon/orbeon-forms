@@ -206,7 +206,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
         super.onBindingUpdate(oldBinding, newBinding)
-        val isNodesetChange = ! Controls.compareNodesets(oldBinding.getNodeset.asScala, newBinding.getNodeset.asScala)
+        val isNodesetChange = ! Controls.compareNodesets(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
         if (isNodesetChange) {
             destroyMirrorListenerIfNeeded()
             initializeMirrorListenerIfNeeded(dispatch = true)

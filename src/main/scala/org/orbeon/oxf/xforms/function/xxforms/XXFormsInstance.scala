@@ -29,7 +29,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
 
         implicit val ctx = xpathContext
 
-        val containingDocument = context.containingDocument
+        val containingDocument = XFormsFunction.context.containingDocument
 
         val instanceId     = stringArgument(0)
         // TODO: Argument is undocumented. Is it ever used at all? We now have a syntax for absolute ids so don't really need it.
@@ -42,7 +42,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
                     { case i: XFormsInstance ⇒ i.rootElement }
             } else
                 // Regular case
-                XXFormsInstance.findInAncestorScopes(context.container, instanceId)
+                XXFormsInstance.findInAncestorScopes(XFormsFunction.context.container, instanceId)
 
         // Return or warn
         rootElementOpt match {

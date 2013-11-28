@@ -136,7 +136,7 @@ trait FileMetadata extends XFormsValueControl {
                 contextStack.setBinding(self.bindingContext)
                 contextStack.pushBinding(e, self.getEffectiveId, self.getChildElementScope(e))
 
-                contextStack.getCurrentSingleItem match {
+                contextStack.getCurrentBindingContext.getSingleItem match {
                     case currentSingleItem: NodeInfo ⇒
                         DataModel.setValueIfChanged(
                             currentSingleItem,
@@ -176,7 +176,7 @@ object FileMetadata {
         val contextStack = m.getContextStack
         contextStack.setBinding(m.bindingContext)
         contextStack.pushBinding(element, m.getEffectiveId, m.getChildElementScope(element))
-        DataModel.getValue(contextStack.getCurrentSingleItem)
+        DataModel.getValue(contextStack.getCurrentBindingContext.getSingleItem)
     }
 
     // Format a string containing a number of bytes to a human-readable string

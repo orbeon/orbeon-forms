@@ -56,12 +56,12 @@ public class RuntimeBind implements XFormsObject {
         binds.model.getContextStack().pushBinding(staticBind.element(), binds.model.getEffectiveId(), binds.model.getResolutionScope());
         {
             // NOTE: This should probably go into XFormsContextStack
-            if (binds.model.getContextStack().getCurrentBindingContext().isNewBind()) {
+            if (binds.model.getContextStack().getCurrentBindingContext().newBind()) {
                 // Case where a @nodeset or @ref attribute is present -> a current nodeset is therefore available
-                nodeset = binds.model.getContextStack().getCurrentNodeset();
+                nodeset = binds.model.getContextStack().getCurrentBindingContext().nodeset();
             } else {
                 // Case where of missing @nodeset attribute (it is optional in XForms 1.1 and defaults to the context item)
-                final Item contextItem = binds.model.getContextStack().getContextItem();
+                final Item contextItem = binds.model.getContextStack().getCurrentBindingContext().contextItem();
                 nodeset = (contextItem == null) ? XFormsConstants.EMPTY_ITEM_LIST : Collections.singletonList(contextItem);
             }
 

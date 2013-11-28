@@ -91,7 +91,7 @@ public class Variable {
             }
             {
                 final BindingContext bindingContext = contextStack.getCurrentBindingContext();
-                final List<Item> currentNodeset = bindingContext.getNodeset();
+                final List<Item> currentNodeset = bindingContext.nodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
 
@@ -99,7 +99,7 @@ public class Variable {
                     final boolean scopeModelVariables = VariableAnalysis.variableScopesModelVariables(staticVariable);
                     try {
                         variableValue = XPathCache.evaluateAsExtent(
-                                currentNodeset, bindingContext.getPosition(),
+                                currentNodeset, bindingContext.position(),
                                 expression, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(scopeModelVariables),
                                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData(),
                                 containingDocument.getRequestStats().getReporter());
@@ -112,8 +112,6 @@ public class Variable {
                         } else {
                             throw new OXFException(e);
                         }
-                    } finally {
-                        contextStack.returnFunctionContext();
                     }
                 } else {
                     variableValue = EmptySequence.getInstance();

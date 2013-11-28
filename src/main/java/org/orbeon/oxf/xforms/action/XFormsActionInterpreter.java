@@ -131,7 +131,7 @@ public class XFormsActionInterpreter {
                 // NOTE: It's not 100% how @context and @iterate should interact here. Right now @iterate overrides @context,
                 // i.e. @context is evaluated first, and @iterate sets a new context for each iteration
                 {
-                    final List<Item> currentNodeset = _actionXPathContext.getCurrentNodeset();
+                    final List<Item> currentNodeset = _actionXPathContext.getCurrentBindingContext().nodeset();
                     final int iterationCount = currentNodeset.size();
                     for (int index = 1; index <= iterationCount; index++) {
 
@@ -149,7 +149,7 @@ public class XFormsActionInterpreter {
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
                 runSingleIteration(actionAnalysis, actionElement.getQName(),
-                        ifConditionAttribute, whileIterationAttribute, _actionXPathContext.hasOverriddenContext(), _actionXPathContext.getContextItem());
+                        ifConditionAttribute, whileIterationAttribute, _actionXPathContext.getCurrentBindingContext().hasOverriddenContext(), _actionXPathContext.getCurrentBindingContext().contextItem());
             }
 
             // Restore
@@ -278,41 +278,30 @@ public class XFormsActionInterpreter {
      */
     public String evaluateAsString(Element actionElement, List<Item> nodeset, int position, String xpathExpression) {
 
-        // Setup function context
         final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
         final String result = XPathCache.evaluateAsString(
                 nodeset, position,
-                xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
+                xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentBindingContext().getInScopeVariables(),
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
                 (LocationData) actionElement.getData(),
                 containingDocument().getRequestStats().getReporter());
-
-        // Restore function context
-        _actionXPathContext.returnFunctionContext();
 
         return result != null ? result : "";
     }
 
     public List<Item> evaluateKeepItems(Element actionElement, List<Item> nodeset, int position, String xpathExpression) {
 
-
-        // Setup function context
         final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
-        final List<Item> result = XPathCache.evaluateKeepItems(
+        return XPathCache.evaluateKeepItems(
                 nodeset, position,
-                xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
+                xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentBindingContext().getInScopeVariables(),
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
                 (LocationData) actionElement.getData(),
                 containingDocument().getRequestStats().getReporter());
-
-        // Restore function context
-        _actionXPathContext.returnFunctionContext();
-
-        return result;
     }
 
     /**
@@ -341,23 +330,19 @@ public class XFormsActionInterpreter {
             final NamespaceMapping namespaceMapping = getNamespaceMappings(actionElement);
             final LocationData locationData = (LocationData) actionElement.getData();
 
-            // Setup function context
             final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
             resolvedAVTValue = XPathCache.evaluateAsAvt(
-                bindingContext.getNodeset(),
-                bindingContext.getPosition(),
+                bindingContext.nodeset(),
+                bindingContext.position(),
                 attributeValue,
                 namespaceMapping,
-                _actionXPathContext.getCurrentVariables(),
+                _actionXPathContext.getCurrentBindingContext().getInScopeVariables(),
                 XFormsContainingDocument.getFunctionLibrary(),
                 functionContext,
                 null,
                 locationData,
                 containingDocument().getRequestStats().getReporter());
-
-            // Restore function context
-            _actionXPathContext.returnFunctionContext();
         } else {
             // We optimize as this doesn't need AVT evaluation
             resolvedAVTValue = attributeValue;
@@ -471,7 +456,7 @@ public class XFormsActionInterpreter {
             model = (XFormsModel) o;
         } else {
             // Id is not specified
-            model = _actionXPathContext.getCurrentModel();
+            model = _actionXPathContext.getCurrentBindingContext().model();
         }
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());

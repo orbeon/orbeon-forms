@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -28,18 +27,16 @@ public class XXFormsRepeatItems extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        final XFormsContextStack contextStack = getContextStack(xpathContext);
-
         // Get repeat id
         final Expression contextIdExpression = (argument.length == 0) ? null : argument[0];
         final String repeatId;
         if (contextIdExpression == null) {
-            repeatId = contextStack.getEnclosingRepeatId();
+            repeatId = bindingContext(xpathContext).enclosingRepeatId();
         } else {
             repeatId = contextIdExpression.evaluateAsString(xpathContext).toString();
         }
 
         // Get repeat node-set for given id
-        return new ListIterator(contextStack.getRepeatItems(repeatId));
+        return new ListIterator(bindingContext(xpathContext).repeatItems(repeatId));
     }
 }

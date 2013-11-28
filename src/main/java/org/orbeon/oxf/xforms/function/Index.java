@@ -33,7 +33,7 @@ public class Index extends XFormsFunction {
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatStaticId) {
-        final int index = getXBLContainer(xpathContext).getRepeatIndex(getSourceEffectiveId(xpathContext), repeatStaticId);
+        final int index = XFormsFunction.context(xpathContext).container().getRepeatIndex(getSourceEffectiveId(xpathContext), repeatStaticId);
         if (index == -1) {
             // Throw runtime exception
             final String message = "Function index uses repeat id '" + repeatStaticId + "' which is not in scope";

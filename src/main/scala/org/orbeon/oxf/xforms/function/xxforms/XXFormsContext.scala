@@ -32,7 +32,7 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
                 // Get context id by evaluating expression
                 val contextStaticId = contextIdExpression.evaluateAsString(xpathContext).toString
                 // Get context item for context id
-                context(xpathContext).contextStack.getContextForId(contextStaticId) match {
+                bindingContext(xpathContext).contextForId(contextStaticId) match {
                     case null ⇒ EmptyIterator.getInstance
                     case contextItem ⇒ SingletonIterator.makeIterator(contextItem)
                 }

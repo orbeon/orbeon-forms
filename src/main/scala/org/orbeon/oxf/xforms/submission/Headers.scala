@@ -66,17 +66,15 @@ object Headers {
                 val combine = {
                     val avtCombine = headerElement.attributeValue("combine", defaultCombineValue)
                     val result = XPathCache.evaluateAsAvt(
-                        contextStack.getCurrentBindingContext.getNodeset,
-                        contextStack.getCurrentBindingContext.getPosition,
+                        contextStack.getCurrentBindingContext.nodeset,
+                        contextStack.getCurrentBindingContext.position,
                         avtCombine,
                         xblContainer.getContainingDocument.getNamespaceMappings(headerElement),
-                        contextStack.getCurrentVariables,
+                        contextStack.getCurrentBindingContext.getInScopeVariables,
                         XFormsContainingDocument.getFunctionLibrary, contextStack.getFunctionContext(sourceEffectiveId),
                         null,
                         headerElement.getData.asInstanceOf[LocationData],
                         xblContainer.getContainingDocument.getRequestStats.getReporter)
-
-                    contextStack.returnFunctionContext()
 
                     if (! allowedCombineValues(result))
                         throw new OXFException("Invalid value '" + result + "' for attribute combine.")
@@ -100,9 +98,9 @@ object Headers {
                 val headerScope = xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(headerElement))
                 contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 
-                if (contextStack.getCurrentBindingContext.isNewBind) {
+                if (contextStack.getCurrentBindingContext.newBind) {
                     // There is a binding so a possible iteration
-                    for (position ← 1 to contextStack.getCurrentNodeset.size) {
+                    for (position ← 1 to contextStack.getCurrentBindingContext.nodeset.size) {
                         contextStack.pushIteration(position)
                         handleHeaderElement(headerElement)
                         contextStack.popBinding()

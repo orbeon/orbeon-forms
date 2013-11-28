@@ -159,7 +159,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         mustBindValidate = binds != null;
 
         // Create context stack
-        this.contextStack = new XFormsContextStack(this);
+        this.contextStack = new XFormsContextStack(container());
 
         // Temporarily initialize the evaluation context to an empty context, so that handlers upon xforms-model-construct can work
         this.defaultEvaluationContext = XFormsContextStack.defaultContext(null, container, this);

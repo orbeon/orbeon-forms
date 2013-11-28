@@ -47,7 +47,7 @@ class XXFormsScriptAction extends XFormsAction {
             case "xpath" | "text/xpath" | "application/xpath" ⇒ // "unofficial" type
                 // Evaluate XPath expression for its side effects only
                 val bindingContext = actionInterpreter.actionXPathContext.getCurrentBindingContext
-                actionInterpreter.evaluateKeepItems(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
+                actionInterpreter.evaluateKeepItems(actionElement, bindingContext.nodeset, bindingContext.position, actionElement.getText)
             case other ⇒
                 throw new OXFException("Unsupported script type: " + other)
         }

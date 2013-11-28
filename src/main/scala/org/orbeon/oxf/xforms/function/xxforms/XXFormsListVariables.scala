@@ -28,7 +28,7 @@ class XXFormsListVariables extends XFormsFunction with FunctionSupport {
 
         val modelEffectiveId = stringArgument(0)(xpathContext)
 
-        context.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
+        XFormsFunction.context.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
             case model: XFormsModel ⇒
                 val variables = model.getTopLevelVariables
 

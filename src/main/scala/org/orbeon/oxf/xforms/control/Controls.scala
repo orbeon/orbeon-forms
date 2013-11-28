@@ -299,7 +299,7 @@ object Controls {
                 control match {
                     case repeatControl: XFormsRepeatControl ⇒
                         // Update iterations
-                        val oldRepeatSeq = control.bindingContext.getNodeset.asScala
+                        val oldRepeatSeq = control.bindingContext.nodeset.asScala
                         control.evaluateBindingAndValues(bindingContext, update = true)
                         val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
 

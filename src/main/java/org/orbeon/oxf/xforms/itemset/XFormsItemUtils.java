@@ -138,7 +138,7 @@ public class XFormsItemUtils {
                     final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
                     //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
-                    final List<org.orbeon.saxon.om.Item> currentNodeSet = currentBindingContext.getNodeset();
+                    final List<org.orbeon.saxon.om.Item> currentNodeSet = currentBindingContext.nodeset();
                     if (currentNodeSet != null) {
 
                         // Node stack tracks the relative position of the current node wrt ancestor nodes
@@ -306,22 +306,20 @@ public class XFormsItemUtils {
                 } else {
                     // Possible AVT
                     final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
-                    final List<org.orbeon.saxon.om.Item> currentNodeset = currentBindingContext.getNodeset();
+                    final List<org.orbeon.saxon.om.Item> currentNodeset = currentBindingContext.nodeset();
                     if (currentNodeset != null && currentNodeset.size() > 0) {
                         String tempResult;
                         try {
                             tempResult = XPathCache.evaluateAsAvt(
-                                    currentNodeset, currentBindingContext.getPosition(),
+                                    currentNodeset, currentBindingContext.position(),
                                     attributeValue, container.getNamespaceMappings(itemChoiceItemsetElement),
-                                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                    contextStack.getCurrentBindingContext().getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                     contextStack.getFunctionContext(elementEffectiveId), null,
                                     (LocationData) itemChoiceItemsetElement.getData(),
                                     container.getContainingDocument().getRequestStats().getReporter());
                         } catch (Exception e) {
                             XFormsError.handleNonFatalXPathError(container, e);
                             tempResult = "";
-                        } finally {
-                            contextStack.returnFunctionContext();
                         }
 
                         result.put(attributeName, tempResult);

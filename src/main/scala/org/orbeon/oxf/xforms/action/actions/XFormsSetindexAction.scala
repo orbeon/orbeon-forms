@@ -42,7 +42,7 @@ class XFormsSetindexAction extends XFormsAction {
 
             val indexXPath = element.attributeValue("index")
             val contextStack = interpreter.actionXPathContext
-            val indexString = interpreter.evaluateAsString(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
+            val indexString = interpreter.evaluateAsString(element, contextStack.getCurrentBindingContext.nodeset, contextStack.getCurrentBindingContext.position, "number(" + indexXPath + ")")
 
             try indexString.toInt
             catch { case NonFatal(_) ⇒ return } // "If the index evaluates to NaN the action has no effect."

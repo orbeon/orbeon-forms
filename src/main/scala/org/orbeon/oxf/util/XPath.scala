@@ -17,7 +17,7 @@ import org.orbeon.oxf.xml.{XMLUtils, ShareableXPathStaticContext, NamespaceMappi
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathStaticContext, XPathExpression}
 import org.orbeon.saxon.style.AttributeValueTemplate
-import org.orbeon.saxon.expr.{XPathContextMajor, ExpressionTool, ExpressionVisitor, Expression}
+import org.orbeon.saxon.expr._
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
@@ -43,7 +43,7 @@ object XPath {
     type Reporter = (String, Long) ⇒ Unit
 
     // To resolve a variable
-    type VariableResolver = (StructuredQName, Item) ⇒ ValueRepresentation
+    type VariableResolver = (StructuredQName, XPathContext) ⇒ ValueRepresentation
 
     // Context accessible during XPath evaluation
     private val xpathContextDyn = new DynamicVariable[FunctionContext]

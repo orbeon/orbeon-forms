@@ -55,10 +55,10 @@ public class XFormsLoadAction extends XFormsAction {
 
         // "If both are present, the action has no effect."
         final BindingContext bindingContext = actionInterpreter.actionXPathContext().getCurrentBindingContext();
-        if (bindingContext.isNewBind() && resourceAttributeValue != null)
+        if (bindingContext.newBind() && resourceAttributeValue != null)
             return;
 
-        if (bindingContext.isNewBind()) {
+        if (bindingContext.newBind()) {
             // Use single-node binding
             final String tempValue = DataModel.getValue(bindingContext.getSingleItem());
             if (tempValue != null) {

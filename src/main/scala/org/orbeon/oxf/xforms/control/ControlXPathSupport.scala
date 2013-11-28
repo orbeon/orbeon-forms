@@ -46,7 +46,7 @@ trait ControlXPathSupport {
 
             // NOTE: the control may or may not be bound, so don't use getBoundItem()
             val bc = bindingContext
-            val contextNodeset = bc.getNodeset
+            val contextNodeset = bc.nodeset
             if (contextNodeset.size == 0)
                 null // TODO: in the future we should be able to try evaluating anyway
             else {
@@ -55,16 +55,14 @@ trait ControlXPathSupport {
                 getContextStack.setBinding(bc)
                 // Evaluate
                 try
-                    XPathCache.evaluateAsAvt(contextNodeset, bc.getPosition, attributeValue, getNamespaceMappings,
+                    XPathCache.evaluateAsAvt(contextNodeset, bc.position, attributeValue, getNamespaceMappings,
                         bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
                         containingDocument.getRequestStats.addXPathStat)
                 catch {
                     case NonFatal(t) ⇒
                         XFormsError.handleNonFatalXPathError(container, t)
                         null
-                } finally
-                    // Restore function context to prevent leaks caused by context pointing to removed controls
-                    returnFunctionContext()
+                }
             }
         }
     }
@@ -90,9 +88,7 @@ trait ControlXPathSupport {
                 case NonFatal(t) ⇒
                     XFormsError.handleNonFatalXPathError(container, t)
                     None
-            } finally
-                // Restore function context to prevent leaks caused by context pointing to removed controls
-                returnFunctionContext()
+            }
         }
     }
 
@@ -112,15 +108,10 @@ trait ControlXPathSupport {
                     case NonFatal(t) ⇒
                         XFormsError.handleNonFatalXPathError(container, t)
                         None
-                } finally
-                    // Restore function context to prevent leaks caused by context pointing to removed controls
-                    returnFunctionContext()
+                }
         }
 
     // Return an XPath function context having this control as source control.
     private def getFunctionContext =
         getContextStack.getFunctionContext(getEffectiveId)
-
-    private def returnFunctionContext() =
-        getContextStack.returnFunctionContext()
 }

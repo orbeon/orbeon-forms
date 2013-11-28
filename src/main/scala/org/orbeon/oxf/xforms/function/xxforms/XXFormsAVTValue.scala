@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.FunctionSupport
+import org.orbeon.oxf.xforms.function.{XFormsFunction, FunctionSupport}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.saxon.value.StringValue
@@ -30,7 +30,7 @@ class XXFormsAVTValue extends FunctionSupport {
         // TODO: handle also absolute id
         for {
             forPrefixedId      ← sourceScope.prefixedIdForStaticIdOpt(forId)
-            attControlAnalysis ← Option(getXBLContainer.partAnalysis.getAttributeControl(forPrefixedId, attName))
+            attControlAnalysis ← Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
             control            ← relevantControl(attControlAnalysis.staticId)
             attControl         ← ScalaUtils.collectByErasedType[XXFormsAttributeControl](control)
         } yield

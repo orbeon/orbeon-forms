@@ -40,7 +40,7 @@ class XFormsSetvalueAction extends XFormsAction {
             valueExpression match {
                 case Some(valueExpression) ⇒
                     // Value to set is computed with an XPath expression
-                    actionInterpreter.evaluateAsString(actionElement, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, valueExpression)
+                    actionInterpreter.evaluateAsString(actionElement, contextStack.getCurrentBindingContext.nodeset, contextStack.getCurrentBindingContext.position, valueExpression)
                 case None ⇒
                     // Value to set is static content
                     actionElement.getStringValue
@@ -49,7 +49,7 @@ class XFormsSetvalueAction extends XFormsAction {
         assert(valueToSet ne null)
 
         // Set the value on target node if possible
-        contextStack.getCurrentSingleItem match {
+        contextStack.getCurrentBindingContext.getSingleItem match {
             case nodeInfo: NodeInfo ⇒
                 // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot be
                 // written to. But because of the way we now handle errors in actions, we throw an exception instead and

@@ -49,7 +49,7 @@ public class XFormsDeleteAction extends XFormsAction {
         final String atAttribute = actionElement.attributeValue("at");
         final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
 
-        final List<Item> collectionToUpdate = contextStack.getCurrentNodeset();
+        final List<Item> collectionToUpdate = contextStack.getCurrentBindingContext().nodeset();
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
         // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node

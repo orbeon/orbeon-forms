@@ -128,18 +128,17 @@ object XFormsAction {
 
                         // Evaluate context parameter
                         val result = XPathCache.normalizeSingletons(XPathCache.evaluate(
-                            actionInterpreter.actionXPathContext.getCurrentNodeset,
-                            actionInterpreter.actionXPathContext.getCurrentPosition,
+                            actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
+                            actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
                             valueOrSelect,
                             actionInterpreter.getNamespaceMappings(element),
-                            contextStack.getCurrentVariables,
+                            contextStack.getCurrentBindingContext.getInScopeVariables,
                             XFormsContainingDocument.getFunctionLibrary,
                             contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
                             null,
                             element.getData.asInstanceOf[LocationData],
                             actionInterpreter.containingDocument().getRequestStats.addXPathStat).asScala)
 
-                        contextStack.returnFunctionContext()
                         contextStack.popBinding()
 
                         result

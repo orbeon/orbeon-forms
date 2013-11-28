@@ -55,7 +55,7 @@ trait RRRAction extends XFormsAction with RRRFunctions {
     override def execute(context: DynamicActionContext): Unit = {
 
         val interpreter = context.interpreter
-        val model       = interpreter.actionXPathContext.getCurrentModel
+        val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
 
         def resolve(qName: QName) =
             (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean

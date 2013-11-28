@@ -27,7 +27,7 @@ class XFormsRefreshAction extends XFormsAction {
     override def execute(context: DynamicActionContext): Unit = {
 
         val interpreter = context.interpreter
-        val model       = interpreter.actionXPathContext.getCurrentModel
+        val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
 
         if (model ne null) {
             XFormsRefreshAction.refresh(model)

@@ -287,7 +287,7 @@ public class XFormsUtils {
 
         // Try to get single node binding
         {
-            final boolean hasSingleNodeBinding = currentBindingContext.isNewBind();
+            final boolean hasSingleNodeBinding = currentBindingContext.newBind();
             if (hasSingleNodeBinding) {
                 final Item boundItem = currentBindingContext.getSingleItem();
                 final String tempResult = DataModel.getValue(boundItem);
@@ -306,22 +306,20 @@ public class XFormsUtils {
             final String valueAttribute = childElement.attributeValue(XFormsConstants.VALUE_QNAME);
             final boolean hasValueAttribute = valueAttribute != null;
             if (hasValueAttribute) {
-                final List<Item> currentNodeset = currentBindingContext.getNodeset();
+                final List<Item> currentNodeset = currentBindingContext.nodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     String tempResult;
                     try {
                             tempResult = XPathCache.evaluateAsString(
-                                currentNodeset, currentBindingContext.getPosition(),
+                                currentNodeset, currentBindingContext.position(),
                                 valueAttribute, container.getNamespaceMappings(childElement),
-                                contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                contextStack.getCurrentBindingContext().getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                 contextStack.getFunctionContext(sourceEffectiveId), null,
                                 (LocationData) childElement.getData(),
                                 container.getContainingDocument().getRequestStats().getReporter());
                     } catch (Exception e) {
                         XFormsError.handleNonFatalXPathError(container, e);
                         tempResult = "";
-                    } finally {
-                        contextStack.returnFunctionContext();
                     }
 
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;

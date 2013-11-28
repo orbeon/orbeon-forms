@@ -157,7 +157,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
                     _,
                     Option(StringValue.makeStringValue(getValue)),
                     FormatNamespaceMapping,
-                    getContextStack.getCurrentVariables))
+                    getContextStack.getCurrentBindingContext.getInScopeVariables))
     }
 
     /**

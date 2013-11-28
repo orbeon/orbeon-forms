@@ -31,7 +31,7 @@ public class XFormsResetAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentModel();
+        final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentBindingContext().model();
 
         // "This action initiates reset processing by dispatching an xforms-reset event to the specified model."
         Dispatch.dispatchEvent(new XFormsResetEvent(model));

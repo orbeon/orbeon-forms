@@ -71,7 +71,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 Option(DataModel.getValue(bc.getSingleItem))
             else
                 // Value comes from the XPath expression within the value attribute
-                evaluateAsString(valueAttribute, bc.getNodeset.asScala, bc.getPosition)
+                evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
 
         setValue(value getOrElse "")
     }

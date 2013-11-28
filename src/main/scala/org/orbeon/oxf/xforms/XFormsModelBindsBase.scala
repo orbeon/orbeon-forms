@@ -27,6 +27,7 @@ import org.orbeon.saxon.om.{StructuredQName, Item, NodeInfo}
 import org.orbeon.saxon.value.SequenceExtent
 import scala.util.control.NonFatal
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
+import org.orbeon.saxon.expr.XPathContext
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
@@ -120,16 +121,14 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         // Setup function context
         // NOTE: When we implement support for allowing binds to receive events, source must be bind id.
         val functionContext = model.getContextStack.getFunctionContext(model.getEffectiveId)
-        try XPath.evaluateSingle(nodeset, position, xpathExpression.compiledExpression, functionContext, variableResolver).asInstanceOf[Boolean]
-        finally model.getContextStack.returnFunctionContext()
+        XPath.evaluateSingle(nodeset, position, xpathExpression.compiledExpression, functionContext, variableResolver).asInstanceOf[Boolean]
     }
 
     protected def evaluateStringExpression(nodeset: JList[Item], position: Int, xpathExpression: StaticXPathMIP): String = {
         // Setup function context
         // NOTE: When we implement support for allowing binds to receive events, source must be bind id.
         val functionContext = model.getContextStack.getFunctionContext(model.getEffectiveId)
-        try XPath.evaluateAsString(nodeset, position, xpathExpression.compiledExpression, functionContext, variableResolver)
-        finally model.getContextStack.returnFunctionContext()
+        XPath.evaluateAsString(nodeset, position, xpathExpression.compiledExpression, functionContext, variableResolver)
     }
 
     protected def handleMIPXPathException(throwable: Throwable, bind: RuntimeBind, xpathMIP: StaticXPathMIP, message: String) {
@@ -211,15 +210,15 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         }
 
     private val variableResolver =
-        (variableName: StructuredQName, contextItem: Item) ⇒
+        (variableName: StructuredQName, xpathContext: XPathContext) ⇒
             staticModel.bindsByName.get(variableName.getLocalName) match {
                 case Some(bind) ⇒
-                    // Variable value is the bind nodeset
-                    val currentBindNodeset = getBindNodeset(bind.staticId, contextItem)
+                    // Variable value is a bind nodeset to resolve
+                    val currentBindNodeset = getBindNodeset(bind.staticId, xpathContext.getContextItem)
                     new SequenceExtent(currentBindNodeset)
                 case None ⇒
                     // Try top-level model variables
-                    val modelVariables = model.getContextStack.getCurrentVariables
+                    val modelVariables = model.getContextStack.getCurrentBindingContext.getInScopeVariables
                     val result = modelVariables.get(variableName.getLocalName)
                     // NOTE: With XPath analysis on, variable scope has been checked statically
                     if (result eq null)

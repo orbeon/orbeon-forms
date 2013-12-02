@@ -188,7 +188,8 @@ object XFormsFunction {
         container: XBLContainer,
         bindingContext: BindingContext,
         sourceEffectiveId: String,
-        model: XFormsModel) extends XPath.FunctionContext {
+        model: XFormsModel,
+        data: Any) extends XPath.FunctionContext {
 
         def containingDocument = container.containingDocument
     }

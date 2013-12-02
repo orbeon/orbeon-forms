@@ -189,7 +189,7 @@ public class InstanceData {// rename to DataNodeProperties once done
                     else if (sb.length() > 0)
                         sb.append(' ');
 
-                    sb.append(bindNode.bindStaticId());
+                    sb.append(bindNode.parentBind().staticId());
                 }
         return sb == null ? null : sb.toString();
     }

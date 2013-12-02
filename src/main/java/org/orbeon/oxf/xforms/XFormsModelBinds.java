@@ -58,8 +58,6 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
     public final XFormsContainingDocument containingDocument;  // current containing document
     private final XPathDependencies dependencies;
 
-    private List<RuntimeBind> topLevelBinds = new ArrayList<RuntimeBind>();
-
     private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
 
     private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
@@ -105,7 +103,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
         // Reset everything
         // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
-        topLevelBinds.clear();
+        topLevelBinds().clear();
         singleNodeContextBinds().clear();
         iterationsForContextNodeInfo().clear();
 
@@ -134,7 +132,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
         // Even before that, the bind tree could be modified more dynamically as is the case with controls
         for (final StaticBind staticBind : staticModel.topLevelBindsJava())
-            topLevelBinds.add(new RuntimeBind(XFormsModelBinds.this, staticBind, true)); // remember as top-level bind
+            topLevelBinds().add(new RuntimeBind(model, staticBind, null, true)); // remember as top-level bind
 
         isFirstRebuild = false;
 
@@ -165,9 +163,9 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                     // Handle default values first
                     if (staticModel.hasDefaultValueBind())
                         iterateBinds(new BindRunner() {
-                            public void applyBind(RuntimeBind bind, int position) {
-                                if (bind.staticBind.getDefaultValue() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.DEFAULT(), null))
-                                    handleDefaultValueBind(bind, position);
+                            public void applyBind(BindNode bindNode) {
+                                if (bindNode.staticBind().getDefaultValue() != null && dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind(), Model.DEFAULT(), null))
+                                    handleDefaultValueBind(bindNode);
                             }
                         });
                     // This will be false from now on as we have done our first handling of calculate binds
@@ -177,9 +175,9 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 // Handle calculations
                 if (staticModel.hasCalculateBind())
                     iterateBinds(new BindRunner() {
-                        public void applyBind(RuntimeBind bind, int position) {
-                            if (bind.staticBind.getCalculate() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.CALCULATE(), null))
-                                handleCalculateBind(bind, position);
+                        public void applyBind(BindNode bindNode) {
+                            if (bindNode.staticBind().getCalculate() != null && dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind(), Model.CALCULATE(), null))
+                                handleCalculateBind(bindNode);
                         }
                     });
 
@@ -203,9 +201,9 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
         // Apply
         iterateBinds(new BindRunner() {
-            public void applyBind(RuntimeBind bind, int position) {
-                if (bind.staticBind.hasCalculateComputedMIPs() || bind.staticBind.hasCustomMIPs()) // don't bother if not
-                    handleComputedExpressionBind(bind, position);
+            public void applyBind(BindNode bindNode) {
+                if (bindNode.staticBind().hasCalculateComputedMIPs() || bindNode.staticBind().hasCustomMIPs()) // don't bother if not
+                    handleComputedExpressionBind(bindNode);
             }
         });
     }
@@ -230,67 +228,38 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             // 1. Validate based on type and requiredness
             if (staticModel.hasTypeBind() || staticModel.hasRequiredBind())
                 iterateBinds(new BindRunner() {
-                    public void applyBind(RuntimeBind bind, int position) {
-                        if (bind.staticBind.dataTypeOrNull() != null || bind.staticBind.getRequired() != null) // don't bother if not
-                            validateTypeAndRequired(bind, position, invalidInstances);
+                    public void applyBind(BindNode bindNode) {
+                        if (bindNode.staticBind().dataTypeOrNull() != null || bindNode.staticBind().getRequired() != null) // don't bother if not
+                            validateTypeAndRequired(bindNode, invalidInstances);
                     }
                 });
 
             // 2. Validate constraints
             if (staticModel.hasConstraintBind())
                 iterateBinds(new BindRunner() {
-                    public void applyBind(RuntimeBind bind, int position) {
-                        if (bind.staticBind.constraintsByLevel().nonEmpty()) // don't bother if not
-                            validateConstraint(bind, position, invalidInstances);
+                    public void applyBind(BindNode bindNode) {
+                        if (bindNode.staticBind().constraintsByLevel().nonEmpty()) // don't bother if not
+                            validateConstraint(bindNode, invalidInstances);
                     }
                 });
         }
     }
 
-    public RuntimeBind resolveBind(String bindId, Item contextItem) {
-
-        final RuntimeBind singleNodeContextBind = singleNodeContextBinds().get(bindId);
-        if (singleNodeContextBind != null) {
-            // This bind has a single-node context (incl. top-level bind), so ignore context item and just return the bind nodeset
-            return singleNodeContextBind;
-        } else {
-            // Nested bind, context item will be used
-
-            // This requires a context node, not just any item
-            if (contextItem instanceof NodeInfo) {
-                final List<RuntimeBind.BindIteration> iterationsForContextNode = iterationsForContextNodeInfo().get(contextItem);
-                if (iterationsForContextNode != null) {
-                    for (final RuntimeBind.BindIteration currentIteration: iterationsForContextNode) {
-                        final RuntimeBind currentBind = currentIteration.getBind(bindId);
-                        if (currentBind != null) {
-                            // Found
-                            return currentBind;
-                        }
-                    }
-                }
-            }
-            // "From among the bind objects associated with the target bind element, if there exists a bind object
-            // created with the same in-scope evaluation context node as the source object, then that bind object is the
-            // desired target bind object. Otherwise, the IDREF resolution produced a null search result."
-        }
-
-        // Nothing found
-        return null;
-    }
-
     public Item evaluateBindByType(RuntimeBind bind, int position, QName mipType) throws XPathException {
+
+        final BindNode bindNode = bind.getBindNode(position);
 
         if (mipType.equals(XFormsConstants.RELEVANT_QNAME)) {
             // Relevant
-            final Boolean relevant = evaluateRelevantMIP(bind, position);
+            final Boolean relevant = evaluateRelevantMIP(bindNode);
             return (relevant != null) ? BooleanValue.get(relevant) : null;
         } else if (mipType.equals(XFormsConstants.READONLY_QNAME)) {
             // Readonly
-            final Boolean readonly = evaluateReadonlyMIP(bind, position);
+            final Boolean readonly = evaluateReadonlyMIP(bindNode);
             return (readonly != null) ? BooleanValue.get(readonly) : null;
         } else if (mipType.equals(XFormsConstants.REQUIRED_QNAME)) {
             // Required
-            final Boolean required = evaluateRequiredMIP(bind, position);
+            final Boolean required = evaluateRequiredMIP(bindNode);
             return (required != null) ? BooleanValue.get(required) : null;
         } else if (mipType.equals(XFormsConstants.TYPE_QNAME)) {
             // Type
@@ -301,20 +270,20 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             // Constraint
             // TODO: Add support for other constraint levels.
             if (bind.staticBind.constraintsByLevel().nonEmpty())
-                return BooleanValue.get(failedConstraintMIPs(StaticBind.jErrorLevel(), bind, position).isEmpty());
+                return BooleanValue.get(failedConstraintMIPs(StaticBind.jErrorLevel(), bindNode).isEmpty());
             else
                 return null;
         } else if (mipType.equals(XFormsConstants.CALCULATE_QNAME)) {
             // Calculate
-            final String result = evaluateCalculateBind(bind, position);
+            final String result = evaluateCalculateBind(bindNode);
             return (result != null) ? new StringValue(result) : null;
         } else if (mipType.equals(XFormsConstants.XXFORMS_DEFAULT_QNAME)) {
             // xxf:default
-            final String result = evaluateXXFormsDefaultBind(bind, position);
+            final String result = evaluateXXFormsDefaultBind(bindNode);
             return (result != null) ? new StringValue(result) : null;
         } else {
             // Try custom MIPs
-            final String result = evaluateCustomMIP(bind, Model.buildCustomMIPName(mipType.getQualifiedName()), position);
+            final String result = evaluateCustomMIP(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
             return (result != null) ? new StringValue(result) : null;
         }
     }
@@ -322,7 +291,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
     // Iterate over all binds and for each one do the callback.
     private void iterateBinds(BindRunner bindRunner) {
         // Iterate over top-level binds
-        for (final RuntimeBind currentBind : topLevelBinds) {
+        for (final RuntimeBind currentBind : topLevelBinds()) {
             try {
                 currentBind.applyBinds(bindRunner);
             } catch (Exception e) {
@@ -331,14 +300,13 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         }
     }
 
-    private String evaluateXXFormsDefaultBind(RuntimeBind bind, int position) {
-        // Handle xxf:default MIP
-        if (bind.staticBind.getDefaultValue() != null) {
-            // Compute default value
+    private String evaluateXXFormsDefaultBind(BindNode bindNode) {
+        final StaticBind.XPathMIP defaultMIP = bindNode.staticBind().getDefaultValue();
+        if (defaultMIP != null) {
             try {
-                return evaluateStringExpression(bind.nodeset, position, bind.staticBind.getDefaultValue());
+                return evaluateStringExpression(bindNode, defaultMIP);
             } catch (Exception e) {
-                handleMIPXPathException(e, bind, bind.staticBind.getDefaultValue(), "evaluating XForms default bind");
+                handleMIPXPathException(e, bindNode, defaultMIP, "evaluating XForms default bind");
                 return null;
             }
         } else {
@@ -346,33 +314,33 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         }
     }
 
-    private void handleDefaultValueBind(RuntimeBind bind, int position) {
+    private void handleDefaultValueBind(BindNode bindNode) {
 
-        final String stringResult = evaluateXXFormsDefaultBind(bind, position);
+        final String stringResult = evaluateXXFormsDefaultBind(bindNode);
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and handle this error
-            final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            DataModel.jSetValueIfChanged(containingDocument, model, bind.staticBind.locationData(), currentNodeInfo, stringResult, "default", true, indentedLogger);
+            final NodeInfo currentNodeInfo = bindNode.node();
+            DataModel.jSetValueIfChanged(containingDocument, model, bindNode.locationData(), currentNodeInfo, stringResult, "default", true, indentedLogger);
         }
     }
 
-    public void handleCalculateBind(RuntimeBind bind, int position) {
-        final String stringResult = evaluateCalculateBind(bind, position);
+    public void handleCalculateBind(BindNode bindNode) {
+        final String stringResult = evaluateCalculateBind(bindNode);
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and handle this error
-            final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            DataModel.jSetValueIfChanged(containingDocument, model, bind.staticBind.locationData(), currentNodeInfo, stringResult, "calculate", true, indentedLogger);
+            final NodeInfo currentNodeInfo = bindNode.node();
+            DataModel.jSetValueIfChanged(containingDocument, model, bindNode.locationData(), currentNodeInfo, stringResult, "calculate", true, indentedLogger);
         }
     }
 
-    public String evaluateCalculateBind(RuntimeBind bind, int position) {
+    public String evaluateCalculateBind(BindNode bindNode) {
         // Handle calculate MIP
-        if (bind.staticBind.getCalculate() != null) {
-            // Compute calculated value
+        final StaticBind.XPathMIP calculateMIP = bindNode.staticBind().getCalculate();
+        if (calculateMIP != null) {
             try {
-                return evaluateStringExpression(bind.nodeset, position, bind.staticBind.getCalculate());
+                return evaluateStringExpression(bindNode, calculateMIP);
             } catch (Exception e) {
-                handleMIPXPathException(e, bind, bind.staticBind.getCalculate(), "evaluating XForms calculate bind");
+                handleMIPXPathException(e, bindNode, calculateMIP, "evaluating XForms calculate bind");
                 // Blank value so we don't have stale calculated values
                 return "";
             }
@@ -381,36 +349,39 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         }
     }
 
-    private void handleComputedExpressionBind(RuntimeBind bind, int position) {
+    private void handleComputedExpressionBind(BindNode bindNode) {
+        
+        final StaticBind staticBind = bindNode.staticBind();
 
         // Handle relevant, readonly, required, and custom MIPs
-        if (bind.staticBind.getRelevant() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.RELEVANT(), null))
-            evaluateAndSetRelevantMIP(bind, position);
-        if (bind.staticBind.getReadonly() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.READONLY(), null) || bind.staticBind.getCalculate() != null)
-            evaluateAndSetReadonlyMIP(bind, position);
-        if (bind.staticBind.getRequired() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.REQUIRED(), null))
-            evaluateAndSetRequiredMIP(bind, position);
+        if (staticBind.getRelevant() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.RELEVANT(), null))
+            evaluateAndSetRelevantMIP(bindNode);
+        if (staticBind.getReadonly() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.READONLY(), null) || staticBind.getCalculate() != null)
+            evaluateAndSetReadonlyMIP(bindNode);
+        if (staticBind.getRequired() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.REQUIRED(), null))
+            evaluateAndSetRequiredMIP(bindNode);
 
         // TODO: optimize those as well
-        evaluateAndSetCustomMIPs(bind, position);
+        evaluateAndSetCustomMIPs(bindNode);
     }
 
-    private void evaluateAndSetRequiredMIP(RuntimeBind bind, int position) {
-        final Boolean required = evaluateRequiredMIP(bind, position);
+    private void evaluateAndSetRequiredMIP(BindNode bindNode) {
+        final Boolean required = evaluateRequiredMIP(bindNode);
         if (required != null) {
             // Update node with MIP value
-            bind.setRequired(position, required);
+            bindNode.setRequired(required);
         }
     }
 
-    private Boolean evaluateRequiredMIP(RuntimeBind bind, int position) {
-        if (bind.staticBind.getRequired() != null) {
+    private Boolean evaluateRequiredMIP(BindNode bindNode) {
+        final StaticBind.XPathMIP requiredMIP = bindNode.staticBind().getRequired();
+        if (requiredMIP != null) {
             // Evaluate "required" XPath expression on this node
             try {
                 // Get MIP value
-                return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getRequired());
+                return evaluateBooleanExpression(bindNode, requiredMIP);
             } catch (Exception e) {
-                handleMIPXPathException(e, bind, bind.staticBind.getRequired(), "evaluating XForms required bind");
+                handleMIPXPathException(e, bindNode, requiredMIP, "evaluating XForms required bind");
                 return ! Model.DEFAULT_REQUIRED(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
@@ -418,25 +389,25 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         }
     }
 
-    private void evaluateAndSetReadonlyMIP(RuntimeBind bind, int position) {
-        final Boolean readonly = evaluateReadonlyMIP(bind, position);
-        if (readonly != null) {
-            // Mark node
-            bind.setReadonly(position, readonly);
-        } else if (bind.staticBind.getCalculate() != null) {
+    private void evaluateAndSetReadonlyMIP(BindNode bindNode) {
+        final Boolean readonlyMIP = evaluateReadonlyMIP(bindNode);
+        if (readonlyMIP != null) {
+            bindNode.setReadonly(readonlyMIP);
+        } else if (bindNode.staticBind().getCalculate() != null) {
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
-            bind.setReadonly(position, true);
+            bindNode.setReadonly(true);
         }
     }
 
-    private Boolean evaluateReadonlyMIP(RuntimeBind bind, int position) {
-        if (bind.staticBind.getReadonly() != null) {
+    private Boolean evaluateReadonlyMIP(BindNode bindNode) {
+        final StaticBind.XPathMIP readonlyMIP = bindNode.staticBind().getReadonly();
+        if (readonlyMIP != null) {
             // The bind has a readonly attribute
             // Evaluate "readonly" XPath expression on this node
             try {
-                return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getReadonly());
+                return evaluateBooleanExpression(bindNode, readonlyMIP);
             } catch (Exception e) {
-                handleMIPXPathException(e, bind, bind.staticBind.getReadonly(), "evaluating XForms readonly bind");
+                handleMIPXPathException(e, bindNode, readonlyMIP, "evaluating XForms readonly bind");
                 return ! Model.DEFAULT_READONLY(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
@@ -444,21 +415,21 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         }
     }
 
-    private void evaluateAndSetRelevantMIP(RuntimeBind bind, int position) {
-        final Boolean relevant = evaluateRelevantMIP(bind, position);
+    private void evaluateAndSetRelevantMIP(BindNode bindNode) {
+        final Boolean relevant = evaluateRelevantMIP(bindNode);
         if (relevant != null) {
-            // Mark node
-            bind.setRelevant(position, relevant);
+            bindNode.setRelevant(relevant);
         }
     }
 
-    private Boolean evaluateRelevantMIP(RuntimeBind bind, int position) {
-        if (bind.staticBind.getRelevant() != null) {
+    private Boolean evaluateRelevantMIP(BindNode bindNode) {
+        final StaticBind.XPathMIP relevantMIP = bindNode.staticBind().getRelevant();
+        if (relevantMIP != null) {
             // Evaluate "relevant" XPath expression on this node
             try {
-                return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getRelevant());
+                return evaluateBooleanExpression(bindNode, relevantMIP);
             } catch (Exception e) {
-                handleMIPXPathException(e, bind, bind.staticBind.getRelevant(), "evaluating XForms relevant bind");
+                handleMIPXPathException(e, bindNode, relevantMIP, "evaluating XForms relevant bind");
                 return ! Model.DEFAULT_RELEVANT(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
@@ -466,13 +437,14 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         }
     }
 
-    private void validateTypeAndRequired(RuntimeBind bind, int position, Set<String> invalidInstances) {
+    private void validateTypeAndRequired(BindNode bindNode, Set<String> invalidInstances) {
 
-        assert bind.staticBind.dataTypeOrNull() != null || bind.staticBind.getRequired() != null;
+        final StaticBind staticBind = bindNode.staticBind();
+        
+        assert staticBind.dataTypeOrNull() != null || staticBind.getRequired() != null;
 
         // Don't try to apply validity to a node if it has children nodes or if it's not a node
         // "The type model item property is not applied to instance nodes that contain child elements"
-        final BindNode bindNode = bind.getBindNode(position);
         final NodeInfo currentNodeInfo = bindNode.node();
         if (currentNodeInfo == null || bindNode.hasChildrenElements())
             return;
@@ -499,13 +471,13 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         // - but if we did, we should handle also the case where another bind is setting requiredness on the node
         //
         final boolean typeValidity;
-        if (bind.typeQName != null) {
-             if (dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.TYPE(), null)
-                     || bind.staticBind.getRequired() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.REQUIRED(), null)) {
+        if (staticBind.dataType().isDefined()) {
+             if (dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.TYPE(), null)
+                     || staticBind.getRequired() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.REQUIRED(), null)) {
                  // Compute new type validity if the value of the node might have changed OR the value of requiredness
                  // might have changed
-                typeValidity = validateType(bind, currentNodeInfo, isRequired);
-                bind.setTypeValidity(position, typeValidity);
+                typeValidity = validateType(bindNode.parentBind(), currentNodeInfo, isRequired);
+                bindNode.setTypeValid(typeValidity);
              } else {
                  // Keep current value
                 typeValidity = bindNode.typeValid();
@@ -527,7 +499,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             // concerned
             requiredValidity = true;
         }
-        bind.setRequiredValidity(position, requiredValidity);
+        bindNode.setRequiredValid(requiredValidity);
 
         // Remember invalid instances
         if (!typeValidity || !requiredValidity) {
@@ -539,10 +511,12 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
     private boolean validateType(RuntimeBind bind, NodeInfo currentNodeInfo, boolean required) {
 
+        final StaticBind staticBind = bind.staticBind;
+
         final boolean typeValid;
         {
             // NOTE: xf:bind/@type is a literal type value, and it is the same that applies to all nodes pointed to by xf:bind/@ref
-            final QName typeQName = bind.typeQName;
+            final QName typeQName = staticBind.dataType().get();
 
             final String typeNamespaceURI = typeQName.getNamespaceURI();
             final String typeLocalname = typeQName.getName();
@@ -568,7 +542,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
                 final String validationError =
                     xformsValidator.validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(),
-                            bind.staticBind.locationData());
+                            staticBind.locationData());
 
                 typeValid = validationError == null;
 
@@ -584,7 +558,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 // Get type information
                 final int requiredTypeFingerprint = StandardNames.getFingerprint(newTypeNamespaceURI, typeLocalname);
                 if (requiredTypeFingerprint == -1) {
-                    throw new ValidationException("Invalid schema type '" + bind.staticBind.dataTypeOrNull() + "'", bind.staticBind.locationData());
+                    throw new ValidationException("Invalid schema type '" + staticBind.dataTypeOrNull() + "'", staticBind.locationData());
 
                     // TODO: xxx check what XForms event must be dispatched
                 }
@@ -595,11 +569,11 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                     xpathEvaluator = new XPathEvaluator();
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                     final IndependentContext context = (IndependentContext) xpathEvaluator.getStaticContext();
-                    for (final Map.Entry<String, String> entry : bind.staticBind.namespaceMapping().mapping.entrySet()) {
+                    for (final Map.Entry<String, String> entry : staticBind.namespaceMapping().mapping.entrySet()) {
                         context.declareNamespace(entry.getKey(), entry.getValue());
                     }
                 } catch (Exception e) {
-                    throw OrbeonLocationException.wrapException(e, bind.staticBind.locationData());
+                    throw OrbeonLocationException.wrapException(e, staticBind.locationData());
 
                     // TODO: xxx check what XForms event must be dispatched
                 }
@@ -632,7 +606,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                         // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
                         final Element namespaceElement = XML.unwrapElement(namespaceNodeInfo);
                         final NamespaceMapping namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement));
-                        typeValid = isOptionalAndEmpty || XPath.isXPath2Expression(nodeValue, namespaceMapping, bind.staticBind.locationData(), indentedLogger);
+                        typeValid = isOptionalAndEmpty || XPath.isXPath2Expression(nodeValue, namespaceMapping, staticBind.locationData(), indentedLogger);
                     } else {
                         // This means that we are bound to a node which is not an element and which does not have a
                         // parent element. This could be a detached attribute, or an element node, etc. Unsure if we
@@ -641,7 +615,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                         typeValid = isOptionalAndEmpty;
                     }
                 } else {
-                    throw new ValidationException("Invalid schema type '" + bind.staticBind.dataTypeOrNull() + "'", bind.staticBind.locationData());
+                    throw new ValidationException("Invalid schema type '" + staticBind.dataTypeOrNull() + "'", staticBind.locationData());
 
                     // TODO: xxx check what XForms event must be dispatched
                 }
@@ -651,11 +625,11 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
                 // There are possibly types defined in the schema
                 final String validationError
-                        = model.getSchemaValidator().validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), bind.staticBind.locationData());
+                        = model.getSchemaValidator().validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), staticBind.locationData());
 
                 typeValid = validationError == null;
             } else {
-                throw new ValidationException("Invalid schema type '" + bind.staticBind.dataTypeOrNull() + "'", bind.staticBind.locationData());
+                throw new ValidationException("Invalid schema type '" + staticBind.dataTypeOrNull() + "'", staticBind.locationData());
 
                 // TODO: xxx check what XForms event must be dispatched
             }
@@ -669,7 +643,6 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
     }
 
     public static interface BindRunner {
-        public void applyBind(RuntimeBind bind, int position);
+        public void applyBind(BindNode bind);
     }
-
 }

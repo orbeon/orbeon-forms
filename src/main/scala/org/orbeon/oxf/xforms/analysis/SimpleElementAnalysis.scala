@@ -41,7 +41,8 @@ class SimpleElementAnalysis(
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val model = findContainingModel
-    lazy val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
+
+    val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
 
     lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 

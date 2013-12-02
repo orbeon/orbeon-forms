@@ -13,6 +13,7 @@ import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.common.ValidationException
 import XFormsUtils.getElementId
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 // Represent a static <xf:bind> element
 class StaticBind(
@@ -30,6 +31,18 @@ class StaticBind(
     staticBind ⇒
 
     import StaticBind._
+
+    def parentBind = parent match {
+        case parentBind: StaticBind ⇒ Some(parentBind)
+        case _                      ⇒ None
+    }
+
+    val ancestorBinds: List[StaticBind] = parentBind match {
+        case Some(parent) ⇒ parent :: parent.ancestorBinds
+        case None         ⇒ Nil
+    }
+
+    val ancestorOrSelfBinds: List[StaticBind] = staticBind :: ancestorBinds
 
     // Represent an individual MIP on an <xf:bind> element
     trait MIP {
@@ -100,6 +113,10 @@ class StaticBind(
 
     val dataTypeOrNull =
         typeMIPAsList.headOption map (_.datatype) orNull
+
+    val dataType: Option[QName] =
+        typeMIPAsList.headOption map (_.datatype) map
+            (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, _, true))
 
     // Built-in XPath MIPs
     val mipNameToXPathMIP = {
@@ -180,7 +197,6 @@ class StaticBind(
     // Create children binds
     private var _children: Seq[StaticBind] = Dom4j.elements(element, XFORMS_BIND_QNAME) map (new StaticBind(bindTree, _, staticBind, None))// NOTE: preceding not handled for now
     def children  = _children
-    def jChildren = _children.asJava
 
     // Globally remember if we have seen these categories of binds
     bindTree.hasDefaultValueBind ||= getMIPs(Default.name).nonEmpty

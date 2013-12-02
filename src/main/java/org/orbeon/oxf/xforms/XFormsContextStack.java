@@ -118,12 +118,16 @@ public class XFormsContextStack {
         return getFunctionContext(sourceEffectiveId, this.head);
     }
 
-    public XFormsFunction.Context getFunctionContext(String sourceEffectiveId, BindingContext binding) {
-        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.model());
+    public XFormsFunction.Context getFunctionContext(String sourceEffectiveId, Object data) {
+        return getFunctionContext(sourceEffectiveId, this.head, data);
     }
 
-    public void returnFunctionContext() {
-        // NOP XXX
+    public XFormsFunction.Context getFunctionContext(String sourceEffectiveId, BindingContext binding) {
+        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.model(), null);
+    }
+
+    public XFormsFunction.Context getFunctionContext(String sourceEffectiveId, BindingContext binding, Object data) {
+        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.model(), data);
     }
 
     /**
@@ -337,7 +341,7 @@ public class XFormsContextStack {
                         newPosition = 0;
                     } else {
                         bind = (RuntimeBind) o;
-                        newNodeset = bind.nodeset;
+                        newNodeset = bind.items;
                         hasOverriddenContext = false;
                         contextItem = baseBindingContext.getSingleItem();
                         isNewBind = true;

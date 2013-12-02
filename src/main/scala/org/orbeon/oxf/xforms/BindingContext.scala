@@ -129,7 +129,6 @@ case class BindingContext(
         // stack but it is safer.
         getFunctionContext(sourceEffectiveId)
         val result = pushVariable(staticVariable.element, variable.getVariableName, variable.getVariableValue(sourceEffectiveId, true, handleNonFatal), newScope)
-        returnFunctionContext()
 
         assert(result.variables.size == 1)
         result.variables.get(0)

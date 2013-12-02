@@ -123,7 +123,7 @@ object DataModel {
             // Create dangling element
             val newElementInfo = XML.elementInfo("orbeon-dangling-element")
             // Then attach a readonly bind node to it. This is as if there was a <bind readonly="true" for the node>
-            val bindNode = new BindNode(bindId, newElementInfo, null)
+            val bindNode = new BindNode(null, 1, newElementInfo)
             bindNode.setReadonly(value = true)
             InstanceData.addBindNode(newElementInfo, bindNode)
 

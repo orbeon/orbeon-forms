@@ -1801,4 +1801,155 @@
         </output>
     </test>
 
+    <test description="#152: Unexpected result with variable inside an xf:bind iteration (multiple resolution scenarios)" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model" xmlns:saxon="http://saxon.sf.net/">
+                        <xf:instance id="instance">
+                            <items xmlns="" calculated="">
+                                <item calculated="">
+                                    <foo calculated=""/>
+                                    <bar calculated=""/>
+                                    <baz calculated=""/>
+                                    <baz calculated=""/>
+                                </item>
+                                <item calculated="">
+                                    <foo calculated=""/>
+                                    <bar calculated=""/>
+                                    <baz calculated=""/>
+                                    <baz calculated=""/>
+                                </item>
+                                <gaga calculated=""/>
+                            </items>
+                        </xf:instance>
+
+                        <xf:bind id="items-bind" name="items" ref="instance()">
+                            <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                            <xf:bind id="item-bind"  name="item"  ref="item">
+                                <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                <xf:bind id="foo-bind" name="foo" ref="foo">
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                </xf:bind>
+                                <xf:bind id="bar-bind" name="bar" ref="bar">
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                </xf:bind>
+                                <xf:bind id="baz-bind" name="baz" ref="baz">
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                </xf:bind>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:bind id="gaga-bind" name="gaga" ref="gaga">
+                            <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <items calculated="foo=/items/item[1]/foo[1] foo=/items/item[2]/foo[1] bar=/items/item[1]/bar[1] bar=/items/item[2]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[1] item=/items/item[2] items=/items gaga=/items/gaga[1]">
+                                    <item calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]">
+                                        <foo calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
+                                        <bar calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
+                                        <baz calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
+                                        <baz calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
+                                    </item>
+                                    <item calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]">
+                                        <foo calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                        <bar calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                        <baz calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                        <baz calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                    </item>
+                                    <gaga calculated="foo=/items/item[1]/foo[1] foo=/items/item[2]/foo[1] bar=/items/item[1]/bar[1] bar=/items/item[2]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[1] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                </items>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="#152: Unexpected result with variable inside an xf:bind iteration (sums)" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+                        <xf:instance id="fr-form-instance">
+                            <form>
+                                <my-section>
+                                    <my-repeat>
+                                        <col1>123</col1>
+                                        <col2>456</col2>
+                                        <rowsum/>
+                                    </my-repeat>
+                                    <my-repeat>
+                                        <col1>1</col1>
+                                        <col2>2</col2>
+                                        <rowsum/>
+                                    </my-repeat>
+                                    <totalsum/>
+                                </my-section>
+                            </form>
+                        </xf:instance>
+
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                                <xf:bind id="my-repeat-bind" ref="my-repeat" name="my-repeat">
+                                    <xf:bind id="col1-bind" ref="col1" name="col1"/>
+                                    <xf:bind id="col2-bind" ref="col2" name="col2"/>
+                                    <xf:bind id="rowsum-bind" ref="rowsum" name="rowsum"
+                                             calculate="sum(($col1, $col2)[. castable as xs:decimal], 0.0)"/>
+                                </xf:bind>
+                                <xf:bind id="totalsum-bind" name="totalsum" ref="totalsum"
+                                         calculate="sum($rowsum[. castable as xs:decimal], 0.0)"/>
+                            </xf:bind>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="fr-form-instance" model-id="fr-form-model">
+                                <form>
+                                    <my-section>
+                                        <my-repeat>
+                                            <col1>123</col1>
+                                            <col2>456</col2>
+                                            <rowsum>579</rowsum>
+                                        </my-repeat>
+                                        <my-repeat>
+                                            <col1>1</col1>
+                                            <col2>2</col2>
+                                            <rowsum>3</rowsum>
+                                        </my-repeat>
+                                        <totalsum>582</totalsum>
+                                    </my-section>
+                                </form>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

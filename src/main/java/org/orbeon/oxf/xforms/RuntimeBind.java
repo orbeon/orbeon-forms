@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.analysis.model.BindTree;
 import org.orbeon.oxf.xforms.analysis.model.StaticBind;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.saxon.om.Item;
@@ -26,21 +25,15 @@ import java.util.*;
 
 public class RuntimeBind implements XFormsObject {
 
-    private final XFormsModelBinds binds;
-    public  BindTree foo;
+    public final XFormsModel model;
+    public final BindIteration parentIteration;
+
     public final StaticBind staticBind;
-    public final List<Item> nodeset;       // actual nodeset for this bind
-
-    public final QName typeQName;
-
-    private List<BindNode> bindNodes; // List<BindIteration>
+    public final List<Item> items;
+    public final List<BindNode> bindNodes;
 
     public XFormsContainingDocument containingDocument() {
-        return binds.containingDocument;
-    }
-
-    public XFormsModel model() {
-        return binds.model;
+        return model.containingDocument;
     }
 
     // To work around Scala compiler bug ("error: not found: value BindTree") when accessing staticBind directly
@@ -48,24 +41,30 @@ public class RuntimeBind implements XFormsObject {
         return staticBind.namespaceMapping();
     }
 
-    public RuntimeBind(XFormsModelBinds binds, StaticBind staticBind, boolean isSingleNodeContext) {
-        this.binds = binds;
+    public RuntimeBind(XFormsModel model, StaticBind staticBind, BindIteration parentIteration, boolean isSingleNodeContext) {
+        this.model = model;
+        this.parentIteration = parentIteration;
         this.staticBind = staticBind;
 
-        // Compute nodeset for this bind
-        binds.model.getContextStack().pushBinding(staticBind.element(), binds.model.getEffectiveId(), binds.model.getResolutionScope());
+        final XFormsContextStack contextStack = model.getContextStack();
+
+        // Compute items and bind nodes
+        contextStack.pushBinding(staticBind.element(), model.getEffectiveId(), model.getResolutionScope());
         {
             // NOTE: This should probably go into XFormsContextStack
-            if (binds.model.getContextStack().getCurrentBindingContext().newBind()) {
+            final BindingContext bindingContext = contextStack.getCurrentBindingContext();
+            if (bindingContext.newBind()) {
                 // Case where a @nodeset or @ref attribute is present -> a current nodeset is therefore available
-                nodeset = binds.model.getContextStack().getCurrentBindingContext().nodeset();
+                items = bindingContext.nodeset();
             } else {
                 // Case where of missing @nodeset attribute (it is optional in XForms 1.1 and defaults to the context item)
-                final Item contextItem = binds.model.getContextStack().getCurrentBindingContext().contextItem();
-                nodeset = (contextItem == null) ? XFormsConstants.EMPTY_ITEM_LIST : Collections.singletonList(contextItem);
+                final Item contextItem = bindingContext.contextItem();
+                items = (contextItem == null) ? XFormsConstants.EMPTY_ITEM_LIST : Collections.singletonList(contextItem);
             }
 
-            assert nodeset != null;
+            assert items != null;
+
+            final XFormsModelBinds binds = model.getBinds();
 
             // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
             // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind
@@ -74,31 +73,27 @@ public class RuntimeBind implements XFormsObject {
             if (isSingleNodeContext)
                 binds.singleNodeContextBinds().put(staticBind.staticId(), this);
 
-            // Set type on node
-            // Get type namespace and local name
-            typeQName = evaluateTypeQName(staticBind.namespaceMapping().mapping);
-
-            final int nodesetSize = nodeset.size();
+            final int nodesetSize = items.size();
             if (nodesetSize > 0) {
                 // Only then does it make sense to create BindNodes
 
-                final List<StaticBind> childrenStaticBinds = staticBind.jChildren();
+                final scala.collection.Seq<StaticBind> childrenStaticBinds = staticBind.children();
                 if (childrenStaticBinds.size() > 0) {
                     // There are children binds (and maybe MIPs)
                     bindNodes = new ArrayList<BindNode>(nodesetSize);
 
                     // Iterate over nodeset and produce child iterations
                     int currentPosition = 1;
-                    for (final Item item : nodeset) {
-                        binds.model.getContextStack().pushIteration(currentPosition);
+                    for (final Item item : items) {
+                        contextStack.pushIteration(currentPosition);
                         {
                             // Create iteration and remember it
                             final boolean isNewSingleNodeContext = isSingleNodeContext && nodesetSize == 1;
-                            final BindIteration currentBindIteration = new BindIteration(getStaticId(), isNewSingleNodeContext, item, childrenStaticBinds, typeQName);
+                            final BindIteration currentBindIteration = new BindIteration(this, currentPosition, item, isNewSingleNodeContext, childrenStaticBinds);
                             bindNodes.add(currentBindIteration);
 
                             // Create mapping context node -> iteration
-                            final NodeInfo iterationNodeInfo = (NodeInfo) nodeset.get(currentPosition - 1);
+                            final NodeInfo iterationNodeInfo = (NodeInfo) items.get(currentPosition - 1);
                             List<BindIteration> iterations = binds.iterationsForContextNodeInfo().get(iterationNodeInfo);
                             if (iterations == null) {
                                 iterations = new ArrayList<BindIteration>();
@@ -106,47 +101,50 @@ public class RuntimeBind implements XFormsObject {
                             }
                             iterations.add(currentBindIteration);
                         }
-                        binds.model.getContextStack().popBinding();
+                        contextStack.popBinding();
 
                         currentPosition++;
                     }
                 } else if (staticBind.hasMIPs()) {
-                    // No children binds, but we have MIPs, so create holders anyway
+                    // No children binds, but we have MIPs, so create holders too
                     bindNodes = new ArrayList<BindNode>(nodesetSize);
 
-                    for (final Item item : nodeset)
-                        bindNodes.add(new BindNode(getStaticId(), item, typeQName));
+                    int currentPosition = 1;
+                    for (final Item item : items) {
+                        bindNodes.add(new BindNode(this, currentPosition, item));
+                        currentPosition++;
+                    }
+                } else {
+                    bindNodes = Collections.emptyList();
                 }
+            } else {
+                bindNodes = Collections.emptyList();
             }
 
         }
-        binds.model.getContextStack().popBinding();
+        contextStack.popBinding();
     }
 
     public void applyBinds(XFormsModelBinds.BindRunner bindRunner) {
-        if (nodeset.size() > 0) {
-            // Handle each node in this node-set
-            final Iterator<BindNode> j = (bindNodes != null) ? bindNodes.iterator() : null;
-
-            for (int index = 1; index <= nodeset.size(); index++) {
-                final BindNode currentBindIteration = (j != null) ? j.next() : null;
-
+        // We can only apply if we have bind nodes
+        if (bindNodes != null) {
+            for (final BindNode bindNode : bindNodes) {
                 // Handle current node
-                bindRunner.applyBind(this, index);
+                bindRunner.applyBind(bindNode);
 
                 // Handle children binds if any
-                if (currentBindIteration instanceof BindIteration)
-                    ((BindIteration) currentBindIteration).applyBinds(bindRunner);
+                if (bindNode instanceof BindIteration)
+                    ((BindIteration) bindNode).applyBinds(bindRunner);
             }
         }
     }
 
-    public String getStaticId() {
+    public String staticId() {
         return staticBind.staticId();
     }
 
     public String getEffectiveId() {
-        return XFormsUtils.getRelatedEffectiveId(binds.model.getEffectiveId(), getStaticId());
+        return XFormsUtils.getRelatedEffectiveId(model.getEffectiveId(), staticId());
     }
 
     public QName evaluateTypeQName(Map<String, String> namespaceMap) {
@@ -180,64 +178,5 @@ public class RuntimeBind implements XFormsObject {
 
     public BindNode getBindNode(int position) {
         return (bindNodes != null) ? bindNodes.get(position - 1) : null;
-    }
-
-    // Delegate to BindNode
-    public void setRelevant(int position, boolean value) {
-        getBindNode(position).setRelevant(value);
-    }
-
-    public void setReadonly(int position, boolean value) {
-        getBindNode(position).setReadonly(value);
-    }
-
-    public void setRequired(int position, boolean value) {
-        getBindNode(position).setRequired(value);
-    }
-
-    public void setCustom(int position, String name, String value) {
-        getBindNode(position).setCustom(name, value);
-    }
-
-    public void setTypeValidity(int position, boolean value) {
-        getBindNode(position).setTypeValid(value);
-    }
-
-    public void setRequiredValidity(int position, boolean value) {
-        getBindNode(position).setRequiredValid(value);
-    }
-
-    public boolean isValid(int position) {
-        return getBindNode(position).valid();
-    }
-
-    // Bind node that also contains nested binds
-    class BindIteration extends BindNode {
-
-        private List<RuntimeBind> childrenBinds;
-
-        public BindIteration(String bindStaticId, boolean isSingleNodeContext, Item item, List<StaticBind> childrenStaticBinds, QName typeQName) {
-
-            super(bindStaticId, item, typeQName);
-
-            assert childrenStaticBinds.size() > 0;
-
-            // Iterate over children and create children binds
-            childrenBinds = new ArrayList<RuntimeBind>(childrenStaticBinds.size());
-            for (final StaticBind staticBind : childrenStaticBinds)
-                childrenBinds.add(new RuntimeBind(binds, staticBind, isSingleNodeContext));
-        }
-
-        public void applyBinds(XFormsModelBinds.BindRunner bindRunner) {
-            for (final RuntimeBind currentBind : childrenBinds)
-                currentBind.applyBinds(bindRunner);
-        }
-
-        public RuntimeBind getBind(String bindId) {
-            for (final RuntimeBind currentBind : childrenBinds)
-                if (currentBind.staticBind.staticId().equals(bindId))
-                    return currentBind;
-            return null;
-        }
     }
 }

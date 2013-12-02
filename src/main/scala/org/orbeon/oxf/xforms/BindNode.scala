@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.dom4j.QName
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
@@ -26,35 +25,39 @@ import collection.breakOut
 
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.
-class BindNode(val bindStaticId: String, item: Item, typeQName: QName) {
+class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
     import BindNode._
+
+    require(parentBind ne null)
 
     val (node, hasChildrenElements) =
         item match {
             case node: NodeInfo ⇒
                 val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && XML.hasChildElement(node)
                 InstanceData.addBindNode(node, this)
-                if (typeQName ne null)
-                    InstanceData.setBindType(node, typeQName)
+                staticBind.dataType foreach (InstanceData.setBindType(node, _))
                 (node, hasChildrenElements)
             case _ ⇒
                 (null, false)
         }
 
     // Current MIP state
-    private var _relevant        = Model.DEFAULT_RELEVANT // move to public var once all callers are Scala
-    private var _readonly        = Model.DEFAULT_READONLY // move to public var once all callers are Scala
-    private var _required        = Model.DEFAULT_REQUIRED // move to public var once all callers are Scala
+    private var _relevant      = Model.DEFAULT_RELEVANT // move to public var once all callers are Scala
+    private var _readonly      = Model.DEFAULT_READONLY // move to public var once all callers are Scala
+    private var _required      = Model.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
-    private var _typeValid       = Model.DEFAULT_VALID    // move to public var once all callers are Scala
-    private var _requiredValid   = Model.DEFAULT_VALID    // move to public var once all callers are Scala
+    private var _typeValid     = Model.DEFAULT_VALID    // move to public var once all callers are Scala
+    private var _requiredValid = Model.DEFAULT_VALID    // move to public var once all callers are Scala
 
     private var _customMips = Map.empty[String, String]
 
     // Since there are only 3 levels we should always get an optimized immutable Map
     // For a given level, an empty List is not allowed.
     var failedConstraints = EmptyConstraints
+
+    def staticBind = parentBind.staticBind
+    def locationData = staticBind.locationData
 
     def constraintsSatisfiedForLevel(level: ValidationLevel) = ! failedConstraints.contains(level)
 
@@ -73,6 +76,28 @@ class BindNode(val bindStaticId: String, item: Item, typeQName: QName) {
 
     def typeValid       = _typeValid
     def valid           = _typeValid && _requiredValid && constraintsSatisfiedForLevel(ErrorLevel)
+
+    def ancestorOrSelfBindNodes =
+        Iterator.iterate(this)(_.parentBind.parentIteration) takeWhile (_ ne null)
+}
+
+// Bind node that also contains nested binds
+class BindIteration(parentBind: RuntimeBind, position: Int, item: Item, isSingleNodeContext: Boolean, childrenStaticBinds: Seq[StaticBind])
+    extends BindNode(parentBind, position, item) {
+    
+    require(childrenStaticBinds.size > 0)
+    
+    // Iterate over children and create children binds
+    val childrenBinds =
+        for (staticBind ← childrenStaticBinds)
+            yield new RuntimeBind(parentBind.model, staticBind, this, isSingleNodeContext)
+
+    def applyBinds(bindRunner: XFormsModelBinds.BindRunner): Unit =
+        for (currentBind ← childrenBinds)
+            currentBind.applyBinds(bindRunner)
+
+    def findChildBindByStaticId(bindId: String) =
+        childrenBinds find (_.staticBind.staticId == bindId) orNull
 }
 
 object BindNode {

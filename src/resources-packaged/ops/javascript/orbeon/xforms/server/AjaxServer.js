@@ -751,12 +751,12 @@
             // Whether this response has triggered a load which will replace the current page.
             var newDynamicStateTriggersReplace = false;
 
-            var xmlNamespace = null; // xforms namespace
+            var xxfPrefix = null; // xforms namespace
             // Getting xforms namespace
             for (var j = 0; j < responseRoot.attributes.length; j++) {
                 if (responseRoot.attributes[j].nodeValue == XXFORMS_NAMESPACE_URI) {
                     var attrName = responseRoot.attributes[j].name;
-                    xmlNamespace = attrName.substr(attrName.indexOf(":") + 1);
+                    xxfPrefix = attrName.substr(attrName.indexOf(":") + 1);
                     break;
                 }
             }
@@ -782,7 +782,7 @@
 
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var copyRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "copy-repeat-template", xmlNamespace);
+                                var copyRepeatTemplateElements = $(controlValuesElement).children(xxfPrefix + '\\:copy-repeat-template');
                                 var copyRepeatTemplateElementsLength = copyRepeatTemplateElements.length;
                                 for (var j = 0; j < copyRepeatTemplateElementsLength; j++) {
 
@@ -882,7 +882,7 @@
                                     ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                 }
 
-                                var deleteRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "delete-repeat-elements", xmlNamespace);
+                                var deleteRepeatTemplateElements = $(controlValuesElement).children(xxfPrefix + '\\:delete-repeat-elements');
                                 var deleteRepeatTemplateElementsLength = deleteRepeatTemplateElements.length;
                                 for (var j = 0; j < deleteRepeatTemplateElementsLength; j++) {
 
@@ -1148,7 +1148,7 @@
                             // Update controls
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "control", xmlNamespace);
+                                var controlElements = $(controlValuesElement).children(xxfPrefix + '\\:control');
                                 var controlElementsLength = controlElements.length;
                                 // Update control value and MIPs
                                 for (var j = 0; j < controlElementsLength; j++) {
@@ -1552,7 +1552,7 @@
                                 }
 
                                 // Handle innerHTML updates
-                                var innerElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "inner-html", xmlNamespace);
+                                var innerElements = $(controlValuesElement).children(xxfPrefix + '\\:inner-html');
                                 var innerElementsLength = innerElements.length;
                                 for (var j = 0; j < innerElementsLength; j++) {
                                     var innerElement = innerElements[j];
@@ -1614,7 +1614,7 @@
                                 }
 
                                 // Handle updates to HTML attributes
-                                var attributeElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "attribute", xmlNamespace);
+                                var attributeElements = $(controlValuesElement).children(xxfPrefix + '\\:attribute');
                                 var attributeElementslength = attributeElements.length;
                                 for (var j = 0; j < attributeElementslength; j++) {
                                     var attributeElement = attributeElements[j];
@@ -1628,7 +1628,7 @@
                                 }
 
                                 // Handle text updates
-                                var textElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "text", xmlNamespace);
+                                var textElements = $(controlValuesElement).children(xxfPrefix + '\\:text');
                                 var textElementslength = textElements.length;
                                 for (var j = 0; j < textElementslength; j++) {
                                     var textElement = textElements[j];
@@ -1643,7 +1643,7 @@
                                 }
 
                                 // Model item properties on a repeat item
-                                var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "repeat-iteration", xmlNamespace);
+                                var repeatIterationElements = $(controlValuesElement).children(xxfPrefix + '\\:repeat-iteration');
                                 var repeatIterationElementslength = repeatIterationElements.length;
                                 for (var j = 0; j < repeatIterationElementslength; j++) {
                                     var repeatIterationElement = repeatIterationElements[j];
@@ -1657,7 +1657,7 @@
                                 }
 
                                 // "div" elements for xf:switch and xxf:dialog
-                                var divsElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "div", xmlNamespace);
+                                var divsElements = $(controlValuesElement).children(xxfPrefix + '\\:div');
                                 var divElementsLength = divsElements.length;
                                 for (var j = 0; j < divElementsLength; j++) {
                                     var divElement = divsElements[j];

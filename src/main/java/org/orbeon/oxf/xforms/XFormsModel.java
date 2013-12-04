@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.model.DataModel;
+import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.model.XFormsModelAction;
 import org.orbeon.oxf.xforms.state.InstanceState;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;

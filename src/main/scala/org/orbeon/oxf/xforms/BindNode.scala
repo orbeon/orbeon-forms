@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.xforms
 
+import collection.JavaConverters._
+import collection.breakOut
+import java.util.{List ⇒ JList}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
+import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
 import org.w3c.dom.Node.ELEMENT_NODE
-import collection.JavaConverters._
-import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
-import collection.breakOut
 
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.

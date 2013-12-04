@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.RuntimeBind
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 

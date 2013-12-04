@@ -19,6 +19,7 @@ import org.dom4j.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
+import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, Item}
 import xbl.Scope

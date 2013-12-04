@@ -18,17 +18,18 @@ import java.{util ⇒ ju}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.dom4j.TypedNodeWrapper
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{ValueRepresentation, StructuredQName, Item, NodeInfo}
 import org.orbeon.saxon.value.SequenceExtent
 import scala.util.control.NonFatal
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.oxf.xforms.function.XFormsFunction
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
@@ -45,8 +46,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     private implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
 
     protected val topLevelBinds = new ju.ArrayList[RuntimeBind]
-    protected val singleNodeContextBinds = new ju.HashMap[String, RuntimeBind]
-    protected val iterationsForContextNodeInfo = new ju.HashMap[Item, ju.List[BindIteration]]
+    val singleNodeContextBinds = new ju.HashMap[String, RuntimeBind]
+    val iterationsForContextNodeInfo = new ju.HashMap[Item, ju.List[BindIteration]]
 
     protected def validateConstraint(bindNode: BindNode, invalidInstances: ju.Set[String]) {
 
@@ -265,7 +266,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                                                 case pathTail ⇒
                                                     // We need to dig deeper to reach the target
                                                     for {
-                                                        nextBindNode ← nextBind.bindNodes.asScala.iterator.asInstanceOf[Iterator[BindIteration]]
+                                                        nextBindNode ← nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
                                                         targetItem   ← nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
                                                     } yield
                                                         targetItem
@@ -299,10 +300,6 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                             }
                     }
 
-
-
-//                    val currentBindNodeset = getBindNodeset(staticBindWithName.staticId, xpathContext.getContextItem)
-//                    new SequenceExtent(currentBindNodeset)
                 case None ⇒
                     // Try top-level model variables
                     val modelVariables = model.getContextStack.getCurrentBindingContext.getInScopeVariables

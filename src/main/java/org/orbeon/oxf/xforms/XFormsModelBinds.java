@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.StaticBind;
 import org.orbeon.oxf.xforms.model.DataModel;
+import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -263,13 +264,12 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             return (required != null) ? BooleanValue.get(required) : null;
         } else if (mipType.equals(XFormsConstants.TYPE_QNAME)) {
             // Type
-            final NamespaceMapping namespaceMapping = bind.staticBind.namespaceMapping();
-            final QName type = bind.evaluateTypeQName(namespaceMapping.mapping);
-            return (type != null) ? new QNameValue(type.getNamespacePrefix(), type.getNamespaceURI(), type.getName(), null) : null;
+            final scala.Option<QName> type = bind.staticBind().dataType();
+            return (type.isDefined()) ? new QNameValue(type.get().getNamespacePrefix(), type.get().getNamespaceURI(), type.get().getName(), null) : null;
         } else if (mipType.equals(XFormsConstants.CONSTRAINT_QNAME)) {
             // Constraint
             // TODO: Add support for other constraint levels.
-            if (bind.staticBind.constraintsByLevel().nonEmpty())
+            if (bind.staticBind().constraintsByLevel().nonEmpty())
                 return BooleanValue.get(failedConstraintMIPs(StaticBind.jErrorLevel(), bindNode).isEmpty());
             else
                 return null;
@@ -295,7 +295,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             try {
                 currentBind.applyBinds(bindRunner);
             } catch (Exception e) {
-                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind.locationData(), "evaluating XForms binds", currentBind.staticBind.element()));
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind().locationData(), "evaluating XForms binds", currentBind.staticBind().element()));
             }
         }
     }
@@ -511,7 +511,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
     private boolean validateType(RuntimeBind bind, NodeInfo currentNodeInfo, boolean required) {
 
-        final StaticBind staticBind = bind.staticBind;
+        final StaticBind staticBind = bind.staticBind();
 
         final boolean typeValid;
         {

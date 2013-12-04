@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
@@ -341,7 +342,7 @@ public class XFormsContextStack {
                         newPosition = 0;
                     } else {
                         bind = (RuntimeBind) o;
-                        newNodeset = bind.items;
+                        newNodeset = bind.items();
                         hasOverriddenContext = false;
                         contextItem = baseBindingContext.getSingleItem();
                         isNewBind = true;

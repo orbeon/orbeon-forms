@@ -143,7 +143,7 @@ object DataModel {
 
         try {
             control.bind flatMap
-                (bind ⇒ evaluateBoundItem(bind.namespaceMapping)) exists
+                (bind ⇒ evaluateBoundItem(bind.staticBind.namespaceMapping)) exists
                     (XFormsControl.isAllowedBoundItem(control, _))
         } catch {
             case NonFatal(_) ⇒ false

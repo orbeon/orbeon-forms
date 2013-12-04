@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.xforms.RuntimeBind
+import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
@@ -27,7 +27,7 @@ class Bind extends XFormsFunction with FunctionSupport {
 
         XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, bindingContext.getSingleItem) match {
             case bind: RuntimeBind ⇒ new ListIterator(bind.items)
-            case _ ⇒ EmptyIterator.getInstance
+            case _                 ⇒ EmptyIterator.getInstance
         }
     }
 }

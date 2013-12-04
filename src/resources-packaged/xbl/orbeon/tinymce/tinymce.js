@@ -23,12 +23,10 @@
         groupElement: null,
         visibleInputElement: null,
         myEditor: null,
-        clientValueTextareaId: null,
         serverValueOutputId: null,
         tinymceInitialized: false,
 
         init: function() {
-            this.clientValueTextareaId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-client-value', null, this.container)[0].id;
             this.serverValueOutputId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-server-value', null, this.container)[0].id;
 
             // Tell TinyMCE about base URL, which it can't guess in combined resources
@@ -74,7 +72,11 @@
 
         // Send value in MCE to server
         clientToServer: function() {
-            ORBEON.xforms.Document.setValue(this.clientValueTextareaId, this.myEditor.getContent());
+            ORBEON.xforms.Document.dispatchEvent({
+                targetId:   this.container.id,
+                eventName:  'fr-set-client-value',
+                properties: { 'fr-value': this.myEditor.getContent() }
+            });
         },
 
         // TinyMCE got the focus

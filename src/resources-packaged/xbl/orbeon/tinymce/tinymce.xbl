@@ -28,7 +28,7 @@
     <xbl:script src="/xbl/orbeon/tinymce/jscripts/tiny_mce/tiny_mce.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce-config.js"/>
-    <xbl:binding id="fr-tinymce" element="fr|tinymce" xxbl:mode="lhha binding value focus">
+    <xbl:binding id="fr-tinymce" element="fr|tinymce" xxbl:mode="lhha binding value focus" xxf:external-events="fr-set-client-value">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Formatted Text</display-name>
             <display-name lang="fi">Muotoiltu teksti</display-name>
@@ -75,25 +75,16 @@
                  See also tinymce-config.js. -->
             <xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/ui.css"/>
         </xbl:resources>
-        <xbl:implementation>
-            <xf:model id="tinymce-model">
-                <xf:instance id="tinymce-instance">
-                    <instance>
-                        <client-value/>
-                    </instance>
-                </xf:instance>
-            </xf:model>
-        </xbl:implementation>
+        <xbl:handlers>
+            <xbl:handler event="fr-set-client-value" phase="target">
+                <xf:setvalue ref="xxf:binding('fr-tinymce')" value="xxf:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', xf:element('value', event('fr-value')), 'clean-html')"/>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:template>
             <xf:var name="binding"      value="xxf:binding('fr-tinymce')"/>
             <xf:var name="script"       value="not(exf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
-            <xf:var name="client-value" value="client-value"/>
 
             <xf:group ref=".[$script]">
-                <!-- XForms control the JavaScript writes to -->
-                <xf:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value xforms-hidden">
-                    <xf:setvalue ev:event="xforms-value-changed" ref="$binding" value="xxf:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', $client-value, 'clean-html')"/>
-                </xf:textarea>
                 <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
                     <xxf:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxf:script>

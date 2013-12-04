@@ -1949,4 +1949,117 @@
         </output>
     </test>
 
+    <test description="Bind resolution algorithm" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+                        <xf:instance id="fr-form-instance">
+                            <form>
+                                <my-section>
+                                    <my-repeat>
+                                        <col1>123</col1>
+                                        <col2>456</col2>
+                                        <rowsum/>
+                                    </my-repeat>
+                                    <my-repeat>
+                                        <col1>1</col1>
+                                        <col2>2</col2>
+                                        <rowsum/>
+                                    </my-repeat>
+                                    <totalsum/>
+                                </my-section>
+                            </form>
+                        </xf:instance>
+
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                                <xf:bind id="my-repeat-bind" ref="my-repeat" name="my-repeat">
+                                    <xf:bind id="col1-bind" ref="col1" name="col1"/>
+                                    <xf:bind id="col2-bind" ref="col2" name="col2"/>
+                                    <xf:bind id="rowsum-bind" ref="rowsum" name="rowsum"
+                                             calculate="sum(($col1, $col2)[. castable as xs:decimal], 0.0)"/>
+                                </xf:bind>
+                                <xf:bind id="totalsum-bind" name="totalsum" ref="totalsum"
+                                         calculate="sum($rowsum[. castable as xs:decimal], 0.0)"/>
+                            </xf:bind>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <!-- Repeat matching bind hierarchy -->
+                    <xf:repeat     id="my-repeat-control"  bind="my-repeat-bind">
+                        <xf:input  id="col1-control"       bind="col1-bind"/>
+                        <xf:input  id="col2-control"       bind="col2-bind"/>
+                        <xf:output id="rowsum-control"     bind="rowsum-bind"/>
+                    </xf:repeat>
+                    <xf:output     id="totalsum-control"   bind="totalsum-bind"/>
+
+                    <!-- Second repeat matching bind hierarchy -->
+                    <xf:repeat     id="my-repeat2-control" bind="my-repeat-bind">
+                        <xf:output id="rowsum2-control"    bind="rowsum-bind"/>
+                    </xf:repeat>
+
+                    <!-- Third repeat matching bind hierarchy, but using outer ref -->
+                    <xf:repeat     id="my-repeat3-control" ref="my-section/my-repeat">
+                        <xf:output id="rowsum3-control"    bind="rowsum-bind"/>
+                    </xf:repeat>
+
+                    <!-- Refer to ambiguous bind outside of repeat -->
+                    <xf:output     id="rowsum4-control"    bind="rowsum-bind"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="fr-form-instance" model-id="fr-form-model">
+                                <form>
+                                    <my-section>
+                                        <my-repeat>
+                                            <col1>123</col1>
+                                            <col2>456</col2>
+                                            <rowsum>579</rowsum>
+                                        </my-repeat>
+                                        <my-repeat>
+                                            <col1>1</col1>
+                                            <col2>2</col2>
+                                            <rowsum>3</rowsum>
+                                        </my-repeat>
+                                        <totalsum>582</totalsum>
+                                    </my-section>
+                                </form>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat-control" index="1"/>
+                            <control effective-id="my-repeat2-control" index="1"/>
+                            <control effective-id="my-repeat3-control" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="col1-control⊙1">123</xxf:control>
+                        <xxf:control id="col2-control⊙1">456</xxf:control>
+                        <xxf:control id="rowsum-control⊙1" readonly="true">579</xxf:control>
+                        <xxf:control id="col1-control⊙2">1</xxf:control>
+                        <xxf:control id="col2-control⊙2">2</xxf:control>
+                        <xxf:control id="rowsum-control⊙2" readonly="true">3</xxf:control>
+                        <xxf:control id="totalsum-control" readonly="true">582</xxf:control>
+                        <xxf:control id="rowsum2-control⊙1" readonly="true">579</xxf:control>
+                        <xxf:control id="rowsum2-control⊙2" readonly="true">3</xxf:control>
+                        <xxf:control id="rowsum3-control⊙1" readonly="true">579</xxf:control>
+                        <xxf:control id="rowsum3-control⊙2" readonly="true">3</xxf:control>
+                        <xxf:control id="rowsum4-control" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

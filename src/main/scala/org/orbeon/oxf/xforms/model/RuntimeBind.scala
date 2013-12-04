@@ -20,13 +20,12 @@ import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NodeInfo
 
 class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parentIteration: BindIteration, isSingleNodeContext: Boolean) extends XFormsObject {
 
     def containingDocument = model.containingDocument
-    def staticId           = staticBind.staticId
     def getEffectiveId     = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, staticId)
+    def staticId           = staticBind.staticId
 
     val (items, bindNodes) = {
         val contextStack = model.getContextStack
@@ -53,36 +52,36 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
         // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
         // the Single Node Binding or Node Set Binding"
         if (isSingleNodeContext)
-            binds.singleNodeContextBinds.put(staticBind.staticId, this)
+            binds.singleNodeContextBinds += staticBind.staticId → this
 
-        val nodesetSize = items.size
+        val itemsAsScala = items.asScala
+        val itemsSize    = itemsAsScala.size
 
         val bindNodes: Seq[BindNode] =
-            if (nodesetSize > 0) {
+            if (itemsAsScala.nonEmpty) {
                 // Only then does it make sense to create BindNodes
                 val childrenStaticBinds = staticBind.children
                 if (childrenStaticBinds.size > 0) {
                     // There are children binds (and maybe MIPs)
-                    val result = new m.ArrayBuffer[BindNode](nodesetSize)
+                    val result = new m.ArrayBuffer[BindNode](itemsSize)
+                    
+                    val childrenBindsHaveSingleNodeContext = isSingleNodeContext && itemsSize == 1
 
                     // Iterate over nodeset and produce child iterations
                     var currentPosition = 1
-                    for (item ← items.asScala) {
+                    for (item ← itemsAsScala) {
                         contextStack.pushIteration(currentPosition)
 
                         // Create iteration and remember it
-                        val isNewSingleNodeContext = isSingleNodeContext && nodesetSize == 1
-                        val currentBindIteration = new BindIteration(this, currentPosition, item, isNewSingleNodeContext, childrenStaticBinds)
+                        val currentBindIteration = new BindIteration(this, currentPosition, item, childrenBindsHaveSingleNodeContext, childrenStaticBinds)
                         result += currentBindIteration
 
-                        // Create mapping context node -> iteration
-                        val iterationNodeInfo = items.get(currentPosition - 1).asInstanceOf[NodeInfo]
-                        var iterations = binds.iterationsForContextNodeInfo.get(iterationNodeInfo)
-                        if (iterations eq null) {
-                            iterations = new ju.ArrayList[BindIteration]
-                            binds.iterationsForContextNodeInfo.put(iterationNodeInfo, iterations)
+                        // Create mapping context item → iteration
+                        // There might already be a mapping
+                        if (! childrenBindsHaveSingleNodeContext) {
+                            val existingIterations = binds.iterationsForContextItem.getOrElseUpdate(item, Nil)
+                            binds.iterationsForContextItem += item → (currentBindIteration :: existingIterations)
                         }
-                        iterations.add(currentBindIteration)
 
                         contextStack.popBinding
                         currentPosition += 1
@@ -90,9 +89,9 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
                     result
                 } else if (staticBind.hasMIPs) {
                     // No children binds, but we have MIPs, so create holders too
-                    val result = new m.ArrayBuffer[BindNode](nodesetSize)
+                    val result = new m.ArrayBuffer[BindNode](itemsSize)
                     var currentPosition = 1
-                    for (item ← items.asScala) {
+                    for (item ← itemsAsScala) {
                         result += new BindNode(this, currentPosition, item)
                         currentPosition += 1
                     }
@@ -107,8 +106,8 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
         (items, bindNodes)
     }
 
-    def applyBinds(bindRunner: BindRunner): Unit = {
-        if (! bindNodes.isEmpty) {
+    def applyBinds(bindRunner: BindRunner): Unit =
+        if (bindNodes.nonEmpty) {
             for (bindNode ← bindNodes) {
                 // Handle current node
                 bindRunner.applyBind(bindNode)
@@ -120,8 +119,7 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
                 }
             }
         }
-    }
 
-    def getBindNode(position: Int): BindNode =
+    def getBindNode(position: Int) =
         bindNodes(position - 1)
 }

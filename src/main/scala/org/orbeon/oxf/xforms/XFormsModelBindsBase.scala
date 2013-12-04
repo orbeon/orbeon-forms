@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import collection.JavaConverters._
+import collection.{mutable ⇒ m}
 import java.{util ⇒ ju}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
@@ -23,13 +24,14 @@ import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.RuntimeBind
+import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, RuntimeBind}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.dom4j.TypedNodeWrapper
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.{ValueRepresentation, StructuredQName, Item, NodeInfo}
+import org.orbeon.saxon.om.{ValueRepresentation, StructuredQName, Item}
 import org.orbeon.saxon.value.SequenceExtent
 import scala.util.control.NonFatal
+import org.orbeon.oxf.util.ScalaUtils._
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
@@ -45,9 +47,9 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     private implicit val logger = model.getIndentedLogger
     private implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
 
-    protected val topLevelBinds = new ju.ArrayList[RuntimeBind]
-    val singleNodeContextBinds = new ju.HashMap[String, RuntimeBind]
-    val iterationsForContextNodeInfo = new ju.HashMap[Item, ju.List[BindIteration]]
+    protected val topLevelBinds  = new ju.ArrayList[RuntimeBind]
+    val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
+    val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
 
     protected def validateConstraint(bindNode: BindNode, invalidInstances: ju.Set[String]) {
 
@@ -155,43 +157,43 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         }
     }
 
-    def resolveBind(bindId: String, contextItem: Item): RuntimeBind = {
-        val singleNodeContextBind = singleNodeContextBinds.get(bindId)
-        if (singleNodeContextBind ne null) {
-            // This bind has a single-node context (incl. top-level bind), so ignore context item and just return the bind nodeset
-            singleNodeContextBind
-        } else {
-            // Nested bind, context item will be used
-            if (contextItem.isInstanceOf[NodeInfo]) {
-                val iterationsForContextNode = iterationsForContextNodeInfo.get(contextItem)
-                if (iterationsForContextNode ne null) {
-                    for (currentIteration ← iterationsForContextNode.asScala) {
-                        val currentBind = currentIteration.findChildBindByStaticId(bindId)
-                        if (currentBind ne null) {
-                            return currentBind
-                        }
-                    }
-                }
-            }
-            // "From among the bind objects associated with the target bind element, if there exists a bind object
-            // created with the same in-scope evaluation context node as the source object, then that bind object is the
-            // desired target bind object. Otherwise, the IDREF resolution produced a null search result."
-            null
-        }
-    }
+    // Implement "4.7.2 References to Elements within a bind Element":
+    //
+    // "When a source object expresses a Single Node Binding or Node Set Binding with a bind attribute, the IDREF of the
+    // bind attribute is resolved to a target bind object whose associated nodeset is used by the Single Node Binding or
+    // Node Set Binding. However, if the target bind element has one or more bind element ancestors, then the identified
+    // bind may be a target element that is associated with more than one target bind object.
+    //
+    // If a target bind element is outermost, or if all of its ancestor bind elements have nodeset attributes that
+    // select only one node, then the target bind only has one associated bind object, so this is the desired target
+    // bind object whose nodeset is used in the Single Node Binding or Node Set Binding. Otherwise, the in-scope
+    // evaluation context node of the source object containing the bind attribute is used to help select the appropriate
+    // target bind object from among those associated with the target bind element.
+    //
+    // From among the bind objects associated with the target bind element, if there exists a bind object created with
+    // the same in-scope evaluation context node as the source object, then that bind object is the desired target bind
+    // object. Otherwise, the IDREF resolution produced a null search result."
+    def resolveBind(bindId: String, contextItem: Item): RuntimeBind =
+        singleNodeContextBinds.get(bindId) match {
+            case Some(singleNodeContextBind) ⇒
+                // This bind has a single-node context (incl. top-level bind), so ignore context item and just return the bind nodeset
+                singleNodeContextBind
+            case None ⇒
+                // Nested bind: use context item
 
-    /**
-     * Return the nodeset for a given bind and context item, as per "4.7.2 References to Elements within a bind
-     * Element".
-     *
-     * @param bindId        id of the bind to handle
-     * @param contextItem   context item if necessary
-     * @return              bind nodeset
-     */
-    def getBindNodeset(bindId: String, contextItem: Item): ju.List[Item] = {
-        val bind = resolveBind(bindId, contextItem)
-        if (bind ne null) bind.items else XFormsConstants.EMPTY_ITEM_LIST
-    }
+                // "From among the bind objects associated with the target bind element, if there exists a bind object
+                // created with the same in-scope evaluation context node as the source object, then that bind object is
+                // the desired target bind object. Otherwise, the IDREF resolution produced a null search result."
+                val it =
+                    for {
+                        iterations ← iterationsForContextItem.get(contextItem).iterator
+                        iteration  ← iterations
+                        childBind  ← iteration.findChildBindByStaticId(bindId)
+                    } yield
+                        childBind
+
+                it.headOption.orNull
+        }
 
     protected def evaluateAndSetCustomMIPs(bindNode: BindNode): Unit =
         if (bindNode.staticBind.customMIPNameToXPathMIP.nonEmpty) // in most cases there are no custom MIPs

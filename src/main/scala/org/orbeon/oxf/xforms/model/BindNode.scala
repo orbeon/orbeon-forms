@@ -11,14 +11,14 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms
+package org.orbeon.oxf.xforms.model
 
 import collection.JavaConverters._
 import collection.breakOut
 import java.util.{List ⇒ JList}
+import org.orbeon.oxf.xforms.{XFormsModelBinds, InstanceData}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
@@ -82,25 +82,6 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
         Iterator.iterate(this)(_.parentBind.parentIteration) takeWhile (_ ne null)
 }
 
-// Bind node that also contains nested binds
-class BindIteration(parentBind: RuntimeBind, position: Int, item: Item, isSingleNodeContext: Boolean, childrenStaticBinds: Seq[StaticBind])
-    extends BindNode(parentBind, position, item) {
-    
-    require(childrenStaticBinds.size > 0)
-    
-    // Iterate over children and create children binds
-    val childrenBinds =
-        for (staticBind ← childrenStaticBinds)
-            yield new RuntimeBind(parentBind.model, staticBind, this, isSingleNodeContext)
-
-    def applyBinds(bindRunner: XFormsModelBinds.BindRunner): Unit =
-        for (currentBind ← childrenBinds)
-            currentBind.applyBinds(bindRunner)
-
-    def findChildBindByStaticId(bindId: String) =
-        childrenBinds find (_.staticBind.staticId == bindId) orNull
-}
-
 object BindNode {
 
     type Constraints = Map[ValidationLevel, List[StaticBind#ConstraintXPathMIP]]
@@ -145,4 +126,23 @@ object BindNode {
             buildersByLevel.map { case (k, v) ⇒ k → v.result()} (breakOut)
         }
     }
+}
+
+// Bind node that also contains nested binds
+class BindIteration(parentBind: RuntimeBind, position: Int, item: Item, childrenBindsHaveSingleNodeContext: Boolean, childrenStaticBinds: Seq[StaticBind])
+    extends BindNode(parentBind, position, item) {
+
+    require(childrenStaticBinds.size > 0)
+
+    // Iterate over children and create children binds
+    val childrenBinds =
+        for (staticBind ← childrenStaticBinds)
+            yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
+
+    def applyBinds(bindRunner: XFormsModelBinds.BindRunner): Unit =
+        for (currentBind ← childrenBinds)
+            currentBind.applyBinds(bindRunner)
+
+    def findChildBindByStaticId(bindId: String) =
+        childrenBinds find (_.staticBind.staticId == bindId)
 }

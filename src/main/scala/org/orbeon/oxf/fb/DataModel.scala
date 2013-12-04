@@ -20,9 +20,10 @@ import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xforms.{BindNode, InstanceData}
+import org.orbeon.oxf.xforms.{InstanceData}
 import scala.util.control.NonFatal
 import org.orbeon.scaxon.XML
+import org.orbeon.oxf.xforms.model.BindNode
 
 object DataModel {
 

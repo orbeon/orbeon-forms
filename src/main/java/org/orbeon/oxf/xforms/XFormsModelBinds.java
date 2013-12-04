@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.StaticBind;
+import org.orbeon.oxf.xforms.model.BindNode;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xml.NamespaceMapping;
@@ -106,7 +107,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
         topLevelBinds().clear();
         singleNodeContextBinds().clear();
-        iterationsForContextNodeInfo().clear();
+        iterationsForContextItem().clear();
 
         // Clear all instances that might have InstanceData
         // Only need to do this after the first rebuild

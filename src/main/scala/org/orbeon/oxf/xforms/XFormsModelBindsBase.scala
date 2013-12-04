@@ -284,14 +284,13 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                     resolveAncestorOrSelf(
                         contextBindNode,
                         variableName
-                    ) orElse
-                        resolveNotAncestorOrSelf(
-                            modelBinds            = this,
-                            contextBindNode       = contextBindNode,
-                            targetStaticBind      = targetStaticBind,
-                            variableName          = variableName
-                        ) getOrElse
-                            (throw new IllegalStateException)
+                    ) orElse resolveNotAncestorOrSelf(
+                        this,
+                        contextBindNode,
+                        targetStaticBind,
+                        variableName
+                    ) getOrElse
+                        (throw new IllegalStateException)
 
                 case None ⇒
                     // Try top-level model variables
@@ -431,14 +430,12 @@ private object BindVariableResolver {
                     modelBinds,
                     targetStaticBind.staticId,
                     concreteAncestorIteration
-                ) orElse
-                    resolveMultiple(
-                        modelBinds,
-                        targetAncestorOrSelf,
-                        concreteAncestorIteration,
-                        childBindOnTargetBranch.staticId
-                    )
-
+                ) orElse resolveMultiple(
+                    modelBinds,
+                    targetAncestorOrSelf,
+                    concreteAncestorIteration,
+                    childBindOnTargetBranch.staticId
+                )
         }
     }
 }

@@ -121,12 +121,12 @@
                         <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
                         <xxf:script
                             ev:target="formatted-value"
-                            ev:event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxf:script>
+                            ev:event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xxf:script>
 
                         <xxf:script
                             ev:target="#observer"
                             ev:observer="fr-number"
-                            ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.update();</xxf:script>
+                            ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xxf:script>
 
                         <!-- Readwrite mode -->
                         <xf:group ref="$binding[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]">

@@ -64,6 +64,9 @@
             // Register listener
             YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.focus, this, true);
             YAHOO.util.Event.addBlurListener(this.visibleInputElement, this.blur, this, true);
+            $(this.visibleInputElement).on('keypress', _.bind(function(e) {
+                if (e.which == 13) this.sendValueToServer();
+            }, this));
         },
 
         focus: function() {
@@ -73,10 +76,14 @@
             Document.dispatchEvent(this.xformsInputElement.id, 'xforms-focus');
         },
 
-        blur: function() {
-            this.hasFocus = false;
+        sendValueToServer: function() {
             var newValue = this.visibleInputElement.value;
             Document.setValue(this.xformsInputElement.id, newValue);
+        },
+
+        blur: function() {
+            this.hasFocus = false;
+            this.sendValueToServer();
             var formId = $(this.container).parents('form').attr('id');
 
             // Always update visible value with XForms value
@@ -84,7 +91,7 @@
             // - value change not dispatched if server value hasn't changed
             // - if visible changed, but XForms hasn't, we still need to show XForms value
             // - see: https://github.com/orbeon/orbeon-forms/issues/1026
-            AS.nextAjaxResponse(formId).then(_.bind(this.update, this));
+            AS.nextAjaxResponse(formId).then(_.bind(this.updateWithServerValue, this));
         },
 
         numberToEditString: function(number) {
@@ -102,7 +109,7 @@
             return isNaN(Number(cleanedAsNumberString)) ? number : cleaned;
         },
 
-        update: function() {
+        updateWithServerValue: function() {
             // Get value as formatted by server
             var numberFormattedValue = Document.getValue(this.xformsInputElement.id);
             // If there is an update in the value, and the field already has the focus, just populate with the
@@ -122,17 +129,17 @@
 
         parameterPrefixChanged: function() {
             this.prefix = Document.getValue(this.prefixElement.id);
-            this.update();
+            this.updateWithServerValue();
         },
 
         parameterDecimalSeparatorChanged: function() {
             this.decimalSeparator = Document.getValue(this.decimalSeparatorElement.id);
-            this.update();
+            this.updateWithServerValue();
         },
 
         parameterGroupingSeparatorChanged: function() {
             this.groupingSeparator = Document.getValue(this.groupingSeparatorElement.id);
-            this.update();
+            this.updateWithServerValue();
         },
 
         parameterDigitsAfterDecimalChanged: function() {}

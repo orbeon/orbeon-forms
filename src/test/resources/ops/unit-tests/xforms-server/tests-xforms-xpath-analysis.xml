@@ -67,7 +67,6 @@
 
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">
@@ -302,7 +301,6 @@
 
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">
@@ -1583,7 +1581,6 @@
                         <xf:var name="mv" value="xxf:instance('instance1')"/>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">
@@ -1681,7 +1678,6 @@
 
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">
@@ -4491,7 +4487,6 @@
                         <xf:bind id="b2" ref="." relevant="$foo = 42"/>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">
@@ -6398,7 +6393,6 @@
                         </xf:bind>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">

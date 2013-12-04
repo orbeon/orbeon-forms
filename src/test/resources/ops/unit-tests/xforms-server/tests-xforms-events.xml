@@ -2444,7 +2444,6 @@
 
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">

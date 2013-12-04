@@ -1355,7 +1355,6 @@
                         </xf:bind>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">
@@ -1430,7 +1429,6 @@
                         <xf:setvalue ev:event="xforms-ready" ref="result" value="xxf:valid(../value)"/>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">
@@ -1528,7 +1526,6 @@
                     <xf:bind ref="." calculate="42"/>
                 </xf:model>
             </xh:head>
-            <xh:body/>
         </xh:html>
         </input>
         <output name="response">

@@ -1690,7 +1690,6 @@
 
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">
@@ -1731,7 +1730,6 @@
 
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">
@@ -2205,7 +2203,6 @@
                         </xf:action>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">

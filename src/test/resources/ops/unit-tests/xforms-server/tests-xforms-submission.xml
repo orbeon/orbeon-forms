@@ -1672,7 +1672,6 @@
                         <xf:submission id="submission" serialization="none" method="get" action="oxf:/ops/unit-tests/test-data/book-diderot.xml"/>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">
@@ -1700,7 +1699,6 @@ az4K</document>
                         <xf:submission id="submission" serialization="none" method="get" action="http://www.google.com/"/>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">
@@ -1735,7 +1733,6 @@ az4K</document>
                         </xf:submission>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </input>
         <output name="response">

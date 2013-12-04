@@ -62,7 +62,6 @@
                         <xf:send ev:event="xforms-ready" submission="fr-default-submission"/>
                     </xf:model>
                 </xh:head>
-                <xh:body/>
             </xh:html>
         </p:input>
         <p:output name="data" id="xhtml-xforms"/>

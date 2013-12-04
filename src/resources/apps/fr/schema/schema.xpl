@@ -13,7 +13,9 @@
   -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -30,10 +32,22 @@
         <p:output name="data" id="unrolled-form-definition"/>
     </p:processor>
 
+    <!-- Remove xf:bind/@relevant, so can know about itemsets also for non-relevant controls -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#unrolled-form-definition"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:template match="xf:bind/@relevant"/>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="form-without-relevant"/>
+    </p:processor>
+
     <p:processor name="fr:xforms-to-schema">
         <p:input name="instance" href="#instance"/>
-        <p:input name="data" href="#unrolled-form-definition"/>
-        <p:input name="annotated-document" href="#unrolled-form-definition"/>
+        <p:input name="data" href="#form-without-relevant"/>
+        <p:input name="annotated-document" href="#form-without-relevant"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

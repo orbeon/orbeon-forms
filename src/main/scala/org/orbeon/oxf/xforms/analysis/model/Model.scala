@@ -276,7 +276,6 @@ trait ModelBinds {
     // TODO: use and produce variables introduced with xf:bind/@name
 
     def topLevelBinds = bindTree().topLevelBinds
-    def topLevelBindsJava = topLevelBinds.asJava
 
     def hasBinds = bindTree().hasBinds
     def containsBind(bindId: String) = bindTree().bindIds(bindId)

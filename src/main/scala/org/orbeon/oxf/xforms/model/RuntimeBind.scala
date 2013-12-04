@@ -77,7 +77,8 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
                         result += currentBindIteration
 
                         // Create mapping context item → iteration
-                        // There might already be a mapping
+                        // NOTE: There might already be a mapping.
+                        // NOTE: Indexing nodes is probably not efficient with Dom4j, as nodes don't implement hashCode!
                         if (! childrenBindsHaveSingleNodeContext) {
                             val existingIterations = binds.iterationsForContextItem.getOrElseUpdate(item, Nil)
                             binds.iterationsForContextItem += item → (currentBindIteration :: existingIterations)

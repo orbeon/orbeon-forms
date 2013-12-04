@@ -18,20 +18,21 @@ import collection.{mutable ⇒ m}
 import java.{util ⇒ ju}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, RuntimeBind}
+import org.orbeon.oxf.xforms.model.{DataModel, BindIteration, BindNode, RuntimeBind}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.dom4j.TypedNodeWrapper
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.{ValueRepresentation, StructuredQName, Item}
+import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, StructuredQName, Item}
 import org.orbeon.saxon.value.SequenceExtent
 import scala.util.control.NonFatal
-import org.orbeon.oxf.util.ScalaUtils._
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
@@ -47,9 +48,63 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     private implicit val logger = model.getIndentedLogger
     private implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
 
-    val topLevelBinds            = new ju.ArrayList[RuntimeBind]
+    private var _topLevelBinds: Seq[RuntimeBind] = Nil
+    def topLevelBinds = _topLevelBinds
+
     val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
     val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
+    
+    // Whether this is the first rebuild for the associated XForms model
+    private var isFirstRebuild = containingDocument.isInitializing 
+    
+    // Iterate over all binds and for each one call the callback
+    protected def iterateBinds(bindRunner: BindRunner): Unit =
+        // Iterate over top-level binds
+        for (currentBind ← _topLevelBinds)
+            try
+                currentBind.applyBinds(bindRunner)
+            catch {
+                case NonFatal(e) ⇒
+                    throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind.locationData, "evaluating XForms binds", currentBind.staticBind.element))
+            }
+    
+    // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
+    def rebuild(): Unit =
+        withDebug("performing rebuild", Seq("model id" → model.getEffectiveId)) {
+
+            // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
+    
+            // Clear all instances that might have InstanceData
+            // Only need to do this after the first rebuild
+            if (! isFirstRebuild)
+                for (instance ← model.getInstances.asScala) {
+                    // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                    // The reason is that clearing this state can take quite some time
+                    val instanceMightBeSchemaValidated = model.hasSchema && instance.isSchemaValidation
+                    val instanceMightHaveMips =
+                        dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId) ||
+                        dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId)
+    
+                    if (instanceMightBeSchemaValidated || instanceMightHaveMips)
+                        DataModel.visitElementJava(instance.rootElement, new DataModel.NodeVisitor {
+                            def visit(nodeInfo: NodeInfo): Unit =
+                                InstanceData.clearState(nodeInfo)
+                        })
+                }
+
+            // Not ideal, but this state is updated when the bind tree is updated below
+            singleNodeContextBinds.clear()
+            iterationsForContextItem.clear()
+    
+            // Iterate through all top-level bind elements to create new bind tree
+            // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
+            // Even before that, the bind tree could be modified more dynamically as is the case with controls
+            _topLevelBinds =
+                for (staticBind ← staticModel.topLevelBinds)
+                    yield new RuntimeBind(model, staticBind, null, true)
+    
+            isFirstRebuild = false
+        }
 
     protected def validateConstraint(bindNode: BindNode, invalidInstances: ju.Set[String]) {
 
@@ -103,10 +158,9 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     }
 
     private def evaluateSingleConstraintMIP(bindNode: BindNode, mip: StaticXPathMIP) =
-        try {
-            //println(s"evaluateConstraintMIPs: ${bind.getStaticId}, ${mip.compiledExpression.string}")
+        try
             evaluateBooleanExpression(bindNode, mip)
-        } catch {
+        catch {
             case NonFatal(e) ⇒
                 handleMIPXPathException(e, bindNode, mip, "evaluating XForms constraint bind")
                 ! Model.DEFAULT_VALID
@@ -208,7 +262,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
     // ones statically, but don't have yet a solution to combine them. Should we string-join them?
     protected def evaluateCustomMIP(bindNode: BindNode, propertyName: String): String =
-        try evaluateStringExpression(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(propertyName).head)
+        try
+            evaluateStringExpression(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(propertyName).head)
         catch {
             case NonFatal(e) ⇒
                 handleMIPXPathException(e, bindNode, bindNode.staticBind.getCalculate, "evaluating XForms custom bind")
@@ -331,7 +386,7 @@ private object BindVariableResolver {
         val rootBinds = (
             concreteAncestorIteration
             map       (_.childrenBinds)
-            getOrElse modelBinds.topLevelBinds.asScala
+            getOrElse modelBinds.topLevelBinds
         )
 
         Some(searchDescendantRuntimeBinds(targetAncestorOrSelf, rootBinds, rootId))

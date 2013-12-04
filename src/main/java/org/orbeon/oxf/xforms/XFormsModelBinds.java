@@ -29,10 +29,11 @@ import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.StandardNames;
 import org.orbeon.saxon.sxpath.IndependentContext;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.XPathException;
@@ -46,7 +47,8 @@ import org.orbeon.saxon.value.StringValue;
 import org.orbeon.scaxon.XML;
 import org.w3c.dom.Node;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represent a given model's binds.
@@ -63,7 +65,6 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
     private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
 
     private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
-    private boolean isFirstRebuild;                             // whether this is the first rebuild for the associated XForms model
 
     /**
      * Create an instance of XFormsModelBinds if the given model has xf:bind elements.
@@ -84,62 +85,11 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         this.dependencies = this.containingDocument.getXPathDependencies();
 
         this.staticModel = model.getStaticModel();
-
-        // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
-        // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
-        // initialization. So the assignation below is ok.
-        this.isFirstCalculate = this.isFirstRebuild = containingDocument.isInitializing();
+        this.isFirstCalculate = containingDocument.isInitializing();
     }
 
     public void resetFirstCalculate() {
         this.isFirstCalculate = true;
-    }
-
-    /**
-     * Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
-     */
-    public void rebuild() {
-
-        if (indentedLogger.isDebugEnabled())
-            indentedLogger.startHandleOperation("model", "performing rebuild", "model id", model.getEffectiveId());
-
-        // Reset everything
-        // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
-        topLevelBinds().clear();
-        singleNodeContextBinds().clear();
-        iterationsForContextItem().clear();
-
-        // Clear all instances that might have InstanceData
-        // Only need to do this after the first rebuild
-        if (! isFirstRebuild) {
-            for (final XFormsInstance instance : model.getInstances()) {
-                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
-                // The reason is that clearing this state can take quite some time
-                final boolean instanceMightBeSchemaValidated = model.hasSchema() && instance.isSchemaValidation();
-                final boolean instanceMightHaveMips =
-                        dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId()) ||
-                        dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId());
-
-                if (instanceMightBeSchemaValidated || instanceMightHaveMips) {
-                    DataModel.visitElementJava(instance.rootElement(), new DataModel.NodeVisitor() {
-                        public void visit(NodeInfo nodeInfo) {
-                            InstanceData.clearState(nodeInfo);
-                        }
-                    });
-                }
-            }
-        }
-
-        // Iterate through all top-level bind elements to create new bind tree
-        // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
-        // Even before that, the bind tree could be modified more dynamically as is the case with controls
-        for (final StaticBind staticBind : staticModel.topLevelBindsJava())
-            topLevelBinds().add(new RuntimeBind(model, staticBind, null, true)); // remember as top-level bind
-
-        isFirstRebuild = false;
-
-        if (indentedLogger.isDebugEnabled())
-            indentedLogger.endHandleOperation();
     }
 
     /**
@@ -286,18 +236,6 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             // Try custom MIPs
             final String result = evaluateCustomMIP(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
             return (result != null) ? new StringValue(result) : null;
-        }
-    }
-
-    // Iterate over all binds and for each one do the callback.
-    private void iterateBinds(BindRunner bindRunner) {
-        // Iterate over top-level binds
-        for (final RuntimeBind currentBind : topLevelBinds()) {
-            try {
-                currentBind.applyBinds(bindRunner);
-            } catch (Exception e) {
-                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind().locationData(), "evaluating XForms binds", currentBind.staticBind().element()));
-            }
         }
     }
 

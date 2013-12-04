@@ -1811,34 +1811,45 @@
                                     <bar calculated=""/>
                                     <baz calculated=""/>
                                     <baz calculated=""/>
+                                    <!-- No qux -->
                                 </item>
                                 <item calculated="">
                                     <foo calculated=""/>
                                     <bar calculated=""/>
                                     <baz calculated=""/>
                                     <baz calculated=""/>
+                                    <!-- 1 qux -->
+                                    <qux calculated=""/>
+                                </item>
+                                <item calculated="">
+                                    <!-- 2 qux -->
+                                    <qux calculated=""/>
+                                    <qux calculated=""/>
                                 </item>
                                 <gaga calculated=""/>
                             </items>
                         </xf:instance>
 
                         <xf:bind id="items-bind" name="items" ref="instance()">
-                            <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                            <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
                             <xf:bind id="item-bind"  name="item"  ref="item">
-                                <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
                                 <xf:bind id="foo-bind" name="foo" ref="foo">
-                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
                                 </xf:bind>
                                 <xf:bind id="bar-bind" name="bar" ref="bar">
-                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
                                 </xf:bind>
                                 <xf:bind id="baz-bind" name="baz" ref="baz">
-                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                                </xf:bind>
+                                <xf:bind id="qux-bind" name="qux" ref="qux">
+                                    <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
                                 </xf:bind>
                             </xf:bind>
                         </xf:bind>
                         <xf:bind id="gaga-bind" name="gaga" ref="gaga">
-                            <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga) return concat(name($n), '=', saxon:path($n)), ' ')"/>
+                            <xf:bind ref="@calculated" calculate="string-join(for $n in ($foo, $bar, $baz, $item, $items, $gaga, $qux) return concat(name($n), '=', saxon:path($n)), ' ')"/>
                         </xf:bind>
                     </xf:model>
                 </xh:head>
@@ -1850,20 +1861,28 @@
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
-                                <items calculated="foo=/items/item[1]/foo[1] foo=/items/item[2]/foo[1] bar=/items/item[1]/bar[1] bar=/items/item[2]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[1] item=/items/item[2] items=/items gaga=/items/gaga[1]">
+                                <items calculated="foo=/items/item[1]/foo[1] foo=/items/item[2]/foo[1] bar=/items/item[1]/bar[1] bar=/items/item[2]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[1] item=/items/item[2] item=/items/item[3] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1] qux=/items/item[3]/qux[1] qux=/items/item[3]/qux[2]">
                                     <item calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]">
                                         <foo calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
                                         <bar calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
                                         <baz calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[1] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
                                         <baz calculated="foo=/items/item[1]/foo[1] bar=/items/item[1]/bar[1] baz=/items/item[1]/baz[2] item=/items/item[1] items=/items gaga=/items/gaga[1]"/>
+                                        <!-- No qux -->
                                     </item>
-                                    <item calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]">
-                                        <foo calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
-                                        <bar calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
-                                        <baz calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
-                                        <baz calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                    <item calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1]">
+                                        <foo calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1]"/>
+                                        <bar calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1]"/>
+                                        <baz calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] item=/items/item[2] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1]"/>
+                                        <baz calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1]"/>
+                                        <!-- 1 qux -->
+                                        <qux calculated="foo=/items/item[2]/foo[1] bar=/items/item[2]/bar[1] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[2] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1]"/>
                                     </item>
-                                    <gaga calculated="foo=/items/item[1]/foo[1] foo=/items/item[2]/foo[1] bar=/items/item[1]/bar[1] bar=/items/item[2]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[1] item=/items/item[2] items=/items gaga=/items/gaga[1]"/>
+                                    <item calculated="item=/items/item[3] items=/items gaga=/items/gaga[1] qux=/items/item[3]/qux[1] qux=/items/item[3]/qux[2]">
+                                        <!-- 2 qux -->
+                                        <qux calculated="item=/items/item[3] items=/items gaga=/items/gaga[1] qux=/items/item[3]/qux[1]"/>
+                                        <qux calculated="item=/items/item[3] items=/items gaga=/items/gaga[1] qux=/items/item[3]/qux[2]"/>
+                                    </item>
+                                    <gaga calculated="foo=/items/item[1]/foo[1] foo=/items/item[2]/foo[1] bar=/items/item[1]/bar[1] bar=/items/item[2]/bar[1] baz=/items/item[1]/baz[1] baz=/items/item[1]/baz[2] baz=/items/item[2]/baz[1] baz=/items/item[2]/baz[2] item=/items/item[1] item=/items/item[2] item=/items/item[3] items=/items gaga=/items/gaga[1] qux=/items/item[2]/qux[1] qux=/items/item[3]/qux[1] qux=/items/item[3]/qux[2]"/>
                                 </items>
                             </instance>
                         </instances>

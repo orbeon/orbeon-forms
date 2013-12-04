@@ -47,7 +47,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     private implicit val logger = model.getIndentedLogger
     private implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
 
-    protected val topLevelBinds  = new ju.ArrayList[RuntimeBind]
+    val topLevelBinds            = new ju.ArrayList[RuntimeBind]
     val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
     val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
 
@@ -216,99 +216,171 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         }
 
     private val variableResolver =
-        (variableName: StructuredQName, xpathContext: XPathContext) ⇒
-            staticModel.bindsByName.get(variableName.getLocalName) match {
+        (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
+            staticModel.bindsByName.get(variableQName.getLocalName) match {
                 case Some(targetStaticBind) ⇒
                     // Variable value is a bind nodeset to resolve
+                
+                    import BindVariableResolver._
 
-                    val localname = variableName.getLocalName
+                    val contextBindNode = XFormsFunction.context(xpathContext).data.asInstanceOf[BindNode]
+                    val variableName    = variableQName.getLocalName
 
-                    // Retrieve context
-                    val contextBindNode   = XFormsFunction.context(xpathContext).data.asInstanceOf[BindNode]
-                    val contextStaticBind = contextBindNode.staticBind
-
-                    contextBindNode.ancestorOrSelfBindNodes find (_.staticBind.name == localname) match {
-                        case Some(matchingBindNode) ⇒
-                            // Optimization: The variable refers to the current bind node or an ancestor, in which case
-                            // return as "closest" node the node for the current iteration.
-                            matchingBindNode.node
-                        case None ⇒
-                            // General case where the target Not in the direct line of ancestors
-                            // FIXME: can avoid reversing every time?
-                            val staticContextAncestorOrSelf = contextStaticBind.ancestorOrSelfBinds.reverse
-                            val staticTargetAncestorOrSelf  = targetStaticBind.ancestorOrSelfBinds.reverse
-
-                            staticContextAncestorOrSelf.iterator zip staticTargetAncestorOrSelf.iterator collectFirst {
-                                case (bindOnContextBranch, bindOnTargetBranch) if bindOnContextBranch ne bindOnTargetBranch ⇒
-                                    // We found, from the root, the first static binds which are different. If both of
-                                    // them are nested binds, they have a common parent. If at least one of them is a
-                                    // top-level bind, then they don't have a common parent.
-                                    
-                                    // If they are nested binds and therefore have a common parent, we start search at
-                                    // the closest common bind iteration. Otherwise, we start search at the top-level.
-                                    
-                                    // Then we search recursively toward bind leaves, following the path of target ids,
-                                    // and for each concrete target return all the items found.
-
-                                    def searchDescendantRuntimeBinds(binds: Seq[RuntimeBind], rootId: String, name: String): ValueRepresentation = {
-
-                                        def nextNodes(binds: Iterator[RuntimeBind], path: List[String]): Iterator[Item] = {
-
-                                            require(path.nonEmpty)
-
-                                            val nextBind = {
-                                                val nextId = path.head
-                                                binds find (_.staticId == nextId) get
-                                            }
-
-                                            path.tail match {
-                                                case Nil ⇒
-                                                    // We are at a target: return all items
-                                                    nextBind.items.asScala.iterator
-                                                case pathTail ⇒
-                                                    // We need to dig deeper to reach the target
-                                                    for {
-                                                        nextBindNode ← nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
-                                                        targetItem   ← nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
-                                                    } yield
-                                                        targetItem
-                                            }
-                                        }
-
-                                        val pathList      = staticTargetAncestorOrSelf map (_.staticId) dropWhile (rootId !=)
-                                        val itemsIterator = nextNodes(binds.iterator, pathList).toArray
-
-                                        new SequenceExtent(itemsIterator)
-                                    }
-
-                                    val startingRuntimeBinds =
-                                        bindOnTargetBranch.parentBind match {
-                                            case Some(commonParentBind) ⇒
-
-                                                // Find corresponding runtime bind node
-                                                contextBindNode.ancestorOrSelfBindNodes collectFirst {
-                                                    case iteration: BindIteration if iteration.parentBind.staticId == commonParentBind.staticId ⇒
-                                                        iteration.childrenBinds
-                                                } get // this has to be there
-
-                                            case None ⇒
-                                                // No common parent, use top-level binds
-                                                topLevelBinds.asScala
-                                        }
-
-                                    searchDescendantRuntimeBinds(startingRuntimeBinds, bindOnTargetBranch.staticId, localname)
-                            } getOrElse {
-                                throw new IllegalStateException
-                            }
-                    }
+                    resolveAncestorOrSelf(
+                        contextBindNode,
+                        variableName
+                    ) orElse
+                        resolveNotAncestorOrSelf(
+                            modelBinds            = this,
+                            contextBindNode       = contextBindNode,
+                            targetStaticBind      = targetStaticBind,
+                            variableName          = variableName
+                        ) getOrElse
+                            (throw new IllegalStateException)
 
                 case None ⇒
                     // Try top-level model variables
                     val modelVariables = model.getContextStack.getCurrentBindingContext.getInScopeVariables
-                    val result = modelVariables.get(variableName.getLocalName)
+                    val result = modelVariables.get(variableQName.getLocalName)
                     // NOTE: With XPath analysis on, variable scope has been checked statically
                     if (result eq null)
-                        throw new ValidationException("Undeclared variable in XPath expression: $" + variableName.getClarkName, staticModel.locationData)
+                        throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData)
                     result
             }
+}
+
+private object BindVariableResolver {
+    
+    def findAncestorOrSelfWithName(bindNode: BindNode, name: String) =
+        bindNode.ancestorOrSelfBindNodes find (_.staticBind.name == name)
+
+    // NOTE: This requires that a branch doesn't start with the other.
+    def findStaticAncestry(branch1: List[StaticBind], branch2: List[StaticBind]) =
+        branch1.ensuring(_.nonEmpty).iterator zip branch2.ensuring(_.nonEmpty).iterator collectFirst {
+            case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
+                (bindOnBranch2.parentBind, bindOnBranch1, bindOnBranch2)
+        }
+
+    // NOTE: This requires that descendantBindNode is a descendant of a runtime bind associated with ancestorStaticBind.
+    def findConcreteAncestorOrSelfIteration(ancestorStaticBind: StaticBind, descendantBindNode: BindNode) =
+        descendantBindNode.ancestorOrSelfBindNodes collectFirst {
+            case iteration: BindIteration if iteration.forStaticId == ancestorStaticBind.staticId ⇒ iteration
+        } get
+
+    def hasAncestorIteration(ancestorIteration: BindIteration, descendantRuntimeBind: RuntimeBind) =
+        descendantRuntimeBind.parentIteration.ancestorOrSelfBindNodes exists (_ eq ancestorIteration)
+
+    def searchDescendantRuntimeBinds(targetAncestorOrSelf: List[StaticBind], rootBinds: Seq[RuntimeBind], rootId: String): ValueRepresentation = {
+
+        def nextNodes(binds: Iterator[RuntimeBind], path: List[String]): Iterator[Item] = {
+
+            require(path.nonEmpty)
+
+            val nextBind = {
+                val nextId = path.head
+                binds find (_.staticId == nextId) get
+            }
+
+            path.tail match {
+                case Nil ⇒
+                    // We are at a target: return all items
+                    nextBind.items.asScala.iterator
+                case pathTail ⇒
+                    // We need to dig deeper to reach the target
+                    for {
+                        nextBindNode ← nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
+                        targetItem   ← nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
+                    } yield
+                        targetItem
+            }
+        }
+
+        val pathList      = targetAncestorOrSelf map (_.staticId) dropWhile (rootId !=)
+        val itemsIterator = nextNodes(rootBinds.iterator, pathList).toArray
+
+        new SequenceExtent(itemsIterator)
+    }
+
+    // Try to resolve using a non-ambiguous, indexed single-node context bind
+    def resolveSingle(
+            modelBinds: XFormsModelBindsBase,
+            targetBindId: String,
+            concreteAncestorIteration: Option[BindIteration]): Option[ValueRepresentation] =
+        modelBinds.singleNodeContextBinds.get(targetBindId) flatMap { singleNodeTarget ⇒
+            // The target bind is not ambiguous, see if it matches
+            concreteAncestorIteration match {
+                case Some(ancestorIteration) if hasAncestorIteration(concreteAncestorIteration.get, singleNodeTarget) ⇒
+                    // The binds have a common static ancestor and the target is a descendant of the same iteration
+                    Some(new SequenceExtent(singleNodeTarget.items))
+                case None ⇒
+                    // The binds are disjoint so the target is valid
+                    Some(new SequenceExtent(singleNodeTarget.items))
+                case Some(_) ⇒
+                    // The binds have a common static ancestor but the runtime target is disjoint
+                    None
+            }
+        }
+
+    // Try to resolve by searching descendants nodes
+    def resolveMultiple(
+            modelBinds: XFormsModelBindsBase,
+            targetAncestorOrSelf: List[StaticBind],
+            concreteAncestorIteration: Option[BindIteration],
+            rootId: String): Option[ValueRepresentation] = {
+
+        val rootBinds = (
+            concreteAncestorIteration
+            map       (_.childrenBinds)
+            getOrElse modelBinds.topLevelBinds.asScala
+        )
+
+        Some(searchDescendantRuntimeBinds(targetAncestorOrSelf, rootBinds, rootId))
+    }
+
+    // Try to resolve an ancestor-or-self bind
+    def resolveAncestorOrSelf(contextBindNode: BindNode, variableName: String): Option[ValueRepresentation] =
+        findAncestorOrSelfWithName(contextBindNode, variableName) map (_.node)
+
+    // Try to resolve a bind which is not an ancestor-or-self bind
+    def resolveNotAncestorOrSelf(
+            modelBinds: XFormsModelBindsBase,
+            contextBindNode: BindNode,
+            targetStaticBind: StaticBind,
+            variableName: String): Option[ValueRepresentation] = {
+
+        val contextAncestorOrSelf = contextBindNode.staticBind.ancestorOrSelfBinds.reverse
+        val targetAncestorOrSelf  = targetStaticBind.ancestorOrSelfBinds.reverse
+
+        findStaticAncestry(contextAncestorOrSelf, targetAncestorOrSelf) flatMap {
+            case (commonStaticAncestorOpt, _, childBindOnTargetBranch) ⇒
+
+                // We found, from the root, the first static binds which are different. If both of
+                // them are nested binds, they have a common parent. If at least one of them is a
+                // top-level bind, then they don't have a common parent.
+
+                // If they are nested binds and therefore have a common parent, we start search at
+                // the closest common bind iteration. Otherwise, we start search at the top-level.
+
+                // From here we search in two ways:
+                // 1. If the target bind is indexed and is is not ambiguous, check whether it is the one we want
+                // 2. Otherwise, we search recursively toward bind leaves, following the path of target ids, and for
+                //    each concrete target return all the items found.
+
+                val concreteAncestorIteration =
+                    commonStaticAncestorOpt map (findConcreteAncestorOrSelfIteration(_, contextBindNode))
+            
+                resolveSingle(
+                    modelBinds,
+                    targetStaticBind.staticId,
+                    concreteAncestorIteration
+                ) orElse
+                    resolveMultiple(
+                        modelBinds,
+                        targetAncestorOrSelf,
+                        concreteAncestorIteration,
+                        childBindOnTargetBranch.staticId
+                    )
+
+        }
+    }
 }

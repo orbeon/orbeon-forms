@@ -134,6 +134,8 @@ class BindIteration(parentBind: RuntimeBind, position: Int, item: Item, children
 
     require(childrenStaticBinds.size > 0)
 
+    def forStaticId = parentBind.staticId
+
     // Iterate over children and create children binds
     val childrenBinds =
         for (staticBind ← childrenStaticBinds)

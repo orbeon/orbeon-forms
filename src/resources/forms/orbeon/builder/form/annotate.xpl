@@ -35,10 +35,6 @@
 
                 <xsl:variable name="model" select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
 
-                <!-- Duplicated from model.xml, but we have to right now as the form hasn't been loaded yet at this point -->
-                <xsl:variable name="is-custom-instance"
-                              select="$model/xf:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
-
                 <!-- Whether we have "many" controls -->
                 <xsl:variable name="many-controls"
                               select="count(/*/xh:body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
@@ -49,19 +45,6 @@
                               select="fbf:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
 
                 <xsl:template match="xf:help[generate-id() = $unneeded-elements]"/>
-
-                <!-- Custom instance: add dataModel namespace binding to top-level bind -->
-                <xsl:template match="xf:bind[@id = 'fr-form-binds']">
-                    <xsl:copy>
-                        <!-- NOTE: add even if not($is-custom-instance) so that things work if we switch to $is-custom-instance -->
-                        <xsl:namespace name="dataModel" select="'java:org.orbeon.oxf.fb.DataModel'"/>
-                        <xsl:apply-templates select="@* | node()"/>
-                    </xsl:copy>
-                </xsl:template>
-                <!-- Custom instance: for nested binds, rewrite @ref/@nodeset -->
-                <xsl:template match="xf:bind[$is-custom-instance and @id and @id != 'fr-form-binds']/@ref | xf:bind[$is-custom-instance and @id and @id != 'fr-form-binds']/@nodeset">
-                    <xsl:attribute name="{name()}" select="dataModel:annotatedBindRef(../@id, .)"/>
-                </xsl:template>
 
                 <!-- Temporarily mark read-only instances as read-write -->
                 <xsl:template match="xf:instance[@xxf:readonly = 'true']">

@@ -27,7 +27,6 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
-    val CustomXMLDoc       = "oxf:/org/orbeon/oxf/fb/template-with-custom-xml.xhtml"
     val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
     val SectionsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
     val RowspansDoc        = "oxf:/org/orbeon/oxf/fb/template-with-rowspans.xhtml"

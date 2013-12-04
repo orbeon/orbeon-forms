@@ -75,8 +75,6 @@ trait FormBuilderSupport extends XFormsSupport {
 
                         <xf:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding"/>
 
-                        <xf:var name="is-custom-instance" value={if (isCustomInstance) "true()" else "false()"}/>
-
                         <xf:action ev:event="xforms-model-construct-done">
                             <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
                             <xf:var name="temp" value="xxf:create-document()"/>

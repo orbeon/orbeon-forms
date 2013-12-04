@@ -20,7 +20,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xforms.{InstanceData}
+import org.orbeon.oxf.xforms.InstanceData
 import scala.util.control.NonFatal
 import org.orbeon.scaxon.XML
 import org.orbeon.oxf.xforms.model.BindNode
@@ -90,28 +90,20 @@ object DataModel {
 //        }
     }
 
-    // Find a bind ref by name (deannotate the expression if needed)
+    // Find a bind ref by name
     def getBindRef(inDoc: NodeInfo, name: String) =
         findBindByName(inDoc, name) flatMap
-            bindRefOrNodeset map
-                deAnnotatedBindRef
+            bindRefOrNodeset
 
     // Set a bind ref by name (annotate the expression if needed)
     def setBindRef(inDoc: NodeInfo, name: String, ref: String) =
         findBindByName(inDoc, name) foreach { bind ⇒
             delete(bind \@ "nodeset")
-            ensureAttribute(bind, "ref", annotatedBindRefIfNeeded(bindId(name), ref))
+            ensureAttribute(bind, "ref", ref)
         }
 
     // XForms callers
     def getBindRefOrEmpty(inDoc: NodeInfo, name: String) = getBindRef(inDoc, name).orNull
-
-    private val AnnotatedBindRef = """dataModel:bindRef\([^,]*,(.*)\)$""".r
-
-    def annotatedBindRef(bindId: String, ref: String) = "dataModel:bindRef('" + bindId + "', " + ref + ")"
-    def deAnnotatedBindRef(ref: String) = AnnotatedBindRef.replaceFirstIn(ref.trim, "$1").trim
-
-    def annotatedBindRefIfNeeded(bindId: String, ref: String) = ref
 
     // Function called via `dataModel:bindRef()` from the binds to retrieve the adjusted bind node at design time. If
     // the bound item is non-empty and acceptable for the control, then it is returned. Otherwise, a pointer to

@@ -36,9 +36,6 @@
                 <xsl:variable name="metadata"
                               select="/*/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*"/>
 
-                <xsl:variable name="is-custom-instance"
-                              select="$metadata/form-instance-mode = 'custom'"/>
-
                 <!-- HTML title -->
                 <xsl:template match="xh:head/xh:title">
                     <xsl:copy>
@@ -84,11 +81,6 @@
                         <!-- Process everything else -->
                         <xsl:apply-templates select="@* except (@edit-ref, @xxf:update, @open, @fb:open) | node()"/>
                     </xsl:element>
-                </xsl:template>
-
-                <!-- Restore binds pointing via deAnnotatedBindRef() -->
-                <xsl:template match="xf:bind/@ref[$is-custom-instance] | xf:bind/@nodeset[$is-custom-instance]">
-                    <xsl:attribute name="{name()}" select="dataModel:deAnnotatedBindRef(.)"/>
                 </xsl:template>
 
                 <!-- Convert MIP names (attributes and nested elements) -->

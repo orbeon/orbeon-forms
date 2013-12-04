@@ -134,7 +134,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
                         val newBind: Seq[NodeInfo] =
                             <xf:bind id={bindId(bindName)}
-                                         ref={annotatedBindRefIfNeeded(bindId(bindName), bindName)}
+                                         ref={bindName}
                                          name={bindName}
                                          xmlns:xf="http://www.w3.org/2002/xforms"/>
 

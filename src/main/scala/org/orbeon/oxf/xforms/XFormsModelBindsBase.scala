@@ -49,10 +49,10 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     private implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
 
     private var _topLevelBinds: Seq[RuntimeBind] = Nil
-    def topLevelBinds = _topLevelBinds
+    final def topLevelBinds = _topLevelBinds
 
-    val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
-    val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
+    final val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
+    final val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
     
     // Whether this is the first rebuild for the associated XForms model
     private var isFirstRebuild = containingDocument.isInitializing 
@@ -60,9 +60,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     // Iterate over all binds and for each one call the callback
     protected def iterateBinds(bindRunner: BindRunner): Unit =
         // Iterate over top-level binds
-        for (currentBind ← _topLevelBinds)
-            try
-                currentBind.applyBinds(bindRunner)
+        for (currentBind ← topLevelBinds)
+            try currentBind.applyBinds(bindRunner)
             catch {
                 case NonFatal(e) ⇒
                     throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind.locationData, "evaluating XForms binds", currentBind.staticBind.element))
@@ -158,8 +157,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     }
 
     private def evaluateSingleConstraintMIP(bindNode: BindNode, mip: StaticXPathMIP) =
-        try
-            evaluateBooleanExpression(bindNode, mip)
+        try evaluateBooleanExpression(bindNode, mip)
         catch {
             case NonFatal(e) ⇒
                 handleMIPXPathException(e, bindNode, mip, "evaluating XForms constraint bind")
@@ -168,9 +166,9 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
     protected def failedConstraintMIPs(level: ValidationLevel, bindNode: BindNode): List[StaticConstraintXPathMIP] =
         for {
-            mips      ← bindNode.staticBind.constraintsByLevel.get(level).toList
-            mip       ← mips
-            failed    = ! evaluateSingleConstraintMIP(bindNode, mip)
+            mips   ← bindNode.staticBind.constraintsByLevel.get(level).toList
+            mip    ← mips
+            failed = ! evaluateSingleConstraintMIP(bindNode, mip)
             if failed
         } yield
             mip
@@ -262,8 +260,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
     // ones statically, but don't have yet a solution to combine them. Should we string-join them?
     protected def evaluateCustomMIP(bindNode: BindNode, propertyName: String): String =
-        try
-            evaluateStringExpression(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(propertyName).head)
+        try evaluateStringExpression(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(propertyName).head)
         catch {
             case NonFatal(e) ⇒
                 handleMIPXPathException(e, bindNode, bindNode.staticBind.getCalculate, "evaluating XForms custom bind")

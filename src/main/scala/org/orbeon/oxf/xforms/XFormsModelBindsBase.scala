@@ -360,21 +360,24 @@ private object BindVariableResolver {
     def resolveSingle(
             modelBinds: XFormsModelBindsBase,
             targetBindId: String,
-            concreteAncestorIteration: Option[BindIteration]): Option[ValueRepresentation] =
-        modelBinds.singleNodeContextBinds.get(targetBindId) flatMap { singleNodeTarget ⇒
-            // The target bind is not ambiguous, see if it matches
+            concreteAncestorIteration: Option[BindIteration]): Option[ValueRepresentation] = {
+
+        def isValidTarget(singleNodeTarget: RuntimeBind) =
             concreteAncestorIteration match {
-                case Some(ancestorIteration) if hasAncestorIteration(concreteAncestorIteration.get, singleNodeTarget) ⇒
-                    // The binds have a common static ancestor and the target is a descendant of the same iteration
-                    Some(new SequenceExtent(singleNodeTarget.items))
-                case None ⇒
-                    // The binds are disjoint so the target is valid
-                    Some(new SequenceExtent(singleNodeTarget.items))
-                case Some(_) ⇒
-                    // The binds have a common static ancestor but the runtime target is disjoint
-                    None
+                // The binds have a common static ancestor and the target is a descendant of the same iteration
+                case Some(ancestorIteration) if hasAncestorIteration(ancestorIteration, singleNodeTarget) ⇒ true
+                // The binds are disjoint so the target is valid
+                case None ⇒ true
+                // The binds have a common static ancestor but the runtime target is disjoint
+                case _ ⇒ false
             }
-        }
+
+        for {
+            singleNodeTarget ← modelBinds.singleNodeContextBinds.get(targetBindId)
+            if isValidTarget(singleNodeTarget)
+        } yield
+            new SequenceExtent(singleNodeTarget.items)
+    }
 
     // Try to resolve by searching descendants nodes
     def resolveMultiple(

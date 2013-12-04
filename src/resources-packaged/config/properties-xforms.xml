@@ -111,6 +111,7 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                   value="30000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"        value="2000"/>
 
+    <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                 value=""/>
     <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>

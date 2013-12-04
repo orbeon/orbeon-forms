@@ -919,6 +919,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 this.datePickerNavigator = new ORBEON.util.Property("datepicker.navigator", true);
                 this.datePickerTwoMonths = new ORBEON.util.Property("datepicker.two-months", false);
                 this.showErrorDialog = new ORBEON.util.Property("show-error-dialog", true);
+                this.loginPageDetectionRegexp = new ORBEON.util.Property("login-page-detection-regexp", "");
                 this.clientEventMode = new ORBEON.util.Property("client.events.mode", "default");
                 this.clientEventsFilter = new ORBEON.util.Property("client.events.filter", "");
                 this.resourcesVersioned = new ORBEON.util.Property("oxf.resources.versioned", false);
@@ -3942,60 +3943,55 @@ ORBEON.xforms.Init = {
                 // Initialize loading and error indicator
                 ORBEON.xforms.Globals.formErrorPanel[formID] = null;
 
-                for (var formChildIndex = 0; formChildIndex < formElement.childNodes.length; formChildIndex++) {
-                    var formChild = formElement.childNodes[formChildIndex];
-                    if (ORBEON.util.Dom.isElement(formChild) && YAHOO.util.Dom.hasClass(formChild, "xforms-error-panel")) {
+                _.each($(formElement).find('.xforms-error-dialogs > .xforms-error-panel'), function(errorPanelEl) {
+                    // Create and store error panel
+                    YAHOO.util.Dom.generateId(errorPanelEl);
+                    YAHOO.util.Dom.removeClass(errorPanelEl, "xforms-initially-hidden");
+                    var errorPanel = new YAHOO.widget.Panel(errorPanelEl.id, {
+                        modal: true,
+                        fixedcenter: false,
+                        underlay: "shadow",
+                        visible: false,
+                        constraintoviewport: true,
+                        draggable: true
+                    });
+                    errorPanel.render();
+                    ORBEON.util.Utils.overlayUseDisplayHidden(errorPanel);
+                    errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
+                    ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
-                        // Create and store error panel
-                        YAHOO.util.Dom.generateId(formChild);
-                        YAHOO.util.Dom.removeClass(formChild, "xforms-initially-hidden");
-                        var errorPanel = new YAHOO.widget.Panel(formChild.id, {
-                            modal: true,
-                            fixedcenter: false,
-                            underlay: "shadow",
-                            visible: false,
-                            constraintoviewport: true,
-                            draggable: true
-                        });
-                        errorPanel.render();
-                        ORBEON.util.Utils.overlayUseDisplayHidden(errorPanel);
-                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
-                        ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
+                    // Find reference to elements in the details hidden section
+                    var titleDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "hd");
+                    var bodyDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "bd");
+                    var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
+                    var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
+                    YAHOO.util.Dom.generateId(showDetailsA);
 
-                        // Find reference to elements in the details hidden section
-                        var titleDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "hd");
-                        var bodyDiv = ORBEON.util.Dom.getChildElementByClass(formChild, "bd");
-                        var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
-                        var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
-                        YAHOO.util.Dom.generateId(showDetailsA);
+                    // Find reference to elements in the details shown section
+                    var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
+                    var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
+                    YAHOO.util.Dom.generateId(hideDetailsA);
+                    errorPanel.errorTitleDiv = titleDiv;
+                    errorPanel.errorBodyDiv = bodyDiv;
+                    errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
 
-                        // Find reference to elements in the details shown section
-                        var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
-                        var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
-                        YAHOO.util.Dom.generateId(hideDetailsA);
-                        errorPanel.errorTitleDiv = titleDiv;
-                        errorPanel.errorBodyDiv = bodyDiv;
-                        errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
+                    // Register listener that will show/hide the detail section
+                    YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
+                    YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
 
-                        // Register listener that will show/hide the detail section
-                        YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
-                        YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
-
-                        // Handle listeners on error panel
-                        var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, formChild);
-                        if (closeA.length != 0) {
-                            YAHOO.util.Dom.generateId(closeA[0]);
-                            YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
-                        }
-
-                        var reloadA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-reload", null, formChild);
-                        if (reloadA.length != 0) {
-                            YAHOO.util.Dom.generateId(reloadA[0]);
-                            YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
-                        }
-                        break;
+                    // Handle listeners on error panel
+                    var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, errorPanelEl);
+                    if (closeA.length != 0) {
+                        YAHOO.util.Dom.generateId(closeA[0]);
+                        YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
                     }
-                }
+
+                    var reloadA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-reload", null, errorPanelEl);
+                    if (reloadA.length != 0) {
+                        YAHOO.util.Dom.generateId(reloadA[0]);
+                        YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
+                    }
+                });
 
                 var elements = formElement.elements;
                 var xformsRepeatTree;

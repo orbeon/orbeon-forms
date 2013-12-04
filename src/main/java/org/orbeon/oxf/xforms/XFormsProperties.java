@@ -87,6 +87,7 @@ public class XFormsProperties {
     private static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
     private static final String SHOW_RECOVERABLE_ERRORS_PROPERTY = "show-recoverable-errors";
 
+    private static final String LOGIN_PAGE_DETECTION_REGEXP = "login-page-detection-regexp";
     private static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
     private static final String CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
 
@@ -254,6 +255,7 @@ public class XFormsProperties {
             new PropertyDefinition(DATEPICKER_NAVIGATOR_PROPERTY, true, true),
             new PropertyDefinition(DATEPICKER_TWO_MONTHS_PROPERTY, false, true),
             new PropertyDefinition(SHOW_ERROR_DIALOG_PROPERTY, true, true),
+            new PropertyDefinition(LOGIN_PAGE_DETECTION_REGEXP, "", true),
             new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY, "default", true),
             new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true),
             new PropertyDefinition(DATATABLE_INIT_IN_VIEWPORT, false, true)

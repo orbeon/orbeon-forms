@@ -554,6 +554,7 @@
      *
      */
     AjaxServer.handleFailureAjax = function(o) {
+        var formID = ORBEON.xforms.Globals.requestForm.id;
 
         if (o.responseXML && o.responseXML.documentElement && o.responseXML.documentElement.tagName.indexOf("error") != -1) {
             // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
@@ -564,13 +565,36 @@
             //      </error>
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
-            var formID = ORBEON.xforms.Globals.requestForm.id;
             var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
             var body = ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0];
             var detailsFromBody = body != null ? ORBEON.util.Dom.getStringValue(body) : null;
             AjaxServer.showError(title, detailsFromBody, formID);
         } else {
-            AjaxServer.retryRequestAfterDelay(AjaxServer.asyncAjaxRequest);
+            var loginRegexp = ORBEON.util.Properties.loginPageDetectionRegexp.get();
+            if (loginRegexp != '' && new RegExp(loginRegexp).test(o.responseText)) {
+
+                // It seems we got a login page back, so display dialog and reload form
+                var dialogEl = $('#' + formID + ' .xforms-login-detected-dialog');
+
+                // Link dialog with title for ARIA
+                var title = dialogEl.find('h4');
+                if (_.isUndefined(title.attr('id'))) {
+                    var titleId = _.uniqueId('xf-');
+                    title.attr('id', titleId);
+                    dialogEl.attr('aria-labelledby', titleId);
+                }
+
+                dialogEl.find('button').one('click.xf', function() {
+                    // Reloading the page will redirect us to the login page if necessary
+                    window.location.href = window.location.href;
+                });
+                dialogEl.modal({
+                  backdrop: 'static', // Click on the background doesn't hide dialog
+                  keyboard: false     // Can't use esc to close the dialog
+                });
+            } else {
+                AjaxServer.retryRequestAfterDelay(AjaxServer.asyncAjaxRequest);
+            }
         }
     };
 

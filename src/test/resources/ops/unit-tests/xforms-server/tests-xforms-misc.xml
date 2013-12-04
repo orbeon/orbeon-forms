@@ -636,85 +636,98 @@
             </xh:html>
         </input>
         <output name="response">
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
-                 <xh:body class="yui-skin-sam">
-                     <noscript xmlns="http://www.w3.org/1999/xhtml">
-                         <div class="xforms-noscript-panel">
-                             <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
-                             <ul>
-                                 <li>Turn on JavaScript in your browser if it supports it.</li>
-                                 <li>Use a browser that supports JavaScript.</li>
-                                 <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
-                             </ul>
-                         </div>
-                     </noscript>
+            <xh:html>
+                <xh:body class="yui-skin-sam">
+                    <noscript xmlns="http://www.w3.org/1999/xhtml">
+                        <div class="xforms-noscript-panel">
+                            <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
+                            <ul>
+                                <li>Turn on JavaScript in your browser if it supports it.</li>
+                                <li>Use a browser that supports JavaScript.</li>
+                                <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
+                            </ul>
+                        </div>
+                    </noscript>
                     <xh:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-hint-appearance-inline xforms-help-appearance-dialog" action="/doc/home-welcome" method="POST" onsubmit="return false">
-                         <xh:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
-                         <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
-                         <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
-                         <xh:input type="hidden" name="$server-events" value=""/>
-                         <xh:input type="text" name="$client-state" value="" class="xforms-initially-hidden"/>
-                         <xh:input type="hidden" name="$repeat-tree" value="xf-1"/>
-                         <xh:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
-                         <xh:span class="xforms-loading-loading">Loading...</xh:span>
-                         <xh:span class="xforms-loading-none"/>
-                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-panel xforms-initially-hidden">
-                            <div class="hd">An error has occurred</div>
-                            <div class="bd">
-                                <p>You may want to try one of the following:</p>
-                                <ul>
-                                    <li>
-                                        <a class="xforms-error-panel-close">Close this dialog</a>and continue to use this page.
-                                    </li>
-                                    <li>
-                                        <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
-                                    </li>
-                                    <li>
-                                        <p>If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
-                                        <ul>
-                                            <li>With Firefox: hold down the
-                                                <code>shift</code>key and click the Reload button in your browser toolbar.
-                                            </li>
-                                            <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
-                                            <li>With Internet Explorer: hold down the
-                                                <code>control</code>key and click the Reload button in your browser toolbar.
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>Return
-                                        <a href="/">home</a>.
-                                    </li>
-                                </ul>
-                                <div class="xforms-error-panel-details-hidden">
-                                    <p>
-                                        <a class="xforms-error-panel-show-details">
-                                            <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
-                                            <span>Show details</span>
-                                        </a>
-                                    </p>
+                        <xh:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
+                        <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
+                        <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
+                        <xh:input type="hidden" name="$server-events" value=""/>
+                        <xh:input type="text" name="$client-state" value="" class="xforms-initially-hidden"/>
+                        <xh:input type="hidden" name="$repeat-tree" value="xf-1"/>
+                        <xh:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
+                        <xh:span class="xforms-loading-loading">Loading...</xh:span>
+                        <xh:span class="xforms-loading-none"/>
+                        <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">
+                            <div class="xforms-error-panel xforms-initially-hidden">
+                                <div class="hd">An error has occurred</div>
+                                <div class="bd">
+                                    <p>You may want to try one of the following:</p>
+                                    <ul>
+                                        <li>
+                                            <a class="xforms-error-panel-close">Close this dialog</a>and continue to use this page.
+                                        </li>
+                                        <li>
+                                            <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
+                                        </li>
+                                        <li>
+                                            <p>If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
+                                            <ul>
+                                                <li>With Firefox: hold down the
+                                                    <code>shift</code>key and click the Reload button in your browser toolbar.
+                                                </li>
+                                                <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
+                                                <li>With Internet Explorer: hold down the
+                                                    <code>control</code>key and click the Reload button in your browser toolbar.
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>Return
+                                            <a href="/">home</a>.
+                                        </li>
+                                    </ul>
+                                    <div class="xforms-error-panel-details-hidden">
+                                        <p>
+                                            <a class="xforms-error-panel-show-details">
+                                                <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                                                <span>Show details</span>
+                                            </a>
+                                        </p>
+                                    </div>
+                                    <div class="xforms-error-panel-details-shown xforms-disabled">
+                                        <p>
+                                            <a class="xforms-error-panel-hide-details">
+                                                <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                                                <span>Hide details</span>
+                                            </a>
+                                        </p>
+                                        <div class="xforms-error-panel-details"/>
+                                    </div>
                                 </div>
-                                <div class="xforms-error-panel-details-shown xforms-disabled">
-                                    <p>
-                                        <a class="xforms-error-panel-hide-details">
-                                            <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
-                                            <span>Hide details</span>
-                                        </a>
-                                    </p>
-                                    <div class="xforms-error-panel-details"/>
+                            </div>
+                            <div class="xforms-login-detected-dialog modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-header">
+                                    <h4>Reloading form</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>This form has to be reloaded. This most likely happened because your session has expired, which might take to the login page. (If you think that you shouldn't see this message and that the problem persists, please contact support.)</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-primary">OK</button>
                                 </div>
                             </div>
                         </div>
-                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-help-panel xforms-initially-hidden">
-                             <div class="hd">Help</div>
-                             <div class="bd">
-                                 <div class="xforms-help-panel-message"/>
-                                 <div class="xforms-help-panel-close">
-                                     <button class="btn btn-small">Close</button>
-                                 </div>
-                             </div>
-                         </div>
-                         <xh:span id="xforms-select-full-template" class="xforms-template">
-                             <xh:span class="xforms-deselected">
+                        <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-help-panel xforms-initially-hidden">
+                            <div class="hd">Help</div>
+                            <div class="bd">
+                                <div class="xforms-help-panel-message"/>
+                                <div class="xforms-help-panel-close">
+                                    <button class="btn btn-small">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                        <xh:span id="xforms-select-full-template" class="xforms-template">
+                            <xh:span class="xforms-deselected">
                                 <xh:label class="checkbox" for="$xforms-item-id-select$">
                                     <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>
                                     <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
@@ -735,15 +748,15 @@
                         </xh:span>
                         <xh:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
                         <xh:span class="xforms-repeat-delimiter"/>
-                         <xh:span class="xforms-repeat-selected-item-1"/>
-                         <xh:span class="xforms-repeat-delimiter"/>
-                         <xh:span/>
-                         <xh:span class="xforms-repeat-delimiter"/>
-                         <xh:span class="xforms-repeat-template"/>
-                         <xh:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
-                     </xh:form>
-                 </xh:body>
-             </xh:html>
+                        <xh:span class="xforms-repeat-selected-item-1"/>
+                        <xh:span class="xforms-repeat-delimiter"/>
+                        <xh:span/>
+                        <xh:span class="xforms-repeat-delimiter"/>
+                        <xh:span class="xforms-repeat-template"/>
+                        <xh:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
+                    </xh:form>
+                </xh:body>
+            </xh:html>
         </output>
     </test>
 

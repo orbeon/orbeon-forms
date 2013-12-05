@@ -42,17 +42,9 @@
         name="action-models-ids"
         select="$fr-form-model-id, /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
 
-    <!-- Whether $context is within a section template -->
-    <xsl:function name="fr:in-section-template" as="xs:boolean">
-        <xsl:param name="context" as="element()"/>
-        <xsl:sequence select="exists($context/ancestor::xbl:implementation)"/>
-    </xsl:function>
-
-    <!-- The path is different depending on whether we are within a section template or not.
-         See: https://github.com/orbeon/orbeon-forms/issues/1190 -->
+    <!-- See also: https://github.com/orbeon/orbeon-forms/issues/1190 -->
     <xsl:function name="fr:instance-path" as="xs:string">
-        <xsl:param name="context" as="element()"/>
-        <xsl:value-of select="concat('instance(''fr-form-instance'')/', if (fr:in-section-template($context)) then '' else '*/')"/>
+        <xsl:text>(xxf:binding(concat($control-name, '-control')), bind(concat($control-name, '-bind')))[1]</xsl:text>
     </xsl:function>
 
     <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
@@ -61,7 +53,7 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
             <!-- Set value -->
-            <xf:setvalue ref="$path" value="{fr:instance-path(.)}*[name() = $control-name]"/>
+            <xf:setvalue ref="$path" value="{fr:instance-path()}"/>
         </xsl:copy>
     </xsl:template>
 
@@ -73,7 +65,7 @@
             <!-- Set value and escape single quotes -->
             <xf:setvalue xmlns:sql="http://orbeon.org/oxf/xml/sql"
                          ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                         value="concat('''', replace(string({fr:instance-path(.)}*[name() = $control-name]), '''', ''''''), '''')"/>
+                         value="concat('''', replace(string({fr:instance-path()}), '''', ''''''), '''')"/>
         </xsl:copy>
     </xsl:template>
 
@@ -83,7 +75,7 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
             <!-- Set value -->
-            <xf:setvalue ref="{fr:instance-path(.)}*[name() = $control-name]" value="$control-value"/>
+            <xf:setvalue ref="{fr:instance-path()}" value="$control-value"/>
         </xsl:copy>
     </xsl:template>
 

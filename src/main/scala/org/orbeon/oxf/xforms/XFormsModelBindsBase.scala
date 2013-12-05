@@ -64,8 +64,15 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             try currentBind.applyBinds(bindRunner)
             catch {
                 case NonFatal(e) ⇒
-                    throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind.locationData, "evaluating XForms binds", currentBind.staticBind.element))
-            }
+                    throw OrbeonLocationException.wrapException(
+                        e,
+                        new ExtendedLocationData(
+                            currentBind.staticBind.locationData,
+                            "evaluating XForms binds",
+                            currentBind.staticBind.element
+                        )
+                    )
+                }
     
     // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
     def rebuild(): Unit =
@@ -105,7 +112,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             isFirstRebuild = false
         }
 
-    protected def validateConstraint(bindNode: BindNode, invalidInstances: ju.Set[String]) {
+    protected def validateConstraint(bindNode: BindNode, invalidInstances: ju.Set[String]): Unit = {
 
         assert(bindNode.staticBind.constraintsByLevel.nonEmpty)
 
@@ -173,28 +180,32 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         } yield
             mip
 
-    protected def evaluateBooleanExpression(bindNode: BindNode, xpathExpression: StaticXPathMIP): Boolean = {
-        // Setup function context
+    protected def evaluateBooleanExpression(bindNode: BindNode, xpathMIP: StaticXPathMIP): Boolean =
         // NOTE: When we implement support for allowing binds to receive events, source must be bind id.
-        val functionContext = model.getContextStack.getFunctionContext(model.getEffectiveId, bindNode)
-        XPath.evaluateSingle(bindNode.parentBind.items, bindNode.position, xpathExpression.compiledExpression, functionContext, variableResolver).asInstanceOf[Boolean]
-    }
+        XPath.evaluateSingle(
+            contextItems       = bindNode.parentBind.items,
+            contextPosition    = bindNode.position,
+            compiledExpression = xpathMIP.compiledExpression,
+            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, bindNode),
+            variableResolver).asInstanceOf[Boolean]
 
-    protected def evaluateStringExpression(bindNode: BindNode, xpathExpression: StaticXPathMIP): String = {
-        // Setup function context
+    protected def evaluateStringExpression(bindNode: BindNode, xpathMIP: StaticXPathMIP): String =
         // NOTE: When we implement support for allowing binds to receive events, source must be bind id.
-        val functionContext = model.getContextStack.getFunctionContext(model.getEffectiveId, bindNode)
-        XPath.evaluateAsString(bindNode.parentBind.items, bindNode.position, xpathExpression.compiledExpression, functionContext, variableResolver)
-    }
+        XPath.evaluateAsString(
+            contextItems       = bindNode.parentBind.items,
+            contextPosition    = bindNode.position,
+            compiledExpression = xpathMIP.compiledExpression,
+            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, bindNode),
+            variableResolver)
 
-    protected def handleMIPXPathException(throwable: Throwable, bindNode: BindNode, xpathMIP: StaticXPathMIP, message: String) {
+    protected def handleMIPXPathException(throwable: Throwable, bindNode: BindNode, xpathMIP: StaticXPathMIP, message: String): Unit = {
         Exceptions.getRootThrowable(throwable) match {
             case e: TypedNodeWrapper.TypedValueException ⇒
                 // Consider validation errors as ignorable. The rationale is that if the function (the XPath
                 // expression) works on inputs that are not valid (hence the validation error), then the function cannot
-                // produce a meaningful result. We think that it is worth handling this condition slightly differently from
-                // other dynamic and static errors, so that users can just write expression without constant checks with
-                // `castable as` or `instance of`.
+                // produce a meaningful result. We think that it is worth handling this condition slightly differently
+                // from other dynamic and static errors, so that users can just write expression without constant checks
+                // with `castable as` or `instance of`.
                 debug("typed value exception", Seq("node name" → e.nodeName, "expected type" → e.typeName, "actual value" → e.nodeValue))
             case t ⇒
                 // All other errors dispatch an event and will cause the usual fatal-or-not behavior
@@ -228,7 +239,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     def resolveBind(bindId: String, contextItem: Item): RuntimeBind =
         singleNodeContextBinds.get(bindId) match {
             case Some(singleNodeContextBind) ⇒
-                // This bind has a single-node context (incl. top-level bind), so ignore context item and just return the bind nodeset
+                // This bind has a single-node context (incl. top-level bind), so ignore context item and just return
+                // the bind nodeset
                 singleNodeContextBind
             case None ⇒
                 // Nested bind: use context item

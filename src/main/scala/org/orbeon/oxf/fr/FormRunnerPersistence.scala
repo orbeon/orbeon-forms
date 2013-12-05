@@ -36,6 +36,9 @@ trait FormRunnerPersistence {
 
     val StandardProviderProperties = Set("uri", "autosave", "active", "permissions")
 
+    // NOTE: We generate .bin, but sample data can contain other extensions
+    private val RecognizedAttachmentExtensions = Set("bin", "jpg", "jpeg", "gif", "png", "pdf")
+
     // Check whether a value correspond to an uploaded file
     //
     // For this to be true
@@ -57,7 +60,7 @@ trait FormRunnerPersistence {
 
     // Whether the given path is an attachment path (ignoring an optional query string)
     def isAttachmentURLFor(basePath: String, url: String) =
-        url.startsWith(basePath) && splitQuery(url)._1.endsWith(".bin")
+        url.startsWith(basePath) && (split[List](splitQuery(url)._1, ".").lastOption exists RecognizedAttachmentExtensions)
 
     // For a given attachment path, return the filename
     def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last

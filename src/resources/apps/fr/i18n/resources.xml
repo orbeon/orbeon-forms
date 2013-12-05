@@ -68,6 +68,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Import</import>
                 <new>&lt;i class="icon-plus"/&gt; New</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Edit</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; Duplicate</duplicate>
             </buttons>
             <titles>
                 <summary-title>Summary</summary-title>
@@ -349,6 +350,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Importer</import>
                 <new>&lt;i class="icon-plus"/&gt; Nouveau</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Editer</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; Dupliquer</duplicate>
             </buttons>
             <titles>
                 <summary-title>Sommaire</summary-title>
@@ -622,6 +624,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Importar</import>
                 <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Editar</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
             </buttons>
             <titles>
                 <summary-title>Resumen</summary-title>
@@ -889,6 +892,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Importer</import>
                 <new>&lt;i class="icon-plus"/&gt; Nytt skjema</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Rediger</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
             </buttons>
             <titles>
                 <summary-title>Oppsummering</summary-title>
@@ -1155,6 +1159,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Импорт</import>
                 <new>&lt;i class="icon-plus"/&gt; Новая</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Редактировать</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
             </buttons>
             <titles>
                 <summary-title>Общая информация</summary-title>
@@ -1425,6 +1430,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Importa</import>
                 <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Modifica</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
             </buttons>
             <titles>
                 <summary-title>Sommario</summary-title>
@@ -1702,6 +1708,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Importieren</import>
                 <new>&lt;i class="icon-plus"/&gt; Neu</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Ändern</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
             </buttons>
             <titles>
                 <summary-title>Übersicht</summary-title>
@@ -1979,6 +1986,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Tuo</import>
                 <new>&lt;i class="icon-plus"/&gt; Uusi</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Muokkaa</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
             </buttons>
             <titles>
                 <summary-title>Yhteenveto</summary-title>

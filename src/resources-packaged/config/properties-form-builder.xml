@@ -51,7 +51,7 @@
     <property as="xs:integer" name="oxf.fb.section.close"                            value="100"/>
 
     <!-- Form Builder summary page  -->
-    <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="home delete new"/>
+    <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="home delete duplicate new"/>
 
     <!-- Available languages -->
     <property as="xs:string" name="oxf.fr.available-languages.orbeon.builder"        value="en fr it de"/>

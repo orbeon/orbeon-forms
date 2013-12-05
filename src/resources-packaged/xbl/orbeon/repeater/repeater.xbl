@@ -26,7 +26,6 @@
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:script src="/xbl/orbeon/repeater/repeater.js"/>
-    <xbl:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js"/>
 
     <xbl:binding id="fr-repeater-binding" element="fr|repeater" xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
 

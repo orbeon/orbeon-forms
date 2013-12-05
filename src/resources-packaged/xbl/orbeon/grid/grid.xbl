@@ -107,9 +107,11 @@
                             <xf:var name="repeat-sequence">
                                 <xxf:sequence value="{$repeat-expression}" xxbl:scope="outer"/>
                             </xf:var>
-                            <xf:var name="repeat-template">
-                                <xxf:sequence value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
-                            </xf:var>
+                            <xsl:if test="not($readonly)">
+                                <xf:var name="repeat-template">
+                                    <xxf:sequence value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
+                                </xf:var>
+                            </xsl:if>
                             <xf:var name="repeat-index">
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
                                 <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
@@ -361,91 +363,93 @@
                                                 <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
 
                                                     <!-- Run row operations, checking that they are allowed first -->
-                                                    <xf:action
-                                                        event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
-                                                        target="#observer"
-                                                        if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-tr', 'class'))">
+                                                    <xsl:if test="not($readonly)">
+                                                        <xf:action
+                                                            event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
+                                                            target="#observer"
+                                                            if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-tr', 'class'))">
 
-                                                        <!-- Make sure we have stable references -->
-                                                        <xf:var name="context" value="$repeat-context"/>
-                                                        <xf:var name="items"   value="xxf:repeat-items()"/>
-                                                        <xf:var name="p"       value="xxf:repeat-position()"/>
-                                                        <xf:var name="source"  value="$items[$p]"/>
+                                                            <!-- Make sure we have stable references -->
+                                                            <xf:var name="context" value="$repeat-context"/>
+                                                            <xf:var name="items"   value="xxf:repeat-items()"/>
+                                                            <xf:var name="p"       value="xxf:repeat-position()"/>
+                                                            <xf:var name="source"  value="$items[$p]"/>
 
-                                                        <!-- Delete source node in any case. It's ok because we have a
-                                                             reference to it for operations that still require it. -->
-                                                        <xf:delete ref="$source"/>
+                                                            <!-- Delete source node in any case. It's ok because we have a
+                                                                 reference to it for operations that still require it. -->
+                                                            <xf:delete ref="$source"/>
 
-                                                        <!-- NOTES:
+                                                            <!-- NOTES:
 
-                                                             1. In actions below, we try to restore focus explicitly
-                                                                as we don't have an xf:move action. See:
+                                                                 1. In actions below, we try to restore focus explicitly
+                                                                    as we don't have an xf:move action. See:
 
-                                                                https://github.com/orbeon/orbeon-forms/issues/1426
+                                                                    https://github.com/orbeon/orbeon-forms/issues/1426
 
-                                                             2. When the repeat sequence updates immediately, focus
-                                                                handling tends to work, but when the repeat sequence
-                                                                updates upon refresh, information about the order of
-                                                                operations is lost and the focus is not set to the last
-                                                                inserted row.
+                                                                 2. When the repeat sequence updates immediately, focus
+                                                                    handling tends to work, but when the repeat sequence
+                                                                    updates upon refresh, information about the order of
+                                                                    operations is lost and the focus is not set to the last
+                                                                    inserted row.
 
-                                                             3. The client dispatches xxforms-repeat-activate after the
-                                                                operation has run. That event happens to be ignored as
-                                                                we delete the current iteration first.
-                                                         -->
+                                                                 3. The client dispatches xxforms-repeat-activate after the
+                                                                    operation has run. That event happens to be ignored as
+                                                                    we delete the current iteration first.
+                                                             -->
 
-                                                        <xf:action if="event('xxf:type') = 'fr-move-up'">
+                                                            <xf:action if="event('xxf:type') = 'fr-move-up'">
 
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$source"
-                                                                position="before"/>
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p - 1]"
+                                                                    origin="$source"
+                                                                    position="before"/>
 
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1"/>
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1"/>
 
+                                                            </xf:action>
+
+                                                            <xf:action if="event('xxf:type') = 'fr-move-down'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p + 1]"
+                                                                    origin="$source"
+                                                                    position="after"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2"/>
+
+                                                            </xf:action>
+
+                                                            <xf:action if="event('xxf:type') = 'fr-insert-above'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p - 1]"
+                                                                    origin="$repeat-template, $source"
+                                                                    position="after"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3"/>
+
+                                                            </xf:action>
+
+                                                            <xf:action if="event('xxf:type') = 'fr-insert-below'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p - 1]"
+                                                                    origin="$source, $repeat-template"
+                                                                    position="after"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4"/>
+
+                                                            </xf:action>
                                                         </xf:action>
-
-                                                        <xf:action if="event('xxf:type') = 'fr-move-down'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p + 1]"
-                                                                origin="$source"
-                                                                position="after"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2"/>
-
-                                                        </xf:action>
-
-                                                        <xf:action if="event('xxf:type') = 'fr-insert-above'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$repeat-template, $source"
-                                                                position="after"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3"/>
-
-                                                        </xf:action>
-
-                                                        <xf:action if="event('xxf:type') = 'fr-insert-below'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$source, $repeat-template"
-                                                                position="after"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4"/>
-
-                                                        </xf:action>
-                                                    </xf:action>
+                                                    </xsl:if>
 
                                                     <xsl:copy-of select="$content"/>
                                                 </xf:group>

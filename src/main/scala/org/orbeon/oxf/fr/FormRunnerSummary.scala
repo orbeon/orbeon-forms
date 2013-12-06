@@ -30,15 +30,14 @@ trait FormRunnerSummary {
         val someFormVersion = Some(formVersion) // use the same form version as the data to clone
 
         putWithAttachments(
-            data                   = data.root,
-            toBaseURI              = "", // local save
-            fromBasePath           = createFormDataBasePath(app, form, isDraft = false, fromDocument),
-            toBasePath             = createFormDataBasePath(app, form, isDraft = false, toDocument),
-            filename               = "data.xml",
-            commonQueryString      = "",
-            forceAttachments       = true,
-            dataFormVersion        = someFormVersion,
-            attachmentsFormVersion = someFormVersion
+            data               = data.root,
+            toBaseURI          = "", // local save
+            fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
+            toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
+            filename           = "data.xml",
+            commonQueryString  = "",
+            forceAttachments   = true,
+            formVersion        = someFormVersion
         )
     }
 }

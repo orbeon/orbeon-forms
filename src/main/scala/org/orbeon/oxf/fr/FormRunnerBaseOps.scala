@@ -130,17 +130,18 @@ trait FormRunnerBaseOps {
     def hasCaptcha = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
 
     // The standard Form Runner parameters
-    case class FormRunnerParams(app: String, form: String, document: Option[String], mode: String)
+    case class FormRunnerParams(app: String, form: String, formVersion: String, document: Option[String], mode: String)
 
     object FormRunnerParams {
         def apply(): FormRunnerParams = {
             val params = parametersInstance.rootElement
 
             FormRunnerParams(
-                app      = params \ "app",
-                form     = params \ "form",
-                document = nonEmptyOrNone(params \ "document"),
-                mode     = params \ "mode"
+                app         = params \ "app",
+                form        = params \ "form",
+                formVersion = params \ "form-version",
+                document    = nonEmptyOrNone(params \ "document"),
+                mode        = params \ "mode"
             )
         }
     }

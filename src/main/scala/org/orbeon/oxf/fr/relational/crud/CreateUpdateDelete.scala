@@ -30,14 +30,14 @@ import org.xml.sax.InputSource
 
 trait CreateUpdateDelete extends RequestResponse with Common {
 
-    case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String])
+    case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String], formVersion: Option[Int])
     def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
         val table = tableName(req)
         val resultSet = {
             val ps = connection.prepareStatement(
-                s"""select created ${req.forData.option(", username , groupname").mkString}
+                s"""select created ${req.forData.option(", username , groupname, form_version").mkString}
                    |  from $table
                    | where (last_modified_time, $idCols)
                    |       in
@@ -46,9 +46,9 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                    |               from $table
                    |              where app  = ?
                    |                    and form = ?
-                   |                    and form_version = ?
-                   |                    ${if (req.forData)       "and document_id = ?" else ""}
-                   |                    ${if (req.forAttachment) "and file_name   = ?" else ""}
+                   |                    ${if (! req.forData)     "and form_version = ?" else ""}
+                   |                    ${if (req.forData)       "and document_id  = ?" else ""}
+                   |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
                    |           group by $idCols
                    |       )
                    |       and deleted = 'N'
@@ -56,7 +56,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             val position = Iterator.from(1)
             ps.setString(position.next(), req.app)
             ps.setString(position.next(), req.form)
-            ps.setInt   (position.next(), requestedFormVersion(connection, req))
+            if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(connection, req))
             if (req.forData)       ps.setString(position.next(), req.dataPart.get.documentId)
             if (req.forAttachment) ps.setString(position.next(), req.filename.get)
             ps.executeQuery()
@@ -66,7 +66,8 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         if (resultSet.next()) {
             val row = new Row(resultSet.getTimestamp("created"),
                               if (req.forData) Option(resultSet.getString("username" )) else None,
-                              if (req.forData) Option(resultSet.getString("groupname")) else None)
+                              if (req.forData) Option(resultSet.getString("groupname")) else None,
+                              if (req.forData) Option(resultSet.getInt("form_version")) else None)
             // Query should return at most one row
             assert(! resultSet.next())
             Some(row)
@@ -136,7 +137,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                                      ps.setString(position.next(), requestUsername.getOrElse(null))
                                      ps.setString(position.next(), req.app)
                                      ps.setString(position.next(), req.form)
-                                     ps.setInt   (position.next(), requestedFormVersion(connection, req))
+                                     ps.setInt   (position.next(), existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req)))
         if (req.forData)             ps.setString(position.next(), req.dataPart.get.documentId)
         if (req.forData)             ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
         if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
@@ -159,9 +160,9 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             val req = request
 
             // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
-            // - For efficiency: when we can, it's better to 400 right away without accessing the database.
-            // - For correctness: e.g., a  put for a document id is an invalid request, but if we start by checking
+            // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking
             //   permissions, we might not find the document and return a 400 instead.
+            // - For efficiency: when we can, it's better to 400 right away without accessing the database.
             def checkVersionInitial(): Unit = {
                 val badVersion =
                     // Only GET for form definitions can request a version for a given document
@@ -197,11 +198,10 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             }
 
             def checkVersionWithExisting(existing: Option[Row]): Unit = {
-                val badVersion = req.forData && (
-                        // Create: a specific version number is required
-                        (! delete && existing.isEmpty && ! req.version.isInstanceOf[Specific]) ||
-                        // Update: no version can be specified
-                        (! delete && existing.isDefined && ! (req.version == Unspecified)))
+                // Create: a specific version number is required
+                // Update: we're OK if a version is specified; we just won't use it
+                val badVersion = req.forData &&
+                        (! delete && existing.isEmpty && ! req.version.isInstanceOf[Specific])
                 if (badVersion) throw HttpStatusCodeException(400)
             }
 

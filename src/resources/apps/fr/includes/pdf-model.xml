@@ -15,7 +15,7 @@
           xmlns:xf="http://www.w3.org/2002/xforms"
           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
-    <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
+        <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
     <!-- Don't use xxf:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
@@ -25,7 +25,10 @@
         method="post"
         replace="all"
         ref="xxf:instance('fr-form-instance')"
-        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}{xxf:append-query-params('', for $l in event('fr-language')[normalize-space()] return ('fr-remember-language=false', concat('fr-language=', $l)))}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}{xxf:append-query-params('', (
+                concat('form-version=', $parameters/form-version),
+                for $l in event('fr-language')[normalize-space()] return ('fr-remember-language=false', concat('fr-language=', $l))
+            ))}"
         xxf:show-progress="false"/>
 
     <!-- Open PDF for the current form data (dispatch from XPL) -->

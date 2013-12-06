@@ -192,7 +192,7 @@ trait FormRunnerActions {
 
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
-            val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
+            val FormRunnerParams(app, form, formVersion, Some(document), _) = FormRunnerParams()
             val isDraft = paramByName(params, "draft").exists(_ == "true")
 
             // Notify that the data is about to be saved
@@ -200,19 +200,17 @@ trait FormRunnerActions {
 
             val modeElement = parametersInstance.rootElement \ "mode"
             val isNew = modeElement.stringValue == "new"
-            val formVersion = (parametersInstance.rootElement \ "form-version").stringValue
 
             // Save
             val (beforeURLs, afterURLs) = putWithAttachments(
-                data                   = formInstance.root,
-                toBaseURI              = "", // local save
-                fromBasePath           = createFormDataBasePath(app, form, ! isDraft, document),
-                toBasePath             = createFormDataBasePath(app, form, isDraft, document),
-                filename               = "data.xml",
-                commonQueryString      = s"valid=$dataValid",
-                forceAttachments       = false,
-                dataFormVersion        = isNew option formVersion,
-                attachmentsFormVersion = Some(formVersion)
+                data              = formInstance.root,
+                toBaseURI         = "", // local save
+                fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
+                toBasePath        = createFormDataBasePath(app, form, isDraft, document),
+                filename          = "data.xml",
+                commonQueryString = s"valid=$dataValid",
+                forceAttachments  = false,
+                formVersion       = Some(formVersion)
             )
 
             // If we were in new mode, now we must be in edit mode
@@ -292,7 +290,7 @@ trait FormRunnerActions {
     def trySend(params: ActionParams): Try[Any] =
         Try {
 
-            implicit val formRunnerParams @ FormRunnerParams(app, form, document, _) = FormRunnerParams()
+            implicit val formRunnerParams @ FormRunnerParams(app, form, formVersion, document, _) = FormRunnerParams()
 
             val propertyPrefixOpt = paramByNameOrDefault(params, "property")
 
@@ -311,11 +309,12 @@ trait FormRunnerActions {
             val paramsToAppend =
                 stringOptionToSet(findParamValue("parameters")).toList
 
-            def paramValuesToAppend = paramsToAppend collect {
-                case name @ "app"      ⇒ name → app
-                case name @ "form"     ⇒ name → form
-                case name @ "document" ⇒ name → document.get
-                case name @ "valid"    ⇒ name → dataValid.toString
+            val paramValuesToAppend = paramsToAppend collect {
+                case name @ "app"          ⇒ name → app
+                case name @ "form"         ⇒ name → form
+                case name @ "form-version" ⇒ name → formVersion
+                case name @ "document"     ⇒ name → document.get
+                case name @ "valid"        ⇒ name → dataValid.toString
             }
 
             // Append query parameters to the URL
@@ -376,7 +375,7 @@ trait FormRunnerActions {
                 Some("prune")      → "false",
                 Some("replace")    → "all",
                 Some("content")    → "xml",
-                Some("parameters") → ""
+                Some("parameters") → "form-version"
             )
         } flatMap
             trySend
@@ -405,28 +404,28 @@ trait FormRunnerActions {
 
     def tryNavigateToReview(params: ActionParams): Try[Any] =
         Try {
-            val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
+            val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/view/$document"
         } flatMap
             tryChangeMode
 
     def tryNavigateToEdit(params: ActionParams): Try[Any] =
         Try {
-            val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
+            val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/edit/$document"
         } flatMap
             tryChangeMode
 
     def tryToggleNoscript(params: ActionParams): Try[Any] =
         Try {
-            val FormRunnerParams(app, form, Some(document), mode) = FormRunnerParams()
+            val FormRunnerParams(app, form, _, Some(document), mode) = FormRunnerParams()
             s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! XFormsProperties.isNoscript(containingDocument)).toString}"
         } flatMap
             tryChangeMode
 
     def tryNavigateToSummary(params: ActionParams): Try[Any]  =
         Try {
-            val FormRunnerParams(app, form, _, _) = FormRunnerParams()
+            val FormRunnerParams(app, form, _, _, _) = FormRunnerParams()
             s"/fr/$app/$form/summary"
         } flatMap
             tryNavigateTo

@@ -28,18 +28,17 @@ trait PublishOps {
         try {
             val attachments =
                 putWithAttachments(
-                    data                   = xhtml.root,
-                    toBaseURI              = "", // local publish
-                    fromBasePath           = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
-                    toBasePath             = createFormDefinitionBasePath(app, form),
-                    filename               = "form.xhtml",
-                    commonQueryString      = s"document=$document",
-                    forceAttachments       = false,
+                    data              = xhtml.root,
+                    toBaseURI         = "", // local publish
+                    fromBasePath      = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
+                    toBasePath        = createFormDefinitionBasePath(app, form),
+                    filename          = "form.xhtml",
+                    commonQueryString = s"document=$document",
+                    forceAttachments  = false,
                     // Using "next" for attachments works as attachments are saved first, and the persistence layer
                     // uses the latest version of the published forms (not attachments) to figure what the next
                     // version is
-                    dataFormVersion        = Some("next"),
-                    attachmentsFormVersion = Some("next")
+                    formVersion       = Some("next")
                 )
             setvalue(instanceRoot("fb-publish-instance").get / "attachments", attachments._1.size.toString)
             toggle("fb-publish-dialog-success")

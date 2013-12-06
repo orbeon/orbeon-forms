@@ -187,14 +187,20 @@
                 <!-- If URI is /new (it should be), change it to /edit/id -->
                 <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
                 <xxf:script ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
-                    if (history &amp;&amp; history.replaceState) {
-                        var hashIndex = location.href.indexOf("#");
-                        var hrefWithoutHash = hashIndex != -1 ? location.href.substring(0, hashIndex) : location.href;
-                        if (hrefWithoutHash.lastIndexOf("/new") == hrefWithoutHash.length - 4) {
-                            var hash = hashIndex != -1 ? location.href.substring(hashIndex) : "";
-                            history.replaceState(null, "", "edit/" + ORBEON.xforms.Document.getValue("fr-parameters-instance-document") + hash);
+                    <![CDATA[
+                        if (history && history.replaceState) {
+                            var NewSuffix = '/new';
+                            var endsWithNew = location.pathname.indexOf(NewSuffix, location.pathname.length - NewSuffix.length) != -1;
+                            if (endsWithNew) {
+                                var documentId = ORBEON.xforms.Document.getValue("fr-parameters-instance-document");
+                                var editSuffix = "edit/" +
+                                    documentId +
+                                    location.search +   // E.g. ?form-version=42
+                                    location.hash;      // For now not used by Form Runner, but it is safer to keep it
+                                history.replaceState(null, "", editSuffix);
+                            }
                         }
-                    }
+                    ]]>
                 </xxf:script>
             </xf:var>
 

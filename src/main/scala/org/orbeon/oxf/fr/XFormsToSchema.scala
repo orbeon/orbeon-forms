@@ -33,6 +33,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML.{Attribute ⇒ _, Text ⇒ _, _}
 import xml._
+import org.orbeon.oxf.processor.ProcessorImpl
 
 /**
  *  Supported:
@@ -67,9 +68,8 @@ class XFormsToSchema extends XFormsToSomething {
         Version.instance.requirePEFeature("XForms schema generator service")
 
         // Read form and library
-        val SchemaPath(appName, formName) = NetUtils.getExternalContext.getRequest.getRequestPath
-
-        val formSource = FormRunner.readPublishedForm(appName, formName).get
+        val SchemaPath(appName, _) = NetUtils.getExternalContext.getRequest.getRequestPath
+        val formSource = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA), XPath.GlobalConfiguration)
         val libraries  = Libraries(FormRunner.readPublishedForm("orbeon", "library"), FormRunner.readPublishedForm(appName, "library"))
 
         // Compute root xs:element

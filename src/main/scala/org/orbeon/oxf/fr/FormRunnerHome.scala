@@ -139,16 +139,15 @@ trait FormRunnerHome {
 
     def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(
-            data                   = xhtml.root,
-            toBaseURI              = toBaseURI,
-            fromBasePath           = createFormDefinitionBasePath(app, form),
-            toBasePath             = createFormDefinitionBasePath(app, form),
-            filename               = "form.xhtml",
-            commonQueryString      = "",
-            forceAttachments       = forceAttachments,
-            username               = nonEmptyOrNone(username),
-            password               = nonEmptyOrNone(password),
-            dataFormVersion        = Some("next"),
-            attachmentsFormVersion = Some("next")
+            data              = xhtml.root,
+            toBaseURI         = toBaseURI,
+            fromBasePath      = createFormDefinitionBasePath(app, form),
+            toBasePath        = createFormDefinitionBasePath(app, form),
+            filename          = "form.xhtml",
+            commonQueryString = "",
+            forceAttachments  = forceAttachments,
+            username          = nonEmptyOrNone(username),
+            password          = nonEmptyOrNone(password),
+            formVersion       = Some("next")
         )
 }

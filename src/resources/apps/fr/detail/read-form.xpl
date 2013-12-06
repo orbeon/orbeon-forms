@@ -23,7 +23,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
-    <!-- Parameters (app, form, document, and mode) -->
+    <!-- Parameters (app, form, form version, document, and mode) -->
     <p:param type="input" name="instance"/>
     <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
     <p:param type="output" name="data"/>
@@ -45,12 +45,6 @@
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
                 </url>
-                <xsl:if test="$document != ''">
-                    <header>
-                        <name>Orbeon-For-Document-Id</name>
-                        <value><xsl:value-of select="$document"/></value>
-                    </header>
-                </xsl:if>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                 <!-- Form definitions are always in XML format -->
@@ -59,8 +53,27 @@
                 <handle-xinclude>false</handle-xinclude>
                 <!-- Enable conditional GET -->
                 <cache-control><use-local-cache>true</use-local-cache><conditional-get>true</conditional-get></cache-control>
+
+                <!-- If we know the document id, tell the persistence API,
+                     otherwise pass the request form version, if there is one -->
+                <xsl:variable name="known-document-id"               select="$document != ''"/>
+                <xsl:variable name="specific-form-version-requested" select="/*/form-version != ''"/>
+                <xsl:if test="$known-document-id">
+                    <header>
+                        <name>Orbeon-For-Document-Id</name>
+                        <value><xsl:value-of select="$document"/></value>
+                    </header>
+                </xsl:if>
+                <xsl:if test="not($known-document-id) and $specific-form-version-requested">
+                    <header>
+                        <name>Orbeon-Form-Definition-Version</name>
+                        <value><xsl:value-of select="/*/form-version"/></value>
+                    </header>
+                </xsl:if>
+
                 <!-- Read the Orbeon-Form-Definition-Version, if provided -->
                 <read-header>orbeon-form-definition-version</read-header>
+
             </config>
         </p:input>
         <p:output name="data" id="document"/>

@@ -201,8 +201,7 @@ trait FormRunnerPersistence {
             forceAttachments: Boolean,
             username: Option[String] = None,
             password: Option[String] = None,
-            dataFormVersion: Option[String] = None,
-            attachmentsFormVersion: Option[String] = None) = {
+            formVersion: Option[String] = None) = {
 
         // Find all instance nodes containing file URLs we need to upload
         val (uploadHolders, beforeURLs, afterURLs) =
@@ -216,7 +215,7 @@ trait FormRunnerPersistence {
                     "resource"     → Some(appendQueryString(toBaseURI + resource, commonQueryString)),
                     "username"     → username,
                     "password"     → password,
-                    "form-version" → attachmentsFormVersion)
+                    "form-version" → formVersion)
                 )
             }
 
@@ -233,7 +232,7 @@ trait FormRunnerPersistence {
                 "resource"     → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
                 "username"     → username,
                 "password"     → password,
-                "form-version" → dataFormVersion)
+                "form-version" → formVersion)
             )
 
         // Do things in order, so we don't update path or save the data if any the upload fails

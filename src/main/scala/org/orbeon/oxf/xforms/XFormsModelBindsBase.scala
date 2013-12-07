@@ -294,12 +294,10 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                         (throw new IllegalStateException)
                 case None ⇒
                     // Try top-level model variables
-                    val modelVariables = model.getContextStack.getCurrentBindingContext.getInScopeVariables
-                    val result = modelVariables.get(variableQName.getLocalName)
+                    val modelVariables = model.getDefaultEvaluationContext.getInScopeVariables
                     // NOTE: With XPath analysis on, variable scope has been checked statically
-                    if (result eq null)
-                        throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData)
-                    result
+                    Option(modelVariables.get(variableQName.getLocalName)) getOrElse
+                        (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
             }
 }
 

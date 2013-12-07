@@ -19,102 +19,22 @@ import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, RuntimeBind}
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, Item}
 import org.orbeon.saxon.value.SequenceExtent
 
+// Implement bind variable resolution, taking an optional context bind node as starting point
 object BindVariableResolver {
 
-    def findAncestorOrSelfWithName(bindNode: BindNode, name: String) =
-        bindNode.ancestorOrSelfBindNodes find (_.staticBind.name == name)
-
-    // NOTE: This requires that a branch doesn't start with the other.
-    def findStaticAncestry(branch1Opt: Option[List[StaticBind]], branch2: List[StaticBind]) =
-        branch1Opt match {
-            case Some(branch1) ⇒
-                branch1.ensuring(_.nonEmpty).iterator zip branch2.ensuring(_.nonEmpty).iterator collectFirst {
-                    case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
-                        (bindOnBranch2.parentBind, bindOnBranch2)
-                }
-            case None ⇒
-                Some(None, branch2.head)
-        }
-
-
-    // NOTE: This requires that descendantBindNode is a descendant of a runtime bind associated with ancestorStaticBind.
-    def findConcreteAncestorOrSelfIteration(ancestorStaticBind: StaticBind, descendantBindNode: BindNode) =
-        descendantBindNode.ancestorOrSelfBindNodes collectFirst {
-            case iteration: BindIteration if iteration.forStaticId == ancestorStaticBind.staticId ⇒ iteration
-        } get
-
-    def hasAncestorIteration(ancestorIteration: BindIteration, descendantRuntimeBind: RuntimeBind) =
-        descendantRuntimeBind.parentIteration.ancestorOrSelfBindNodes exists (_ eq ancestorIteration)
-
-    def searchDescendantRuntimeBinds(targetAncestorOrSelf: List[StaticBind], rootBinds: Seq[RuntimeBind], rootId: String): SequenceExtent = {
-
-        def nextNodes(binds: Iterator[RuntimeBind], path: List[String]): Iterator[Item] = {
-
-            require(path.nonEmpty)
-
-            val nextBind = {
-                val nextId = path.head
-                binds find (_.staticId == nextId) get
-            }
-
-            path.tail match {
-                case Nil ⇒
-                    // We are at a target: return all items
-                    nextBind.items.asScala.iterator
-                case pathTail ⇒
-                    // We need to dig deeper to reach the target
-                    for {
-                        nextBindNode ← nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
-                        targetItem   ← nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
-                    } yield
-                        targetItem
-            }
-        }
-
-        val pathList = targetAncestorOrSelf map (_.staticId) dropWhile (rootId !=)
-        val items    = nextNodes(rootBinds.iterator, pathList).toArray
-
-        new SequenceExtent(items)
-    }
-
-    // Try to resolve using a non-ambiguous, indexed single-node context bind
-    def resolveSingle(
+    // Main resolution function
+    def resolveClosestBind(
             modelBinds: XFormsModelBindsBase,
-            targetBindId: String,
-            concreteAncestorIteration: Option[BindIteration]): Option[SequenceExtent] = {
-
-        def isValidTarget(singleNodeTarget: RuntimeBind) =
-            concreteAncestorIteration match {
-                // The binds have a common static ancestor and the target is a descendant of the same iteration
-                case Some(ancestorIteration) if hasAncestorIteration(ancestorIteration, singleNodeTarget) ⇒ true
-                // The binds are disjoint so the target is valid
-                case None ⇒ true
-                // The binds have a common static ancestor but the runtime target is disjoint
-                case _ ⇒ false
-            }
-
-        for {
-            singleNodeTarget ← modelBinds.singleNodeContextBinds.get(targetBindId)
-            if isValidTarget(singleNodeTarget)
-        } yield
-            new SequenceExtent(singleNodeTarget.items)
-    }
-
-    // Try to resolve by searching descendants nodes
-    def resolveMultiple(
-            modelBinds: XFormsModelBindsBase,
-            targetAncestorOrSelf: List[StaticBind],
-            concreteAncestorIteration: Option[BindIteration],
-            rootId: String): Option[SequenceExtent] = {
-
-        val rootBinds = (
-            concreteAncestorIteration
-            map       (_.childrenBinds)
-            getOrElse modelBinds.topLevelBinds
+            contextBindNodeOpt: Option[BindNode],
+            targetStaticBind: StaticBind): Option[ValueRepresentation]=
+        resolveAncestorOrSelf(
+            contextBindNodeOpt,
+            targetStaticBind
+        ) orElse resolveNotAncestorOrSelf(
+            modelBinds,
+            contextBindNodeOpt,
+            targetStaticBind
         )
-
-        Some(searchDescendantRuntimeBinds(targetAncestorOrSelf, rootBinds, rootId))
-    }
 
     // Try to resolve an ancestor-or-self bind
     def resolveAncestorOrSelf(contextBindNodeOpt: Option[BindNode], targetStaticBind: StaticBind): Option[NodeInfo] =
@@ -164,17 +84,98 @@ object BindVariableResolver {
         }
     }
 
-    // Main resolution function
-    def resolveClosestBind(
+    def findAncestorOrSelfWithName(bindNode: BindNode, name: String) =
+        bindNode.ancestorOrSelfBindNodes find (_.staticBind.name == name)
+
+    // NOTE: This requires that a branch doesn't start with the other.
+    def findStaticAncestry(branch1Opt: Option[List[StaticBind]], branch2: List[StaticBind]) =
+        branch1Opt match {
+            case Some(branch1) ⇒
+                branch1.ensuring(_.nonEmpty).iterator zip branch2.ensuring(_.nonEmpty).iterator collectFirst {
+                    case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
+                        (bindOnBranch2.parentBind, bindOnBranch2)
+                }
+            case None ⇒
+                Some(None, branch2.head)
+        }
+
+
+    // NOTE: This requires that descendantBindNode is a descendant of a runtime bind associated with ancestorStaticBind.
+    def findConcreteAncestorOrSelfIteration(ancestorStaticBind: StaticBind, descendantBindNode: BindNode) =
+        descendantBindNode.ancestorOrSelfBindNodes collectFirst {
+            case iteration: BindIteration if iteration.forStaticId == ancestorStaticBind.staticId ⇒ iteration
+        } get
+
+    def hasAncestorIteration(ancestorIteration: BindIteration, descendantRuntimeBind: RuntimeBind) =
+        descendantRuntimeBind.parentIteration.ancestorOrSelfBindNodes exists (_ eq ancestorIteration)
+
+    // Try to resolve using a non-ambiguous, indexed single-node context bind
+    def resolveSingle(
             modelBinds: XFormsModelBindsBase,
-            contextBindNodeOpt: Option[BindNode],
-            targetStaticBind: StaticBind): Option[ValueRepresentation]=
-        resolveAncestorOrSelf(
-            contextBindNodeOpt,
-            targetStaticBind
-        ) orElse resolveNotAncestorOrSelf(
-            modelBinds,
-            contextBindNodeOpt,
-            targetStaticBind
+            targetBindId: String,
+            concreteAncestorIteration: Option[BindIteration]): Option[SequenceExtent] = {
+
+        def isValidTarget(singleNodeTarget: RuntimeBind) =
+            concreteAncestorIteration match {
+                // The binds have a common static ancestor and the target is a descendant of the same iteration
+                case Some(ancestorIteration) if hasAncestorIteration(ancestorIteration, singleNodeTarget) ⇒ true
+                // The binds are disjoint so the target is valid
+                case None ⇒ true
+                // The binds have a common static ancestor but the runtime target is disjoint
+                case _ ⇒ false
+            }
+
+        for {
+            singleNodeTarget ← modelBinds.singleNodeContextBinds.get(targetBindId)
+            if isValidTarget(singleNodeTarget)
+        } yield
+            new SequenceExtent(singleNodeTarget.items)
+    }
+
+    def searchDescendantRuntimeBinds(targetAncestorOrSelf: List[StaticBind], rootBinds: Seq[RuntimeBind], rootId: String): SequenceExtent = {
+
+        def nextNodes(binds: Iterator[RuntimeBind], path: List[String]): Iterator[Item] = {
+
+            require(path.nonEmpty)
+
+            val nextBind = {
+                val nextId = path.head
+                binds find (_.staticId == nextId) get
+            }
+
+            path.tail match {
+                case Nil ⇒
+                    // We are at a target: return all items
+                    nextBind.items.asScala.iterator
+                case pathTail ⇒
+                    // We need to dig deeper to reach the target
+                    for {
+                        nextBindNode ← nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
+                        targetItem   ← nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
+                    } yield
+                        targetItem
+            }
+        }
+
+        val pathList = targetAncestorOrSelf map (_.staticId) dropWhile (rootId !=)
+        val items    = nextNodes(rootBinds.iterator, pathList).toArray
+
+        new SequenceExtent(items)
+    }
+
+    // Try to resolve by searching descendants nodes
+    def resolveMultiple(
+            modelBinds: XFormsModelBindsBase,
+            targetAncestorOrSelf: List[StaticBind],
+            concreteAncestorIteration: Option[BindIteration],
+            rootId: String): Option[SequenceExtent] = {
+
+        val rootBinds = (
+            concreteAncestorIteration
+            map       (_.childrenBinds)
+            getOrElse modelBinds.topLevelBinds
         )
+
+        Some(searchDescendantRuntimeBinds(targetAncestorOrSelf, rootBinds, rootId))
+    }
 }

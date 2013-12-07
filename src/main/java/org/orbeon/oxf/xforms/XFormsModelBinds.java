@@ -199,7 +199,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
     public Item evaluateBindByType(RuntimeBind bind, int position, QName mipType) throws XPathException {
 
-        final BindNode bindNode = bind.getBindNode(position);
+        final BindNode bindNode = bind.getOrCreateBindNode(position);
 
         if (mipType.equals(XFormsConstants.RELEVANT_QNAME)) {
             // Relevant

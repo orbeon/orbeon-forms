@@ -258,7 +258,6 @@ trait ModelBinds {
 
     def bindsById = bindTree().bindsById
     def bindsByName = bindTree().bindsByName
-    def jBindsByName = bindTree().bindsByName.asJava
 
     def hasDefaultValueBind = bindTree().hasDefaultValueBind
     def hasCalculateBind = bindTree().hasCalculateBind

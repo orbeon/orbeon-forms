@@ -17,13 +17,12 @@
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:exf="http://www.exforms.org/exf/1-0"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:p="http://www.orbeon.com/oxf/pipeline">
+        xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -35,6 +34,9 @@
          - annotate.xpl
          - form-to-xbl.xsl
          - https://github.com/orbeon/orbeon-forms/issues/1019
+         - https://github.com/orbeon/orbeon-forms/issues/1190
+         - https://github.com/orbeon/orbeon-forms/issues/1465
+         - https://github.com/orbeon/orbeon-forms/issues/1105
      -->
 
     <!-- Gather top-level model as well as models within section templates -->
@@ -42,9 +44,20 @@
         name="action-models-ids"
         select="$fr-form-model-id, /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
 
-    <!-- See also: https://github.com/orbeon/orbeon-forms/issues/1190 -->
-    <xsl:function name="fr:instance-path" as="xs:string">
-        <xsl:text>(xxf:binding(concat($control-name, '-control')), bind(concat($control-name, '-bind')))[1]</xsl:text>
+    <!-- Store the absolute id of the source in the request -->
+    <xsl:template match="/xh:html/xh:head//
+                            xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]/
+                            xf:action[p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready')]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- When setting or getting service values, resolve the target nodes relative to the source id -->
+    <xsl:function name="fr:resolve-targets" as="xs:string">
+        <xsl:text>frf:resolveTargetRelativeToControl(xxf:get-request-attribute('fr-action-source'), concat($control-name, '-bind'))</xsl:text>
     </xsl:function>
 
     <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
@@ -53,7 +66,7 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
             <!-- Set value -->
-            <xf:setvalue ref="$path" value="{fr:instance-path()}"/>
+            <xf:setvalue ref="$path" value="{fr:resolve-targets()}"/>
         </xsl:copy>
     </xsl:template>
 
@@ -65,7 +78,7 @@
             <!-- Set value and escape single quotes -->
             <xf:setvalue xmlns:sql="http://orbeon.org/oxf/xml/sql"
                          ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                         value="concat('''', replace(string({fr:instance-path()}), '''', ''''''), '''')"/>
+                         value="concat('''', replace(string({fr:resolve-targets()}), '''', ''''''), '''')"/>
         </xsl:copy>
     </xsl:template>
 
@@ -74,8 +87,8 @@
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
-            <!-- Set value -->
-            <xf:setvalue ref="{fr:instance-path()}" value="$control-value"/>
+            <!-- Set values (we choose to set all targets returned) -->
+            <xf:setvalue iterate="{fr:resolve-targets()}" ref="." value="$control-value"/>
         </xsl:copy>
     </xsl:template>
 
@@ -118,7 +131,7 @@
                  autocomplete, which is also a single selection control. -->
             <xf:var name="element-name" value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
             <xf:action if="$element-name = 'select' or ends-with($element-name, '-select')">
-                <xf:action iterate="bind(concat($control-name, '-bind'))">
+                <xf:action iterate="{fr:resolve-targets()}">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         ref="$bind"
@@ -126,7 +139,7 @@
                 </xf:action>
             </xf:action>
             <xf:action if="$element-name = ('select1', 'autocomplete') or ends-with($element-name, '-select1')">
-                <xf:action iterate="bind(concat($control-name, '-bind'))">
+                <xf:action iterate="{fr:resolve-targets()}">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         if="not(string($bind) = $resource-holders[1]/item/value)"

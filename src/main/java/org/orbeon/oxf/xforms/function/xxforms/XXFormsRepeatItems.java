@@ -31,12 +31,12 @@ public class XXFormsRepeatItems extends XFormsFunction {
         final Expression contextIdExpression = (argument.length == 0) ? null : argument[0];
         final String repeatId;
         if (contextIdExpression == null) {
-            repeatId = bindingContext(xpathContext).enclosingRepeatId();
+            repeatId = bindingContext().enclosingRepeatId();
         } else {
             repeatId = contextIdExpression.evaluateAsString(xpathContext).toString();
         }
 
         // Get repeat node-set for given id
-        return new ListIterator(bindingContext(xpathContext).repeatItems(repeatId));
+        return new ListIterator(bindingContext().repeatItems(repeatId));
     }
 }

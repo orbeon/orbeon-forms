@@ -186,8 +186,9 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             contextItems       = bindNode.parentBind.items,
             contextPosition    = bindNode.position,
             compiledExpression = xpathMIP.compiledExpression,
-            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, bindNode),
-            variableResolver).asInstanceOf[Boolean]
+            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
+            variableResolver   = variableResolver
+        ).asInstanceOf[Boolean]
 
     protected def evaluateStringExpression(bindNode: BindNode, xpathMIP: StaticXPathMIP): String =
         // NOTE: When we implement support for allowing binds to receive events, source must be bind id.
@@ -195,8 +196,9 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             contextItems       = bindNode.parentBind.items,
             contextPosition    = bindNode.position,
             compiledExpression = xpathMIP.compiledExpression,
-            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, bindNode),
-            variableResolver)
+            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
+            variableResolver   = variableResolver
+        )
 
     protected def handleMIPXPathException(throwable: Throwable, bindNode: BindNode, xpathMIP: StaticXPathMIP, message: String): Unit = {
         Exceptions.getRootThrowable(throwable) match {
@@ -284,23 +286,12 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             staticModel.bindsByName.get(variableQName.getLocalName) match {
                 case Some(targetStaticBind) ⇒
                     // Variable value is a bind nodeset to resolve
-                
-                    import BindVariableResolver._
-
-                    val contextBindNode = XFormsFunction.context(xpathContext).data.asInstanceOf[BindNode]
-                    val variableName    = variableQName.getLocalName
-
-                    resolveAncestorOrSelf(
-                        contextBindNode,
-                        variableName
-                    ) orElse resolveNotAncestorOrSelf(
-                        this,
-                        contextBindNode,
-                        targetStaticBind,
-                        variableName
+                    BindVariableResolver.resolveClosestBind(
+                        modelBinds          = this,
+                        contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
+                        targetStaticBind    = targetStaticBind
                     ) getOrElse
                         (throw new IllegalStateException)
-
                 case None ⇒
                     // Try top-level model variables
                     val modelVariables = model.getContextStack.getCurrentBindingContext.getInScopeVariables
@@ -312,17 +303,23 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             }
 }
 
-private object BindVariableResolver {
+object BindVariableResolver {
     
     def findAncestorOrSelfWithName(bindNode: BindNode, name: String) =
         bindNode.ancestorOrSelfBindNodes find (_.staticBind.name == name)
 
     // NOTE: This requires that a branch doesn't start with the other.
-    def findStaticAncestry(branch1: List[StaticBind], branch2: List[StaticBind]) =
-        branch1.ensuring(_.nonEmpty).iterator zip branch2.ensuring(_.nonEmpty).iterator collectFirst {
-            case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
-                (bindOnBranch2.parentBind, bindOnBranch1, bindOnBranch2)
+    def findStaticAncestry(branch1Opt: Option[List[StaticBind]], branch2: List[StaticBind]) =
+        branch1Opt match {
+            case Some(branch1) ⇒ 
+                branch1.ensuring(_.nonEmpty).iterator zip branch2.ensuring(_.nonEmpty).iterator collectFirst {
+                    case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
+                        (bindOnBranch2.parentBind, bindOnBranch2)
+                }
+            case None ⇒
+                Some(None, branch2.head)
         }
+
 
     // NOTE: This requires that descendantBindNode is a descendant of a runtime bind associated with ancestorStaticBind.
     def findConcreteAncestorOrSelfIteration(ancestorStaticBind: StaticBind, descendantBindNode: BindNode) =
@@ -333,7 +330,7 @@ private object BindVariableResolver {
     def hasAncestorIteration(ancestorIteration: BindIteration, descendantRuntimeBind: RuntimeBind) =
         descendantRuntimeBind.parentIteration.ancestorOrSelfBindNodes exists (_ eq ancestorIteration)
 
-    def searchDescendantRuntimeBinds(targetAncestorOrSelf: List[StaticBind], rootBinds: Seq[RuntimeBind], rootId: String): ValueRepresentation = {
+    def searchDescendantRuntimeBinds(targetAncestorOrSelf: List[StaticBind], rootBinds: Seq[RuntimeBind], rootId: String): SequenceExtent = {
 
         def nextNodes(binds: Iterator[RuntimeBind], path: List[String]): Iterator[Item] = {
 
@@ -358,17 +355,17 @@ private object BindVariableResolver {
             }
         }
 
-        val pathList      = targetAncestorOrSelf map (_.staticId) dropWhile (rootId !=)
-        val itemsIterator = nextNodes(rootBinds.iterator, pathList).toArray
+        val pathList = targetAncestorOrSelf map (_.staticId) dropWhile (rootId !=)
+        val items    = nextNodes(rootBinds.iterator, pathList).toArray
 
-        new SequenceExtent(itemsIterator)
+        new SequenceExtent(items)
     }
 
     // Try to resolve using a non-ambiguous, indexed single-node context bind
     def resolveSingle(
             modelBinds: XFormsModelBindsBase,
             targetBindId: String,
-            concreteAncestorIteration: Option[BindIteration]): Option[ValueRepresentation] = {
+            concreteAncestorIteration: Option[BindIteration]): Option[SequenceExtent] = {
 
         def isValidTarget(singleNodeTarget: RuntimeBind) =
             concreteAncestorIteration match {
@@ -392,7 +389,7 @@ private object BindVariableResolver {
             modelBinds: XFormsModelBindsBase,
             targetAncestorOrSelf: List[StaticBind],
             concreteAncestorIteration: Option[BindIteration],
-            rootId: String): Option[ValueRepresentation] = {
+            rootId: String): Option[SequenceExtent] = {
 
         val rootBinds = (
             concreteAncestorIteration
@@ -404,21 +401,20 @@ private object BindVariableResolver {
     }
 
     // Try to resolve an ancestor-or-self bind
-    def resolveAncestorOrSelf(contextBindNode: BindNode, variableName: String): Option[ValueRepresentation] =
-        findAncestorOrSelfWithName(contextBindNode, variableName) map (_.node)
+    def resolveAncestorOrSelf(contextBindNodeOpt: Option[BindNode], targetStaticBind: StaticBind): Option[NodeInfo] =
+        contextBindNodeOpt flatMap (findAncestorOrSelfWithName(_, targetStaticBind.name)) map (_.node)
 
     // Try to resolve a bind which is not an ancestor-or-self bind
     def resolveNotAncestorOrSelf(
             modelBinds: XFormsModelBindsBase,
-            contextBindNode: BindNode,
-            targetStaticBind: StaticBind,
-            variableName: String): Option[ValueRepresentation] = {
+            contextBindNodeOpt: Option[BindNode],
+            targetStaticBind: StaticBind): Option[SequenceExtent] = {
 
-        val contextAncestorOrSelf = contextBindNode.staticBind.ancestorOrSelfBinds.reverse
-        val targetAncestorOrSelf  = targetStaticBind.ancestorOrSelfBinds.reverse
+        val contextAncestorOrSelfOpt = contextBindNodeOpt map (_.staticBind.ancestorOrSelfBinds.reverse)
+        val targetAncestorOrSelf     = targetStaticBind.ancestorOrSelfBinds.reverse
 
-        findStaticAncestry(contextAncestorOrSelf, targetAncestorOrSelf) flatMap {
-            case (commonStaticAncestorOpt, _, childBindOnTargetBranch) ⇒
+        findStaticAncestry(contextAncestorOrSelfOpt, targetAncestorOrSelf) flatMap {
+            case (commonStaticAncestorOpt, childBindOnTargetBranch) ⇒
 
                 // We found, from the root, the first static binds which are different. If both of
                 // them are nested binds, they have a common parent. If at least one of them is a
@@ -433,7 +429,11 @@ private object BindVariableResolver {
                 //    each concrete target return all the items found.
 
                 val concreteAncestorIteration =
-                    commonStaticAncestorOpt map (findConcreteAncestorOrSelfIteration(_, contextBindNode))
+                    for {
+                        commonStaticAncestor ← commonStaticAncestorOpt
+                        contextBindNode      ← contextBindNodeOpt
+                    } yield
+                        findConcreteAncestorOrSelfIteration(commonStaticAncestor, contextBindNode)
             
                 resolveSingle(
                     modelBinds,
@@ -447,4 +447,18 @@ private object BindVariableResolver {
                 )
         }
     }
+
+    // Main resolution function
+    def resolveClosestBind(
+            modelBinds: XFormsModelBindsBase,
+            contextBindNodeOpt: Option[BindNode],
+            targetStaticBind: StaticBind): Option[ValueRepresentation]=
+        resolveAncestorOrSelf(
+            contextBindNodeOpt,
+            targetStaticBind
+        ) orElse resolveNotAncestorOrSelf(
+            modelBinds,
+            contextBindNodeOpt,
+            targetStaticBind
+        )
 }

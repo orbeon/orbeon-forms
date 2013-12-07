@@ -32,7 +32,7 @@ public class XXFormsIndex extends Index {
 
         if (repeatId == null) {
             // Find closest enclosing id
-            return findIndexForRepeatId(xpathContext, bindingContext(xpathContext).enclosingRepeatId());
+            return findIndexForRepeatId(xpathContext, bindingContext().enclosingRepeatId());
         } else {
             return super.evaluateItem(xpathContext);
         }

@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -30,26 +28,21 @@ public class XXFormsGetRequestAttribute extends XXFormsGetScopeAttribute {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
-        if (containingDocument == null || containingDocument.isInitializing()) { // support null for use outside of XForms
-            // Get attribute name
-            final Expression attributeNameExpression = argument[0];
-            final String attributeName = attributeNameExpression.evaluateAsString(xpathContext).toString();
+        // Get attribute name
+        final Expression attributeNameExpression = argument[0];
+        final String attributeName = attributeNameExpression.evaluateAsString(xpathContext).toString();
 
-            // Get optional content type
-            final String contentType;
-            if (argument.length >= 2) {
-                final Expression contentTypeExpression = argument[1];
-                contentType = contentTypeExpression.evaluateAsString(xpathContext).toString();
-            } else {
-                contentType = null;
-            }
-
-            // Get attribute value
-            final Object attributeObject = NetUtils.getExternalContext().getRequest().getAttributesMap().get(attributeName);
-            return convertAttributeValue(xpathContext, attributeObject, contentType, attributeName);
+        // Get optional content type
+        final String contentType;
+        if (argument.length >= 2) {
+            final Expression contentTypeExpression = argument[1];
+            contentType = contentTypeExpression.evaluateAsString(xpathContext).toString();
         } else {
-            throw new OXFException("xxf:get-request-attribute() can only be called during XForms initialization.");
+            contentType = null;
         }
+
+        // Get attribute value
+        final Object attributeObject = NetUtils.getExternalContext().getRequest().getAttributesMap().get(attributeName);
+        return convertAttributeValue(xpathContext, attributeObject, contentType, attributeName);
     }
 }

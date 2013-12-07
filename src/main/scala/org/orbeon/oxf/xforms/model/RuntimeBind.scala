@@ -108,7 +108,7 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
     }
 
     def applyBinds(bindRunner: BindRunner): Unit =
-        if (bindNodes.nonEmpty) {
+        if (bindNodes.nonEmpty)
             for (bindNode ← bindNodes) {
                 // Handle current node
                 bindRunner.applyBind(bindNode)
@@ -119,8 +119,8 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
                     case _ ⇒
                 }
             }
-        }
 
-    def getBindNode(position: Int) =
-        bindNodes(position - 1)
+    // The RuntimeBind might not have BindNodes, so create one when needed
+    def getOrCreateBindNode(position: Int) =
+        bindNodes.lift(position - 1) getOrElse new BindNode(this, position, items.get(position - 1))
 }

@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 class Context extends XFormsFunction with MatchSimpleAnalysis {
 
     override def evaluateItem(xpathContext: XPathContext) =
-        bindingContext(xpathContext).contextItem
+        bindingContext.contextItem
 
     override def getIntrinsicDependencies =
         StaticProperty.DEPENDS_ON_CONTEXT_ITEM

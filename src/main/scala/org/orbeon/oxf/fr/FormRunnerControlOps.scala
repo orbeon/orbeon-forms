@@ -13,10 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{ValueRepresentation, NodeInfo}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.RuntimeBind
+import org.orbeon.oxf.xforms.BindVariableResolver
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
@@ -94,4 +98,38 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
         nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
+
+    // Resolve a target bind from a source
+    // - the source can refer to either a control with a `bind`, or directly to a bind
+    // - if this is not the case, the target is resolved from the enclosing model
+    // - this must be called from an XPath expression
+    def resolveTargetRelativeToControl(sourceStaticOrAbsoluteId: String, targetBindStaticId: String): ValueRepresentation = {
+
+        val container         = XFormsFunction.context.container
+        val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
+        val model             = XFormsFunction.context.model
+
+        val modelBinds        = model.getBinds
+        val staticModel       = model.staticModel
+
+        def findBindForSource =
+            Option(container.resolveObjectByIdInScope(sourceEffectiveId, sourceStaticOrAbsoluteId, null)) collect {
+                case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
+                case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+            } flatten
+
+        def contextBindNodeOpt =
+            for (sourceRuntimeBind ← findBindForSource)
+            yield
+                sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
+
+        val valueOpt =
+            for {
+                targetStaticBind  ← staticModel.bindsById.get(targetBindStaticId)
+                value             ← BindVariableResolver.resolveClosestBind(modelBinds, contextBindNodeOpt, targetStaticBind)
+            } yield
+                value
+
+        valueOpt.orNull
+    }
 }

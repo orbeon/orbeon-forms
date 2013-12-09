@@ -99,7 +99,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="instance" debug="xxx"/>
+        <p:output name="data" ref="instance"/>
     </p:processor>
 
     <!-- Handle XInclude (mainly for "resource" type of persistence) -->

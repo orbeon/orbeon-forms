@@ -116,10 +116,7 @@
                                     <xf:case id="case-closed" selected="{not($initially-open)}"/>
                                     <!-- Open section -->
                                     <xf:case id="case-open" selected="{$initially-open}">
-                                        <xsl:if test="not($editable) and $animate">
-                                            <xsl:attribute name="class">xxforms-animate</xsl:attribute>
-                                        </xsl:if>
-                                        <xf:group class="fr-section-content" xxbl:scope="outer" xxf:element="div">
+                                        <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
                                                     <fr:repeater ref="*" xbl:attr="template">

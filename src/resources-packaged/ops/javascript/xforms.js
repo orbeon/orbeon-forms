@@ -2436,6 +2436,11 @@ ORBEON.xforms.Controls = {
 
     /**
      * Toggle a single case.
+     *
+     * [1] We disable the open/close animation on IE10 and under. The animation works on IE11, but we've seen problems
+     *     with earlier versions, so, since the animation is only cosmetic, we determine that it isn't worth debugging
+     *     those issues and that we're better off just disabling the animation for those old versions of IE.
+     *     YAHOO.env.ua.ie returns 0 for IE11, as YUI doesn't detect IE11 as being IE.
      */
     toggleCase: function(controlId, visible) {
         var caseBegin = ORBEON.xforms.Controls.findCaseBegin(controlId);
@@ -2450,59 +2455,32 @@ ORBEON.xforms.Controls = {
             if (cursor.nodeType == ELEMENT_TYPE) {
                 // Change visibility by switching class
                 if (cursor.id == "xforms-case-end-" + controlId) break;
-                var doAnimate = cursor.id != "xforms-case-begin-" + controlId && // don't animate case-begin/end
-                        YAHOO.util.Dom.hasClass(cursor, "xxforms-animate") // only animate if class present
-                        && !(YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7); // simply disable animation for IE 6/7 as they behave badly
-                if (doAnimate) {
+                var doAnimate = cursor.id != "xforms-case-begin-" + controlId &&    // Don't animate case-begin/end
+                        YAHOO.util.Dom.hasClass(cursor, "xxforms-animate") &&       // Only animate if class present
+                        YAHOO.env.ua.ie == 0;                                       // Simply disable animation for IE<=10 [1]
 
-                    function hideOverflowDuringAnim(anim) {
-                        cursor.style.overflow = "hidden";
-                        anim.onComplete.subscribe(_.bind(function(cursor) {
-                            cursor.style.overflow = "";
-                        }, this, cursor));
-                    }
-
+                var updateClasses = _.partial(function(el) {
                     if (visible) {
-                        // Figure out what its natural height is
-                        cursor.style.height = "auto";
-                        var region = YAHOO.util.Dom.getRegion(cursor);
-                        var fullHeight = region.bottom - region.top;
-
-                        // Set height back to 0 and animate back to natural height
-                        cursor.style.height = 0;
-
-                        YAHOO.util.Dom.addClass(cursor, "xforms-case-selected");
-                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected");
-                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
-
-                        var anim = new YAHOO.util.Anim(cursor, { height: {  to: fullHeight } }, .2);
-                        hideOverflowDuringAnim(anim);
-                        anim.onComplete.subscribe(_.bind(function(cursor) {
-                            // Set back the height to auto when the animation is finished
-                            // This is also needed because the natural height might have changed during animation
-                            cursor.style.height = "auto";
-                        }, this, cursor));
-                        anim.animate();
+                        YAHOO.util.Dom.addClass   (el, "xforms-case-selected");
+                        YAHOO.util.Dom.removeClass(el, "xforms-case-deselected");
+                        YAHOO.util.Dom.removeClass(el, "xforms-case-deselected-subsequent");
                     } else {
-                        var anim = new YAHOO.util.Anim(cursor, { height: { to: 0 } }, 0.2);
-                        hideOverflowDuringAnim(anim);
-                        anim.onComplete.subscribe(_.bind(function(cursor) {
-                            // Only close case once the animation terminates
-                            YAHOO.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
-                            YAHOO.util.Dom.removeClass(cursor, "xforms-case-selected");
-                        }, this, cursor));
-                        anim.animate();
+                        YAHOO.util.Dom.addClass   (el, "xforms-case-deselected-subsequent");
+                        YAHOO.util.Dom.removeClass(el, "xforms-case-selected");
+                    }
+                }, cursor);
+
+                if (doAnimate) {
+                    if (visible) {
+                        updateClasses();
+                        $(cursor).css('display', 'none');  // So jQuery's toggle knows the block is hidden
+                        $(cursor).animate({ height: 'toggle' }, { duration: 200 });
+                    } else {
+                        $(cursor).animate({ height: 'toggle' }, { duration: 200, complete: updateClasses });
                     }
                 } else {
-                    if (visible) {
-                        YAHOO.util.Dom.addClass(cursor, "xforms-case-selected");
-                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected");
-                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
-                        ORBEON.util.Dom.nudgeAfterDelay(cursor);
-                    } else {
-                        YAHOO.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
-                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-selected");
-                    }
+                    updateClasses();
+                    ORBEON.util.Dom.nudgeAfterDelay(cursor);
                 }
             }
         }

@@ -64,14 +64,20 @@ object XFormsModelSubmissionBase {
                 def annotateElementIfPossible(control: XFormsSingleNodeControl) = {
                     // NOTE: We check on the whole set of constraint ids. Since the control reads in all the failed
                     // constraints for the level, the sets of ids must match.
-                    val failedConstraintIds = control.failedConstraints map (_.id) toSet
-
                     for {
-                        level       ← control.alertLevel
-                        elementsMap ← elementsToAnnotate.get(level)
-                        element     ← elementsMap.get(failedConstraintIds)
+                        level               ← control.alertLevel
+                        controlAlert        ← Option(control.getAlert)
+                        failedConstraintIds = (control.failedConstraints map (_.id) toSet)
+                        elementsMap         ← elementsToAnnotate.get(level)
+                        element             ← elementsMap.get(failedConstraintIds)
+                        qName               = QName.get(level.name, XXFORMS_NAMESPACE_SHORT)
                     } locally {
-                        element.addAttribute(QName.get(level.name, XXFORMS_NAMESPACE_SHORT), control.getAlert)
+                        // There can be an existing attribute if more than one control bind to the same element
+                        Option(element.attribute(qName)) match {
+                            case Some(existing) ⇒ existing.setValue(existing.getValue + controlAlert)
+                            case None           ⇒ element.addAttribute(qName, controlAlert)
+                        }
+
                         annotated = true
                     }
                 }

@@ -473,7 +473,7 @@
                                     <xf:select ref="help/@isHTML" appearance="full">
                                         <xf:item>
                                             <xf:value>true</xf:value>
-                                            <xf:label>Use HTML</xf:label>
+                                            <xf:label ref="$resources/dialog-control-details/use-html"/>
                                         </xf:item>
                                     </xf:select>
                                     <!-- Help message -->

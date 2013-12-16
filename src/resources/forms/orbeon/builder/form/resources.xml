@@ -435,6 +435,7 @@
             <validation-type><label>Validation Type</label></validation-type>
             <validation-details><label>Validation Details</label></validation-details>
             <level><label>Level</label></level>
+            <use-html>Use HTML</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Section Settings</label>
@@ -1286,6 +1287,7 @@
             <validation-type><label>Type de validation</label></validation-type>
             <validation-details><label>Détails de validation</label></validation-details>
             <level><label>Niveau</label></level>
+            <use-html>En HTML</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Paramètres de la section</label>
@@ -2140,6 +2142,7 @@
             <validation-type><label>[Validation Type]</label></validation-type>
             <validation-details><label>[Validation Details]</label></validation-details>
             <level><label>[Level]</label></level>
+            <use-html>[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Rediger seksjonsdetaljer</label>
@@ -2992,6 +2995,7 @@
             <validation-type><label>[Validation Type]</label></validation-type>
             <validation-details><label>[Validation Details]</label></validation-details>
             <level><label>[Level]</label></level>
+            <use-html>[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Настройки раздела</label>
@@ -3849,6 +3853,7 @@
             <validation-type><label>Tipo di convalida</label></validation-type>
             <validation-details><label>Dettagli di convalida</label></validation-details>
             <level><label>Livello</label></level>
+            <use-html>[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Dettagli della sezione</label>
@@ -4706,6 +4711,7 @@
             <validation-type><label>Validationstypen</label></validation-type>
             <validation-details><label>Validierungsdetails</label></validation-details>
             <level><label>Level</label></level>
+            <use-html>[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Abschnittdetails</label>
@@ -5567,6 +5573,7 @@
             <validation-type><label>Vahvistamisen tyyppi</label></validation-type>
             <validation-details><label>Vahvistamisen tiedot</label></validation-details>
             <level><label>Taso</label></level>
+            <use-html>[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Lohkon yksityiskohdat</label>

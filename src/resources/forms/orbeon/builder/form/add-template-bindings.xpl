@@ -44,8 +44,11 @@
 
                 <xsl:template match="/*/xh:head/xf:model[last()]">
                     <xsl:next-match/>
-                    <xsl:copy-of select="$bindings-to-insert/parent::xbl:xbl"/>
+                    <xsl:apply-templates select="$bindings-to-insert/parent::xbl:xbl"/>
                 </xsl:template>
+
+                <!-- Don't include FB metadata as it's unneeded -->
+                <xsl:template match="xbl:xbl/fb:metadata | xbl:binding/fb:metadata" xmlns:fb="http://orbeon.org/oxf/xml/form-builder"/>
 
             </xsl:stylesheet>
         </p:input>

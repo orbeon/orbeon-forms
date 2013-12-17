@@ -194,6 +194,9 @@
   margin-left: 0;
   width: 100%;
 }
+.orbeon .xforms-hint-appearance-inline .xforms-items .xforms-hint {
+  display: none;
+}
 .orbeon .xforms-trigger button,
 .orbeon .xforms-trigger input {
   white-space: nowrap;

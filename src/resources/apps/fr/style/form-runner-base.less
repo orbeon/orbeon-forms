@@ -136,6 +136,11 @@
         width: 100%;
     }
 
+    // Exception to the above rule: hints for items don't take space in the page, and are shown on click or mouseover
+    .xforms-hint-appearance-inline .xforms-items .xforms-hint {
+        display: none;
+    }
+
     // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
     .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
 

@@ -20,23 +20,31 @@
         var hintRegionEl       = $(this);
         var hintText           = hintRegionEl.nextAll('.xforms-hint').text();
         var tooltipData        = hintRegionEl.data('tooltip');
-        var haveHint           = hintText != '';
-        var tooltipInitialized = ! _.isUndefined(tooltipData);
+        var HaveHint           = 1 << 0;
+        var TooltipInitialized = 1 << 1;
 
-        if (haveHint && tooltipInitialized) {
-            // If already initialized, we just need to update the message
-            tooltipData.options.title = hintText;
-        } else if (haveHint && ! tooltipInitialized) {
-            // Create tooltip and show right away
-            hintRegionEl.tooltip({
-                title: hintText,
-                animation: false,
-                placement: 'right'
-            });
-            hintRegionEl.tooltip('show');
-        } else if (! haveHint && tooltipInitialized) {
-            // We had a tooltip, but we don't have anything for show anymore
-            hintRegionEl.tooltip('destroy');
+        switch ((hintText != '' ? HaveHint : 0) |
+                (! _.isUndefined(tooltipData) ? TooltipInitialized : 0)) {
+
+            case HaveHint | TooltipInitialized:
+                // If already initialized, we just need to update the message
+                tooltipData.options.title = hintText;
+                break;
+            case HaveHint:
+                // Create tooltip and show right away
+                hintRegionEl.tooltip({
+                    title: hintText,
+                    animation: false,
+                    placement: 'right'
+                });
+                hintRegionEl.tooltip('show');
+                break;
+            case TooltipInitialized:
+                // We had a tooltip, but we don't have anything for show anymore
+                hintRegionEl.tooltip('destroy');
+                break;
+            default:
+                // NOP if not initialized and we don't have a tooltip
         }
     });
 

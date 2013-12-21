@@ -34,8 +34,6 @@
         var el                  = controlEl.children().not(LhhaClasses).first(); // [1]
         var elPos               = getPosition(el);
         var placement           = getPlacement(elPos);
-        var popoverContainer    = getOrCreatePopoverContainer(controlEl);
-        var previousPopover     = popoverContainer.children('.popover');
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');
 
         // Hide other help popovers before (maybe) showing this one
@@ -135,16 +133,6 @@
              : (space.top   >= RequiredSpaceVertical || space.bottom >= RequiredSpaceVertical)
              ?  space.top   >= space.bottom ? 'top' : 'bottom'
              : 'over';
-    }
-
-    function getOrCreatePopoverContainer(controlEl) {
-        var formEl = controlEl.closest('form');
-        var container = formEl.children('.xforms-help-popover');
-        if (! container.is('*')) {
-            container = $('<div class="xforms-help-popover">');
-            formEl.prepend(container);
-        }
-        return container;
     }
 
     /**

@@ -133,7 +133,7 @@
                                             <xf:alert/>
                                         </xf:input>
                                     </xh:td>
-                                    <xh:td class="{if (not($has-item-hint-editor)) then 'xforms-hidden' else ()}">
+                                    <xh:td class="fb-itemset-hint-cell {if (not($has-item-hint-editor)) then 'xforms-hidden' else ()}">
                                         <xf:input ref="hint" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
                                             <xf:label ref="$resources/dialog-itemsets/hint/label"/>
                                             <xf:alert/>

@@ -269,17 +269,18 @@ body {
     // Itemset editor dialog
     // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
     .fb-dialog-itemsets {
-        width: 400px;
+        width: 500px;
 
         .xbl-fr-grid {
             .dialog-scrollable(450px);
-            table.fr-grid { table-layout: auto } // So we can remove columns (hint) with display: none
+            table.fr-grid { table-layout: auto }                        // So we can remove columns (hint) with display: none
         }
 
+        .fb-itemset-hint-cell { width: 200px }                          // Make hint section wider than the label/value
         .fr-grid-2-columns .xforms-input input { width: 13em }
         .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
         .xbl-fr-link-select1 .xforms-label { display: none }
-        .xforms-invalid .xforms-input-input { border-color: #DF731B }     // show errors also for fields that aren't visited
+        .xforms-invalid .xforms-input-input { border-color: #DF731B }   // Show errors also for fields that aren't visited
 
         // Ideally boolean inputs should display better by default (https://github.com/orbeon/orbeon-forms/issues/854)
         .xforms-type-boolean {

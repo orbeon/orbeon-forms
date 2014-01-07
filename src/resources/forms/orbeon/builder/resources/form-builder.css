@@ -347,7 +347,7 @@ body {
   border-bottom: 1px solid #ddddee;
 }
 .orbeon .fb-dialog-itemsets {
-  width: 400px;
+  width: 500px;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid {
   max-height: 450px;
@@ -359,6 +359,9 @@ body {
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid table.fr-grid {
   table-layout: auto;
+}
+.orbeon .fb-dialog-itemsets .fb-itemset-hint-cell {
+  width: 200px;
 }
 .orbeon .fb-dialog-itemsets .fr-grid-2-columns .xforms-input input {
   width: 13em;

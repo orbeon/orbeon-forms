@@ -55,6 +55,7 @@
                             <item>                  <!-- Template when adding items -->
                                 <label/>
                                 <value/>
+                                <hint/>
                             </item>
                         </template>
                         <triggers>                  <!-- Nodes to which we bind triggers -->
@@ -116,6 +117,8 @@
                             <xf:label ref="$resources/messages/lhha-checkbox"/>
                         </xf:input>
                         <xf:group ref="$local/items">
+                            <xf:var name="control-element" value="fbf:findControlByNameOrEmpty(fbf:getFormDoc(), $local/control-name)"/>
+                            <xf:var name="has-item-hint-editor" value="fbf:hasEditor($control-element, 'item-hint')"/>
                             <fr:grid repeat="true" ref="item" id="fb-itemset-repeat" origin="$local/template/item" columns="2">
                                 <xh:tr>
                                     <xh:td>
@@ -127,6 +130,12 @@
                                     <xh:td>
                                         <xf:input ref="value" id="fb-itemset-value-input" class="fb-itemset-value-input">
                                             <xf:label ref="$resources/dialog-itemsets/value/label"/>
+                                            <xf:alert/>
+                                        </xf:input>
+                                    </xh:td>
+                                    <xh:td class="{if (not($has-item-hint-editor)) then 'xforms-hidden' else ()}">
+                                        <xf:input ref="hint" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
+                                            <xf:label ref="$resources/dialog-itemsets/hint/label"/>
                                             <xf:alert/>
                                         </xf:input>
                                     </xh:td>

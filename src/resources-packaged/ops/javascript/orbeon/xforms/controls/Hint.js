@@ -14,7 +14,15 @@
 
 (function() {
 
-    // Show, update, init, or destroy the tooltip on mouseover a hint region
+    /**
+     * Show, update, init, or destroy the tooltip on mouseover on a hint region
+     *
+     * [1] In Form Builder, the tooltip is absolutely positioned inside a div.fb-hover that gets inserted inside the
+     *     the cell, and which is position: relative. Thus if we don't have a width on the tooltip, the browser tries
+     *     to set its width to the tooltip doesn't "come out" of the div.fb-hover, which makes it extremely narrow
+     *     since the tooltip is shown all the way to the right of the cell. To avoid this, if we detect that situation,
+     *     we set the container to be the parent of the div.fb-hover (which is the td).
+     */
     $(document).on('mouseover', '.xforms-form .xforms-items .xforms-hint-region', function() {
 
         var hintRegionEl       = $(this);
@@ -31,11 +39,15 @@
                 tooltipData.options.title = hintText;
                 break;
             case HaveHint:
+                // Avoid super-narrow tooltip in Form Builder [1]
+                var parentFbHover = hintRegionEl.closest('.fb-hover');
+                var container = parentFbHover.is('*') ? parentFbHover.parent() : hintRegionEl;
                 // Create tooltip and show right away
                 hintRegionEl.tooltip({
-                    title: hintText,
+                    title:     hintText,
                     animation: false,
-                    placement: 'right'
+                    placement: 'right',
+                    container: container
                 });
                 hintRegionEl.tooltip('show');
                 break;

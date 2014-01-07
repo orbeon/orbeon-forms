@@ -582,6 +582,9 @@
             <value>
                 <label>Value</label>
             </value>
+            <hint>
+                <label>Hint</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>
@@ -858,14 +861,17 @@
                 <item>
                     <label>First choice</label>
                     <value>one</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Second choice</label>
                     <value>two</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Third choice</label>
                     <value>three</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -1434,6 +1440,9 @@
             <value>
                 <label>Valeur</label>
             </value>
+            <hint>
+                <label>Suggestion</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editeur de services HTTP</label>
@@ -2289,6 +2298,9 @@
             <value>
                 <label>Verdi</label>
             </value>
+            <hint>
+                <label>[Hint]</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjenesteredigering</label>
@@ -3142,6 +3154,9 @@
             <value>
                 <label>Системное значение</label>
             </value>
+            <hint>
+                <label>[Hint]</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Редактор HTTP-сервисов</label>
@@ -4000,6 +4015,9 @@
             <value>
                 <label>Valore</label>
             </value>
+            <hint>
+                <label>[Hint]</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore HTTP-servizi</label>
@@ -4858,6 +4876,9 @@
             <value>
                 <label>Wert</label>
             </value>
+            <hint>
+                <label>[Hint]</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
@@ -5720,6 +5741,9 @@
             <value>
                 <label>Arvo</label>
             </value>
+            <hint>
+                <label>[Hint]</label>
+            </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>

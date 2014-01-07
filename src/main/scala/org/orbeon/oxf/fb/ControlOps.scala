@@ -65,12 +65,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
             // Evaluate path from instance root element
             val holders = eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat).asInstanceOf[Seq[NodeInfo]]
-            
+
             if (withIterations)
                 (holders / iterationName(controlName)) ++ holders
             else
                 holders
-            
+
         } getOrElse
             Seq.empty
 
@@ -290,7 +290,17 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         // Maybe add template items to the resource holder
         if (hasEditor(controlElement, "static-itemset")) {
             val fbResourceInFBLang = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-form-resources"))
-            val templateItems = fbResourceInFBLang \ "template" \ "items" \ "item"
+            val originalTemplateItems = fbResourceInFBLang \ "template" \ "items" \ "item"
+            val templateItems = if (hasEditor(controlElement, "item-hint")) {
+                // Supports hint: keep hint we have in the resources.xml
+                originalTemplateItems
+            }  else {
+                // Hint not supported: <hint> in each <item>
+                originalTemplateItems map { item ⇒
+                    val newLHHA = (item / *) filter (_.localname != "hint")
+                    elementInfo("item", newLHHA)
+                }
+            }
             insert(into = resourceHolder, origin = templateItems)
         }
         // Create one holder per existing language
@@ -429,7 +439,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def binding(controlElement: NodeInfo) =
         asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo find (b ⇒
             viewTemplate(b) match {
-                case Some(viewTemplate) ⇒ viewTemplate.qname == controlElement.qname
+                case Some(viewTemplate) ⇒
+                    viewTemplate.qname                         == controlElement.qname &&
+                    viewTemplate.att("appearance").stringValue == controlElement.att("appearance").stringValue
                 case _ ⇒ false
             })
 

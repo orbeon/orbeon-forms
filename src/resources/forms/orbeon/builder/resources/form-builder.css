@@ -357,6 +357,9 @@ body {
 .orbeon .fb-dialog-itemsets .xbl-fr-grid > * {
   background-color: #ffffff;
 }
+.orbeon .fb-dialog-itemsets .xbl-fr-grid table.fr-grid {
+  table-layout: auto;
+}
 .orbeon .fb-dialog-itemsets .fr-grid-2-columns .xforms-input input {
   width: 13em;
 }

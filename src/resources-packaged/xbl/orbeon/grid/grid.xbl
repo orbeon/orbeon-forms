@@ -170,11 +170,10 @@
                                         </xsl:if>
                                         <xsl:for-each select="$grid-rows[1]/*:td">
                                             <xsl:variable name="control" select="*[1]"/>
+                                            <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
                                             <xh:th>
-                                                <xsl:if test="$is-editable">
-                                                    <xsl:attribute name="class"       select="'fb-grid-th', 'xforms-activable'"/>
-                                                    <xsl:attribute name="xxf:control" select="'true'"/>
-                                                </xsl:if>
+                                                <xsl:copy-of select="fr:th-td-classes-attr(local-name(), @class)"/>
+                                                <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
                                                 <xsl:copy-of select="@colspan"/>
                                                 <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
                                                     <!--
@@ -302,16 +301,12 @@
                                                             <xf:var name="control" value="$td/*[1]" as="element()?"/>
                                                         </xsl:if>
 
+                                                        <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
                                                         <xh:td>
-                                                            <xsl:choose>
-                                                                <xsl:when test="$is-editable">
-                                                                    <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                                    <xsl:attribute name="class"><xsl:value-of select="'xforms-activable', 'fb-grid-td', @class"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
-                                                                </xsl:when>
-                                                                <xsl:otherwise>
-                                                                    <xsl:attribute name="class"><xsl:value-of select="@class"/></xsl:attribute>
-                                                                </xsl:otherwise>
-                                                            </xsl:choose>
+                                                            <xsl:copy-of select="fr:th-td-classes-attr(local-name(), @class)"/>
+                                                            <xsl:if test="$is-editable">
+                                                                <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                                            </xsl:if>
                                                             <xsl:copy-of select="@* except (@class, @xxf:control)"/>
                                                             <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
                                                             <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
@@ -494,6 +489,24 @@
                         </xh:div>
                     </xh:td>
                 </xsl:template>
+
+                <xsl:function name="fr:th-td-classes-vars" as="element(xf:var)*">
+                    <xsl:param name="input-class" as="attribute(class)?"/>
+                    <xsl:if test="exists($input-class)">
+                        <xf:var name="class-avt" xxbl:scope="outer"><xsl:value-of select="$input-class"/>                                  </xf:var>
+                        <xf:var name="class-value"                 ><xxf:sequence xxbl:scope="outer" value="xxf:evaluate-avt($class-avt)"/></xf:var>
+                    </xsl:if>
+                </xsl:function>
+
+                <xsl:function name="fr:th-td-classes-attr">
+                    <xsl:param name="th-td"       as="xs:string"/> <!-- Either 'th' or 'td' -->
+                    <xsl:param name="input-class" as="attribute(class)?"/>
+                    <xsl:variable name="classes" select="(
+                            if (exists($input-class)) then '{$class-value}'                                 else (),
+                            if ($is-editable)         then (concat('fb-grid-', $th-td), 'xforms-activable') else ()
+                        )"/>
+                    <xsl:if test="exists($classes)"><xsl:attribute name="class" select="$classes"/></xsl:if>
+                </xsl:function>
 
             </xsl:transform>
         </xbl:template>

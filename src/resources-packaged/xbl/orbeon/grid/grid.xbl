@@ -172,7 +172,7 @@
                                             <xsl:variable name="control" select="*[1]"/>
                                             <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
                                             <xh:th>
-                                                <xsl:copy-of select="fr:th-td-classes-attr(local-name(), @class)"/>
+                                                <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
                                                 <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
                                                 <xsl:copy-of select="@colspan"/>
                                                 <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
@@ -303,7 +303,7 @@
 
                                                         <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
                                                         <xh:td>
-                                                            <xsl:copy-of select="fr:th-td-classes-attr(local-name(), @class)"/>
+                                                            <xsl:copy-of select="fr:th-td-classes-attr('td', @class)"/>
                                                             <xsl:if test="$is-editable">
                                                                 <xsl:attribute name="xxf:control">true</xsl:attribute>
                                                             </xsl:if>
@@ -503,9 +503,9 @@
                     <xsl:param name="input-class" as="attribute(class)?"/>
                     <xsl:variable name="fb-selected-avt">{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:variable>
                     <xsl:variable name="classes" select="(
-                            if (exists($input-class)) then '{$class-value}'                                 else (),
-                            if ($is-editable)         then (concat('fb-grid-', $th-td), 'xforms-activable') else (),
-                            if ($is-editable)         then $fb-selected-avt                                 else ()
+                            if (exists($input-class))           then '{$class-value}'                                 else (),
+                            if ($is-editable)                   then (concat('fb-grid-', $th-td), 'xforms-activable') else (),
+                            if ($is-editable and $th-td = 'td') then $fb-selected-avt                                 else ()
                         )"/>
                     <xsl:if test="exists($classes)"><xsl:attribute name="class" select="$classes"/></xsl:if>
                 </xsl:function>

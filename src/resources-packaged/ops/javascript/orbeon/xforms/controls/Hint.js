@@ -26,17 +26,17 @@
     $(document).on('mouseover', '.xforms-form .xforms-items .xforms-hint-region', function() {
 
         var hintRegionEl       = $(this);
-        var hintText           = hintRegionEl.nextAll('.xforms-hint').text();
+        var hintHtml           = hintRegionEl.nextAll('.xforms-hint').html();
         var tooltipData        = hintRegionEl.data('tooltip');
         var HaveHint           = 1 << 0;
         var TooltipInitialized = 1 << 1;
 
-        switch ((hintText != '' ? HaveHint : 0) |
+        switch ((hintHtml != '' ? HaveHint : 0) |
                 (! _.isUndefined(tooltipData) ? TooltipInitialized : 0)) {
 
             case HaveHint | TooltipInitialized:
                 // If already initialized, we just need to update the message
-                tooltipData.options.title = hintText;
+                tooltipData.options.title = hintHtml;
                 break;
             case HaveHint:
                 // Avoid super-narrow tooltip in Form Builder [1]
@@ -44,7 +44,8 @@
                 var container = parentFbHover.is('*') ? parentFbHover.parent() : hintRegionEl;
                 // Create tooltip and show right away
                 hintRegionEl.tooltip({
-                    title:     hintText,
+                    title:     hintHtml,
+                    html:      true,
                     animation: false,
                     placement: 'right',
                     container: container

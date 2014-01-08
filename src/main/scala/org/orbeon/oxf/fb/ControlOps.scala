@@ -552,8 +552,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // For a given control, set the mediatype on the itemset labels to be HTML or plain text
     def setItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String, isHTML: Boolean): Unit =
-        if (isHTML != isItemsetHTMLMediatype(inDoc, controlName))
-            setHTMLMediatype(findControlByName(inDoc, controlName).toList child "itemset" child "label", isHTML)
+        if (isHTML != isItemsetHTMLMediatype(inDoc, controlName)) {
+            val itemsetEl = findControlByName(inDoc, controlName).toList child "itemset"
+            val labelHintEls = Seq("label", "hint") flatMap (itemsetEl.child(_))
+            setHTMLMediatype(labelHintEls, isHTML)
+        }
 
     private def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
         nodes foreach { lhhaElement ⇒

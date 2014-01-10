@@ -114,7 +114,7 @@
                                     <sql:query>
                                         select
                                             last_modified_time,
-                                            <xsl:if test="not($is-attachment)">t.xml xml</xsl:if>
+                                            <xsl:if test="not($is-attachment)">t.xml<xsl:if test="/request/provider = 'oracle'">.getClobVal()</xsl:if> xml</xsl:if>
                                             <xsl:if test="$is-attachment">file_content</xsl:if>
                                             <xsl:if test="$is-data-draft">, username, groupname</xsl:if>
                                         from <xsl:value-of select="$table-name"/> t

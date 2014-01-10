@@ -124,7 +124,8 @@
                         fbf:updateMip($form, $new-name, 'readonly', $i/readonly),
                         fbf:setRepeatProperties($form, $new-name, true(),
                                                 xs:integer($i/min-repeat),
-                                                if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1)
+                                                if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1,
+                                                ())
                     </xf:action>
                     <!-- No classes for sections for now -->
 

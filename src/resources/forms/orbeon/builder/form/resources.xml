@@ -454,6 +454,20 @@
                 <alert>Incorrect XPath expression</alert>
                 <hint>Boolean XPath expression</hint>
             </readonly>
+            <repeat>
+                <label>Repeat Section Content</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>Enable Custom Iteration Name</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>Custom Iteration Name</label>
+                <alert>Name is already in use or incorrect</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>Basic Settings And Formulas</label></tab-base>
+            <tab-repeat><label>Repeated Content</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Grid Settings</label>
@@ -1312,6 +1326,20 @@
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath booléenne</hint>
             </readonly>
+            <repeat>
+                <label>Répéter le contenu de la section</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>Activer un nom d'itération personalisé</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>Nom d'itération personalisé</label>
+                <alert>Le nom est déjà utilisé ou incorrect</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>Paramètres de base et formules</label></tab-base>
+            <tab-repeat><label>Contenu répété</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Paramètres de la grille</label>
@@ -2170,6 +2198,20 @@
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
+            <repeat>
+                <label>[Repeat Section Content]</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>[Enable Custom Iteration Name]</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>[Custom Iteration Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>[Basic Settings And Formula]s</label></tab-base>
+            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>[Grid Settings]</label>
@@ -3026,6 +3068,20 @@
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
             </readonly>
+            <repeat>
+                <label>[Repeat Section Content]</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>[Enable Custom Iteration Name]</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>[Custom Iteration Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>[Basic Settings And Formula]s</label></tab-base>
+            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Редактировать настройки сетки</label>
@@ -3887,6 +3943,20 @@
                 <alert>Espressione XPath non valida</alert>
                 <hint>Espressione XPath boolean</hint>
             </readonly>
+            <repeat>
+                <label>[Repeat Section Content]</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>[Enable Custom Iteration Name]</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>[Custom Iteration Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>[Basic Settings And Formula]s</label></tab-base>
+            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Dettagli griglia</label>
@@ -4748,6 +4818,20 @@
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
             </readonly>
+            <repeat>
+                <label>[Repeat Section Content]</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>[Enable Custom Iteration Name]</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>[Custom Iteration Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>[Basic Settings And Formula]s</label></tab-base>
+            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Tabellendetails</label>
@@ -5613,6 +5697,20 @@
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
             </readonly>
+            <repeat>
+                <label>[Repeat Section Content]</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>[Enable Custom Iteration Name]</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>[Custom Iteration Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>[Basic Settings And Formula]s</label></tab-base>
+            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Ruudukon yksityiskohdat</label>

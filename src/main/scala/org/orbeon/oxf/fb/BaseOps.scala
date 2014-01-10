@@ -52,7 +52,7 @@ trait BaseOps extends Logging {
 
     // Find a series of next available ids for a given token
     // Return ids of the form "foo-123-foo", where "foo" is the token
-    def nextIds(inDoc: NodeInfo, token: String, count: Int, useInstance: Boolean = true) = {
+    def nextIds(inDoc: NodeInfo, token: String, count: Int) = {
 
         val prefix = token + "-"
         val suffix = "-" + token
@@ -69,7 +69,7 @@ trait BaseOps extends Logging {
             def canUseIndex = fbInstance.documentInfo == root
 
             val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (_.localname + suffix) else Seq.empty
+            val instanceIds = formInstanceRoot(root) \\ * map (_.localname + suffix)
 
             elementIds ++ instanceIds
         }

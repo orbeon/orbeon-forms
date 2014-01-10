@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.util.ScalaUtils._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
@@ -37,6 +36,9 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     val IsContainer: NodeInfo ⇒ Boolean =
         node ⇒ (node self ContainerElementTest) || isFBBody(node)
 
+    // NOTE: Later repeated grids should also support a nested iteration element
+    def controlRequiresNestedIterationElement(node: NodeInfo) = IsSection(node) && IsRepeat(node)
+
     // Namespace URL a section template component must match
     private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
@@ -51,31 +53,20 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
         (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
     // Find ancestor section and grid names from root to leaf
-    def findContainerNames(descendant: NodeInfo, includeSelf: Boolean = false, fromParent: Option[String] = None): Seq[String] = {
+    def findContainerNames(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
         
-        val allNamesWithContainers =
+        val namesWithContainers =
             for {
                 container ← findAncestorContainers(descendant, includeSelf)
                 name      ← getControlNameOpt(container)
             } yield
                 name → container
-        
-        val namesWithContainers =
-            fromParent match {
-                case Some(parentName) ⇒
-                    val matches = Set(parentName, iterationName(parentName))
-                    allNamesWithContainers takeWhile {
-                        case (name, _) ⇒ ! matches(name)
-                    }
-                case None ⇒
-                    allNamesWithContainers
-            }
 
         // Repeated sections add an intermediary iteration element
         val namesFromLeaf =
             namesWithContainers flatMap {
                 case (name, container) ⇒
-                    (IsRepeat(container) && IsSection(container) list iterationName(name)) ::: name :: Nil
+                    findRepeatIterationName(descendant, name).toList ::: name :: Nil
             }
 
         namesFromLeaf.reverse
@@ -92,4 +83,17 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     // Find all ancestor repeats from leaf to root
     def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
         findAncestorContainers(descendantOrSelf, includeSelf) filter IsRepeat
+
+    // For XPath callers
+    def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =
+        findRepeatIterationName(inDoc, controlName) getOrElse ""
+
+    def findRepeatIterationName(inDoc: NodeInfo, controlName: String): Option[String] =
+        for {
+            control       ← findControlByName(inDoc, controlName)
+            if controlRequiresNestedIterationElement(control)
+            bind          ← findBindByName(inDoc, controlName)
+            iterationBind ← bind / "*:bind" headOption // there should be only a single nested bind
+        } yield
+            findBindName(iterationBind)
 }

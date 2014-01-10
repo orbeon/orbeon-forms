@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.util.ScalaUtils._
 
 trait ContainerOps extends ControlOps {
 
@@ -188,13 +189,18 @@ trait ContainerOps extends ControlOps {
         }
     }
 
-    def setRepeatProperties(inDoc: NodeInfo, controlName: String, repeat: Boolean, min: Int, max: Int): Unit = {
+    def hasCustomIterationName(inDoc: NodeInfo, controlName: String) =
+        findRepeatIterationName(inDoc, controlName) exists (isCustomIterationName(controlName, _))
 
-        val controlOpt     = findControlByName(inDoc, controlName)
-        val wasRepeat      = controlOpt exists (_.attValue("repeat") == "true")
+    def isCustomIterationName(controlName: String, iterationName: String) =
+        defaultIterationName(controlName) != iterationName
 
-        // Update control attributes first
-        controlOpt foreach { control ⇒
+    def setRepeatProperties(inDoc: NodeInfo, controlName: String, repeat: Boolean, min: Int, max: Int, iterationNameOrEmpty: String): Unit =
+        findControlByName(inDoc, controlName) foreach { control ⇒
+
+            val wasRepeat = control.attValue("repeat") == "true"
+
+            // Update control attributes first
             // A missing or invalid value is taken as the default value: 0 for min, unbounded for max. In both cases, we
             // don't set the attribute value. This means that in the end we only set positive integer values.
             toggleAttribute(control, "repeat",   "true",       repeat)
@@ -205,20 +211,27 @@ trait ContainerOps extends ControlOps {
             if (! wasRepeat && repeat) {
                 // Insert new bind and template
 
-                // Insert nested iteration bind
+                val iterationName = nonEmptyOrNone(iterationNameOrEmpty) getOrElse defaultIterationName(controlName)
+
+                // Make sure there are no nested binds
                 val oldNestedBinds = findBindByName(inDoc, controlName).toList / *
                 delete(oldNestedBinds)
-                ensureBindsByName(inDoc, controlName) // uses the new `repeat="true"` attribute which implies the nested iteration element
+
+                // Insert nested iteration bind
+                findControlByName(inDoc, controlName) foreach { control ⇒
+                    ensureBinds(inDoc, findContainerNames(control) :+ controlName :+ iterationName)
+                }
+
                 val controlBind   = findBindByName(inDoc, controlName)
                 val iterationBind = controlBind.toList / *
                 insert(into = iterationBind, origin = oldNestedBinds)
 
                 // Insert nested iteration data holders
                 // NOTE: There can be multiple existing data holders due to enclosing repeats
-                findDataHolders(inDoc, controlName, withIterations = false) foreach { holder ⇒
+                findDataHolders(inDoc, controlName) foreach { holder ⇒
                     val nestedHolders = holder / *
                     delete(nestedHolders)
-                    insert(into = holder, origin = elementInfo(iterationName(controlName), nestedHolders))
+                    insert(into = holder, origin = elementInfo(iterationName, nestedHolders))
                 }
 
                 // Update existing templates
@@ -238,7 +251,7 @@ trait ContainerOps extends ControlOps {
                 insert(into = controlBind, origin = oldNestedBinds)
 
                 // Mover data holders up and keep only the first iteration
-                findDataHolders(inDoc, controlName, withIterations = false) foreach { holder ⇒
+                findDataHolders(inDoc, controlName) foreach { holder ⇒
                     val nestedHolders = holder / * take 1 child *
                     delete(holder / *)
                     insert(into = holder, origin = nestedHolders)
@@ -258,7 +271,6 @@ trait ContainerOps extends ControlOps {
                 // MAYBE: Delete template just in case.
             }
         }
-    }
 
     def renameTemplate(doc: NodeInfo, oldName: String, newName: String): Unit =
         for {
@@ -304,11 +316,9 @@ trait ContainerOps extends ControlOps {
     // Make sure all template instances reflect the current bind structure
     def updateTemplates(inDoc: NodeInfo): Unit =
         for {
-            templateInstance ← templateInstanceElements(inDoc: NodeInfo)
+            templateInstance ← templateInstanceElements(inDoc)
             name             = controlName(templateInstance attValue "id")
-            control          ← findControlByName(inDoc, name)
-            repeatedSection  = IsRepeat(control) && IsSection(control)
-            bind             ← findBindByName(inDoc, if (repeatedSection) iterationName(name) else name)
+            bind             ← findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name)
         } locally {
             ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
         }

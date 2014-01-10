@@ -52,8 +52,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
-    // Find control holders (there can be more than one with repeats)
-    def findDataHolders(inDoc: NodeInfo, controlName: String, withIterations: Boolean = false): Seq[NodeInfo] =
+    // Find data holders (there can be more than one with repeats)
+    // NOTE: We use XPath to find holders, but with the "new" custom XML data model, we might not need to do this and
+    // just use element names.
+    def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
         findBindByName(inDoc, controlName) map { bind ⇒
             // From bind, infer path by looking at ancestor-or-self binds
             val bindRefs = (bind ancestorOrSelf "*:bind" flatMap bindRefOrNodeset).reverse.tail
@@ -64,13 +66,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
 
             // Evaluate path from instance root element
-            val holders = eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat).asInstanceOf[Seq[NodeInfo]]
-
-            if (withIterations)
-                (holders / iterationName(controlName)) ++ holders
-            else
-                holders
-
+            eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat).asInstanceOf[Seq[NodeInfo]]
         } getOrElse
             Seq.empty
 
@@ -107,12 +103,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         // Take the first result
         controlsWithName.headOption flatMap getControlNameOpt
     }
-
-    // Ensure that a tree of bind exists, search the tree of controls
-    def ensureBindsByName(inDoc: NodeInfo, name: String) =
-        findControlByName(inDoc, name) foreach { control ⇒
-            ensureBinds(inDoc, findContainerNames(control, includeSelf = true))
-        }
 
     // Ensure that a tree of bind exists
     def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
@@ -179,15 +169,32 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         control :: holders
     }
 
-    // Rename a control with its holders, binds, etc.
+    // Rename a control with its holders, binds, etc. but *not* its nested iteration if any
     def renameControlIfNeeded(inDoc: NodeInfo, oldName: String, newName: String): Unit =
         if (oldName != newName) {
-            renameDataAndResourceHolders(inDoc, oldName, newName)
-            renameBinds                         (inDoc, oldName, newName)
-            renameControl                       (inDoc, oldName, newName)
-            renameTemplate                      (inDoc, oldName, newName)
+
+            findDataHolders(inDoc, oldName) foreach (rename(_, newName))
+            findResourceHolders(oldName)    foreach (rename(_, newName))
+
+            renameBinds   (inDoc, oldName, newName)
+            renameControl (inDoc, oldName, newName)
+            renameTemplate(inDoc, oldName, newName)
 
             updateTemplates(inDoc)
+        }
+
+    // Rename a control's nested iteration if any
+    def renameControlIterationIfNeeded(inDoc: NodeInfo, oldControlName: String, newControlName: String, oldChildElementNameOrBlank: String, newChildElementNameOrBlank: String): Unit =
+        if (findControlByName(inDoc, oldControlName) exists controlRequiresNestedIterationElement) {
+
+            val oldName = nonEmptyOrNone(oldChildElementNameOrBlank) getOrElse defaultIterationName(oldControlName)
+            val newName = nonEmptyOrNone(newChildElementNameOrBlank) getOrElse defaultIterationName(newControlName)
+
+            if (oldName != newName) {
+                findDataHolders(inDoc, oldName) foreach (rename(_, newName))
+                renameBinds(inDoc, oldName, newName)
+                updateTemplates(inDoc)
+            }
         }
 
     def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
@@ -229,31 +236,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         delete(bindElement \@ "nodeset") // sanitize
     }
 
-    // Rename a bind, including the associated iteration bind if any
-    def renameBinds(inDoc: NodeInfo, oldName: String, newName: String): Unit = {
-
-        val binds = findBindByName(inDoc, oldName).toList ::: findBind(inDoc, isBindForName(_, iterationName(oldName))).toList
-
-        binds foreach { bind ⇒
-            renameBindElement(bind, if (isIterationName(findBindName(bind))) iterationName(newName) else newName)
-        }
-    }
-
-    // Rename holders with the given name
-    def renameDataAndResourceHolders(inDoc: NodeInfo, oldName: String, newName: String): Unit = {
-
-        def findHolders(inDoc: NodeInfo, holderName: String) = {
-            val result = mutable.Buffer[NodeInfo]()
-            result ++=
-                findDataHolders(inDoc, holderName, withIterations = true) ++=
-                findResourceHolders(holderName)
-            result
-        }
-
-        findHolders(inDoc, oldName) foreach { holder ⇒
-            rename(holder, if (isIterationName(holder.localname)) iterationName(newName) else newName)
-        }
-    }
+    // Rename a bind
+    def renameBinds(inDoc: NodeInfo, oldName: String, newName: String): Unit =
+        findBindByName(inDoc, oldName) foreach (renameBindElement(_, newName))
 
     // Find or create a data holder for the given hierarchy of names
     private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
@@ -407,10 +392,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(inDoc: NodeInfo) =
-        fbFormInstance.idsIterator filter isIdForControl map controlName
+        fbFormInstance.idsIterator filter isIdForControl map controlName toSet
 
     // For XForms callers
-    def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = getAllControlNames(inDoc) map StringValue.makeStringValue
+    def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator =
+        getAllControlNames(inDoc).iterator map StringValue.makeStringValue
 
     // Return all the controls in the view
     def getAllControlsWithIds(inDoc: NodeInfo) =

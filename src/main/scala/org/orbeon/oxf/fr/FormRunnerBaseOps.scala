@@ -55,8 +55,7 @@ trait FormRunnerBaseOps {
     def controlId(controlName: String) = controlName + "-control"
     def templateId(gridName: String)   = gridName    + TemplateSuffix
 
-    def iterationName(repeatName: String) = repeatName + "-iteration"
-    def isIterationName(name: String)     = name.endsWith("-iteration")
+    def defaultIterationName(repeatName: String) = repeatName + "-iteration"
 
     // Find an element by id
     def byId(inDoc: NodeInfo, id: String) = Option(inDoc.getDocumentRoot.selectID(id))

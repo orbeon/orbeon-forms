@@ -257,7 +257,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                     } yield
                         childBind
 
-                it.headOption.orNull
+                it.nextOption.orNull
         }
 
     protected def evaluateAndSetCustomMIPs(bindNode: BindNode): Unit =

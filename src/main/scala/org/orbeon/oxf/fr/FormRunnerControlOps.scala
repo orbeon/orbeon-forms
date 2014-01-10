@@ -52,7 +52,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             control ← byId(inDoc, controlName + '-' + suffix).iterator
         } yield
             control
-    ).headOption
+    ).nextOption
 
     // Find a control id by name
     def findControlIdByName(inDoc: NodeInfo, controlName: String) =

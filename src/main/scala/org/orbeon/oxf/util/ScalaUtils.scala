@@ -159,7 +159,7 @@ object ScalaUtils extends PathOps {
 
     // Extensions on Iterator[T]
     implicit class IteratorWrapper[T](val i: Iterator[T]) extends AnyVal {
-        def headOption = i.hasNext option i.next()
+        def nextOption = i.hasNext option i.next()
     }
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!

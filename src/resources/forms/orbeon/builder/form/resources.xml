@@ -80,9 +80,9 @@
         <new-grid>
             <label>New Grid</label>
         </new-grid>
-        <new-repeat>
-            <label>New Repeat</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>New Repeated Grid</label>
+        </new-repeated-grid>
         <change-schema>
             <label>Change Schema</label>
         </change-schema>
@@ -957,9 +957,9 @@
         <new-grid>
             <label>Nouvelle grille</label>
         </new-grid>
-        <new-repeat>
-            <label>Nouveaux champs répétés</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>Nouvelle grille répétée</label>
+        </new-repeated-grid>
         <change-schema>
             <label>Changer schéma</label>
         </change-schema>
@@ -1828,9 +1828,9 @@
         <new-grid>
             <label>Nytt rutenett</label>
         </new-grid>
-        <new-repeat>
-            <label>[New Repeat]</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>[New Repeated Grid]</label>
+        </new-repeated-grid>
         <change-schema>
             <label>Endre skjema</label>
         </change-schema>
@@ -2699,9 +2699,9 @@
         <new-grid>
             <label>Новая сетка</label>
         </new-grid>
-        <new-repeat>
-            <label>[New Repeat]</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>[New Repeated Grid]</label>
+        </new-repeated-grid>
         <change-schema>
             <label>Изменить схему</label>
         </change-schema>
@@ -3569,9 +3569,10 @@
         <new-grid>
             <label>Nuova griglia</label>
         </new-grid>
-        <new-repeat>
-            <label>Nuovo repeat</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>[New Repeated Grid]</label>
+            <!--<label>Nuovo repeat</label>-->
+        </new-repeated-grid>
         <change-schema>
             <label>Cambia schema</label>
         </change-schema>
@@ -4444,9 +4445,10 @@
         <new-grid>
             <label>Neue Tabelle</label>
         </new-grid>
-        <new-repeat>
-            <label>Neue Schleife</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>[New Repeated Grid]</label>
+            <!--<label>Neue Schleife</label>-->
+        </new-repeated-grid>
         <change-schema>
             <label>Schema ändern</label>
         </change-schema>
@@ -5323,9 +5325,10 @@
         <new-grid>
             <label>Uusi ruudukko</label>
         </new-grid>
-        <new-repeat>
-            <label>Uusi toisto</label>
-        </new-repeat>
+        <new-repeated-grid>
+            <label>[New Repeated Grid]</label>
+            <!--<label>Uusi toisto</label>-->
+        </new-repeated-grid>
         <change-schema>
             <label>Uusi skeema</label>
         </change-schema>

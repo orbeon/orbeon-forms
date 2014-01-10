@@ -102,10 +102,10 @@
                 </xf:trigger>
             </xh:div>
             <xh:div class="fb-tool">
-                <xf:trigger appearance="full" id="insert-new-repeat-trigger" ref="instance('fb-variables')/grid-trigger" >
+                <xf:trigger appearance="full" ref="instance('fb-variables')/grid-trigger" >
                     <xf:label>
                         <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
-                        <xf:output value="$form-resources/new-repeat/label"/>
+                        <xf:output value="$form-resources/new-repeated-grid/label"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
                         toolboxOps:insertNewRepeat($model)

@@ -157,13 +157,13 @@
                 <!-- Mark the sum as invalid if there is any non-valid quantity -->
                 <xf:bind id="total-units" ref="units" type="xs:nonNegativeInteger"
                          calculate="sum(../../item/quantity[string(.) castable as xs:integer])"
-                         constraint="not((for $v in ../../item/quantity return xxf:valid($v)) = false())"/>
+                         constraint="not((for $v in ../../item/quantity return valid($v)) = false())"/>
                 <!-- Sum all prices that have integer quantities -->
                 <!-- Mark the sum as invalid if there is any non-valid quantity -->
                 <xf:bind id="total-price" ref="price" type="xs:decimal"
                          calculate="sum(for $item in ../../item[string(quantity) castable as xs:integer]
                                         return $item/price * $item/quantity)"
-                         constraint="xxf:valid(../units)"/>
+                         constraint="valid(../units)"/>
             </xf:bind>
 
             <!-- Set focus to first quantity field -->

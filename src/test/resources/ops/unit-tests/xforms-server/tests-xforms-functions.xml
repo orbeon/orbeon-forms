@@ -1833,7 +1833,7 @@
         </output>
     </test>
 
-    <test description="xf:valid() and xxf:valid()" name="oxf:pipeline">
+    <test description="valid() and xxf:valid()" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -1881,18 +1881,18 @@
 
                     <xf:repeat id="repeat2" ref="1 to count(items/*)">
                         <xf:var name="e" value="instance()/items/element[xxf:repeat-position()]"/>
-                        <xf:output id="o5" value="xf:valid($e/*, false(), false())"/>
-                        <xf:output id="o6" value="xf:valid($e/*, true(), false())"/>
-                        <xf:output id="o7" value="xf:valid($e, false())"/>
-                        <xf:output id="o8" value="xf:valid($e)"/>
+                        <xf:output id="o5" value="valid($e/*, false(), false())"/>
+                        <xf:output id="o6" value="valid($e/*, true(), false())"/>
+                        <xf:output id="o7" value="valid($e, false())"/>
+                        <xf:output id="o8" value="valid($e)"/>
                     </xf:repeat>
 
-                    <xf:output id="valid-attribute2"    value="xf:valid(valid-attribute)"/>
-                    <xf:output id="valid-descendant2"   value="xf:valid(valid-descendant)"/>
-                    <xf:output id="invalid-attribute2"  value="xf:valid(invalid-attribute)"/>
-                    <xf:output id="invalid-descendant2" value="xf:valid(invalid-descendant)"/>
-                    <xf:output id="valid-atomic2"       value="xf:valid(42)"/>
-                    <xf:output id="valid-empty2"        value="xf:valid(())"/>
+                    <xf:output id="valid-attribute2"    value="valid(valid-attribute)"/>
+                    <xf:output id="valid-descendant2"   value="valid(valid-descendant)"/>
+                    <xf:output id="invalid-attribute2"  value="valid(invalid-attribute)"/>
+                    <xf:output id="invalid-descendant2" value="valid(invalid-descendant)"/>
+                    <xf:output id="valid-atomic2"       value="valid(42)"/>
+                    <xf:output id="valid-empty2"        value="valid(())"/>
                 </body>
             </xh:html>
         </input>
@@ -2290,7 +2290,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:output id="output1" value="xf:valid(.)"/>
+                    <xf:output id="output1" value="valid(.)"/>
                     <xf:output id="output2" value="string-join(for $i in ('width', 'height', 'mediatype') return concat($i, ': ', string(xxf:image-metadata(., $i))), ' | ')"/>
                 </xh:body>
             </xh:html>

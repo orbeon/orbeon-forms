@@ -157,7 +157,7 @@ trait FormRunnerPersistence {
         readDocument(createFormMetadataPath(appName, formName))
 
     // Whether the form data is valid as per the error summary
-    // We use instance('fr-error-summary-instance')/valid and not xxf:valid() because the instance validity may not be
+    // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
     // reflected with the use of XBL components.
     def dataValid = errorSummaryInstance.rootElement \ "valid" === "true"
 

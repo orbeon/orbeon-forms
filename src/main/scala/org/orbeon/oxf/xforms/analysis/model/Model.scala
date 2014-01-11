@@ -301,7 +301,7 @@ object Model {
 
     // NOTE: "required" is special: it is evaluated during recalculate, but used during revalidate. In effect both
     // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
-    // "required" MIP, not on the XPath of it. See also what we would need for xxf:valid(), etc. functions.
+    // "required" MIP, not on the XPath of it. See also what we would need for valid(), etc. functions.
     case object Relevant     extends { val name = "relevant" }   with StdMIP with BooleanMIP with ComputedMIP
     case object Readonly     extends { val name = "readonly" }   with StdMIP with BooleanMIP with ComputedMIP
     case object Required     extends { val name = "required" }   with StdMIP with BooleanMIP with ComputedMIP with ValidateMIP

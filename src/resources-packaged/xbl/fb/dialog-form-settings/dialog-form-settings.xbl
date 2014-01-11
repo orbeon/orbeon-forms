@@ -228,7 +228,7 @@
                     <xf:action
                             ev:event="DOMActivate"
                             ev:target="fb-application-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
-                            if="xxf:valid(instance(), true())">
+                            if="valid(instance())">
 
                         <!-- Dispatch event with result -->
                         <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">

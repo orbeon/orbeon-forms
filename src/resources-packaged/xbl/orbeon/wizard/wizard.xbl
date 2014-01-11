@@ -187,10 +187,10 @@
                         <xf:var name="active"
                                 value="xxf:case('switch') = '{concat(@id, '-case')}'"/>
                         <xh:li class="{{if ($active) then 'active' else (),
-                                        if (xxf:visited('{$top-level-section-case-id}') and not(xf:valid(context()))) then 'invalid' else ()}}">
+                                        if (xxf:visited('{$top-level-section-case-id}') and not(valid(context()))) then 'invalid' else ()}}">
 
                             <!--visited: <xf:output value="xxf:visited('{$top-level-section-case-id}')"/>-->
-                            <!--valid: <xf:output value="xxf:valid(context(), true())"/>-->
+                            <!--valid: <xf:output value="valid(context())"/>-->
 
                             <xf:var
                                 name="section-label"

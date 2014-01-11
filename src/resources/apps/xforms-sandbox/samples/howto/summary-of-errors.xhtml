@@ -65,7 +65,7 @@
 
         <!-- Summary of errors; the magic is done by the xxf:valid() function -->
         <xh:ul>
-            <xf:repeat ref="employees/employee[not(xxf:valid(., true()))]">
+            <xf:repeat ref="employees/employee[not(valid(.))]">
                 <xh:li>
                     <xf:trigger appearance="minimal">
                         <xf:label>Correct errors for employee <xf:output value="@id"/></xf:label>

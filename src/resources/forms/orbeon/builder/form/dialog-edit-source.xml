@@ -36,7 +36,7 @@
         <xh:span>
             <xf:trigger appearance="xxf:primary">
                 <xf:label ref="$form-resources/apply/label"/>
-                <xf:action event="DOMActivate" if="xxf:valid(source)">
+                <xf:action event="DOMActivate" if="valid(source)">
                     <!-- Parse the XML, annotate and save it -->
                     <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
                         <xf:property name="data" value="saxon:parse(instance('fb-source-editor-instance')/source)"/>

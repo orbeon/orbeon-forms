@@ -55,7 +55,7 @@
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
             <!-- Save data upon close unless the sub-form is not valid -->
-            <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and xf:valid($i)" observer="dialog">
+            <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and valid($i)" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-section-details')"/>
 
                 <!-- NOTE: We use string() to access string value of NCName -->
@@ -82,11 +82,11 @@
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="dialog" if="event('xxf:targetid') != 'cancel-trigger'">
                 <!-- Close and save if the data is valid-->
-                <xxf:hide if="xf:valid($i)" dialog="dialog">
+                <xxf:hide if="valid($i)" dialog="dialog">
                     <xf:property name="fb-save" value="true()"/>
                 </xxf:hide>
                 <!-- Mark all visited if the data is invalid -->
-                <xxf:setvisited if="not(xf:valid($i))" control="dialog" recurse="true"/>
+                <xxf:setvisited if="not(valid($i))" control="dialog" recurse="true"/>
             </xbl:handler>
             <!-- Close and cancel upon DOMActivate -->
             <xbl:handler event="DOMActivate" observer="cancel-trigger">

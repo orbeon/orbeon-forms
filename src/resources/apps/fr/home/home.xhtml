@@ -675,12 +675,12 @@
                 <xf:action if="event('xxf:targetid') = 'cancel-button'">
                     <xxf:hide event="DOMActivate" dialog="fr-credentials-dialog"/>
                 </xf:action>
-                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and xf:valid((username, password))">
+                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and valid((username, password))">
                     <xxf:hide dialog="fr-credentials-dialog">
                         <xf:property name="fr-connect" value="true()"/>
                     </xxf:hide>
                 </xf:action>
-                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and not(xf:valid((username, password)))">
+                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and not(valid((username, password)))">
                     <xxf:setvisited control="fr-credentials-dialog" recurse="true"/>
                 </xf:action>
             </xf:action>

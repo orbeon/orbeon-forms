@@ -225,7 +225,7 @@
 
                         <xf:action ev:event="xforms-ready" iterate="*">
                             <xf:var name="current" value="."/>
-                            <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), xxf:valid($current))"/>
+                            <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), valid($current))"/>
                         </xf:action>
 
                     </xf:model>
@@ -301,7 +301,7 @@
 
                                     <xf:action ev:event="xforms-ready" iterate="*/*">
                                         <xf:var name="current" value="."/>
-                                        <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), xxf:valid($current))"/>
+                                        <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), valid($current))"/>
                                     </xf:action>
 
                                 </xf:model>
@@ -1426,7 +1426,7 @@
                         <!-- Update value on which validity depends -->
                         <xf:setvalue ev:event="xforms-model-construct-done" ref="value/@valid">false</xf:setvalue>
                         <!-- Get latest validity -->
-                        <xf:setvalue ev:event="xforms-ready" ref="result" value="xxf:valid(../value)"/>
+                        <xf:setvalue ev:event="xforms-ready" ref="result" value="valid(../value)"/>
                     </xf:model>
                 </xh:head>
             </xh:html>
@@ -1659,7 +1659,7 @@
                                 </xf:model>
                             </xh:head>
                             <xh:body>
-                                <xf:output id="validities" value="string-join(for $xpath in (xpath | */@xpath) return string(xxf:valid($xpath)), '-')"/>
+                                <xf:output id="validities" value="string-join(for $xpath in (xpath | */@xpath) return string(valid($xpath)), '-')"/>
                             </xh:body>
                         </xh:html>
                     </p:input>
@@ -1708,7 +1708,7 @@
                 <xh:body>
                     <xf:output
                         id="my-output"
-                        value="string-join(for $v in (xxf:valid(constraint),
+                        value="string-join(for $v in (valid(constraint),
                                                       xxf:relevant(relevant),
                                                       xxf:required(required),
                                                       xxf:readonly(readonly))

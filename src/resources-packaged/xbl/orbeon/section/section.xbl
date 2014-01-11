@@ -119,7 +119,7 @@
                                         <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
-                                                    <fr:repeater ref="*" xbl:attr="template">
+                                                    <fr:repeater ref="*" xbl:attr="template min max remove-constraint">
                                                         <xsl:if test="not($readonly)">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-repeat-menu dropdown">
                                                                 <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown" tabindex="-1" xmlns="http://www.w3.org/1999/xhtml">

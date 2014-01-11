@@ -13,17 +13,14 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.saxon.om._
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
+import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xforms.InstanceData
+import org.orbeon.saxon.om._
+import org.orbeon.scaxon.XML._
 import scala.util.control.NonFatal
-import org.orbeon.scaxon.XML
-import org.orbeon.oxf.xforms.model.BindNode
 
 object DataModel {
 
@@ -104,24 +101,6 @@ object DataModel {
 
     // XForms callers
     def getBindRefOrEmpty(inDoc: NodeInfo, name: String) = getBindRef(inDoc, name).orNull
-
-    // Function called via `dataModel:bindRef()` from the binds to retrieve the adjusted bind node at design time. If
-    // the bound item is non-empty and acceptable for the control, then it is returned. Otherwise, a pointer to
-    // a dangling element is returned. This allows that element to hold MIPs. The element is marked as readonly so that
-    // controls cannot write to it directly.
-    def bindRef(bindId: String, i: SequenceIterator): SequenceIterator =
-        if (isAllowedBoundItem(controlName(bindId), asScalaSeq(i).headOption))
-            i.getAnother
-        else {
-            // Create dangling element
-            val newElementInfo = XML.elementInfo("orbeon-dangling-element")
-            // Then attach a readonly bind node to it. This is as if there was a <bind readonly="true" for the node>
-            val bindNode = new BindNode(null, 1, newElementInfo)
-            bindNode.setReadonly(value = true)
-            InstanceData.addBindNode(newElementInfo, bindNode)
-
-            SingletonIterator.makeIterator(newElementInfo)
-        }
 
     // For a given value control name and XPath expression, whether the resulting bound item is acceptable
     // Called from control details dialog

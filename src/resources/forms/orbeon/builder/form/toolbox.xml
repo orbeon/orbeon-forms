@@ -152,7 +152,7 @@
             <xh:div class="fb-tool">
                 <xf:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
                     <!-- Custom XML -->
-                    <fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>
+                    <!--<fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>-->
                     <xf:trigger>
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>

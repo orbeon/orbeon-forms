@@ -28,8 +28,7 @@
                             xmlns:xh="http://www.w3.org/1999/xhtml"
                             xmlns:xf="http://www.w3.org/2002/xforms"
                             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events"
-                            xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 

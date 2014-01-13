@@ -178,11 +178,15 @@ public class Dom4jUtils {
      * @return          resulting string
      */
     public static String domToPrettyString(final Document document) {
+        return domToPrettyString(document.getRootElement());
+    }
+
+    public static String domToPrettyString(final Element element) {
         final OutputFormat format = new OutputFormat();
         format.setIndentSize(4);
         format.setNewlines(true);
         format.setTrimText(true);
-        return domToString(document.getRootElement(), format);
+        return domToString(element, format);
     }
 
     /**

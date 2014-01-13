@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.test
 
-import org.dom4j.{Document ⇒ JDocument}
+import org.dom4j.{Document ⇒ JDocument, Element ⇒ JElement}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
@@ -21,6 +21,16 @@ import org.scalatest.junit.AssertionsForJUnit
 trait TestSupport extends AssertionsForJUnit {
     def assertXMLDocuments(left: JDocument, right: JDocument) = {
         val result = Dom4j.compareDocumentsIgnoreNamespacesInScope(left, right)
+
+        // So that we get a nicer message
+        if (! result) {
+            assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
+            assert(condition = false)
+        }
+    }
+
+    def assertXMLElementsCollapse(left: JElement, right: JElement) = {
+        val result = Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
 
         // So that we get a nicer message
         if (! result) {

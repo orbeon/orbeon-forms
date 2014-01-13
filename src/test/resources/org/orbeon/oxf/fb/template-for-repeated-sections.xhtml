@@ -1,0 +1,157 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Test Repeated Sections</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance">
+                <form>
+                    <my-section>
+                        <my-input/>
+                        <my-grid>
+                            <my-textarea/>
+                        </my-grid>
+                    </my-section>
+                    <other-section>
+                        <other-input/>
+                    </other-section>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                    <xf:bind id="my-input-bind" name="my-input" ref="my-input"/>
+                    <xf:bind id="my-grid-bind" ref="my-grid" name="my-grid">
+                        <xf:bind id="my-textarea-bind" ref="my-textarea" name="my-textarea"/>
+                    </xf:bind>
+                    
+                </xf:bind>
+                <xf:bind id="other-section-bind" ref="other-section" name="other-section">
+                    <xf:bind id="other-input-bind" ref="other-input" name="other-input"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+                <metadata>
+                    <application-name>test</application-name>
+                    <form-name>repeated-section</form-name>
+                    <title xml:lang="en">Test Repeated Sections</title>
+                    <description xml:lang="en"/>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <!-- Don't make readonly by default in case a service modifies the resources -->
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
+                <resources>
+                    <resource xml:lang="en">
+                        <other-input>
+                            <label>Other Input</label>
+                            <hint/>
+                        </other-input>
+                        <my-textarea>
+                            <label>My Textarea</label>
+                            <hint/>
+                        </my-textarea>
+                        <my-section>
+                            <label>My Section</label>
+                        </my-section>
+                        <other-section>
+                            <label>Other section</label>
+                            <help/>
+                        </other-section>
+                        <my-input>
+                            <label>My Input</label>
+                            <hint/>
+                            
+                        </my-input>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="my-grid-template">
+                <my-grid>
+                    <my-textarea/>
+                </my-grid>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <fr:section id="my-section-control" bind="my-section-bind">
+                    <xf:label ref="$form-resources/my-section/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="my-input-control" bind="my-input-bind">
+                                    <xf:label ref="$form-resources/my-input/label"/>
+                                    <xf:hint ref="$form-resources/my-input/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="my-grid-control" repeat="true" bind="my-grid-bind"
+                             template="instance('my-grid-template')"
+                             min="1">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:textarea id="my-textarea-control" bind="my-textarea-bind">
+                                    <xf:label ref="$form-resources/my-textarea/label"/>
+                                    <xf:hint ref="$form-resources/my-textarea/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                                </xf:textarea>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="other-section-control" bind="other-section-bind">
+                    <xf:label ref="$form-resources/other-section/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="other-input-control" bind="other-input-bind">
+                                    <xf:label ref="$form-resources/other-input/label"/>
+                                    <xf:hint ref="$form-resources/other-input/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        
+                        
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

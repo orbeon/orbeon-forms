@@ -47,7 +47,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
     private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(/([^/]+))?)?""".r
 
-    private val ParametersToForward = Set("document")
+    private val ParametersToForward = Set("document", "valid")
 
     // Start the processor
     override def start(pipelineContext: PipelineContext) {

@@ -89,7 +89,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <us-address/>
                 </form>
             </xf:instance>
-            <xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds" ref="instance('fr-form-instance')">
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="text-controls-bind" ref="text-controls" name="text-controls">
                     <xf:bind id="input-bind" ref="input" name="input"/>
                     <xf:bind id="textarea-bind" ref="textarea" name="textarea"/>
@@ -630,7 +630,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <fr:body xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xf:label ref="$form-resources/text-controls/label"/>
                     <fr:grid columns="3">

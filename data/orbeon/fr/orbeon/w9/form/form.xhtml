@@ -30,7 +30,7 @@
                     </hidden>
                 </form>
             </xf:instance>
-            <xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds" ref="instance('fr-form-instance')">
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="applicant-bind" name="applicant" ref="applicant">
                     <xf:bind id="name-bind" name="name" ref="name" required="true()"/>
                     <xf:bind name="business-name" id="business-name-bind" ref="business-name"/>
@@ -230,7 +230,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                 <fr:section id="applicant-control" bind="applicant-bind">
                     <xf:label ref="$form-resources/applicant/label"/>
                     <xf:help ref="$form-resources/applicant/help"/>

@@ -43,7 +43,7 @@
                     </hidden>
                 </form>
             </xf:instance>
-            <xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds"
+            <xf:bind id="fr-form-binds"
                      ref="instance('fr-form-instance')">
                 <xf:bind id="applicant-bind" name="applicant" ref="applicant">
                     <xf:bind id="name-bind" name="name" ref="name" required="true()"/>
@@ -265,7 +265,6 @@
     <xh:body>
         <fr:view>
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl"
-                     xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors"
                      xmlns:p="http://www.orbeon.com/oxf/pipeline">
                 <fr:section id="applicant-control" bind="applicant-bind">

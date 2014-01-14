@@ -20,21 +20,18 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-         xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details" xxbl:mode="binding">
         <xbl:handlers>
-            <!-- Handler to open dialog -->
+            <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
-                <xf:setvalue ref="original-control-name" value="fbf:controlName(event('control-id'))"/>
-                <xf:setvalue ref="control-name"          value="../original-control-name"/>
-                <xxf:show dialog="dialog"/>
-            </xbl:handler>
-            <!-- When the dialog opens, get type information from the form -->
-            <xbl:handler event="xxforms-dialog-open" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
+
+                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+
+                <xf:setvalue ref="original-control-name" value="fbf:controlName(event('control-id'))"/>
+                <xf:setvalue ref="control-name"          value="$i/original-control-name"/>
 
                 <xf:setvalue ref="$i/control-names" value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
                 <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
@@ -106,10 +103,10 @@
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+
+                <xxf:show dialog="dialog"/>
             </xbl:handler>
             <!-- Save data upon close unless the sub-form is not valid -->
-            <!-- NOTE: We used to have not(event('fb-save') = false()), but we prefer explicit now because we may get
-                 an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
             <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and valid($i)" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
@@ -134,7 +131,6 @@
                     <xf:setvalue ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))" value="$bound-node"/>
                 </xf:action>
 
-
                 <xf:action type="xpath">
                     (: Write alerts and constraints :)
                     fbf:writeAlertsAndValidationsAsXML($form, $i/control-name, $i/default-alert/alert, $i/validations/validation),
@@ -145,6 +141,20 @@
                     fbf:setControlHelp($i/control-name, $i/help),
                     fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
                 </xf:action>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="control-name-input control-custom-input save-button">
+                <!-- Close and save if the data is valid-->
+                <xxf:hide if="xf:valid($i)" dialog="dialog">
+                    <xf:property name="fb-save" value="true()"/>
+                </xxf:hide>
+                <!-- Mark all visited if the data is invalid -->
+                <xxf:setvisited if="not(valid($i))" control="dialog" recurse="true"/>
+            </xbl:handler>
+            <!-- Close and cancel upon DOMActivate -->
+            <xbl:handler event="DOMActivate" observer="cancel-button">
+                <xxf:hide dialog="dialog">
+                    <xf:property name="fb-save" value="false()"/>
+                </xxf:hide>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -187,7 +197,7 @@
                     type="xs:NCName"
                     calculate="normalize-space()"
                     readonly="false()"
-                    constraint=". = ../original-control-name or not(. = xxf:split(../control-names))"/>
+                    constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
 
                 <xf:bind ref="default-alert">
                     <xf:bind
@@ -260,7 +270,7 @@
                 <xf:var name="schema-prefix" value="fbf:findSchemaPrefixOrEmpty($form)" as="xs:string?"/>
 
                 <fr:tabbable>
-                    <fr:tab id="validations-tab">
+                    <fr:tab id="base-tab">
                         <fr:label ref="$resources/dialog-control-details/tab-base/label"/>
                         <fr:grid>
                             <xh:tr>
@@ -491,27 +501,13 @@
                         </fr:grid>
                     </fr:tab>
                 </fr:tabbable>
-
-                <xf:action event="DOMActivate" observer="control-name-input control-custom-input save-button">
-                    <!-- Close and save if the data is valid-->
-                    <xxf:hide if="valid($i)" dialog="dialog">
-                        <xf:property name="fb-save" value="true()"/>
-                    </xxf:hide>
-                    <!-- Mark all visited if the data is invalid -->
-                    <xxf:setvisited if="not(valid($i))" control="dialog" recurse="true"/>
-                </xf:action>
-
                 <xh:div class="fr-dialog-buttons">
                     <xf:trigger appearance="xxf:primary" id="save-button">
                         <xf:label ref="$resources/apply/label"/>
                     </xf:trigger>
                     <xf:output value="$resources/or/label"/>
-                    <xf:trigger appearance="minimal">
+                    <xf:trigger appearance="minimal" id="cancel-button">
                         <xf:label ref="$resources/cancel/label"/>
-                        <!-- Close and cancel upon DOMActivate -->
-                        <xxf:hide event="DOMActivate" dialog="dialog">
-                            <xf:property name="fb-save" value="false()"/>
-                        </xxf:hide>
                     </xf:trigger>
                 </xh:div>
             </xxf:dialog>

@@ -26,22 +26,70 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
-    <xbl:binding id="fb-dialog-grid-details" element="fb|dialog-grid-details">
+    <xbl:binding id="fb-dialog-grid-details" element="fb|dialog-grid-details" xxbl:mode="binding">
         <xbl:handlers>
-            <!-- Handler to open dialog -->
+            <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xf:var name="form" value="xxf:binding('fb-dialog-grid-details')"/>
+
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
                 <xf:setvalue ref="original-grid-name" value="fbf:getContainerNameOrEmpty(event('grid'))"/>
-                <xf:setvalue ref="grid-name" value="../original-grid-name"/>
+                <xf:setvalue ref="grid-name" value="$i/original-grid-name"/>
+
+                <xf:setvalue ref="$i/min-repeat" value="fbf:getMin($form, $i/grid-name)"/>
+                <xf:setvalue ref="$i/max-repeat" value="fbf:getMaxOrEmpty($form, $i/grid-name)"/>
+
+                <xf:setvalue ref="$i/relevant" value="fbf:getMipOrEmpty($form, $i/grid-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly" value="fbf:getMipOrEmpty($form, $i/grid-name, 'readonly')"/>
+
+                <xf:setvalue ref="$i/control-names" value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
 
                 <xxf:show dialog="dialog"/>
+
+                <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
+                     want them to win -->
+                <xf:setfocus ev:event="xforms-enabled" control="dialog"/>
+
+            </xbl:handler>
+            <!-- Save data upon close unless the sub-form is not valid -->
+            <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and valid($i)" observer="dialog">
+                <xf:var name="form" value="xxf:binding('fb-dialog-grid-details')"/>
+
+                <xf:var name="old-name" value="$i/original-grid-name/string()"/>
+                <xf:var name="new-name" value="$i/grid-name/string()"/>
+
+                <xf:action type="xpath">
+                    fbf:renameControlIfNeeded($form, $old-name, $new-name),
+                    fbf:updateMip($form, $new-name, 'relevant', $i/relevant),
+                    fbf:updateMip($form, $new-name, 'readonly', $i/readonly),
+                    fbf:setRepeatProperties($form, $new-name, true(),
+                                            xs:integer($i/min-repeat),
+                                            if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1,
+                                            ())
+                </xf:action>
+                <!-- No classes for sections for now -->
+
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="dialog" if="event('xxf:targetid') != 'cancel-button'">
+                <!-- Close and save if the data is valid-->
+                <xxf:hide if="xf:valid($i)" dialog="dialog">
+                    <xf:property name="fb-save" value="true()"/>
+                </xxf:hide>
+                <!-- Mark all visited if the data is invalid -->
+                <xxf:setvisited if="not(valid($i))" control="dialog" recurse="true"/>
+            </xbl:handler>
+            <!-- Close and cancel upon DOMActivate -->
+            <xbl:handler event="DOMActivate" observer="cancel-button">
+                <xxf:hide dialog="dialog">
+                    <xf:property name="fb-save" value="false()"/>
+                </xxf:hide>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <local valid="true">
+                    <local>
                         <original-grid-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <grid-name/>             <!-- Possibly new name set by users -->
 
@@ -53,15 +101,11 @@
 
                         <control-names/>         <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
-                        <save-trigger/>
+                        <save-button/>
                     </local>
                 </xf:instance>
                 
                 <xf:var name="i" value="instance()"/>
-
-                <!-- Enable/disable trigger -->
-                <xf:setvalue ev:event="xxforms-invalid" ev:observer="i" ref="@valid">false</xf:setvalue>
-                <xf:setvalue ev:event="xxforms-valid"   ev:observer="i" ref="@valid">true</xf:setvalue>
 
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="grid-name"
@@ -78,61 +122,14 @@
                          constraint="not(string() castable as xs:integer) or not(string(../min-repeat) castable as xs:integer) or xs:integer(.) ge xs:integer(../min-repeat)"
                          calculate="normalize-space()" readonly="false()"/>
 
-                <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
-
             </xf:model>
         </xbl:implementation>
         <xbl:template>
             <xf:group id="container" appearance="xxf:internal">
 
                 <!-- Bindings specified on control -->
-                <xf:var name="form"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
                 <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
-                <xf:var name="components"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xf:var>
 
-                <xf:var name="body" value="$form/xh:body treat as element()"/>
-
-                <!-- Show dialog -->
-                <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-
-                    <xf:setvalue ref="$i/min-repeat" value="fbf:getMin($form, $i/grid-name)"/>
-                    <xf:setvalue ref="$i/max-repeat" value="fbf:getMaxOrEmpty($form, $i/grid-name)"/>
-
-                    <xf:setvalue ref="$i/relevant" value="fbf:getMipOrEmpty($form, $i/grid-name, 'relevant')"/>
-                    <xf:setvalue ref="$i/readonly" value="fbf:getMipOrEmpty($form, $i/grid-name, 'readonly')"/>
-
-                    <xf:setvalue ref="$i/control-names" value="string-join(fbf:getAllControlNamesXPath($body), ' ')"/>
-
-                    <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
-                         want them to win -->
-                    <xf:setfocus ev:event="xforms-enabled" control="dialog"/>
-
-                </xf:action>
-
-                <!-- Close dialog upon cancel -->
-                <xxf:hide ev:event="DOMActivate" ev:observer="cancel-trigger" dialog="dialog"/>
-
-                <!-- Save data upon close -->
-                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $i/@valid = 'true'">
-
-                    <xf:var name="old-name" value="$i/original-grid-name/string()"/>
-                    <xf:var name="new-name" value="$i/grid-name/string()"/>
-
-                    <xf:action type="xpath">
-                        fbf:renameControlIfNeeded($form, $old-name, $new-name),
-                        fbf:updateMip($form, $new-name, 'relevant', $i/relevant),
-                        fbf:updateMip($form, $new-name, 'readonly', $i/readonly),
-                        fbf:setRepeatProperties($form, $new-name, true(),
-                                                xs:integer($i/min-repeat),
-                                                if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1,
-                                                ())
-                    </xf:action>
-                    <!-- No classes for sections for now -->
-
-                    <xxf:hide dialog="dialog"/>
-                </xf:action>
-
-                <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal">
                     <xf:label ref="$resources/dialog-grid-details/label"/>
                     <xh:div>
@@ -210,11 +207,11 @@
                         </xh:div>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <xf:trigger ref="save-trigger" id="save-trigger" appearance="xxf:primary">
+                                <xf:trigger ref="save-button" id="save-button" appearance="xxf:primary">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>
-                                <xf:trigger appearance="minimal" id="cancel-trigger">
+                                <xf:trigger appearance="minimal" id="cancel-button">
                                     <xf:label ref="$resources/cancel/label"/>
                                 </xf:trigger>
                             </xf:group>

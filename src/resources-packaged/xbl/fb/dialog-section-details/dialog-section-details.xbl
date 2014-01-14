@@ -80,7 +80,7 @@
 
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
-            <xbl:handler event="DOMActivate" observer="dialog" if="event('xxf:targetid') != 'cancel-trigger'">
+            <xbl:handler event="DOMActivate" observer="dialog" if="event('xxf:targetid') != 'cancel-button'">
                 <!-- Close and save if the data is valid-->
                 <xxf:hide if="valid($i)" dialog="dialog">
                     <xf:property name="fb-save" value="true()"/>
@@ -89,7 +89,7 @@
                 <xxf:setvisited if="not(valid($i))" control="dialog" recurse="true"/>
             </xbl:handler>
             <!-- Close and cancel upon DOMActivate -->
-            <xbl:handler event="DOMActivate" observer="cancel-trigger">
+            <xbl:handler event="DOMActivate" observer="cancel-button">
                 <xxf:hide dialog="dialog">
                     <xf:property name="fb-save" value="false()"/>
                 </xxf:hide>
@@ -121,7 +121,7 @@
 
                         <control-names/>         <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
-                        <save-trigger/>
+                        <save-button/>
                     </local>
                 </xf:instance>
 
@@ -301,11 +301,11 @@
 
                     <xh:div class="fr-dialog-buttons">
                         <xf:group id="triggers">
-                            <xf:trigger ref="save-trigger" id="save-trigger" appearance="xxf:primary">
+                            <xf:trigger ref="save-button" id="save-button" appearance="xxf:primary">
                                 <xf:label ref="$resources/apply/label"/>
                             </xf:trigger>
                             <xf:output value="$resources/or/label"/>
-                            <xf:trigger appearance="minimal" id="cancel-trigger">
+                            <xf:trigger appearance="minimal" id="cancel-button">
                                 <xf:label ref="$resources/cancel/label"/>
                             </xf:trigger>
                         </xf:group>

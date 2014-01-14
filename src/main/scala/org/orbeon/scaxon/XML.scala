@@ -465,9 +465,9 @@ object XML {
     }).convertToItem(_: Any)
 
     // Convert a Java object to a Saxon Item but keep unchanged if already an Item
-    val anyToItemIfNeeded: Any ⇒ Item = _ match {
+    val anyToItemIfNeeded: Any ⇒ Item = {
         case i: Item ⇒ i
-        case a ⇒ anyToItem(a)
+        case a       ⇒ anyToItem(a)
     }
 
     // Other implicits

@@ -55,6 +55,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.security.KeyStore;
 import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
@@ -79,77 +80,73 @@ public class HTTPURLConnection extends URLConnection {
     private static AuthState proxyAuthState = null;
 
     static {
-        final BasicHttpParams basicHttpParams = new BasicHttpParams();
-        // Remove limit on the number of connections per host
-        ConnManagerParams.setMaxConnectionsPerRoute(basicHttpParams, new ConnPerRouteBean(Integer.MAX_VALUE));
-        // Remove limit on the number of max connections
-        ConnManagerParams.setMaxTotalConnections(basicHttpParams, Integer.MAX_VALUE);
-
-        // Set parameters per as configured in the properties
-        final HttpConnectionParamBean paramBean = new HttpConnectionParamBean(basicHttpParams);
-        final PropertySet propertySet = Properties.instance().getPropertySet();
-        paramBean.setStaleCheckingEnabled(propertySet.getBoolean(STALE_CHECKING_ENABLED_PROPERTY, true));
-        paramBean.setSoTimeout(propertySet.getInteger(SO_TIMEOUT_PROPERTY, 0));
-
-        // Create SSL context, based on a custom key store if specified
-        final SSLContext sslcontext;
         try {
+            final BasicHttpParams basicHttpParams = new BasicHttpParams();
+            // Remove limit on the number of connections per host
+            ConnManagerParams.setMaxConnectionsPerRoute(basicHttpParams, new ConnPerRouteBean(Integer.MAX_VALUE));
+            // Remove limit on the number of max connections
+            ConnManagerParams.setMaxTotalConnections(basicHttpParams, Integer.MAX_VALUE);
+
+            // Set parameters per as configured in the properties
+            final HttpConnectionParamBean paramBean = new HttpConnectionParamBean(basicHttpParams);
+            final PropertySet propertySet = Properties.instance().getPropertySet();
+            paramBean.setStaleCheckingEnabled(propertySet.getBoolean(STALE_CHECKING_ENABLED_PROPERTY, true));
+            paramBean.setSoTimeout(propertySet.getInteger(SO_TIMEOUT_PROPERTY, 0));
+
+            // Create SSL context, based on a custom key store if specified
+            KeyStore trustStore = null;
             final String keyStoreURI = propertySet.getStringOrURIAsString(SSL_KEYSTORE_URI, false);
             final String keyStorePassword = propertySet.getString(SSL_KEYSTORE_PASSWORD);
             if (keyStoreURI != null) {
-                sslcontext = SSLContext.getInstance("TLS");
-
                 final URL url = new URL(null, keyStoreURI);
                 final InputStream is = url.openStream();
-
-                sslcontext.init(null, new TrustManager[] {KeyStoreTrustManager.apply(is, keyStorePassword)}, null);
-            } else {
-            	sslcontext = SSLContext.getInstance("Default");
+                trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(is, keyStorePassword.toCharArray());
             }
+
+            // Create SSL hostname verifier
+            final String hostnameVerifierProperty = propertySet.getString(SSL_HOSTNAME_VERIFIER, "strict");
+            final X509HostnameVerifier hostnameVerifier =
+                      "browser-compatible".equals(hostnameVerifierProperty) ? SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
+                    : "allow-all".equals(hostnameVerifierProperty) ? SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+                    : SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+
+            // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
+            final SchemeRegistry schemeRegistry = new SchemeRegistry();
+            schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+
+            final SSLSocketFactory sslSocketFactory = new SSLSocketFactory(SSLSocketFactory.TLS, trustStore, "password", trustStore, null, null, hostnameVerifier);
+            schemeRegistry.register(new Scheme("https", 443, sslSocketFactory));
+
+            connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);
+
+            // Set proxy if defined in properties
+            final String proxyHost = propertySet.getString(PROXY_HOST_PROPERTY);
+            final Integer proxyPort = propertySet.getInteger(PROXY_PORT_PROPERTY);
+            if (proxyHost != null && proxyPort != null) {
+                final boolean useTLS = propertySet.getBoolean(PROXY_SSL_PROPERTY, false);
+                basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
+
+                // Proxy authentication
+                final String proxyUsername = propertySet.getString(PROXY_USERNAME_PROPERTY);
+                final String proxyPassword = propertySet.getString(PROXY_PASSWORD_PROPERTY);
+                if (proxyUsername != null && proxyPassword != null) {
+                    final String ntlmHost = propertySet.getString(PROXY_NTLM_HOST_PROPERTY);
+                    final String ntlmDomain = propertySet.getString(PROXY_NTLM_DOMAIN_PROPERTY);
+                    final Credentials proxyCredentials = ntlmHost != null && ntlmDomain != null
+                            ? new NTCredentials(proxyUsername, proxyPassword,ntlmHost,ntlmDomain)
+                            : new UsernamePasswordCredentials(proxyUsername, proxyPassword);
+                    proxyAuthState = new AuthState();
+                    proxyAuthState.setCredentials(proxyCredentials);
+                }
+            }
+
+            // Save HTTP parameters which we'll need when instantiating an HttpClient (even though it could get the
+            // parameters from the connection manager)
+            httpParams = basicHttpParams;
         } catch (Exception e) {
             throw new OXFException(e);
         }
-
-        // Create SSL hostname verifier
-        final String hostnameVerifierProperty = propertySet.getString(SSL_HOSTNAME_VERIFIER, "strict");
-        final X509HostnameVerifier hostnameVerifier =
-                  "browser-compatible".equals(hostnameVerifierProperty) ? SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
-                : "allow-all".equals(hostnameVerifierProperty) ? SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
-                : SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
-
-        // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
-        final SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-
-        final SSLSocketFactory sslSocketFactory = new SSLSocketFactory(sslcontext, hostnameVerifier);
-        schemeRegistry.register(new Scheme("https", 443, sslSocketFactory));
-
-        connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);
-
-        // Set proxy if defined in properties
-        final String proxyHost = propertySet.getString(PROXY_HOST_PROPERTY);
-        final Integer proxyPort = propertySet.getInteger(PROXY_PORT_PROPERTY);
-        if (proxyHost != null && proxyPort != null) {
-            final boolean useTLS = propertySet.getBoolean(PROXY_SSL_PROPERTY, false);
-            basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
-
-            // Proxy authentication
-            final String proxyUsername = propertySet.getString(PROXY_USERNAME_PROPERTY);
-            final String proxyPassword = propertySet.getString(PROXY_PASSWORD_PROPERTY);
-            if (proxyUsername != null && proxyPassword != null) {
-                final String ntlmHost = propertySet.getString(PROXY_NTLM_HOST_PROPERTY);
-                final String ntlmDomain = propertySet.getString(PROXY_NTLM_DOMAIN_PROPERTY);
-                final Credentials proxyCredentials = ntlmHost != null && ntlmDomain != null
-                        ? new NTCredentials(proxyUsername, proxyPassword,ntlmHost,ntlmDomain)
-                        : new UsernamePasswordCredentials(proxyUsername, proxyPassword);
-                proxyAuthState = new AuthState();
-                proxyAuthState.setCredentials(proxyCredentials);
-            }
-        }
-
-        // Save HTTP parameters which we'll need when instantiating an HttpClient (even though it could get the
-        // parameters from the connection manager)
-        httpParams = basicHttpParams;
     }
 
     private CookieStore cookieStore;

@@ -115,7 +115,8 @@ public class HTTPURLConnection extends URLConnection {
             final SchemeRegistry schemeRegistry = new SchemeRegistry();
             schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
 
-            final SSLSocketFactory sslSocketFactory = new SSLSocketFactory(SSLSocketFactory.TLS, trustStore, "password", trustStore, null, null, hostnameVerifier);
+            // Calling "full" constructor: https://github.com/apache/httpclient/blob/4.2.x/httpclient/src/main/java/org/apache/http/conn/ssl/SSLSocketFactory.java#L203
+            final SSLSocketFactory sslSocketFactory = new SSLSocketFactory(SSLSocketFactory.TLS, trustStore, keyStorePassword, trustStore, null, null, hostnameVerifier);
             schemeRegistry.register(new Scheme("https", 443, sslSocketFactory));
 
             connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);

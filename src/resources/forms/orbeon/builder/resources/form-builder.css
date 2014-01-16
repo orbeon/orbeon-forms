@@ -138,7 +138,7 @@ body {
   font-size: 20px;
   line-height: 40px;
   color: #BBB;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   z-index: 1;
   background: white;
   opacity: 0.01;
@@ -431,7 +431,7 @@ body {
 }
 .orbeon #fb-database-service-dialog textarea {
   height: 10em;
-  font-family: monospace;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
 }
 .orbeon #fb-edit-help-dialog {
   width: 400px;

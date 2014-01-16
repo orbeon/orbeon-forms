@@ -368,7 +368,7 @@ body.orbeon {
 /* ***** Print and PDF ********************************************************************************************** */
 @media print {
   html {
-    font-family: "Arial Unicode MS";
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
   html,
   html body.orbeon {

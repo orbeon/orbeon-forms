@@ -86,7 +86,7 @@ body {
         font-size: 20px;                                                    // Matching the title font size
         line-height: 40px;                                                  // So text is vertically centered
         color: #BBB;                                                        // Light gray denoting hint
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;        // Matching font defined by Bootstrap for titles
+        font-family: @baseFontFamily;                                       // Matching font defined by Bootstrap for titles
         z-index: 1;                                                         // Show on top of the page (default is 0)
         background: white; opacity: 0.01;                                   // For IE9 and IE10, fixing https://github.com/orbeon/orbeon-forms/issues/1402,
                                                                             // see http://stackoverflow.com/a/6480792/5295
@@ -332,7 +332,7 @@ body {
         width: 550px;
         textarea {
             height: 10em;
-            font-family: monospace;
+            font-family: @monoFontFamily;
         }
     }
 

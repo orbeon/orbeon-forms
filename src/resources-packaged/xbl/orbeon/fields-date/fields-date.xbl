@@ -128,7 +128,7 @@
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <xf:var name="c" value="normalize-space(string-join((year, month, day), ''))" as="xs:string"/>
                     <xf:action if="$c = ''">
-                        <xf:setvalue ref="is-valid" value="xxf:valid($binding)"/>
+                        <xf:setvalue ref="is-valid" value="valid($binding)"/>
                         <xf:setvalue ref="$binding"/>
                     </xf:action>
                     <xf:action if="$c != ''">

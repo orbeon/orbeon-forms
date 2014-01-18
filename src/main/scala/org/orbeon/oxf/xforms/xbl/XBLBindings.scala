@@ -463,12 +463,14 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                         throw new OXFException("Duplicate id found for static id: " + staticId)
 
                     // Index scope
-                    partAnalysis.mapScopeIds(staticId, prefixedId, scope)
+                    partAnalysis.mapScopeIds(staticId, prefixedId, scope, ignoreIfPresent = false)
 
+                    // Index AVT `for` if needed
                     if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
                         val forStaticId = attributes.getValue("for")
                         val forPrefixedId = prefix + forStaticId
-                        partAnalysis.mapScopeIds(forStaticId, forPrefixedId, scope)
+
+                        partAnalysis.mapScopeIds(forStaticId, forPrefixedId, scope, ignoreIfPresent = true)
                     }
                 }
             }

@@ -37,7 +37,7 @@ trait PartXBLAnalysis extends TransientState {
             staticId ← metadata.idGenerator.ids.asScala
             prefixedId = prefix + staticId
         } yield
-            mapScopeIds(staticId, prefixedId, startScope)
+            mapScopeIds(staticId, prefixedId, startScope, ignoreIfPresent = false)
 
         // Tell top-level static id generator to stop checking for duplicate ids
         // TODO: not nice, check what this is about (seems needed as of 2012-02-29)
@@ -59,13 +59,14 @@ trait PartXBLAnalysis extends TransientState {
     def deregisterScope(scope: Scope) =
         scopesById -= scope.scopeId
 
-    def mapScopeIds(staticId: String, prefixedId: String, scope: Scope) {
-        if (prefixedIdToXBLScopeMap.contains(prefixedId))
-            throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
-
-        scope += staticId → prefixedId
-        prefixedIdToXBLScopeMap += prefixedId → scope
-    }
+    def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit =
+        if (prefixedIdToXBLScopeMap.contains(prefixedId)) {
+            if (! ignoreIfPresent)
+                throw new OXFException(" Duplicate id found for prefixed id: " + prefixedId)
+        } else {
+            scope += staticId → prefixedId
+            prefixedIdToXBLScopeMap += prefixedId → scope
+        }
 
     // Deindex the given control's XBL-related information
     def unmapScopeIds(control: ElementAnalysis): Unit = {

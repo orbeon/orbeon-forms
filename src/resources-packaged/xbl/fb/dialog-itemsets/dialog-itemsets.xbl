@@ -102,7 +102,7 @@
                     fbf:setItemsetHTMLMediatype(fbf:getFormDoc(), $local/control-name, $local/html)
                 </xf:action>
 
-                <xf:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input">                      <!-- Add line when users press enter -->
+                <xf:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input fb-itemset-hint-input"> <!-- Add line when users press enter -->
                     <xf:var name="index" value="index('fb-itemset-repeat-repeat')"/>
                     <xf:insert context="$local/items" ref="item" at="$index" origin="$local/template/item"/>
                     <xf:setfocus control="fb-itemset-label-input"/>

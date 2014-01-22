@@ -32,18 +32,20 @@ trait FormRunnerBaseOps {
     val XBL = XBL_NAMESPACE_URI
     val FR = "http://orbeon.org/oxf/xml/form-runner"
 
-    val NoscriptParam     = "fr-noscript"
-    val LanguageParam     = "fr-language"
-    val EmbeddableParam   = "orbeon-embeddable"
+    val NoscriptParam         = "fr-noscript"
+    val LanguageParam         = "fr-language"
+    val EmbeddableParam       = "orbeon-embeddable"
 
-    val ParametersModel   = "fr-parameters-model"
-    val PersistenceModel  = "fr-persistence-model"
-    val ResourcesModel    = "fr-resources-model"
-    val FormModel         = "fr-form-model"
-    val ErrorSummaryModel = "fr-error-summary-model"
-    val SectionsModel     = "fr-sections-model"
+    val LiferayLanguageHeader = "orbeon-liferay-language"
 
-    val TemplateSuffix    = "-template"
+    val ParametersModel       = "fr-parameters-model"
+    val PersistenceModel      = "fr-persistence-model"
+    val ResourcesModel        = "fr-resources-model"
+    val FormModel             = "fr-form-model"
+    val ErrorSummaryModel     = "fr-error-summary-model"
+    val SectionsModel         = "fr-sections-model"
+
+    val TemplateSuffix        = "-template"
 
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid

@@ -96,15 +96,15 @@ trait FormRunnerLang {
     def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
         val request = NetUtils.getExternalContext.getRequest
 
-        def fromHeader  = request.getFirstHeader("orbeon-liferay-language") map cleanLanguage
-        def fromRequest = request.getFirstParamAsString(LanguageParam) map cleanLanguage
+        def fromHeader  = request.getFirstHeader       (LiferayLanguageHeader) map cleanLanguage
+        def fromRequest = request.getFirstParamAsString(LanguageParam)         map cleanLanguage
         def fromSession = stringFromSession(request, LanguageParam)
 
         nonEmptyOrNone(requestedLang) orElse
-            fromHeader orElse
-            fromRequest orElse
-            fromSession orElse
-            Option(getDefaultLang(appForm))
+            fromHeader                orElse
+            fromRequest               orElse
+            fromSession               orElse
+            Some(getDefaultLang(appForm))
     }
 
     // Support e.g. en_US with underscore, but normalize to en-US and only keep the language part for now. Later we can

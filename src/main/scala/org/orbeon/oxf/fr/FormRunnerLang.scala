@@ -97,7 +97,7 @@ trait FormRunnerLang {
         val request = NetUtils.getExternalContext.getRequest
 
         def fromHeader  = request.getFirstHeader("orbeon-liferay-language") map cleanLanguage
-        def fromRequest = request.getFirstHeader(LanguageParam) map cleanLanguage
+        def fromRequest = request.getFirstParamAsString(LanguageParam) map cleanLanguage
         def fromSession = stringFromSession(request, LanguageParam)
 
         nonEmptyOrNone(requestedLang) orElse

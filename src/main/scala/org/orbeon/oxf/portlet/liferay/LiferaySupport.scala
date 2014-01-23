@@ -13,13 +13,10 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-
 import collection.JavaConverters._
 import com.liferay.portal.kernel.language.LanguageUtil
 import com.liferay.portal.model.User
-import com.liferay.portal.util.PortalUtil
 import javax.portlet._
-import javax.servlet.http.HttpServletRequest
 import org.orbeon.oxf.util.ScalaUtils._
 
 object LiferaySupport {

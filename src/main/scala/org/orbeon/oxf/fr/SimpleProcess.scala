@@ -331,6 +331,13 @@ trait FormRunnerActions {
 
             // TODO: Remove duplication once @replace is an AVT
             val replace = if (propertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
+
+            // Set data-safe-override as we know we are not losing data upon navigation. This happens:
+            // - with changing mode (tryChangeMode)
+            // - when navigating away using the "send" action
+            if (replace == "all")
+                setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
+
             sendThrowOnError(s"fr-send-submission-$replace", propertiesAsMap)
         }
 
@@ -367,9 +374,6 @@ trait FormRunnerActions {
 
     private def tryChangeMode(path: String): Try[Any] =
         Try {
-            // Set data-safe-override as we know we are not losing data upon navigation
-            setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
-
             Map[Option[String], String](
                 Some("uri")        → appendCommonFormRunnerParameters(path),
                 Some("method")     → "post",

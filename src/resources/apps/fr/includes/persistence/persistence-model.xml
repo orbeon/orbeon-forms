@@ -485,7 +485,9 @@
     <xf:action observer="fr-form-instance fb-form-instance" event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed">
         <xf:action if="$mode = ('new', 'edit')">
             <!-- Mark status as dirty if data changes -->
-            <xf:setvalue ref="$persistence-instance/data-status"     value="'dirty'"/>
+            <xf:setvalue ref="$persistence-instance/data-status"          value="'dirty'"/>
+            <!-- Reset override, see: https://github.com/orbeon/orbeon-forms/issues/1325  -->
+            <xf:setvalue ref="$persistence-instance/data-safe-override"   value="'false'"/>
             <xf:action if="$autosave-enabled">
                 <xf:setvalue ref="$autosave-elem/status"                  value="'dirty'"/>
                 <xf:setvalue ref="$autosave-elem/change-timestamp"        value="current-dateTime()"/>

@@ -13,13 +13,21 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContext}
+import org.orbeon.saxon.expr.{ExpressionVisitor, _}
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{BooleanValue, Int64Value, IntegerValue, StringValue}
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
+
+trait RuntimeDependentFunction extends SystemFunction {
+  override def getIntrinsicDependencies =
+    super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT
+
+  // Suppress compile-time evaluation by doing nothing
+  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
+}
 
 abstract class FunctionSupport extends SystemFunction {
 

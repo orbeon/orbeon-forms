@@ -76,7 +76,7 @@ abstract class XFormsFunction extends FunctionSupport {
    *
    * NOTE: A few functions would benefit from not having this, but it is always safe.
    */
-  override def preEvaluate(visitor: ExpressionVisitor) = this
+  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
 
   def bindingContext = context.bindingContext
 

@@ -295,6 +295,7 @@
             }}"
             xxf:noscript-support="{$is-noscript-support}"
             xxf:external-events="{@xxf:external-events} fr-open-pdf"
+            xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xforms11-switch="false"
             xxf:xpath-analysis="true">
 
@@ -444,11 +445,14 @@
             <xsl:apply-templates select="node()"/>
 
             <!-- Variable exposing all the user roles -->
+
             <xf:var name="fr-roles" value="frf:orbeonRolesSequence()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
 
             <!-- Variable exposing the form app/form/mode -->
             <xf:var name="fr-app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
             <xf:var name="fr-form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
+
+            <!-- Variable exposing the form mode -->
             <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode/string()"/>
 
             <!-- Bind to set the form instance read-only when necessary -->

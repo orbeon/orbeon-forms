@@ -18,7 +18,8 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, StringConversions}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.oxf.xml.RuntimeDependentFunction
+import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
@@ -60,7 +61,7 @@ class XXFormsGetRequestHeader extends RequestFunction {
     Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
 }
 
-trait RequestFunction extends XFormsFunction {
+trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
 
   def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[List[String]]
   def fromRequest(request: Request, name: String): Option[List[String]]
@@ -82,25 +83,25 @@ trait RequestFunction extends XFormsFunction {
 }
 
 // xxf:username()  as xs:string? and xxf:get-remote-user() as xs:string?
-class XXFormsUsername extends XFormsFunction {
+class XXFormsUsername extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     Option(NetUtils.getExternalContext.getRequest.getUsername)
 }
 
 // xxf:user-group() as xs:string?
-class XXFormsUserGroup extends XFormsFunction {
+class XXFormsUserGroup extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     Option(NetUtils.getExternalContext.getRequest.getUserGroup)
 }
 
 // xxf:user-roles() as xs:string*
-class XXFormsUserRoles extends XFormsFunction {
+class XXFormsUserRoles extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     asIterator(NetUtils.getExternalContext.getRequest.getUserRoles)
 }
 
 // xxf:is-user-in-role(xs:string) as xs:boolean
-class XXFormsIsUserInRole extends XFormsFunction {
+class XXFormsIsUserInRole extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     NetUtils.getExternalContext.getRequest.isUserInRole(stringArgument(0)(xpathContext))
 }

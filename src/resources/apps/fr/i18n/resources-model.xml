@@ -55,6 +55,10 @@
     <xf:instance id="fr-languages-instance" src="oxf:/apps/fr/i18n/languages.xml" xxf:readonly="true" xxf:cache="true"/>
 
     <xf:action event="fr-update-language">
+
+        <xf:var name="old-lang"    value="$lang/string()"/>
+        <xf:var name="old-fr-lang" value="$fr-lang/string()"/>
+
         <!-- Find form language -->
         <xf:setvalue
             if="$app != '*'"
@@ -79,10 +83,17 @@
             xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))
         </xf:action>
 
-        <!-- So that model variables are updated in case another model uses them -->
-        <xf:rebuild/>
-        <xf:recalculate/>
-        <xf:revalidate/>
+        <xf:action if="$old-lang != $lang/string() or $old-fr-lang != $fr-lang/string()">
+            <!-- So that model variables are updated in case another model uses them -->
+            <xf:rebuild/>
+            <xf:recalculate/>
+            <xf:revalidate/>
+
+            <!-- So that binds which depend on language work are updated at a later time, see:
+                 https://github.com/orbeon/orbeon-forms/issues/1500 -->
+            <xf:recalculate model="fr-form-model" xxf:deferred="true"/>
+            <xf:revalidate  model="fr-form-model" xxf:deferred="true"/>
+        </xf:action>
     </xf:action>
 
     <!-- Respond to language change in the UI -->

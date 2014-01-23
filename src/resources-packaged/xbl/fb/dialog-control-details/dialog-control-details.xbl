@@ -20,6 +20,7 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details" xxbl:mode="binding">
@@ -43,7 +44,7 @@
 
                 <!-- Process the LHHA of each details control -->
                 <!-- LATER: Use xxf:dynamic for custom properties. -->
-                <xf:var name="resources" value="fbf:currentFormResources()"/>
+                <xf:var name="resources" value="frf:currentFormResources()"/>
                 <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
                 <xf:action iterate="$i/fb:control-details/*/(xf:label, xf:hint, xf:help, xf:alert)">
                     <xf:var name="lhha" value="."/>

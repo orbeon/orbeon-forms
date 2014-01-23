@@ -124,9 +124,6 @@ trait FormRunnerBaseOps {
     def errorSummaryInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
     def persistenceInstance  = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
 
-    def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
-    def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
-
     // Whether the form has a captcha
     def hasCaptcha = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
 

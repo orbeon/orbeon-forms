@@ -20,6 +20,8 @@ import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
+import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 
 // NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {
@@ -33,6 +35,11 @@ trait FormRunnerLang {
     // The client passes "*" or blank to indicate that there is no current app/form name
     def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
     def getAppForm(app: String, form: String) = hasAppForm(app, form) option AppForm(app, form)
+
+    def currentLang          = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("lang"))
+    def currentFRLang        = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-lang"))
+    def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
+    def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
 
     // List of available languages for the given form
     // Empty if the form doesn't have resources

@@ -282,7 +282,7 @@ trait FormRunnerActions {
         "annotate"   → "",
         "replace"    → "none",
         "content"    → "xml",
-        "parameters" → "app form document valid"
+        "parameters" → "app form document valid language"
     )
 
     private val SendParameterKeys = List("uri") ++ DefaultSendParameters.keys
@@ -315,6 +315,7 @@ trait FormRunnerActions {
                 case name @ "form-version" ⇒ name → formVersion
                 case name @ "document"     ⇒ name → document.get
                 case name @ "valid"        ⇒ name → dataValid.toString
+                case name @ "language"     ⇒ name → currentLang.stringValue
             }
 
             // Append query parameters to the URL

@@ -764,7 +764,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="Simple use of xxf:evaluate-bind-property function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -946,7 +946,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="Initial build of controls may use out of date binds" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1405,7 +1405,7 @@
             </controls>
         </output>
     </test>
-    
+
     <test description="Validation information is updated before xforms-ready runs" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316315&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
@@ -2172,7 +2172,7 @@
                         <xxf:control id="my-number≡xf-33" relevant="false"/>
                         <xxf:control id="my-number≡xf-34" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_e834de97e3c36d68bb884729ac63a070fd0f42a1" target-id="my-number≡formatted-value" observer-id="my-number≡xf-3"/>
+                    <xxf:script name="xf_15aff4236c7a122fe92ebe36872a441e3cd4d0bf" target-id="my-number≡formatted-value" observer-id="my-number≡xf-3"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -569,7 +569,7 @@
                         <xxf:control id="my-currency≡xf-35" relevant="false"/>
                         <xxf:control id="my-currency≡xf-36" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_fa30a492ccf5a9b9010af9801271fad0aadbc46c" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
+                    <xxf:script name="xf_01d33a0f45056a1c82a2217322761ac96dcf3673" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>

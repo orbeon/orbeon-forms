@@ -399,7 +399,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
         def getCookieOrigin(url: String) = {
             val uri = new URI(url)
-            new CookieOrigin(uri.getHost, uri.getPort, uri.getPath, uri.getScheme == "https")
+            def defaultPort   = if (uri.getScheme == "https") 443 else 80
+            def effectivePort = if (uri.getPort < 0) defaultPort else uri.getPort
+            new CookieOrigin(uri.getHost, effectivePort, uri.getPath, uri.getScheme == "https")
         }
 
         def getOrCreateCookieStore(session: PortletSession) =

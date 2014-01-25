@@ -1822,10 +1822,37 @@
                                     // Display loading indicator unless the server tells us not to display it
                                     newDynamicStateTriggersReplace = true;
                                 }
-                                // Set the action to the URL of the current page, so the URL seen by the client is always the URL
-                                // of a page to which we didn't do a submission replace="all"
-                                if (requestForm.action.indexOf("xforms-server-submit") == -1)
-                                    requestForm.action = window.location.href;
+
+                                /**
+                                 * Set the action to the URL of the current page.
+                                 *
+                                 * We can't (or don't know how to) set the URL to the URL to which we did a submission
+                                 * replace="all", so the best we can do it to set it to the current URL.
+                                 *
+                                 * We don't do it when the server generated a <form action="…"> that contains
+                                 * xforms-server-submit, which can happen in cases (e.g. running in a portal) where for
+                                 * some reason submitting to the URL of the page wouldn't work.
+                                 *
+                                 * When the target is an iframe, we add a ?t=id to work around a Chrome bug happening
+                                 * when doing a POST to the same page that was just loaded, gut that the POST returns
+                                 * a PDF. See:
+                                 *
+                                 *     https://code.google.com/p/chromium/issues/detail?id=330687
+                                 *     https://github.com/orbeon/orbeon-forms/issues/1480
+                                 */
+                                if (requestForm.action.indexOf("xforms-server-submit") == -1) {
+                                    var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
+                                    var a = $('<a>');
+                                    a.prop('href', window.location.href);
+                                    if (isTargetAnIframe) {
+                                        var param = "t=" + _.uniqueId();
+                                        var search = a.prop('search');
+                                        var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
+                                        a.prop('search', newSearch);
+                                    }
+                                    requestForm.action = a.prop('href');
+                                }
+
                                 if (target == null) {
                                     // Reset as this may have been changed before by asyncAjaxRequest
                                     requestForm.removeAttribute("target");

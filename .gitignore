@@ -2,6 +2,5 @@ build/
 tmp/
 target/
 build-local.properties
-src/resources-private/
+src/resources-local/
 tmp
-TODO.txt

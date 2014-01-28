@@ -297,6 +297,16 @@
 
             </xf:action>
 
+            <!-- Reset search selection and navigation -->
+            <xf:action ev:event="fr-reset-search">
+
+                <xf:setvalue ref="instance('fr-selection-instance')"/>
+                <xf:setindex repeat="documents-repeat" index="1"/>
+                <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+
+                <xf:send submission="search-submission"/>
+            </xf:action>
+
             <!-- Summary data -->
             <xf:instance id="fr-summary-instance">
                 <documents xmlns="" total="0" search-total="0">
@@ -410,14 +420,7 @@
                     <xf:group class="fr-summary-search">
 
                         <!-- Search also when user presses "enter" in a field -->
-                        <xf:action ev:event="DOMActivate">
-                            <!-- Reset search selection and navigation -->
-                            <xf:setvalue ref="instance('fr-selection-instance')"/>
-                            <xf:setindex repeat="documents-repeat" index="1"/>
-                            <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-
-                            <xf:send submission="search-submission"/>
-                        </xf:action>
+                        <xf:dispatch ev:event="DOMActivate" name="fr-reset-search" targetid="fr-form-model"/>
 
                         <xf:switch id="search-switch">
                             <!-- Free-text search -->
@@ -454,12 +457,7 @@
                                                 <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
                                                 <xf:setvalue ref="$form-query"/>
 
-                                                <!-- Reset search selection and navigation -->
-                                                <xf:setvalue ref="instance('fr-selection-instance')"/>
-                                                <xf:setindex repeat="documents-repeat" index="1"/>
-                                                <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-
-                                                <xf:send submission="search-submission"/>
+                                                <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
                                             </xf:action>
                                         </xf:select1>
                                     </xf:group>
@@ -484,14 +482,7 @@
                                             </xf:itemset>
 
                                             <!-- Update search results when selection changes -->
-                                            <xf:action ev:event="xforms-value-changed">
-                                                <!-- Reset search selection and navigation -->
-                                                <xf:setvalue ref="instance('fr-selection-instance')"/>
-                                                <xf:setindex repeat="documents-repeat" index="1"/>
-                                                <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-
-                                                <xf:send submission="search-submission"/>
-                                            </xf:action>
+                                            <xf:dispatch ev:event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
                                         </xf:select1>
                                     </xf:group>
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
@@ -919,11 +910,7 @@
                                             </xf:send>
                                         </xf:action>
                                         <!-- Reset search selection and navigation -->
-                                        <xf:setvalue ref="instance('fr-selection-instance')"/>
-                                        <xf:setindex repeat="documents-repeat" index="1"/>
-                                        <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-
-                                        <xf:send submission="search-submission"/>
+                                        <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
                                     </xf:action>
                                 </xf:trigger>
                             </xf:group>
@@ -951,11 +938,7 @@
                         </xf:dispatch>
                     </xf:action>
                     <!-- Reset search selection and navigation -->
-                    <xf:setvalue ref="instance('fr-selection-instance')" value="''"/>
-                    <xf:setindex repeat="documents-repeat" index="1"/>
-                    <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-                    <!-- Update search -->
-                    <xf:send submission="search-submission"/>
+                    <xf:dispatch name="fr-reset-search" targetid="fr-form-model"/>
                 </xf:action>
             </fr:positive-choice>
         </fr:alert-dialog>

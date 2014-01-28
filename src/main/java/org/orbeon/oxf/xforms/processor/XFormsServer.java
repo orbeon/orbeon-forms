@@ -127,24 +127,36 @@ public class XFormsServer extends ProcessorImpl {
         // Get files if any (those come from xforms-server-submit.xpl upon submission)
         final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
-        // Gather client events if any
-        final List<Element> clientEvents = (actionElement != null) ? Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME) : Collections.<Element>emptyList();
-
         // Hit session if it exists (it's probably not even necessary to do so)
         final ExternalContext.Session session = request.getSession(false);
 
         // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
-        if (clientEvents.size() == 1) {
-            if (ClientEvents.doQuickReturnEvents(xmlReceiver, request, requestDocument, indentedLogger, logRequestResponse, clientEvents, session))
+        // NOTE: If we don't have a receiver, this means that we are in the second pass of a submission with
+        // replace="all". In this case, only server events are provided.
+        final scala.collection.immutable.List<ClientEvents.LocalEvent> remainingClientEvents;
+        if (xmlReceiver == null)
+            remainingClientEvents = ClientEvents.extractLocalEvents(actionElement);
+        else {
+            remainingClientEvents =
+                ClientEvents.handleQuickReturnEvents(
+                    xmlReceiver,
+                    request,
+                    requestDocument,
+                    logRequestResponse,
+                    ClientEvents.extractLocalEvents(actionElement),
+                    session,
+                    indentedLogger
+                );
+
+            if (remainingClientEvents.isEmpty())
                 return;
         }
 
         // Gather server events containers if any
-        final List<Element> serverEventsElements = Dom4jUtils.elements(requestDocument.getRootElement(), XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
+        final scala.collection.immutable.List<Element> serverEventsElements = ClientEvents.extractServerEventsElements(requestDocument.getRootElement());
 
         // Find an output stream for xf:submission[@replace = 'all']
         final ExternalContext.Response response = PipelineResponse.getResponse(xmlReceiver, externalContext);
-
 
         final XFormsStateLifecycle.RequestParameters parameters = XFormsStateManager.instance().extractParameters(requestDocument, false);
         Callable<SubmissionResult> replaceAllCallable = null;
@@ -173,7 +185,7 @@ public class XFormsServer extends ProcessorImpl {
                             // Set deployment mode into request (useful for epilogue)
                             request.getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getDeploymentType().name());
 
-                            final boolean hasEvents = clientEvents.size() > 0|| serverEventsElements.size() > 0;
+                            final boolean hasEvents = remainingClientEvents.nonEmpty() || serverEventsElements.nonEmpty();
                             // Whether there are uploaded files to handle
                             final boolean hasFiles = XFormsUploadControl.hasSubmittedFiles(filesElement);
 
@@ -203,7 +215,7 @@ public class XFormsServer extends ProcessorImpl {
 
                                             // Dispatch the events
                                             if (hasEvents)
-                                                eventsFindings[0] = ClientEvents.processEvents(containingDocument, clientEvents, serverEventsElements);
+                                                eventsFindings[0] = ClientEvents.processEvents(containingDocument, remainingClientEvents, serverEventsElements);
 
                                             // End external events
                                             containingDocument.afterExternalEvents();

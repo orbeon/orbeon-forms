@@ -22,6 +22,7 @@ import org.orbeon.oxf.xml.Dom4j
 import org.dom4j.Element
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.Dom4j.elemToElement
+import org.orbeon.oxf.xforms.event.ClientEvents.LocalEvent
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -46,20 +47,22 @@ class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:body>
             </xh:html>
 
-        val events: Seq[Element] = Seq(
+        val events: List[Element] = List(
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>,
-            <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>)
+            <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>
+        )
 
-        val expected: Seq[Element] = Seq(
+        val expected: List[Element] = List(
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>,
-            <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>)
+            <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>
+        )
 
-        val result = ClientEvents.reorderNoscriptEvents(events, document)
+        val result = ClientEvents.reorderNoscriptEvents(events map (LocalEvent(_, trusted = false)), document)
 
         assert(expected.size === result.size)
         for ((left, right) ← expected zip result)
         yield
-            assert(Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right))
+            assert(Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right.elementForDebug))
     }
 
     @Test def adjustIdForRepeatIteration(): Unit = {

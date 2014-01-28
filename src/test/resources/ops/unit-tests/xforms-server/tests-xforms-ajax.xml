@@ -136,86 +136,10 @@
         </input>
         <output name="response">
             <responses>
-                <xxf:event-response>
-                    <xxf:dynamic-state>
-                        <dynamic-state sequence="2" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
-                            <instances>
-                                <instance id="instance" model-id="model">
-                                    <instance>new</instance>
-                                </instance>
-                            </instances>
-                        </dynamic-state>
-                    </xxf:dynamic-state>
-                    <xxf:action>
-                        <xxf:control-values/>
-                    </xxf:action>
-                </xxf:event-response>
-                <xxf:event-response>
-                    <xxf:dynamic-state>
-                        <dynamic-state sequence="3" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
-                            <instances>
-                                <instance id="instance" model-id="model">
-                                    <instance>new</instance>
-                                </instance>
-                            </instances>
-                            <response>
-                                <xxf:event-response>
-                                    <xxf:dynamic-state>
-                                        <dynamic-state sequence="2" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
-                                            <instances>
-                                                <instance id="instance" model-id="model">
-                                                    <instance>new</instance>
-                                                </instance>
-                                            </instances>
-                                        </dynamic-state>
-                                    </xxf:dynamic-state>
-                                    <xxf:action>
-                                        <xxf:control-values/>
-                                    </xxf:action>
-                                </xxf:event-response>
-                            </response>
-                        </dynamic-state>
-                    </xxf:dynamic-state>
-                    <xxf:action>
-                        <xxf:control-values/>
-                    </xxf:action>
-                </xxf:event-response>
-                <xxf:event-response>
-                    <xxf:dynamic-state>
-                        <dynamic-state sequence="3" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
-                            <instances>
-                                <instance id="instance" model-id="model">
-                                    <instance>new</instance>
-                                </instance>
-                            </instances>
-                            <response>
-                                <xxf:event-response>
-                                    <xxf:dynamic-state>
-                                        <dynamic-state sequence="2" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
-                                            <instances>
-                                                <instance id="instance" model-id="model">
-                                                    <instance>new</instance>
-                                                </instance>
-                                            </instances>
-                                        </dynamic-state>
-                                    </xxf:dynamic-state>
-                                    <xxf:action>
-                                        <xxf:control-values/>
-                                    </xxf:action>
-                                </xxf:event-response>
-                            </response>
-                        </dynamic-state>
-                    </xxf:dynamic-state>
-                    <xxf:action>
-                        <xxf:control-values/>
-                    </xxf:action>
-                </xxf:event-response>
-                <exceptions>
-                    <exception>
-                        <type>org.orbeon.oxf.common.OXFException</type>
-                        <message>Got unexpected request sequence number</message>
-                    </exception>
-                </exceptions>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
             </responses>
         </output>
     </test>

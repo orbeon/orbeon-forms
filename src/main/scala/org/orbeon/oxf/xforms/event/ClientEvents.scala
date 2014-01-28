@@ -19,9 +19,8 @@ import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml._
-import java.util.{ArrayList, List ⇒ JList, Set ⇒ JSet, Collections ⇒ JCollections}
+import java.{util ⇒ ju}
 import dom4j.{LocationSAXContentHandler, Dom4jUtils}
 import org.orbeon.oxf.pipeline.api._
 import org.dom4j.{Document, Element}
@@ -42,50 +41,61 @@ object ClientEvents extends Logging {
         XXFormsUploadDoneEvent.StandardProperties ++
         XXFormsLoadEvent.StandardProperties
 
-    private val DummyEvent = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
+    private val DummyEvent = List(LocalEvent(Dom4jUtils.createElement("dummy"), trusted = false))
 
-    private case class LocalEvent(private val element: Element, trusted: Boolean) {
-        val name = element.attributeValue("name")
-        val targetEffectiveId = element.attributeValue("source-control-id")
-        val bubbles = element.attributeValue("bubbles") != "false" // default is true
-        val cancelable = element.attributeValue("cancelable") != "false" // default is true
+    case class LocalEvent(private val element: Element, trusted: Boolean) {
 
         def attributeValue(name: String) = element.attributeValue(name)
-        lazy val properties = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Option(e.getText)) } toMap
-        lazy val value = if (properties.nonEmpty) "" else element.getText // for now we don't support both a value and properties
+        def elementForDebug = element
+
+        val name              = attributeValue("name")
+        val targetEffectiveId = attributeValue("source-control-id")
+        val bubbles           = attributeValue("bubbles")    != "false" // default is true
+        val cancelable        = attributeValue("cancelable") != "false" // default is true
+
+        lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Option(e.getText)) } toMap
+        lazy val value        = if (properties.nonEmpty) "" else element.getText // for now we don't support both a value and properties
     }
+
+    def extractLocalEvents(actionElement: Element): List[LocalEvent] =
+        if (actionElement ne null)
+            Dom4j.elements(actionElement, XXFORMS_EVENT_QNAME) map (LocalEvent(_, trusted = false)) toList
+        else
+            Nil
+    
+    def extractServerEventsElements(rootElement: Element) =
+        Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME) toList
 
     // Entry point called by the server: process a sequence of incoming client events.
     def processEvents(
-            doc: XFormsContainingDocument,
-            clientEvents: JList[Element],
-            serverEvents: JList[Element]): (Boolean, JSet[String], String) = {
+            doc:                  XFormsContainingDocument,
+            clientEvents:         List[LocalEvent],
+            serverEventsElements: List[Element]): (Boolean, ju.Set[String], String) = {
 
         val allClientAndServerEvents = {
 
             // Process events for noscript mode if needed
             val clientEventsAfterNoscript =
                 if (doc.getStaticState.isNoscript)
-                    reorderNoscriptEvents(clientEvents.asScala, doc)
+                    reorderNoscriptEvents(clientEvents, doc)
                 else
-                    clientEvents.asScala
+                    clientEvents
 
             // Decode encrypted server events
-            def decodeServerEvents(element: Element) = {
-                val document = decodeXML(element.getStringValue)
-                Dom4j.elements(document.getRootElement, XXFORMS_EVENT_QNAME)
-            }
+            def decodeServerEvents(text: String) =
+                Dom4j.elements(decodeXML(text).getRootElement, XXFORMS_EVENT_QNAME) map
+                    (LocalEvent(_, trusted = true)) toList
 
-            // Decode global server events
-            val globalServerEvents: Seq[LocalEvent] = serverEvents.asScala flatMap decodeServerEvents map (LocalEvent(_, trusted = true))
+            // All global server events
+            val globalServerEvents = serverEventsElements flatMap (e ⇒ decodeServerEvents(e.getStringValue))
 
             // Gather all events including decoding action server events
             globalServerEvents ++
                 (clientEventsAfterNoscript flatMap {
-                    case element if element.attributeValue("name") == XXFORMS_SERVER_EVENTS ⇒
-                        decodeServerEvents(element) map (LocalEvent(_, trusted = true))
-                    case element ⇒
-                        List(LocalEvent(element, trusted = false))
+                    case event if event.name == XXFORMS_SERVER_EVENTS ⇒
+                        decodeServerEvents(event.value)
+                    case event ⇒
+                        List(event)
                 })
         }
 
@@ -148,52 +158,52 @@ object ClientEvents extends Logging {
             (gotAllEvents, valueChangeControlIds.asJava, clientFocusControlId)
 
         } else
-            (false, JCollections.emptySet[String], null)
+            (false, ju.Collections.emptySet[String], null)
     }
 
     // NOTE: Leave public for unit tests
-    def reorderNoscriptEvents(eventElements: Seq[Element], doc: XFormsContainingDocument): Seq[Element] = {
+    def reorderNoscriptEvents(eventElements: List[LocalEvent], doc: XFormsContainingDocument): List[LocalEvent] = {
 
         // Event categories
-        sealed trait Category
-        case object Other extends Category
-        case object ValueChange extends Category
-        case object SelectBlank extends Category
-        case object Activation extends Category
+        sealed trait EventCategory
+        case object Other       extends EventCategory
+        case object ValueChange extends EventCategory
+        case object SelectBlank extends EventCategory
+        case object Activation  extends EventCategory
 
         // All categories in the order we want them
-        val AllCategories = Seq(Other, ValueChange, SelectBlank, Activation)
+        val AllCategories: List[EventCategory] = List(Other, ValueChange, SelectBlank, Activation)
 
         // Group events in 3 categories
-        def getEventCategory(element: Element) = element match {
+        def getEventCategory(event: LocalEvent): EventCategory = event match {
             // Special event for noscript mode
-            case element if element.attributeValue("name") == XXFORMS_VALUE_OR_ACTIVATE ⇒
-                val sourceControlId = element.attributeValue("source-control-id")
-                element match {
+            case event if event.name == XXFORMS_VALUE_OR_ACTIVATE ⇒
+                if (doc.getStaticOps.isValueControl(event.targetEffectiveId))
                     // This is a value event
-                    case element if doc.getStaticOps.isValueControl(sourceControlId) ⇒ ValueChange
+                    ValueChange
+                else
                     // This is most likely a trigger or submit which will translate into a DOMActivate. We will move it
                     // to the end so that value change events are committed to instance data before that.
-                    case _ ⇒ Activation
-                }
-            case _ ⇒ Other
+                    Activation
+            case _ ⇒
+                Other
         }
 
         // NOTE: map keys are not in predictable order, but map values preserve the order
         val groups = eventElements groupBy getEventCategory
 
         // Special handling of checkboxes blanking in noscript mode
-        val blankEvents = {
+        val blankingEvents: List[LocalEvent] = {
 
             // Get set of all value change events effective ids
-            def getValueChangeIds = groups.get(ValueChange).toList.flatten map (_.attributeValue("source-control-id")) toSet
+            def getValueChangeIds = groups.getOrElse(ValueChange, Nil) map (_.targetEffectiveId) toSet
 
             // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
             def createBlankingEvent(control: XFormsControl) = {
                 val newEventElement = Dom4jUtils.createElement(XXFORMS_EVENT_QNAME)
                 newEventElement.addAttribute("name", XXFORMS_VALUE_OR_ACTIVATE)
                 newEventElement.addAttribute("source-control-id", control.getEffectiveId)
-                newEventElement
+                LocalEvent(newEventElement, trusted = false)
             }
 
             val selectFullControls = doc.getControls.getCurrentControlTree.getSelectFullControls
@@ -201,13 +211,14 @@ object ClientEvents extends Logging {
             // Find all relevant and non-readonly select controls for which no value change event arrived. For each such
             // control, create a new event that will blank its value.
             selectFullControls.asScala.keySet -- getValueChangeIds map
-                (selectFullControls.get(_).asInstanceOf[XFormsSelectControl]) filter
+                (id ⇒ selectFullControls.get(id).asInstanceOf[XFormsSelectControl]) filter
                     (control ⇒ control.isRelevant && ! control.isReadonly) map
-                        createBlankingEvent toSeq
+                        createBlankingEvent toList
         }
 
         // Return all events by category in the order we defined the categories
-        AllCategories flatMap ((groups + (SelectBlank → blankEvents)).get(_)) flatten
+        //AllCategories flatMap ((groups + (SelectBlank → blankingEvents)).get(_)) flatten
+        AllCategories flatMap (groups + (SelectBlank → blankingEvents)).get flatten
     }
 
     // Incoming ids can have the form `my-repeat⊙1` in order to target a repeat iteration. This is ambiguous without
@@ -308,26 +319,39 @@ object ClientEvents extends Logging {
         }
     }
 
-    // Check for and handle events that don't need access to the document but can return an Ajax response rapidly.
-    def doQuickReturnEvents(
-            xmlReceiver: XMLReceiver,
-            request: ExternalContext.Request,
-            requestDocument: Document,
-            indentedLogger: IndentedLogger,
-            logRequestResponse: Boolean,
-            clientEvents: JList[Element],
-            session: ExternalContext.Session): Boolean = {
+    private val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
 
-        val eventElement = clientEvents.asScala(0)
+    def allQuickReturnEvents(clientEvents: ju.List[Element]) =
+        clientEvents.asScala map (LocalEvent(_, trusted = false).name) forall QuickResponseEventNames
+
+    // Check for and handle events that don't need access to the document but can return an Ajax response rapidly
+    def handleQuickReturnEvents(
+            xmlReceiver:        XMLReceiver,
+            request:            ExternalContext.Request,
+            requestDocument:    Document,
+            logRequestResponse: Boolean,
+            clientEvents:       List[LocalEvent],
+            session:            ExternalContext.Session)(implicit indentedLogger: IndentedLogger): List[LocalEvent] = {
+
+        def isHeartbeat(event: LocalEvent)      = event.name == XXFORMS_SESSION_HEARTBEAT
+        def isUploadProgress(event: LocalEvent) = event.name == XXFORMS_UPLOAD_PROGRESS
+
+        def hasHeartBeat(clientEvents: List[LocalEvent]) =
+            clientEvents exists isHeartbeat
+
+        def hasUploadProgress(clientEvents: List[LocalEvent]) =
+            clientEvents exists isUploadProgress
+
+        def hasOther(clientEvents: List[LocalEvent]) =
+            clientEvents exists (e ⇒ ! isHeartbeat(e) && ! isUploadProgress(e))
 
         // Helper to make it easier to output simple Ajax responses
         def eventResponse(messageType: String, message: String)(block: XMLReceiverHelper ⇒ Unit): Boolean = {
-            implicit val CurrentLogger = indentedLogger
             withDebug(message) {
                 // Hook-up debug content handler if we must log the response document
                 val (responseReceiver, debugContentHandler) =
                     if (logRequestResponse) {
-                        val receivers = new ArrayList[XMLReceiver]
+                        val receivers = new ju.ArrayList[XMLReceiver]
                         receivers.add(xmlReceiver)
                         val debugContentHandler = new LocationSAXContentHandler
                         receivers.add(debugContentHandler)
@@ -354,43 +378,58 @@ object ClientEvents extends Logging {
             true
         }
 
-        eventElement.attributeValue("name") match {
-            // Quick response for heartbeat
-            case XXFORMS_SESSION_HEARTBEAT ⇒
+        if (hasOther(clientEvents)) {
+            // Return other events
+            clientEvents filterNot isHeartbeat filterNot isUploadProgress
+        } else if (hasUploadProgress(clientEvents)) {
+            // Directly output progress information for all controls found
+            eventResponse("ajax response", "handling quick upload progress Ajax response") { helper ⇒
 
-                if (indentedLogger.isDebugEnabled) {
-                    if (session != null)
-                        indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId)
-                    else
-                        indentedLogger.logDebug("heartbeat", "received heartbeat from client (no session available).")
-                }
+                val uploadProgressEvents = clientEvents filter isUploadProgress
+                val ids                  = uploadProgressEvents map (_.targetEffectiveId)
 
-                // Output empty Ajax response
-                eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
+                val requestUUID          = XFormsStateManager.getRequestUUID(requestDocument)
+                val allProgress          = ids flatMap (id ⇒ Multipart.getUploadProgress(request, requestUUID, id).toList)
 
-            // Quick response for upload progress
-            case XXFORMS_UPLOAD_PROGRESS ⇒
+                if (allProgress.nonEmpty) {
 
-                // Output simple resulting document
-                eventResponse("ajax response", "handling quick upload progress Ajax response") { helper ⇒
-                    val sourceControlId = eventElement.attributeValue("source-control-id")
-                    Multipart.getUploadProgress(request, XFormsStateManager.getRequestUUID(requestDocument), sourceControlId) match {
-                        case Some(progress) ⇒
+                    helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "action")
+                    helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "control-values")
 
-                            helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "action")
-                            helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "control-values")
-                            helper.element("xxf", XXFORMS_NAMESPACE_URI, "control",
-                                Array[String]("id", request.getContainerNamespace + sourceControlId,
+                    allProgress foreach {
+                        progress ⇒
+                            helper.element(
+                                "xxf", XXFORMS_NAMESPACE_URI, "control",
+                                Array[String]("id", request.getContainerNamespace + progress.fieldName,
                                     "progress-state",    progress.state.name,
                                     "progress-received", progress.receivedSize.toString,
-                                    "progress-expected", progress.expectedSize map (_.toString) orNull))
-                            helper.endElement()
-                            helper.endElement()
-
-                        case _ ⇒
+                                    "progress-expected", progress.expectedSize map (_.toString) orNull
+                                )
+                            )
                     }
+
+                    helper.endElement()
+                    helper.endElement()
                 }
-            case _ ⇒ false
+            }
+            Nil
+        } else if (hasHeartBeat(clientEvents)) {
+            // Output empty Ajax response
+
+            if (indentedLogger.isDebugEnabled) {
+                if (session != null)
+                    indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId)
+                else
+                    indentedLogger.logDebug("heartbeat", "received heartbeat from client (no session available).")
+            }
+
+            eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
+
+            Nil
+        } else {
+            // No events to process
+            eventResponse("ajax response", "handling quick empty response")(helper ⇒ ())
+            Nil
         }
     }
 

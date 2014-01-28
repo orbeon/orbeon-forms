@@ -73,7 +73,8 @@
                 <!-- Remove anchors as links appear inline, see https://github.com/orbeon/orbeon-forms/issues/1288 -->
                 <xsl:template match="*:div[p:classes() = 'xforms-mediatype-text-html']//*:a">
                     <span>
-                        <xsl:apply-templates select="@* except @shape | node()"/>
+                        <!-- Filter all attributes specific to <a> -->
+                        <xsl:apply-templates select="@* except (@shape, @href, @target, @download, @ping, @rel, @hreflang, @type) | node()"/>
                     </span>
                 </xsl:template>
                 <!-- These are unneeded and can make iText choke (values too long) -->

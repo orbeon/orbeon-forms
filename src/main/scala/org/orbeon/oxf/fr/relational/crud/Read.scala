@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import org.orbeon.oxf.fr.relational.{Next, Unspecified, Specific, RelationalUtils}
-import org.orbeon.oxf.util.{Connection, NetUtils}
+import java.io.OutputStreamWriter
+import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.fr.relational.{Next, Unspecified, RelationalUtils}
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
@@ -96,7 +97,10 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                     NetUtils.copyStream(blob.getBinaryStream, httpResponse.getOutputStream)
                 } else {
                     val clob = resultSet.getClob("xml")
-                    NetUtils.copyStream(clob.getCharacterStream, httpResponse.getWriter)
+                    httpResponse.setHeader("Content-Type", "application/xml")
+                    val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
+                    NetUtils.copyStream(clob.getCharacterStream, writer)
+                    writer.close()
                 }
 
             } else {

@@ -68,12 +68,18 @@
                 </xsl:template>
                 <!-- While we are at it filter out scripts as they won't be used -->
                 <xsl:template match="*:script | *:noscript"/>
-                <!-- See https://github.com/orbeon/orbeon-forms/issues/264 -->
-                <xsl:template match="*:a/@shape"/>
-                <!-- Remove anchors as links appear inline, see https://github.com/orbeon/orbeon-forms/issues/1288 -->
-                <xsl:template match="*:div[p:classes() = 'xforms-mediatype-text-html']//*:a">
+                <!--
+                    See:
+
+                    https://github.com/orbeon/orbeon-forms/issues/1288
+                    https://github.com/orbeon/orbeon-forms/issues/1515
+                    https://github.com/orbeon/orbeon-forms/issues/264
+
+                    The issue is with all anchors, so now filter all <a> elements.
+                 -->
+                <xsl:template match="*:a">
                     <span>
-                        <!-- Filter all attributes specific to <a> -->
+                        <!-- Filter all attributes specific to <a> as per HTML 5 -->
                         <xsl:apply-templates select="@* except (@shape, @href, @target, @download, @ping, @rel, @hreflang, @type) | node()"/>
                     </span>
                 </xsl:template>

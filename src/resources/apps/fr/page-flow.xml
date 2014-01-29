@@ -38,11 +38,11 @@
     <!-- ==== Built-in Oracle, MySQL, and DB2 persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/(oracle|mysql|db2)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+    <service path="/fr/service/(oracle|mysql|db2|sqlserver)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
              model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
-    <service path="/fr/service/(oracle|mysql|db2)/search/([^/^.]+)/([^/^.]+)"
+    <service path="/fr/service/(oracle|mysql|db2|sqlserver)/search/([^/^.]+)/([^/^.]+)"
              view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->

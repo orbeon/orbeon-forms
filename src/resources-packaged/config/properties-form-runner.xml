@@ -30,6 +30,8 @@
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                 value="/fr/service/db2"/>
     <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                           value="/fr/service/sqlserver"/>
+    <property as="xs:string"  name="oxf.fr.persistence.sqlserver.datasource"                    value="sqlserver"/>
 
     <!-- Whether providers support autosave -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.autosave"                              value="false"/>

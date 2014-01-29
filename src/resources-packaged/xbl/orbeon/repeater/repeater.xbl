@@ -104,6 +104,23 @@
                                 value="{if ($max-occurs = ('none', 'unbounded')) then 'true()'
                                         else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
 
+                        <!-- Placeholder to add first iteration when empty (could have `and count($repeat-sequence) = 0`,
+                             but seems fine to keep this permanently). See #1509. -->
+                        <xf:group ref=".[$can-add]">
+                            <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1" class="fr-repeater-add">
+                                <xf:label><xh:i class="icon-plus-sign"/><xf:output value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')/components/grid/insert-below"/></xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
+                                    <xf:insert context="$repeat-context"
+                                               ref="$repeat-sequence"
+                                               origin="$repeat-template"
+                                               at="$p"/>
+                                    <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                    <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:group>
+
                         <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
                             <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
 

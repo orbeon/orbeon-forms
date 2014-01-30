@@ -51,6 +51,7 @@ trait FormRunnerLang {
         val allowedFormLanguages = formLanguages.asScala.toList filter isAllowedLang(appForm)
         val defaultLanguage = getDefaultLang(appForm)
 
+        // Reorder to put default language first if it is allowed
         val withDefaultPrepended =
             if (allowedFormLanguages contains defaultLanguage)
                 defaultLanguage :: (allowedFormLanguages filterNot (_ == defaultLanguage))

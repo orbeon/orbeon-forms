@@ -24,16 +24,6 @@
     <service path="/xforms-sandbox/service/css-after-5-seconds" model="services/css-after-5-seconds.xpl"/>
     <service path="/xforms-sandbox/service/bad-xml" model="services/bad-xml.xpl"/>
 
-    <service path="/xforms-sandbox/service/twitter"
-             model="services/twitter.xpl"
-             default-submission="services/twitter.xsl">
-        <setvalue ref="/xsl:stylesheet/xsl:variable[@name='q']/q" parameter="q"/>
-        <setvalue ref="/xsl:stylesheet/xsl:variable[@name='page']/@select" parameter="page"/>
-        <setvalue ref="/xsl:stylesheet/xsl:variable[@name='rpp']/@select" parameter="rpp"/>
-        <setvalue ref="/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@select" parameter="sortBy"/>
-        <setvalue ref="/xsl:stylesheet/xsl:template/xsl:apply-templates/xsl:sort/@order" parameter="sortOrder"/>
-    </service>
-
     <service path="/xforms-sandbox/service/(.+)" view="services/${1}.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

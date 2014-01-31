@@ -21,6 +21,7 @@
     <head>
         <title>Using YUI's datatable</title>
         <xf:model id="model">
+            <!-- NOTE: The Twitter REST API v1 is no longer active. -->
             <xf:instance id="twitter"
                 src="/xforms-sandbox/service/twitter?sortBy=published&amp;sortOrder=descending"/>
             <xf:bind ref="instance('twitter')/atom:entry/atom:published"

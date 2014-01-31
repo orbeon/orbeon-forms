@@ -19,6 +19,7 @@
     <head>
         <title>Using YUI's datatable</title>
         <xf:model id="model">
+            <!-- NOTE: The Twitter REST API v1 is no longer active. -->
             <xf:instance id="instance" src="http://search.twitter.com/search.atom?q=xforms&amp;rpp=40"/>
             <xf:bind ref="instance('instance')/atom:entry/atom:published" type="xf:dateTime"/>
 

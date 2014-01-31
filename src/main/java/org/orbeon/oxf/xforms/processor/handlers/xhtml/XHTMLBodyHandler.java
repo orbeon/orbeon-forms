@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -212,8 +213,13 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
     }
     
-    private abstract static class Matcher extends ElementHandlerController.Matcher {
-        
+    private abstract static class Matcher implements ElementHandlerController.Matcher<ElementAnalysis> {
+
+        public String getPrefixedId(Attributes attributes, Object handlerContext) {
+            final HandlerContext hc = (HandlerContext) handlerContext;
+            return hc.getPrefixedId(attributes);
+        }
+
         public ElementAnalysis getElementAnalysis(Attributes attributes, Object handlerContext) {
             final HandlerContext hc = (HandlerContext) handlerContext;
             final String prefixedId = hc.getPrefixedId(attributes);
@@ -227,6 +233,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         public boolean hasAppearance(ElementAnalysis elementAnalysis, QName appearance) {
             return XFormsControl.jAppearances(elementAnalysis).contains(appearance);
         }
+
+        public final ElementAnalysis match(Attributes attributes, Object handlerContext) {
+            return doesMatch(attributes, handlerContext) ? getElementAnalysis(attributes, handlerContext) : null;
+        }
+
+        abstract boolean doesMatch(Attributes attributes, Object handlerContext);
     }
     
     private static class AppearanceMatcher extends Matcher {
@@ -235,15 +247,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             this.appearance = appearance;
         }
 
-        public Object match(Attributes attributes, Object handlerContext) {
-            final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
-            return hasAppearance(elementAnalysis, appearance) ? elementAnalysis : null;
+        public boolean doesMatch(Attributes attributes, Object handlerContext) {
+            return hasAppearance(getElementAnalysis(attributes, handlerContext), appearance);
         }
     }
 
     private static class AnyMatcher extends Matcher {
-        public Object match(Attributes attributes, Object handlerContext) {
-            return getElementAnalysis(attributes, handlerContext);
+        boolean doesMatch(Attributes attributes, Object handlerContext) {
+            return true;
         }
     }
 
@@ -260,30 +271,26 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME));
         controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", new Matcher() {
-            public Object match(Attributes attributes, Object handlerContext) {
-                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // TODO: aks ElementAnalysis for its mediatype
                 final String mediatypeValue = attributes.getValue("mediatype");
-                return mediatypeValue != null && mediatypeValue.startsWith("image/") ? elementAnalysis : null;
+                return mediatypeValue != null && mediatypeValue.startsWith("image/");
             }
         });
         controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", new Matcher() {
-            public Object match(Attributes attributes, Object handlerContext) {
-                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // TODO: aks ElementAnalysis for its mediatype
                 final String mediatypeValue = attributes.getValue("mediatype");
-                return mediatypeValue != null && mediatypeValue.equals("text/html") ? elementAnalysis : null;
+                return mediatypeValue != null && mediatypeValue.equals("text/html");
             }
         });
         controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", ANY_MATCHER);
 
         // xf:trigger
-        final Matcher triggerSubmitMinimalMatcher = new Matcher() {
-            public ElementAnalysis match(Attributes attributes, Object handlerContext) {
-                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
-                return elementAnalysis != null && !containingDocument.getStaticState().isNoscript()             // in noscript mode, use the full appearance
-                        && hasAppearance(elementAnalysis, XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)      // minimal appearance
-                       ? elementAnalysis : null;
+        final Matcher triggerSubmitMinimalMatcher = new AppearanceMatcher(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) {
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
+                // in noscript mode, use the full appearance
+                return ! containingDocument.getStaticState().isNoscript() && super.doesMatch(attributes, handlerContext);
             }
         };
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
@@ -296,30 +303,33 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // xf:group
         controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
-        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME));
-        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", new Matcher() {
-            public Object match(Attributes attributes, Object handlerContext) {
-                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
 
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", new Matcher() {
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotatorContentHandler adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue) ? elementAnalysis : null;
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
             }
         });
+
+        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME) {
+                    public boolean doesMatch(Attributes attributes, Object handlerContext) {
+                        return super.doesMatch(attributes, handlerContext) || LHHASupport.hasLabel(containingDocument, getPrefixedId(attributes, handlerContext));
+                    }
+                });
+
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", ANY_MATCHER);
 
         // xf:switch
         // NOTE: We use the same handlers for switch as we do for group
         controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", new Matcher() {
-            public Object match(Attributes attributes, Object handlerContext) {
-                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
-
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotatorContentHandler adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue) ? elementAnalysis : null;
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
             }
         });
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", ANY_MATCHER);

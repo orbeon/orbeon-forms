@@ -350,7 +350,7 @@ Inserting error information into error list:
                             <xbl:content includes=":root > fr|header > *"/>
 
                             <!-- Body of the error summary -->
-                            <xf:group class="fr-error-summary-body {{for $d in distinct-values(error/@level[. = ('error', 'warning', 'info')]/string()) return concat('fr-level-', $d)}}" id="body" appearance="xxf:fieldset">
+                            <xf:group class="fr-error-summary-body {{for $d in distinct-values(error/@level[. = ('error', 'warning', 'info')]/string()) return concat('fr-level-', $d)}}" id="body">
                                 <!-- Include optional fr:label into xf:label -->
                                 <xsl:for-each select="/*/fr:label[1]">
                                     <xf:label xxbl:scope="outer" class="fr-error-title">

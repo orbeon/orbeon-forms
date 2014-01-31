@@ -156,7 +156,7 @@
                                 </xf:input>
                                 -->
                                 <!-- Min -->
-                                <xf:group appearance="xxf:fieldset">
+                                <xf:group>
                                     <xf:label value="$resources/dialog-grid-details/min/label"/>
                                     <xf:select1 ref="$i/min-repeat" appearance="full">
                                         <xf:item>
@@ -181,7 +181,7 @@
                                     </xf:input>
                                 </xf:group>
                                 <!-- Max -->
-                                <xf:group appearance="xxf:fieldset">
+                                <xf:group>
                                     <xf:label value="$resources/dialog-grid-details/max/label"/>
                                     <xf:select1 ref="$i/max-repeat" appearance="full">
                                         <xf:item>

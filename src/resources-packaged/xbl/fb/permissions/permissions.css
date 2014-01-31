@@ -1115,6 +1115,7 @@ body.orbeon {
 .orbeon fieldset > legend {
   line-height: inherit;
   font-size: 14.3px;
+  margin-bottom: 10px;
 }
 .orbeon .fr-grid .xforms-textarea.xforms-static pre,
 .orbeon .fr-grid .xforms-mediatype-text-html.xforms-static {

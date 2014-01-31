@@ -34,7 +34,7 @@
             <xf:var name="is-existing-schema" value="exists($model/xs:schema)" as="xs:boolean"/>
             <xf:var name="is-new-schema" value="exists($instance/schema/xs:schema)" as="xs:boolean"/>
 
-            <xf:group ref="$schema-element" class="fb-hide-alert" appearance="xxf:fieldset">
+            <xf:group ref="$schema-element" class="fb-hide-alert">
                 <xf:label class="fb-dialog-h2" value="$form-resources/dialog-upload-schema/messages/(if ($is-new-schema) then new-schema-information else existing-schema-information)"/>
 
                 <xh:div class="fb-dialog-section">
@@ -64,7 +64,7 @@
                 </xh:div>
 
             </xf:group>
-            <xf:group class="fb-hide-alert" appearance="xxf:fieldset">
+            <xf:group class="fb-hide-alert">
                 <xf:label class="fb-dialog-h2" ref="$form-resources/dialog-upload-schema/operations/label"/>
 
                 <xh:div class="fb-dialog-section">

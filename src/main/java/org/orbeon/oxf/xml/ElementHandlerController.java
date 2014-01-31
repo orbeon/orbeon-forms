@@ -588,13 +588,12 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         }
     }
 
-    public static abstract class Matcher {
-        public abstract Object match(Attributes attributes, Object handlerContext);
+    public interface Matcher<T> {
+        T match(Attributes attributes, Object handlerContext);
     }
 
-    private final Matcher ALL_MATCHER = new Matcher() {
-        @Override
-        public Object match(Attributes attributes, Object handlerContext) {
+    private final Matcher ALL_MATCHER = new Matcher<Boolean>() {
+        public Boolean match(Attributes attributes, Object handlerContext) {
             // Just return something
             return Boolean.TRUE;
         }

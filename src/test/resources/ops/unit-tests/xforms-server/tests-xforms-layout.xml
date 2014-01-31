@@ -324,10 +324,6 @@
                         </xf:group>
                         <xh:table>
                             <xf:group id="my-new-table-group" ref=".">
-                                <xf:label>My label</xf:label>
-                                <xf:hint>My hint</xf:hint>
-                                <xf:help>My help</xf:help>
-                                <xf:alert>My alert</xf:alert>
                                 <xh:tr>
                                     <xh:td><xf:output id="my-new-output-4" value="'Hello!'"/></xh:td>
                                 </xh:tr>
@@ -339,18 +335,18 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
-                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:fieldset id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:fieldset class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-group⊙1" class="xforms-group xforms-invalid xforms-required xforms-repeat-selected-item-1">
-                    <xh:label class="xforms-label" for="my-new-group⊙1">My label</xh:label>
+                <xh:fieldset id="my-new-group⊙1" class="xforms-group xforms-invalid xforms-required xforms-repeat-selected-item-1">
+                    <xh:legend class="xforms-label" id="my-new-group≡≡l⊙1">My label</xh:legend>
                     <xh:span id="my-new-output-1⊙1" class="xforms-control xforms-output">
                         <xh:span id="my-new-output-1≡≡c⊙1" class="xforms-output-output">Hello!</xh:span>
                     </xh:span>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
-                </xh:span>
+                </xh:fieldset>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-output-2⊙1" class="xforms-control xforms-output xforms-repeat-selected-item-1">
                     <xh:span id="my-new-output-2≡≡c⊙1" class="xforms-output-output">Hello!</xh:span>
@@ -378,17 +374,17 @@
                     <xh:tr id="group-end-my-new-table-group⊙1" class="xforms-group-begin-end"/>
                 </xh:table>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-repeat-delimiter"/>
+                <xh:fieldset class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-group" class="xforms-group xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-group"/>
+                <xh:fieldset id="my-new-group" class="xforms-group xforms-repeat-template">
+                    <xh:legend class="xforms-label" id="my-new-group≡≡l"/>
                     <xh:span id="my-new-output-1" class="xforms-control xforms-output">
                         <xh:span id="my-new-output-1≡≡c" class="xforms-output-output"/>
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help"/>
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
-                </xh:span>
+                </xh:fieldset>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-output-2" class="xforms-control xforms-output xforms-repeat-template">
                     <xh:span id="my-new-output-2≡≡c" class="xforms-output-output"/>
@@ -416,7 +412,7 @@
                     <xh:tr id="group-end-my-new-table-group" class="xforms-group-begin-end"/>
                 </xh:table>
                 <xh:span class="xforms-repeat-template"/>
-                <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
+                <xh:fieldset id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
         </output>
     </test>

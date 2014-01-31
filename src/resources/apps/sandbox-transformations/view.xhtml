@@ -91,7 +91,7 @@
             <xf:send ev:event="xforms-value-changed" submission="run-submission"/>
         </xf:group>
         <!-- Display result -->
-        <xf:group appearance="xxf:fieldset">
+        <xf:group>
             <xf:label>Output</xf:label>
             <xf:output value="saxon:serialize(instance('response'), 'html')" mediatype="text/html"/>
         </xf:group>

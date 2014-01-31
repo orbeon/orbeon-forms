@@ -151,21 +151,21 @@
                 </xh:table>
             </xh:div>
 
-            <xf:group ref="instance('control-instance')/query" appearance="xxf:fieldset">
+            <xf:group ref="instance('control-instance')/query">
                 <xf:label>XQuery to execute</xf:label>
                 <xf:textarea ref="instance('query-instance')/exist:text" appearance="xxf:autosize" incremental="true">
                     <xf:label/>
                 </xf:textarea>
             </xf:group>
 
-            <xf:group ref="instance('control-instance')/insert" appearance="xxf:fieldset">
+            <xf:group ref="instance('control-instance')/insert">
                 <xf:label>Document to insert</xf:label>
                 <xf:textarea ref="." appearance="xxf:autosize" incremental="true">
                     <xf:label/>
                 </xf:textarea>
             </xf:group>
 
-            <xf:group appearance="xxf:fieldset">
+            <xf:group>
                 <xf:label>Result</xf:label>
                 <xf:output ref="instance('control-instance')/formatted-result" mediatype="text/html"/>
             </xf:group>

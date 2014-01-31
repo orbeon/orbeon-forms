@@ -22,7 +22,7 @@
       <option name="outputFromStdout" value="true" />
       <option name="passParentEnvs" value="true" />
       <option name="program" value="/usr/local/bin/lessc" />
-      <option name="scopeName" value="Project Files" />
+      <option name="scopeName" value="Changed Files" />
       <option name="trackOnlyRoot" value="false" />
       <option name="workingDir" value="$FileDir$" />
       <envs>

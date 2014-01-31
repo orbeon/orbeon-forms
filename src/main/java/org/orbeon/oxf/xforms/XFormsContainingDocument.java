@@ -305,7 +305,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 } else {
                     // Not found static state in cache, create static state from input
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
+                    indentedLogger.startHandleOperation("initialization", "restoring static state");
                     this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
+                    indentedLogger.endHandleOperation();
 
                     // Store in cache
                     XFormsStaticStateCache.instance().storeDocument(this.staticState);
@@ -342,7 +344,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.uuid = dynamicState.uuid();
         this.sequence = dynamicState.sequence();
 
-        indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
+        indentedLogger.logDebug("initialization", "restoring dynamic state for UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
 
         // Restore request information
         if (dynamicState.decodeDeploymentTypeJava() != null) {

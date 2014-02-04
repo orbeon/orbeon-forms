@@ -141,7 +141,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                     try {
                         getClass().getClassLoader().loadClass("org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement");
                         clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcatDelegate");
-                        SQLProcessor.logger.info("Using Oracle Tomcat 5 delegate.");
+                        SQLProcessor.logger.info("Using Oracle Tomcat delegate.");
                     } catch (Throwable t) {
                         // Ignore
                     }

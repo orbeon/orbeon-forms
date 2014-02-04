@@ -47,7 +47,7 @@
     <!-- Store the absolute id of the source in the request -->
     <xsl:template match="/xh:html/xh:head//
                             xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]/
-                            xf:action[p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready')]">
+                            xf:action[p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>

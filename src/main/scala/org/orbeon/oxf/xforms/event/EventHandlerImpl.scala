@@ -311,7 +311,7 @@ object EventHandlerImpl extends Logging {
         val resolvedObject =
             if (targetObject.scope == handler.scope) {
                 // The scopes match so we can resolve the id relative to the target
-                Option(targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId, null))
+                targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
             } else if (handler.isPhantom) {
                 // Special case of a phantom handler
                 // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id

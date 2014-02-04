@@ -182,7 +182,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         wasValidCommit()
     }
 
+    // Binding as a Seq of Item
     override def binding: Seq[Item] = Option(_boundItem).toList
+
+    // Bound node if any
+    final def boundNode = binding.headOption collect { case node: NodeInfo ⇒ node }
 
     // Single-node controls support refresh events
     override def supportsRefreshEvents = true

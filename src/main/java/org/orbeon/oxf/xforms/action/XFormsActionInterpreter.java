@@ -394,7 +394,8 @@ public class XFormsActionInterpreter {
     public XFormsObject resolveObject(Element actionElement, String targetStaticOrAbsoluteId) {
 
         // First resolve the object by static id
-        final XFormsObject result = _container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, null);
+        final XFormsObject result =
+                _container.resolveObjectByIdInScopeJava(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, null);
 
         if (result == null) {
             return null;

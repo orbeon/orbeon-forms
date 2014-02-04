@@ -501,7 +501,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val model = getFormModel
         for {
             controlId ← findControlIdByName(getFormDoc, controlName)
-            control ← Option(model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId, null)) map (_.asInstanceOf[XFormsControl])
+            control   ← model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
         } yield
             control
     }

@@ -99,11 +99,29 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
         nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
 
-    // Resolve a target bind from a source
-    // - the source can refer to either a control with a `bind`, or directly to a bind
-    // - if this is not the case, the target is resolved from the enclosing model
-    // - this must be called from an XPath expression
-    def resolveTargetRelativeToControl(sourceStaticOrAbsoluteId: String, targetBindStaticId: String): ValueRepresentation = {
+    // Resolve target bind nodes from an action source and a target control.
+    //
+    // Must be called from an XPath expression.
+    //
+    // As of 2014-01-31:
+    //
+    // - the source of an action is a concrete
+    //     - a control
+    //     - or a model
+    // - the target is a control name
+    //
+    // We first try to resolve a concrete target control based on the source and the control name. If that works, great,
+    // we then find the bound node if any. This returns 0 or 1 node.
+    //
+    // If that fails, for example because the target control is not relevant, we fall back to searching binds. We first
+    // identify a bind for the source, if any. Then resolve the target bind. This returns 0 to n nodes.
+    //
+    // Other considerations:
+    //
+    // - in the implementation below, the source can also directly refer to a bind
+    // - if the source is not found, the target is resolved from the enclosing model
+    //
+    def resolveTargetRelativeToActionSource(actionSourceAbsoluteId: String, targetControlName: String): ValueRepresentation = {
 
         val container         = XFormsFunction.context.container
         val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
@@ -112,24 +130,39 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         val modelBinds        = model.getBinds
         val staticModel       = model.staticModel
 
-        def findBindForSource =
-            Option(container.resolveObjectByIdInScope(sourceEffectiveId, sourceStaticOrAbsoluteId, null)) collect {
-                case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
-                case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+        def fromControl: Option[ValueRepresentation] = {
+
+            def findControl =
+                container.resolveObjectByIdInScope(
+                    absoluteIdToEffectiveId(actionSourceAbsoluteId),
+                    controlId(targetControlName)
+                )
+ 
+            findControl collect {
+                case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
             } flatten
+        }
 
-        def contextBindNodeOpt =
-            for (sourceRuntimeBind ← findBindForSource)
-            yield
-                sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
+        def fromBind: Option[ValueRepresentation] = {
 
-        val valueOpt =
+            def findBindForSource =
+                container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
+                    case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
+                    case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+                } flatten
+
+            def findBindNodeForSource =
+                for (sourceRuntimeBind ← findBindForSource)
+                yield
+                    sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
+
             for {
-                targetStaticBind  ← staticModel.bindsById.get(targetBindStaticId)
-                value             ← BindVariableResolver.resolveClosestBind(modelBinds, contextBindNodeOpt, targetStaticBind)
+                targetStaticBind  ← staticModel.bindsById.get(bindId(targetControlName))
+                value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
             } yield
                 value
+        }
 
-        valueOpt.orNull
+        fromControl orElse fromBind getOrElse null
     }
 }

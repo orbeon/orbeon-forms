@@ -57,7 +57,7 @@
 
     <!-- When setting or getting service values, resolve the target nodes relative to the source id -->
     <xsl:function name="fr:resolve-targets" as="xs:string">
-        <xsl:text>frf:resolveTargetRelativeToControl(xxf:get-request-attribute('fr-action-source'), concat($control-name, '-bind'))</xsl:text>
+        <xsl:text>frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), $control-name)</xsl:text>
     </xsl:function>
 
     <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">

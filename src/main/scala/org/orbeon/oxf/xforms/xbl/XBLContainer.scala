@@ -333,10 +333,9 @@ trait ContainerResolver {
         def fromConcreteRepeat = {
 
             val repeatControl =
-                resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId, null) match {
-                    case repeat: XFormsRepeatControl ⇒ Some(repeat)
-                    case iteration: XFormsRepeatIterationControl ⇒ Some(iteration.repeat)
-                    case _ ⇒ None
+                resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId) collect {
+                    case repeat: XFormsRepeatControl             ⇒ repeat
+                    case iteration: XFormsRepeatIterationControl ⇒ iteration.repeat
                 }
 
             repeatControl map (_.getIndex)
@@ -357,10 +356,14 @@ trait ContainerResolver {
         fromConcreteRepeat orElse fromStaticRepeat getOrElse -1
     }
 
-    def resolveObjectByIdInScope(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
+    def resolveObjectByIdInScopeJava(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item) =
+        resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId, Option(contextItem)).orNull
+
+    def resolveObjectByIdInScope(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Option[Item] = None): Option[XFormsObject] = {
         val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
         val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
-        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItem)
+
+        Option(resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItem.orNull))
     }
 
     /**

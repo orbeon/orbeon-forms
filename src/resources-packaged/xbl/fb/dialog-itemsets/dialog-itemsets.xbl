@@ -14,26 +14,22 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:script src="/xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
     <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
         <xbl:handlers>
-            <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
-                <xf:delete ref="items/item"/>                       <!-- Clear local items -->
+                <xf:delete ref="(items, template)/item"/>           <!-- Clear local items and template -->
+
                 <xf:var name="control-name"     value="fbf:controlName(event('control-element')/@id)"/>
                 <xf:setvalue ref="control-name" value="$control-name"/>
                 <xf:setvalue ref="control-type" value="event('control-element')/local-name()"/>
@@ -41,42 +37,72 @@
                 <xf:setvalue ref="html"         value="fbf:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
+            
+            <xbl:handler event="xxforms-dialog-open" observer="dialog">
+
+                <!-- Get current language and items in the all languages -->
+                <xf:setvalue ref="$i/lang"            value="fbf:currentLang()"/>
+                <xf:insert   context="$i/items"       origin="fbf:getControlItemsGroupedByValue($i/control-name)"/>
+
+                <!-- Create empty template with all placeholders -->
+                <xf:insert   context="$i/template"    origin="$i/items/item[1]"/>
+                <xf:setvalue iterate="$i/template/item/*" ref="."/>
+
+                <!-- Set focus on input rather than button -->
+                <xf:setfocus control="fb-itemset-label-input"/>
+            </xbl:handler>
+
+            <!-- Close dialog upon click on save/cancel -->
+            <xbl:handler event="DOMActivate" observer="save-trigger cancel-trigger">
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <!-- Save on click on save -->
+            <xbl:handler event="DOMActivate" observer="save-trigger" type="xpath">
+                fbf:setControlItems($i/control-name, $i/items),
+                fbf:setItemsetHTMLMediatype(fbf:getFormDoc(), $i/control-name, $i/html)
+            </xbl:handler>
+
+            <!-- Add line when users press enter -->
+            <xbl:handler event="DOMActivate" observer="fb-itemset-label-input fb-itemset-value-input fb-itemset-hint-input">
+                <xf:var name="index" value="index('fb-itemset-repeat-repeat')"/>
+                <xf:insert context="$i/items" ref="item" at="$index" origin="$i/template/item"/>
+                <xf:setfocus control="fb-itemset-label-input"/>
+            </xbl:handler>
+            
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
-                <xf:instance id="local">
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <instance>
                         <control-name/>             <!-- So we can find back the control when saving if users change the name -->
                         <control-type/>             <!-- Either 'select' or 'select1' -->
                         <appearance/>
                         <html/>                     <!-- Whether labels can contain HTML markup -->
+                        <lang/>                     <!-- The current language -->
                         <items/>                    <!-- Contains item elements in the current language -->
-                        <template>
-                            <item>                  <!-- Template when adding items -->
-                                <label/>
-                                <value/>
-                                <hint/>
-                            </item>
-                        </template>
+                        <template/>                 <!-- Template when adding items -->
                         <triggers>                  <!-- Nodes to which we bind triggers -->
                             <enabled/>              <!-- A node that is always enabled -->
                             <disabled/>             <!-- A node that is always disabled -->
                         </triggers>
                     </instance>
                 </xf:instance>
+
+                <xf:var name="i" value="instance('i')"/>
+
                 <xf:bind ref="html" type="xs:boolean"/>
-                <xf:bind ref="items/item">                                                                                      <!-- Constraints on items' value and label -->
+                <xf:bind ref="items/item">                                                                                          <!-- Constraints on items' value and label -->
                     <xf:bind ref="label, value">
-                        <xf:bind ref="." calculate="normalize-space(.)" readonly="false()"/>                                    <!-- Additional spaces are most likely there by error -->
-                        <xf:bind ref="." constraint=". != ''"/>                                                                 <!-- Empty values are not allowed -->
-                        <xf:bind ref="." constraint="for $ln in local-name() return
-                            not((../../item/*[local-name() = $ln] except .) = .)"/>                                             <!-- No duplicate label or value are allowed -->
+                        <xf:bind ref="." calculate="normalize-space(.)" readonly="false()"/>                                        <!-- Additional spaces are most likely there by error -->
+                        <xf:bind ref="." constraint=". != ''"/>                                                                     <!-- Empty labels or values are not allowed -->
                     </xf:bind>
-                    <xf:bind ref="value">
-                        <xf:bind ref="." constraint="/instance/control-type = 'select1' or not(contains(., ' '))"/>             <!-- No spaces in values are allowed for xf:select -->
-                    </xf:bind>
+                    <xf:bind ref="label" constraint="for $l in string(@lang) return not(($i/items/item/label[@lang = $l] except .) = .)"/>   <!-- No duplicate label or value are allowed -->
+                    <xf:bind ref="value" constraint="not(($i/items/item/value except .) = .)"/>                                     <!-- No duplicate label or value are allowed -->
+                    <xf:bind ref="value" constraint="/instance/control-type = 'select1' or not(contains(., ' '))"/>                 <!-- No spaces in values are allowed for xf:select -->
                 </xf:bind>
                 <xf:bind ref="triggers/disabled" readonly="true()"/>
+
             </xf:model>
         </xbl:implementation>
         <xbl:template>
@@ -84,66 +110,58 @@
 
                 <!-- Bindings specified on control -->
                 <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
-                <xf:var name="local" value="instance('local')"/>
-
-                <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xf:insert context="$local/items" origin="fbf:getControlItems(fbf:controlId($local/control-name))"/>     <!-- Get items in the current language -->
-                    <xf:insert if="empty($local/items/item)" context="$local/items" origin="$local/template/item"/>                 <!-- Insert new blank item if there were no items -->
-                    <xf:action iterate="$local/items/item">                                                                         <!-- Fixup if missing label and value elements -->
-                        <xf:insert context="." if="empty(label)" ref="*[1]"      position="before" origin="$local/template/item/label"/>
-                        <xf:insert context="." if="empty(value)" ref="*[last()]" position="after"  origin="$local/template/item/value"/>
-                    </xf:action>
-                    <xf:setfocus control="fb-itemset-label-input"/>                                                                 <!-- Set focus on input rather than button -->
-                </xf:action>
-
-                <xxf:hide ev:event="DOMActivate" ev:observer="save-trigger cancel-trigger" dialog="dialog"/>                        <!-- Close dialog upon click on save/cancel -->
-                <xf:action ev:event="DOMActivate" ev:observer="save-trigger" type="xpath">                                          <!-- Save on click on save -->
-                    fbf:setControlItems(fbf:controlId($local/control-name), $local/items),
-                    fbf:setItemsetHTMLMediatype(fbf:getFormDoc(), $local/control-name, $local/html)
-                </xf:action>
-
-                <xf:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input fb-itemset-hint-input"> <!-- Add line when users press enter -->
-                    <xf:var name="index" value="index('fb-itemset-repeat-repeat')"/>
-                    <xf:insert context="$local/items" ref="item" at="$index" origin="$local/template/item"/>
-                    <xf:setfocus control="fb-itemset-label-input"/>
-                </xf:action>
 
                 <!-- Actual dialog -->
                 <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">
                     <xf:label ref="$resources/dialog-itemsets/label"/>
                     <xh:div class="fb-dialog-body fb-hide-alert">
                         <!-- Only allow HTML for full appearance -->
-                        <xf:input ref="$local/html[../appearance = 'full']">
+                        <xf:input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox">
                             <xf:label ref="$resources/messages/lhha-checkbox"/>
                         </xf:input>
-                        <xf:group ref="$local/items">
-                            <xf:var name="control-element" value="fbf:findControlByNameOrEmpty(fbf:getFormDoc(), $local/control-name)"/>
-                            <xf:var name="has-item-hint-editor" value="fbf:hasEditor($control-element, 'item-hint')"/>
-                            <fr:grid repeat="true" ref="item" id="fb-itemset-repeat" origin="$local/template/item" columns="2">
+
+                        <xh:div class="fr-language-choice">
+                            <!-- Put default language first, then other languages -->
+                            <xf:var
+                                name="available-languages"
+                                model="fr-resources-model"
+                                value="frf:getFormLangSelection('orbeon', 'builder', fbf:allLangsXPath())"/>
+
+                            <!-- Don't display language selector if there is only one language -->
+                            <xf:group ref=".[count($available-languages) gt 1 and normalize-space(xxf:get-request-header('orbeon-liferay-language')) = '']">
+                                <fr:link-select1 ref="$i/lang">
+                                    <xf:itemset ref="$available-languages">
+                                        <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
+                                        <xf:value ref="context()"/>
+                                    </xf:itemset>
+                                </fr:link-select1>
+                            </xf:group>
+                        </xh:div>
+
+                        <xf:group ref="$i/items">
+                            <xf:var name="control-element" value="fbf:findControlByNameOrEmpty(fbf:getFormDoc(), $i/control-name)"/>
+                            <fr:grid repeat="true" ref="item" id="fb-itemset-repeat" origin="$i/template/item" columns="2">
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:input ref="label" id="fb-itemset-label-input" class="fb-itemset-label-input">
+                                        <xf:input ref="label[@lang = $i/lang]" id="fb-itemset-label-input" class="fb-itemset-label-input">
                                             <xf:label ref="$resources/dialog-itemsets/label/label"/>
-                                            <xf:alert/>
                                         </xf:input>
                                     </xh:td>
                                     <xh:td>
                                         <xf:input ref="value" id="fb-itemset-value-input" class="fb-itemset-value-input">
                                             <xf:label ref="$resources/dialog-itemsets/value/label"/>
-                                            <xf:alert/>
                                         </xf:input>
                                     </xh:td>
-                                    <xh:td class="fb-itemset-hint-cell {if (not($has-item-hint-editor)) then 'xforms-hidden' else ()}">
-                                        <xf:input ref="hint" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
+                                    <xh:td class="fb-itemset-hint-cell {if (not(exists($i/items/item/hint))) then 'xforms-hidden' else ()}">
+                                        <xf:input ref="hint[@lang = $i/lang]" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
                                             <xf:label ref="$resources/dialog-itemsets/hint/label"/>
-                                            <xf:alert/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>
                         </xf:group>
                         <xh:div class="fr-dialog-buttons">
-                            <xf:trigger ref="$local/triggers/(if (valid($local)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
+                            <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
                                 <xf:label ref="$resources/apply/label"/>
                             </xf:trigger>
                             <xf:output value="$resources/or/label"/>

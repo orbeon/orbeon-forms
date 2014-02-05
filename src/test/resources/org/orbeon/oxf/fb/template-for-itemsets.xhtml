@@ -1,0 +1,188 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance">
+                <form>
+                    <section-1>
+                        <dropdown/>
+                        <radios>one</radios>
+                    </section-1>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="dropdown-bind" ref="dropdown" name="dropdown"/>
+                    <xf:bind id="radios-bind" ref="radios" name="radios"/>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+                <metadata>
+                    <application-name>a</application-name>
+                    <form-name>a</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                    <title xml:lang="fr">Untitled Form</title>
+                    <description xml:lang="fr"/>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
+                <resources>
+                    <resource xml:lang="en">
+                        <dropdown>
+                            <label>Dropdown</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>one</value>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>two</value>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>three</value>
+                            </item>
+                        </dropdown>
+                        <radios>
+                            <label>Radio buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <hint>Hint 1</hint>
+                                <value>one</value>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <hint>Hint 2</hint>
+                                <value>two</value>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <hint>Hint 3</hint>
+                                <value>three</value>
+                            </item>
+                        </radios>
+                        <section-1>
+                            <label>Untitled Section</label>
+                        </section-1>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <dropdown>
+                            <label>Menu déroulant</label>
+                            <hint/>
+                            <item>
+                                <label>Premier choix</label>
+                                <value>one</value>
+                            </item>
+                            <item>
+                                <label>Second choix</label>
+                                <value>two</value>
+                            </item>
+                            <item>
+                                <label>Troisième choix</label>
+                                <value>three</value>
+                            </item>
+                        </dropdown>
+                        <radios>
+                            <label>Boutons radio</label>
+                            <hint/>
+                            <item>
+                                <label>Premier choix</label>
+                                <hint>Suggestion 1</hint>
+                                <value>one</value>
+                            </item>
+                            <item>
+                                <label>Second choix</label>
+                                <hint>Suggestion 2</hint>
+                                <value>two</value>
+                            </item>
+                            <item>
+                                <label>Troisième choix</label>
+                                <hint>Suggestion 3</hint>
+                                <value>three</value>
+                            </item>
+                        </radios>
+                        <section-1>
+                            <label>Untitled Section</label>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
+                <request/>
+            </xf:instance>
+            <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
+                <response/>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <fr:section id="section-1-control" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:select1 id="dropdown-control" appearance="minimal" bind="dropdown-bind">
+                                    <xf:label ref="$form-resources/dropdown/label"/>
+                                    <xf:hint ref="$form-resources/dropdown/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:item>
+                                        <xf:label>[Select...]</xf:label>
+                                        <xf:value/>
+                                    </xf:item>
+                                    <xf:itemset ref="$form-resources/dropdown/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xh:td>
+                            <xh:td>
+
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:select1 id="radios-control" appearance="full" bind="radios-bind">
+                                    <xf:label ref="$form-resources/radios/label"/>
+                                    <xf:hint ref="$form-resources/radios/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:itemset ref="$form-resources/radios/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                        <xf:hint ref="hint"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -76,6 +76,10 @@ trait FormBuilderSupport extends XFormsSupport {
                         <xf:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding"/>
 
                         <xf:action ev:event="xforms-model-construct-done">
+                            <!-- Load components -->
+                            <xf:insert context="instance('fb-components-instance')"
+                                       origin="xxf:call-xpl('oxf:/org/orbeon/oxf/fb/simple-toolbox.xpl', (), (), 'data')"/>
+
                             <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
                             <xf:var name="temp" value="xxf:create-document()"/>
                             <xf:insert context="$temp"

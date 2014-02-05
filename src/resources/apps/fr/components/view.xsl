@@ -177,7 +177,7 @@
                     model="fr-persistence-model"
                     ref="instance('fr-persistence-instance')/data-safe"
                     id="fr-data-safe-input"
-                    class="xforms-disabled"/>
+                    class="xforms-hidden"/>
 
             <!-- Expose document id to JavaScript -->
             <xf:output id="fr-parameters-instance-document" ref="xxf:instance('fr-parameters-instance')/document" style="display: none"/>

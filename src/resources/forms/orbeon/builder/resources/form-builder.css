@@ -188,7 +188,7 @@ body {
 .orbeon .fb-nowrap {
   white-space: nowrap;
 }
-.orbeon .fb-hide-alert .xforms-alert {
+.orbeon .fb-hide-alert .xforms-visited > .xforms-alert.xforms-active {
   display: none;
 }
 .orbeon .fb-toolbox {
@@ -346,12 +346,13 @@ body {
   border-bottom: 1px solid #ddddee;
 }
 .orbeon .fb-dialog-itemsets {
-  width: 500px;
+  width: 600px;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid {
   max-height: 450px;
   overflow-y: auto;
   padding: 0;
+  clear: both;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid > * {
   background-color: #ffffff;
@@ -377,6 +378,7 @@ body {
 }
 .orbeon .fb-dialog-itemsets .xforms-type-boolean {
   display: block;
+  float: left;
   margin-bottom: 5px;
 }
 .orbeon .fb-dialog-itemsets .xforms-type-boolean input {

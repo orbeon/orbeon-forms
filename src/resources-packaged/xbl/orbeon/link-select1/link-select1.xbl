@@ -63,7 +63,7 @@
             <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
             <!-- HACK: Until we support the value XBL mode, use this in outer scope to capture xforms-value-changed -->
-            <xf:output class="xforms-disabled" ref="." xxbl:scope="outer"/>
+            <xf:output class="xforms-hidden" ref="." xxbl:scope="outer"/>
 
             <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
                  repeat nodeset recalculations -->

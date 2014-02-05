@@ -172,6 +172,8 @@
                                             <xsl:variable name="control" select="*[1]"/>
                                             <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
                                             <xh:th>
+                                                <!-- NOTE: A bit unclear why we copy td/@class to th class. Itemset
+                                                     editor relies on this to hide hint column as of 2014-02-05. -->
                                                 <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
                                                 <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
                                                 <xsl:copy-of select="@colspan"/>

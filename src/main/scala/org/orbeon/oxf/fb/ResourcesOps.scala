@@ -19,6 +19,8 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.saxon.om.NodeInfo
 import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
+import java.{util ⇒ ju}
+import org.orbeon.oxf.util.ScalaUtils._
 
 trait ResourcesOps extends BaseOps {
 
@@ -27,6 +29,8 @@ trait ResourcesOps extends BaseOps {
     def allResources          = currentResources parent * child "resource"
     def allLangs              = allResources att "*:lang" map (_.stringValue)
     def allLangsWithResources = allLangs zip allResources
+
+    def allLangsXPath         = allLangs.asJava
 
     // Find the current resource holder for the given name
     def findCurrentResourceHolder(controlName: String) =
@@ -77,28 +81,90 @@ trait ResourcesOps extends BaseOps {
     def getControlHelpOrEmpty(controlName: String) =
         getControlResourceOrEmpty(controlName, "help")
 
-    // Get the control's <item> for the current language
-    def getControlItems(controlId: String) =
-        findCurrentResourceHolder(controlName(controlId)).toSeq flatMap (n ⇒ n \ "item") asJava
+    def hasItemHintEditor(controlName: String) =
+        findControlByName(getFormDoc, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
 
-    // Set the control's <item> for the current language and keep other languages in sync
-    def setControlItems(controlId: String, items: NodeInfo): Unit = {
-        val currentLangLocal = currentLang
-        val newItems = items \ "item"
-        // Iterate over resources for each language
-        for ((lang, holder) ← findResourceHoldersWithLang(controlName(controlId))) {
-            // Remove items we had and insert the new one
-            val oldItems = holder \ "item"
-            delete(oldItems)
-            insert(into = holder, after = holder \ *, origin = newItems)
-            // If this is not the current language, copy over labels we used to have
-            if (lang != currentLangLocal)
-                for (newItem ← holder \ "item") {
-                    // If we can find an oldItem corresponding to the newItem, copy over the label
-                    for (oldItem ← oldItems)
-                        if (oldItem \ "value" === newItem \ "value")
-                            setvalue(newItem \ "label", oldItem \ "label")
+    // Get the control's items for all languages
+    def getControlItemsGroupedByValue(controlName: String): ju.List[NodeInfo] = {
+
+        val holdersWithLang = findResourceHoldersWithLang(controlName)
+
+        // All unique values in the order they appear
+        val distinctValues = (
+            for {
+                (lang, holder) ← holdersWithLang
+                item           ← holder / "item"
+            } yield
+                item / "value" stringValue
+        ).distinct
+
+        // All languages in the order they appear
+        val allLangs =
+            holdersWithLang map (_._1)
+
+        def holderItemForValue(holder: NodeInfo, value: String) =
+            holder / "item" find (_ / "value" === value)
+
+        def lhhaForLangAndValue(lang: String, value: String, lhha: String) = (
+            findResourceHoldersForLang(controlName, lang)
+            map (holderItemForValue(_, value).toList / lhha stringValue)
+            getOrElse ""
+        )
+
+        val addHints = hasItemHintEditor(controlName)
+
+        val newItemElems =
+            for (value ← distinctValues)
+            yield
+                <item>
+                    {
+                        for (lang  ← allLangs)
+                        yield
+                            <label lang={lang}>{lhhaForLangAndValue(lang, value, "label")}</label> ::
+                            (addHints list <hint lang={lang}>{lhhaForLangAndValue(lang, value, "hint")}</hint>)
+                    }
+                    <value>{value}</value>
+                </item>
+
+        def emptyItemElem =
+            <item>
+                {
+                    for (lang  ← allLangs)
+                    yield
+                        <label lang=""/> :: (addHints list <hint lang=""/>)
                 }
+                <value/>
+            </item>
+
+        def itemElemsToReturn =
+            if (newItemElems.nonEmpty) newItemElems else List(emptyItemElem)
+
+        itemElemsToReturn map elemToNodeInfo asJava
+    }
+
+    // Set the control's items for all languages
+    def setControlItems(controlName: String, items: NodeInfo): Unit = {
+
+        val addHints = hasItemHintEditor(controlName)
+
+        for ((lang, holder) ← findResourceHoldersWithLang(controlName)) {
+
+            delete(holder / "item")
+
+            val newItemElems =
+                for (item ← items / "item")
+                yield {
+                    <item>
+                        <label>{item / "label" filter (_.attValue("lang") == lang) stringValue}</label>
+                        {
+                            if (addHints)
+                                <hint>{ item / "hint"  filter (_.attValue("lang") == lang) stringValue}</hint>
+                        }
+                        <value>{item / "value" stringValue}</value>
+                    </item>
+                }
+
+            insert(into = holder, after = holder / *, origin = newItemElems map elemToNodeInfo toList)
         }
     }
 

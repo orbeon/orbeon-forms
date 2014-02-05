@@ -21,7 +21,8 @@
      * or because the server asks us to do so.
      *
      * [1] We want the arrow to point to the form field, not somewhere between the label and the field,
-     *     hence here we look for the first element which is not an LHHA
+     *     hence here we look for the first element which is not an LHHA. If we don't find any such element
+     *     we use the container as a fallback (e.g. xf:group that only contains the help and a label).
      * [2] Using animation unnecessarily complicates things, by creating cases where we have two popovers
      *     in the DOM, when one is being hidden while the other is being shown, so we just disable animations.
      */
@@ -31,7 +32,7 @@
         var labelText           = $(Controls.getControlLHHA(controlEl, 'label')).text();
         var helpText            = $(Controls.getControlLHHA(controlEl, 'help' )).text();
         var LhhaClasses         = '.xforms-label, .xforms-help, .xforms-hint, .xforms-alert';
-        var el                  = controlEl.children().not(LhhaClasses).first(); // [1]
+        var el                  = controlEl.children().not(LhhaClasses).add(controlEl).first(); // [1]
         var elPos               = getPosition(el);
         var placement           = getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');

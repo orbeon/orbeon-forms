@@ -309,6 +309,9 @@
 .orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-hint {
   display: none;
 }
+.orbeon .fr-repeat-table.fr-repeat-single-row th span.xforms-group {
+  display: block;
+}
 .orbeon .fr-repeat-table tr th .xforms-label {
   display: block;
 }

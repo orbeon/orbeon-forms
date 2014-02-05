@@ -296,6 +296,14 @@ body.orbeon { background-color: @frBackground }
     }
 
     .table th { text-align: center }
+
+    // If there is a group with a label in a grid th, remove the border added by Bootstrap
+    .fr-grid {
+        th legend.xforms-label {
+            border-bottom: none;
+            margin: 0;
+        }
+    }
 }
 
 /* ***** Print and PDF ********************************************************************************************** */

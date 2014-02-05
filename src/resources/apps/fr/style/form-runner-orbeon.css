@@ -365,6 +365,10 @@ body.orbeon {
 .orbeon .table th {
   text-align: center;
 }
+.orbeon .fr-grid th legend.xforms-label {
+  border-bottom: none;
+  margin: 0;
+}
 /* ***** Print and PDF ********************************************************************************************** */
 @media print {
   html {

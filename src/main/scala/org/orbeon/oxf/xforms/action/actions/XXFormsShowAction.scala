@@ -23,8 +23,8 @@ import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent
 class XXFormsShowAction extends XFormsAction {
     override def execute(actionContext: DynamicActionContext): Unit = {
 
-        val interpreter        = actionContext.interpreter
-        val actionElement      = actionContext.element
+        val interpreter   = actionContext.interpreter
+        val actionElement = actionContext.element
 
         resolveControl("dialog")(actionContext) match {
             case Some(targetDialog: XFormsEventTarget) ⇒

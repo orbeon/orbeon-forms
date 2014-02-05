@@ -123,12 +123,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     //
     def resolveTargetRelativeToActionSource(actionSourceAbsoluteId: String, targetControlName: String): ValueRepresentation = {
 
-        val container         = XFormsFunction.context.container
-        val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
-        val model             = XFormsFunction.context.model
-
-        val modelBinds        = model.getBinds
-        val staticModel       = model.staticModel
+        val container = XFormsFunction.context.container
 
         def fromControl: Option[ValueRepresentation] = {
 
@@ -144,6 +139,12 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         }
 
         def fromBind: Option[ValueRepresentation] = {
+
+            val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
+            val model             = XFormsFunction.context.model
+
+            val modelBinds        = model.getBinds
+            val staticModel       = model.staticModel
 
             def findBindForSource =
                 container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {

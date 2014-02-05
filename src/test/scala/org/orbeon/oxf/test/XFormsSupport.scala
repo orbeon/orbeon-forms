@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.test
 
-import org.dom4j.{Element ⇒ JElement}
-import org.mockito.Mockito
+import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
@@ -23,11 +22,11 @@ import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsSingleNodeContro
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget, XFormsCustomEvent, Dispatch}
 import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance}
+import org.orbeon.oxf.xforms.{XFormsObject, XFormsModel, XFormsContainingDocument, XFormsInstance}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.mock.MockitoSugar
-import scala.xml.{XML, Elem}
+import org.mockito.stubbing.Answer
+import org.mockito.invocation.InvocationOnMock
 
 
 trait XFormsSupport extends MockitoSugar {
@@ -49,6 +48,14 @@ trait XFormsSupport extends MockitoSugar {
         Mockito when actionInterpreter.containingDocument thenReturn doc
         Mockito when actionInterpreter.container thenReturn doc
         Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
+
+        // Resolve assuming target relative to the document
+        Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString()) thenAnswer new Answer[XFormsObject] {
+            def answer(invocation: InvocationOnMock) = {
+                val targetStaticOrAbsoluteId = invocation.getArguments()(1).asInstanceOf[String]
+                doc.resolveObjectById("#document", targetStaticOrAbsoluteId, null)
+            }
+        }
 
         actionInterpreter
     }
@@ -94,9 +101,13 @@ trait XFormsSupport extends MockitoSugar {
     def getItemset(controlId: String) =
         getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, null)
 
-    // Automatically convert between Scala Elem andDom4j Document/Element
-    protected def getControl(controlId: String)           = getObject(controlId).asInstanceOf[XFormsControl]
-    protected def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
-    protected def getValueControl(controlId: String)      = getObject(controlId).asInstanceOf[XFormsValueControl]
-    protected def getObject(controlId: String)            = document.getObjectByEffectiveId(controlId)
+    def resolveControl(staticOrAbsoluteId: String)       = resolveObject(staticOrAbsoluteId) collect { case c: XFormsControl ⇒ c }
+    def resolveValueControl(staticOrAbsoluteId: String)  = resolveObject(staticOrAbsoluteId) collect { case c: XFormsValueControl ⇒ c }
+    def resolveModel(staticOrAbsoluteId: String)         = resolveObject(staticOrAbsoluteId) collect { case m: XFormsModel   ⇒ m }
+    def resolveObject(staticOrAbsoluteId: String)        = document.resolveObjectByIdInScope("#document", staticOrAbsoluteId)
+    
+    def getControl(controlEffectiveId: String)           = getObject(controlEffectiveId).asInstanceOf[XFormsControl]
+    def getSingleNodeControl(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsSingleNodeControl]
+    def getValueControl(controlEffectiveId: String)      = getObject(controlEffectiveId).asInstanceOf[XFormsValueControl]
+    def getObject(effectiveId: String)                   = document.getObjectByEffectiveId(effectiveId)
 }

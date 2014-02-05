@@ -76,6 +76,7 @@ class XFormsControl(
     final val staticControl: Control = part.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)).asInstanceOf[Control]
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
+    final def absoluteId = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
 
     final def stateToRestore     = restoringControl(effectiveId)
     final def stateToRestoreJava = stateToRestore.orNull

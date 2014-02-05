@@ -101,7 +101,10 @@ trait GridOps extends ContainerOps {
 
     private def trAtRowPos(gridId: String, rowPos: Int): NodeInfo = {
         val grid = containerById(gridId)
-        (grid \ "*:tr")(rowPos)
+        val trs = grid \ "*:tr"
+        // Reason for the modulo: the value of rowPos sent by client is on the flatten iterations / rows;
+        // it is not just row position in the first iteration.
+        trs(rowPos % trs.length)
     }
 
     // Insert a row below
@@ -316,8 +319,7 @@ trait GridOps extends ContainerOps {
     }
 
     def controlsInRow(gridId: String, rowPos: Int): Int = {
-        val grid = containerById(gridId)
-        val row = (grid \ "*:tr")(rowPos)
+        val row = trAtRowPos(gridId, rowPos)
         (row \ "*:td" \ *).length
     }
 

@@ -3,8 +3,8 @@ jdk:
   - oraclejdk7
 env:
   global:
-    secure: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
-    secure: "bAgBFLf9R51upNAWfHJyBsByveotFRwCUAWFIiVTgCGxAE5mhWFMZl9HsAL0oiacjzmQ03u2toboOdTH/tfm2bohtQZknFleO0rDhLyW3ZmYI65vmFm1uYVrbyzMI0l7t/Ws4gZW9SC5cUl7m2GjTnB/qKg/O6uohPU7uqf8KEU="
+    - secure: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
+    - secure: "bAgBFLf9R51upNAWfHJyBsByveotFRwCUAWFIiVTgCGxAE5mhWFMZl9HsAL0oiacjzmQ03u2toboOdTH/tfm2bohtQZknFleO0rDhLyW3ZmYI65vmFm1uYVrbyzMI0l7t/Ws4gZW9SC5cUl7m2GjTnB/qKg/O6uohPU7uqf8KEU="
 before_script:
   - curl https://gist.github.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 install:

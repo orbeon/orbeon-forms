@@ -298,6 +298,7 @@
 
     <!-- Submission to create/update an attachment -->
     <xf:submission id="fr-create-update-attachment-submission"
+            validate="false"
             method="put"
             serialization="application/octet-stream"
             ref="event('holder')"

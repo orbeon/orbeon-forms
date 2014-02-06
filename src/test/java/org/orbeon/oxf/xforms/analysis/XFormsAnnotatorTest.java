@@ -32,7 +32,7 @@ import org.orbeon.saxon.dom4j.NodeWrapper;
 
 import java.util.List;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class XFormsAnnotatorTest extends ResourceManagerTestBase {
 

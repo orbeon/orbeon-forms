@@ -28,7 +28,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase;
 
 import java.util.List;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class URLRewriterTest extends ResourceManagerTestBase {
 

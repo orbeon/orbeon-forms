@@ -25,8 +25,8 @@ import org.orbeon.oxf.xforms.analysis.model.Model;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class XFormsStaticStateTest extends ResourceManagerTestBase {
 

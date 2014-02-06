@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class XFormsStateManagerTest extends ResourceManagerTestBase {
 

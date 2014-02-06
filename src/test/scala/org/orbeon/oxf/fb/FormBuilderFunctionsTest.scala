@@ -117,10 +117,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     def selectFirstTd(doc: NodeInfo): Unit =
         selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
 
-    @Test def insertControl(): Unit = insertControl(isCustomInstance = false)
-
-    private def insertControl(isCustomInstance: Boolean): Unit =
-        withActionAndFBDoc(TemplateDoc, isCustomInstance) { doc ⇒
+    @Test def insertControl(): Unit =
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
 
@@ -143,9 +141,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(containerNames == Seq("section-1"))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
-            val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
-            if (! isCustomInstance)
-                assert((dataHolder.head precedingSibling * head).name === "control-1")
+            val dataHolder = assertDataHolder(doc, newControlName)
+            assert((dataHolder.head precedingSibling * head).name === "control-1")
 
             val controlBind = findBindByName(doc, newControlName).get
             assert(hasIdValue(controlBind, bindId(newControlName)))
@@ -154,10 +151,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
         }
 
-    @Test def insertRepeat(): Unit = insertRepeat(isCustomInstance = false)
-
-    private def insertRepeat(isCustomInstance: Boolean): Unit =
-        withActionAndFBDoc(TemplateDoc, isCustomInstance) { doc ⇒
+    @Test def insertRepeat(): Unit =
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
@@ -176,9 +171,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert(containerNames === Seq("section-1", newRepeatName))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
-                val dataHolder = assertDataHolder(doc, containerNames.last, isCustomInstance)
-                if (! isCustomInstance)
-                    assert((dataHolder.head precedingSibling * head).name === "control-1")
+                val dataHolder = assertDataHolder(doc, containerNames.last)
+                assert((dataHolder.head precedingSibling * head).name === "control-1")
 
                 val controlBind = findBindByName(doc, newRepeatName).get
                 assert(hasIdValue(controlBind, bindId(newRepeatName)))
@@ -191,7 +185,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
             val newControlNameOption = insertNewControl(doc, binding)
 
-            assert(newControlNameOption === Some(if (isCustomInstance) "control-3" else "control-4"))
+            assert(newControlNameOption === Some("control-4"))
             val newControlName = newControlNameOption.get
 
             // Test result
@@ -207,11 +201,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert(hasIdValue(findControlByName(doc, newControlName).get, controlId(newControlName)))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
-                val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
-                if (! isCustomInstance) {
-                    assert(dataHolder.head precedingSibling * isEmpty)
-                    assert((dataHolder.head parent * head).name === newRepeatName)
-                }
+                val dataHolder = assertDataHolder(doc, newControlName)
+                assert(dataHolder.head precedingSibling * isEmpty)
+                assert((dataHolder.head parent * head).name === newRepeatName)
 
                 val controlBind = findBindByName(doc, newControlName).get
                 assert(hasIdValue(controlBind, bindId(newControlName)))
@@ -221,13 +213,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
                 val templateHolder = templateRoot(doc, newRepeatName).get \ newControlName headOption
 
-                if (! isCustomInstance) {
-                    assert(templateHolder.isDefined)
-                    assert(templateHolder.get precedingSibling * isEmpty)
-                    assert((templateHolder.get parent * head).name === newRepeatName)
-                } else {
-                    assert(templateHolder.isEmpty)
-                }
+                assert(templateHolder.isDefined)
+                assert(templateHolder.get precedingSibling * isEmpty)
+                assert((templateHolder.get parent * head).name === newRepeatName)
             }
         }
 
@@ -509,12 +497,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 //
 //    }
 
-    private def assertDataHolder(doc: DocumentWrapper, holderName: String, isCustomInstance: Boolean) = {
+    private def assertDataHolder(doc: DocumentWrapper, holderName: String) = {
         val dataHolder = findDataHolders(doc, holderName)
-        if (isCustomInstance)
-            assert(dataHolder.isEmpty)
-        else
-            assert(dataHolder.length == 1)
+        assert(dataHolder.length == 1)
         dataHolder
     }
 }

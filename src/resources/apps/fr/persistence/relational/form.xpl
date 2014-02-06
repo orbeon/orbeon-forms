@@ -38,16 +38,25 @@
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
+    <p:processor name="oxf:regexp">
+        <p:input name="config"><config>/fr/service/(oracle|mysql|db2)/form(/([^/]+)(/([^/]+))?)?</config></p:input>
+        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
+        <p:output name="data" id="matcher-groups"/>
+    </p:processor>
 
     <p:processor name="oxf:xslt">
+        <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="request" href="#request"/>
         <p:input name="data"><dummy/></p:input>
         <p:input name="config">
             <request xsl:version="2.0">
                 <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
+                <xsl:variable name="matcher-groups" as="element(group)+" select="doc('input:matcher-groups')/result/group"/>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <xsl:copy-of select="doc('input:instance')/request/*"/>
+                <xsl:variable name="matcher-groups" as="element(group)+" select="doc('input:matcher-groups')/result/group"/>
+                <provider><xsl:value-of select="$matcher-groups[1]"/></provider>
             </request>
         </p:input>
         <p:output name="data" id="request-description"/>
@@ -63,7 +72,7 @@
                         <xsl:copy-of select="/request/sql:datasource"/>
                         <sql:execute>
                             <sql:query>
-                                select  d.xml xml, d.last_modified_time last_modified_time
+                                select  d.xml<xsl:if test="/request/provider = 'oracle'">.getClobVal()</xsl:if> xml, d.last_modified_time last_modified_time
                                 from    orbeon_form_definition d,
                                         (
                                             select      app, form, max(last_modified_time) last_modified_time

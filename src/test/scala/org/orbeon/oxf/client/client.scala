@@ -13,21 +13,19 @@
  */
 package org.orbeon.oxf.client
 
+import collection.JavaConverters._
+import java.net.URL
+import java.util.concurrent.TimeUnit
+import org.apache.commons.lang3.StringUtils
 import org.junit.{After, AfterClass, BeforeClass}
-import org.openqa.selenium.firefox.{FirefoxProfile, FirefoxDriver}
 import org.openqa.selenium._
+import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.scalatest.concurrent.Eventually._
+import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.time._
-import org.apache.commons.lang3.StringUtils
-import org.openqa.selenium.chrome.ChromeDriverService
-import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
-import java.io.File
-import java.util.concurrent.TimeUnit
-import org.scalatest.matchers.ShouldMatchers
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
-import collection.JavaConverters._
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
@@ -203,30 +201,23 @@ abstract class OrbeonClientBase
 
 object OrbeonClientBase {
 
-    private var _service: Option[ChromeDriverService] = _
     private var _driver: WebDriver = _
     def driver = _driver ensuring (_ ne null)
     val DefaultTimeout = Span(10, Seconds)
 
     @BeforeClass
     def createAndStartService(): Unit = {
-        System.getProperty("oxf.test.driver") match {
-            case "chromedriver" ⇒
-                _service = Some(ChromeDriverService.createDefaultService())
-                _service.get.start()
-                _driver = new RemoteWebDriver(_service.get.getUrl, DesiredCapabilities.chrome())
-            case _ ⇒
-                _service = None
-                val profile = new FirefoxProfile()
-                if (System.getProperty("oxf.test.firefox.firebug") == "true") {
-                    profile.addExtension(new File("lib/test/firebug-1.11.2-fx.xpi"))
-                    profile.setPreference("extensions.firebug.currentVersion", "1.11.2")
-                    profile.setPreference("extensions.firebug.addonBarOpened", true)
-                    profile.setPreference("extensions.firebug.allPagesActivation", "on")
-                    profile.setPreference("extensions.firebug.script.enableSites", true)
-                }
-                _driver = new FirefoxDriver(profile)
+        val capabilities = (
+            DesiredCapabilities.firefox()
+            |!> (_.setCapability("version", "5"))
+            |!> (_.setCapability("platform", Platform.XP))
+        )
+        val server = {
+            val username = System.getenv("SAUCE_USERNAME")
+            val password = System.getenv("SAUCE_ACCESS_KEY")
+            new URL("http://" + username + ":" + password + "@localhost:4445/wd/hub")
         }
+        _driver = new RemoteWebDriver(server, capabilities)
 
         // Set default timeout when searching for an element
         // (Note that this doesn't solve all our problems: the element could be in the DOM, but not visible yet,
@@ -238,6 +229,5 @@ object OrbeonClientBase {
     @AfterClass
     def createAndStopService(): Unit = {
         _driver.quit()
-        _service foreach (_.stop())
     }
 }

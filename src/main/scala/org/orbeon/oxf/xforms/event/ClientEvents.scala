@@ -101,7 +101,7 @@ object ClientEvents extends Logging {
 
         if (allClientAndServerEvents.nonEmpty) {
 
-            def filterEvents(events: Seq[LocalEvent]) = events filter {
+            def filterEvents(events: List[LocalEvent]) = events filter {
                 case a if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒ false
                 case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
                     debug("ignoring invalid client event", Seq(
@@ -112,10 +112,10 @@ object ClientEvents extends Logging {
                 case _ ⇒ true
             }
 
-            def combineValueEvents(events: Seq[LocalEvent]): Seq[XFormsEvent] = events match {
-                case Seq() ⇒ Seq()
-                case Seq(localEvent) ⇒ safelyCreateAndMapEvent(doc, localEvent).toList
-                case _ ⇒
+            def combineValueEvents(events: List[LocalEvent]): List[XFormsEvent] = events match {
+                case Nil              ⇒ Nil
+                case List(localEvent) ⇒ safelyCreateAndMapEvent(doc, localEvent).toList
+                case _                ⇒
 
                     // Grouping key for value change events
                     case class EventGroupingKey(name: String, targetId: String) {
@@ -128,7 +128,7 @@ object ClientEvents extends Logging {
                     // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
                     // beforehand.
                     (events ++ DummyEvent).sliding(2).toList flatMap {
-                        case Seq(a, b) ⇒
+                        case List(a, b) ⇒
                             if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
                                 safelyCreateAndMapEvent(doc, a)
                             else

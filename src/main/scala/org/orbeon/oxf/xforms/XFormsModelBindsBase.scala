@@ -145,7 +145,11 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             // This is a common scenario, e.g. <xf:bind type="xs:integer" constraint=". > 0"/>
             // We clear all constraints in this case
 
-            // TODO XXX: what about scenario:
+            // NOTE: The above is cleary a common scenario, but there is nothing requiring that the constraint use the
+            // value, e.g.: <xf:bind type="xs:integer" constraint="../foo > 0"/>. For now we still consider that an
+            // invalid type is handled separately from constraints. This might be the right thing to do or not.
+
+            // TODO: what about scenario:
             // 1. value type valid
             // 2. constraint fails
             // 3. value no longer type valid

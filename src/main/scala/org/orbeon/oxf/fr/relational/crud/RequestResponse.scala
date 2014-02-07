@@ -35,7 +35,6 @@ trait RequestResponse {
             request.forAttachment option "_attach"
         ).flatten.mkString
 
-
     def httpRequest = NetUtils.getExternalContext.getRequest
     def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
     def requestUsername : Option[String] = headerValue("orbeon-username")

@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.relational.crud
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.common.Version
 
 
 class CRUD
@@ -26,14 +27,20 @@ class CRUD
         with CreateUpdateDelete {
 
     override def start(pipelineContext: PipelineContext) {
-        try
+        try {
+            val req = request
+
+            val PEProviders = Seq("oracle", "db2", "sqlserver")
+            if (PEProviders.contains(req.provider))
+                Version.instance.requirePEFeature("Enterprise relational database")
+
             httpRequest.getMethod match {
-                case "GET"    ⇒ get()
-                case "PUT"    ⇒ change(delete = false)
-                case "DELETE" ⇒ change(delete = true)
+                case "GET"    ⇒ get(req)
+                case "PUT"    ⇒ change(req, delete = false)
+                case "DELETE" ⇒ change(req, delete = true)
                 case _        ⇒ httpResponse.setStatus(405)
             }
-        catch {
+        } catch {
             case e: HttpStatusCodeException ⇒
                 httpResponse.setStatus(e.code)
         }

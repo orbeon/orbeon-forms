@@ -21,9 +21,8 @@ import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
-    def get(): Unit = {
+    def get(req: Request): Unit = {
         RelationalUtils.withConnection { connection ⇒
-            val req = request
 
             val badVersion =
                 // For data, version must be left unspecified
@@ -33,8 +32,8 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             if (badVersion) throw HttpStatusCodeException(400)
 
             val resultSet = {
-                val table = tableName(request)
-                val idCols = idColumns(request)
+                val table = tableName(req)
+                val idCols = idColumns(req)
                 val xmlCol = if (req.provider == "oracle") "t.xml.getClobVal()" else "t.xml"
                 val ps = connection.prepareStatement(
                     s"""select

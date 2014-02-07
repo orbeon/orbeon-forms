@@ -155,9 +155,8 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         ps.executeUpdate()
     }
 
-    def change(delete: Boolean): Unit = {
+    def change(req: Request, delete: Boolean): Unit = {
         RelationalUtils.withConnection { connection ⇒
-            val req = request
 
             // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
             // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking

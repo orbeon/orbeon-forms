@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers
 
-import org.orbeon.oxf.xml.{XMLUtils, DeferredXMLReceiver}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 trait HandlerHelper {
 
-    def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes)(body: ⇒ T)(implicit receiver: DeferredXMLReceiver): T = {
+    def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes)(body: ⇒ T)(implicit receiver: XMLReceiver): T = {
         val qName = XMLUtils.buildQName(prefix, localName)
         receiver.startElement(uri, localName, qName, atts)
         val result = body
@@ -27,7 +27,7 @@ trait HandlerHelper {
         result
     }
 
-    def element(prefix: String, uri: String, localName: String, atts: Attributes)(implicit receiver: DeferredXMLReceiver) =
+    def element(prefix: String, uri: String, localName: String, atts: Attributes)(implicit receiver: XMLReceiver) =
         withElement(prefix, uri, localName, atts) {}
 
     def withFormattingPrefix[T](body: String ⇒ T)(implicit context: HandlerContext): T = {

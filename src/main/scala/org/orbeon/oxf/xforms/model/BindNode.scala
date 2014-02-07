@@ -119,7 +119,7 @@ object BindNode {
                 failed      = bindNode.failedConstraints.getOrElse(level, Nil)
                 if failed.nonEmpty
             } locally {
-                val builder = buildersByLevel.getOrElse(level, List.newBuilder[StaticBind#ConstraintXPathMIP])
+                val builder = buildersByLevel.getOrElseUpdate(level, List.newBuilder[StaticBind#ConstraintXPathMIP])
                 builder ++= failed
             }
 

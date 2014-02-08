@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
 
 /**
- * Single root container for the entire controls hierarchy.
+ * Single root container for a part, whether top-level or a nested part.
  */
 class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
     extends ContainerControl(staticStateContext, element, None, None, scope)
@@ -34,16 +34,25 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     override val prefixedId     = part.startScope.fullPrefix + staticId
     override def containerScope = part.startScope
 
-    // Assign a top-level lang based on the first xml:lang found on a top-level control. This allows xxbl:global
-    // controls to inherit that xml:lang. All other top-level controls already have an xml:lang placed by
-    // XFormsExtractor.
     override lazy val lang: Option[LangRef] = {
 
-        val firstChildXMLLang = Dom4j.elements(element) collectFirst {
-            case e if e.attribute(XML_LANG_QNAME) ne null ⇒ e.attributeValue(XML_LANG_QNAME)
+        // Assign a top-level lang based on the first xml:lang found on a top-level control. This allows
+        // xxbl:global controls to inherit that xml:lang. All other top-level controls already have an xml:lang
+        // placed by XFormsExtractor.
+        def fromChildElements = {
+
+            val firstChildXMLLang = Dom4j.elements(element) collectFirst {
+                case e if e.attribute(XML_LANG_QNAME) ne null ⇒ e.attributeValue(XML_LANG_QNAME)
+            }
+
+            firstChildXMLLang flatMap extractXMLLang
         }
 
-        firstChildXMLLang flatMap extractXMLLang
+        // Ask the parent part
+        def fromParentPart =
+            part.elementInParent flatMap (_.lang)
+
+        fromChildElements orElse fromParentPart
     }
 
     // Ignore <xbl:xbl> elements that can be at the top-level, as the static state document produced by the extractor.

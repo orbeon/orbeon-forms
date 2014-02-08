@@ -86,10 +86,10 @@ object Authorizer extends Logging {
 
         def appendToURI(uri: URI, path: String, query: Option[String]) = {
 
-            val newPath  = dropTrailingSlash(uri.getPath) + appendStartingSlash(path)
-            val newQuery = Option(uri.getQuery) ++ query mkString "&"
+            val newPath  = dropTrailingSlash(uri.getRawPath) + appendStartingSlash(path)
+            val newQuery = Option(uri.getRawQuery) ++ query mkString "&"
 
-            new URI(uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort, newPath, if (newQuery.nonEmpty) newQuery else null, null)
+            new URI(uri.getScheme, uri.getRawUserInfo, uri.getHost, uri.getPort, newPath, if (newQuery.nonEmpty) newQuery else null, null)
         }
 
         // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host

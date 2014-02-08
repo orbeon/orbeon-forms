@@ -260,7 +260,8 @@ object XFormsUploadControl {
     // Remove the MAC from the URL
     def removeMAC(url: String) = {
         val uri = new URI(url)
-        val query = Option(uri.getQuery) map decodeSimpleQuery getOrElse Seq()
+        // NOTE: Use getRawQuery, as the query might encode & and =, and we should not decode them before decoding the query
+        val query = Option(uri.getRawQuery) map decodeSimpleQuery getOrElse Seq()
         val filteredQuery = query filterNot (_._1 == "mac") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, "utf-8") } mkString "&"
 
         NetUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)

@@ -525,7 +525,7 @@ public class XFormsUtils {
         if (containingDocument.isPortletContainer() && resolvedURI.getFragment() != null) {
             // XForms page was loaded from a portlet and there is a fragment, remove it
             try {
-                return new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
+                return new URI(resolvedURI.getScheme(), resolvedURI.getRawAuthority(), resolvedURI.getRawPath(), resolvedURI.getRawQuery(), null).toString();
             } catch (URISyntaxException e) {
                 throw new OXFException(e);
             }

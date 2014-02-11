@@ -674,4 +674,57 @@
         </output>
     </test>
 
+    <test description="#1546: Default value overrides existing when switching to view mode" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model1">
+                        <xf:instance id="instance1">
+                            <value/>
+                        </xf:instance>
+
+                        <xf:bind ref="instance()" xxf:default="42"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:setvalue ref="instance()" value="123"/>
+                            <xf:recalculate xxf:deferred="true"/>
+                        </xf:action>
+                    </xf:model>
+                    <xf:model id="model2">
+                        <xf:instance id="instance2">
+                            <value/>
+                        </xf:instance>
+
+                        <xf:bind ref="instance()" xxf:default="42"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:setvalue ref="instance()" value="123"/>
+                            <xf:recalculate xxf:defaults="true"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <value>123</value>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <value>42</value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

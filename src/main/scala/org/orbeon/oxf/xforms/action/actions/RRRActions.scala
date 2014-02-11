@@ -71,7 +71,7 @@ object RRRAction{
 
     private def execute(functions: RRRFunctions, model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
         // Set the flag in any case
-        functions.setFlag(model, deferred)
+        functions.setFlag(model, applyDefaults)
 
         // Perform the action immediately if needed
         // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the

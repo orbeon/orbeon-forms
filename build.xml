@@ -337,7 +337,6 @@
          The task is executed automatically by IntelliJ, which saves us from having to edit that file by hand. -->
     <target name="intellij-before-make" depends="set-version">
         <mkdir dir="test/src/config"/>
-        <copy file="src/resources-local/config/license.xml" todir="test/src/config" failonerror="false"/>
         <copy file="build/src/Version.scala" tofile="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
     </target>
 

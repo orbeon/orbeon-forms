@@ -54,12 +54,12 @@ class Instance extends XFormsFunction {
                     // this or other models might not yet have been constructed, however they might be referred to, for
                     // example with model variables.
 
-                    val dynamicInstance = instanceId match {
+                    def dynamicInstance = instanceId match {
                         case Some(instanceId) ⇒ Option(model.getInstance(instanceId))
                         case None             ⇒ Option(model.getDefaultInstance)
                     }
 
-                    val staticInstance = instanceId match {
+                    def staticInstance = instanceId match {
                         case Some(instanceId) ⇒ model.staticModel.instances.get(instanceId)
                         case None             ⇒ model.staticModel.defaultInstance
                     }

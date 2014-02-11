@@ -209,6 +209,8 @@ object OrbeonClientBase {
     def createAndStartService(): Unit = {
         val capabilities = (
             DesiredCapabilities.firefox()
+            |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
+            |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
             |!> (_.setCapability("version", "5"))
             |!> (_.setCapability("platform", Platform.XP))
         )

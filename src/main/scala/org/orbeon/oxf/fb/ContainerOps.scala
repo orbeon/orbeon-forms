@@ -19,6 +19,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 
 trait ContainerOps extends ControlOps {
 
@@ -305,12 +306,35 @@ trait ContainerOps extends ControlOps {
         }
     }
 
+    def findCurrentBindingByName(inDoc: NodeInfo, controlName: String, bindings: Seq[NodeInfo]) =
+        for {
+            controlElement ← findControlByName(inDoc, controlName)
+            datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
+            binding        ← findCurrentBinding(controlElement.qname, datatype, bindings)
+        } yield
+            binding
+
     // Create an instance template based on a hierarchy of binds rooted at the given bind
+    // This checks each control binding in case the control specifies a custom data holder.
     def createTemplateContentFromBind(bind: NodeInfo): NodeInfo = {
-        val e = elementInfo(findBindName(bind))
-        // TODO: Insert instance template as is done in insertNewControl
-        insert(into = e, origin = bind / "*:bind" map createTemplateContentFromBind)
-        e
+
+        val inDoc    = bind.getDocumentRoot
+        val bindings = componentBindings
+
+        def holderForBind(bind: NodeInfo): NodeInfo = {
+
+            val controlName = findBindName(bind)
+
+            val fromBinding =
+                findCurrentBindingByName(inDoc, controlName, bindings) map
+                    (FormBuilder.newDataHolder(controlName, _))
+
+            val e = fromBinding getOrElse elementInfo(controlName)
+            insert(into = e, origin = bind / "*:bind" map holderForBind)
+            e
+        }
+
+        holderForBind(bind)
     }
 
     // Make sure all template instances reflect the current bind structure

@@ -18,6 +18,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 
 /*
  * Form Builder: toolbox operations.
@@ -44,7 +45,7 @@ object ToolboxOps {
 
                 // Insert control template
                 val newControlElement: NodeInfo =
-                    viewTemplate(binding) match {
+                    findViewTemplate(binding) match {
                         case Some(viewTemplate) ⇒
                             // There is a specific template available
                             val controlElement = insert(into = gridTd, origin = viewTemplate).head
@@ -69,15 +70,8 @@ object ToolboxOps {
                 // Adjust bindings on newly inserted control
                 renameControlByElement(newControlElement, newControlName)
 
-                val metadata = binding \ "*:metadata"
-
                 // Data holder may contain file attributes
-                val instanceTemplate = metadata \ "*:templates" \ "*:instance"
-                val dataHolder =
-                    if (! instanceTemplate.isEmpty)
-                        elementInfo(newControlName, (instanceTemplate.head \@ @*) ++ (instanceTemplate \ *))
-                    else
-                        elementInfo(newControlName)
+                val dataHolder = newDataHolder(newControlName, binding)
 
                 val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
                 val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
@@ -98,7 +92,7 @@ object ToolboxOps {
                 ensureAttribute(newControlElement, "bind", bind \@ "id" stringValue)
 
                 // Set bind attributes if any
-                insert(into = bind, origin = bindAttributesTemplate(binding))
+                insert(into = bind, origin = findBindAttributesTemplate(binding))
 
                 // This can impact templates
                 updateTemplates(doc)
@@ -339,7 +333,7 @@ object ToolboxOps {
                 insert(after = Seq(model) ++ xbl, origin = binding parent * )
 
             // Insert template into section
-            viewTemplate(binding) foreach
+            findViewTemplate(binding) foreach
                 (template ⇒ insert(into = section, after = section \ *, origin = template))
         }
 

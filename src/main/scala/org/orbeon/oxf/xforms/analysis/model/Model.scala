@@ -27,6 +27,8 @@ import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 import Model._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xforms.analysis.StaticStateContext
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -348,6 +350,17 @@ object Model {
     val DEFAULT_REQUIRED   = false
     val DEFAULT_VALID      = true
     val DEFAULT_CONSTRAINT = true
+
+    def getVariationTypeOrKeep(datatype: QName) =
+        if (XFormsVariationTypeNames(datatype.getName))
+            if (datatype.getNamespaceURI == XFORMS_NAMESPACE_URI)
+                QName.get(datatype.getName, "", XSD_URI)
+            else if (datatype.getNamespaceURI == XSD_URI)
+                QName.get(datatype.getName, "", XFORMS_NAMESPACE_URI)
+            else
+                datatype
+        else
+            datatype
 
     val XFormsSchemaTypeNames = Set(
         "dayTimeDuration",

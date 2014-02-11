@@ -170,5 +170,5 @@ object AbstractBinding {
 
     // Parse the selector and return the first direct binding binding
     private def directBindingQName(bindingElement: Element) =
-        BindingDescriptor.findDirectBinding(bindingElement.attributeValue(ELEMENT_QNAME), Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap).get
+        BindingDescriptor.findFirstDirectBinding(bindingElement.attributeValue(ELEMENT_QNAME), Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap).get
 }

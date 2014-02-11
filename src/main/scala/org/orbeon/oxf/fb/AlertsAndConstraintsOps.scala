@@ -24,7 +24,6 @@ import org.dom4j.{Namespace, QName}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import scala.xml.Elem
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLUtils
 
 trait AlertsAndConstraintsOps extends ControlOps {
@@ -210,30 +209,31 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     case class DatatypeValidation(level: ValidationLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
 
+        require(builtinType.isDefined || schemaType.isDefined)
+
         def write(inDoc: NodeInfo, controlName: String): Unit = {
 
-            val components = asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
-
-            val newDatatypeOpt = datatype(inDoc, controlName)
+            val newDatatype = datatype(inDoc, controlName)
 
             // Rename control element if needed when the datatype changes
             for {
                 control        ← findControlByName(inDoc, controlName)
-                oldDatatype    ← DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
-                newDatatype    ← newDatatypeOpt
+                oldDatatype    = DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
                 if oldDatatype != newDatatype
-                newElementName ← BindingDescriptor.newElementName(control.qname, oldDatatype, newDatatype, components)
+                newElementName ← FormBuilder.newElementName(control.qname, oldDatatype, newDatatype, componentBindings)
             } locally {
+                // TODO: If binding changes, what about instance and bind templates? Should also be updated? Not a concrete
+                // case as of now, but can happen depending on which bindings are available.
                 rename(control, newElementName)
             }
 
             val datatypeString =
-                newDatatypeOpt map { qName ⇒ XMLUtils.buildQName(qName.getNamespacePrefix, qName.getName) } getOrElse ""
+                XMLUtils.buildQName(newDatatype.getNamespacePrefix, newDatatype.getName)
 
             updateMip(inDoc, controlName, Type.name, datatypeString)
         }
 
-        def datatype(inDoc: NodeInfo, controlName: String): Option[QName] = {
+        def datatype(inDoc: NodeInfo, controlName: String): QName = {
 
             // Bind must be present
             val bind = findBindByName(inDoc, controlName).get
@@ -250,17 +250,17 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     // Namespace mapping must be in scope
                     val prefix = bind.nonEmptyPrefixesForURI(nsURI).sorted.head
 
-                    Some(new QName(builtinType, new Namespace(prefix, nsURI)))
+                    new QName(builtinType, new Namespace(prefix, nsURI))
                 case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
                     // Schema type OTOH comes with a prefix if needed
                     val localname = parseQName(schemaType)._2
                     val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
                         { case (prefix, uri) ⇒ new Namespace(prefix, uri) } getOrElse
                         Namespace.NO_NAMESPACE
-                    Some(new QName(localname, namespace))
+                    new QName(localname, namespace)
                 case _ ⇒
-                    // No type specified, should not happen, but if it does we remove the type MIP
-                    None
+                    // No type specified, must not happen as we require a type at construction
+                    throw new IllegalStateException
             }
         }
 

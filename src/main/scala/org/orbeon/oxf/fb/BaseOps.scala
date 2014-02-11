@@ -35,14 +35,17 @@ trait BaseOps extends Logging {
     // Find the form document being edited
     def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
 
+    // All xbl:binding elements available
+    def componentBindings = asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+
     // Return fb-form-instance
-    def fbFormInstance =
-        topLevelInstance("fr-form-model", "fb-form-instance").get
+    def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get
 
     // Find the top-level form model of the form being edited
     def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
     def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
+    
     def templateRoot(inDoc: NodeInfo, repeatName: String) =
         inlineInstanceRootElement(inDoc, templateId(repeatName))
 

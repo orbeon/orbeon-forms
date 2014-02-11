@@ -19,68 +19,111 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import scala.collection.JavaConverters._
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.css.CSSSelectorParser
+import org.orbeon.oxf.xforms.analysis.model.Model
 
-case class BindingDescriptor(elementName: QName, datatype: Option[QName], appearance: Option[String], mediatype: Option[String])
+// Minimum amount of things we need to filter bindings
+case class BindingDescriptor(
+    elementName: QName,
+    datatype: Option[QName],
+    appearance: Option[String],
+    mediatype: Option[String]
+)(
+    // Optionally store a reference to the binding element, but this is not part of the case-classiness
+    val binding: Option[NodeInfo]
+)
 
 object BindingDescriptor {
 
     import CSSSelectorParser._
 
-    def parseAllSelectors(bindings: Seq[NodeInfo]): Map[QName, BindingDescriptor] = {
-
-        def parseBindingSelectors(binding: NodeInfo) =
-            parseSelectors(binding attValue  "element", binding.namespaceMappings.toMap)
-
-        // Assume there is only a single simple mapping among all bindings
-        (bindings map parseBindingSelectors).foldLeft(Map.empty[QName, BindingDescriptor])(_ ++ _)
+    // For all bindings, and for selectors that have one or more direct bindings, AND one optional datatype binding,
+    // return a map of direct bindings names to the BindingDescriptor for the datatype binding.
+    // This assumes there is only a single direct mapping with a given name among all bindings.
+    //
+    // RFE: Relax those tight assumptions.
+    //
+    def createDirectToDatatypeMappingsForAllBindings(bindings: Seq[NodeInfo]): Map[QName, BindingDescriptor] = {
+        
+        def createOne(binding: NodeInfo) = {
+            val (selectors, namespaces) = getBindingSelectorsAndNamespaces(binding)
+            createDirectToDatatypeMappings(selectors, namespaces, binding)
+        }
+        
+        (bindings map createOne).foldLeft(Map.empty[QName, BindingDescriptor])(_ ++ _)
     }
 
-    def findDirectBinding(selectors: String, namespaces: Map[String, String]): Option[QName] =
-        CSSSelectorParser.parseSelectors(selectors) collectFirst {
-            case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), Nil) ⇒
-                QName.get(localname, prefix, namespaces(prefix))
-        }
+    // Find the first direct binding
+    // NOTE: Used by AbstractBinding
+    def findFirstDirectBinding(selectors: String, namespaces: Map[String, String]): Option[QName] =
+        CSSSelectorParser.parseSelectors(selectors) collectFirst directBindingPF(namespaces, None) map (_.elementName)
 
-    def parseSelectors(selectors: String, namespaces: Map[String, String]): Map[QName, BindingDescriptor] = {
+    // Example: fr|number, xf|textarea
+    private def directBindingPF(namespaces: Map[String, String], binding: Option[NodeInfo]): PartialFunction[Selector, BindingDescriptor] = {
+        case Selector(
+                ElementWithFiltersSelector(
+                    Some(TypeSelector(Some(Some(prefix)), localname)),
+                    Nil),
+                Nil) ⇒
+
+            BindingDescriptor(
+                QName.get(localname, prefix, namespaces(prefix)),
+                None,
+                None,
+                None
+            )(binding)
+    }
+
+    // Example: xf|input:xxf-type("xs:decimal")
+    private def datatypeBindingPF(namespaces: Map[String, String], binding: Option[NodeInfo]): PartialFunction[Selector, BindingDescriptor] = {
+        case Selector(
+                ElementWithFiltersSelector(
+                    Some(TypeSelector(Some(Some(prefix)), localname)),
+                    List(
+                        // TODO: Support appearance and mediatype
+                        //AttributeFilter(None, "appearance", Some(AttributePredicate("=", appearance))),
+                        //AttributeFilter(None, "mediatype", Some(AttributePredicate("=", mediatype))),
+                        FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype)))
+                    )
+                ),
+                Nil) ⇒
+
+            BindingDescriptor(
+                QName.get(localname, prefix, namespaces(prefix)),
+                nonEmptyOrNone(datatype) map (extractTextValueQName(namespaces.asJava, _, true)),
+                None,
+                None
+            )(binding)
+    }
+
+    def getAllDirectAndDatatypeDescriptors(bindings: Seq[NodeInfo]) = {
+
+        def descriptorsForSelectors(selectors: String, namespaces: Map[String, String], binding: NodeInfo) =
+            CSSSelectorParser.parseSelectors(selectors) collect
+                directBindingPF(namespaces, Some(binding)).orElse(datatypeBindingPF(namespaces, Some(binding)))
+
+        for {
+            binding    ← bindings
+            (selectors, namespaces) = getBindingSelectorsAndNamespaces(binding)
+            descriptor ← descriptorsForSelectors(selectors, namespaces, binding)
+        } yield
+            descriptor
+    }
+
+    private def getBindingSelectorsAndNamespaces(binding: NodeInfo) =
+        (binding attValue "element", binding.namespaceMappings.toMap)
+
+    // For selectors that have one or more direct bindings, AND one optional datatype binding, return a map of direct
+    // bindings names to the BindingDescriptor for the datatype binding
+    private def createDirectToDatatypeMappings(selectors: String, namespaces: Map[String, String], binding: NodeInfo): Map[QName, BindingDescriptor] = {
 
         val parsed = CSSSelectorParser.parseSelectors(selectors)
 
-        // Example: fr|number
         val directBindings =
-            parsed collect {
-                case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), Nil) ⇒
-                    BindingDescriptor(
-                        QName.get(localname, prefix, namespaces(prefix)),
-                        None,
-                        None,
-                        None
-                    )
-            }
+            parsed collect directBindingPF(namespaces, Some(binding))
 
-        // Example: xf|input:xxf-type("xs:decimal")
         val datatypeBindings =
-            parsed collect {
-                case Selector(
-                        ElementWithFiltersSelector(
-                            Some(TypeSelector(Some(Some(prefix)), localname)),
-                            List(
-                                // TODO: Support appearance and mediatype
-                                //AttributeFilter(None, "appearance", Some(AttributePredicate("=", appearance))),
-                                //AttributeFilter(None, "mediatype", Some(AttributePredicate("=", mediatype))),
-                                FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype)))
-                            )
-                        ),
-                    Nil) ⇒
-                    BindingDescriptor(
-                        QName.get(localname, prefix, namespaces(prefix)),
-                        nonEmptyOrNone(datatype) map (extractTextValueQName(namespaces.asJava, _, true)),
-                        None,
-                        None
-                    )
-            }
+            parsed collect datatypeBindingPF(namespaces, Some(binding))
 
         val mapping =
             for {
@@ -92,36 +135,35 @@ object BindingDescriptor {
         mapping.toMap
     }
 
-    def findDirectBinding(controlName: QName, datatype: QName, mappings: Map[QName, BindingDescriptor]): Option[QName] = {
+    // For a given control name and datatype
+    // NOTE: Again, some assumptions are made. We search first a datatype descriptor, then a direct descriptor.
+    def findCurrentBinding(controlName: QName, datatype: QName, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
 
         val Datatype1 = datatype
-        val Datatype2 =
-            if (XFormsVariationTypeNames(Datatype1.getName))
-                if (Datatype1.getNamespaceURI == FormRunner.XF)
-                    QName.get(Datatype1.getName, "", FormRunner.XS)
-                else if (Datatype1.getNamespaceURI == FormRunner.XS)
-                    QName.get(Datatype1.getName, "", FormRunner.XF)
-                else
-                    Datatype1
-            else
-                Datatype1
+        val Datatype2 = Model.getVariationTypeOrKeep(datatype)
+
+        val descriptors = getAllDirectAndDatatypeDescriptors(bindings)
+
+        def findDatatypeDescriptor =
+            descriptors collectFirst {
+                case d @ BindingDescriptor(`controlName`, Some(Datatype1 | Datatype2), None, None) ⇒ d.binding
+            } flatten
+
+        def findDirectDescriptor =
+            descriptors collectFirst {
+                case d @ BindingDescriptor(`controlName`, None, None, None) ⇒ d.binding
+            } flatten
+
+        findDatatypeDescriptor orElse findDirectDescriptor
+    }
+
+    def findDirectBindingForDatatypeBinding(controlName: QName, datatype: QName, mappings: Map[QName, BindingDescriptor]): Option[QName] = {
+
+        val Datatype1 = datatype
+        val Datatype2 = Model.getVariationTypeOrKeep(datatype)
 
         mappings collectFirst {
             case (qName, BindingDescriptor(`controlName`, Some(Datatype1 | Datatype2), None, None)) ⇒ qName
         }
-    }
-
-    def newElementName(currentControlName: QName, oldDatatype: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
-
-        val mappings = BindingDescriptor.parseAllSelectors(bindings)
-
-        // The current control name might be a direct binding, in which case we can find its original name
-        val originalName = mappings.get(currentControlName) map (_.elementName) getOrElse currentControlName
-
-        // Using the original control name and the new datatype, try to find a new direct binding
-        val newName = findDirectBinding(originalName, newDatatype, mappings) getOrElse originalName
-
-        // Only return Some if the name changes
-        currentControlName != newName option newName
     }
 }

@@ -29,3 +29,4 @@ object FormBuilder
     with SchemaOps
     with PermissionsOps
     with PublishOps
+    with BindingOps

@@ -15,12 +15,12 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-import BindingDescriptor._
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.dom4j.QName
+import org.orbeon.oxf.fb.FormBuilder._
 
 class BindingDescriptorTest extends AssertionsForJUnit {
 

@@ -17,9 +17,8 @@ import collection.JavaConverters._
 import annotation.tailrec
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.fb.DataModel._
 import Model._
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
+import org.orbeon.oxf.xml.NamespaceMapping
 
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -33,6 +32,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 
 /*
  * Form Builder: operations on controls.
@@ -403,86 +403,15 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         findFRBodyElement(inDoc) \\ * filter
             (e ⇒ isIdForControl(e attValue "id"))
 
-    // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
-    def viewTemplate(binding: NodeInfo) = {
-        val metadata = binding \ "*:metadata"
-        (((metadata \ "*:template") ++ (metadata \ "*:templates" \ "*:view")) \ *).headOption
-    }
-
-    // From an <xbl:binding>, return all bind attributes
-    // They are obtained from the legacy datatype element or from templates/bind.
-    def bindAttributesTemplate(binding: NodeInfo) = {
-        val metadata = binding \ "*:metadata"
-        val typeFromDatatype = ("", "type") → ((metadata \ "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
-        val bindAttributes = metadata \ "*:templates" \ "*:bind" \@ @* map (att ⇒ att.qname →  att.stringValue)
-
-        typeFromDatatype +: bindAttributes filterNot
-            { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
-            { case (qname, value) ⇒ attributeInfo(qname, value) }
-    }
-
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-    def binding(controlElement: NodeInfo) =
-        asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo find (b ⇒
-            viewTemplate(b) match {
-                case Some(viewTemplate) ⇒
-                    viewTemplate.qname                         == controlElement.qname &&
-                    viewTemplate.att("appearance").stringValue == controlElement.att("appearance").stringValue
-                case _ ⇒ false
-            })
-
-    // Version returning a list, for called from XForms
-    // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a Option -> List function?
-    def bindingOrEmpty(controlElement: NodeInfo) = binding(controlElement).orNull
+    // For XPath callers
+    // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a Option → List function?
+    def bindingOrEmpty(controlElement: NodeInfo) =
+        FormBuilder.bindingForControlElement(controlElement, componentBindings).orNull
 
     // Finds if a control uses a particular type of editor (say "static-itemset")
-    // TODO: make `editor` something other than a string
-    def hasEditor(controlElement: NodeInfo, editor: String) = {
-        (binding(controlElement) filter (b ⇒ {
-            val staticItemsetAttribute = (b \ "*:metadata" \ "*:editors" \@ editor).headOption
-            staticItemsetAttribute match {
-                case Some(a) ⇒ a.stringValue == "true"
-                case _ ⇒ false
-            }
-        })).isDefined
-    }
-
-    // Get a node's "appearance" attribute as an Option[String]
-    def appearanceOption(e: NodeInfo) =
-        e \@ "appearance" map (_.stringValue) headOption
-
-    // Given a control (e.g. xf:input) and its xf:bind, find the corresponding xbl:binding elements
-    def findBindingsForControl(components: NodeInfo, control: NodeInfo, bind: NodeInfo) = {
-
-        val stringQName = XMLConstants.XS_STRING_QNAME
-
-        // Get QName from the bind, using xs:string if no type is found
-        val controlTypeQName =
-            bind \@ "type" headOption match {
-                case Some(tpe) ⇒ bind.resolveQName(tpe.stringValue)
-                case None ⇒ stringQName
-            }
-
-        // Support both xs:foo and xf:foo as they are considered to be equivalent when looking up the metadata. So
-        // here we ignore the namespace URI to achieve this (could be more restrictive if needed).
-        val controlTypeLocalname = controlTypeQName.getName
-        val controlQName = control.qname
-        val controlAppearanceOption = appearanceOption(control)
-
-        // Get matching xbl:bindings
-        components \ (XBL → "xbl") \ (XBL → "binding") filter { binding ⇒
-
-            val template = viewTemplate(binding)
-            val typeLocalname = bindAttributesTemplate(binding) self "type" map (_ stringValue) headOption
-
-            // Control name and template name must match
-            (template exists (_.qname == controlQName)) &&
-            // Appearance must match
-            (template exists (appearanceOption(_) == controlAppearanceOption)) &&
-            // Type local names must match if present
-            (typeLocalname.isEmpty || (typeLocalname exists (_ == controlTypeLocalname)))
-        } asJava
-    }
+    def hasEditor(controlElement: NodeInfo, editor: String) =
+        FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, componentBindings)
 
     // Find a given static control by name
     def findStaticControlByName(controlName: String) = {

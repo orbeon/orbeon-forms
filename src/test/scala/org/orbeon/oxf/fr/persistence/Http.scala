@@ -29,7 +29,7 @@ import java.io.ByteArrayOutputStream
 
 private object Http {
 
-    private val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql-ng"
+    private val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql"
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     case class Credentials(username: String, roles: Set[String], group: String)

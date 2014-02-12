@@ -3,8 +3,7 @@
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                      value="mysql"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.mysql-ng.uri"                        value="/fr/service/mysql"/>
-    <property as="xs:string"  name="oxf.fr.persistence.mysql-ng.datasource"                 value="mysql_tomcat"/>
+    <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                    value="mysql_tomcat"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.data"      value="exist"/>             <!-- So we can find the imported data -->
 
     <property as="xs:string"  processor-name="oxf:page-flow" name="service-public-methods"  value="GET HEAD POST PUT DELETE"/>

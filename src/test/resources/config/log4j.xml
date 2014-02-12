@@ -14,14 +14,11 @@
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" xmlns="http://jakarta.apache.org/log4j/">
 
     <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
-        <param name="Target" value="System.err"/>
+        <param name="Target" value="System.out"/>
         <param name="Encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ISO8601} %-5p %c{1} %x - %m%n"/>
         </layout>
-        <filter class="org.apache.log4j.varia.LevelRangeFilter">
-            <param name="LevelMin" value="debug"/>
-        </filter>
     </appender>
 
     <category name="org.orbeon.oxf.xforms.processor.XFormsServer">

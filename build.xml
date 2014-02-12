@@ -723,7 +723,7 @@
                             <then><copy file="${mysql.jar}" todir="build/apache-tomcat-${tomcat-version}/lib"/></then>
                         </if>
                         <!-- Run -->
-                        <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true">
+                        <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true" taskname="tomcat">
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
                             <jvmarg value="-Dcatalina.base=test/catalina_base"/>
                             <jvmarg line="-server -verbosegc -Xms256m -Xmx1024m -XX:MaxPermSize=256m -Djava.awt.headless=true -XX:+PerfDisableSharedMem"/>

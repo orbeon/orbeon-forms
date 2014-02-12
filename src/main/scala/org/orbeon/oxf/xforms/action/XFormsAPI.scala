@@ -34,6 +34,7 @@ import util.Try
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl
+import scala.reflect.ClassTag
 
 object XFormsAPI {
 
@@ -278,50 +279,46 @@ object XFormsAPI {
             case error: XFormsSubmitErrorEvent ⇒ throw new SubmitException(error)
         }
 
+    // NOTE: There is no source id passed so we resolve relative to the document
+    private def resolveAs[T: ClassTag](staticOrAbsoluteId: String) =
+        containingDocument.resolveObjectByIdInScope("#document", staticOrAbsoluteId, None) flatMap collectByErasedType[T]
+
     // xf:toggle
-    def toggle(caseId: String, deferred: Boolean = true): Unit = {
-        val caseControl = containingDocument.getObjectByEffectiveId(caseId).asInstanceOf[XFormsCaseControl]
-        XFormsToggleAction.toggle(caseControl, deferred)
-    }
+    def toggle(caseId: String, deferred: Boolean = true): Unit =
+        resolveAs[XFormsCaseControl](caseId) foreach
+            (XFormsToggleAction.toggle(_, deferred))
 
     // xf:rebuild
-    def rebuild(modelId: String, deferred: Boolean = false): Unit = {
-        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
-        RRRAction.rebuild(model, deferred)
-    }
+    def rebuild(modelId: String, deferred: Boolean = false): Unit =
+        resolveAs[XFormsModel](modelId) foreach
+            (RRRAction.rebuild(_, deferred))
 
     // xf:revalidate
-    def revalidate(modelId: String, deferred: Boolean = false): Unit = {
-        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
-        RRRAction.revalidate(model, deferred)
-    }
+    def revalidate(modelId: String, deferred: Boolean = false): Unit =
+        resolveAs[XFormsModel](modelId) foreach
+            (RRRAction.revalidate(_, deferred))
 
     // xf:recalculate
-    def recalculate(modelId: String, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
-        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
-        RRRAction.recalculate(model, deferred, applyDefaults)
-    }
+    def recalculate(modelId: String, deferred: Boolean = false, applyDefaults: Boolean = false): Unit =
+        resolveAs[XFormsModel](modelId) foreach
+            (RRRAction.recalculate(_, deferred, applyDefaults))
 
     // xf:refresh
-    def refresh(modelId: String): Unit = {
-        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
-        XFormsRefreshAction.refresh(model)
-    }
+    def refresh(modelId: String): Unit =
+        resolveAs[XFormsModel](modelId) foreach
+            XFormsRefreshAction.refresh
 
     // xf:show
     def show(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
-        collectByErasedType[XFormsEventTarget](containingDocument.getObjectByEffectiveId(dialogId)) foreach {
-            XXFormsShowAction.showDialog(_, properties = properties)
-        }
+        resolveAs[XFormsEventTarget](dialogId) foreach
+            (XXFormsShowAction.showDialog(_, properties = properties))
 
     // xf:load
-    def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit = {
+    def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit =
         XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, url, target.orNull, null, false, false)
-    }
 
     // xf:setfocus
     def setfocus(controlId: String, inputOnly: Boolean = false): Unit =
-        collectByErasedType[XFormsControl](containingDocument.getObjectByEffectiveId(controlId)) foreach {
-            XFormsSetfocusAction.setfocus(_, inputOnly)
-        }
+        resolveAs[XFormsControl](controlId) foreach
+            (XFormsSetfocusAction.setfocus(_, inputOnly))
 }

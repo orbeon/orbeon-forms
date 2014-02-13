@@ -33,7 +33,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             val statement = connection.createStatement
             try {
                 // Create tables
-                val createDDL = readSQL(s"$Base/mysql-4_4.sql")
+                val createDDL = readSQL(s"$Base/mysql-4_5.sql")
                 createDDL foreach statement.executeUpdate
 
                 // Run the interesting code

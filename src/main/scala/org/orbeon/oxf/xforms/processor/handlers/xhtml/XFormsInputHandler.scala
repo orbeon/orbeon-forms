@@ -59,42 +59,24 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
         val isConcreteControl = inputControl ne null
         if (isBoolean) {
             // Produce a boolean output
-            if (! isStaticReadonly(inputControl)) {
-                // Output control
-                val isMultiple = true
-                val itemset = new Itemset(isMultiple)
-                // NOTE: We have decided that it did not make much sense to encode the value for boolean. This also poses
-                // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
-                // the encrypted value of "true". So we do not encrypt values.
-                // NOTE: Put null label so that it is not output at all
-                itemset.addChildItem(Item(0, isMultiple, encode = false, attributes = null, label = null, help = None, hint = None, value = "true"))
 
-                // NOTE: In the future, we may want to use other appearances provided by xf:select
-    //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
+            val isMultiple = true
+            val itemset = new Itemset(isMultiple)
+            // NOTE: We have decided that it did not make much sense to encode the value for boolean. This also poses
+            // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
+            // the encrypted value of "true". So we do not encrypt values.
+            // NOTE: Put null label so that it is not output at all
+            itemset.addChildItem(Item(0, isMultiple, encode = false, attributes = null, label = null, help = None, hint = None, value = "true"))
 
-                // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
-                val select1Handler = new XFormsSelect1Handler {
-                    override def getPrefixedId = XFormsInputHandler.this.getPrefixedId
-                    override def getEffectiveId = XFormsInputHandler.this.getEffectiveId
-                    override def getControl = XFormsInputHandler.this.getControl
-                }
-                select1Handler.setContext(getContext)
-                select1Handler.init(uri, localname, qName, attributes, elementAnalysis)
-                select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
-            } else {
-                // Output static read-only value
-                if (isRelevantControl) {
-                    val xhtmlPrefix = handlerContext.findXHTMLPrefix
-                    val enclosingElementLocalname = "span"
-
-                    val atts = List("class" → "xforms-field")
-                    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, enclosingElementLocalname, atts) {
-                        val outputValue = inputControl.getExternalValue
-                        if (outputValue ne null)
-                            xmlReceiver.characters(outputValue.toCharArray, 0, outputValue.length)
-                    }
-                }
+            // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
+            val select1Handler = new XFormsSelect1Handler {
+                override def getPrefixedId  = XFormsInputHandler.this.getPrefixedId
+                override def getEffectiveId = XFormsInputHandler.this.getEffectiveId
+                override def getControl     = XFormsInputHandler.this.getControl
             }
+            select1Handler.setContext(getContext)
+            select1Handler.init(uri, localname, qName, attributes, elementAnalysis)
+            select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
         } else {
             // Create xh:span
             val xhtmlPrefix = handlerContext.findXHTMLPrefix

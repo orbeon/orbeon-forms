@@ -304,12 +304,55 @@ body.orbeon { background-color: @frBackground }
             margin: 0;
         }
     }
+
+    .fr-mode-pdf, .fr-mode-view {
+
+        .xforms-static > label {
+            cursor: default;
+        }
+
+        .xforms-textarea.xforms-static pre, .xforms-mediatype-text-html.xforms-static {
+            cursor: not-allowed;
+        }
+
+        // NOTE: The !important seems needed with FlyingSaucer, who knows why.
+        .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
+            &.xforms-static {
+                .xforms-selected, .xforms-deselected {
+                    display: block;
+                    min-height: @baseLineHeight;
+                    background-size: 14px !important;
+                    background-repeat: no-repeat !important;
+                    background-position: 0 3px !important;
+                    cursor: not-allowed;
+
+                    label {
+                        cursor: not-allowed;
+                    }
+                }
+                .xforms-selected {
+                    background-image: url("/apps/fr/style/images/glyphicons/checkbox-selected.png") !important;
+                }
+                .xforms-deselected {
+                    background-image: url("/apps/fr/style/images/glyphicons/checkbox-deselected.png") !important;
+                }
+            }
+        }
+
+        .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items {
+            border: none;
+            overflow-y: visible;
+            .box-shadow(none);
+            padding: 0;
+        }
+    }
 }
 
 /* ***** Print and PDF ********************************************************************************************** */
 
 // This is also used for PDF generation
 @media print {
+
     html {
         &, body.orbeon { background-color: white; background-image: none }
         font-family: @baseFontFamily;

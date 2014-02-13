@@ -728,7 +728,7 @@
                         </div>
                         <xh:span id="xforms-select-full-template" class="xforms-template">
                             <xh:span class="xforms-deselected">
-                                <xh:label class="checkbox" for="$xforms-item-id-select$">
+                                <xh:label class="checkbox">
                                     <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>
                                     <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
                                     <xh:span class="xforms-help">$xforms-template-help$</xh:span>
@@ -738,7 +738,7 @@
                         </xh:span>
                         <xh:span id="xforms-select1-full-template" class="xforms-template">
                             <xh:span class="xforms-deselected">
-                                <xh:label class="radio" for="$xforms-item-id-select1$">
+                                <xh:label class="radio">
                                     <xh:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>
                                     <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
                                     <xh:span class="xforms-help">$xforms-template-help$</xh:span>

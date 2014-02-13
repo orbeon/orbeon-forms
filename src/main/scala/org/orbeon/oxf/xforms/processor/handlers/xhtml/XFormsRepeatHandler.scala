@@ -22,7 +22,7 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes
 import java.lang.{StringBuilder ⇒ JStringBuilder}
-import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
+import org.orbeon.oxf.xforms.processor.handlers.{XFormsBaseHandler, OutputInterceptor}
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import scala.util.control.NonFatal
 
@@ -129,7 +129,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
             val repeatIndex = repeatControl.getIndex
             val selectedClass = "xforms-repeat-selected-item-" + ((handlerContext.countParentRepeats % 4) + 1)
-            val isStaticReadonly = super.isStaticReadonly(repeatControl)
+            val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
 
             val addedClasses = new StringBuilder(200)
             for (i ← 1 to repeatControl.getSize) {
@@ -141,7 +141,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                 addedClasses.setLength(0)
 
                 // Selected iteration
-                val selected = isRepeatSelected && i == repeatIndex && !isStaticReadonly
+                val selected = isRepeatSelected && i == repeatIndex && ! staticReadonly
                 if (selected)
                     addedClasses append selectedClass
 

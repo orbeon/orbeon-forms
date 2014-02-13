@@ -369,6 +369,74 @@ body.orbeon {
   border-bottom: none;
   margin: 0;
 }
+.orbeon .fr-mode-pdf .xforms-static > label,
+.orbeon .fr-mode-view .xforms-static > label {
+  cursor: default;
+}
+.orbeon .fr-mode-pdf .xforms-textarea.xforms-static pre,
+.orbeon .fr-mode-view .xforms-textarea.xforms-static pre,
+.orbeon .fr-mode-pdf .xforms-mediatype-text-html.xforms-static,
+.orbeon .fr-mode-view .xforms-mediatype-text-html.xforms-static {
+  cursor: not-allowed;
+}
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+  display: block;
+  min-height: 20px;
+  background-size: 14px !important;
+  background-repeat: no-repeat !important;
+  background-position: 0 3px !important;
+  cursor: not-allowed;
+}
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected label,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected label,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected label {
+  cursor: not-allowed;
+}
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
+  background-image: url("/apps/fr/style/images/glyphicons/checkbox-selected.png") !important;
+}
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+  background-image: url("/apps/fr/style/images/glyphicons/checkbox-deselected.png") !important;
+}
+.orbeon .fr-mode-pdf .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items,
+.orbeon .fr-mode-view .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items {
+  border: none;
+  overflow-y: visible;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  padding: 0;
+}
 /* ***** Print and PDF ********************************************************************************************** */
 @media print {
   html {

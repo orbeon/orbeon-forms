@@ -158,11 +158,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return reusableAttributes;
     }
     
-    protected boolean isStaticReadonly(XFormsControl control) {
+    public static boolean isStaticReadonly(XFormsControl control) {
         return control != null && control.isStaticReadonly();
     }
 
-    protected static String getLHHACId(XFormsContainingDocument containingDocument, String controlEffectiveId, String suffix) {
+    public static String getLHHACId(XFormsContainingDocument containingDocument, String controlEffectiveId, String suffix) {
         // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
         return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
     }

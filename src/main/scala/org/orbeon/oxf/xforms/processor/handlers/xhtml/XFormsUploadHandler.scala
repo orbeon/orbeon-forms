@@ -46,7 +46,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
         withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", containerAttributes) {
     
             // xhtml:input unless static readonly
-            if (! isStaticReadonly(control)) {
+            if (! XFormsBaseHandler.isStaticReadonly(control)) {
                 reusableAttributes.clear()
                 reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-select")
                 reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "file")

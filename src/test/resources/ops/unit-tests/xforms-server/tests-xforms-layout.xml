@@ -1368,13 +1368,13 @@
                     <xh:label class="xforms-label">My label</xh:label>
                     <xh:span class="xforms-items">
                         <xh:span class="xforms-selected">
-                            <xh:label class="radio" for="my-new-select1≡≡e0⊙1">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0⊙1" type="radio" name="my-new-select1⊙1" value="apple" checked="checked"/>
                                 <xh:span>Apple</xh:span>
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e1⊙1">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e1⊙1" type="radio" name="my-new-select1⊙1" value="orange"/>
                                 <xh:span class="xforms-hint-region">Orange</xh:span>
                                 <xh:span class="xforms-help">Orange help</xh:span>
@@ -1382,13 +1382,13 @@
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e2⊙1">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e2⊙1" type="radio" name="my-new-select1⊙1" value="blueberry"/>
                                 <xh:span>Blueberry</xh:span>
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e3⊙1">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e3⊙1" type="radio" name="my-new-select1⊙1" value="pineapple"/>
                                 <xh:span>Pineapple</xh:span>
                             </xh:label>
@@ -1405,13 +1405,13 @@
                     <xh:label class="xforms-label"/>
                     <xh:span class="xforms-items">
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e0">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0" type="radio" name="my-new-select1" value="apple"/>
                                 <xh:span>Apple</xh:span>
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e1">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e1" type="radio" name="my-new-select1" value="orange"/>
                                 <xh:span class="xforms-hint-region">Orange</xh:span>
                                 <xh:span class="xforms-help">Orange help</xh:span>
@@ -1419,13 +1419,13 @@
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e2">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e2" type="radio" name="my-new-select1" value="blueberry"/>
                                 <xh:span>Blueberry</xh:span>
                             </xh:label>
                         </xh:span>
                         <xh:span class="xforms-deselected">
-                            <xh:label class="radio" for="my-new-select1≡≡e3">
+                            <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e3" type="radio" name="my-new-select1" value="pineapple"/>
                                 <xh:span>Pineapple</xh:span>
                             </xh:label>

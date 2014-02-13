@@ -11,11 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence
+package org.orbeon.oxf.fr.persistence.rest
 
 import scala.xml.Elem
 
-object Permissions {
+private object Permissions {
 
     type Permissions = Option[Seq[Permission]]
 

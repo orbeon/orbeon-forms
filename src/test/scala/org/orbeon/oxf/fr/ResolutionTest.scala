@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.Value
 
-class ActionsTest extends DocumentTestBase with AssertionsForJUnit {
+class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
     def source: JDocument =
         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -136,7 +136,7 @@ class ActionsTest extends DocumentTestBase with AssertionsForJUnit {
             </xh:body>
         </xh:html>
 
-    def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String) =
+    private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String) =
         FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName) match {
             case value: Value   ⇒ asScalaIterator(value.iterate()) map (_.getStringValue) toList
             case node: NodeInfo ⇒ List(node.getStringValue)

@@ -18,31 +18,34 @@ import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 
-class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection {
+/**
+ * Test the DDL we provide to create and update databases.
+ */
+class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
+    private def withNewDatabase[T](block: Connection ⇒ T): T = {
 
-    def withNewDatabase[T](block: Connection ⇒ T): T = {
         try {
             val createUserAndDatabase = Seq(
                 "create user orbeon_ddl@localhost identified by 'orbeon_ddl'",
                 "create database orbeon_ddl",
                 "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost"
             )
-            asRoot(createUserAndDatabase foreach _.createStatement.executeUpdate)
-            asOrbeon(block)
+            DB.asRoot(createUserAndDatabase foreach _.createStatement.executeUpdate)
+            DB.asOrbeon(block)
         } finally {
             val dropUserAndDatabase = Seq(
                 "drop user orbeon_ddl@localhost",
                 "drop database orbeon_ddl"
             )
-            asRoot(dropUserAndDatabase foreach _.createStatement.executeUpdate)
+            DB.asRoot(dropUserAndDatabase foreach _.createStatement.executeUpdate)
         }
     }
 
     // Runs the SQL, and returns the DDL for the tables as defined in the database
-    def sqlToDDL(connection: Connection, sql: Seq[String]): Map[String, String] = {
+    private def sqlToDDL(connection: Connection, sql: Seq[String]): Map[String, String] = {
         val statement = connection.createStatement
-        getTableNames(connection).map { tableName ⇒
+        DB.getTableNames(connection).map { tableName ⇒
             val tableResultSet = statement.executeQuery("show create table " + tableName)
             tableResultSet.next()
             val tableDDL = tableResultSet.getString(2)
@@ -51,8 +54,8 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Datab
     }
 
     @Test def createAndUpgradeTest(): Unit = {
-        val updateDDL = withNewDatabase(sqlToDDL(_, readSQL(s"$Base/mysql-4_3.sql") ++ readSQL(s"$Base/mysql-4_3-to-4_4.sql")))
-        val createDDL = withNewDatabase(sqlToDDL(_, readSQL(s"$Base/mysql-4_4.sql")))
+        val updateDDL = withNewDatabase(sqlToDDL(_, DB.readSQL(s"$DB.Base/mysql-4_3.sql") ++ DB.readSQL(s"$DB.Base/mysql-4_3-to-4_4.sql")))
+        val createDDL = withNewDatabase(sqlToDDL(_, DB.readSQL(s"$DB.Base/mysql-4_4.sql")))
         assert(updateDDL === createDDL)
     }
 }

@@ -11,8 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence
+package org.orbeon.oxf.fr.persistence.rest
 
+import java.io.ByteArrayOutputStream
 import org.dom4j.Document
 import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.resources.URLFactory
@@ -22,12 +23,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.Array
 import scala.Some
 import scala.util.Try
-import org.orbeon.oxf.fr.relational.Specific
-import scala.Some
-import org.orbeon.oxf.fr.relational.ForDocument
-import java.io.ByteArrayOutputStream
 
-private object Http {
+private object HttpRequest {
 
     private val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql"
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")

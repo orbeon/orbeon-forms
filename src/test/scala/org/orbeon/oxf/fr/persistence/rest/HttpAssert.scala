@@ -11,31 +11,34 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence
+package org.orbeon.oxf.fr.persistence.rest
 
+import java.io.ByteArrayInputStream
 import org.orbeon.oxf.fr.relational.Version
 import org.orbeon.oxf.test.TestSupport
 import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import java.io.ByteArrayInputStream
 
-private object Assert extends TestSupport {
+/**
+ *
+ */
+private object HttpAssert extends TestSupport {
 
     sealed trait Expected
-    case   class ExpectedBody(body: Http.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
+    case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
     case   class ExpectedCode(code: Integer) extends Expected
 
-    def get(url: String, version: Version, expected: Expected, credentials: Option[Http.Credentials] = None): Unit = {
-        val (resultCode, headers, resultBody) = Http.get(url, version, credentials)
+    def get(url: String, version: Version, expected: Expected, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+        val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
         expected match {
             case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
                 assert(resultCode === 200)
                 // Check body
                 body match {
-                    case Http.XML(expectedDoc) ⇒
+                    case HttpRequest.XML(expectedDoc) ⇒
                         val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
                         assertXMLDocuments(resultDoc, expectedDoc)
-                    case Http.Binary(expectedFile) ⇒
+                    case HttpRequest.Binary(expectedFile) ⇒
                         assert(resultBody.get === expectedFile)
                 }
                 // Check operations
@@ -50,13 +53,13 @@ private object Assert extends TestSupport {
         }
     }
 
-    def put(url: String, version: Version, body: Http.Body, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
-        val actualCode = Http.put(url, version, body, credentials)
+    def put(url: String, version: Version, body: HttpRequest.Body, expectedCode: Integer, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+        val actualCode = HttpRequest.put(url, version, body, credentials)
         assert(actualCode === expectedCode)
     }
 
-    def del(url: String, version: Version, expectedCode: Integer, credentials: Option[Http.Credentials] = None): Unit = {
-        val actualCode = Http.del(url, version, credentials)
+    def del(url: String, version: Version, expectedCode: Integer, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+        val actualCode = HttpRequest.del(url, version, credentials)
         assert(actualCode === expectedCode)
     }
 }

@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence
 
-import java.sql.{DriverManager, Connection}
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.resources.URLFactory
 import java.io.{StringWriter, InputStreamReader}
+import java.sql.{DriverManager, Connection}
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.mutable.ListBuffer
 
-trait DatabaseConnection {
+private object DB {
 
     val Base = "oxf:/apps/fr/persistence/relational/ddl"
 

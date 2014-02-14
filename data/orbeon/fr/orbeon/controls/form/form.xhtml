@@ -55,7 +55,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         <datetime>2009-10-16T17:48:03</datetime>
                         <dropdown-date>2009-10-16</dropdown-date>
                         <fields-date>2009-10-16</fields-date>
-                        <date-picker>2009-10-16</date-picker>
                     </date-time-controls>
                     <selection-controls>
                         <dropdown>cat</dropdown>
@@ -103,7 +102,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
                     <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"/>
                     <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
-                    <xf:bind id="date-picker-bind" ref="date-picker" type="xf:date" name="date-picker"/>
                 </xf:bind>
                 <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit', 'test')">
                     <xf:bind id="browser-button-bind" ref="browser-button" name="browser-button"/>
@@ -329,10 +327,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <label>Fields Date</label>
                             <hint>Date selector with separate fields</hint>
                         </fields-date>
-                        <date-picker>
-                            <label>Date Picker</label>
-                            <hint>Simple date picker</hint>
-                        </date-picker>
                         <textarea>
                             <label>Text Area</label>
                             <hint>Standard text area</hint>
@@ -557,10 +551,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <label>Date avec champs</label>
                             <hint>Sélecteur de date avec champs séparés</hint>
                         </fields-date>
-                        <date-picker>
-                            <label>Sélecteur de date</label>
-                            <hint>Sélecteur de date simple</hint>
-                        </date-picker>
                         <textarea>
                             <label>Zone de texte</label>
                             <hint>Zone de texte standard</hint>
@@ -875,13 +865,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:fields-date>
                             </xh:td>
-                            <xh:td>
-                                <fr:date-picker bind="date-picker-bind" id="date-picker-control">
-                                    <xf:label ref="$form-resources/date-picker/label"/>
-                                    <xf:hint ref="$form-resources/date-picker/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:date-picker>
-                            </xh:td>
+                            <xh:td/>
                         </xh:tr>
                     </fr:grid>
                 </fr:section>

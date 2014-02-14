@@ -28,7 +28,8 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*"           value="oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
                                                                                             oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
                                                                                             oxf:/xbl/orbeon/fields-date/fields-date.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*"          value="oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
+    <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*"          value="oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
+                                                                                            oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
                                                                                             oxf:/xbl/orbeon/box-select/box-select.xbl
                                                                                             oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
                                                                                             oxf:/xbl/orbeon/autocomplete/autocomplete.xbl"/>

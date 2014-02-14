@@ -1,0 +1,81 @@
+<!--
+  Copyright (C) 2014 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
+
+    <xbl:binding id="fr-dropdown-select1" element="fr|dropdown-select1" xxbl:container="span" xxbl:mode="lhha binding value">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Dropdown Menu</display-name>
+            <display-name lang="es">Menú Desplegable</display-name>
+            <display-name lang="fi">Pudotusvalikko</display-name>
+            <display-name lang="fr">Menu déroulant</display-name>
+            <display-name lang="ru">Выпадающий список</display-name>
+            <display-name lang="de">Dropdown-Menü</display-name>
+            <display-name lang="it">Menu a tendina</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
+            </icon>
+            <editors static-itemset="true"/>
+            <templates>
+                <view>
+                    <fr:dropdown-select1 id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                    </fr:dropdown-select1>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <resources>
+                        <resource xml:lang="en"><select>Select one:</select></resource>
+                        <resource xml:lang="fr"><select>Sélectionner:</select></resource>
+                        <resource xml:lang="es"><select>[Select one:]</select></resource>
+                        <resource xml:lang="no"><select>Velg:</select></resource>
+                        <resource xml:lang="ru"><select>Выберите:</select></resource>
+                        <resource xml:lang="it"><select>Seleziona:</select></resource>
+                        <resource xml:lang="de"><select>Auswählen:</select></resource>
+                        <resource xml:lang="fi"><select>Valitse:</select></resource>
+                    </resources>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:select1 appearance="minimal" ref="xxf:binding('fr-dropdown-select1')">
+                <xf:itemset ref=".[not(exf:required() and normalize-space())]">
+                    <xf:label value="if (normalize-space() or not(exf:required())) then '' else xxf:r('select')"/>
+                    <xf:value/>
+                </xf:itemset>
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select1>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

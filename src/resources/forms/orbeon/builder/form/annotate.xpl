@@ -225,6 +225,13 @@
                     <xsl:attribute name="ref" select="."/>
                 </xsl:template>
 
+                <!-- Convert minimal xf:select1 to fr:dropdown-select1 -->
+                <xsl:template match="xf:select1[@appearance = 'minimal']">
+                    <fr:dropdown-select1>
+                        <xsl:apply-templates select="@* except @appearance | node() except xf:item[xf:label = '[Select...]']"/>
+                    </fr:dropdown-select1>
+                </xsl:template>
+
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="annotated"/>

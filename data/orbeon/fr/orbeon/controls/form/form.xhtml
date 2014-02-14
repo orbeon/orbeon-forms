@@ -105,7 +105,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
                     <xf:bind id="date-picker-bind" ref="date-picker" type="xf:date" name="date-picker"/>
                 </xf:bind>
-                <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit')">
+                <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit', 'test')">
                     <xf:bind id="browser-button-bind" ref="browser-button" name="browser-button"/>
                     <xf:bind id="link-button-bind" ref="link-button" name="link-button"/>
                 </xf:bind>
@@ -890,18 +890,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <fr:grid columns="3">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 appearance="minimal" bind="dropdown-bind" id="dropdown-control" class="fr-width-7em">
+                                <fr:dropdown-select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-7em">
                                     <xf:label ref="$form-resources/dropdown/label"/>
                                     <xf:hint ref="$form-resources/dropdown/hint"/>
-                                    <xf:item>
-                                        <xf:label>[Select...]</xf:label>
-                                        <xf:value/>
-                                    </xf:item>
                                     <xf:itemset ref="$form-resources/dropdown/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:dropdown-select1>
                             </xh:td>
                             <xh:td>
                                 <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">

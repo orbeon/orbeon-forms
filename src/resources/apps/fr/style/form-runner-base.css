@@ -728,6 +728,9 @@
   .orbeon #xforms-form .btn-toolbar {
     font-size: .5px;
   }
+  .fr-page-break-before {
+    page-break-before: always;
+  }
 }
 @page {
   @bottom-center {

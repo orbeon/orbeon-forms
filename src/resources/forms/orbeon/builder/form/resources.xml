@@ -450,8 +450,8 @@
             <options>
                 <label>Options</label>
                 <item>
-                    <label>Page Break</label>
-                    <value>fr-page-break</value>
+                    <label>Page Break Before</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
@@ -1332,8 +1332,8 @@
             <options>
                 <label>Options</label>
                 <item>
-                    <label>Saut de page</label>
-                    <value>fr-page-break</value>
+                    <label>Saut de page avant</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
@@ -2214,8 +2214,8 @@
             <options>
                 <label>[Options]</label>
                 <item>
-                    <label>[Page Break]</label>
-                    <value>fr-page-break</value>
+                    <label>[Page Break Before]</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
@@ -3094,8 +3094,8 @@
             <options>
                 <label>[Options]</label>
                 <item>
-                    <label>[Page Break]</label>
-                    <value>fr-page-break</value>
+                    <label>[Page Break Before]</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
@@ -3980,8 +3980,8 @@
             <options>
                 <label>[Options]</label>
                 <item>
-                    <label>[Page Break]</label>
-                    <value>fr-page-break</value>
+                    <label>[Page Break Before]</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
@@ -4866,8 +4866,8 @@
             <options>
                 <label>[Options]</label>
                 <item>
-                    <label>[Page Break]</label>
-                    <value>fr-page-break</value>
+                    <label>[Page Break Before]</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
@@ -5756,8 +5756,8 @@
             <options>
                 <label>[Options]</label>
                 <item>
-                    <label>[Page Break]</label>
-                    <value>fr-page-break</value>
+                    <label>[Page Break Before]</label>
+                    <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>

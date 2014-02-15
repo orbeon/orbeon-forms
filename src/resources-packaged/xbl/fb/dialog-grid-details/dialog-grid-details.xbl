@@ -24,6 +24,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-grid-details" element="fb|dialog-grid-details" xxbl:mode="binding">
@@ -34,16 +35,25 @@
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <xf:setvalue ref="original-grid-name" value="fbf:getContainerNameOrEmpty(event('grid'))"/>
-                <xf:setvalue ref="grid-name" value="$i/original-grid-name"/>
+                <xf:setvalue ref="original-control-name" value="fbf:getContainerNameOrEmpty(event('grid'))"/>
+                <xf:setvalue ref="control-name"          value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/min-repeat" value="fbf:getMin($form, $i/grid-name)"/>
-                <xf:setvalue ref="$i/max-repeat" value="fbf:getMaxOrEmpty($form, $i/grid-name)"/>
+                <xf:setvalue ref="$i/min-repeat"         value="fbf:getMin($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/max-repeat"         value="fbf:getMaxOrEmpty($form, $i/control-name)"/>
 
-                <xf:setvalue ref="$i/relevant" value="fbf:getMipOrEmpty($form, $i/grid-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly" value="fbf:getMipOrEmpty($form, $i/grid-name, 'readonly')"/>
+                <xf:setvalue ref="$i/relevant"           value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"           value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
 
-                <xf:setvalue ref="$i/control-names" value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
+                <xf:setvalue ref="$i/control-names"      value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
+
+                <xf:var name="control"                   value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="resources"                 value="frf:currentFormResources()"/>
+
+                <xf:var name="standard-classes"          value="$resources/dialog-grid-details/options/item/value/string()"/>
+                <xf:var name="control-classes"           value="xxf:split($control/@class)"/>
+
+                <xf:setvalue ref="$i/standard-classes"   value="string-join($control-classes[. = $standard-classes], ' ')"/>
+                <xf:setvalue ref="$i/custom-classes"     value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <xxf:show dialog="dialog"/>
 
@@ -56,8 +66,8 @@
             <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and valid($i)" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-grid-details')"/>
 
-                <xf:var name="old-name" value="$i/original-grid-name/string()"/>
-                <xf:var name="new-name" value="$i/grid-name/string()"/>
+                <xf:var name="old-name" value="$i/original-control-name/string()"/>
+                <xf:var name="new-name" value="$i/control-name/string()"/>
 
                 <xf:action type="xpath">
                     fbf:renameControlIfNeeded($form, $old-name, $new-name),
@@ -68,7 +78,12 @@
                                             if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1,
                                             ())
                 </xf:action>
-                <!-- No classes for sections for now -->
+
+                <!-- Write classes -->
+                <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $new-name)"/>
+                <xf:var name="classes" value="string-join(distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes))), ' ')"/>
+                <xf:delete if="count($classes) = 0" ref="$control/@class"/>
+                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', $classes)"/>
 
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="dialog" if="event('xxf:targetid') != 'cancel-button'">
@@ -90,8 +105,11 @@
             <xf:model id="model">
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <local>
-                        <original-grid-name/>    <!-- So we can find back the control when saving if users change the name -->
-                        <grid-name/>             <!-- Possibly new name set by users -->
+                        <original-control-name/> <!-- So we can find back the control when saving if users change the name -->
+                        <control-name/>          <!-- Possibly new name set by users -->
+
+                        <standard-classes/>
+                        <custom-classes/>
 
                         <relevant/>              <!-- XPath: whether the grid is relevant -->
                         <readonly/>              <!-- XPath: whether the grid is readonly -->
@@ -108,11 +126,11 @@
                 <xf:var name="i" value="instance()"/>
 
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
-                <xf:bind ref="grid-name"
+                <xf:bind ref="control-name"
                          type="xs:NCName"
                          calculate="normalize-space()"
                          readonly="false()"
-                         constraint="string() = ../original-grid-name or not(string() = xxf:split(../control-names))"/>
+                         constraint="string() = ../original-control-name or not(string() = xxf:split(../control-names))"/>
 
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
 
@@ -136,10 +154,23 @@
                         <xh:div class="fr-grid">
                             <xh:div class="fr-grid-content">
                                 <!-- Control name -->
-                                <xf:input ref="$i/grid-name" incremental="true">
-                                    <xf:label value="$resources/dialog-grid-details/grid-name/label"/>
-                                    <xf:alert ref="$resources/dialog-grid-details/grid-name/alert"/>
-                                    <xf:hint  ref="$resources/dialog-grid-details/grid-name/hint"/>
+                                <xf:input ref="$i/control-name" incremental="true">
+                                    <xf:label value="$resources/dialog-grid-details/control-name/label"/>
+                                    <xf:alert ref="$resources/dialog-grid-details/control-name/alert"/>
+                                    <xf:hint  ref="$resources/dialog-grid-details/control-name/hint"/>
+                                </xf:input>
+                                <!-- Classes -->
+                                <!-- No standard classes yet
+                                <xf:select ref="$i/standard-classes" appearance="full">
+                                    <xf:label ref="$resources/dialog-grid-details/options/label"/>
+                                    <xf:itemset ref="$resources/dialog-grid-details/options/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select>
+                                -->
+                                <xf:input ref="$i/custom-classes">
+                                    <xf:label ref="$resources/classes/label"/>
                                 </xf:input>
                                 <!-- Relevant -->
                                 <xf:input ref="relevant" incremental="true">

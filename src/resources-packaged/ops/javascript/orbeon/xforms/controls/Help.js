@@ -184,24 +184,32 @@
 
         // Adjust position
         var popoverOffset = popover.offset();
-        popoverOffset.top =
-                (_.contains(['right', 'left'], placement) && (popoverOffset.top - elPos.scrollTop < padding))
-            ?   elPos.margins.top + elPos.scrollTop + padding
-            :   placement == 'top'
-            ?   elPos.offset.top - popover.outerHeight() - arrowHeight
-            :   placement == 'over'
-            ?   elPos.offset.top + padding
-            :   popoverOffset.top;
-        popoverOffset.left =
-                placement == 'right'
-            ?   elPos.offset.left + elPos.width + arrowWidth
-            :   placement == 'left'
-            ?   elPos.offset.left - popover.outerWidth() - arrowWidth
-            :   _.contains(['top', 'bottom'], placement)
-            ?   elPos.offset.left
-            :   placement == 'over'
-            ?   elPos.offset.left + elPos.width - popover.outerWidth() - padding
-            :   popoverOffset.top;
+        popoverOffset.top = (function() {
+            switch (true) {
+                case _.contains(['right', 'left'], placement) && (popoverOffset.top - elPos.scrollTop < padding):
+                    return elPos.margins.top + elPos.scrollTop + padding;
+                case placement == 'top':
+                    return elPos.offset.top - popover.outerHeight() - arrowHeight;
+                case placement == 'over':
+                    return elPos.offset.top + padding;
+                default:
+                    return popoverOffset.top;
+            }
+        })();
+        popoverOffset.left = (function() {
+            switch (true) {
+                case placement == 'right':
+                    return elPos.offset.left + elPos.width + arrowWidth
+                case placement == 'left':
+                    return elPos.offset.left - popover.outerWidth() - arrowWidth
+                case _.contains(['top', 'bottom'], placement):
+                    return elPos.offset.left
+                case placement == 'over':
+                    return elPos.offset.left + elPos.width - popover.outerWidth() - padding;
+                default:
+                    return popoverOffset.top;
+            }
+        })();
         popover.offset(popoverOffset);
 
         // Adjust arrow height for right/left

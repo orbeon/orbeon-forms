@@ -32,7 +32,8 @@
         var labelText           = $(Controls.getControlLHHA(controlEl, 'label')).text();
         var helpText            = $(Controls.getControlLHHA(controlEl, 'help' )).text();
         var LhhaClasses         = '.xforms-label, .xforms-help, .xforms-hint, .xforms-alert';
-        var el                  = controlEl.children().not(LhhaClasses).add(controlEl).first(); // [1]
+        var firstNonLhhaChild   = controlEl.children().not(LhhaClasses).first();
+        var el                  = firstNonLhhaChild.is('*') ? firstNonLhhaChild : controlEl; // [1]
         var elPos               = getPosition(el);
         var placement           = getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');

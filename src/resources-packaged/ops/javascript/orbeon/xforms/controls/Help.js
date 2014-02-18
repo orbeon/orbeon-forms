@@ -29,8 +29,8 @@
     Controls.showHelp = function(controlEl) {
 
         controlEl = $(controlEl);
-        var labelText           = $(Controls.getControlLHHA(controlEl, 'label')).text();
-        var helpText            = $(Controls.getControlLHHA(controlEl, 'help' )).text();
+        var labelText           = Controls.getLabelMessage(controlEl[0]);
+        var helpText            = Controls.getHelpMessage (controlEl[0]);
         var firstChildFormEl    = controlEl.find(':input').first();
         var el                  = firstChildFormEl.is('*') ? firstChildFormEl : controlEl; // [1]
         var elPos               = getPosition(el);

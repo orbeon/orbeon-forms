@@ -18,7 +18,7 @@
 
 .orbeon {
 
-    .navbar {
+    .navbar .navbar-inner .container {
         .fr-status-icons {
             display: block;
             float: left;
@@ -26,6 +26,9 @@
         }
 
         .badge { margin-left: 5px; }
+
+        img { margin-right: 15px; }
+        h1 { margin-left: 0; }
     }
 
     .fr-body {
@@ -631,12 +634,63 @@
     .fr-page-break-before {
         page-break-before: always;
     }
+
+    .navbar img {
+        position: running(logo);
+    }
+
+    .fr-header-title {
+        position: running(header-title);
+        display: inline;
+        font-size: 14px;
+    }
+
+    .fr-footer-title {
+        position: running(footer-title);
+        font-size: 14px;
+    }
 }
 
-// Add page number at bottom
-// NOTE: Not sure how to internationalize this, so use "/"
 @page {
+    @top-left {
+        content: element(header-title);
+        border-bottom: 1px solid gray;
+        padding-bottom: 10px;
+        vertical-align: bottom;
+    }
+
+    @top-center {
+        border-bottom: 1px solid gray;
+        padding-bottom: 10px;
+        vertical-align: bottom;
+        width: auto;
+    }
+
+    @top-right {
+        border-bottom: 1px solid gray;
+        padding-bottom: 10px;
+        vertical-align: bottom;
+    }
+
+    @bottom-left {
+        content: element(footer-title);
+        border-top: 1px solid gray;
+        padding-top: 10px;
+        vertical-align: top;
+    }
+
     @bottom-center {
         content: counter(page) " / " counter(pages);
+        border-top: 1px solid gray;
+        padding-top: 10px;
+        vertical-align: top;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+    }
+
+    @bottom-right {
+        border-top: 1px solid gray;
+        padding-top: 10px;
+        vertical-align: top;
     }
 }

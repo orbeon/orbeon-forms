@@ -98,6 +98,16 @@
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>
                 </xsl:template>
+                <!-- Make a copy of useful information so it can be moved, via CSS, to headers and footers -->
+                <xsl:template match="*:body">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*"/>
+                        <xsl:variable name="title" select="/*/*:head/*:title/string()"/>
+                        <span class="fr-header-title xforms-hidden"><xsl:value-of select="$title"/></span>
+                        <span class="fr-footer-title xforms-hidden"><xsl:value-of select="$title"/></span>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:copy>
+                </xsl:template>
             </xsl:transform>
         </p:input>
         <p:input name="data" href="#rewritten-data"/>

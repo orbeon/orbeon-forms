@@ -27,7 +27,7 @@
     <!--
         Component to represent a date control based on drop-down menus.
      -->
-    <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date" xxbl:container="span" xxbl:mode="lhha binding value">
+    <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date" xxbl:container="span" xxbl:mode="lhha binding value" xxbl:label-for="select1">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -186,7 +186,7 @@
                 <xf:group ref=".[not($view)]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                    <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
+                    <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex" id="select1">
                         <xf:item>
                             <xf:label value="xxf:r('year')"/>
                             <xf:value/>

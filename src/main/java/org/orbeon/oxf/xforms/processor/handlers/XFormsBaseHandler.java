@@ -41,7 +41,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         LABEL, HELP, HINT, ALERT, CONTROL
     }
 
-    protected static final Map<LHHAC, String> LHHAC_CODES = new HashMap<LHHAC, String>();
+    public static final Map<LHHAC, String> LHHAC_CODES = new HashMap<LHHAC, String>();
     static {
         LHHAC_CODES.put(LHHAC.LABEL, "l");
         LHHAC_CODES.put(LHHAC.HELP, "p");

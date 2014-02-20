@@ -25,7 +25,7 @@
     <!--
         Component to represent a date control based on separate fields.
      -->
-    <xbl:binding id="fr-fields-date-binding" element="fr|fields-date" xxbl:mode="lhha binding value">
+    <xbl:binding id="fr-fields-date-binding" element="fr|fields-date" xxbl:mode="lhha binding value" xxbl:label-for="input">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -119,7 +119,7 @@
                 <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                    <xf:input ref="month" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex"/>
+                    <xf:input ref="month" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input"/>
                     <xf:input ref="day"   class="fr-width-2digits"/>
                     <xf:input ref="year"  class="fr-width-4digits"/>
                 </xf:group>

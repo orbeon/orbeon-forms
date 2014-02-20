@@ -19,6 +19,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
@@ -68,38 +70,12 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                         val lhhaType = LHHAC.valueOf(localname.toUpperCase)
 
                         val forEffectiveId =
-                            if (lhhaType == LHHAC.LABEL) {
-                                // Label, try to determine @for
+                            if (lhhaType == LHHAC.LABEL)
+                                XFormsLHHAHandler.findTargetControlFor(handlerContext, targetControl, targetControlEffectiveId)
+                            else
+                                None
 
-                                // NOTE: This is funky. We do this because for some controls, @for does not point to the standard foo$bar$$c.1-2-3
-                                // id, but to another id. So we try to guess which handler is being used. However, this will not produce the
-                                // correct result all the time as matching is not only based on QName! A much better solution would be to always
-                                // use the foo$bar$$c.1-2-3 scheme for the @for id of a control. Also note that some controls don't support @for.
-
-                                val controlElement = targetControl.element
-
-                                handlerContext.getController.getHandler(controlElement) match {
-                                    case handler: XFormsControlLifecyleHandler ⇒
-
-                                        // Perform minimal handler initialization because we just want to use it to get the effective id
-                                        handler.setContext(handlerContext)
-
-                                        handler.init(
-                                            controlElement.getNamespaceURI,
-                                            controlElement.getName,
-                                            XMLUtils.buildQName(controlElement.getNamespacePrefix, controlElement.getName),
-                                            XMLUtils.getSAXAttributes(controlElement),
-                                            targetControl)
-
-                                        handler.getForEffectiveId(targetControlEffectiveId)
-                                    case _ ⇒
-                                        null
-                                }
-                            } else
-                                // Not a label, so no need to determine @for
-                                null
-
-                        handleLabelHintHelpAlert(lhhaAnalysis, targetControlEffectiveId, forEffectiveId, lhhaType, xformsControl.orNull, isTemplate, true)
+                        handleLabelHintHelpAlert(lhhaAnalysis, targetControlEffectiveId, forEffectiveId.orNull, lhhaType, xformsControl.orNull, isTemplate, true)
 
                     case _ ⇒
                         // Don't output markup for the LHHA
@@ -109,6 +85,37 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                 // Don't output markup for the LHHA
                 // This can happen if the author forgot a @for attribute, but also for xf:group/xf:label[not(@for)]
                 // Q: Can this also happen if we don't find the LHHAAnalysis?
+        }
+    }
+}
+
+object XFormsLHHAHandler {
+
+    def findTargetControlFor(handlerContext: HandlerContext, targetControl: ElementAnalysis, targetControlEffectiveId: String): Option[String] = {
+
+        // NOTE: This is funky. We do this because for some controls, @for does not point to the standard foo$bar$$c.1-2-3
+        // id, but to another id. So we try to guess which handler is being used. However, this will not produce the
+        // correct result all the time as matching is not only based on QName! A much better solution would be to always
+        // use the foo$bar$$c.1-2-3 scheme for the @for id of a control. Also note that some controls don't support @for.
+
+        val controlElement = targetControl.element
+
+        handlerContext.getController.getHandler(controlElement) match {
+            case handler: XFormsControlLifecyleHandler ⇒
+
+                // Perform minimal handler initialization because we just want to use it to get the effective id
+                handler.setContext(handlerContext)
+
+                handler.init(
+                    controlElement.getNamespaceURI,
+                    controlElement.getName,
+                    XMLUtils.buildQName(controlElement.getNamespacePrefix, controlElement.getName),
+                    XMLUtils.getSAXAttributes(controlElement),
+                    targetControl)
+
+                Some(handler.getForEffectiveId(targetControlEffectiveId))
+            case _ ⇒
+                None
         }
     }
 }

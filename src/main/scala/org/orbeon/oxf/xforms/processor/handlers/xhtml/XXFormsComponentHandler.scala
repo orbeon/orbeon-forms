@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.dom4j.Document
 import org.xml.sax.{Locator, Attributes}
 import org.orbeon.oxf.xml._
 import java.lang.StringBuilder
-
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
@@ -64,8 +64,22 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def handleHint()  = if (handleLHHA) super.handleHint()
     protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
 
-    // Don't use @for as we ae not pointing to an HTML control
-    override def getForEffectiveId(effectiveId: String) = null
+    // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
+    override def getForEffectiveId(effectiveId: String) = {
+        for {
+            labelFor            ← binding.abstractBinding.labelFor
+            labelForEffectiveId = XFormsUtils.getRelatedEffectiveId(getControl.getEffectiveId + COMPONENT_SEPARATOR, labelFor)
+            labelForPrefixedId  = XFormsUtils.getPrefixedId(labelForEffectiveId)
+            staticTarget        ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
+            targetControlFor    ← {
+                // Push/pop component context so that handler resolution works
+                handlerContext.pushComponentContext(getPrefixedId)
+                try XFormsLHHAHandler.findTargetControlFor(handlerContext, staticTarget, labelForEffectiveId)
+                finally handlerContext.popComponentContext()
+            }
+        } yield
+            targetControlFor
+    } orNull
 }
 
 object XXFormsComponentHandler {

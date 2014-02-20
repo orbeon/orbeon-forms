@@ -174,6 +174,8 @@ public class XFormsConstants {
     public static final QName XXBL_CONTAINER_QNAME = new QName("container", XXBL_NAMESPACE);
     public static final QName XXBL_GLOBAL_QNAME = new QName("global", XXBL_NAMESPACE);
     public static final QName XXBL_MODE_QNAME = new QName("mode", XXBL_NAMESPACE);
+    public static final QName XXBL_LABEL_FOR_QNAME = new QName("label-for", XXBL_NAMESPACE);
+
 
     public enum XXBLScope { inner, outer }
     public enum DeploymentType { separate, integrated, standalone}

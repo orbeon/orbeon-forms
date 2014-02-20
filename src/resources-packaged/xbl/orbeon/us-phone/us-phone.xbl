@@ -21,7 +21,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
-    <xbl:binding id="fr-phone-binding" element="fr|us-phone" xxbl:container="span" xxbl:mode="lhha binding value">
+    <xbl:binding id="fr-phone-binding" element="fr|us-phone" xxbl:container="span" xxbl:mode="lhha binding value" xxbl:label-for="input">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -65,6 +65,7 @@
             <xf:group ref="$binding[not($view)]">
                 <xh:span class="input-append">
                     <xf:input
+                        id="input"
                         xbl:attr="navindex navindex=tabindex"
                         ref="."
                         class="fr-width-10em"

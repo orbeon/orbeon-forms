@@ -52,6 +52,8 @@ case class AbstractBinding(
     def modeItemset     = xblMode("itemset") // NIY as of 2012-11-20
     def modeHandlers    = ! xblMode("nohandlers")
 
+    val labelFor        = Option(bindingElement.attributeValue(XXBL_LABEL_FOR_QNAME))
+
     // Return a CSS-friendly name for this binding (no `|` or `:`)
     val cssName   = qNameMatch.getQualifiedName.replace(':', '-')
 

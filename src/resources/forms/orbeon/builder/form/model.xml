@@ -289,8 +289,11 @@
     <xf:recalculate ev:event="xxforms-value-changed" ev:observer="fr-parameters-instance"/>
 
     <!-- All form resources -->
-    <xf:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
-                     xxf:readonly="true" xxf:cache="true"/>
+    <xf:instance
+        id="fr-form-resources"
+        src="oxf:/forms/orbeon/builder/form/resources.xml"
+        xxf:readonly="true"
+        xxf:cache="true"/>
 
     <!-- Instance containing the current language of the form being edited -->
     <xf:instance id="fb-language-instance">

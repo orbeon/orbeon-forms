@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * XForms instance() function.
  *
  * 7.11.1 The instance() Function
  */
-class Instance extends XFormsFunction {
+class Instance extends XFormsFunction with FunctionSupport {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
@@ -33,7 +33,7 @@ class Instance extends XFormsFunction {
         // document element node) is returned for the default instance in the model that contains the current context
         // node."
 
-        val instanceId = argument.lift(0) map (_.evaluateAsString(xpathContext).toString.trim) filter StringUtils.isNotBlank
+        val instanceId = stringArgumentOpt(0) flatMap nonEmptyOrNone
 
         // Get model and instance with given id for that model only
 

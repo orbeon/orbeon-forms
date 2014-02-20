@@ -109,7 +109,7 @@ class XFormsControl(
         part.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
 
     // Update this control's effective id based on the parent's effective id
-    def updateEffectiveId() {
+    def updateEffectiveId(): Unit = {
         if (staticControl.isWithinRepeat) {
             val parentEffectiveId = parent.getEffectiveId
             val parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId)

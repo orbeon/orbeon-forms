@@ -485,27 +485,22 @@ body.orbeon {
   .orbeon .xbl-fr-section .fr-section-title .fr-section-label a {
     color: black;
   }
-  .orbeon .navbar,
-  .orbeon .navbar.navbar-inverse {
+  .orbeon .navbar {
     position: static;
   }
-  .orbeon .navbar .navbar-inner,
-  .orbeon .navbar.navbar-inverse .navbar-inner {
+  .orbeon .navbar .navbar-inner {
     background-color: white;
     border-bottom: 1px solid #e3e3e3;
     padding-left: 0;
   }
-  .orbeon .navbar .navbar-inner .container h1,
-  .orbeon .navbar.navbar-inverse .navbar-inner .container h1 {
+  .orbeon .navbar .navbar-inner .container h1 {
     font-size: 24px;
     color: black;
   }
-  .orbeon .navbar .navbar-inner .fr-language-choice,
-  .orbeon .navbar.navbar-inverse .navbar-inner .fr-language-choice {
+  .orbeon .navbar .navbar-inner .fr-language-choice {
     display: none;
   }
-  .orbeon .navbar .navbar-inner .brand,
-  .orbeon .navbar.navbar-inverse .navbar-inner .brand {
+  .orbeon .navbar .navbar-inner .brand {
     color: #555555;
     font-size: 25px;
   }

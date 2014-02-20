@@ -67,11 +67,14 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
     override def getForEffectiveId(effectiveId: String) = {
         for {
-            labelFor            ← binding.abstractBinding.labelFor
-            labelForEffectiveId = XFormsUtils.getRelatedEffectiveId(getControl.getEffectiveId + COMPONENT_SEPARATOR, labelFor)
-            labelForPrefixedId  = XFormsUtils.getPrefixedId(labelForEffectiveId)
+            labelForStaticId    ← binding.abstractBinding.labelFor
+            labelForPrefixedId  ← binding.innerScope.prefixedIdForStaticIdOpt(labelForStaticId)
             staticTarget        ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
             targetControlFor    ← {
+                // Assume the target is within the same repeat iteration
+                val suffix              = XFormsUtils.getEffectiveIdSuffixWithSeparator(getControl.getEffectiveId)
+                val labelForEffectiveId = labelForPrefixedId + suffix
+
                 // Push/pop component context so that handler resolution works
                 handlerContext.pushComponentContext(getPrefixedId)
                 try XFormsLHHAHandler.findTargetControlFor(handlerContext, staticTarget, labelForEffectiveId)

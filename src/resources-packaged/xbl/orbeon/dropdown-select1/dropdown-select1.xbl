@@ -55,13 +55,13 @@
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
-                        <resource xml:lang="en"><select>Select one:</select></resource>
-                        <resource xml:lang="fr"><select>Sélectionner:</select></resource>
+                        <resource xml:lang="en"><select>Please select:</select></resource>
+                        <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
                         <resource xml:lang="es"><select>[Select one:]</select></resource>
                         <resource xml:lang="no"><select>Velg:</select></resource>
                         <resource xml:lang="ru"><select>Выберите:</select></resource>
-                        <resource xml:lang="it"><select>Seleziona:</select></resource>
-                        <resource xml:lang="de"><select>Auswählen:</select></resource>
+                        <resource xml:lang="it"><select>Si prega di selezionare:</select></resource>
+                        <resource xml:lang="de"><select>Bitte auswählen:</select></resource>
                         <resource xml:lang="fi"><select>Valitse:</select></resource>
                     </resources>
                 </xf:instance>

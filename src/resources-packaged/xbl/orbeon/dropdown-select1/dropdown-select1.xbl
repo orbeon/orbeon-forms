@@ -70,14 +70,15 @@
 
         <xbl:template>
             <xf:select1 appearance="minimal" ref="xxf:binding('fr-dropdown-select1')" id="select1">
-                <!--<xf:item>-->
-                    <!--<xf:label/>-->
-                    <!--<xf:value/>-->
-                <!--</xf:item>-->
-                <xf:itemset ref=".[not(exf:required() and normalize-space())]">
-                    <xf:label value="if (normalize-space() or not(exf:required())) then '' else xxf:r('select')"/>
+                <!-- Title item -->
+                <!-- Always present, but blank if the control is readonly OR if a value is already selected -->
+                <!-- Alternate behavior: remove title item if a value is selected -->
+                <!--<xf:itemset ref=".[not(exf:required() and normalize-space())]">-->
+                <xf:itemset ref=".">
+                    <xf:label value="if (xxf:readonly() or normalize-space()) then '' else xxf:r('select')"/>
                     <xf:value/>
                 </xf:itemset>
+                <!-- Copy user items -->
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select1>
         </xbl:template>

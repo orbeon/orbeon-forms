@@ -116,7 +116,7 @@
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
                                 <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
-                            <!-- NOTE: We need a better way to get the Form Runner mode. See also #673 and #629. -->
+                            <!-- NOTE: We need a better way to get the Form Runner mode. -->
                             <xf:var name="view-mode" value="xxf:readonly($repeat-context) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
                         </xsl:if>
 

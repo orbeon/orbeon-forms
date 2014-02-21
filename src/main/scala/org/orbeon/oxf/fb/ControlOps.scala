@@ -32,7 +32,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 
 /*
  * Form Builder: operations on controls.
@@ -137,6 +136,20 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
         // Start with top-level
         ensureBind(topLevelBind, names.toIterator)
+    }
+
+    // Iterate over the given bind followed by all of its descendants, depth-first
+    def iterateSelfAndDescendantBinds(rootBind: NodeInfo): Iterator[NodeInfo] = {
+
+        def selfAndDescendant(bind: NodeInfo): Iterator[NodeInfo] = {
+
+            val childrenIterator    = bind / "*:bind" iterator
+            val descendantsIterator = childrenIterator flatMap selfAndDescendant
+
+            Iterator.single(bind) ++ descendantsIterator
+        }
+
+        selfAndDescendant(rootBind)
     }
 
     // Delete the controls in the given grid cell, if any

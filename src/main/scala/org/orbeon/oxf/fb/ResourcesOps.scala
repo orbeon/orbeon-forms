@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
 import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
 import java.{util ⇒ ju}
@@ -26,11 +26,14 @@ trait ResourcesOps extends BaseOps {
 
     def currentResources      = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("current-resources"))
     def currentLang           = currentResources attValue "*:lang"
-    def allResources          = currentResources parent * child "resource"
-    def allLangs              = allResources att "*:lang" map (_.stringValue)
-    def allLangsWithResources = allLangs zip allResources
+    def resourcesRoot         = currentResources parent * head
 
-    def allLangsXPath         = allLangs.asJava
+    def allResources(resources: NodeInfo)  = resources child "resource"
+    def allLangs(resources: NodeInfo)      = allResources(resources) attValue "*:lang"
+    def allLangsXPath(resources: NodeInfo) = allLangs(resources).asJava
+
+    def allLangsWithResources(resources: NodeInfo) =
+        allLangs(resources) zip allResources(resources)
 
     // Find the current resource holder for the given name
     def findCurrentResourceHolder(controlName: String) =
@@ -47,9 +50,9 @@ trait ResourcesOps extends BaseOps {
             (n ⇒ n \ resourceName)
 
     // NOTE: Doesn't enforce that the same number of e.g. <alert> elements are present per lang
-    def getControlResourcesWithLang(controlName: String, resourceName: String, langs: Seq[String] = allLangs) = {
+    def getControlResourcesWithLang(controlName: String, resourceName: String, langs: Seq[String] = allLangs(resourcesRoot)) = {
         val langsSet = langs.toSet
-        findResourceHoldersWithLang(controlName) collect {
+        findResourceHoldersWithLang(controlName, resourcesRoot) collect {
             case (lang, holder) if langsSet(lang) ⇒ lang → (holder child resourceName)
         }
     }
@@ -87,7 +90,9 @@ trait ResourcesOps extends BaseOps {
     // Get the control's items for all languages
     def getControlItemsGroupedByValue(controlName: String): ju.List[NodeInfo] = {
 
-        val holdersWithLang = findResourceHoldersWithLang(controlName)
+        val localResourcesRoot = resourcesRoot
+
+        val holdersWithLang = findResourceHoldersWithLang(controlName, localResourcesRoot)
 
         // All unique values in the order they appear
         val distinctValues = (
@@ -106,7 +111,7 @@ trait ResourcesOps extends BaseOps {
             holder / "item" find (_ / "value" === value)
 
         def lhhaForLangAndValue(lang: String, value: String, lhha: String) = (
-            findResourceHoldersForLang(controlName, lang)
+            findResourceHolderForLang(controlName, lang, localResourcesRoot)
             map (holderItemForValue(_, value).toList / lhha stringValue)
             getOrElse ""
         )
@@ -147,7 +152,7 @@ trait ResourcesOps extends BaseOps {
 
         val addHints = hasItemHintEditor(controlName)
 
-        for ((lang, holder) ← findResourceHoldersWithLang(controlName)) {
+        for ((lang, holder) ← findResourceHoldersWithLang(controlName, resourcesRoot)) {
 
             delete(holder / "item")
 
@@ -193,7 +198,7 @@ trait ResourcesOps extends BaseOps {
 
     // NOTE: Assume enclosing control resource holder already exists
     def ensureResourceHoldersForLang(controlName: String, resourceName: String, count: Int, lang: String) = {
-        val controlHolder = findResourceHoldersForLang(controlName, lang).get
+        val controlHolder = findResourceHolderForLang(controlName, lang, resourcesRoot).get
 
         val existing = controlHolder child resourceName
 
@@ -207,32 +212,35 @@ trait ResourcesOps extends BaseOps {
     }
 
     // NOTE: Assume enclosing control resource holder already exists
-    def ensureResourceHoldersForLangs(controlName: String, resourceName: String, count: Int = 1, langs: Seq[String] = allLangs) =
-        allLangs map (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
+    def ensureResourceHoldersForLangs(controlName: String, resourceName: String, count: Int = 1, langs: Seq[String] = allLangs(resourcesRoot)) =
+        allLangs(resourcesRoot) map (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
-    def findResourceHoldersForLang(controlName: String, lang: String) =
-        findResourceHoldersWithLang(controlName) collectFirst { case (`lang`, holder) ⇒ holder }
+    def findResourceHolderForLang(controlName: String, lang: String, resources: NodeInfo) =
+        findResourceHoldersWithLang(controlName, resources) collectFirst { case (`lang`, holder) ⇒ holder }
 
     // Find control resource holders
     def findResourceHolders(controlName: String): Seq[NodeInfo] =
-        findResourceHoldersWithLang(controlName) map (_._2)
+        findResourceHoldersWithLang(controlName, resourcesRoot) map (_._2)
 
     // Find control resource holders with their language
-    def findResourceHoldersWithLang(controlName: String): Seq[(String, NodeInfo)] =
+    def findResourceHoldersWithLang(controlName: String, resources: NodeInfo): Seq[(String, NodeInfo)] =
         for {
-            (lang, resource) ← allLangsWithResources
+            (lang, resource) ← allLangsWithResources(resources)
             holder           ← resource child controlName headOption // there *should* be only one
         } yield
             (lang, holder)
 
+    // For the given bind and lang, find all associated resource holders
+    def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resources: NodeInfo) =
+        FormBuilder.iterateSelfAndDescendantBinds(rootBind) map findBindName flatMap (findResourceHolderForLang(_, lang, resources))
+
+    // Same for XPath callers
+    def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resources: NodeInfo): SequenceIterator =
+        iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resources)
+
     // Same as above but doesn't require a Form Builder context
     def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
-        for {
-            resource ← resourcesInstanceRoot(inDoc) child "resource"
-            lang     = resource attValue "*:lang"
-            holder   ← resource child controlName headOption // there *should* be only one
-        } yield
-            (lang, holder)
+        findResourceHoldersWithLang(controlName, resourcesInstanceRoot(inDoc))
 
     def lhhaHoldersForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String) =
         for {

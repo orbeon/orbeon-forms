@@ -348,7 +348,7 @@ object ToolboxOps {
         findControlByName(doc, name) foreach { controlElement ⇒
 
             // Create <resource xml:lang="..."> containers
-            val resourcesWithLang = findResourceHoldersWithLang(name) map {
+            val resourcesWithLang = findResourceHoldersWithLang(name, resourcesRoot) map {
                 case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
             }
 

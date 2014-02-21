@@ -98,7 +98,7 @@
                 </icon>
             </metadata>
 
-            <xsl:apply-templates select="/xh:html/xh:body//fr:section"/>
+            <xsl:apply-templates select="/xh:html/xh:body//fr:section[empty(ancestor::fr:section)]"/>
         </xbl:xbl>
     </xsl:template>
 
@@ -124,7 +124,7 @@
         <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'fr-form-model'), $model-id)"/>
     </xsl:template>
 
-    <!-- Generate one component per section -->
+    <!-- Generate one component per top-level section -->
     <xsl:template match="/xh:html/xh:body//fr:section">
 
         <!-- ==== Section information ============================================================================== -->
@@ -143,7 +143,6 @@
 
         <!-- Section instance data element -->
         <!-- NOTE: could also gather ancestor-or-self::xf:bind/@ref and evaluate expression to be more generic -->
-        <!-- TODO: What do do with custom data model? -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
         <!-- Binding ids must be unique as the xbl:xbl of the section templates are embedded into the published forms.
@@ -236,12 +235,12 @@
                     <!-- Sections resources: include resource for section and for all leaf controls -->
                     <xf:instance id="fr-form-resources">
                         <resources xmlns="">
-                            <xsl:for-each select="$fr-resources-instance/*/resource">
+                            <xsl:variable name="resources" select="$fr-resources-instance/*"/>
+                            <xsl:for-each select="$resources/resource">
                                 <xsl:variable name="lang" select="@xml:lang" as="xs:string"/>
 
                                 <resource xml:lang="{$lang}">
-                                    <xsl:copy-of select="*[name() = $section-name]"/>
-                                    <xsl:copy-of select="*[name() = (for $n in $section-data//*[not(*)] return name($n))]"/>
+                                    <xsl:copy-of select="fbf:iterateSelfAndDescendantBindsResourceHoldersXPath($section-bind, $lang, $resources)"/>
                                 </resource>
                             </xsl:for-each>
                         </resources>
@@ -323,8 +322,8 @@
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 
                 <xf:group appearance="xxf:internal">
-                    <!-- Copy grids within section -->
-                    <xsl:copy-of select="$fr-section/(fr:grid | fb:grid)"/>
+                    <!-- Copy section content -->
+                    <xsl:copy-of select="$fr-section/*"/>
                 </xf:group>
             </xbl:template>
         </xbl:binding>

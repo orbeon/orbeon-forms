@@ -131,7 +131,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
                 def messagesForAllLangs(a: AlertDetails) = {
                     val messagesMap = a.messages.toMap
-                    allLangs map { lang ⇒ lang → messagesMap.getOrElse(lang, "") }
+                    allLangs(resourcesRoot) map { lang ⇒ lang → messagesMap.getOrElse(lang, "") }
                 }
 
                 val messagesByLang = (
@@ -144,7 +144,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 // Make sure we have a default for all languages if there are no alerts or if some languages are missing
                 // from the alerts. We do want to update all languages on write, including removing unneeded <alert>
                 // elements.
-                val defaultMessages = allLangs map (_ → Nil)
+                val defaultMessages = allLangs(resourcesRoot) map (_ → Nil)
 
                 defaultMessages.toMap ++ messagesByLang toList
             }

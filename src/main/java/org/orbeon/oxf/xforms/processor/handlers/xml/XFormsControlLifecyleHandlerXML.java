@@ -52,15 +52,15 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 	}
 
 	protected String getPrefixedId() {
-		return xFormsControlLifecycleHandlerDelegate.getPrefixedId();
+		return xFormsControlLifecycleHandlerDelegate.prefixedId();
 	}
 
 	protected String getEffectiveId() {
-		return xFormsControlLifecycleHandlerDelegate.getEffectiveId();
+		return xFormsControlLifecycleHandlerDelegate.effectiveId();
 	}
 
-	protected XFormsControl getControl() {
-		return xFormsControlLifecycleHandlerDelegate.getControl();
+	protected XFormsControl currentControlOrNull() {
+		return xFormsControlLifecycleHandlerDelegate.currentControlOrNull();
 	}
 
     @Override
@@ -72,9 +72,9 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
     @Override
     public final void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (isMustOutputControl(getControl())) {
+        if (isMustOutputControl(currentControlOrNull())) {
 
-            handleControlStart(uri, localname, qName, attributes, getEffectiveId(), getControl());
+            handleControlStart(uri, localname, qName, attributes, getEffectiveId(), currentControlOrNull());
             
             // xf:label
             if (hasLocalLabel())
@@ -96,8 +96,8 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
     @Override
     public final void end(String uri, String localname, String qName) throws SAXException {
-        if (isMustOutputControl(getControl())) {
-        	handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), getControl());
+        if (isMustOutputControl(currentControlOrNull())) {
+        	handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), currentControlOrNull());
         }
     }
 
@@ -133,22 +133,22 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, getControl(), isTemplate());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, currentControlOrNull(), isTemplate());
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.ALERT, getControl(), isTemplate());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.ALERT, currentControlOrNull(), isTemplate());
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HINT, getControl(), isTemplate());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HINT, currentControlOrNull(), isTemplate());
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, getControl(), isTemplate());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, currentControlOrNull(), isTemplate());
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {

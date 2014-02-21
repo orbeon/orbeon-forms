@@ -61,7 +61,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     protected void handleLabel() throws SAXException {
         // TODO: check why we output our own label here
 
-        final XFormsSingleNodeControl groupControl = (XFormsSingleNodeControl) getControl();
+        final XFormsSingleNodeControl groupControl = (XFormsSingleNodeControl) currentControlOrNull();
         final String effectiveId = getEffectiveId();
 
         reusableAttributes.clear();

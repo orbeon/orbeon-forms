@@ -41,16 +41,18 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
     override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef) {
         super.init(uri, localname, qName, attributes, matched)
-        this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(elementAnalysis, getControl)
+        this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(elementAnalysis, currentControlOrNull)
     }
 
-    private def controlHas(predicate: XFormsInputControl ⇒ Boolean) = Option(getControl) exists predicate
+    // TODO: Use type member instead
+    protected override def currentControlOrNull = super.currentControlOrNull.asInstanceOf[XFormsInputControl]
+    protected override def currentControlOpt    = super.currentControlOpt.asInstanceOf[Option[XFormsInputControl]]
+
+    private def controlHas(predicate: XFormsInputControl ⇒ Boolean) = currentControlOpt exists predicate
 
     private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
     private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.getAppearances.contains(XFORMS_MINIMAL_APPEARANCE_QNAME))
     private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
-
-    protected override def getControl = super.getControl.asInstanceOf[XFormsInputControl]
 
     protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
         val inputControl = control.asInstanceOf[XFormsInputControl]
@@ -70,9 +72,10 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
             // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
             val select1Handler = new XFormsSelect1Handler {
-                override def getPrefixedId  = XFormsInputHandler.this.getPrefixedId
-                override def getEffectiveId = XFormsInputHandler.this.getEffectiveId
-                override def getControl     = XFormsInputHandler.this.getControl
+                override def getPrefixedId        = XFormsInputHandler.this.getPrefixedId
+                override def getEffectiveId       = XFormsInputHandler.this.getEffectiveId
+                override def currentControlOrNull = XFormsInputHandler.this.currentControlOrNull
+                override def currentControlOpt    = XFormsInputHandler.this.currentControlOpt
             }
             select1Handler.setContext(getContext)
             select1Handler.init(uri, localname, qName, attributes, elementAnalysis)

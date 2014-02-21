@@ -18,7 +18,6 @@ import org.xml.sax.{Locator, Attributes}
 import org.orbeon.oxf.xml._
 import java.lang.StringBuilder
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
@@ -68,11 +67,12 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     override def getForEffectiveId(effectiveId: String) = {
         for {
             labelForStaticId    ← binding.abstractBinding.labelFor
+            currentControl      ← currentControlOpt // can be missing if we are in template
             labelForPrefixedId  ← binding.innerScope.prefixedIdForStaticIdOpt(labelForStaticId)
             staticTarget        ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
             targetControlFor    ← {
                 // Assume the target is within the same repeat iteration
-                val suffix              = XFormsUtils.getEffectiveIdSuffixWithSeparator(getControl.getEffectiveId)
+                val suffix              = XFormsUtils.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
                 val labelForEffectiveId = labelForPrefixedId + suffix
 
                 // Push/pop component context so that handler resolution works

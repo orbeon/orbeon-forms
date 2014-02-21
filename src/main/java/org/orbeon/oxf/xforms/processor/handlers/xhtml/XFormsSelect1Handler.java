@@ -607,7 +607,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     @Override
     protected void handleLabel() throws SAXException {
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
-        if (isStaticReadonly(getControl()) || !(appearanceTrait != null && appearanceTrait.isFull()) || !handlerContext.isNoScript()) {
+        if (isStaticReadonly(currentControlOrNull()) || !(appearanceTrait != null && appearanceTrait.isFull()) || !handlerContext.isNoScript()) {
             // In noscript mode for full items, this is handled by fieldset/legend
             super.handleLabel();
         }

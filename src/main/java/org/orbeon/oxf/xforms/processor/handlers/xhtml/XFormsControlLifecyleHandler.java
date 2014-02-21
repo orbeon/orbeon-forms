@@ -74,15 +74,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 	}
 
 	protected String getPrefixedId() {
-		return xFormsControlLifecycleHandlerDelegate.getPrefixedId();
+		return xFormsControlLifecycleHandlerDelegate.prefixedId();
 	}
 
 	protected String getEffectiveId() {
-		return xFormsControlLifecycleHandlerDelegate.getEffectiveId();
+		return xFormsControlLifecycleHandlerDelegate.effectiveId();
 	}
 
-	protected XFormsControl getControl() {
-		return xFormsControlLifecycleHandlerDelegate.getControl();
+	protected XFormsControl currentControlOrNull() {
+		return xFormsControlLifecycleHandlerDelegate.currentControlOrNull();
+	}
+
+    protected scala.Option<XFormsControl> currentControlOpt() {
+		return xFormsControlLifecycleHandlerDelegate.currentControlOpt();
 	}
 
 	@Override
@@ -93,7 +97,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     @Override
     public final void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (isMustOutputControl(getControl())) {
+        if (isMustOutputControl(currentControlOrNull())) {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
             if (isMustOutputContainerElement()) {
@@ -119,7 +123,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
                 if ("control".equals(current)) {
                     // Handle control
-                    handleControlStart(uri, localname, qName, attributes, getEffectiveId(), getControl());
+                    handleControlStart(uri, localname, qName, attributes, getEffectiveId(), currentControlOrNull());
                     // Do the rest in end() below if needed
                     if (i < config.length - 1) {
                         // There remains stuff to process
@@ -152,14 +156,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     @Override
     public final void end(String uri, String localname, String qName) throws SAXException {
-        if (isMustOutputControl(getControl())) {
+        if (isMustOutputControl(currentControlOrNull())) {
             // Process everything after the control has been shown
             if (endConfig != null) {
 
                 for (final String current : endConfig) {
                     if ("control".equals(current)) {
                         // Handle control
-                        handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), getControl());
+                        handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), currentControlOrNull());
                     } else if ("label".equals(current)) {
                         // xf:label
                         if (hasLocalLabel())
@@ -234,22 +238,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, currentControlOrNull(), isTemplate(), false);
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, currentControlOrNull(), isTemplate(), false);
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, currentControlOrNull(), isTemplate(), false);
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, currentControlOrNull(), isTemplate(), false);
     }
 
     // Must be overridden by subclasses
@@ -275,7 +279,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
         final String prefixedId = getPrefixedId();
         final String effectiveId = getEffectiveId();
-        final XFormsControl xformsControl = getControl();
+        final XFormsControl xformsControl = currentControlOrNull();
 
         // Get classes
         final StringBuilder classes;

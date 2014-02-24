@@ -22,6 +22,7 @@
     var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
     var StringUtils = ORBEON.util.String;
+    var Globals = ORBEON.xforms.Globals;
 
     /**
      * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -143,14 +144,14 @@
                 && ORBEON.xforms.Globals.eventQueue.length > 0
                 && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
 
-            // Populate map for efficiency
-            // TODO: could compute this once and for all
-            var eventsToFilter = {};
-            {
-                var eventsToFilterProperty = ORBEON.util.Properties.clientEventsFilter.get().split(" ");
-                for (var eventIndex = 0; eventIndex < eventsToFilterProperty.length; eventIndex++)
-                    eventsToFilter[eventsToFilterProperty[eventIndex]] = true;
-            }
+            // Filter events (typically used for xforms-focus/xforms-blur events)
+            (function() {
+                var eventsToFilter = Properties.clientEventsFilter.get().split(" ");
+                Globals.eventQueue = _.filter(Globals.eventQueue, function(event) {
+                    var filterThisEvent = _.contains(eventsToFilter, event.eventName);
+                    return ! filterThisEvent;
+                });
+            })();
 
             var foundActivatingEvent = false;
             if (ORBEON.util.Properties.clientEventMode.get() == "deferred") {
@@ -173,7 +174,7 @@
 
                     // Check if we find a class on the target that tells us this is an activating event
                     // Do NOT consider a filtered event as an activating event
-                    if (event.targetId != null && eventsToFilter[event.eventName] == null) {
+                    if (event.targetId != null) {
                         var target = ORBEON.util.Dom.get(event.targetId);
                         if (target == null) {
                             // Target is not on the client. For most use cases, assume event should be dispatched right away.
@@ -238,45 +239,43 @@
                         // Extract information from event array
                         var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
                         // Proceed with this event only if this is not one of the event we filter
-                        if (eventsToFilter[event.eventName] == null) {
-                            if (event.eventName == "xxforms-value") {
-                                // Value change is handled specially as values are collapsed
+                        if (event.eventName == "xxforms-value") {
+                            // Value change is handled specially as values are collapsed
 
-                                if (seenControlValue[event.targetId] == null) {
-                                    // Haven't yet seen this control in current block of events
+                            if (seenControlValue[event.targetId] == null) {
+                                // Haven't yet seen this control in current block of events
 
-                                    var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
-                                    if (YAHOO.util.Dom.hasClass(ORBEON.util.Dom.get(event.targetId), "xforms-upload") ||
-                                            (serverValue == null || serverValue != event.value)) {
+                                var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
+                                if (YAHOO.util.Dom.hasClass(ORBEON.util.Dom.get(event.targetId), "xforms-upload") ||
+                                        (serverValue == null || serverValue != event.value)) {
 
-                                        // Add event
-                                        seenControlValue[event.targetId] = event;
-                                        ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
-                                        newEvents.push(event);
-                                    }
-                                } else {
-                                    // Have seen this control already in current block of events
-
-                                    // Keep latest value
-                                    seenControlValue[event.targetId].value = event.value;
-                                    // Update server value
+                                    // Add event
+                                    seenControlValue[event.targetId] = event;
                                     ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
-                                }
-                            } else if (event.eventName == "xxforms-upload-progress") {
-                                // Collapse multiple upload progress requests only sending the one for the latest control
-                                if (firstUploadProgressEvent == null) {
-                                    firstUploadProgressEvent = event;
                                     newEvents.push(event);
-                                } else {
-                                    firstUploadProgressEvent.targetId = event.targetId;
                                 }
                             } else {
-                                // Any non-value change event is a boundary between event blocks
-                                seenControlValue = {};
+                                // Have seen this control already in current block of events
 
-                                // Add event
-                                newEvents.push(event);
+                                // Keep latest value
+                                seenControlValue[event.targetId].value = event.value;
+                                // Update server value
+                                ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
                             }
+                        } else if (event.eventName == "xxforms-upload-progress") {
+                            // Collapse multiple upload progress requests only sending the one for the latest control
+                            if (firstUploadProgressEvent == null) {
+                                firstUploadProgressEvent = event;
+                                newEvents.push(event);
+                            } else {
+                                firstUploadProgressEvent.targetId = event.targetId;
+                            }
+                        } else {
+                            // Any non-value change event is a boundary between event blocks
+                            seenControlValue = {};
+
+                            // Add event
+                            newEvents.push(event);
                         }
                     }
                     ORBEON.xforms.Globals.eventQueue = newEvents;

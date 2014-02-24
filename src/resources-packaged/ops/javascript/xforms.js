@@ -3808,7 +3808,7 @@ ORBEON.xforms.Init = {
 
     document: function() {
 
-        ORBEON.xforms.Globals = {
+        _.extend(ORBEON.xforms.Globals, {
             // Booleans used for browser detection
             isMac : navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                 // Running on Mac
             isRenderingEngineGecko: YAHOO.env.ua.gecko,                                           // Firefox or compatible (Gecko rendering engine)
@@ -3878,7 +3878,7 @@ ORBEON.xforms.Init = {
             changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
             topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
                 ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
-        };
+        });
 
         // Initialize DOM methods based on browser
         (function () {

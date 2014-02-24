@@ -189,7 +189,7 @@
                             <xf:delete ref="instance('inspector-instance')/xpath-output/node()"/>
                             <xf:insert if="instance('inspector-instance')/xpath != ''"
                                     context="instance('inspector-instance')/xpath-output"
-                                    origin="xxf:instance(instance('inspector-instance')/current-instance, true())/
+                                    origin="xxf:instance(instance('inspector-instance')/current-instance)/
                                         saxon:evaluate(instance('inspector-instance')/xpath)"/>
                         </xf:action>
                         <xf:input ref="." id="inspector-xpath">
@@ -217,7 +217,7 @@
                 <xh:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
                     <xf:group ref="instance('inspector-instance')" appearance="xxf:internal">
                         <!-- NOTE: We can't use a calculate for this, as it would only be execute if something in the current model changes -->
-                        <xf:var name="current-instance" value="xxf:instance(current-instance, true())"/>
+                        <xf:var name="current-instance" value="xxf:instance(current-instance)"/>
                         <xf:var name="shown-output" value="
                                 if (function = 'view-instance') then
                                     if (mode = 'formatted')

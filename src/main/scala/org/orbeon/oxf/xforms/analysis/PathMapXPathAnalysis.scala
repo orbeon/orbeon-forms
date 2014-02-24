@@ -338,6 +338,9 @@ object PathMapXPathAnalysis {
                                     stringLiteral.asInstanceOf[PrefixedIdStringLiteral].prefixedValue
                                 else if (searchAncestors)
                                     // xxf:instance()
+                                    // NOTE: Absolute ids should also be supported. Right now search will fail with an
+                                    // absolute id. However, it is unlikely that literal absolute ids will be passed, so
+                                    // this is probably not a big deal.
                                     partAnalysis.findInstancePrefixedId(scope, originalInstanceId) // can return null
                                 else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
                                     // HACK: datatable e.g. uses instance(prefixedId)!

@@ -3329,8 +3329,8 @@
                         <xxf:control id="my-foo2" relevant="false"/>
                         <xxf:control id="my-foo2≡my-output" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:message level="modal">instance, my-foo1≡my-xbl-instance</xxf:message>
-                    <xxf:message level="modal">instance, my-foo1≡my-xbl-instance, my-foo3≡my-xbl-instance</xxf:message>
+                    <xxf:message level="modal">|instance|, |my-foo1≡my-xbl-instance|</xxf:message>
+                    <xxf:message level="modal">|instance|, |my-foo1≡my-xbl-instance|, |my-foo3≡my-xbl-instance|</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

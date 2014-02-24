@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * xxf:instance() function. This function operates like the standard instance() function, except that it looks for
@@ -44,7 +45,6 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
     }
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) = {
-        // TODO: if argument[1] is true, must search globally
         argument(0).addToPathMap(pathMap, pathMapNodeSet)
         new PathMap.PathMapNodeSet(pathMap.makeNewRoot(this))
     }
@@ -53,6 +53,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
 object XXFormsInstance {
 
     // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
+    // Also allow an absolute instance id
     def findInAncestorScopes(startContainer: XBLContainer, instanceId: String): Option[NodeInfo] = {
 
         // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
@@ -61,6 +62,15 @@ object XXFormsInstance {
         // dynamically is when this function is used during xforms-model-construct. At that time, instances in
         // this or other models might not yet have been constructed, however they might be referred to, for
         // example with model variables.
+
+        def findObjectByAbsoluteId(id: String) =
+            startContainer.containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(id))
+
+        def findAbsolute =
+            if (XFormsUtils.isAbsoluteId(instanceId))
+                collectByErasedType[XFormsInstance](findObjectByAbsoluteId(instanceId)) map (_.rootElement)
+            else
+                None
 
         def findDynamic = {
             val containers = Iterator.iterate(startContainer)(_.getParentXBLContainer) takeWhile (_ ne null)
@@ -83,6 +93,6 @@ object XXFormsInstance {
             None
         }
 
-        findDynamic orElse findStatic
+        findAbsolute orElse findDynamic orElse findStatic
     }
 }

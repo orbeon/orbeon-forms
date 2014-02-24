@@ -19,6 +19,7 @@ import org.orbeon.saxon.expr.{ExpressionTool, Expression, XPathContext}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import collection.JavaConverters._
+import org.orbeon.scaxon.XML._
 
 protected trait FunctionSupport extends XFormsFunction {
 
@@ -82,6 +83,8 @@ protected trait FunctionSupport extends XFormsFunction {
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)
     def asItem(v: Option[String])    = v map stringToStringValue orNull
+
+    implicit def stringIteratorToSequenceIterator(i: Iterator[String]): SequenceIterator = i map stringToStringValue
 
     implicit def itemSeqOptToIterator(v: Option[Seq[Item]])     = v map (s ⇒ new ListIterator(s.asJava)) getOrElse EmptyIterator.getInstance
     implicit def stringSeqOptToIterator(v: Option[Seq[String]]) = v map asIterator getOrElse EmptyIterator.getInstance

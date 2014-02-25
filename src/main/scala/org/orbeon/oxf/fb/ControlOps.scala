@@ -139,18 +139,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Iterate over the given bind followed by all of its descendants, depth-first
-    def iterateSelfAndDescendantBinds(rootBind: NodeInfo): Iterator[NodeInfo] = {
-
-        def selfAndDescendant(bind: NodeInfo): Iterator[NodeInfo] = {
-
-            val childrenIterator    = bind / "*:bind" iterator
-            val descendantsIterator = childrenIterator flatMap selfAndDescendant
-
-            Iterator.single(bind) ++ descendantsIterator
-        }
-
-        selfAndDescendant(rootBind)
-    }
+    def iterateSelfAndDescendantBinds(rootBind: NodeInfo): Iterator[NodeInfo] =
+        rootBind descendantOrSelf "*:bind" iterator
 
     // Delete the controls in the given grid cell, if any
     def deleteCellContent(td: NodeInfo, updateTemplates: Boolean = false): Unit = {

@@ -414,6 +414,21 @@
             <fr:neutral-choice/>
         </fr:alert-dialog>
 
+        <!-- Generic confirmation dialog (message must be passed dynamically) -->
+        <fr:alert-dialog id="fr-confirmation-dialog" close="true">
+            <fr:label ref="$fr-resources/detail/messages/confirmation-dialog-title"/>
+            <fr:negative-choice>
+                <xf:action event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                    process:runProcess('oxf.fr.detail.process', 'abort')
+                </xf:action>
+            </fr:negative-choice>
+            <fr:positive-choice>
+                <xf:action event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                    process:runProcess('oxf.fr.detail.process', 'resume')
+                </xf:action>
+            </fr:positive-choice>
+        </fr:alert-dialog>
+
         <!-- Listen for upload events -->
         <xf:action
             ev:event="xxforms-upload-error"

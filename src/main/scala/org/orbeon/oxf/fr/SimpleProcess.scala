@@ -157,6 +157,7 @@ trait FormRunnerActions {
         "save"             → trySaveAttachmentsAndData,
         "success-message"  → trySuccessMessage,
         "error-message"    → tryErrorMessage,
+        "confirm"          → tryConfirm,
         "email"            → trySendEmail,
         "send"             → trySend,
         "navigate"         → tryNavigate,
@@ -242,14 +243,22 @@ trait FormRunnerActions {
         def fromResource = paramByNameOrDefault(params, "resource") map (k ⇒ currentFRResources \ "detail" \ "messages" \ k stringValue)
         def fromParam    = paramByName(params, "message")
 
-        fromResource orElse fromParam get
+        fromResource orElse fromParam
     }
 
     def trySuccessMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.successMessage(messageFromResourceOrParam(params)))
+        Try(FormRunner.successMessage(messageFromResourceOrParam(params).get))
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.errorMessage(messageFromResourceOrParam(params)))
+        Try(FormRunner.errorMessage(messageFromResourceOrParam(params).get))
+
+    def tryConfirm(params: ActionParams): Try[Any] =
+        Try {
+            def defaultMessage = currentFRResources \ "detail" \ "messages" \ "confirmation-dialog-message" stringValue
+            def message        = messageFromResourceOrParam(params) getOrElse defaultMessage
+
+            show("fr-confirmation-dialog", Map("message" → Some(message)))
+        }
 
     // TODO: Use xf:show("fr-submission-result-dialog")
     def tryShowResultDialog(params: ActionParams): Try[Any] =

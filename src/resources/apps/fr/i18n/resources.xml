@@ -172,6 +172,8 @@
                 <process-error>There was an error running the process. Please contact the application administrator.</process-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
                 <error-dialog-title>Unable to complete action</error-dialog-title>
+                <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
+                <confirmation-dialog-message>Are you sure you want to continue?</confirmation-dialog-message>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <validation-dialog-title>Review Form Validation Messages</validation-dialog-title>
@@ -454,6 +456,8 @@
                 <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre l'administrateur système.</process-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
                 <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
+                <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
+                <confirmation-dialog-message>Etes-vous sûr de vouloir continuer ?</confirmation-dialog-message>
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <validation-dialog-title>Revoir les messages de validation</validation-dialog-title>
@@ -728,6 +732,8 @@
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
                 <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino guarda los datos.</clear-confirm-message>
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
+                <confirmation-dialog-title>[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message>[Are you sure you want to continue?]</confirmation-dialog-message>
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
                 <validation-dialog-title>[Review Form Validation Messages]</validation-dialog-title>
@@ -997,6 +1003,8 @@
                 <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
+                <confirmation-dialog-title>[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message>[Are you sure you want to continue?]</confirmation-dialog-message>
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <validation-dialog-title>[Review Form Validation Messages]</validation-dialog-title>
@@ -1263,6 +1271,8 @@
                 <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
+                <confirmation-dialog-title>[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message>[Are you sure you want to continue?]</confirmation-dialog-message>
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <validation-dialog-title>[Review Form Validation Messages]</validation-dialog-title>
@@ -1534,6 +1544,8 @@
                 <process-error>È apparso un errore mentre in questo processo. Si prega di contattare l'amministratore.</process-error>
                 <clear-confirm-message>Sei sicuro di volere pulitre tutti i spazi in questa pagina? Tutti i dati che non sono salvati saranno perduti.</clear-confirm-message>
                 <error-dialog-title>Non è stato possibile completare questa Azione</error-dialog-title>
+                <confirmation-dialog-title>[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message>[Are you sure you want to continue?]</confirmation-dialog-message>
                 <submit-dialog-title>Il modulo è stato inviato</submit-dialog-title>
                 <submit-dialog-message>L'informazione è stata inviata. Grazie.</submit-dialog-message>
                 <validation-dialog-title>Elenco dei messaggi di convalida del modulo</validation-dialog-title>
@@ -1812,6 +1824,8 @@
                 <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
                 <clear-confirm-message>Sind Sie sich sicher, dass Sie alle Felder auf dieser Seite zurücksetzen wollen? Ungespeicherte Änderungen gehen verloren.</clear-confirm-message>
                 <error-dialog-title>Aktion konnte nicht ausgeführt werden</error-dialog-title>
+                <confirmation-dialog-title>[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message>[Are you sure you want to continue?]</confirmation-dialog-message>
                 <submit-dialog-title>Formular abgeschickt</submit-dialog-title>
                 <submit-dialog-message>Ihre Daten wurden abgeschickt. Danke.</submit-dialog-message>
                 <validation-dialog-title>Überblick über Meldungen zur Formularvalidierung</validation-dialog-title>
@@ -2090,6 +2104,8 @@
                 <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
                 <clear-confirm-message>Oletko varma, että haluat tyhjentää kaikki kentät tällä sivulla? Tiedot häviävät jos et ole tallentanut niitä</clear-confirm-message>
                 <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
+                <confirmation-dialog-title>[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message>[Are you sure you want to continue?]</confirmation-dialog-message>
                 <submit-dialog-title>Lomake toimitettu</submit-dialog-title>
                 <submit-dialog-message>Tietosi on toimitettu.</submit-dialog-message>
                 <validation-dialog-title>Käy läpi lomakevalidoinnin viestejä</validation-dialog-title>

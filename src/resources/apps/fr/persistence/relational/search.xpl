@@ -369,7 +369,7 @@
                     <xsl:if test="$search/search/query[empty(@path) and normalize-space() != '']">
                         <xsl:choose>
                             <xsl:when test="$search/search/provider = 'mysql'">
-                                and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
+                                and xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
                             </xsl:when>
                             <xsl:when test="$search/search/provider = 'oracle'">
                                 and contains(xml, '<xsl:value-of select="f:escape-sql(concat('%', replace($search/search/query[not(@path)], '_', '\\_'), '%'))"/>') > 0

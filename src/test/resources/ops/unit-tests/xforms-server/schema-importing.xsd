@@ -1,0 +1,16 @@
+<xs:schema targetNamespace="http://orbeon.org/oxf/examples/test1"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:import namespace="http://orbeon.org/oxf/examples/test2" schemaLocation="schema-imported.xsd"/>
+
+    <xs:simpleType name="zip">
+        <xs:restriction base="xs:positiveInteger">
+            <xs:minInclusive value="10000"/>
+            <xs:maxInclusive value="99999"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
+

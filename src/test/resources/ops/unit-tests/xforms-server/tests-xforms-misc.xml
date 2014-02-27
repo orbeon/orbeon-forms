@@ -1208,4 +1208,43 @@
         </output>
     </test>
 
+    <test description="#1340: XML Schema xs:import doesn't support relative paths" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:test1="http://orbeon.org/oxf/examples/test1" xmlns:test2="http://orbeon.org/oxf/examples/test2">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" schema="oxf:/ops/unit-tests/xforms-server/schema-importing.xsd">
+                        <xf:instance>
+                            <form>
+                                <zip1>12345</zip1>
+                                <zip2>12345</zip2>
+                                <zip3>123456</zip3>
+                                <zip4>123456</zip4>
+                            </form>
+                        </xf:instance>
+
+                        <xf:bind ref="zip1 | zip3" type="test1:zip"/>
+                        <xf:bind ref="zip2 | zip4" type="test2:zip"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="validities" value="string-join(*/string(valid()), '-')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="validities">true-true-false-false</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

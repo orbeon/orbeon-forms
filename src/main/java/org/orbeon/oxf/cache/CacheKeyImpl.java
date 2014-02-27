@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004-2005 Orbeon, Inc.
+ *  Copyright (C) 2004 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,16 +13,20 @@
  */
 package org.orbeon.oxf.cache;
 
-public abstract class OutputCacheKey extends CacheKeyImpl {
+public abstract class CacheKeyImpl implements CacheKey {
 
-    protected final String outputName;
+    private Class clazz;
 
-    public OutputCacheKey(final Class c, final String outputName) {
-        // Don't do this test at runtime, as it appears to be costly
-//        if (!Processor.class.isAssignableFrom(c)) {
-//            throw new IllegalArgumentException("c must be a sub-class of PipelineProcessor");
-//        }
-        this.outputName = outputName;
-        setClazz(c);
+    public Class getClazz() { return clazz; }
+    public void setClazz(Class clazz) { this.clazz = clazz; }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof CacheKeyImpl && this.clazz.equals(((CacheKeyImpl) other).clazz);
+    }
+
+    @Override
+    public int hashCode() {
+        return clazz.hashCode();
     }
 }

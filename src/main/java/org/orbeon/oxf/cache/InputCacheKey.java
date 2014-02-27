@@ -14,9 +14,8 @@
 package org.orbeon.oxf.cache;
 
 import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
 
-public class InputCacheKey extends CacheKey {
+public class InputCacheKey extends CacheKeyImpl {
 
     private String inputName;
     private OutputCacheKey outputKey;
@@ -59,12 +58,5 @@ public class InputCacheKey extends CacheKey {
         return "InputCacheKey [class: " + CacheUtils.getShortClassName(getClazz())
                 + ", inputName: " + getInputName()
                 + ", " + getOutputKey().toString() + "]";
-    }
-
-    @Override
-    public void toXML(XMLReceiverHelper helper, Object validities) {
-        helper.startElement("input", new String[] { "class", getClazz().getName(), "name", inputName } );
-        outputKey.toXML(helper, validities);
-        helper.endElement();
     }
 }

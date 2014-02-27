@@ -15,12 +15,10 @@ package org.orbeon.oxf.cache;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
 
-import java.util.Iterator;
 import java.util.List;
 
-public class InternalCacheKey extends CacheKey {
+public class InternalCacheKey extends CacheKeyImpl {
 
     private String type;
     private String key;
@@ -81,22 +79,5 @@ public class InternalCacheKey extends CacheKey {
         } catch (Exception e) {
             throw new OXFException(e);
         }
-    }
-
-    @Override
-    public void toXML(XMLReceiverHelper helper, Object validities) {
-        final List validitiesList = (List) validities;
-        final Iterator validitiesIterator = (validitiesList != null) ? validitiesList.iterator() : null;
-
-        final Long localValidity = (key != null && validitiesIterator != null) ? (Long) validitiesIterator.next() : null;
-
-        helper.startElement("internal", new String[] { "class", getClazz().getName(), "validity", (localValidity != null) ? localValidity.toString() : null, "type", type, "key", key });
-        if (keys != null) {
-            for (final CacheKey key : keys) {
-                final Object childValidity = (validitiesIterator != null) ? validitiesIterator.next() : null;
-                key.toXML(helper, childValidity);
-            }
-        }
-        helper.endElement();
     }
 }

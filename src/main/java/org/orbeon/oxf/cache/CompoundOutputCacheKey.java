@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.xml.XMLReceiverHelper;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class CompoundOutputCacheKey extends OutputCacheKey {
 
@@ -61,21 +61,5 @@ public class CompoundOutputCacheKey extends OutputCacheKey {
     public String toString() {
         return "CompoundOutputCacheKey [class: " + CacheUtils.getShortClassName(getClazz())
                 + ", outputName: " + outputName + ", key: " + keys + "]";
-    }
-
-    @Override
-    public void toXML(XMLReceiverHelper helper, Object validities) {
-
-        final List validitiesList = (List) validities;
-        final Iterator validitiesIterator = (validitiesList != null) ? validitiesList.iterator() : null;
-
-        helper.startElement("output", new String[] { "class", getClazz().getName(), "name", outputName });
-        if (keys != null) {
-            for (final CacheKey key : keys) {
-                final Object childValidity = (validitiesIterator != null) ? validitiesIterator.next() : null;
-                key.toXML(helper, childValidity);
-            }
-        }
-        helper.endElement();
     }
 }

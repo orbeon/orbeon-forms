@@ -76,8 +76,8 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Create combined key for (transformer type, config)
                     final CacheKey typeCacheKey = transformerFactory == null
-                            ? (CacheKey) getInputKey(context, typeInput)
-                            : (CacheKey) new InternalCacheKey(TraxTransformer.this, "transformerType",
+                            ? getInputKey(context, typeInput)
+                            : new InternalCacheKey(TraxTransformer.this, "transformerType",
                                     transformerFactory.getClass().getName());
                     final CacheKey configCacheKey = getInputKey(context, configInput);
                     final InternalCacheKey combinedInputCacheKey = typeCacheKey == null || configCacheKey == null ? null :

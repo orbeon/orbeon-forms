@@ -13,48 +13,22 @@
  */
 package org.orbeon.oxf.xforms.schema
 
-import org.orbeon.msv.reader.GrammarReaderController
-import org.orbeon.oxf.xforms.{XFormsModelSchemaValidator, XFormsUtils, XFormsContainingDocument}
-import org.xml.sax.{InputSource, Locator}
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
-import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.oxf.processor.validation.SchemaValidationException
 import java.net.URL
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.msv.grammar.Grammar
+import org.orbeon.msv.reader.GrammarReaderController
 import org.orbeon.oxf.cache.CacheKey
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.processor.validation.SchemaValidationException
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.xforms.{XFormsModelSchemaValidator, XFormsUtils, XFormsContainingDocument}
+import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.dom4j.LocationData
+import org.xml.sax.{InputSource, Locator}
 import scala.util.control.NonFatal
-import scala.util.hashing.MurmurHash3
 
 case class SchemaInfo(grammar: Grammar, dependencies: SchemaDependencies)
-
-class SchemaKey(val urlString: String) extends CacheKey {
-
-    setClazz(classOf[SchemaKey])
-
-    // This is crazy, but because CacheKey already implements hashCode and equals, we need to override them and can't
-    // leverage a case class implementation.
-    override def hashCode() =
-        MurmurHash3.productHash((getClazz, urlString))
-
-    override def equals(other: scala.Any) =
-        other match {
-            case other: SchemaKey ⇒ urlString == other.urlString && super.equals(other)
-            case _                ⇒ false
-        }
-
-    def toXML(helper: XMLReceiverHelper, validities: AnyRef): Unit =
-        helper.element(
-            "url",
-            Array(
-                "class", getClazz.getName,
-                "validity", Option(validities) map (_.toString) orNull,
-                "url", urlString
-            )
-        )
-}
+case class SchemaKey(urlString: String) extends CacheKey
 
 class MSVGrammarReaderController(
         containingDocument: XFormsContainingDocument,

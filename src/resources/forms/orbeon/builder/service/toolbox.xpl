@@ -111,22 +111,10 @@
         <p:output name="data" id="components-xml"/>
     </p:processor>
 
-    <!-- Serialize out as is -->
+    <!-- Serialize out -->
     <p:processor name="oxf:http-serializer">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#components-xml">
-            <config xsl:version="2.0">
-                <cache-control>
-                    <use-local-cache>false</use-local-cache>
-                </cache-control>
-                <!--<header>-->
-                    <!--<name>Last-Modified</name>-->
-                    <!--<value>-->
-                         <!-- Format the date -->
-                         <!-- TODO: extract meaningful date in eXist CRUD! -->
-                        <!--<xsl:value-of select="format-dateTime(xs:dateTime('2008-11-18T00:00:00'), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>-->
-                    <!--</value>-->
-                <!--</header>-->
-            </config>
+        <p:input name="config">
+            <config><cache-control><use-local-cache>false</use-local-cache></cache-control></config>
         </p:input>
         <p:input name="data" href="#components-xml"/>
     </p:processor>

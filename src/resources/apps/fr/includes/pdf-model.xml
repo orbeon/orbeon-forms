@@ -25,7 +25,7 @@
         method="post"
         replace="all"
         ref="xxf:instance('fr-form-instance')"
-        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}{xxf:append-query-params('', (
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf{xxf:append-query-params('', (
                 concat('form-version=', $parameters/form-version),
                 for $l in event('fr-language')[normalize-space()] return ('fr-remember-language=false', concat('fr-language=', $l))
             ))}"

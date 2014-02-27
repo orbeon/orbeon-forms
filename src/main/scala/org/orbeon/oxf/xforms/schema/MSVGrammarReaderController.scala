@@ -26,12 +26,24 @@ import org.orbeon.msv.grammar.Grammar
 import org.orbeon.oxf.cache.CacheKey
 import org.orbeon.oxf.externalcontext.URLRewriter
 import scala.util.control.NonFatal
+import scala.util.hashing.MurmurHash3
 
 case class SchemaInfo(grammar: Grammar, dependencies: SchemaDependencies)
 
-case class SchemaKey(urlString: String) extends CacheKey {
+class SchemaKey(val urlString: String) extends CacheKey {
 
     setClazz(classOf[SchemaKey])
+
+    // This is crazy, but because CacheKey already implements hashCode and equals, we need to override them and can't
+    // leverage a case class implementation.
+    override def hashCode() =
+        MurmurHash3.productHash((getClazz, urlString))
+
+    override def equals(other: scala.Any) =
+        other match {
+            case other: SchemaKey ⇒ urlString == other.urlString && super.equals(other)
+            case _                ⇒ false
+        }
 
     def toXML(helper: XMLReceiverHelper, validities: AnyRef): Unit =
         helper.element(

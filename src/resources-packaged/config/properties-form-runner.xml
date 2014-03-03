@@ -61,9 +61,7 @@
                                                                                                        /apps/fr/style/form-runner-base.css
                                                                                                        /apps/fr/style/form-runner-orbeon.css"/>
     <property as="xs:string"  name="oxf.fr.css.custom.uri.*.*"                                  value=""/>
-    <property as="xs:string"  name="oxf.fr.js.uri.*.*"                                          value="/apps/fr/script/form-runner.js
-                                                                                                       /xbl/orbeon/grid/grid.js
-                                                                                                       /xbl/orbeon/repeater/repeater.js"/>
+    <property as="xs:string"  name="oxf.fr.js.uri.*.*"                                          value="/apps/fr/script/form-runner.js"/>
     <property as="xs:string"  name="oxf.fr.js.custom.uri.*.*"                                   value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.method"                               value=""/>                      <!-- "container" or "header" or empty -->
     <property as="xs:string"  name="oxf.fr.authentication.header.username"                      value="My-Username-Header"/>    <!-- with Liferay: Orbeon-Liferay-User-Email or Orbeon-Liferay-User-Full-Name are also possible -->

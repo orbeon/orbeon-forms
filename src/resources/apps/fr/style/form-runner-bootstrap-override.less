@@ -286,6 +286,9 @@ body.orbeon {
     // ---------
 
     .dropdown-menu {
+
+        z-index: 2000; // because YUI dialogs are > 1000
+
         // <a> nested one more level
         > li > span > a {
             display: block;

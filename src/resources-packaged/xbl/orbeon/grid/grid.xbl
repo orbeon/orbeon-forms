@@ -32,6 +32,8 @@
     <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
          such as xh:, xf:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
 
+    <xbl:script src="/xbl/orbeon/grid/grid.js"/>
+
     <xbl:binding id="fr-grid-binding" element="fr|grid" xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
 
         <xbl:handlers>
@@ -42,25 +44,30 @@
 
         <!-- Keep a single global copy of the grid row menu. It is moved around as needed. -->
         <xxbl:global>
-            <ul class="dropdown-menu fr-grid-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml" id="fr-grid-dropdown-ul">
-                <li class="fr-insert-above">
-                    <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="fr-insert-below">
-                    <a tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="divider"/>
-                <li class="fr-move-up">
-                    <a tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="fr-move-down">
-                    <a tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="divider"/>
-                <li class="fr-remove">
-                    <a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
-                </li>
-            </ul>
+            <div class="dropdown fr-grid-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml">
+                <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1">
+                    <span class="caret"/>
+                </button>
+                <ul class="dropdown-menu">
+                    <li class="fr-insert-above">
+                        <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="fr-insert-below">
+                        <a tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="divider"/>
+                    <li class="fr-move-up">
+                        <a tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="fr-move-down">
+                        <a tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="divider"/>
+                    <li class="fr-remove">
+                        <a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
+                    </li>
+                </ul>
+            </div>
         </xxbl:global>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -277,11 +284,11 @@
                                                     <!-- Repeat buttons/menu -->
                                                     <xsl:if test="$is-repeat and not($readonly) and $static-row-pos = 1">
                                                         <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
-                                                            <div class="dropdown" xmlns="http://www.w3.org/1999/xhtml">
-                                                                <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown" tabindex="-1">
-                                                                    <span class="caret"/>
-                                                                </button>
-                                                            </div>
+                                                            <xh:div class="dropdown">
+                                                                <xh:button class="btn btn-mini fr-grid-dropdown-button" tabindex="-1">
+                                                                    <xh:span class="caret"/>
+                                                                </xh:button>
+                                                            </xh:div>
                                                         </xh:td>
                                                     </xsl:if>
 

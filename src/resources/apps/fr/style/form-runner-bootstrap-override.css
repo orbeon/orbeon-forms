@@ -319,6 +319,9 @@ body.orbeon {
   background-color: transparent;
   cursor: default;
 }
+.orbeon .dropdown-menu {
+  z-index: 2000;
+}
 .orbeon .dropdown-menu > li > span > a {
   display: block;
   padding: 3px 20px;

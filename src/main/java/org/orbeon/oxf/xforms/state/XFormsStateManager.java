@@ -296,7 +296,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         // which is not desirable. Further, we now have a lock stored in the session.
         final Lock lock = getDocumentLock(parameters.getUUID());
         if (lock == null)
-            throw new OXFException("Session has expired. Unable to process incoming request.");
+            throw new OXFException("Document session has expired. Unable to process incoming request.");
 
         // Lock document for at most the max retry delay plus an increment
         try {

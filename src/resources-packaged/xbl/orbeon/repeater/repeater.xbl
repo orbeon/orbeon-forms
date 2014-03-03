@@ -41,25 +41,30 @@
 
         <!-- Keep a single global copy of the repeat menu. It is moved around as needed. -->
         <xxbl:global>
-            <ul class="dropdown-menu fr-repeat-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml" id="fr-repeat-dropdown-ul">
-                <li class="fr-insert-above">
-                    <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="fr-insert-below">
-                    <a tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="divider"/>
-                <li class="fr-move-up">
-                    <a tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="fr-move-down">
-                    <a tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
-                </li>
-                <li class="divider"/>
-                <li class="fr-remove">
-                    <a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
-                </li>
-            </ul>
+            <div class="dropdown fr-repeater-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml">
+                <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1">
+                    <span class="caret"/>
+                </button>
+                <ul class="dropdown-menu">
+                    <li class="fr-insert-above">
+                        <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="fr-insert-below">
+                        <a tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="divider"/>
+                    <li class="fr-move-up">
+                        <a tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="fr-move-down">
+                        <a tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                    </li>
+                    <li class="divider"/>
+                    <li class="fr-remove">
+                        <a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
+                    </li>
+                </ul>
+            </div>
         </xxbl:global>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

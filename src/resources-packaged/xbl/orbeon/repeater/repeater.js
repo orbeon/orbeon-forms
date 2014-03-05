@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-(function($) {
+window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
 
     // Keep pointing to menu so we can move it around as needed
     var globalMenu = $('.fr-repeater-dropdown-menu')[0];
@@ -88,4 +88,4 @@
             $(document).on('click.orbeon', '.fr-repeater-dropdown-menu .fr-' + opName, actionFunction(opName));
         });
     }
-})(window.jQuery); // NOTE: Bootstrap 3 uses non-global jQuery
+});

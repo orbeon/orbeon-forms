@@ -16,7 +16,7 @@ package org.orbeon.oxf.client
 import org.orbeon.oxf.client.fb.{Permissions, LabelHintEditor}
 import org.junit.runners.MethodSorters
 import org.junit.FixMethodOrder
-import org.orbeon.oxf.client.fr.Currency
+import org.orbeon.oxf.client.fr.{Grid, Currency}
 
 // List all client tests which we want to run with a single run of the driver
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -28,3 +28,4 @@ class CombinedClientTest
     with LabelHintEditor
     with Permissions
     with Currency
+    with Grid

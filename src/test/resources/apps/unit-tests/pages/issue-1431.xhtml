@@ -1,0 +1,30 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xml:lang="en">
+    <xh:head>
+        <xf:model>
+            <xf:instance>
+                <instance>
+                    <r>
+                        <value>R2-D2</value>
+                    </r>
+                </instance>
+            </xf:instance>
+            <xf:instance id="fr-fr-resources" src="oxf:/apps/fr/i18n/resources.xml"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:grid ref="r" template="xf:element('r', xf:element('value'))" repeat="true" id="my-grid" class="my-grid">
+            <xh:tr>
+                <xh:td>
+                    <xf:input ref="value" id="my-input" class="my-input">
+                        <xf:label>Name</xf:label>
+                    </xf:input>
+                </xh:td>
+            </xh:tr>
+        </fr:grid>
+    </xh:body>
+</xh:html>

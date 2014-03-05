@@ -200,31 +200,6 @@
                     <xf:label>Cost</xf:label>
                 </fr:currency>
             </fr:case>
-            <fr:case>
-                <fr:label>Datatable</fr:label>
-                <fr:datatable id="my-datatable">
-                    <xh:thead>
-                        <xh:tr>
-                            <xh:th fr:sortable="true" fr:resizeable="true">Abbreviation</xh:th>
-                            <xh:th fr:sortable="true" fr:resizeable="true">Name</xh:th>
-                            <xh:th fr:sortable="true" fr:resizeable="true">Population</xh:th>
-                        </xh:tr>
-                    </xh:thead>
-                    <xh:tbody>
-                        <xh:tr repeat-ref="states/state">
-                            <xh:td>
-                                <xf:output ref="abbreviation"/>
-                            </xh:td>
-                            <xh:td>
-                                <xf:output ref="name"/>
-                            </xh:td>
-                            <xh:td>
-                                <xf:output ref="population"/>
-                            </xh:td>
-                        </xh:tr>
-                    </xh:tbody>
-                </fr:datatable>
-            </fr:case>
             <xf:repeat ref="states/state">
                 <fr:case id="my-case-repeat" selected="true">
                     <fr:label value="name"/>

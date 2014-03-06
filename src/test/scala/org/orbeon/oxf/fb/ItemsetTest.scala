@@ -17,10 +17,17 @@ import collection.JavaConverters._
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 import scala.xml.Elem
+import scala.xml.XML
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.util.XPath
 
 class ItemsetTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
@@ -148,4 +155,76 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
                 }
             }
         }
+
+    @Test def insertWithMultipleLanguages(): Unit = {
+
+        val itemTemplates = {
+            val fbResourcesURL = "oxf:/forms/orbeon/builder/form/resources.xml"
+            val fbResources = TransformerUtils.urlToTinyTree(fbResourcesURL).rootElement.child("resource")
+            fbResources.map { resource ⇒
+                val lang = resource.attValue("lang")
+                val items = resource.child("template").child("items").child(*)
+                lang → items
+            }.toMap
+        }
+
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
+
+            // Add a new radio control, and return the resources that were created for that control
+            def resourceForNewControl(): Elem = {
+
+                // Add new control to the form
+                val addedControl = {
+                    val selectionControls = TransformerUtils.urlToTinyTree("oxf:/forms/orbeon/builder/xbl/selection-controls.xbl")
+                    val selectionBindings = selectionControls.rootElement.child("binding")
+                    val radioBinding = selectionBindings.find(_.attValue("id") == "fb-input-select1-full").get
+                    ToolboxOps.insertNewControl(doc, radioBinding)
+                    doc.descendant("select1").last
+                }
+
+                // Extract from the resource the part just about this control
+                val controlName = FormRunner.controlName(addedControl.attValue("id"))
+                <resources>{
+                    FormBuilder.resourcesRoot.child(*) map (resourceForLang ⇒
+                        <resource lang={resourceForLang.attValue("lang")}>{
+                            resourceForLang.child(controlName).child(*).map(nodeInfoToElem)
+                        }</resource>
+                    )
+                }</resources>
+            }
+
+            def assertNewControlResources(expected: Seq[(String, Seq[NodeInfo])]): Unit = {
+                val expectedResources =
+                    <resources>{
+                        expected map { case (lang, items) ⇒
+                            <resource lang={lang}>
+                                <label/>
+                                <hint/>
+                                { items.map(nodeInfoToElem) }
+                            </resource>
+                        }
+                    }</resources>
+                val actualResources = resourceForNewControl()
+                assertXMLDocuments(actualResources, expectedResources)
+            }
+
+            // Editing a form in English; English placeholders are added
+            XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "en")
+            assertNewControlResources(Seq("en" → itemTemplates("en")))
+
+            // Switch language to Japanese; since we don't have FB resources, English is used
+            XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "jp")
+            assertNewControlResources(Seq("jp" → itemTemplates("en")))
+
+            // Switch language to French; French placeholders are added
+            XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "fr")
+            assertNewControlResources(Seq("fr" → itemTemplates("fr")))
+
+            // Add English, in addition to French
+            XFormsAPI.insert(into = FormBuilder.currentResources.getParent,
+                             origin = FormBuilder.currentResources)
+            XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "en")
+            assertNewControlResources(Seq("fr" → itemTemplates("fr"), "en" → itemTemplates("en")))
+        }
+    }
 }

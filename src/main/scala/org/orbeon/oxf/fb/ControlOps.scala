@@ -273,24 +273,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Insert data and resource holders for all languages
-    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]): Unit = {
+    def insertHolderForAllLang(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]): Unit = {
 
-        // Maybe add template items to the resource holder
-        if (hasEditor(controlElement, "static-itemset")) {
-            val fbResourceInFBLang = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-form-resources"))
-            val originalTemplateItems = fbResourceInFBLang \ "template" \ "items" \ "item"
-            val templateItems = if (hasEditor(controlElement, "item-hint")) {
-                // Supports hint: keep hint we have in the resources.xml
-                originalTemplateItems
-            }  else {
-                // Hint not supported: <hint> in each <item>
-                originalTemplateItems map { item ⇒
-                    val newLHHA = (item / *) filter (_.localname != "hint")
-                    elementInfo("item", newLHHA)
-                }
-            }
-            insert(into = resourceHolder, origin = templateItems)
-        }
         // Create one holder per existing language
         val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map (_.stringValue → resourceHolder)
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)

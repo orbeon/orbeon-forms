@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om.{NodeInfo, Item}
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
@@ -40,6 +40,12 @@ trait FormRunnerLang {
     def currentFRLang        = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-lang"))
     def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
     def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
+    def allResources(resources: NodeInfo)  = resources child "resource"
+
+    def formResourcesInLang(lang: String): NodeInfo = {
+        val formResources = topLevelModel("fr-form-model").get.getInstance("fr-form-resources").documentInfo.rootElement
+        (formResources \ *).find(_.attValue("*:lang") == lang).getOrElse(currentFormResources)
+    }
 
     // List of available languages for the given form
     // Empty if the form doesn't have resources

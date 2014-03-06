@@ -18,7 +18,9 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
@@ -37,8 +39,10 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -486,6 +490,20 @@ public class TransformerUtils {
             return readTinyTree(configuration, new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude, handleLexical);
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);// should not happen
+        }
+    }
+
+    public static DocumentInfo urlToTinyTree(String url) {
+        InputStream inputStream = null;
+        try {
+            try {
+                inputStream = URLFactory.createURL(url).openStream();
+                return readTinyTree(XPath.GlobalConfiguration(), inputStream, null, true, true);
+            } finally {
+                if (inputStream != null) inputStream.close();
+            }
+        } catch (IOException e) {
+            throw new OXFException(e);
         }
     }
 

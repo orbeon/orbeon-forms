@@ -28,6 +28,7 @@ trait ResourcesOps extends BaseOps {
     def currentLang           = currentResources attValue "*:lang"
     def resourcesRoot         = currentResources parent * head
 
+    def resourcesInLang(lang: String)      = allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
     def allResources(resources: NodeInfo)  = resources child "resource"
     def allLangs(resources: NodeInfo)      = allResources(resources) attValue "*:lang"
     def allLangsXPath(resources: NodeInfo) = allLangs(resources).asJava

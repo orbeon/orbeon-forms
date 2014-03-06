@@ -19,6 +19,8 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.fr.FormRunner
 
 /*
  * Form Builder: toolbox operations.
@@ -73,14 +75,42 @@ object ToolboxOps {
                 // Data holder may contain file attributes
                 val dataHolder = newDataHolder(newControlName, binding)
 
-                val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
-                val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
+                val formLanguages = allLangs(formResourcesRoot)
+                val resourceHolders = formLanguages map { formLang ⇒
+                    // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
+                    val lhhaResourceEls = {
+                        val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
+                        lhhaNames map (elementInfo(_))
+                    }
+
+                    // Template items, if needed
+                    val itemsResourceEls =
+                        if (hasEditor(newControlElement, "static-itemset")) {
+                            val fbResourceInFormLang = FormRunner.formResourcesInLang(formLang)
+                            val originalTemplateItems = fbResourceInFormLang \ "template" \ "items" \ "item"
+                            if (hasEditor(newControlElement, "item-hint")) {
+                                // Supports hint: keep hint we have in the resources.xml
+                                originalTemplateItems
+                            }  else {
+                                // Hint not supported: <hint> in each <item>
+                                originalTemplateItems map { item ⇒
+                                    val newLHHA = (item / *) filter (_.localname != "hint")
+                                    elementInfo("item", newLHHA)
+                                }
+                            }
+                        } else {
+                            Seq.empty
+                        }
+
+                    val resourceEls = lhhaResourceEls ++ itemsResourceEls
+                    formLang → elementInfo(newControlName, resourceEls)
+                }
 
                 // Insert data and resource holders
                 insertHolders(
                     newControlElement,
                     dataHolder,
-                    resourceHolder,
+                    resourceHolders,
                     precedingControlNameInSectionForControl(newControlElement)
                 )
 
@@ -231,7 +261,7 @@ object ToolboxOps {
             elementInfo(newSectionName, elementContent)
         }
 
-        insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
+        insertHolderForAllLang(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
 
         // Insert the bind element
         ensureBinds(inDoc, findContainerNames(newSectionElement, includeSelf = true))

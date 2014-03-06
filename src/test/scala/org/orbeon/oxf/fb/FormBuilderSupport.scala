@@ -19,6 +19,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.saxon.om.NodeInfo
 
 trait FormBuilderSupport extends XFormsSupport {
 
@@ -45,8 +46,8 @@ trait FormBuilderSupport extends XFormsSupport {
         }
     }
 
-    def prettyPrintForm(doc: DocumentWrapper): Unit =
-        println(Dom4jUtils.domToPrettyString(TransformerUtils.tinyTreeToDom4j(doc)))
+    def prettyPrintElem(elem: NodeInfo): Unit =
+        println(Dom4jUtils.domToPrettyString(TransformerUtils.tinyTreeToDom4j(elem)))
 
     private def formBuilderDoc(url: String) =
         elemToDom4j(
@@ -57,8 +58,10 @@ trait FormBuilderSupport extends XFormsSupport {
                      xmlns:xbl="http://www.w3.org/ns/xbl">
                 <xh:head>
                     <xf:model id="fr-form-model">
-                        <xf:instance id="fb-form-instance" xxf:index="id"><dummy/></xf:instance>
-                        <xf:instance id="fr-form-instance" src={url}/>
+                        <xf:instance id="fb-form-instance"  xxf:index="id"><dummy/></xf:instance>
+                        <xf:instance id="fr-form-instance"  src={url}/>
+                        <xf:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
+                                     xxf:readonly="true" xxf:cache="true"/>
 
                         <xf:var name="model"             value="xh:head/xf:model[@id = 'fr-form-model']"/>
                         <xf:var name="metadata-instance" value="$model/xf:instance[@id = 'fr-form-metadata']/*"/>
@@ -99,6 +102,9 @@ trait FormBuilderSupport extends XFormsSupport {
 
                             <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>
                         </xf:action>
+                    </xf:model>
+                    <xf:model id="fr-resources-model">
+                        <xf:var name="fr-form-resources" value="xxf:instance('fr-form-resources')/resource[@xml:lang = 'en']"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>

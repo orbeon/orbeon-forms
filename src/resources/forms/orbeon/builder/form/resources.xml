@@ -884,17 +884,17 @@
             <items>
                 <item>
                     <label>First choice</label>
-                    <value>one</value>
+                    <value>1</value>
                     <hint/>
                 </item>
                 <item>
                     <label>Second choice</label>
-                    <value>two</value>
+                    <value>2</value>
                     <hint/>
                 </item>
                 <item>
                     <label>Third choice</label>
-                    <value>three</value>
+                    <value>3</value>
                     <hint/>
                 </item>
             </items>
@@ -1766,15 +1766,15 @@
             <items>
                 <item>
                     <label>Premier choix</label>
-                    <value>un</value>
+                    <value>1</value>
                 </item>
                 <item>
                     <label>Deuxième choix</label>
-                    <value>deux</value>
+                    <value>2</value>
                 </item>
                 <item>
                     <label>Troisième choix</label>
-                    <value>trois</value>
+                    <value>3</value>
                 </item>
             </items>
         </template>
@@ -2648,15 +2648,15 @@
             <items>
                 <item>
                     <label>[First choice]</label>
-                    <value>[one]</value>
+                    <value>1</value>
                 </item>
                 <item>
                     <label>[Second choice]</label>
-                    <value>[two]</value>
+                    <value>2</value>
                 </item>
                 <item>
                     <label>[Third choice]</label>
-                    <value>[three]</value>
+                    <value>3</value>
                 </item>
             </items>
         </template>
@@ -3528,15 +3528,15 @@
             <items>
                 <item>
                     <label>[First choice]</label>
-                    <value>[one]</value>
+                    <value>1</value>
                 </item>
                 <item>
                     <label>[Second choice]</label>
-                    <value>[two]</value>
+                    <value>2</value>
                 </item>
                 <item>
                     <label>[Third choice]</label>
-                    <value>[three]</value>
+                    <value>3</value>
                 </item>
             </items>
         </template>
@@ -4414,15 +4414,15 @@
             <items>
                 <item>
                     <label>Prima scelta</label>
-                    <value>one</value>
+                    <value>1</value>
                 </item>
                 <item>
                     <label>Seconda scelta</label>
-                    <value>two</value>
+                    <value>2</value>
                 </item>
                 <item>
                     <label>Terza scelta</label>
-                    <value>three</value>
+                    <value>3</value>
                 </item>
             </items>
         </template>
@@ -5304,15 +5304,15 @@
             <items>
                 <item>
                     <label>Erster Auswahlpunkt</label>
-                    <value>one</value>
+                    <value>1</value>
                 </item>
                 <item>
                     <label>Zweiter Auswahlpunkt</label>
-                    <value>two</value>
+                    <value>2</value>
                 </item>
                 <item>
                     <label>Dritter Auswahlpunkt</label>
-                    <value>three</value>
+                    <value>3</value>
                 </item>
             </items>
         </template>
@@ -6190,15 +6190,15 @@
             <items>
                 <item>
                     <label>Ensimmäinen valinta</label>
-                    <value>yksi</value>
+                    <value>1</value>
                 </item>
                 <item>
                     <label>Toinen valinta</label>
-                    <value>kaksi</value>
+                    <value>2</value>
                 </item>
                 <item>
                     <label>Kolmas valinta</label>
-                    <value>kolme</value>
+                    <value>3</value>
                 </item>
             </items>
         </template>

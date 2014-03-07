@@ -21,7 +21,8 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- Search instance -->
     <p:param name="instance" type="input"/>
@@ -33,6 +34,34 @@
         <p:input name="config" href="../common-search.xpl"/>
         <p:input name="search" href="#instance"/>
         <p:output name="search" id="search-input"/>
+    </p:processor>
+
+    <!-- Check whether users can do a search based on their roles -->
+    <p:processor name="oxf:xforms-submission">
+        <p:input name="request"><dummy/></p:input>
+        <p:input name="submission" transform="oxf:xslt" href="#search-input">
+            <xf:submission xsl:version="2.0" method="get" replace="instance"
+                               resource="/fr/service/persistence/form/{encode-for-uri(/search/app)}/{encode-for-uri(/search/form)}"/>
+        </p:input>
+        <p:output name="response" id="form-metadata"/>
+    </p:processor>
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#form-metadata"/>
+        <p:input name="config">
+            <root xsl:version="2.0">
+                <xsl:variable name="permissions"                select="/forms/form/permissions"/>
+                <xsl:variable name="operations-from-role"       select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xsl:variable name="search-operations"          select="('*', 'read', 'update', 'delete')"/>
+                <xsl:variable name="authorized-based-on-role"   select="$operations-from-role = $search-operations"/>
+                <xsl:if test="not($authorized-based-on-role)">
+                    <xsl:value-of select="frf:sendError(403)"/>
+                </xsl:if>
+            </root>
+        </p:input>
+        <p:output name="data" id="check-authorized"/>
+    </p:processor>
+    <p:processor name="oxf:null-serializer">
+        <p:input name="data" href="#check-authorized"/>
     </p:processor>
 
     <p:processor name="oxf:request">

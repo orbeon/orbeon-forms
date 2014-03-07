@@ -222,9 +222,9 @@
                                                         </xxf:sequence>
                                                     </xf:var>
                                                     <!-- Point to control binding if any, dummy value otherwise -->
-                                                    <xf:group xxbl:scope="outer" ref="$control-binding, ''">
+                                                    <xf:output xxbl:scope="outer" ref="$control-binding, ''">
                                                         <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
-                                                    </xf:group>
+                                                    </xf:output>
                                                 </xsl:if>
                                             </xh:th>
                                         </xsl:for-each>

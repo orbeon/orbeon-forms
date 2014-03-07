@@ -83,6 +83,9 @@ object ToolboxOps {
                         lhhaNames map (elementInfo(_))
                     }
 
+                    // Resource holders from XBL metadata
+                    val xblResourceEls = binding / "*:metadata" / "*:templates" / "*:resources" / *
+
                     // Template items, if needed
                     val itemsResourceEls =
                         if (hasEditor(newControlElement, "static-itemset")) {
@@ -102,7 +105,7 @@ object ToolboxOps {
                             Seq.empty
                         }
 
-                    val resourceEls = lhhaResourceEls ++ itemsResourceEls
+                    val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
                     formLang → elementInfo(newControlName, resourceEls)
                 }
 

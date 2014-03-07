@@ -24,6 +24,7 @@ import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.xml.TransformerUtils
 
 class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
@@ -149,6 +150,21 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
             assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
+        }
+
+    @Test def insertExplanation(): Unit =
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
+
+            // Insert explanation control
+            val selectionControls = TransformerUtils.urlToTinyTree("oxf:/xbl/orbeon/explanation/explanation.xbl")
+            val explanationBinding = selectionControls.rootElement.child("binding").head
+            ToolboxOps.insertNewControl(doc, explanationBinding)
+
+            // Check resource holder just contains <text>, taken from the XBL metadata
+            val explanationResourceHolder = FormBuilder.resourcesRoot.child("resource").child(*).last
+            val actual   = <holder> { explanationResourceHolder.child(*) map nodeInfoToElem } </holder>
+            val expected = <holder><text/></holder>
+            assertXMLDocuments(actual, expected)
         }
 
     @Test def insertRepeat(): Unit =

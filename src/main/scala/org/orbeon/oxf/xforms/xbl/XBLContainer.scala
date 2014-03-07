@@ -267,11 +267,15 @@ trait RefreshSupport {
     //
     // TODO: We might want to implement some code to detect excessive loops/recursion
     def synchronizeAndRefresh(): Unit =
-        while (needRebuildRecalculateRevalidate || containingDocument.getControls.isRequireRefresh) {
-            while (needRebuildRecalculateRevalidate)
-                rebuildRecalculateRevalidateIfNeeded()
-            refreshIfNeeded()
-        }
+        if (! containingDocument.getControls.isInRefresh) // see https://github.com/orbeon/orbeon-forms/issues/1550
+            while (needRebuildRecalculateRevalidate || containingDocument.getControls.isRequireRefresh) {
+
+                while (needRebuildRecalculateRevalidate)
+                    rebuildRecalculateRevalidateIfNeeded()
+
+                if (containingDocument.getControls.isRequireRefresh)
+                    containingDocument.getControls.doRefresh()
+            }
 
     def needRebuildRecalculateRevalidate: Boolean =
         allModels exists (_.needRebuildRecalculateRevalidate)
@@ -289,10 +293,6 @@ trait RefreshSupport {
             // Controls exist, otherwise there is no point in doing anything controls-related
             controls.requireRefresh()
     }
-
-    def refreshIfNeeded(): Unit =
-        // Delegate to controls
-        containingDocument.getControls.refreshIfNeeded(self)
 
     def setDeferredFlagsForSetindex(): Unit =
         // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization and by

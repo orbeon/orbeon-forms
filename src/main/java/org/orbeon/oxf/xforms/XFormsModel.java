@@ -869,6 +869,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // NOTE: If the refresh flag is not set, we do not call synchronizeAndRefresh() because that would only have the
         // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
         // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
+        // FIXME: See https://github.com/orbeon/orbeon-forms/issues/1533
         if (containingDocument.getControls().isRequireRefresh()) {
             container().synchronizeAndRefresh();
         }

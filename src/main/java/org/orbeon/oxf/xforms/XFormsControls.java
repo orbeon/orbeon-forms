@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
 import java.util.ArrayList;
@@ -50,7 +49,10 @@ public class XFormsControls implements XFormsObjectResolver {
     private boolean dirtySinceLastRequest;
 
     // Whether we currently require a UI refresh
-    private boolean requireRefresh;
+    private boolean requireRefresh = false;
+
+    // Whether we are currently in a refresh
+    private boolean inRefresh = false;
 
     private final XFormsContainingDocument containingDocument;
     
@@ -101,17 +103,21 @@ public class XFormsControls implements XFormsObjectResolver {
         return requireRefresh;
     }
 
-    public void refreshDone() {
-        requireRefresh = false;
-        xpathDependencies.refreshDone();
+    public boolean isInRefresh() {
+        return inRefresh;
     }
 
-    public void refreshIfNeeded(XBLContainer container) {
-        if (requireRefresh) {
-            // Refresh is global for now
-            // Will be cleared by doRefresh()
-            doRefresh(container);
-        }
+    public void refreshStart() {
+        requireRefresh = false;
+        inRefresh = true;
+
+        xpathDependencies.refreshStart();
+    }
+
+    public void refreshDone() {
+        inRefresh = false;
+
+        xpathDependencies.refreshDone();
     }
 
     /**
@@ -277,7 +283,14 @@ public class XFormsControls implements XFormsObjectResolver {
         constantItems.put(controlId, itemset);
     }
     
-    public void doRefresh(XBLContainer container) {
+    public void doRefresh() {
+
+        if (inRefresh) {
+            // Ignore "nested refresh"
+            // See https://github.com/orbeon/orbeon-forms/issues/1550
+            indentedLogger.logDebug("controls", "attempt to do nested refresh");
+            return;
+        }
 
         // This method implements the new refresh event algorithm:
         // http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-refresh-events
@@ -285,34 +298,50 @@ public class XFormsControls implements XFormsObjectResolver {
         // Don't do anything if there are no children controls
         if (getCurrentControlTree().getChildren().isEmpty()) {
             indentedLogger.logDebug("controls", "not performing refresh because no controls are available");
-            // Don't forget to clear the flag or we risk infinite recursion
+            refreshStart();
             refreshDone();
         } else {
-            indentedLogger.startHandleOperation("controls", "performing refresh", "container id", container.getEffectiveId());
+            indentedLogger.startHandleOperation("controls", "performing refresh");
             {
+                final XFormsControl focusedBefore;
+                final Controls.BindingUpdater updater;
+                final List<String> controlsEffectiveIds;
+
                 // Notify dependencies
-                xpathDependencies.refreshStart();
+                refreshStart();
+                try {
 
-                // Focused control before updating bindings
-                final XFormsControl focusedBefore = getFocusedControl();
+                    // Focused control before updating bindings
+                    focusedBefore = getFocusedControl();
 
-                // Update control bindings
-                final Controls.BindingUpdater updater = updateControlBindings();
+                    // Update control bindings
+                    // NOTE: During this process, ideally, no events are dispatched. However, at this point, the code
+                    // can an dispatch, upon removed repeat iterations, xforms-disabled, DOMFocusOut and possibly events
+                    // arising from updating the binding of nested XBL controls.
+                    // This unfortunately means that side effects can take place. This should be fixed, maybe by simply
+                    // detaching removed iterations first, and then dispatching events after all bindings have been
+                    // updated as part of dispatchRefreshEvents() below. This requires that controls are able to kind of
+                    // stay alive in detached mode, and then that the index is also available while these events are
+                    // dispatched.
+                    updater = updateControlBindings();
 
-                // There are potentially event handlers for UI events, so do the whole processing
+                    // There are potentially event handlers for UI events, so do the whole processing
 
-                // Gather controls to which to dispatch refresh events
-                final List<String> controlsEffectiveIds = gatherControlsForRefresh();
+                    // Gather controls to which to dispatch refresh events
+                    controlsEffectiveIds = (updater != null) ? gatherControlsForRefresh() : null;
+                } finally {
+                    // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
+                    // effect, and clear the corresponding flag."
+                    refreshDone();
+                }
 
-                // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
-                // effect, and clear the corresponding flag."
-                refreshDone();
+                if (updater != null) {
+                    // Dispatch events
+                    currentControlTree.dispatchRefreshEvents(controlsEffectiveIds);
 
-                // Dispatch events
-                currentControlTree.dispatchRefreshEvents(controlsEffectiveIds);
-
-                // Handle focus changes
-                Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
+                    // Handle focus changes
+                    Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
+                }
             }
             indentedLogger.endHandleOperation();
         }

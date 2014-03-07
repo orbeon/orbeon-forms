@@ -321,6 +321,8 @@
                 <!-- Condition on owner / group -->
                 <xsl:function name="f:owner-group-condition">
                     <xsl:param name="table" as="xs:string"/>
+                    <!-- We should 403 if we're not authorized based on role and don't have any owner permission, see:
+                         https://github.com/orbeon/orbeon-forms/issues/1383#issuecomment-36953739 -->
                     <xsl:if test="not($authorized-based-on-role)">
                         and (
                             <xsl:if test="$authorized-if-owner"><xsl:value-of select="$table"/>.username = <sql:param type="xs:string" select="/search/@orbeon-username"/></xsl:if>

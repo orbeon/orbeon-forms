@@ -350,7 +350,8 @@ public class XFormsControls implements XFormsObjectResolver {
     /**
      * Update all the control bindings.
      *
-     * @return                  true iif bindings were updated
+     * Return null if controls are not initialized or if control bindings are not dirty. Otherwise, control bindings are
+     * updated and the BindingUpdater is returned.
      */
     private Controls.BindingUpdater updateControlBindings() {
 

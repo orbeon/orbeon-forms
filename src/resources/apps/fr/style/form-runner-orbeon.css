@@ -418,7 +418,7 @@ body.orbeon {
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
 .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
-  background-image: url("/apps/fr/style/images/glyphicons/checkbox-selected.png") !important;
+  background-image: url("images/glyphicons/checkbox-selected.png") !important;
 }
 .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
@@ -426,7 +426,7 @@ body.orbeon {
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
 .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
 .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
-  background-image: url("/apps/fr/style/images/glyphicons/checkbox-deselected.png") !important;
+  background-image: url("images/glyphicons/checkbox-deselected.png") !important;
 }
 .orbeon .fr-mode-pdf .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items,
 .orbeon .fr-mode-view .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items {

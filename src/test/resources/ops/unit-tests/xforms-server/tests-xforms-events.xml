@@ -2469,6 +2469,62 @@
         </output>
     </test>
 
+    <test description="For #1550: Refresh upon DOMFocusOut due to deleted iteration doesn't crash" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/1550 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <value/>
+                                <value/>
+                            </values>
+                        </xf:instance>
+
+                        <xf:action event="xforms-ready">
+                            <xf:setfocus control="my-input"/>
+                            <xf:delete ref="value[1]"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <xf:repeat ref="*" id="my-repeat">
+                        <xf:input ref="." id="my-input">
+                            <xf:refresh event="DOMFocusOut"/>
+                        </xf:input>
+                    </xf:repeat>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value/>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:focus control-id="my-input⊙1"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 <!--
 
 TODO:

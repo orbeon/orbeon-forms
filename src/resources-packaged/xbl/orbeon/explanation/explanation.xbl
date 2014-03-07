@@ -1,0 +1,58 @@
+<!--
+  Copyright (C) 2014 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding id="fr-explanation" element="fr|explanation">
+
+        <fb:metadata>
+            <fb:display-name lang="en">Explanation</fb:display-name>
+            <fb:display-name lang="fi">[Explanation]</fb:display-name>
+            <fb:display-name lang="fr">Explication</fb:display-name>
+            <fb:display-name lang="ru">[Explanation]</fb:display-name>
+            <fb:display-name lang="de">[Explanation]</fb:display-name>
+            <fb:display-name lang="it">[Explanation]</fb:display-name>
+            <fb:icon lang="en">
+                <fb:small-icon>/apps/fr/style/images/silk/layout.png</fb:small-icon>
+                <fb:large-icon>/apps/fr/style/images/silk/layout.png</fb:large-icon>
+            </fb:icon>
+            <fb:templates>
+                <fb:resources>
+                    <text/>
+                </fb:resources>
+                <fb:view>
+                    <fr:explanation>
+                        <fr:text ref=""/>
+                    </fr:explanation>
+                </fb:view>
+            </fb:templates>
+        </fb:metadata>
+
+        <xbl:template>
+            <xf:output xxbl:attr="fr:text/@ref" mediatype="text/html" xxbl:scope="outer"/>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

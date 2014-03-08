@@ -3877,7 +3877,29 @@ ORBEON.xforms.Init = {
             modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
             changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
             topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
-                ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
+                ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered,
+
+            // Parse and store initial repeat hierarchy
+            processRepeatHierarchy: function(repeatTreeString) {
+                var repeatTree = repeatTreeString.split(",");
+                for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
+                    var repeatInfo = repeatTree[repeatIndex].split(" ");
+                    var id = repeatInfo[0];
+                    if (repeatInfo.length > 1) {
+                        var parent = repeatInfo[repeatInfo.length - 1];
+                        ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
+                    }
+                }
+                for (var child in ORBEON.xforms.Globals.repeatTreeChildToParent) {
+                    var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
+                    while (parent != null) {
+                        if (!ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent])
+                            ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent] = new Array();
+                        ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent].push(child);
+                        parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
+                    }
+                }
+            },
         });
 
         // Initialize DOM methods based on browser
@@ -4010,26 +4032,7 @@ ORBEON.xforms.Init = {
                     }
                 }
 
-                // Parse and store initial repeat hierarchy
-                var repeatTreeString = xformsRepeatTree.value;
-                var repeatTree = repeatTreeString.split(",");
-                for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
-                    var repeatInfo = repeatTree[repeatIndex].split(" ");
-                    var id = repeatInfo[0];
-                    if (repeatInfo.length > 1) {
-                        var parent = repeatInfo[repeatInfo.length - 1];
-                        ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
-                    }
-                }
-                for (var child in ORBEON.xforms.Globals.repeatTreeChildToParent) {
-                    var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
-                    while (parent != null) {
-                        if (!ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent])
-                            ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent] = new Array();
-                        ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent].push(child);
-                        parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-                    }
-                }
+                ORBEON.xforms.Globals.processRepeatHierarchy(xformsRepeatTree.value);
 
                 // Parse and store initial repeat indexes
                 var repeatIndexesString = xformsRepeatIndices.value;

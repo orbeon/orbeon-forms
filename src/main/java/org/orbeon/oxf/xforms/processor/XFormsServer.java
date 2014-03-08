@@ -196,6 +196,10 @@ public class XFormsServer extends ProcessorImpl {
                             final Tuple3[] eventsFindings = new Tuple3[1];
 
                             final XFormsControl beforeFocusedControl = containingDocument.getControls().getFocusedControl();
+                            final String repeatHierarchy; {
+                                final boolean hasDynamic = ! containingDocument.getStaticOps().jControlsByName("dynamic").isEmpty();
+                                repeatHierarchy = hasDynamic ? containingDocument.getStaticOps().getRepeatHierarchyString(containingDocument.getContainerNamespace()) : null;
+                            }
                             if (hasEvents || hasFiles) {
                                 // Scope the containing document for the XForms API
                                 XFormsAPI.withContainingDocumentJava(containingDocument, new Runnable() {
@@ -285,9 +289,18 @@ public class XFormsServer extends ProcessorImpl {
                                         responseReceiver = new TeeXMLReceiver(receivers);
 
                                         // Prepare and/or output response
-                                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds,
-                                                clientFocusControlId, beforeFocusedControl,
-                                                requestDocument, responseReceiver, allEvents, false);
+                                        outputAjaxResponse(
+                                            containingDocument,
+                                            indentedLogger,
+                                            valueChangeControlIds,
+                                            clientFocusControlId,
+                                            beforeFocusedControl,
+                                            repeatHierarchy,
+                                            requestDocument,
+                                            responseReceiver,
+                                            allEvents,
+                                            false
+                                        );
 
                                         // Store response in to document
                                         containingDocument.rememberLastAjaxResponse(responseStore);
@@ -439,10 +452,17 @@ public class XFormsServer extends ProcessorImpl {
      * @param allEvents                         whether to handle all events
      * @param testOutputAllActions              for testing purposes
      */
-    public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
-                                          Set<String> valueChangeControlIds, String clientFocusControlId, XFormsControl beforeFocusedControl,
-                                          Document requestDocument, XMLReceiver xmlReceiver, boolean allEvents,
-                                          boolean testOutputAllActions) {
+    public static void outputAjaxResponse(
+            XFormsContainingDocument containingDocument,
+            IndentedLogger indentedLogger,
+            Set<String> valueChangeControlIds,
+            String clientFocusControlId,
+            XFormsControl beforeFocusedControl,
+            String repeatHierarchy,
+            Document requestDocument,
+            XMLReceiver xmlReceiver,
+            boolean allEvents,
+            boolean testOutputAllActions) {
 
         final XFormsControls xformsControls = containingDocument.getControls();
 
@@ -598,6 +618,19 @@ public class XFormsServer extends ProcessorImpl {
                     final List<XFormsContainingDocument.Message> messages = containingDocument.getMessagesToRun();
                     if (messages != null) {
                         outputMessagesInfo(ch, messages);
+                    }
+                }
+
+                // Add repeat hierarchy update if needed
+                if (repeatHierarchy != null) {
+                    final String newRepeatHierarchy = containingDocument.getStaticOps().getRepeatHierarchyString(containingDocument.getContainerNamespace());
+                    if (! repeatHierarchy.equals(newRepeatHierarchy)) {
+                        final String escaped = XFormsUtils.escapeJavaScript(newRepeatHierarchy);
+                        outputLoadsInfo(
+                            ch,
+                            containingDocument,
+                            Collections.singletonList(new XFormsContainingDocument.Load("javascript:ORBEON.xforms.Globals.processRepeatHierarchy('"+ escaped + "')", null, null, false, false))
+                        );
                     }
                 }
 

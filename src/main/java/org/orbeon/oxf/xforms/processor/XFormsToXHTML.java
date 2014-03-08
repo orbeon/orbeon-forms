@@ -146,6 +146,6 @@ public class XFormsToXHTML extends XFormsToSomething {
     private void testOutputResponseState(final XFormsContainingDocument containingDocument, final IndentedLogger indentedLogger,
                                          final XMLReceiver xmlReceiver) throws SAXException {
         // Output XML response
-        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, xmlReceiver, false, true);
+        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, null, xmlReceiver, false, true);
     }
 }

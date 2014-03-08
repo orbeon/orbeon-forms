@@ -144,9 +144,9 @@ trait PartControlsAnalysis extends TransientState {
         controlTypes.get("repeat") map { repeats ⇒
             val repeatsWithAncestors =
                 for {
-                    repeat ← repeats.values
+                    repeat               ← repeats.values
                     namespacedPrefixedId = ns + repeat.prefixedId
-                    ancestorRepeat = repeat.ancestorRepeatsAcrossParts.headOption
+                    ancestorRepeat       = repeat.ancestorRepeatsAcrossParts.headOption
                 } yield
                     ancestorRepeat match {
                         case Some(ancestorRepeat) ⇒ namespacedPrefixedId + " " + ns + ancestorRepeat.prefixedId

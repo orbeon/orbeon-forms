@@ -31,7 +31,7 @@ trait ControlAjaxSupport {
     def supportAjaxUpdates = true
 
     // Whether this control got structural changes during the current request
-    def hasStructuralChange = containingDocument.getControlsStructuralChanges.contains(prefixedId)
+    final def hasStructuralChange = containingDocument.getControlsStructuralChanges.contains(prefixedId)
 
     // Whether the control support full Ajax updates
     def supportFullAjaxUpdates = true

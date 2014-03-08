@@ -99,7 +99,7 @@ public class ControlsComparator {
 
             // 1: Check current control
             boolean mustDoFullUpdate;
-            if (control2.hasStructuralChange()) {
+            if (control2.hasStructuralChange()) { // as of 2014-03-07, only xxf:dynamic ever returns true
 
                 assert ! withinFullUpdate();
 
@@ -294,7 +294,7 @@ public class ControlsComparator {
         // Conditions:
         //
         // - there is not already a full update in progress
-        // - we are in span layout OR we are using XXFormsDynamicControl
+        // - we are using XXFormsDynamicControl
         // - the control supports full Ajax updates
         // - there is a mark for the given control
         //

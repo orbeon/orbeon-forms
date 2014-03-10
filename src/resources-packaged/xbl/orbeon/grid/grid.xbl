@@ -221,8 +221,9 @@
                                                             <xsl:apply-templates select="$control/(@bind, @model, @context, @ref)"/>
                                                         </xxf:sequence>
                                                     </xf:var>
-                                                    <!-- Point to control binding if any, dummy value otherwise -->
-                                                    <xf:output xxbl:scope="outer" ref="$control-binding, ''">
+                                                    <!-- Point to control binding if any, dummy value otherwise
+                                                         and make sure there is an empty value. -->
+                                                    <xf:output xxbl:scope="outer" ref="$control-binding, ''" value="''">
                                                         <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                     </xf:output>
                                                 </xsl:if>

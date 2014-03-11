@@ -80,7 +80,8 @@ class XFormsToSchema extends XFormsToSomething {
         // Import XForms schema if necessary
         val schema =
             <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                       xmlns:xf="http://www.w3.org/2002/xforms">
+                       xmlns:xf="http://www.w3.org/2002/xforms"
+                       xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" vc:minVersion="1.1">
                 {
                     val hasXFormsNamespace = rootXsElem.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
                     if (hasXFormsNamespace)
@@ -265,7 +266,7 @@ class XFormsToSchema extends XFormsToSomething {
         // Recurse on children if any
         childrenBinds flatMap (handleBind(libraries, newResolve, _)) match {
             case Nil     ⇒ xsElem
-            case xsElems ⇒ xsElem.copy(child = <xs:complexType><xs:sequence> { xsElems } </xs:sequence></xs:complexType>)
+            case xsElems ⇒ xsElem.copy(child = <xs:complexType><xs:all> { xsElems } </xs:all></xs:complexType>)
         }
     }
 }

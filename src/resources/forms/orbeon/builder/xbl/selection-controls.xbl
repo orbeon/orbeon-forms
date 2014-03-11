@@ -91,7 +91,7 @@
                         <xf:itemset ref="">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
-                            <xf:value ref="hint"/>
+                            <xf:hint ref="hint"/>
                         </xf:itemset>
                     </xf:select>
                 </view>

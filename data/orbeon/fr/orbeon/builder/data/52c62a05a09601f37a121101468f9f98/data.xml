@@ -27,8 +27,7 @@
             <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
 
-                <!-- Individual book element -->
-                <xs:element name="book">
+                <xs:element name="form">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="details" type="details"/>
@@ -122,7 +121,7 @@
 
             <!-- Instance that contains all the books -->
             <xf:instance id="fr-form-instance" xxf:validation="strict">
-                <book xmlns="">
+                <form xmlns="">
                     <details>
                         <title/>
                         <author/>
@@ -136,7 +135,7 @@
                     <notes>
                         <note/>
                     </notes>
-                </book>
+                </form>
             </xf:instance>
 
             <xf:bind id="fr-form-binds" ref=".">

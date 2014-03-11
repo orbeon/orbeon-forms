@@ -1,6 +1,7 @@
-<book>
+<form>
     <details>
         <title>Dream of the Red Chamber</title>
+        <author>Cao Xueqin</author>
         <author>Cao Xueqin</author>
         <language>zh</language>
         <link>http://en.wikipedia.org/wiki/Dream_of_the_Red_Chamber</link>
@@ -12,4 +13,4 @@
     <notes>
         <note/>
     </notes>
-</book>
+</form>

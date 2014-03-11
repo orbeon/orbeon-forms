@@ -94,7 +94,6 @@
 	<classpathentry kind="lib" path="lib/scalatest-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-2_3-4_0_4.jar"/>
 	<classpathentry kind="lib" path="lib/tagsoup-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/TaminoAPI4J.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat-5_5-naming-factory-dbcp.jar"/>
 	<classpathentry kind="lib" path="lib/tyrex-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/xerces-resolver-2_9_orbeon_20070711.jar"/>

@@ -147,59 +147,6 @@
         </output>
     </test>
 
-    <test description="Test Tamino schema on Tamino XQuery" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                <p:param name="result" type="output"/>
-                <p:processor name="oxf:validation">
-                    <p:input name="schema" href="/org/orbeon/oxf/processor/tamino/tamino-query.rng"/>
-                    <p:input name="config">
-                        <config>
-                            <decorate>true</decorate>
-                        </config>
-                    </p:input>
-                    <p:input name="data">
-                        <xquery>
-                            declare namespace
-                            tf="http://namespaces.softwareag.com/tamino/TaminoFunction" update for $pea in
-                            input()/pea where tf:getInoId($pea) = 667 do ( replace $pea/deleteDetails with
-                            <deleteDetails
-                                xmlns:ino="http://namespaces.softwareag.com/tamino/response2" xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                                xmlns:tfx-xforms="http://www.teleflex.com/namespaces/tfx-xforms">
-                                <deletedFlag>true</deletedFlag>
-                                <deleteDateTime>2005-03-16T10:31:33.265Z</deleteDateTime>
-                                <deletededBy>dsinclair</deletededBy>
-                            </deleteDetails>replace $pea/lastUpdate with
-                            <lastUpdate xmlns:ino="http://namespaces.softwareag.com/tamino/response2"
-                                xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                                xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                                xmlns:tfx-xforms="http://www.teleflex.com/namespaces/tfx-xforms">
-                                <updateDateTime>2005-03-16T10:31:33.265Z</updateDateTime>
-                                <updatedBy>dsinclair</updatedBy>
-                            </lastUpdate>)
-                        </xquery>
-                    </p:input>
-                    <p:output name="data" id="validated"/>
-                </p:processor>
-                <p:processor name="oxf:xslt">
-                    <p:input name="data" href="#validated"/>
-                    <p:input name="config">
-                        <result xsl:version="2.0">
-                            <xsl:copy-of select="//v:error" xmlns:v="http://orbeon.org/oxf/xml/validation"/>
-                        </result>
-                    </p:input>
-                    <p:output name="data" ref="result"/>
-                </p:processor>
-            </p:config>
-        </input>
-        <output name="result">
-            <result/>
-        </output>
-    </test>
-
     <!-- Will work when bug 1155 is fixed
 
         <test description="New RNG Schema" name="oxf:pipeline">

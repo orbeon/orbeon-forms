@@ -649,23 +649,6 @@
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer"/>
     </processor>
 
-    <!-- Tamino processors -->
-    <processor name="oxf:tamino-query">
-        <class name="org.orbeon.oxf.processor.tamino.TaminoQueryProcessor"/>
-    </processor>
-
-    <processor name="oxf:tamino-insert">
-        <class name="org.orbeon.oxf.processor.tamino.TaminoInsertProcessor"/>
-    </processor>
-
-    <processor name="oxf:tamino-update">
-        <class name="org.orbeon.oxf.processor.tamino.TaminoUpdateProcessor"/>
-    </processor>
-
-    <processor name="oxf:tamino-delete">
-        <class name="org.orbeon.oxf.processor.tamino.TaminoDeleteProcessor"/>
-    </processor>
-
     <!-- XML:DB processors -->
     <processor name="oxf:xmldb-query">
         <class name="org.orbeon.oxf.processor.xmldb.XMLDBQueryProcessor"/>

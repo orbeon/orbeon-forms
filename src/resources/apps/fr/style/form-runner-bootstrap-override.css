@@ -244,7 +244,7 @@ body.orbeon {
 .orbeon .input-prepend {
   margin-bottom: 0;
 }
-.orbeon .fr-grid tr th label {
+.orbeon .fr-grid tr th .xforms-label {
   margin: 0;
 }
 .orbeon .table {

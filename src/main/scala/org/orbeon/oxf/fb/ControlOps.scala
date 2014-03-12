@@ -32,6 +32,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.fr.FormRunner
 
 /*
  * Form Builder: operations on controls.
@@ -215,15 +216,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             setvalue(controlElement \@ attName, makeInstanceExpression(templateId(newName)))
 
         // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
-        // FIXME: This code is particularly ugly!
-        controlElement \ * filter (e ⇒ LHHANames(e.localname)) map
-            (e ⇒ (e \@ "ref", e.localname)) filter
-                (_._1 nonEmpty) filter { e ⇒
-                    val ref = e._1.stringValue
-                    ref.isEmpty || ref.startsWith("$form-resources")
-                } foreach { e ⇒
-                    setvalue(e._1, s"$$form-resources/$newName/${e._2}")
-                }
+        val resourcesNames = currentResources.child(newName).child(*).map(_.localname).toSet
+        for {
+            resourcePointer ← controlElement.child(*)
+            resourceName = resourcePointer.localname
+            if resourcesNames(resourceName)                             // We have a resource for this sub-element
+            ref = resourcePointer.att("ref").headOption
+            if ref.nonEmpty                                             // If no ref, value might be inline
+            refVal = ref.head.stringValue
+            if refVal.isEmpty || refVal.startsWith("$form-resources")   // Don't overwrite ref pointing somewhere else
+        } locally {
+            setvalue(ref.toSeq, s"$$form-resources/$newName/$resourceName")
+        }
 
         // If using a static itemset editor, set xf:itemset/@ref xf:itemset/@nodeset value
         if (hasEditor(controlElement, "static-itemset"))

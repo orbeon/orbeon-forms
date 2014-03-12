@@ -69,44 +69,44 @@ object ToolboxOps {
                 // Set default pointer to resources if there is an xf:alert
                 setvalue(newControlElement \ "*:alert" \@ "ref", OldStandardAlertRef)
 
-                // Adjust bindings on newly inserted control
-                renameControlByElement(newControlElement, newControlName)
-
                 // Data holder may contain file attributes
                 val dataHolder = newDataHolder(newControlName, binding)
 
-                val formLanguages = allLangs(formResourcesRoot)
-                val resourceHolders = formLanguages map { formLang ⇒
+                // Create resource holder for all form languages
+                val resourceHolders = {
+                    val formLanguages = allLangs(formResourcesRoot)
+                    formLanguages map { formLang ⇒
                     // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
-                    val lhhaResourceEls = {
-                        val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
-                        lhhaNames map (elementInfo(_))
-                    }
-
-                    // Resource holders from XBL metadata
-                    val xblResourceEls = binding / "*:metadata" / "*:templates" / "*:resources" / *
-
-                    // Template items, if needed
-                    val itemsResourceEls =
-                        if (hasEditor(newControlElement, "static-itemset")) {
-                            val fbResourceInFormLang = FormRunner.formResourcesInLang(formLang)
-                            val originalTemplateItems = fbResourceInFormLang \ "template" \ "items" \ "item"
-                            if (hasEditor(newControlElement, "item-hint")) {
-                                // Supports hint: keep hint we have in the resources.xml
-                                originalTemplateItems
-                            }  else {
-                                // Hint not supported: <hint> in each <item>
-                                originalTemplateItems map { item ⇒
-                                    val newLHHA = (item / *) filter (_.localname != "hint")
-                                    elementInfo("item", newLHHA)
-                                }
-                            }
-                        } else {
-                            Seq.empty
+                        val lhhaResourceEls = {
+                            val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
+                            lhhaNames map (elementInfo(_))
                         }
 
-                    val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
-                    formLang → elementInfo(newControlName, resourceEls)
+                        // Resource holders from XBL metadata
+                        val xblResourceEls = binding / "*:metadata" / "*:templates" / "*:resources" / *
+
+                        // Template items, if needed
+                        val itemsResourceEls =
+                            if (hasEditor(newControlElement, "static-itemset")) {
+                                val fbResourceInFormLang = FormRunner.formResourcesInLang(formLang)
+                                val originalTemplateItems = fbResourceInFormLang \ "template" \ "items" \ "item"
+                                if (hasEditor(newControlElement, "item-hint")) {
+                                    // Supports hint: keep hint we have in the resources.xml
+                                    originalTemplateItems
+                                }  else {
+                                    // Hint not supported: <hint> in each <item>
+                                    originalTemplateItems map { item ⇒
+                                        val newLHHA = (item / *) filter (_.localname != "hint")
+                                        elementInfo("item", newLHHA)
+                                    }
+                                }
+                            } else {
+                                Seq.empty
+                            }
+
+                        val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
+                        formLang → elementInfo(newControlName, resourceEls)
+                    }
                 }
 
                 // Insert data and resource holders
@@ -116,6 +116,10 @@ object ToolboxOps {
                     resourceHolders,
                     precedingControlNameInSectionForControl(newControlElement)
                 )
+
+                // Adjust bindings on newly inserted control, done after the control is added as
+                // renameControlByElement() expects resources to be present
+                renameControlByElement(newControlElement, newControlName)
 
                 // Insert the bind element
                 val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName)

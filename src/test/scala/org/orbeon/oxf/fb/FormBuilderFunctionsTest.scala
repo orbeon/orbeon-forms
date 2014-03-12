@@ -25,6 +25,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.fr.FormRunner
 
 class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
@@ -156,15 +157,28 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Insert explanation control
-            val selectionControls = TransformerUtils.urlToTinyTree("oxf:/xbl/orbeon/explanation/explanation.xbl")
-            val explanationBinding = selectionControls.rootElement.child("binding").head
-            ToolboxOps.insertNewControl(doc, explanationBinding)
+            val frExplanation = {
+                val selectionControls = TransformerUtils.urlToTinyTree("oxf:/xbl/orbeon/explanation/explanation.xbl")
+                val explanationBinding = selectionControls.rootElement.child("binding").head
+                ToolboxOps.insertNewControl(doc, explanationBinding)
+                doc.descendant("*:explanation").head
+            }
 
             // Check resource holder just contains <text>, taken from the XBL metadata
-            val explanationResourceHolder = FormBuilder.resourcesRoot.child("resource").child(*).last
-            val actual   = <holder> { explanationResourceHolder.child(*) map nodeInfoToElem } </holder>
-            val expected = <holder><text/></holder>
-            assertXMLDocuments(actual, expected)
+            locally {
+                val explanationResourceHolder = FormBuilder.resourcesRoot.child("resource").child(*).last
+                val actual   = <holder> { explanationResourceHolder.child(*) map nodeInfoToElem } </holder>
+                val expected = <holder><text/></holder>
+                assertXMLDocuments(actual, expected)
+            }
+
+            // Check that the <fr:text ref=""> points to the corresponding <text> resource
+            locally {
+                val controlName = FormRunner.controlName(frExplanation.attValue("id"))
+                val actualRef = frExplanation.child("*:text").head.attValue("ref")
+                val expectedRef = "$form-resources/" ++ controlName ++ "/text"
+                assert(actualRef === expectedRef)
+            }
         }
 
     @Test def insertRepeat(): Unit =

@@ -494,13 +494,12 @@ public class TransformerUtils {
     }
 
     public static DocumentInfo urlToTinyTree(String url) {
-        InputStream inputStream = null;
         try {
+            final InputStream inputStream = URLFactory.createURL(url).openStream();
             try {
-                inputStream = URLFactory.createURL(url).openStream();
                 return readTinyTree(XPath.GlobalConfiguration(), inputStream, null, true, true);
             } finally {
-                if (inputStream != null) inputStream.close();
+                inputStream.close();
             }
         } catch (IOException e) {
             throw new OXFException(e);

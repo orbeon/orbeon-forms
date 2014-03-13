@@ -23,8 +23,23 @@
 
     <!-- fr-form-instance -->
     <p:param type="input" name="instance"/>
-
+    <!-- success -->
     <p:param type="output" name="data"/>
+
+    <!-- If data is posted, store as request attribute so that persistence-model.xml picks it up -->
+    <p:choose href="#instance">
+        <p:when test="not(/null/@xsi:nil='true')">
+            <p:processor name="oxf:scope-serializer">
+                <p:input name="config">
+                    <config>
+                        <key>fr-form-data</key>
+                        <scope>request</scope>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#instance"/>
+            </p:processor>
+        </p:when>
+    </p:choose>
 
     <!-- Extract page detail (app, form, document, and mode) from URL -->
     <p:processor name="oxf:request">

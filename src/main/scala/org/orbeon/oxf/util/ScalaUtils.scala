@@ -123,10 +123,15 @@ object ScalaUtils extends PathOps {
         }
 
     implicit class PipeOps[A](val a: A) extends AnyVal {
-        // Semi-standard pipe operator
+        // Pipe operator
         def |>[B] (f: A ⇒ B) = f(a)
         // Kestrel / K Combinator (known as tap in Ruby/Underscore)
-        def |!>[B](f: A ⇒ Unit): A = { f(a); a }
+        def |!>[B](f: A ⇒ B): A = { f(a); a }
+    }
+
+    implicit class OptionOps[A](val a: Option[A]) extends AnyVal {
+        // Kestrel / K Combinator (known as tap in Ruby/Underscore)
+        def |!>[B](f: A ⇒ B): Option[A] = { a foreach f; a }
     }
 
     // Convert a string of tokens to a set

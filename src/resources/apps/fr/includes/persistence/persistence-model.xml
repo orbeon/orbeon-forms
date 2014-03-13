@@ -74,6 +74,14 @@
                 <xf:send submission="fr-get-instance-from-service"/>
             </xf:action>
 
+            <xf:message level="xxf:log-debug">
+                $mode: <xf:output value="$mode"/>
+                $is-new-id: <xf:output value="$is-new-id"/>
+                $is-xml-submit: <xf:output value="$is-xml-submit"/>
+                $is-submit: <xf:output value="$is-submit"/>
+                $new-from-service: <xf:output value="$new-from-service"/>
+            </xf:message>
+
             <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
                 /new below. Would that break in case of switching modes (script/noscript)? Here seems to be a good start. -->
             <xf:insert ref="instance('fr-initial-instance')" origin="xxf:instance('fr-form-instance')"/>
@@ -155,12 +163,6 @@
                     value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
             </xf:action>
 
-            <xf:message level="xxf:log-debug">
-                $is-submit: <xf:output value="$is-submit"/>
-                $mode: <xf:output value="$mode"/>
-                $is-new-id: <xf:output value="$is-new-id"/>
-            </xf:message>
-
             <!-- Don't allow if we didn't get a submit and we don't have the proper id depending on the mode
 
                  NOTE: 403 applies well to the first condition. For the second condition, a 404 could also be possible.
@@ -207,11 +209,12 @@
             </xf:message>
 
             <!-- If user can't perform the required operations, deny access to this page -->
-            <!-- Don't require any 'schema', don't require any authorized permission, as this is instead protected as a service -->
+            <!-- 'schema' doesn't require any authorized permission as it is simply protected as a service -->
             <xf:var name="unauthorized-access" value="
-                ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create'))) or
-                ($mode = 'edit'                                and not($ops = ('*', 'update'))) or
-                ($mode = ('view', 'pdf', 'email')              and not($ops = ('*', 'read'))  ) or
+                ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create')))           or
+                ($mode = 'edit'                                and not($ops = ('*', 'update')))           or
+                ($mode = ('view', 'pdf')                       and not($ops = ('*', 'read'))  )           or
+                ($mode = ('email')                             and not($ops = ('*', 'create', 'read'))  ) or
                 not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'email', 'schema'))"/>
 
             <!-- Send an "Unauthorized" error if the user is unauthorized -->

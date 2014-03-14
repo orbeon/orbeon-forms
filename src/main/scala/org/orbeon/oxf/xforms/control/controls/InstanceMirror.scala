@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms._
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.event.events.{XXFormsReplaceEvent, XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import event.XFormsEvents._
 import model.DataModel
@@ -55,6 +54,28 @@ object InstanceMirror {
     def removeListener(observer: ListenersTrait, listener: EventListener): Unit =
         for (eventName ← MutationEvents)
             observer.removeListener(eventName, listener)
+
+    // Factory function to create listeners which check whether they called as the result of an action caused by another
+    // listener. If a cycle is detected, we interrupt it and just say that we have processed the event.
+    class ListenerCycleDetector(implicit logger: IndentedLogger) extends ((XFormsContainingDocument, NodeMatcher) ⇒ MirrorEventListener) {
+
+        private var inListener = false
+
+        def apply(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher) =
+            wrap(mirrorListener(containingDocument, findMatchingNode))
+
+        private def wrap(listener: MirrorEventListener): MirrorEventListener = {
+            event ⇒
+                if (! inListener) {
+                    inListener = true
+                    try
+                        listener(event)
+                    finally
+                        inListener = false
+                } else
+                    true
+        }
+    }
 
     // Type of an event listener
     type MirrorEventListener = XFormsEvent ⇒ Boolean
@@ -193,7 +214,7 @@ object InstanceMirror {
                             // Find destination node in inline instance in original doc
                             evalOne(instanceWrapper, path, namespaces) match {
                                 case newNode: VirtualNode ⇒ Some(outerInstance, newNode)
-                                case _ ⇒ throw new IllegalStateException
+                                case _                    ⇒ throw new IllegalStateException
                             }
                     }
                 case _ ⇒ throw new IllegalStateException
@@ -228,150 +249,139 @@ object InstanceMirror {
     }
 
     // Listener that mirrors changes from one document to the other
-    def mirrorListener(
-            containingDocument: XFormsContainingDocument,
-            findMatchingNode: NodeMatcher)(implicit logger: IndentedLogger): MirrorEventListener = {
+    def mirrorListener(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher)(implicit logger: IndentedLogger): MirrorEventListener = {
 
-        event ⇒
-
-            // Check whether we are in an update loop between two mirrored instances. This is the case if:
-            //
-            // - the last 3 events are all the same type of mutation event
-            // - 2 events back, the event was a mutation of the same instance
-            //
-            // We should ideally prove that this never yields false positives.
-            def isInLoop(targetInstance: XFormsInstance, event: XFormsEvent) = {
-                val lastTwoEvents = targetInstance.containingDocument.eventStack.asScala.takeRight(2)
-                //logger.logDebug("event stack", targetInstance.containingDocument.eventStack.asScala map (e ⇒ (e.name, e.targetObject.getEffectiveId)) toString)
-                lastTwoEvents.size == 2 && (lastTwoEvents forall (_.name == event.name)) && (lastTwoEvents.head.targetObject eq targetInstance)
+        case valueChanged: XXFormsValueChangedEvent ⇒
+            findMatchingNode(valueChanged.targetInstance, valueChanged.node, None) match {
+                case Some((matchingInstance, matchingNode)) ⇒
+                    DataModel.setValueIfChanged(
+                        matchingNode,
+                        valueChanged.newValue,
+                        DataModel.logAndNotifyValueChange(containingDocument, "mirror", matchingNode, _, valueChanged.newValue, isCalculate = false),
+                        reason ⇒ throw new OXFException(reason.message)
+                    )
+                    true
+                case _ ⇒
+                    false
             }
 
-            event match {
-                case valueChanged: XXFormsValueChangedEvent ⇒
-                    findMatchingNode(valueChanged.targetInstance, valueChanged.node, None) match {
-                        case Some((matchingInstance, matchingNode)) ⇒
-                            if (! isInLoop(matchingInstance, event))
-                                DataModel.setValueIfChanged(
-                                    matchingNode,
-                                    valueChanged.newValue,
-                                    DataModel.logAndNotifyValueChange(containingDocument, "mirror", matchingNode, _, valueChanged.newValue, isCalculate = false),
-                                    reason ⇒ throw new OXFException(reason.message)
-                                )
-                            true
-                        case _ ⇒
-                            false
+        case insert: XFormsInsertEvent if ! insert.isRootElementReplacement ⇒
+            // Insert except root element replacement
+            findMatchingNode(insert.targetInstance, insert.insertLocationNode, insert.position != "into" option insert.insertLocationIndex) match {
+                case Some((matchingInstance, matchingInsertLocation)) ⇒
+                    insert.position match {
+                        case "into"   ⇒ XFormsAPI.insert(insert.originItems, into   = matchingInsertLocation)
+                        case "before" ⇒ XFormsAPI.insert(insert.originItems, before = matchingInsertLocation)
+                        case "after"  ⇒ XFormsAPI.insert(insert.originItems, after  = matchingInsertLocation)
                     }
-                case insert: XFormsInsertEvent if ! insert.isRootElementReplacement ⇒
-                    // Insert except root element replacement
-                    findMatchingNode(insert.targetInstance, insert.insertLocationNode, insert.position != "into" option insert.insertLocationIndex) match {
-                        case Some((matchingInstance, matchingInsertLocation)) ⇒
-                            if (! isInLoop(matchingInstance, event))
-                                insert.position match {
-                                    case "into"   ⇒ XFormsAPI.insert(insert.originItems, into   = matchingInsertLocation)
-                                    case "before" ⇒ XFormsAPI.insert(insert.originItems, before = matchingInsertLocation)
-                                    case "after"  ⇒ XFormsAPI.insert(insert.originItems, after  = matchingInsertLocation)
+                    true
+                case _ ⇒
+                    false
+            }
+
+        case insert: XFormsInsertEvent if insert.isRootElementReplacement ⇒ true // handled by xxforms-replace
+
+        case delete: XFormsDeleteEvent ⇒
+
+            val successes =
+                delete.deleteInfos map { deleteInfo ⇒ // more than one node might have been removed
+
+                    val removedNodeInfo  = deleteInfo.nodeInfo
+                    val removedNodeIndex = deleteInfo.index
+
+                    // Find the corresponding parent of the removed node and run the body on it. The body returns Some(Node)
+                    // if that node can be removed.
+                    def withNewParent(body: Node ⇒ (Option[Node], Boolean)) = {
+
+                        // If parent is available, find matching node and call body
+                        Option(deleteInfo.parent) match {
+                            case Some(removedParentNodeInfo) ⇒
+                                findMatchingNode(delete.targetInstance, removedParentNodeInfo, None) match {
+                                    case Some((matchingInstance, matchingParentNode)) ⇒
+
+                                        val docWrapper    = matchingParentNode.getDocumentRoot.asInstanceOf[DocumentWrapper]
+                                        val newParentNode = XFormsUtils.getNodeFromNodeInfo(matchingParentNode, "")
+
+                                        body(newParentNode) match {
+                                            case (Some(nodeToRemove: Node), result) ⇒
+                                                XFormsAPI.delete(Seq(docWrapper.wrap(nodeToRemove)))
+                                                result
+                                            case (_, result) ⇒
+                                                result
+                                        }
+                                    case _ ⇒
+                                        false
                                 }
-                            true
-                        case _ ⇒
-                            false
-                    }
-                case insert: XFormsInsertEvent if insert.isRootElementReplacement ⇒ true // handled by xxforms-replace
-                case delete: XFormsDeleteEvent ⇒
-                    delete.deleteInfos map { deleteInfo ⇒ // more than one node might have been removed
-
-                        val removedNodeInfo  = deleteInfo.nodeInfo
-                        val removedNodeIndex = deleteInfo.index
-
-                        // Find the corresponding parent of the removed node and run the body on it. The body returns Some(Node)
-                        // if that node can be removed.
-                        def withNewParent(body: Node ⇒ (Option[Node], Boolean)) = {
-
-                            // If parent is available, find matching node and call body
-                            Option(deleteInfo.parent) match {
-                                case Some(removedParentNodeInfo) ⇒
-                                    findMatchingNode(delete.targetInstance, removedParentNodeInfo, None) match {
-                                        case Some((matchingInstance, matchingParentNode)) ⇒
-
-                                            val docWrapper    = matchingParentNode.getDocumentRoot.asInstanceOf[DocumentWrapper]
-                                            val newParentNode = XFormsUtils.getNodeFromNodeInfo(matchingParentNode, "")
-
-                                            body(newParentNode) match {
-                                                case (Some(nodeToRemove: Node), result) ⇒
-                                                    if (! isInLoop(matchingInstance, event))
-                                                        XFormsAPI.delete(Seq(docWrapper.wrap(nodeToRemove)))
-                                                    result
-                                                case (_, result) ⇒
-                                                    result
-                                            }
-                                        case _ ⇒ false
-                                    }
-                                case _ ⇒ false
-                            }
+                            case _ ⇒
+                                false
                         }
+                    }
 
-                        // Handle removed node depending on type
-                        removedNodeInfo.getNodeKind match {
-                            case ATTRIBUTE_NODE ⇒
-                                // An attribute was removed
-                                withNewParent {
-                                    case newParentElement: Element ⇒
-                                        // Find the attribute  by name (as attributes are unique for a given QName)
-                                        val removedAttribute = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
-                                        newParentElement.attribute(removedAttribute.getQName) match {
-                                            case newAttribute: Attribute ⇒ (Some(newAttribute), true)
+                    // Handle removed node depending on type
+                    removedNodeInfo.getNodeKind match {
+                        case ATTRIBUTE_NODE ⇒
+                            // An attribute was removed
+                            withNewParent {
+                                case newParentElement: Element ⇒
+                                    // Find the attribute  by name (as attributes are unique for a given QName)
+                                    val removedAttribute = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
+                                    newParentElement.attribute(removedAttribute.getQName) match {
+                                        case newAttribute: Attribute ⇒ (Some(newAttribute), true)
+                                        case _ ⇒ (None, false) // out of sync, so probably safer
+                                    }
+                                case _ ⇒
+                                    (None, false)
+                            }
+                        case ELEMENT_NODE ⇒
+                            // An element was removed
+                            withNewParent {
+                                case newParentDocument: Document ⇒
+                                    // Element removed was root element
+
+                                    // Don't perform the deletion of the root element because we don't support
+                                    // this in the data model (although maybe we should). However, consider this
+                                    // a supported change. If the root element is replaced, the subsequent
+                                    // xxforms-replace event will take care of the replacement.
+                                    (None, true)
+
+                                case newParentElement: Element ⇒
+                                    // Element removed had a parent element
+                                    val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
+
+                                    // If we can identify the position
+                                    val content = newParentElement.content.asInstanceOf[JList[Node]]
+                                    if (content.size > removedNodeIndex) {
+                                        content.get(removedNodeIndex) match {
+                                            case newElement: Element if newElement.getQName == removedElement.getQName ⇒ (Some(newElement), true)
                                             case _ ⇒ (None, false) // out of sync, so probably safer
                                         }
-                                    case _ ⇒ (None, false)
-                                }
-                            case ELEMENT_NODE ⇒
-                                // An element was removed
-                                withNewParent {
-                                    case newParentDocument: Document ⇒
-                                        // Element removed was root element
-
-                                        // Don't perform the deletion of the root element because we don't support
-                                        // this in the data model (although maybe we should). However, consider this
-                                        // a supported change. If the root element is replaced, the subsequent
-                                        // xxforms-replace event will take care of the replacement.
-                                        (None, true)
-
-                                    case newParentElement: Element ⇒
-                                        // Element removed had a parent element
-                                        val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
-
-                                        // If we can identify the position
-                                        val content = newParentElement.content.asInstanceOf[JList[Node]]
-                                        if (content.size > removedNodeIndex) {
-                                            content.get(removedNodeIndex) match {
-                                                case newElement: Element if newElement.getQName == removedElement.getQName ⇒ (Some(newElement), true)
-                                                case _ ⇒ (None, false) // out of sync, so probably safer
-                                            }
-                                        } else
-                                            (None, false) // out of sync, so probably safer
-                                    case _ ⇒ (None, false)
-                                }
-                            case TEXT_NODE ⇒
-                                false // TODO
-                            case _ ⇒
-                                false // we don't know how to propagate the change
-                        }
-                    } exists identity // "at least one item is true"
-                case replace: XXFormsReplaceEvent if replace.currentNode.getNodeKind == ELEMENT_NODE ⇒
-                    // Element replacement
-                    findMatchingNode(replace.targetInstance, replace.currentNode.getParent, None) match {
-                        case Some((matchingInstance, matchingParent)) ⇒
-                            if (! isInLoop(matchingInstance, event)) {
-                                val deleted  = XFormsAPI.delete(matchingParent child *, doDispatch = false)
-                                val inserted = XFormsAPI.insert(replace.currentNode, into = matchingParent, doDispatch = false)
-
-                                Dispatch.dispatchEvent(new XXFormsReplaceEvent(matchingInstance, deleted.head, inserted.head))
+                                    } else
+                                        (None, false) // out of sync, so probably safer
+                                case _ ⇒
+                                    (None, false)
                             }
-                            true
+                        case TEXT_NODE ⇒
+                            false // TODO
                         case _ ⇒
-                            false
+                            false // we don't know how to propagate the change
                     }
-                case replace: XXFormsReplaceEvent ⇒ true // handled by xforms-insert
-                case _ ⇒ throw new IllegalStateException // no other events supported
+                }
+
+            successes exists identity // "at least one item is true"
+
+        case replace: XXFormsReplaceEvent if replace.currentNode.getNodeKind == ELEMENT_NODE ⇒
+            // Element replacement
+            findMatchingNode(replace.targetInstance, replace.currentNode.getParent, None) match {
+                case Some((matchingInstance, matchingParent)) ⇒
+                    val deleted  = XFormsAPI.delete(matchingParent child *, doDispatch = false)
+                    val inserted = XFormsAPI.insert(replace.currentNode, into = matchingParent, doDispatch = false)
+
+                    Dispatch.dispatchEvent(new XXFormsReplaceEvent(matchingInstance, deleted.head, inserted.head))
+                    true
+                case _ ⇒
+                    false
             }
+        case replace: XXFormsReplaceEvent ⇒ true // handled by xforms-insert
+        case _ ⇒ throw new IllegalStateException // no other events supported
     }
 }

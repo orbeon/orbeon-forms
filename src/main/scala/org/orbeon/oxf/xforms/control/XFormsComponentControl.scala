@@ -115,17 +115,26 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         val outerDocument = referenceNode.getDocumentRoot
         val outerInstance = containingDocument.getInstanceForNode(outerDocument)
 
-        val outerListener = toEventListener(mirrorListener(
-            containingDocument,
-            toInnerInstanceNode(
-                outerDocument,
-                nestedContainer.partAnalysis,
-                nestedContainer,
-                findOuterInstanceDetailsXBL(mirrorInstance, referenceNode))))
+        val newListenerWithCycleDetector = new ListenerCycleDetector
 
-        val innerListener = toEventListener(mirrorListener(
-            containingDocument,
-            toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)))
+        val outerListener = toEventListener(
+            newListenerWithCycleDetector(
+                containingDocument,
+                toInnerInstanceNode(
+                    outerDocument,
+                    nestedContainer.partAnalysis,
+                    nestedContainer,
+                    findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)
+                )
+            )
+        )
+
+        val innerListener = toEventListener(
+            newListenerWithCycleDetector(
+                containingDocument,
+                toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)
+            )
+        )
 
         // Set outer and inner listeners
 

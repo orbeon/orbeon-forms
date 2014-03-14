@@ -212,7 +212,7 @@
                                 <!-- Only display this if a selection control is picked -->
                                 <xf:group ref=".[(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1] != '']">
                                     <xf:label ref="$form-resources/dialog-actions/itemset/label"/>
-                                    <xf:hint ref="$form-resources/dialog-actions/itemset/hint"/>
+                                    <!--<xf:hint ref="$form-resources/dialog-actions/itemset/hint"/>-->
                                     <xh:div class="fb-parameters">
                                         <xf:input ref="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]">
                                             <xf:label ref="$form-resources/dialog-actions/items/label"/>

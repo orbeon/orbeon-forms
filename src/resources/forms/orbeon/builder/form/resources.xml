@@ -131,6 +131,9 @@
         <enter-hint>
             <label>Click to add a hint</label>
         </enter-hint>
+        <enter-text>
+            <label>Type your text here</label>
+        </enter-text>
         <type-hint>
             <label>Type your hint here</label>
         </type-hint>
@@ -1018,6 +1021,9 @@
         <enter-hint>
             <label>Cliquez pour entrer une suggestion optionnelle</label>
         </enter-hint>
+        <enter-text>
+            <label>Saisissez le texte ici</label>
+        </enter-text>
         <type-hint>
             <label>Saisissez la suggestion ici</label>
         </type-hint>
@@ -1899,6 +1905,9 @@
         <enter-hint>
             <label>klikk for å skrive inn et valgfritt hint</label>
         </enter-hint>
+        <enter-text>
+            <label>[Type your text here]</label>
+        </enter-text>
         <type-hint>
             <label>[Type your hint here]</label>
         </type-hint>
@@ -2780,6 +2789,9 @@
         <enter-hint>
             <label>Нажмите чтобы ввести подсказку</label>
         </enter-hint>
+        <enter-text>
+            <label>[Type your text here]</label>
+        </enter-text>
         <type-hint>
             <label>[Type your hint here]</label>
         </type-hint>
@@ -3661,6 +3673,9 @@
         <enter-hint>
             <label>Fai click per inserire un suggerimento</label>
         </enter-hint>
+        <enter-text>
+            <label>[Type your text here]</label>
+        </enter-text>
         <type-hint>
             <label>Scrivi qui il tuo suggerimento</label>
         </type-hint>
@@ -4547,6 +4562,9 @@
         <enter-hint>
             <label>Klicken, um einen Hinweis hinzuzufgügen</label>
         </enter-hint>
+        <enter-text>
+            <label>[Type your text here]</label>
+        </enter-text>
         <type-hint>
             <label>Schreibe hier den Hinweis hinein</label>
         </type-hint>
@@ -5437,6 +5455,9 @@
         <enter-hint>
             <label>Klikkaa lisätäksesi vihje</label>
         </enter-hint>
+        <enter-text>
+            <label>[Type your text here]</label>
+        </enter-text>
         <type-hint>
             <label>Kirjoita vihjeesi tähän</label>
         </type-hint>

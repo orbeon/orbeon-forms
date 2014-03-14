@@ -121,25 +121,33 @@ $ ->
             else container.find('.xforms-label')
         startEdit()
 
+    ###
+    Show placeholders, e.g. "Click here to…"
+    - Maintain on the <label class="xforms-label"> and <span class="xforms-hint"> an attribute placeholder.
+    - Value of placeholder attribute is the text shown on grid mouseover if the label/hint is empty.
+    - The value of the placeholder is shown with CSS :empty:before.
+    ###
     do ->
-        lhhaNames = ['label', 'hint']
-        gridTdUpdated = []
-        placeholderText = {}
+        resourceNames = ['label', 'hint', 'text']
+        gridTdUpdated = []                  # Seq[gridTd: El] tds on which we set placeholders, to update on lang change
+        placeholderTextForResource = {}     # Map[resource name:String, placeholder: String]
 
         # Set the placeholder attributes in the LHHA inside this gridTd
         updateGridTd = (gridTd) ->
             gridTd = $(gridTd)
-            _.each lhhaNames, (lhha) ->
+            _.each resourceNames, (lhha) ->
                 elementInDiv = gridTd.find(".xforms-#{lhha}")
-                elementInDiv.attr('placeholder', placeholderText[lhha])
+                # If elements is an xf:output, put placeholder attribute on child element
+                if elementInDiv.is('.xforms-output') then elementInDiv = elementInDiv.children('.xforms-output-output')
+                elementInDiv.attr('placeholder', placeholderTextForResource[lhha])
 
         # Reads and stores the placeholder text
         updatePlacehodlerText = ->
             foundDifference = false
-            _.each lhhaNames, (lhha) ->
+            _.each resourceNames, (lhha) ->
                 newText = $("#fb-placeholder-#{lhha}").children().text()
-                if newText != placeholderText[lhha]
-                    placeholderText[lhha] = newText
+                if newText != placeholderTextForResource[lhha]
+                    placeholderTextForResource[lhha] = newText
                     foundDifference = true
             if foundDifference
                 # Only keep the gridTds still in the DOM
@@ -147,6 +155,7 @@ $ ->
                 gridTdUpdated = _.filter(gridTdUpdated, isInDoc)
                 # Update the placeholders in the gridTds we have left
                 _.each(gridTdUpdated, updateGridTd)
+
         # Do initial update when the page is loaded
         updatePlacehodlerText()
         # Update on Ajax response in case the language changed

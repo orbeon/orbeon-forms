@@ -470,7 +470,7 @@
                                 </xh:span>
 
                                 <!-- Label editor -->
-                                <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/> <!--Will be removed when button/link edited with new editor-->
+                                <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/>
                                 <xf:output class="fb-lhha-checkbox-message" ref="$form-resources/messages/lhha-checkbox"/>
                                 <xf:output class="fb-label-placeholder" ref="$form-resources/type-label/label"/>
                                 <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
@@ -480,13 +480,17 @@
                                 </xf:group>
 
                                 <!-- Hint editor -->
-                                <xf:output id="fb-placeholder-hint" ref="$form-resources/enter-hint/label"/> <!--Will be removed when button/link edited with new editor-->
+                                <xf:output id="fb-placeholder-hint" ref="$form-resources/enter-hint/label"/>
                                 <xf:output class="fb-hint-placeholder" ref="$form-resources/type-hint/label"/>
                                 <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal">
                                     <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = fbf:controlName($control-id)]/hint">
                                         <xf:label appearance="minimal" ref="$form-resources/type-hint/label"/>
                                     </xf:input>
                                 </xf:group>
+
+                                <!-- Text editor -->
+                                <xf:output id="fb-placeholder-text" ref="$form-resources/enter-text/label"/>
+
 
                                 <!--
                                     Upload control for static image

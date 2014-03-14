@@ -23,6 +23,7 @@ import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.util.ScalaUtils._
 
 object Controls {
 
@@ -32,7 +33,14 @@ object Controls {
         val bindingContext = containingDocument.getContextStack.resetBindingContext()
         val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
-        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq()) map
+        buildTree(
+            controlIndex,
+            containingDocument,
+            bindingContext,
+            None,
+            rootControl,
+            Seq()
+        ) |!>
             logTreeIfNeeded("after building full tree")
     }
 
@@ -65,7 +73,7 @@ object Controls {
                 Some(repeatControl),
                 repeatControl.staticControl.iteration.get,
                 idSuffix
-            ) map
+            ) |!>
                 logTreeIfNeeded("after building repeat iteration tree")
 
             controlOpt.get.asInstanceOf[XFormsRepeatIterationControl] // we "know" this, right?
@@ -88,7 +96,7 @@ object Controls {
             Some(containerControl),
             rootAnalysis,
             idSuffix
-        ) map
+        ) |!>
             logTreeIfNeeded("after building subtree")
     }
 
@@ -485,7 +493,7 @@ object Controls {
                         visitSiblings(listener, container.children)
                     case nonContainer ⇒
                         // NOTE: Unfortunately we handle children actions of non container controls a bit differently
-                        val childrenActions = nonContainer.getChildrenActions.asScala
+                        val childrenActions = nonContainer.childrenActions
                         if (childrenActions.nonEmpty)
                             visitSiblings(listener, childrenActions)
                 }
@@ -495,10 +503,7 @@ object Controls {
         }
 
     // Log a subtree of controls as XML
-    private def logTreeIfNeeded(message: String) = {
-        control: XFormsControl ⇒
-            if (XFormsProperties.getDebugLogging.contains("control-tree"))
-                control.containingDocument.getControls.getIndentedLogger.logDebug(message, control.toXMLString)
-            control
-    }
+    private def logTreeIfNeeded(message: String)(control: XFormsControl): Unit =
+        if (XFormsProperties.getDebugLogging.contains("control-tree"))
+            control.containingDocument.getControls.getIndentedLogger.logDebug(message, control.toXMLString)
 }

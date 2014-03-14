@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
-import analysis.PartAnalysisImpl
+import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.Controls._
 import event.XFormsEvents._
@@ -37,6 +37,7 @@ import InstanceMirror._
 import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
 import org.orbeon.oxf.util.XPath
+import scala.collection.generic.Growable
 
 /**
  * xxf:dynamic control
@@ -65,7 +66,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     private var previousChangeCount = -1
     private var changeCount = 0
-    private val xblChanges = Buffer[(String, Element)]()
+    private val xblChanges  = Buffer[(String, Element)]()
     private val bindChanges = Buffer[(String, Element)]()
 
     // New scripts created during an update (not functional as of 2012-04-19)
@@ -177,6 +178,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         // Add listener to the single outer instance
         val docWrapper = new DocumentWrapper(element.getDocument, null, XPath.GlobalConfiguration)
 
+        val newListenerWithCycleDetector = new ListenerCycleDetector
+
         // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
         val outerListener: EventListener = {
 
@@ -187,39 +190,47 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 true
             }
 
-            def recordChanges(findChange: NodeInfo ⇒ Option[(String, Element)], changes: Buffer[(String, Element)])(nodes: Seq[NodeInfo]): Boolean = {
+            def recordChanges(findChange: NodeInfo ⇒ Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[NodeInfo]): Boolean = {
                 val newChanges = nodes flatMap (findChange(_))
                 changes ++= newChanges
                 newChanges.nonEmpty
             }
 
             def changeListener(record: Seq[NodeInfo] ⇒ Boolean): MirrorEventListener = {
-                case insert: XFormsInsertEvent ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
-                case delete: XFormsDeleteEvent ⇒ record(delete.deletedNodes)
+                case insert: XFormsInsertEvent              ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
+                case delete: XFormsDeleteEvent              ⇒ record(delete.deletedNodes)
                 case valueChanged: XXFormsValueChangedEvent ⇒ record(Seq(valueChanged.node))
-                case _ ⇒ false
+                case _                                      ⇒ false
             }
 
             // Instance mirror listener
-            val instanceListener = mirrorListener(
-                containingDocument,
-                toInnerInstanceNode(docWrapper, partAnalysis, childContainer, findOuterInstanceDetailsDynamic))
+            val instanceListener =
+                newListenerWithCycleDetector(
+                    containingDocument,
+                    toInnerInstanceNode(docWrapper, partAnalysis, childContainer, findOuterInstanceDetailsDynamic)
+                )
 
             // Compose listeners
-            toEventListener(composeListeners(Seq(
-                instanceListener,
-                changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
-                changeListener(recordChanges(findBindChange, bindChanges)),
-                unknownChange)))
+            toEventListener(composeListeners(
+                Seq(
+                    instanceListener,
+                    changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
+                    changeListener(recordChanges(findBindChange, bindChanges)),
+                    unknownChange)
+                )
+            )
         }
 
         InstanceMirror.addListener(outerInstance, outerListener)
 
         // Add mutation listeners to all top-level inline instances, which upon value change propagate the value
         // change to the related node in the source
-        val innerListener = toEventListener(mirrorListener(
-            containingDocument,
-            toOuterInstanceNodeDynamic(outerInstance, docWrapper, partAnalysis)))
+        val innerListener = toEventListener(
+            newListenerWithCycleDetector(
+                containingDocument,
+                toOuterInstanceNodeDynamic(outerInstance, docWrapper, partAnalysis)
+            )
+        )
 
         partAnalysis.getModelsForScope(partAnalysis.startScope) foreach {
             _.instances.values filter (_.useInlineContent) foreach { instance ⇒

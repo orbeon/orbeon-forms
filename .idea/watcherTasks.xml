@@ -30,7 +30,7 @@
       </envs>
     </TaskOptions>
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="--compile --map --output $ProjectFileDir$/build/orbeon-war/WEB-INF/resources/$FileDirRelativeToSourcepath$ $FilePathRelativeToSourcepath$" />
+      <option name="arguments" value="--compile --output $ProjectFileDir$/build/orbeon-war/WEB-INF/resources/$FileDirRelativeToSourcepath$ $FilePathRelativeToSourcepath$" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" value="Compiles .coffee files into .js files" />
       <option name="exitCodeBehavior" value="NEVER" />

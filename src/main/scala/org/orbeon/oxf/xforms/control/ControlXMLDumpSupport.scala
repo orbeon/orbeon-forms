@@ -39,8 +39,10 @@ trait ControlXMLDumpSupport extends DebugXML{
             "isRelevant", isRelevant.toString,
             "wasRelevant", wasRelevant.toString,
             "binding-names", bindingContext.nodeset.asScala map itemToString mkString ("(", ", ", ")"),
-            "binding-position", bindingContext.position.toString
+            "binding-position", bindingContext.position.toString,
+            "scope", scope.scopeId
         ))
+        childrenActions foreach (_.toXML(helper, List.empty)())
         content
         helper.endElement()
     }

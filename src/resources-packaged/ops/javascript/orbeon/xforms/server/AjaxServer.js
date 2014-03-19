@@ -1274,7 +1274,6 @@
                                                 recreatedInput = true;
                                                 // Clean-up document element by removing type classes
                                                 _.each(INPUT_TYPES, function(type) { YAHOO.util.Dom.removeClass(documentElement, type.className); });
-                                                YAHOO.util.Dom.removeClass(documentElement, "xforms-incremental");
                                                 // Minimal control content can be different
                                                 var isMinimal = YAHOO.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
 

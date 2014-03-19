@@ -70,7 +70,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
     @Test
     public void xxformsAttribute() {
 
-        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", XMLUtils.ParserConfiguration.PLAIN);
+        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", XMLUtils.ParserConfiguration.getDefault());
         final Metadata metadata = new Metadata();
         final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.logger, ""), null, metadata)
                 .annotateShadowTree(document, "");

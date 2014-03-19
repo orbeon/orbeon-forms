@@ -181,7 +181,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) value), resultStore);
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse
-                    XMLUtils.stringToSAX((String) value, "", resultStore, XMLUtils.ParserConfiguration.PLAIN, true);
+                    XMLUtils.stringToSAX((String) value, "", resultStore, XMLUtils.ParserConfiguration.getDefault(), true);
                 } else {
                     // Consider the object a JavaBean
                     readBean(value, mapping, resultStore);
@@ -197,7 +197,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
             contentHandler.startDocument();
 
             // Initialize Castor
-            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getParser());
+            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.getDefault()).getParser());
             adapter.setContentHandler(contentHandler);
             Marshaller marshaller = new Marshaller(adapter);
             marshaller.setMarshalAsDocument(false);

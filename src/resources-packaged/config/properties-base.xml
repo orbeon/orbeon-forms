@@ -82,6 +82,12 @@
     <property as="xs:string"  name="oxf.http.resource.cache-headers"                 value="Cache-Control: public; Pragma:"/>
     <property as="xs:string"  name="oxf.http.nocache.cache-headers"                  value="Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"/>
 
+    <!-- Default parser configuration -->
+    <property as="xs:boolean" name="oxf.xml-parser.validating"                       value="false"/>
+    <property as="xs:boolean" name="oxf.xml-parser.handle-xinclude"                  value="false"/>
+    <property as="xs:boolean" name="oxf.xml-parser.external-entities"                value="false"/>
+
+
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.use-theme"                          value="true"/>
@@ -115,5 +121,6 @@
     <!--<property as="xs:boolean" processor-name="oxf:xml-converter"       name="serialize-xml-11" value="true"/>-->
 
     <!--<property as="xs:NCName"    name="oxf.pipeline.trace.class"    value="org.orbeon.oxf.processor.trace.SystemOutTrace"/>-->
+
 
 </properties>

@@ -77,7 +77,7 @@ public class XXFormsDocBase64 extends XFormsFunction {
         try {
 
             // Use resolver as it does a series of tasks for us, and use "binary" mode
-            final TransformerURIResolver resolver = new TransformerURIResolver(null, PipelineContext.get(), null, XMLUtils.ParserConfiguration.PLAIN, "binary");
+            final TransformerURIResolver resolver = new TransformerURIResolver(null, PipelineContext.get(), null, XMLUtils.ParserConfiguration.getDefault(), "binary");
 
             final StringBuilder sb = new StringBuilder(1024);
 

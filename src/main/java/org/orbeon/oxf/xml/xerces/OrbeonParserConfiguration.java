@@ -26,7 +26,7 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
     private boolean externalEntities;
 
     public OrbeonParserConfiguration() {
-        this(XMLUtils.ParserConfiguration.PLAIN);
+        this(XMLUtils.ParserConfiguration.getDefault());
     }
 
     public OrbeonParserConfiguration(XMLUtils.ParserConfiguration parserConfiguration) {

@@ -183,7 +183,7 @@ private object PEVersion {
                 val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
 
                 useAndClose(new FileInputStream(new File(path))) { is ⇒
-                    Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN)
+                    Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.getDefault)
                 }
             }
 

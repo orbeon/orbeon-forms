@@ -154,7 +154,7 @@ public class ResourceServer extends ProcessorImpl {
 
     public static MimeTypeConfig readMimeTypeConfig() {
         final MimeTypesContentHandler ch = new MimeTypesContentHandler();
-        XMLUtils.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLUtils.ParserConfiguration.PLAIN, false);
+        XMLUtils.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLUtils.ParserConfiguration.getDefault(), false);
         return ch.getMimeTypes();
     }
 

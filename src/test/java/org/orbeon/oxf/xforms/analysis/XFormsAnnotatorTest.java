@@ -41,7 +41,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
 
         final Metadata metadata = new Metadata();
         final XFormsAnnotator ch = new XFormsAnnotator(metadata);
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, XMLUtils.ParserConfiguration.PLAIN, false);
+        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, XMLUtils.ParserConfiguration.getDefault(), false);
 
         // Test that ns information is provided for those elements
         assertNotNull(metadata.getNamespaceMapping("output-in-title").mapping);

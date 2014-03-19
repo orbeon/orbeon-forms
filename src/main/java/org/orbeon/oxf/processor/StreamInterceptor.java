@@ -143,7 +143,7 @@ public class StreamInterceptor {
 
                 } else {
                     // Assume it is XML and parse the output
-                    final XMLReader reader = XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN);
+                    final XMLReader reader = XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.getDefault());
 
                     if (fragment) {
                         // Do not generate start and end document events

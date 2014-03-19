@@ -147,7 +147,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url) {
             this.url = url;
-            this.parserConfiguration = XMLUtils.ParserConfiguration.PLAIN;
+            this.parserConfiguration = XMLUtils.ParserConfiguration.getDefault();
             this.tidyConfig = new TidyConfig(null);
         }
 

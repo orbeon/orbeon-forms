@@ -270,7 +270,7 @@ public class Dom4jUtils {
     }
 
     public static Document readDom4j(String xmlString) throws SAXException, DocumentException {
-        return readDom4j(xmlString, XMLUtils.ParserConfiguration.PLAIN);
+        return readDom4j(xmlString, XMLUtils.ParserConfiguration.getDefault());
     }
 
     public static Document readDom4j(InputStream inputStream, String uri, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
@@ -279,7 +279,7 @@ public class Dom4jUtils {
     }
 
     public static Document readDom4j(InputStream inputStream) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(XMLUtils.ParserConfiguration.PLAIN);
+        final SAXReader saxReader = createSAXReader(XMLUtils.ParserConfiguration.getDefault());
         return saxReader.read(inputStream);
     }
 

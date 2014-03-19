@@ -363,14 +363,14 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.getDefault());
                 xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = dom4jResult;
             }
             try {
-                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.getDefault(), handleLexical);
             } finally {
                 if (resolver != null)
                     resolver.destroy();
@@ -390,7 +390,7 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.getDefault());
                 xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
@@ -419,14 +419,14 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.getDefault());
                 xmlReceiver = new XIncludeReceiver(null, identityHandler, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = identityHandler;
             }
             try {
-                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.getDefault(), handleLexical);
             } finally {
                 if (resolver != null)
                     resolver.destroy();
@@ -443,7 +443,7 @@ public class TransformerUtils {
         try {
             final TransformerURIResolver resolver;
             if (handleXInclude) {
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.getDefault());
             } else {
                 resolver = null;
             }

@@ -31,7 +31,7 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
     private final XMLUtils.ParserConfiguration parserConfiguration;
 
     public XercesSAXParserFactoryImpl() {
-        this(XMLUtils.ParserConfiguration.PLAIN);
+        this(XMLUtils.ParserConfiguration.getDefault());
     }
 
     public XercesSAXParserFactoryImpl(XMLUtils.ParserConfiguration parserConfiguration) {

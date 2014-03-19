@@ -611,7 +611,7 @@ public class XFormsModelSchemaValidator {
         final SchemaDependencies dependencies = new SchemaDependencies();
         // TODO: Use SchemaDependencies to cache dependencies if any
         final MSVGrammarReaderController controller = new MSVGrammarReaderController(containingDocument, dependencies, Option.<String>apply(null));
-        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.PLAIN);
+        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.getDefault());
         final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
 
 //        TransformerUtils.writeTinyTree(schemaElementInfo, reader);

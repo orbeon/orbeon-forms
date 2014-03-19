@@ -494,7 +494,7 @@ object XML {
         nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
 
     def elemToSAX(e: Elem, xmlReceiver: XMLReceiver) =
-        XMLUtils.stringToSAX(e.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
+        XMLUtils.stringToSAX(e.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.getDefault, true)
 
     def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
 

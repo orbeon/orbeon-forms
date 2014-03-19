@@ -192,7 +192,7 @@ object XPath {
                 // Saxon Document.makeDoc() changes the base to "" if it is null
                 // NOTE: We might use TransformerURIResolver/ExternalContext in the future (ThreadLocal)
                 val url = URLFactory.createURL(if (base == "") null else base, href)
-                new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(url.openStream))
+                new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.getDefault), new InputSource(url.openStream))
             } catch {
                 case NonFatal(t) ⇒ throw new TransformerException(t)
             }

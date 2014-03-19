@@ -397,7 +397,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                 // Read connection into SAXStore
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), documentSAXStore, XMLUtils.ParserConfiguration.PLAIN, true);
+                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), documentSAXStore, XMLUtils.ParserConfiguration.getDefault(), true);
 
                 // Obtain last modified
                 lastModifiedLong = connectionResult.getLastModifiedJava();

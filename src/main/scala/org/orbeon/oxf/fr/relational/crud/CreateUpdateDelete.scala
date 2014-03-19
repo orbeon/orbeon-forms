@@ -126,7 +126,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 val transformer = TransformerUtils.getXMLIdentityTransformer
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
                 val writer = new StringBuilderWriter()
-                val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
+                val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.getDefault()), new InputSource(requestInputStream()))
                 transformer.transform(source, new StreamResult(writer))
                 writer.toString
             }

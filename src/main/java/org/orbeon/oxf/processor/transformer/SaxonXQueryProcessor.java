@@ -70,7 +70,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
                     // Create XQuery configuration (depends on attributes input)
-                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
+                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.getDefault());
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
                     // NOTE: Don't use global configuration, which is immutable
                     final Configuration configuration = new Configuration();

@@ -30,6 +30,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
+import org.orbeon.oxf.properties.*;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -60,6 +61,10 @@ import java.util.*;
 public class XMLUtils {
 
     private static Logger logger = Logger.getLogger(XMLUtils.class);
+
+    public static final String DEFAULT_XMLPARSER_VALIDATING_PROPERTY = "oxf.xml-parser.validating";
+    public static final String DEFAULT_XMLPARSER_HANDLE_XINCLUDE_PROPERTY = "oxf.xml-parser.handle-xinclude";
+    public static final String DEFAULT_XMLPARSER_EXTERNAL_ENTITIES_PROPERTY = "oxf.xml-parser.external-entities";
 
     public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
@@ -106,8 +111,28 @@ public class XMLUtils {
             return (validating ? "1" : "0") + (handleXInclude ? "1" : "0") + (externalEntities ? "1" : "0");
         }
 
-        public static final ParserConfiguration PLAIN = new ParserConfiguration(false, false, false);
-        public static final ParserConfiguration XINCLUDE_ONLY = new ParserConfiguration(false, true, false);
+        private static ParserConfiguration defaultConfiguration = null;
+
+        public static ParserConfiguration getDefault() {
+            if (defaultConfiguration != null) {
+                return defaultConfiguration;
+            }
+            ParserConfiguration config;
+            try {
+                config = new ParserConfiguration(
+                        org.orbeon.oxf.properties.Properties.instance().getPropertySet().getBoolean(DEFAULT_XMLPARSER_VALIDATING_PROPERTY),
+                        org.orbeon.oxf.properties.Properties.instance().getPropertySet().getBoolean(DEFAULT_XMLPARSER_HANDLE_XINCLUDE_PROPERTY),
+                        org.orbeon.oxf.properties.Properties.instance().getPropertySet().getBoolean(DEFAULT_XMLPARSER_EXTERNAL_ENTITIES_PROPERTY));
+            } catch (Exception e) {
+                return new ParserConfiguration(false, false, false);
+            }
+            defaultConfiguration = config;
+            return config;
+        }
+
+
+         public static final ParserConfiguration XINCLUDE_ONLY = new ParserConfiguration(false, true, false);
+
     }
 
     static {
@@ -128,7 +153,7 @@ public class XMLUtils {
 
     /**
      * Create a new DocumentBuilder.
-     *
+     * <p/>
      * WARNING: Check how this is used in this file first before calling!
      */
     private static DocumentBuilder newDocumentBuilder() {
@@ -143,7 +168,7 @@ public class XMLUtils {
 
     /**
      * Create a new SAX parser factory.
-     *
+     * <p/>
      * WARNING: Use this only in special cases. In general, use newSAXParser().
      */
     public static SAXParserFactory createSAXParserFactory(XMLUtils.ParserConfiguration parserConfiguration) {
@@ -157,8 +182,8 @@ public class XMLUtils {
     /**
      * Get a SAXParserFactory to build combinations of validating and XInclude-aware SAXParser.
      *
-     * @param parserConfiguration  parser configuration
-     * @return                     the SAXParserFactory
+     * @param parserConfiguration parser configuration
+     * @return the SAXParserFactory
      */
     public static synchronized SAXParserFactory getSAXParserFactory(XMLUtils.ParserConfiguration parserConfiguration) {
 
@@ -176,8 +201,8 @@ public class XMLUtils {
     /**
      * Create a new SAXParser, which can be a combination of validating and/or XInclude-aware.
      *
-     * @param parserConfiguration  parser configuration
-     * @return                     the SAXParser
+     * @param parserConfiguration parser configuration
+     * @return the SAXParser
      */
     public static synchronized SAXParser newSAXParser(XMLUtils.ParserConfiguration parserConfiguration) {
         try {
@@ -228,7 +253,7 @@ public class XMLUtils {
             return sb.toString();
         }
     }
-    
+
     public static String buildExplodedQName(QName qName) {
         return buildExplodedQName(qName.getNamespaceURI(), qName.getName());
     }
@@ -236,12 +261,12 @@ public class XMLUtils {
     /**
      * Convert dom4j attributes to SAX attributes.
      *
-     * @param element   dom4j Element
-     * @return          SAX Attributes
+     * @param element dom4j Element
+     * @return SAX Attributes
      */
     public static AttributesImpl getSAXAttributes(Element element) {
         final AttributesImpl result = new AttributesImpl();
-        for (Iterator i = element.attributeIterator(); i.hasNext();) {
+        for (Iterator i = element.attributeIterator(); i.hasNext(); ) {
             final org.dom4j.Attribute attribute = (org.dom4j.Attribute) i.next();
 
             result.addAttribute(attribute.getNamespaceURI(), attribute.getName(), attribute.getQualifiedName(),
@@ -252,12 +277,12 @@ public class XMLUtils {
 
     /**
      * Return whether the given mediatype is considered as XML.
-     *
+     * <p/>
      * TODO: This does test on the mediatype only, but we need one to check the content type as well for the case
      * "text/html; charset=foobar"
      *
      * @param mediatype mediatype or null
-     * @return          true if not null and XML mediatype, false otherwise
+     * @return true if not null and XML mediatype, false otherwise
      */
     public static boolean isXMLMediatype(String mediatype) {
         return mediatype != null && (mediatype.equals(XML_CONTENT_TYPE1)
@@ -268,8 +293,8 @@ public class XMLUtils {
     /**
      * Return whether the given content type is considered as text.
      *
-     * @param contentType   content type or null
-     * @return              true if not null and a text content type, false otherwise.
+     * @param contentType content type or null
+     * @return true if not null and a text content type, false otherwise.
      */
     public static boolean isTextContentType(String contentType) {
         return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
@@ -277,24 +302,24 @@ public class XMLUtils {
 
     /**
      * Return whether the given content type is considered as text or JSON.
-     *
+     * <p/>
      * NOTE: There was debate about whether JSON is text or not and whether it should have a text/* mediatype:
-     *
+     * <p/>
      * http://www.alvestrand.no/pipermail/ietf-types/2006-February/001655.html
      *
-     * @param contentType   content type or null
-     * @return              true if not null and a text or JSON content type, false otherwise
+     * @param contentType content type or null
+     * @return true if not null and a text or JSON content type, false otherwise
      */
     public static boolean isTextOrJSONContentType(String contentType) {
-        return contentType != null && (isTextContentType(contentType) || contentType.startsWith( "application/json"));
+        return contentType != null && (isTextContentType(contentType) || contentType.startsWith("application/json"));
     }
 
     /**
      * Given an input stream, return a reader. This performs encoding detection as per the XML spec. Caller must close
      * the resulting Reader when done.
      *
-     * @param inputStream   InputStream to process
-     * @return              Reader initialized with the proper encoding
+     * @param inputStream InputStream to process
+     * @return Reader initialized with the proper encoding
      * @throws IOException
      */
     public static Reader getReaderFromXMLInputStream(InputStream inputStream) throws IOException {
@@ -358,11 +383,11 @@ public class XMLUtils {
     /**
      * Parse a string into SAX events. If the string is empty or only contains white space, output an empty document.
      *
-     * @param xml                   XML string
-     * @param systemId              system id of the document, or null
-     * @param xmlReceiver           receiver to output to
-     * @param parserConfiguration   parser configuration
-     * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
+     * @param xml                 XML string
+     * @param systemId            system id of the document, or null
+     * @param xmlReceiver         receiver to output to
+     * @param parserConfiguration parser configuration
+     * @param handleLexical       whether the XML parser must output SAX LexicalHandler events, including comments
      */
     public static void stringToSAX(String xml, String systemId, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         if (xml.trim().equals("")) {
@@ -380,10 +405,10 @@ public class XMLUtils {
     /**
      * Read a URL into SAX events.
      *
-     * @param systemId              system id of the document
-     * @param xmlReceiver           receiver to output to
-     * @param parserConfiguration   parser configuration
-     * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
+     * @param systemId            system id of the document
+     * @param xmlReceiver         receiver to output to
+     * @param parserConfiguration parser configuration
+     * @param handleLexical       whether the XML parser must output SAX LexicalHandler events, including comments
      */
     public static void urlToSAX(String systemId, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         try {
@@ -418,8 +443,8 @@ public class XMLUtils {
         // Insert XInclude processor if needed
         final TransformerURIResolver resolver;
         if (parserConfiguration.handleXInclude) {
-            parserConfiguration =  new XMLUtils.ParserConfiguration(parserConfiguration.validating, false, parserConfiguration.externalEntities, parserConfiguration.uriReferences);
-            resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+            parserConfiguration = new XMLUtils.ParserConfiguration(parserConfiguration.validating, false, parserConfiguration.externalEntities, parserConfiguration.uriReferences);
+            resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.getDefault());
             xmlReceiver = new XIncludeReceiver(null, xmlReceiver, parserConfiguration.uriReferences, resolver);
         } else {
             resolver = null;
@@ -447,8 +472,8 @@ public class XMLUtils {
     /**
      * Return whether the given string contains well-formed XML.
      *
-     * @param xmlString     string to check
-     * @return              true iif the given string contains well-formed XML
+     * @param xmlString string to check
+     * @return true iif the given string contains well-formed XML
      */
     public static boolean isWellFormedXML(String xmlString) {
 
@@ -457,7 +482,7 @@ public class XMLUtils {
             return false;
 
         try {
-            final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
+            final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.getDefault()).getXMLReader();
             xmlReader.setContentHandler(NULL_CONTENT_HANDLER);
             xmlReader.setEntityResolver(ENTITY_RESOLVER);
             xmlReader.setErrorHandler(new org.xml.sax.ErrorHandler() {
@@ -535,7 +560,7 @@ public class XMLUtils {
      * This digester is based on some existing public document (not sure which). There are some
      * changes though. It is not clear anymore why we used that document as a base, as this is
      * purely internal.
-     *
+     * <p/>
      * The bottom line is that the digest should change whenever the infoset of the source XML
      * document changes.
      */
@@ -787,7 +812,7 @@ public class XMLUtils {
 
     /**
      * Convert a double into a String without scientific notation.
-     *
+     * <p/>
      * This is useful for XPath 1.0, which does not understand the scientific notation.
      */
     public static String removeScientificNotation(double value) {
@@ -854,7 +879,7 @@ public class XMLUtils {
 
     public static void parseDocumentFragment(Reader reader, XMLReceiver xmlReceiver) throws SAXException {
         try {
-            final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
+            final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.getDefault()).getXMLReader();
             xmlReader.setContentHandler(new XMLFragmentReceiver(xmlReceiver));
             final ArrayList<Reader> readers = new ArrayList<Reader>(3);
             readers.add(new StringReader("<root>"));
@@ -869,7 +894,7 @@ public class XMLUtils {
     public static void parseDocumentFragment(String fragment, XMLReceiver xmlReceiver) throws SAXException {
         if (fragment.contains("<") || fragment.contains("&")) {
             try {
-                final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
+                final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.getDefault()).getXMLReader();
                 xmlReader.setContentHandler(new XMLFragmentReceiver(xmlReceiver));
                 xmlReader.parse(new InputSource(new StringReader("<root>" + fragment + "</root>")));
             } catch (IOException e) {
@@ -900,8 +925,11 @@ public class XMLUtils {
                 super.endElement(uri, localname, qName);
         }
 
-        public void startDocument() throws SAXException {}
-        public void endDocument() throws SAXException {}
+        public void startDocument() throws SAXException {
+        }
+
+        public void endDocument() throws SAXException {
+        }
     }
 
     /**
@@ -919,7 +947,7 @@ public class XMLUtils {
 
     /**
      * Read characters from a Reader and generate SAX characters events.
-     *
+     * <p/>
      * The caller has to close the Reader if needed.
      */
     public static void readerToCharacters(Reader reader, ContentHandler contentHandler) {
@@ -939,7 +967,7 @@ public class XMLUtils {
     /**
      * Read bytes from an InputStream and generate SAX characters events in Base64 encoding. The
      * InputStream is closed when done.
-     *
+     * <p/>
      * The caller has to close the stream if needed.
      */
     public static void inputStreamToBase64Characters(InputStream is, ContentHandler contentHandler) {
@@ -955,8 +983,11 @@ public class XMLUtils {
 
     public interface Attribute {
         public String getURI();
+
         public String getLocalName();
+
         public String getQName();
+
         public String getValue();
     }
 
@@ -1021,9 +1052,9 @@ public class XMLUtils {
     }
 
     /**
-     * @param attributes    source attributes
-     * @return              new AttributesImpl containing  all attributes that were in src attributes and that were
-     *                      in the default name space.
+     * @param attributes source attributes
+     * @return new AttributesImpl containing  all attributes that were in src attributes and that were
+     * in the default name space.
      */
     public static AttributesImpl getAttributesFromDefaultNamespace(final Attributes attributes) {
         final AttributesImpl ret = new AttributesImpl();
@@ -1043,9 +1074,9 @@ public class XMLUtils {
     /**
      * Append classes to existing attributes. This creates a new AttributesImpl object.
      *
-     * @param attributes    existing attributes
-     * @param newClasses    new classes to append
-     * @return              new attributes
+     * @param attributes existing attributes
+     * @param newClasses new classes to append
+     * @return new attributes
      */
     public static AttributesImpl appendToClassAttribute(Attributes attributes, String newClasses) {
         final String oldClassAttribute = attributes.getValue("class");
@@ -1056,9 +1087,9 @@ public class XMLUtils {
     /**
      * Append an attribute value to existing mutable attributes.
      *
-     * @param attributes        existing attributes
-     * @param attributeName     attribute name
-     * @param attributeValue    value to set or append
+     * @param attributes     existing attributes
+     * @param attributeName  attribute name
+     * @param attributeValue value to set or append
      */
     public static void addOrAppendToAttribute(AttributesImpl attributes, String attributeName, String attributeValue) {
 
@@ -1198,9 +1229,12 @@ public class XMLUtils {
 
         final XMLReceiverHelper helper = new XMLReceiverHelper(new ForwardingXMLReceiver(identity) {
             @Override
-            public void startDocument() {}
+            public void startDocument() {
+            }
+
             @Override
-            public void endDocument() {}
+            public void endDocument() {
+            }
         });
 
         try {
@@ -1219,7 +1253,7 @@ public class XMLUtils {
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Request request = (externalContext != null) ? externalContext.getRequest() : null;
-        helper.startElement("request", new String[] { "request-uri", (request != null) ? request.getRequestURI() : null,
+        helper.startElement("request", new String[]{"request-uri", (request != null) ? request.getRequestURI() : null,
                 "query-string", (request != null) ? request.getQueryString() : null,
                 "method", (request != null) ? request.getMethod() : null
         });
@@ -1234,8 +1268,8 @@ public class XMLUtils {
     /**
      * Make an NCName out of a non-blank string. Any characters that do not belong in an NCName are converted to '_'.
      *
-     * @param name  source
-     * @return      NCName
+     * @param name source
+     * @return NCName
      */
     public static String makeNCName(String name) {
 

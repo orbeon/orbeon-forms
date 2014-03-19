@@ -219,7 +219,7 @@ public class XQueryProcessor extends ProcessorImpl {
                             }
                             if (SaxonXQDataSource.class.isInstance(xqs)) {
                                 // For Saxon: setup a URI resolver to support the "input:" scheme
-                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, XMLUtils.ParserConfiguration.PLAIN);
+                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, XMLUtils.ParserConfiguration.getDefault());
                                 ((SaxonXQDataSource) xqs).getConfiguration().setURIResolver(resolver);
                             }
                             XQConnection conn;

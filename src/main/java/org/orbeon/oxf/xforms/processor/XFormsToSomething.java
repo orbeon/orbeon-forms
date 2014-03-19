@@ -153,7 +153,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         // Create containing document and initialize XForms engine
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToSomething.this, processorOutput,
-                                pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
+                                pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.getDefault());
                         containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.template, uriResolver, PipelineResponse.getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
@@ -206,7 +206,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                     }
                 }
 
-                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToSomething.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
+                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToSomething.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.getDefault());
                 containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.template, uriResolver, PipelineResponse.getResponse(xmlReceiver, externalContext));
             } else {
                 assert !cachedStatus[0];

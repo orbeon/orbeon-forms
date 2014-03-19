@@ -165,7 +165,7 @@ In addition, this product includes the following software:
 - Scala (<http://www.scala-lang.org/>)
 - ScalaTest (<http://www.scalatest.org/>)
 - TagSoup (<http://home.ccil.org/~cowan/XML/tagsoup/>)
-- Sun Multi-Schema XML Validator (<https://msv.dev.java.net/>)
+- Sun Multi-Schema XML Validator (<https://msv.java.net//>)
 - YUI Compressor (<http://developer.yahoo.com/yui/compressor/>)
 - YUI Library (<http://developer.yahoo.com/yui/>)
 

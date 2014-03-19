@@ -2240,7 +2240,7 @@
                 <alert>[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formula]s</label></tab-base>
+            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
@@ -3120,7 +3120,7 @@
                 <alert>[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formula]s</label></tab-base>
+            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
@@ -4006,7 +4006,7 @@
                 <alert>[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formula]s</label></tab-base>
+            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
@@ -4892,7 +4892,7 @@
                 <alert>[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formula]s</label></tab-base>
+            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
@@ -5782,7 +5782,7 @@
                 <alert>[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formula]s</label></tab-base>
+            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label>[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>

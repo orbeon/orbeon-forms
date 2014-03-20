@@ -1,5 +1,5 @@
 <scanning xmlns="urn:jboss:scanning:1.0">
-    <path name="WEB-INF/lib/scala-library-2.9.2.jar">
+    <path name="WEB-INF/lib/scala-library-2.10.3.jar">
         <exclude name="scala" recurse="true"/>
     </path>
 </scanning>

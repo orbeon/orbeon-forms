@@ -23,6 +23,7 @@ import collection.JavaConverters._
 trait FormRunnerPermissions {
 
     import FormRunner._
+    import FormRunnerPermissions._
 
     val PropertyPrefix = "oxf.fr.authentication."
 
@@ -113,9 +114,9 @@ trait FormRunnerPermissions {
     def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): List[(String, Array[String])] = {
         val (username, group, roles) = getUserGroupRoles(userRoles, getHeader)
 
-        (username.toList map ("orbeon-username" → Array(_))) :::
-        (group.toList    map ("orbeon-group"    → Array(_))) :::
-        (roles.toList    map ("orbeon-roles" →))
+        (username.toList map (OrbeonUsernameHeaderName → Array(_))) :::
+        (group.toList    map (OrbeonGroupHeaderName    → Array(_))) :::
+        (roles.toList    map (OrbeonRolesHeaderName    →))
     }
 
     /**
@@ -175,8 +176,8 @@ trait FormRunnerPermissions {
             case Seq("*") ⇒ rolesOperations
             case _ ⇒
                 val dataOperations =
-                    Seq(("orbeon-username", dataUsername,  "owner"),
-                        ("orbeon-group",    dataGroupname, "group-member"))
+                    Seq((OrbeonUsernameHeaderName, dataUsername,  "owner"),
+                        (OrbeonGroupHeaderName,    dataGroupname, "group-member"))
                         .flatMap(Function.tupled(operations _)(_))
                 (rolesOperations ++ dataOperations).distinct
         }
@@ -192,8 +193,9 @@ trait FormRunnerPermissions {
 
     def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
         val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
-        val username = headers.get("orbeon-username").toSeq.flatten.headOption.getOrElse("")
-        val group    = headers.get("orbeon-group"   ).toSeq.flatten.headOption.getOrElse("")
+        val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption.getOrElse("")
+        val group    = headers.get(OrbeonGroupHeaderName   ).toSeq.flatten.headOption.getOrElse("")
+
         allAuthorizedOperations(permissionsElement, username, group)
     }
 
@@ -208,9 +210,15 @@ trait FormRunnerPermissions {
 
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest
-        request.getHeaderValuesMap.asScala.getOrElse("orbeon-roles", Array.empty[String]) toSet
+        request.getHeaderValuesMap.asScala.getOrElse(OrbeonRolesHeaderName, Array.empty[String]) toSet
     }
 
     def orbeonRolesSequence: SequenceIterator =
         orbeonRoles.iterator map stringToStringValue
+}
+
+object FormRunnerPermissions {
+    val OrbeonUsernameHeaderName = "orbeon-username"
+    val OrbeonGroupHeaderName    = "orbeon-group"
+    val OrbeonRolesHeaderName    = "orbeon-roles"
 }

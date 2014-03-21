@@ -17,6 +17,7 @@ import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.fr.FormRunnerPermissions._
 
 trait RequestResponse {
 
@@ -37,8 +38,8 @@ trait RequestResponse {
 
     def httpRequest = NetUtils.getExternalContext.getRequest
     def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
-    def requestUsername : Option[String] = headerValue("orbeon-username")
-    def requestGroup: Option[String] = headerValue("orbeon-group")
+    def requestUsername : Option[String] = headerValue(OrbeonUsernameHeaderName)
+    def requestGroup: Option[String] = headerValue(OrbeonGroupHeaderName)
 
     val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
     val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r

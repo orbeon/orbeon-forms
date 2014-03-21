@@ -20,9 +20,8 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import scala.Array
-import scala.Some
 import scala.util.Try
+import org.orbeon.oxf.fr.FormRunnerPermissions._
 
 private object HttpRequest {
 
@@ -49,10 +48,10 @@ private object HttpRequest {
                 case Specific(version)       ⇒ Seq("Orbeon-Form-Definition-Version" → Array(version.toString))
                 case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id" → Array(documentId))
             }
-            val credentialHeaders = credentials.map( c ⇒ Seq(
-                "Orbeon-Username" → Array(c.username),
-                "Orbeon-Group"    → Array(c.group),
-                "Orbeon-Roles"    → Array(c.roles.mkString(" "))
+            val credentialHeaders = credentials.map(c ⇒ Seq(
+                OrbeonUsernameHeaderName → Array(c.username),
+                OrbeonGroupHeaderName    → Array(c.group),
+                OrbeonRolesHeaderName    → Array(c.roles.mkString(" "))
             )).toSeq.flatten
             val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
             Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))

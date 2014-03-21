@@ -26,6 +26,7 @@ import org.mockito.Mockito
 import com.liferay.portal.model.{Group, Role, User}
 import java.util.Arrays
 import collection.immutable.TreeMap
+import org.orbeon.oxf.fr.FormRunnerPermissions._
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -49,8 +50,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         Mockito when mockRoleEmployee.getName thenReturn "employee"
 
         val mockGroup = mock[Group]
-        Mockito when mockGroup.getGroupId thenReturn 42
-        Mockito when mockGroup.getName    thenReturn "universe"
+        Mockito when mockGroup.getGroupId     thenReturn 42
+        Mockito when mockGroup.getName        thenReturn "universe"
 
         val mockUser = mock[User]
         Mockito when mockUser.getUserId       thenReturn 123
@@ -71,9 +72,9 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
             "orbeon-liferay-user-group-id"    → Seq("42"),
             "orbeon-liferay-user-group-name"  → Seq("universe"),
             "orbeon-liferay-user-roles"       → Seq("manager", "employee"),
-            "orbeon-username"                 → Seq("test@orbeon.com"),
-            "orbeon-group"                    → Seq("universe"),
-            "orbeon-roles"                    → Seq("manager", "employee")
+            OrbeonUsernameHeaderName          → Seq("test@orbeon.com"),
+            OrbeonGroupHeaderName             → Seq("universe"),
+            OrbeonRolesHeaderName             → Seq("manager", "employee")
         )
 
         val actualProperties = amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap

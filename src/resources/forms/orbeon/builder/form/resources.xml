@@ -253,9 +253,6 @@
         <or>
             <label>or</label>
         </or>
-        <select>
-            <label>[Select...]</label>
-        </select>
         <dialog-form-settings>
             <label>Form Settings</label>
             <save-as>Save as…</save-as>
@@ -1143,9 +1140,6 @@
         <or>
             <label>ou</label>
         </or>
-        <select>
-            <label>[Sélectionner...]</label>
-        </select>
         <dialog-form-settings>
             <label>Paramètres du formulaire</label>
             <save-as>Sauvegarder sous…</save-as>
@@ -2027,9 +2021,6 @@
         <or>
             <label>eller</label>
         </or>
-        <select>
-            <label>- Velg -</label>
-        </select>
         <dialog-form-settings>
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
@@ -2911,9 +2902,6 @@
         <or>
             <label>или</label>
         </or>
-        <select>
-            <label>[Выберите...]</label>
-        </select>
         <dialog-form-settings>
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
@@ -3795,9 +3783,6 @@
         <or>
             <label>o</label>
         </or>
-        <select>
-            <label>[Seleziona...]</label>
-        </select>
         <dialog-form-settings>
             <label>Impostazioni modulo</label>
             <save-as>Salva con nome…</save-as>
@@ -4684,9 +4669,6 @@
         <or>
             <label>oder</label>
         </or>
-        <select>
-            <label>[Auswählen...]</label>
-        </select>
         <dialog-form-settings>
             <label>Form Settings</label>
             <save-as>Save as…</save-as>
@@ -5577,9 +5559,6 @@
         <or>
             <label>tai</label>
         </or>
-        <select>
-            <label>[Valitse...]</label>
-        </select>
         <dialog-form-settings>
             <label>Lomakeasetukset</label>
             <save-as>Tallenna nimellä</save-as>

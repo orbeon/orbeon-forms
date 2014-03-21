@@ -130,18 +130,14 @@
                             </xf:group>
                             <!-- Otherwise, if there are multiple choices, use a dropdown -->
                             <xf:group ref=".[$app-chooser = 'select1']">
-                                <xf:select1 ref="app">
+                                <fr:dropdown-select1 ref="app">
                                     <xf:label ref="$resources/application-name/label"/>
                                     <xf:alert ref="$resources/application-name/alert"/>
-                                    <xf:item>
-                                        <xf:label ref="$resources/select/label"/>
-                                        <xf:value/>
-                                    </xf:item>
                                     <xf:itemset ref="xxf:instance('fb-permissions')/app">
                                         <xf:label ref="@name"/>
                                         <xf:value ref="@name"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:dropdown-select1>
                             </xf:group>
                             <!-- Otherwise, if there is just one choice, just show what the value will be -->
                             <xf:group ref=".[$app-chooser = 'output']">

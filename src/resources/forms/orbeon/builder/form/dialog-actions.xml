@@ -50,51 +50,39 @@
         <xh:tr>
             <xh:td>
                 <!-- React to -->
-                <xf:select1 ref="$instance/fb:action/xf:action[1]/@fb:event">
+                <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/@fb:event">
                     <xf:label ref="$form-resources/dialog-actions/event-type/label"/>
                     <xf:hint ref="$form-resources/dialog-actions/event-type/hint"/>
-                    <xf:item>
-                        <xf:label ref="$form-resources/select/label"/>
-                        <xf:value/>
-                    </xf:item>
                     <xf:itemset ref="$form-resources/dialog-actions/event-type/item">
                         <xf:label ref="label"/>
                         <xf:value ref="value"/>
                     </xf:itemset>
-                </xf:select1>
+                </fr:dropdown-select1>
             </xh:td>
             <xh:td>
                 <!-- Control -->
-                <xf:select1 ref="$instance/fb:action/xf:action[1]/@ev:observer">
+                <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/@ev:observer">
                     <xf:label ref="$form-resources/dialog-actions/event-control/label"/>
-                    <xf:item>
-                        <xf:label ref="$form-resources/select/label"/>
-                        <xf:value/>
-                    </xf:item>
                     <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
                         <!-- Try to build a reasonably user-friendly label -->
                         <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                         <xf:value value="@id"/>
                     </xf:itemset>
-                </xf:select1>
+                </fr:dropdown-select1>
             </xh:td>
         </xh:tr>
         <xh:tr>
             <xh:td>
                 <!-- Service to Call -->
-                <xf:select1 ref="$instance/fb:action/xf:action[1]/xf:send/@submission" id="fb-bindings-submission-select">
+                <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/xf:send/@submission" id="fb-bindings-submission-select">
                     <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                     <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
-                    <xf:item>
-                        <xf:label ref="$form-resources/select/label"/>
-                        <xf:value/>
-                    </xf:item>
                     <!-- Show submissions that are NOT yet used by a service. This is a current limitation. -->
                     <xf:itemset ref="$model/fb:submission[ends-with(@id, '-submission') and not(@id = ../fb:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xf:action[1]/xf:send/@submission)]">
                         <xf:label value="substring-before(@id, '-submission')"/>
                         <xf:value value="@id"/>
                     </xf:itemset>
-                </xf:select1>
+                </fr:dropdown-select1>
             </xh:td>
             <xh:td/>
         </xh:tr>
@@ -110,18 +98,14 @@
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                <fr:dropdown-select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/source-control/label"/>
-                                    <xf:item>
-                                        <xf:label ref="$form-resources/select/label"/>
-                                        <xf:value/>
-                                    </xf:item>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:dropdown-select1>
                             </xh:td>
                             <xh:td>
                                 <xf:input ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]">
@@ -137,18 +121,14 @@
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                <fr:dropdown-select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/source-control/label"/>
-                                    <xf:item>
-                                        <xf:label ref="$form-resources/select/label"/>
-                                        <xf:value/>
-                                    </xf:item>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:dropdown-select1>
                             </xh:td>
                             <xh:td>
                                 <xf:input ref="(*:variable | *:var)[@name = 'parameter']/(@value | @select)[1]">
@@ -164,18 +144,14 @@
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-control-value-action']">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                <fr:dropdown-select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/destination-control/label"/>
-                                    <xf:item>
-                                        <xf:label ref="$form-resources/select/label"/>
-                                        <xf:value/>
-                                    </xf:item>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:dropdown-select1>
                             </xh:td>
                             <xh:td>
                                 <xf:input ref="(*:variable | *:var)[@name = 'control-value']/(@value | @select)[1]">
@@ -195,18 +171,14 @@
                         <xh:tr>
                             <xh:td>
                                 <!-- Only list selection controls -->
-                                <xf:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                <fr:dropdown-select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/destination-selection-control/label"/>
-                                    <xf:item>
-                                        <xf:label ref="$form-resources/select/label"/>
-                                        <xf:value/>
-                                    </xf:item>
                                     <xf:itemset ref="$controls-with-itemset">
                                         <!-- Try to build a reasonably user-friendly label -->
                                         <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:dropdown-select1>
                             </xh:td>
                             <xh:td>
                                 <!-- Only display this if a selection control is picked -->

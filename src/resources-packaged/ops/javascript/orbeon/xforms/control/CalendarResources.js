@@ -43,7 +43,7 @@
                 invalidYear: "Vuosi on oltava numero"
             }
         },
-    "it": {
+        "it": {
             properties: {
                 "MONTHS_LONG": [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",  "Settembre",  "Ottobre",  "Novembre",  "Dicembre" ],
                 "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Me", "Gi", "Ve", "Sa"],

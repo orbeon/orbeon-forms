@@ -41,9 +41,10 @@
             <fb:display-name lang="en">Image Annotation</fb:display-name>
             <fb:display-name lang="fi">Kuvakommentti</fb:display-name>
             <fb:display-name lang="fr">Annotation d'image</fb:display-name>
-            <fb:display-name lang="ru">[Image Annotation]</fb:display-name>
+            <fb:display-name lang="ru" only="true">[Image Annotation]</fb:display-name>
             <fb:display-name lang="de">Bearbeitbares Bild</fb:display-name>
             <fb:display-name lang="it">Immagine modificabile</fb:display-name>
+            <fb:display-name lang="sv">Noteringar till bild</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/apps/fr/style/images/silk/paintbrush.png</fb:small-icon>
                 <fb:large-icon>/apps/fr/style/images/silk/paintbrush.png</fb:large-icon>
@@ -99,6 +100,10 @@
                         <resource xml:lang="it">
                             <canvas-not-supported>Per usare le immagini modificabili, suo Browser deve avere il supporto per canvas di HTML5</canvas-not-supported>
                             <annotated-image>Immagine modificabile</annotated-image>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <canvas-not-supported>För att kunna göra noteringar måste webbläsaren stödja HTML5 canvas</canvas-not-supported>
+                            <annotated-image>Bild med noteringar</annotated-image>
                         </resource>
                     </resources>
                 </xf:instance>

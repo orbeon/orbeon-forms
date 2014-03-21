@@ -35,6 +35,7 @@
             <display-name lang="ru">Дата: раздельные поля</display-name>
             <display-name lang="de">Datum in Feldern</display-name>
             <display-name lang="it">Data in campi</display-name>
+            <display-name lang="sv">Datumväljare med separata fält</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>

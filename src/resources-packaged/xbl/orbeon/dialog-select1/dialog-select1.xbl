@@ -36,6 +36,7 @@
             <display-name lang="ru">Один из диалога</display-name>
             <display-name lang="de">Dialog Single Selector</display-name>
             <display-name lang="it">Dialog Single Selector</display-name>
+            <display-name lang="sv">Dialogruta med val</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>

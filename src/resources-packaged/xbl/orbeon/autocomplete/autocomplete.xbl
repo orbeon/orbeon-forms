@@ -33,6 +33,7 @@
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Autocomplete</display-name>
+            <display-name lang="es" todo="true">[Autocomplete]</display-name>
             <display-name lang="fi">Automaattinen täydennys</display-name>
             <display-name lang="fr">Auto-complétion</display-name>
             <display-name lang="ru">Автозаполнение</display-name>
@@ -62,12 +63,14 @@
             <control-details>
                 <xf:input ref="@resource">
                     <xf:label lang="en">Resource URI</xf:label>
+                    <xf:label lang="es" todo="true">[Resource URI]</xf:label>
                     <xf:label lang="fi">Resurssi URI</xf:label>
                     <xf:label lang="fr">URI de la ressource</xf:label>
                     <xf:label lang="it">URI della risorsa</xf:label>
                     <xf:label lang="de">URI der Ressource</xf:label>
                     <xf:label lang="sv">Resursens adress</xf:label>
                     <xf:hint lang="en">HTTP URI returning data used for the suggestions</xf:hint>
+                    <xf:hint lang="es" todo="true">[HTTP URI returning data used for the suggestions]</xf:hint>
                     <xf:hint lang="fi">HTTP URI palauttaa ehdotuksiin käytettyä dataa</xf:hint>
                     <xf:hint lang="fr">URI HTTP auquel réside le service</xf:hint>
                     <xf:hint lang="de">HTTP URI welche die Daten für den Hinweis liefert</xf:hint>

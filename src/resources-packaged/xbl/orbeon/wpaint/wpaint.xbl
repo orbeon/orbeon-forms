@@ -39,6 +39,7 @@
 
         <fb:metadata>
             <fb:display-name lang="en">Image Annotation</fb:display-name>
+            <fb:display-name lang="es" todo="true">[Image Annotation]</fb:display-name>
             <fb:display-name lang="fi">Kuvakommentti</fb:display-name>
             <fb:display-name lang="fr">Annotation d'image</fb:display-name>
             <fb:display-name lang="ru" only="true">[Image Annotation]</fb:display-name>

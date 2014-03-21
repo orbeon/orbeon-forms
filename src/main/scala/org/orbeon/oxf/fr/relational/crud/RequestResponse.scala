@@ -38,7 +38,7 @@ trait RequestResponse {
     def httpRequest = NetUtils.getExternalContext.getRequest
     def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
     def requestUsername : Option[String] = headerValue("orbeon-username")
-    def requestGroupname: Option[String] = headerValue("orbeon-groupname")
+    def requestGroup: Option[String] = headerValue("orbeon-group")
 
     val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
     val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r

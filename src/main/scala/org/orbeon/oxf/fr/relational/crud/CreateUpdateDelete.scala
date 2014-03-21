@@ -30,7 +30,7 @@ import org.xml.sax.InputSource
 
 trait CreateUpdateDelete extends RequestResponse with Common {
 
-    case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String], formVersion: Option[Int])
+    case class Row(created: sql.Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
     def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
@@ -149,7 +149,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         }
         if (req.forData) {
                                      ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))
-                                     ps.setString(position.next(), existingRow.map(_.groupname).flatten.getOrElse(requestGroupname.getOrElse(null)))
+                                     ps.setString(position.next(), existingRow.map(_.group).flatten.getOrElse(requestGroup.getOrElse(null)))
         }
 
         ps.executeUpdate()
@@ -177,7 +177,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                         if (existing.isDefined) {
                             // Check we're allowed to update or delete this resource
                             val username      = existing.get.username
-                            val groupname     = existing.get.groupname
+                            val groupname     = existing.get.group
                             val dataUserGroup = if (username.isEmpty || groupname.isEmpty) None else Some(username.get, groupname.get)
                             val authorizedOps = authorizedOperations(req, dataUserGroup)
                             val requiredOp    = if (delete) "delete" else "update"

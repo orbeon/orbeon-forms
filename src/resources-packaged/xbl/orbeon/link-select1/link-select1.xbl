@@ -35,6 +35,7 @@
             <display-name lang="ru">Выбор в виде ссылок</display-name>
             <display-name lang="de">Link Auswahl</display-name>
             <display-name lang="it">Selezione link</display-name>
+            <display-name lang="sv">Länkväljare</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/link.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/link.png</large-icon>

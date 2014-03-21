@@ -2224,4 +2224,284 @@
             </labels>
         </home>
     </resource>
+    <resource xml:lang="sv">
+        <common>
+            <formats>
+                <within-day>[H]:[m]</within-day>
+                <day-this-year>[D] [Mn,*-3]</day-this-year>
+                <short-date>[Y0001]-[M01]-[D01]</short-date>
+            </formats>
+        </common>
+        <components>
+            <labels>
+                <open-section>Visa sektion</open-section>
+                <close-section>Dölj sektion</close-section>
+                <section-name>Sektionsnamn</section-name>
+            </labels>
+            <grid>
+                <insert-above>Infoga ovanför</insert-above>
+                <insert-below>Infoga nedanför</insert-below>
+                <move-up>Flytta upp</move-up>
+                <move-down>Flytta ned</move-down>
+                <remove>Tag bort</remove>
+            </grid>
+        </components>
+        <untitled-form>Formulär utan titel</untitled-form>
+        <errors>
+            <summary-title>Formuläret {1,choice,
+                0#är fritt från felmeddelanden|
+                1#innehåller '{0,choice,0#fel|1#varning|2#upplysning|3#meddelande}'|
+                1&lt;innehåller '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1# '{0,choice,0#Ett fel|1#En varning|2#En upplysning|3#Ett meddelande}' - |
+                1&lt;{1,number,integer} '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}' - }{2}</form-title>
+            <none>Inga fel i formuläret</none>
+            <unsaved>Ej sparade ändringar</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon Forms bekräftelse</subject>
+            <body>Formuläret bifogas på PDF- och XML-format.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[Y0001]-[M01]-[D01]</date>
+                <time>[H]:[m]:[s]</time>
+                <dateTime>[Y0001]-[M01]-[D01] [H]:[m]:[s]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Start</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Granska</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Ta bort</delete>
+                <import>&lt;i class="icon-upload"/&gt; Importera</import>
+                <new>&lt;i class="icon-plus"/&gt; Skapa</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Redigera</edit><!-- unused as of 2013-04-05 -->
+        <duplicate>&lt;i class="icon-file"/&gt; Duplicera</duplicate>
+            </buttons>
+            <titles>
+                <summary-title>Sammanställning</summary-title>
+                <delete-confirmation>Bekräfta borttag</delete-confirmation>
+                <created>Skapad</created>
+                <last-modified>Ändrad</last-modified>
+                <selected>Vald</selected>
+                <refresh>Uppdatera sidan</refresh>
+                <toc>Innehållsförteckning</toc>
+                <description>Beskrivning</description>
+                <help>Hjälp</help>
+                <error-count>Fel i formuläret</error-count>
+                <errors-count>Fel i formuläret</errors-count>
+            </titles>
+            <search>
+                <search>Sök</search>
+                <search-forms>&lt;i class="icon-search"/&gt; Sök formulär</search-forms>
+                <show-options>Visa sökalternativ</show-options>
+                <close-options>Dölj sökalternativ</close-options>
+                <returned>Sökningen gav {0,number,integer} av {1,number,integer} formulär.</returned>
+            </search>
+            <paging>
+                <to>till</to>
+                <of>av</of>
+            </paging>
+            <messages>
+                <no-form-found>Inget formulär hittades.</no-form-found>
+                <delete-confirmation>Bekräfta att du vill ta bort formulären. Om du tar bort ett sparat formulär så tas motsvarande utkast också bort.</delete-confirmation>
+            </messages>
+            <labels>
+                <draft>Utkast</draft>
+                <read-only>Skrivskyddat</read-only>
+                <language-choice>Välj språk</language-choice>
+                <form-choice>Välj ett formulär</form-choice>
+                <free-search>Fri sökning</free-search>
+                <any>[Alla]</any>
+                <previous>Tillbaka</previous>
+                <next>Nästa</next>
+                <script>Fullständig version</script>
+                <noscript>Tillgänglig version</noscript>
+                <refresh>Visa på nytt</refresh>
+                <close-box>[stäng]</close-box>
+                <help-back>Tillbaka</help-back>
+                <goto-content>Gå till innehåll</goto-content>
+            </labels>
+            <formats>
+                <date>[Y0001]-[M01]-[D01]</date>
+                <time>[H]:[m]:[s]</time>
+                <dateTime>[Y0001]-[M01]-[D01] [H]:[m]:[s]</dateTime>
+                <save-datetime>[Y0001]-[M01]-[D01] [H]:[m]:[s]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Spara</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Spara</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Spara</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Granska</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
+                <email>&lt;i class="icon-envelope"/&gt; Mejla</email>
+                <validate>&lt;i class="icon-ok"/&gt; Godkänn</validate>
+
+                <!-- Legacy buttons -->
+                <submit>&lt;i class="icon-arrow-right"/&gt; Skicka</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Granska</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Redigera</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Skicka</workflow-send>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Start</home>
+                <summary>&lt;i class="icon-list"/&gt; Lista</summary>
+                <close>&lt;i class="icon-remove"/&gt; Stäng</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Rensa</clear>
+                <cancel>Avbryt</cancel>
+                <save-locally>Spara lokalt</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
+                <submit-dialog-keep>Behåll värden och stäng</submit-dialog-keep>
+                <submit-dialog-go>Ok</submit-dialog-go>
+                <submit-dialog-close-window>Stäng fönstret</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <validation-dialog-review>Granskning</validation-dialog-review>
+                <validation-dialog-continue>Fortsätt</validation-dialog-continue>
+            </buttons>
+            <messages>
+                <save-success>Formuläret sparat</save-success>
+                <save-draft-success>Utkast sparat</save-draft-success>
+                <email-success>Mejl skickat</email-success>
+                <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
+                <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
+                <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
+                <clear-confirm-message>Bekräfta att du vill rensa alla fält på denna sida. Värdena går förlorade om du inte har sparat dem.</clear-confirm-message>
+                <error-dialog-title>Operationen kunde inte fullföljas</error-dialog-title>
+                <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
+                <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <submit-dialog-title>Formuläret skickat</submit-dialog-title>
+                <submit-dialog-message>Det ifyllda formuläret är skickat.</submit-dialog-message>
+                <validation-dialog-title>Granskning av giltighet</validation-dialog-title>
+                <validation-dialog-message>Formuläret {1,choice,
+                    0#är fritt från felmeddelanden|
+                    1#innehåller '{0,choice,0#ett fel|1#en varning|2#en upplysning|3#ett meddelande}'|
+                    1&lt;innehåller {1,number,integer} '{0,choice,0#fel|1#varningar|2#upplysningar|3#meddelanden}'}. Du kan granska detta nu eller senare.</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Klicka för att öppna ett formulär.</saved-locally-open>
+                <upload-in-progress>Filer håller på att överföras. Försök igen när överföringen är avslutad.</upload-in-progress>
+                <upload-start>Överföring startas</upload-start>
+                <upload-cancel>Överföring stoppad av användaren</upload-cancel>
+                <upload-done>Överföring klar</upload-done>
+                <upload-error>Fel under överföring. Vänligen försök igen.</upload-error>
+                <upload-error-size>Filen är för stor för att överföras. Största storlek är {0,number,integer} bytes.</upload-error-size>
+            </messages>
+            <drafts>
+                <found-draft>Utkast hittat</found-draft>
+                <found-drafts>Utkast hittades</found-drafts>
+                <found-draft-for-document>Efter att formuläret sparades blev ett utkast automatiskt sparat. Vill du öppna dokumentet eller det automatiskt sparade utkastet?</found-draft-for-document>
+                <found-draft-for-never-saved>Ett utkast sparades automatiskt. Vill du börja från början eller öpppna det automatiskt sparade utkastet?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Flera utkast av detta formulär sparades automatiskt. Vill du börja från början eller se listan med utkast?</found-drafts-for-never-saved>
+                <open-saved>Öppna sparat formulär</open-saved>
+                <open-draft>Öppna automatiskt sparat utkast</open-draft>
+                <view-drafts>Visa automatiskt sparat utkast</view-drafts>
+                <start-new>Börja från början</start-new>
+            </drafts>
+            <labels>
+                <language-choice>Språk</language-choice>
+                <errors>Sammanställning av fel</errors>
+                <check-errors-in-form>Formuläret innehåller fel</check-errors-in-form>
+                <error-details>Visa fel</error-details>
+                <confirm>Bekräfta</confirm>
+                <alert>Utelämnat eller felaktigt värde</alert>
+
+                <captcha-label>Robotfilter</captcha-label>
+                <captcha-alert>Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Detta är en skrivskyddad visning av data
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Spara lokalt</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Klicka Spara-knappen för att spara formulärdata på datorn som en HTML-fil.
+                    </p>
+                    <p>
+                        För att se formulärdata:
+                    </p>
+                    <ul>
+                        <li>Öppna HTML-filen i en webbläsare. (Dubbelklicka filen eller dra den till webbläsaren.)</li>
+                        <li>Klicka på Öppna-knappen.</li>
+                    </ul>
+                    <p>
+                        <b>OBS:</b>Ingen information lagras centralt. Om du tar bort filen på datorn förloras all information.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Start av formulärmotorn</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Upphäv publicering</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
+                <cancel>Avbryt</cancel>
+                <connect>Anslut</connect>
+                <select>Välj</select>
+                <operation>Operation</operation>
+                <all>Alla</all>
+                <none>Inga</none>
+                <unpublished-local>Opublicerade lokala formulär</unpublished-local>
+                <published-local>Publicerade lokala formulär</published-local>
+                <unpublished-remote>Opublicerade formulär på servern</unpublished-remote>
+                <published-remote>Publicerade formulär på servern</published-remote>
+                <newer-local>Lokala formulär som är nyare</newer-local>
+                <newer-remote>Formulär på servern som är nyare</newer-remote>
+                <publish-local>Publicera lokala formulär</publish-local>
+                <unpublish-local>Upphäv publicering av lokala formulär</unpublish-local>
+                <publish-remote>Publicera på servern</publish-remote>
+                <unpublish-remote>Upphäv publicering på servern</unpublish-remote>
+                <push-to-remote>Flytta till servern</push-to-remote>
+                <pull-from-remote>Hämta från servern</pull-from-remote>
+                <navigate-summary>Gå till sammanställning</navigate-summary>
+                <navigate-new>Gå till Skapa</navigate-new>
+            </buttons>
+            <titles>
+                <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
+                <credentials>Serverns identitet</credentials>
+                <status>Status</status>
+                <app>Område</app>
+                <form>Formulär</form>
+                <title>Titel</title>
+                <view>Visa</view>
+                <new>Skapa</new>
+                <local>Lokalt</local>
+                <remote>På servern</remote>
+                <form-identification>Identifiering av formulär</form-identification>
+                <last-modified>Senast ändrad</last-modified>
+            </titles>
+            <messages>
+                <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
+                <publish-confirmation>Bekräfta {0,choice,0#publicering|1#upphävande av publicering} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Tillgänglig</available>
+                <unavailable>Ej tillgänglig</unavailable>
+                <library>Bibliotek</library>
+                <newer>Nyare</newer>
+                <username>Användarnamn</username>
+                <password>Lösenord</password>
+            </labels>
+        </home>
+    </resource>
 </resources>

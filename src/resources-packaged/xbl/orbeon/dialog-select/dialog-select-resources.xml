@@ -72,4 +72,14 @@
         <add>Aggiungere</add>
         <remove>Elimina</remove>
     </resource>
+    <resource xml:lang="sv">
+        <select>...</select>
+        <title>Val</title>
+        <available>Tillgängligt</available>
+        <selected>Vald</selected>
+        <confirm>Bekräfta</confirm>
+        <cancel>Avbryt</cancel>
+        <add>Lägg till</add>
+        <remove>Ta bort</remove>
+    </resource>
 </resources>

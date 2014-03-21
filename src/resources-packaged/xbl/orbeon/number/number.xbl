@@ -33,9 +33,10 @@
             <display-name lang="en">Number</display-name>
             <display-name lang="fi">Numero</display-name>
             <display-name lang="fr">Nombre</display-name>
-            <display-name lang="ru">[Number]</display-name>
+            <display-name lang="ru" todo="true">[Number]</display-name>
             <display-name lang="de">Zahlenwert</display-name>
             <display-name lang="it">Valore numerico</display-name>
+            <display-name lang="sv">Numeriskt värde</display-name>
             <icon lang="en">
                 <!-- TODO: icons -->
                 <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>

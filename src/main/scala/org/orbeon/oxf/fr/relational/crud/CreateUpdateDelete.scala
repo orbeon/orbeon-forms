@@ -158,6 +158,25 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             ps.executeUpdate()
         }
 
+        // If we saved a "normal" document (not a draft), delete any draft document and draft attachments
+        if (req.forData && ! req.dataPart.get.isDraft && ! req.forAttachment) {
+            for (table ←  Set("orbeon_form_data", "orbeon_form_data_attach")) {
+                val ps = connection.prepareStatement(
+                    s"""delete from $table
+                        where
+                            app             = ?
+                            and form        = ?
+                            and document_id = ?
+                            and draft       = 'Y'
+                        """.stripMargin)
+                val position = Iterator.from(1)
+                ps.setString(position.next(), req.app)
+                ps.setString(position.next(), req.form)
+                ps.setString(position.next(), req.dataPart.get.documentId)
+                ps.executeUpdate()
+            }
+        }
+
         // If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name -->
         if (req.forData && req.dataPart.get.isDraft) {
 
@@ -190,7 +209,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             val position = Iterator.from(1)
 
             // Run twice as the the same values are used in the inner
-            for (i <- 1 to 2) {
+            for (i ← 1 to 2) {
                 ps.setString(position.next(), req.app)
                 ps.setString(position.next(), req.form)
                 ps.setString(position.next(), req.dataPart.get.documentId)

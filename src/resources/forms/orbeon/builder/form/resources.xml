@@ -1790,12 +1790,12 @@
         <application-name>
             <label>Applikasjonsnavn</label>
             <hint>Identifiserer en gruppe skjemaer, for eksempel ved funksjonalitet eller avdeling (f.eks. «salg»). Hvis du har én gruppe skjemaer, kan du bruke organisasjonsnavnet (f.eks. «acme»). Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
-            <alert>[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </application-name>
         <form-name>
             <label>Skjemanavn</label>
             <hint>Identifiserer et spesifikt skjema. Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
-            <alert>[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </form-name>
         <title>
             <label>Skjematittel</label>
@@ -1822,7 +1822,7 @@
             <label>Lim inn</label>
         </paste>
         <form-structure>
-            <label>[Form Structure]</label>
+            <label todo="true">[Form Structure]</label>
         </form-structure>
         <controls>
             <label>Skjemaelementer</label>
@@ -1855,7 +1855,7 @@
             <label>Nytt rutenett</label>
         </new-grid>
         <new-repeated-grid>
-            <label>[New Repeated Grid]</label>
+            <label todo="true">[New Repeated Grid]</label>
         </new-repeated-grid>
         <change-schema>
             <label>Endre skjema</label>
@@ -1891,25 +1891,25 @@
             <label>Last skjemakomponenter på nytt</label>
         </reload-components>
         <enter-section-title>
-            <label>[Click to enter a section title]</label>
+            <label todo="true">[Click to enter a section title]</label>
         </enter-section-title>
         <type-section-title>
-            <label>[Type your section title]</label>
+            <label todo="true">[Type your section title]</label>
         </type-section-title>
         <enter-label>
             <label>klikk for å legge inn en ledetekst</label>
         </enter-label>
         <type-label>
-            <label>[Type your label here]</label>
+            <label todo="true">[Type your label here]</label>
         </type-label>
         <enter-hint>
             <label>klikk for å skrive inn et valgfritt hint</label>
         </enter-hint>
         <enter-text>
-            <label>[Type your text here]</label>
+            <label todo="true">[Type your text here]</label>
         </enter-text>
         <type-hint>
-            <label>[Type your hint here]</label>
+            <label todo="true">[Type your hint here]</label>
         </type-hint>
         <enter-text>
             <label>klikk for å skrive inn tekst</label>
@@ -1960,7 +1960,7 @@
             <label>Seksjonsdetaljer</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>[Grid Settings]</label>
+            <label todo="true">[Grid Settings]</label>
         </grid-details-icon>
         <move-up-icon>
             <label>Flytt opp</label>
@@ -1969,10 +1969,10 @@
             <label>Flytt ned</label>
         </move-down-icon>
         <move-right-icon>
-            <label>[Move Right]</label>
+            <label todo="true">[Move Right]</label>
         </move-right-icon>
         <move-left-icon>
-            <label>[Move Left]</label>
+            <label todo="true">[Move Left]</label>
         </move-left-icon>
         <control-details-icon>
             <label>Elementdetaljer</label>
@@ -1984,7 +1984,7 @@
             <label>Rediger hjelpetekst</label>
         </help-icon>
         <new-button>
-            <label>[&lt;i class="icon-plus"/&gt; New]</label>
+            <label todo="true">[&lt;i class="icon-plus"/&gt; New]</label>
         </new-button>
         <test-button>
             <label>&lt;i class="icon-cog"/&gt; Test</label>
@@ -1993,7 +1993,7 @@
             <label>&lt;i class="icon-globe"/&gt; Publiser…</label>
         </publish-button>
         <save-as-button>
-            <label>[Save as…]</label>
+            <label todo="true">[Save as…]</label>
         </save-as-button>
         <!-- Common -->
         <add>
@@ -2006,7 +2006,7 @@
             <label>Rediger</label>
         </edit>
         <classes>
-            <label>[Custom CSS classes]</label>
+            <label todo="true">[Custom CSS classes]</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -2031,30 +2031,30 @@
             <label>- Velg -</label>
         </select>
         <dialog-form-settings>
-            <label>[Form Settings]</label>
-            <save-as>[Save as…]</save-as>
-            <open><label>[Form settings]</label></open>
-            <stats>[Form statistics</stats>
-            <sections>[Sections]</sections>
-            <repeats>[Repeats]</repeats>
-            <grids>[Grids]</grids>
-            <section-templates>[Section templates]</section-templates>
-            <controls>[Controls]</controls>
-            <all>[All]</all>
+            <label todo="true">[Form Settings]</label>
+            <save-as todo="true">[Save as…]</save-as>
+            <open><label todo="true">[Form settings]</label></open>
+            <stats todo="true">[Form statistics</stats>
+            <sections todo="true">[Sections]</sections>
+            <repeats todo="true">[Repeats]</repeats>
+            <grids todo="true">[Grids]</grids>
+            <section-templates todo="true">[Section templates]</section-templates>
+            <controls todo="true">[Controls]</controls>
+            <all todo="true">[All]</all>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
-            <tab-base><label>[Basic Settings]</label></tab-base>
-            <tab-validations><label>[Validations and Alerts]</label></tab-validations>
-            <tab-formulas><label>[Formulas]</label></tab-formulas>
-            <tab-help><label>[Help Message]</label></tab-help>
+            <tab-base><label todo="true">[Basic Settings]</label></tab-base>
+            <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
+            <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
+            <tab-help><label todo="true">[Help Message]</label></tab-help>
             <control-name>
                 <label>Elementnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
                 <hint>F.eks.: «fornavn»</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
                     <label>Vis i oppsummering</label>
                     <value>fr-summary</value>
@@ -2079,7 +2079,7 @@
                 <label>Innebygd type</label>
                 <hint>Inngebygd datatype</hint>
 
-                <use-schema-type>[Use schema type]</use-schema-type>
+                <use-schema-type todo="true">[Use schema type]</use-schema-type>
 
                 <choices>
                     <choices>
@@ -2191,27 +2191,27 @@
                 <hint>XPath-uttrykk</hint>
             </calculate>
             <help>
-                <label>[Help Message]</label>
-                <hint>[Message displayed when users click on the help icon next to the label]</hint>
+                <label todo="true">[Help Message]</label>
+                <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
             </help>
             <alert>
-                <label>[Feilmelding]</label>
-                <hint>[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
+                <label todo="true">[Feilmelding]</label>
+                <hint todo="true">[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
             </alert>
             <default-alert>
-                <label>[Default alert message]</label>
-                <hint>[Active when there is not a more specific alert message]</hint>
+                <label todo="true">[Default alert message]</label>
+                <hint todo="true">[Active when there is not a more specific alert message]</hint>
             </default-alert>
             <use-global-alert>
-                <label>[Use global default alert message]</label>
+                <label todo="true">[Use global default alert message]</label>
             </use-global-alert>
             <use-default-alert>
-                <label>[Use default alert message]</label>
+                <label todo="true">[Use default alert message]</label>
             </use-default-alert>
-            <validation-type><label>[Validation Type]</label></validation-type>
-            <validation-details><label>[Validation Details]</label></validation-details>
-            <level><label>[Level]</label></level>
-            <use-html>[Use HTML]</use-html>
+            <validation-type><label todo="true">[Validation Type]</label></validation-type>
+            <validation-details><label todo="true">[Validation Details]</label></validation-details>
+            <level><label todo="true">[Level]</label></level>
+            <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Rediger seksjonsdetaljer</label>
@@ -2221,9 +2221,9 @@
                 <hint>F.eks.: «adresse»</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
-                    <label>[Page Break Before]</label>
+                    <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -2238,26 +2238,26 @@
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
             <repeat>
-                <label>[Repeat Section Content]</label>
+                <label todo="true">[Repeat Section Content]</label>
             </repeat>
             <custom-iteration-name>
-                <label>[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable Custom Iteration Name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>[Custom Iteration Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
+                <label todo="true">[Custom Iteration Name]</label>
+                <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>[Grid Settings]</label>
+            <label todo="true">[Grid Settings]</label>
             <control-name>
-                <label>[Grid Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
-                <hint>[E.g.: "first-name"]</hint>
+                <label todo="true">[Grid Name]</label>
+                <alert todo="true">[Name is already in use or incorrect]</alert>
+                <hint todo="true">[E.g.: "first-name"]</hint>
             </control-name>
             <visibility>
                 <label>Synlighet</label>
@@ -2270,19 +2270,19 @@
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
             <min>
-                <label>[Minimum Number of Repetitions]</label>
-                <alert>[Incorrect value]</alert>
-                <hint>[Non-negative number]</hint>
+                <label todo="true">[Minimum Number of Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Non-negative number]</hint>
             </min>
             <max>
-                <label>[Maximum Number of Repetitions]</label>
-                <alert>[Incorrect value]</alert>
-                <hint>[Positive number]</hint>
+                <label todo="true">[Maximum Number of Repetitions]</label>
+                <alert todo="true">[Incorrect value]</alert>
+                <hint todo="true">[Positive number]</hint>
             </max>
-            <other>[Other]</other>
-            <one>[One repetition]</one>
-            <unlimited>[Unlimited]</unlimited>
-            <no-minimum>[No minimum]</no-minimum>
+            <other todo="true">[Other]</other>
+            <one todo="true">[One repetition]</one>
+            <unlimited todo="true">[Unlimited]</unlimited>
+            <no-minimum todo="true">[No minimum]</no-minimum>
         </dialog-grid-details>
         <dialog-confirmation>
             <label>Bekreft</label>
@@ -2311,8 +2311,8 @@
             <new-language>
                 <label>Legg til det følgende språket</label>
             </new-language>
-            <common>[Most common languages]</common>
-            <all>[Other languages]</all>
+            <common todo="true">[Most common languages]</common>
+            <all todo="true">[Other languages]</all>
             <add-language>
                 <label>Legg til språk</label>
             </add-language>
@@ -2369,9 +2369,9 @@
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <label>[Edit Choices]</label>
+            <label todo="true">[Edit Choices]</label>
             <resources-language>
-                <label>[Resources Language]</label>
+                <label todo="true">[Resources Language]</label>
             </resources-language>
             <label>
                 <label>Label</label>
@@ -2380,7 +2380,7 @@
                 <label>Verdi</label>
             </value>
             <hint>
-                <label>[Hint]</label>
+                <label todo="true">[Hint]</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>
@@ -2528,13 +2528,13 @@
                 </item>
             </event-type>
             <event-condition>
-                <label>[Condition]</label>
+                <label todo="true">[Condition]</label>
                 <item>
-                    <label>[Run always]</label>
+                    <label todo="true">[Run always]</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>[Run on creation only]</label>
+                    <label todo="true">[Run on creation only]</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -2618,13 +2618,13 @@
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
-            <enable-permissions>[Enable permissions for this form]</enable-permissions>
+            <enable-permissions todo="true">[Enable permissions for this form]</enable-permissions>
             <role>Role</role>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
-            <owner>[Owner]</owner>
-            <group-members>[Group members]</group-members>
+            <owner todo="true">[Owner]</owner>
+            <group-members todo="true">[Group members]</group-members>
             <create>Create</create>
             <read>Read</read>
             <update>Update</update>
@@ -2647,24 +2647,24 @@
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
             <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere):</new-metadata-output>
             <edit-metadata-output/>
-            <save-as-metadata-output>[Enter a new application name and form name to be used for the copy of this form:]</save-as-metadata-output>
-            <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
-            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
+            <save-as-metadata-output todo="true">[Enter a new application name and form name to be used for the copy of this form:]</save-as-metadata-output>
+            <xpath-errors todo="true">[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
+            <lhha-checkbox todo="true">[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Uten tittel</untitled-form>
             <untitled-section>Uten tittel</untitled-section>
             <items>
                 <item>
-                    <label>[First choice]</label>
+                    <label todo="true">[First choice]</label>
                     <value>1</value>
                 </item>
                 <item>
-                    <label>[Second choice]</label>
+                    <label todo="true">[Second choice]</label>
                     <value>2</value>
                 </item>
                 <item>
-                    <label>[Third choice]</label>
+                    <label todo="true">[Third choice]</label>
                     <value>3</value>
                 </item>
             </items>
@@ -2675,12 +2675,12 @@
         <application-name>
             <label>Название приложения</label>
             <hint>Определяет логическую группу форм. Например, по функциональности или по принадлежности к департаменту (например, "hr"). Если группа форм всего одна, можно использовать название организации. Название приложения входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
-            <alert>[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </application-name>
         <form-name>
             <label>Название формы</label>
             <hint>Определяет данную конкретную форму (например, "health-record"). Название формы входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>
-            <alert>[Use ASCII letters, digits, "-" or "_"]</alert>
+            <alert todo="true">[Use ASCII letters, digits, "-" or "_"]</alert>
         </form-name>
         <title>
             <label>Заголовок формы</label>
@@ -2706,7 +2706,7 @@
             <label>Вставить</label>
         </paste>
         <form-structure>
-            <label>[Form Structure]</label>
+            <label todo="true">[Form Structure]</label>
         </form-structure>
         <controls>
             <label>Элементы</label>
@@ -2739,7 +2739,7 @@
             <label>Новая сетка</label>
         </new-grid>
         <new-repeated-grid>
-            <label>[New Repeated Grid]</label>
+            <label todo="true">[New Repeated Grid]</label>
         </new-repeated-grid>
         <change-schema>
             <label>Изменить схему</label>
@@ -2775,25 +2775,25 @@
             <label>Перезагрузить элементы</label>
         </reload-components>
         <enter-section-title>
-            <label>[Click to enter a section title]</label>
+            <label todo="true">[Click to enter a section title]</label>
         </enter-section-title>
         <type-section-title>
-            <label>[Type your section title]</label>
+            <label todo="true">[Type your section title]</label>
         </type-section-title>
         <enter-label>
             <label>Нажмите чтобы ввести название</label>
         </enter-label>
         <type-label>
-            <label>[Type your label here]</label>
+            <label todo="true">[Type your label here]</label>
         </type-label>
         <enter-hint>
             <label>Нажмите чтобы ввести подсказку</label>
         </enter-hint>
         <enter-text>
-            <label>[Type your text here]</label>
+            <label todo="true">[Type your text here]</label>
         </enter-text>
         <type-hint>
-            <label>[Type your hint here]</label>
+            <label todo="true">[Type your hint here]</label>
         </type-hint>
         <enter-text>
             <label>Нажмите чтобы ввести текст</label>
@@ -2890,7 +2890,7 @@
             <label>Редактировать</label>
         </edit>
         <classes>
-            <label>[Custom CSS classes]</label>
+            <label todo="true">[Custom CSS classes]</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -2915,30 +2915,30 @@
             <label>[Выберите...]</label>
         </select>
         <dialog-form-settings>
-            <label>[Form Settings]</label>
-            <save-as>[Save as…]</save-as>
-            <open><label>[Form Settings]</label></open>
-            <stats>[Form statistics</stats>
-            <sections>[Sections]</sections>
-            <repeats>[Repeats]</repeats>
-            <grids>[Grids]</grids>
-            <section-templates>[Section templates]</section-templates>
-            <controls>[Controls]</controls>
-            <all>[All]</all>
+            <label todo="true">[Form Settings]</label>
+            <save-as todo="true">[Save as…]</save-as>
+            <open><label todo="true">[Form Settings]</label></open>
+            <stats todo="true">[Form statistics</stats>
+            <sections todo="true">[Sections]</sections>
+            <repeats todo="true">[Repeats]</repeats>
+            <grids todo="true">[Grids]</grids>
+            <section-templates todo="true">[Section templates]</section-templates>
+            <controls todo="true">[Controls]</controls>
+            <all todo="true">[All]</all>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
-            <tab-base><label>[Basic Settings]</label></tab-base>
-            <tab-validations><label>[Validations and Alerts]</label></tab-validations>
-            <tab-formulas><label>[Formulas]</label></tab-formulas>
-            <tab-help><label>[Help Message]</label></tab-help>
+            <tab-base><label todo="true">[Basic Settings]</label></tab-base>
+            <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
+            <tab-formulas><label todo="true">[Formulas]</label></tab-formulas>
+            <tab-help><label todo="true">[Help Message]</label></tab-help>
             <control-name>
                 <label>Название элемента</label>
                 <alert>Название уже используется или некорректно</alert>
                 <hint>Например: "first-name"</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
                     <label>Показывать в сводной странице</label>
                     <value>fr-summary</value>
@@ -2963,7 +2963,7 @@
                 <label>Встроенный тип</label>
                 <hint>Встроенный тип данных</hint>
 
-                <use-schema-type>[Use schema type]</use-schema-type>
+                <use-schema-type todo="true">[Use schema type]</use-schema-type>
 
                 <choices>
                     <choices>
@@ -3074,27 +3074,27 @@
                 <hint>Булево выражение XPath</hint>
             </calculate>
             <help>
-                <label>[Help Message]</label>
-                <hint>[Message displayed when users click on the help icon next to the label]</hint>
+                <label todo="true">[Help Message]</label>
+                <hint todo="true">[Message displayed when users click on the help icon next to the label]</hint>
             </help>
             <alert>
-                <label>[Сообщение об ошибке]</label>
-                <hint>[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
+                <label todo="true">[Сообщение об ошибке]</label>
+                <hint todo="true">[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
             </alert>
             <default-alert>
-                <label>[Default alert message]</label>
-                <hint>[Active when there is not a more specific alert message]</hint>
+                <label todo="true">[Default alert message]</label>
+                <hint todo="true">[Active when there is not a more specific alert message]</hint>
             </default-alert>
             <use-global-alert>
-                <label>[Use global default alert message]</label>
+                <label todo="true">[Use global default alert message]</label>
             </use-global-alert>
             <use-default-alert>
-                <label>[Use default alert message]</label>
+                <label todo="true">[Use default alert message]</label>
             </use-default-alert>
-            <validation-type><label>[Validation Type]</label></validation-type>
-            <validation-details><label>[Validation Details]</label></validation-details>
-            <level><label>[Level]</label></level>
-            <use-html>[Use HTML]</use-html>
+            <validation-type><label todo="true">[Validation Type]</label></validation-type>
+            <validation-details><label todo="true">[Validation Details]</label></validation-details>
+            <level><label todo="true">[Level]</label></level>
+            <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Настройки раздела</label>
@@ -3104,9 +3104,9 @@
                 <hint>Например: "address"</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
-                    <label>[Page Break Before]</label>
+                    <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -3121,19 +3121,19 @@
                 <hint>Булево выражение XPath</hint>
             </readonly>
             <repeat>
-                <label>[Repeat Section Content]</label>
+                <label todo="true">[Repeat Section Content]</label>
             </repeat>
             <custom-iteration-name>
-                <label>[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable Custom Iteration Name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>[Custom Iteration Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
+                <label todo="true">[Custom Iteration Name]</label>
+                <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Редактировать настройки сетки</label>
@@ -3162,10 +3162,10 @@
                 <alert>Некорректное значение</alert>
                 <hint>Положительное число</hint>
             </max>
-            <other>[Other]</other>
-            <one>[One repetition]</one>
-            <unlimited>[Unlimited]</unlimited>
-            <no-minimum>[No minimum]</no-minimum>
+            <other todo="true">[Other]</other>
+            <one todo="true">[One repetition]</one>
+            <unlimited todo="true">[Unlimited]</unlimited>
+            <no-minimum todo="true">[No minimum]</no-minimum>
         </dialog-grid-details>
         <dialog-confirmation>
             <label>Подтвердить</label>
@@ -3194,8 +3194,8 @@
             <new-language>
                 <label>Добавить следующий язык</label>
             </new-language>
-            <common>[Most common languages]</common>
-            <all>[Other languages]</all>
+            <common todo="true">[Most common languages]</common>
+            <all todo="true">[Other languages]</all>
             <add-language>
                 <label>Добавить язык</label>
             </add-language>
@@ -3263,7 +3263,7 @@
                 <label>Системное значение</label>
             </value>
             <hint>
-                <label>[Hint]</label>
+                <label todo="true">[Hint]</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>
@@ -3411,13 +3411,13 @@
                 </item>
             </event-type>
             <event-condition>
-                <label>[Condition]</label>
+                <label todo="true">[Condition]</label>
                 <item>
-                    <label>[Run always]</label>
+                    <label todo="true">[Run always]</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>[Run on creation only]</label>
+                    <label todo="true">[Run on creation only]</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -3506,8 +3506,8 @@
             <permissions>Права</permissions>
             <operations>Действия</operations>
             <anyone>Любой пользователь</anyone>
-            <owner>[Owner]</owner>
-            <group-members>[Group members]</group-members>
+            <owner todo="true">[Owner]</owner>
+            <group-members todo="true">[Group members]</group-members>
             <create>Заполнять форму</create>
             <read>Просматривать</read>
             <update>редактировать</update>
@@ -3531,23 +3531,23 @@
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
-            <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
-            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
+            <xpath-errors todo="true">[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
+            <lhha-checkbox todo="true">[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Новая форма</untitled-form>
             <untitled-section>Новый раздел</untitled-section>
             <items>
                 <item>
-                    <label>[First choice]</label>
+                    <label todo="true">[First choice]</label>
                     <value>1</value>
                 </item>
                 <item>
-                    <label>[Second choice]</label>
+                    <label todo="true">[Second choice]</label>
                     <value>2</value>
                 </item>
                 <item>
-                    <label>[Third choice]</label>
+                    <label todo="true">[Third choice]</label>
                     <value>3</value>
                 </item>
             </items>
@@ -3622,7 +3622,7 @@
             <label>Nuova griglia</label>
         </new-grid>
         <new-repeated-grid>
-            <label>[New Repeated Grid]</label>
+            <label todo="true">[New Repeated Grid]</label>
             <!--<label>Nuovo repeat</label>-->
         </new-repeated-grid>
         <change-schema>
@@ -3674,7 +3674,7 @@
             <label>Fai click per inserire un suggerimento</label>
         </enter-hint>
         <enter-text>
-            <label>[Type your text here]</label>
+            <label todo="true">[Type your text here]</label>
         </enter-text>
         <type-hint>
             <label>Scrivi qui il tuo suggerimento</label>
@@ -3774,7 +3774,7 @@
             <label>Modifica</label>
         </edit>
         <classes>
-            <label>[Custom CSS classes]</label>
+            <label todo="true">[Custom CSS classes]</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -3827,7 +3827,7 @@
                 <hint>Punti di riferimento nei quali il valore per questo controllo è salvato.</hint>
             </control-xpath>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
                     <label>Mostra nel sommario</label>
                     <value>fr-summary</value>
@@ -3983,7 +3983,7 @@
             <validation-type><label>Tipo di convalida</label></validation-type>
             <validation-details><label>Dettagli di convalida</label></validation-details>
             <level><label>Livello</label></level>
-            <use-html>[Use HTML]</use-html>
+            <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Dettagli della sezione</label>
@@ -3993,9 +3993,9 @@
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
-                    <label>[Page Break Before]</label>
+                    <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -4010,19 +4010,19 @@
                 <hint>Espressione XPath boolean</hint>
             </readonly>
             <repeat>
-                <label>[Repeat Section Content]</label>
+                <label todo="true">[Repeat Section Content]</label>
             </repeat>
             <custom-iteration-name>
-                <label>[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable Custom Iteration Name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>[Custom Iteration Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
+                <label todo="true">[Custom Iteration Name]</label>
+                <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Dettagli griglia</label>
@@ -4152,7 +4152,7 @@
                 <label>Valore</label>
             </value>
             <hint>
-                <label>[Hint]</label>
+                <label todo="true">[Hint]</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>
@@ -4511,7 +4511,7 @@
             <label>Neue Tabelle</label>
         </new-grid>
         <new-repeated-grid>
-            <label>[New Repeated Grid]</label>
+            <label todo="true">[New Repeated Grid]</label>
             <!--<label>Neue Schleife</label>-->
         </new-repeated-grid>
         <change-schema>
@@ -4563,7 +4563,7 @@
             <label>Klicken, um einen Hinweis hinzuzufgügen</label>
         </enter-hint>
         <enter-text>
-            <label>[Type your text here]</label>
+            <label todo="true">[Type your text here]</label>
         </enter-text>
         <type-hint>
             <label>Schreibe hier den Hinweis hinein</label>
@@ -4663,7 +4663,7 @@
             <label>Ändern</label>
         </edit>
         <classes>
-            <label>[Custom CSS classes]</label>
+            <label todo="true">[Custom CSS classes]</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -4716,7 +4716,7 @@
                 <hint>Knotenpunkte, an denen der Wert dieses Bedienelementes gespeichert ist</hint>
             </control-xpath>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
                     <label>Übersicht anzeigen</label>
                     <value>fr-summary</value>
@@ -4872,7 +4872,7 @@
             <validation-type><label>Validationstypen</label></validation-type>
             <validation-details><label>Validierungsdetails</label></validation-details>
             <level><label>Level</label></level>
-            <use-html>[Use HTML]</use-html>
+            <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Abschnittdetails</label>
@@ -4882,9 +4882,9 @@
                 <hint>Z.B.: "kontaktdaten"</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
-                    <label>[Page Break Before]</label>
+                    <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -4899,19 +4899,19 @@
                 <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
             </readonly>
             <repeat>
-                <label>[Repeat Section Content]</label>
+                <label todo="true">[Repeat Section Content]</label>
             </repeat>
             <custom-iteration-name>
-                <label>[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable Custom Iteration Name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>[Custom Iteration Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
+                <label todo="true">[Custom Iteration Name]</label>
+                <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Tabellendetails</label>
@@ -5041,7 +5041,7 @@
                 <label>Wert</label>
             </value>
             <hint>
-                <label>[Hint]</label>
+                <label todo="true">[Hint]</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>
@@ -5404,7 +5404,7 @@
             <label>Uusi ruudukko</label>
         </new-grid>
         <new-repeated-grid>
-            <label>[New Repeated Grid]</label>
+            <label todo="true">[New Repeated Grid]</label>
             <!--<label>Uusi toisto</label>-->
         </new-repeated-grid>
         <change-schema>
@@ -5456,7 +5456,7 @@
             <label>Klikkaa lisätäksesi vihje</label>
         </enter-hint>
         <enter-text>
-            <label>[Type your text here]</label>
+            <label todo="true">[Type your text here]</label>
         </enter-text>
         <type-hint>
             <label>Kirjoita vihjeesi tähän</label>
@@ -5556,7 +5556,7 @@
             <label>Muokkaa</label>
         </edit>
         <classes>
-            <label>[Custom CSS classes]</label>
+            <label todo="true">[Custom CSS classes]</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -5609,7 +5609,7 @@
                 <hint>Viittaa solmuun, johon tämän hallinnan arvo on varastoitu</hint>
             </control-xpath>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
                     <label>Näytä tiivistelmänä</label>
                     <value>fr-summary</value>
@@ -5765,7 +5765,7 @@
             <validation-type><label>Vahvistamisen tyyppi</label></validation-type>
             <validation-details><label>Vahvistamisen tiedot</label></validation-details>
             <level><label>Taso</label></level>
-            <use-html>[Use HTML]</use-html>
+            <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Lohkon yksityiskohdat</label>
@@ -5775,9 +5775,9 @@
                 <hint>Esim.: "osoite"</hint>
             </control-name>
             <options>
-                <label>[Options]</label>
+                <label todo="true">[Options]</label>
                 <item>
-                    <label>[Page Break Before]</label>
+                    <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -5792,19 +5792,19 @@
                 <hint>Boolean XPath-lauseke</hint>
             </readonly>
             <repeat>
-                <label>[Repeat Section Content]</label>
+                <label todo="true">[Repeat Section Content]</label>
             </repeat>
             <custom-iteration-name>
-                <label>[Enable Custom Iteration Name]</label>
+                <label todo="true">[Enable Custom Iteration Name]</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label>[Custom Iteration Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
+                <label todo="true">[Custom Iteration Name]</label>
+                <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label>[Repeated Content]</label></tab-repeat>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Ruudukon yksityiskohdat</label>
@@ -5934,7 +5934,7 @@
                 <label>Arvo</label>
             </value>
             <hint>
-                <label>[Hint]</label>
+                <label todo="true">[Hint]</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>

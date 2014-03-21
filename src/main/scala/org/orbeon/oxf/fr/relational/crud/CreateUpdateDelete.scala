@@ -79,80 +79,126 @@ trait CreateUpdateDelete extends RequestResponse with Common {
     def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Unit = {
 
         val table  = tableName(req)
-        val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
-        val ps = connection.prepareStatement(
-            s"""insert into $table
-                (
-                                                   created, last_modified_time, last_modified_by
-                                                 , app, form, form_version
-                    ${if (req.forData)          ", document_id"             else ""}
-                                                 , deleted
-                    ${if (req.forData)          ", draft"                   else ""}
-                    ${if (req.forAttachment)    ", file_name, file_content" else ""}
-                    ${if (! req.forAttachment) s", $xmlCol"                 else ""}
-                    ${if (req.forData)          ", username, groupname"     else ""}
-                )
-                values
-                (
-                                               ?, ?, ?
-                                               , ?, ?, ?
-                    ${if (req.forData)         ", ?"    else ""}
-                                               , ${if (delete) "'Y'" else "'N'"}
-                    ${if (req.forData)         ", ?"    else ""}
-                    ${if (req.forAttachment)   ", ?, ?" else ""}
-                    ${if (! req.forAttachment) ", ?" else ""}
-                    ${if (req.forData)         ", ?, ?" else ""}
-                )""".stripMargin)
 
-        val position = Iterator.from(1)
-        val now = new Timestamp(System.currentTimeMillis())
+        // Do insert
+        locally {
+            val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
+            val ps = connection.prepareStatement(
+                s"""insert into $table
+                    (
+                                                       created, last_modified_time, last_modified_by
+                                                     , app, form, form_version
+                        ${if (req.forData)          ", document_id"             else ""}
+                                                     , deleted
+                        ${if (req.forData)          ", draft"                   else ""}
+                        ${if (req.forAttachment)    ", file_name, file_content" else ""}
+                        ${if (! req.forAttachment) s", $xmlCol"                 else ""}
+                        ${if (req.forData)          ", username, groupname"     else ""}
+                    )
+                    values
+                    (
+                                                   ?, ?, ?
+                                                   , ?, ?, ?
+                        ${if (req.forData)         ", ?"    else ""}
+                                                   , ${if (delete) "'Y'" else "'N'"}
+                        ${if (req.forData)         ", ?"    else ""}
+                        ${if (req.forAttachment)   ", ?, ?" else ""}
+                        ${if (! req.forAttachment) ", ?" else ""}
+                        ${if (req.forData)         ", ?, ?" else ""}
+                    )""".stripMargin)
 
-        // For put/update, reads the request either as bytes or XML
-        object RequestReader {
-            def requestInputStream(): InputStream = {
-                RequestGenerator.getRequestBody(PipelineContext.get) match {
-                    case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-                    case _ ⇒ httpRequest.getInputStream
+            // For put/update, reads the request either as bytes or XML
+            object RequestReader {
+                def requestInputStream(): InputStream = {
+                    RequestGenerator.getRequestBody(PipelineContext.get) match {
+                        case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
+                        case _ ⇒ httpRequest.getInputStream
+                    }
+                }
+
+                def bytes(): Array[Byte] = {
+                    val os = new ByteArrayOutputStream
+                    NetUtils.copyStream(requestInputStream(), os)
+                    os.toByteArray
+                }
+
+                def xml(): String = {
+                    val transformer = TransformerUtils.getXMLIdentityTransformer
+                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+                    val writer = new StringBuilderWriter()
+                    val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
+                    transformer.transform(source, new StreamResult(writer))
+                    writer.toString
                 }
             }
 
-            def bytes(): Array[Byte] = {
-                val os = new ByteArrayOutputStream
-                NetUtils.copyStream(requestInputStream(), os)
-                os.toByteArray
+            val position = Iterator.from(1)
+            val now = new Timestamp(System.currentTimeMillis())
+
+                                         ps.setTimestamp(position.next(), existingRow.map(_.created).getOrElse(now))
+                                         ps.setTimestamp(position.next(), now)
+                                         ps.setString(position.next(), requestUsername.getOrElse(null))
+                                         ps.setString(position.next(), req.app)
+                                         ps.setString(position.next(), req.form)
+                                         ps.setInt   (position.next(), existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req)))
+            if (req.forData)             ps.setString(position.next(), req.dataPart.get.documentId)
+            if (req.forData)             ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
+            if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
+            if (delete) {
+                                         ps.setNull(position.next(), if (req.forAttachment) Types.BLOB else Types.CLOB)
+            } else {
+                if (req.forAttachment)   ps.setBytes (position.next(), RequestReader.bytes())
+                if (! req.forAttachment) ps.setString(position.next(), RequestReader.xml())
+            }
+            if (req.forData) {
+                                         ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))
+                                         ps.setString(position.next(), existingRow.map(_.group).flatten.getOrElse(requestGroup.getOrElse(null)))
             }
 
-            def xml(): String = {
-                val transformer = TransformerUtils.getXMLIdentityTransformer
-                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-                val writer = new StringBuilderWriter()
-                val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
-                transformer.transform(source, new StreamResult(writer))
-                writer.toString
+            ps.executeUpdate()
+        }
+
+        // If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name -->
+        if (req.forData && req.dataPart.get.isDraft) {
+
+            // In the last_modified_time != ... part of the query, the additional level of nesting required
+            // on MySQL http://stackoverflow.com/a/45498/5295
+            val ps = connection.prepareStatement(
+                s"""delete from $table
+                    where
+                        app = ?
+                        and form = ?
+                        and document_id = ?
+                        ${if (req.forAttachment) "and file_name = ?" else ""}
+                        and draft = 'Y'
+                        and last_modified_time !=
+                            (
+                                select last_modified_time from
+                                (
+                                    select max(last_modified_time) last_modified_time
+                                    from $table
+                                    where
+                                        app = ?
+                                        and form = ?
+                                        and document_id = ?
+                                        ${if (req.forAttachment) "and file_name = ?" else ""}
+                                        and draft = 'Y'
+                                ) t
+                            )
+                    """.stripMargin)
+
+            val position = Iterator.from(1)
+
+            // Run twice as the the same values are used in the inner
+            for (i <- 1 to 2) {
+                ps.setString(position.next(), req.app)
+                ps.setString(position.next(), req.form)
+                ps.setString(position.next(), req.dataPart.get.documentId)
+                if (req.forAttachment) ps.setString(position.next(), req.filename.get)
             }
-        }
 
-                                     ps.setTimestamp(position.next(), existingRow.map(_.created).getOrElse(now))
-                                     ps.setTimestamp(position.next(), now)
-                                     ps.setString(position.next(), requestUsername.getOrElse(null))
-                                     ps.setString(position.next(), req.app)
-                                     ps.setString(position.next(), req.form)
-                                     ps.setInt   (position.next(), existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req)))
-        if (req.forData)             ps.setString(position.next(), req.dataPart.get.documentId)
-        if (req.forData)             ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
-        if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
-        if (delete) {
-                                     ps.setNull(position.next(), if (req.forAttachment) Types.BLOB else Types.CLOB)
-        } else {
-            if (req.forAttachment)   ps.setBytes (position.next(), RequestReader.bytes())
-            if (! req.forAttachment) ps.setString(position.next(), RequestReader.xml())
+            ps.executeUpdate()
         }
-        if (req.forData) {
-                                     ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))
-                                     ps.setString(position.next(), existingRow.map(_.group).flatten.getOrElse(requestGroup.getOrElse(null)))
-        }
-
-        ps.executeUpdate()
     }
 
     def change(req: Request, delete: Boolean): Unit = {

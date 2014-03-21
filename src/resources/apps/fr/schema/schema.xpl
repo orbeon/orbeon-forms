@@ -32,13 +32,20 @@
         <p:output name="data" id="unrolled-form-definition"/>
     </p:processor>
 
-    <!-- Remove xf:bind/@relevant, so can know about itemsets also for non-relevant controls -->
+    <!-- Pre-process form -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#unrolled-form-definition"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <!-- Remove xf:bind/@relevant, so can know about itemsets also for non-relevant controls -->
                 <xsl:template match="xf:bind/@relevant"/>
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/1623 -->
+                <xsl:template match="fr:dropdown-select1">
+                    <xf:select1 appearance="minimal">
+                        <xsl:apply-templates select="@* except @appearance | node()"/>
+                    </xf:select1>
+                </xsl:template>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="form-without-relevant"/>

@@ -32,7 +32,7 @@ trait ControlResourcesEditor extends AssertionsForJUnit with FormBuilderOps with
     private val Body = cssSelector(".fb-navbar img")
 
     // On click on the label, because the label has a `for` pointing to the input, the focus would switch to the input,
-    // which we don't want to happen. So in control-resources-editor.coffee, we remove the `for` after the click. While this
+    // which we don't want to happen. So in control-resources-editor/*.coffee, we remove the `for` after the click. While this
     // works on the browser, it doesn't work when the click is done through WebDriver, just with Firefox. So here
     // we remove the `for` before doing the click.
     private def clickLabel(selector: CssSelectorQuery): Unit = {

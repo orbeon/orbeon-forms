@@ -6323,7 +6323,7 @@
             <label>Hacer Click para agregar ayuda</label>
         </enter-hint>
         <enter-text>
-            <label todo="true">[Type your text here]</label>
+            <label>Escriba texto aquí</label>
         </enter-text>
         <type-hint>
             <label>Escriba la ayuda aquí</label>

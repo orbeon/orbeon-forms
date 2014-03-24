@@ -676,8 +676,12 @@ body {
 }
 .orbeon .fr-view .fr-grid.fr-editable .xforms-label:hover,
 .orbeon .fr-view .fr-grid.fr-editable .xforms-hint:hover,
-.orbeon .fr-view .fr-grid.fr-editable .btn span:hover:hover {
+.orbeon .fr-view .fr-grid.fr-editable .btn span:hover,
+.orbeon .fr-view .fr-grid.fr-editable .xforms-text .xforms-output-output:hover {
   background-color: #eeeeee;
+}
+.orbeon .fr-view .fr-grid.fr-editable .xforms-text .xforms-output-output {
+  min-height: 50px;
 }
 .orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label,
 .orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint,

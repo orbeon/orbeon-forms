@@ -524,9 +524,11 @@ body {
             &:hover .fb-grid-td { border: 1px solid @lightBlue }
         }
         .fb-grid-tr { height: 60px }                                                                                // Enough space to hold row icons so hovering doesn't cause the row to expand
-        .xforms-label, .xforms-hint, .btn span:hover {
+        .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
             &:hover { background-color: #eee }                                                                      // Indicate the value can be edited
         }
+        // Make click area with the grey background larger, as it will typically contain a longer text
+        .xforms-text .xforms-output-output { min-height: 50px; }
 
         // Even if the label or hint is empty, we still want space for 1 line to be reserved
         .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                              // In regular grid content

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.client
 
-import org.orbeon.oxf.client.fb.{Permissions, LabelHintEditor}
+import org.orbeon.oxf.client.fb.{Permissions, ControlResourcesEditor}
 import org.junit.runners.MethodSorters
 import org.junit.FixMethodOrder
 import org.orbeon.oxf.client.fr.{Grid, Currency}
@@ -25,7 +25,7 @@ class CombinedClientTest
     with XForms
     with FormRunnerSummary
     with OrbeonFormsDemoPath
-    with LabelHintEditor
+    with ControlResourcesEditor
     with Permissions
     with Currency
     with Grid

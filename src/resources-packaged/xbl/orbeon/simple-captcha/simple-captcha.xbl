@@ -49,7 +49,7 @@
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
                         <resource xml:lang="en"><ask-to-type-word>Type the word above:</ask-to-type-word></resource>
-                        <resource xml:lang="es"><ask-to-type-word todo="true">[Type the word above:]</ask-to-type-word></resource>
+                        <resource xml:lang="es"><ask-to-type-word>Digite la palabra de la imagen:</ask-to-type-word></resource>
                         <resource xml:lang="fi"><ask-to-type-word>Kirjoita yläpuolella oleva sana tähän:</ask-to-type-word></resource>
                         <resource xml:lang="fr"><ask-to-type-word>Veuillez entrer le mot ci-dessus:</ask-to-type-word></resource>
                         <resource xml:lang="de"><ask-to-type-word>Geben Sie die obigen Wörter ein:</ask-to-type-word></resource>

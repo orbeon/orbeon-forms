@@ -1,9 +1,8 @@
 $ ->
     Builder = ORBEON.Builder
-    Events = ORBEON.xforms.Events
     OD = ORBEON.xforms.Document
 
-    LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint'
+    LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text'
     ControlSelector = '.xforms-control, .xbl-component'
 
     # Global state
@@ -46,6 +45,27 @@ $ ->
             currentControl = null
             currentLabelHint = null
 
+    # Show editor on click on label
+    startEdit = () ->
+        # Remove `for` so browser doesn't set the focus to the control on click
+        currentLabelHint.removeAttr('for')
+        # Show, position, and populate editor
+        # Get position before showing editor, so showing doesn't move things in the page
+        labelHintOffset = currentLabelHint.offset()
+        labelHintEditor().container.show()
+        labelHintEditor().container.offset(labelHintOffset)
+        labelHintEditor().container.width(currentLabelHint.outerWidth())
+        labelHintEditor().textfield.outerWidth(currentLabelHint.outerWidth() - labelHintEditor().checkbox.outerWidth(true))
+        labelHintEditor().textfield.val(labelHintValue()).focus()
+        labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
+        # Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
+        labelHintEditor().checkbox.tooltip(title: $('.fb-message-lhha-checkbox').text())
+        labelHintEditor().textfield.attr('placeholder', $(".fb-message-type-#{lhha()}").text())
+        # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
+        currentLabelHint.css('visibility', 'hidden')
+        # Add class telling if this is a label or hint editor
+        annotateWithLhhaClass(true)
+
     # Heuristic to close the editor based on click and focus events
     clickOrFocus = ({target}) ->
         target = $(target)
@@ -72,26 +92,6 @@ $ ->
         $(document).on('focusin', clickOrFocus)
         editor
 
-    # Show editor on click on label
-    startEdit = () ->
-        # Remove `for` so browser doesn't set the focus to the control on click
-        currentLabelHint.removeAttr('for')
-        # Show, position, and populate editor
-        # Get position before showing editor, so showing doesn't move things in the page
-        labelHintOffset = currentLabelHint.offset()
-        labelHintEditor().container.show()
-        labelHintEditor().container.offset(labelHintOffset)
-        labelHintEditor().container.width(currentLabelHint.outerWidth())
-        labelHintEditor().textfield.outerWidth(currentLabelHint.outerWidth() - labelHintEditor().checkbox.outerWidth(true))
-        labelHintEditor().textfield.val(labelHintValue()).focus()
-        labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
-        # Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
-        labelHintEditor().checkbox.tooltip(title: $('.fb-lhha-checkbox-message').text())
-        labelHintEditor().textfield.attr('placeholder', $(".fb-#{lhha()}-placeholder").text())
-        # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
-        currentLabelHint.css('visibility', 'hidden')
-        # Add class telling if this is a label or hint editor
-        annotateWithLhhaClass(true)
 
     # Click on label/hint
     $('.fb-main').on 'click', LabelHintSelector, ({currentTarget}) ->
@@ -121,48 +121,3 @@ $ ->
             else container.find('.xforms-label')
         startEdit()
 
-    ###
-    Show placeholders, e.g. "Click here to…"
-    - Maintain on the <label class="xforms-label"> and <span class="xforms-hint"> an attribute placeholder.
-    - Value of placeholder attribute is the text shown on grid mouseover if the label/hint is empty.
-    - The value of the placeholder is shown with CSS :empty:before.
-    ###
-    do ->
-        resourceNames = ['label', 'hint', 'text']
-        gridTdUpdated = []                  # Seq[gridTd: El] tds on which we set placeholders, to update on lang change
-        placeholderTextForResource = {}     # Map[resource name:String, placeholder: String]
-
-        # Set the placeholder attributes in the LHHA inside this gridTd
-        updateGridTd = (gridTd) ->
-            gridTd = $(gridTd)
-            _.each resourceNames, (lhha) ->
-                elementInDiv = gridTd.find(".xforms-#{lhha}")
-                # If elements is an xf:output, put placeholder attribute on child element
-                if elementInDiv.is('.xforms-output') then elementInDiv = elementInDiv.children('.xforms-output-output')
-                elementInDiv.attr('placeholder', placeholderTextForResource[lhha])
-
-        # Reads and stores the placeholder text
-        updatePlacehodlerText = ->
-            foundDifference = false
-            _.each resourceNames, (lhha) ->
-                newText = $("#fb-placeholder-#{lhha}").children().text()
-                if newText != placeholderTextForResource[lhha]
-                    placeholderTextForResource[lhha] = newText
-                    foundDifference = true
-            if foundDifference
-                # Only keep the gridTds still in the DOM
-                isInDoc = (e) -> $.contains(document.body, e)
-                gridTdUpdated = _.filter(gridTdUpdated, isInDoc)
-                # Update the placeholders in the gridTds we have left
-                _.each(gridTdUpdated, updateGridTd)
-
-        # Do initial update when the page is loaded
-        updatePlacehodlerText()
-        # Update on Ajax response in case the language changed
-        Events.ajaxResponseProcessedEvent.subscribe updatePlacehodlerText
-
-        # When label/hint empty, show placeholder hinting users can click to edit the label/hint
-        Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) ->
-            if ! _.contains(gridTdUpdated, gridTd)
-                gridTdUpdated.push(gridTd)
-                updateGridTd(gridTd)

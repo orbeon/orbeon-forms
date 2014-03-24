@@ -31,7 +31,9 @@
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/events.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/action-icons.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/placeholders.js"/>
-        <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/control-resources-editor.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/control-resources-editor/control-resources-editor.js"/>
+                                               /forms/orbeon/builder/resources/cell/control-resources-editor.js
+        <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/control-resources-editor/placeholders.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/static-upload.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/section-grid-repeat/position.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/section-grid-repeat/section-editor.js"/>
@@ -469,28 +471,13 @@
                                     </xf:trigger>
                                 </xh:span>
 
-                                <!-- Label editor -->
-                                <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/>
-                                <xf:output class="fb-lhha-checkbox-message" ref="$form-resources/messages/lhha-checkbox"/>
-                                <xf:output class="fb-label-placeholder" ref="$form-resources/type-label/label"/>
-                                <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
-                                    <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = fbf:controlName($control-id)]/label">
-                                        <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>
-                                    </xf:input>
-                                </xf:group>
-
-                                <!-- Hint editor -->
-                                <xf:output id="fb-placeholder-hint" ref="$form-resources/enter-hint/label"/>
-                                <xf:output class="fb-hint-placeholder" ref="$form-resources/type-hint/label"/>
-                                <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal">
-                                    <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = fbf:controlName($control-id)]/hint">
-                                        <xf:label appearance="minimal" ref="$form-resources/type-hint/label"/>
-                                    </xf:input>
-                                </xf:group>
-
-                                <!-- Text editor -->
-                                <xf:output id="fb-placeholder-text" ref="$form-resources/enter-text/label"/>
-
+                                <!-- Resources for control resources editors -->
+                                <xf:output class="fb-message-lhha-checkbox" ref="$form-resources/messages/lhha-checkbox"/>
+                                <xf:output class="fb-message-enter-label"   ref="$form-resources/enter-label/label"/>
+                                <xf:output class="fb-message-type-label"    ref="$form-resources/type-label/label"/>
+                                <xf:output class="fb-message-enter-hint"    ref="$form-resources/enter-hint/label"/>
+                                <xf:output class="fb-message-type-hint"     ref="$form-resources/type-hint/label"/>
+                                <xf:output class="fb-message-enter-text"    ref="$form-resources/enter-text/label"/>
 
                                 <!--
                                     Upload control for static image

@@ -30,7 +30,7 @@
 
         <fb:metadata>
             <fb:display-name lang="en">Explanation</fb:display-name>
-            <fb:display-name lang="es" todo="true">[Explanation]</fb:display-name>
+            <fb:display-name lang="es">Explicación</fb:display-name>
             <fb:display-name lang="fi" todo="true">[Explanation]</fb:display-name>
             <fb:display-name lang="fr">Explication</fb:display-name>
             <fb:display-name lang="ru" todo="true">[Explanation]</fb:display-name>

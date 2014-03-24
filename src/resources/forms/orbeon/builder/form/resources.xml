@@ -6423,7 +6423,7 @@
             <label>Editar</label>
         </edit>
         <classes>
-            <label todo="true">[Custom CSS classes]</label>
+            <label>Classes CSS customizadas</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -6629,7 +6629,7 @@
             <validation-type><label>Tipo de Validación</label></validation-type>
             <validation-details><label>Detalles de Validación</label></validation-details>
             <level><label>Nivel</label></level>
-            <use-html todo="true">[Use HTML]</use-html>
+            <use-html>Usa HTML</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Detalles de Sección</label>
@@ -6639,9 +6639,9 @@
                 <hint>Ej: "nombre"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Opciones</label>
                 <item>
-                    <label todo="true">[Page Break Before]</label>
+                    <label>Salto de Página Antes</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -6656,19 +6656,19 @@
                 <hint>Expresión XPath booleana</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Section Content]</label>
+                <label>Repetir Contenido de Sección</label>
             </repeat>
             <custom-iteration-name>
-                <label todo="true">[Enable Custom Iteration Name]</label>
+                <label>Habilitar Nombre Customizado de Iteracción</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label todo="true">[Custom Iteration Name]</label>
-                <alert todo="true">[Name is already in use or incorrect]</alert>
+                <label>Nombre Customizado de Iteracción</label>
+                <alert>Nombre ya en uso o es incorrecto</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
+            <tab-base><label>Configuración y Formulas Básicas</label></tab-base>
+            <tab-repeat><label>Repetir Contenido</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Detalles de Grilla</label>
@@ -6798,7 +6798,7 @@
                 <label>Valor</label>
             </value>
             <hint>
-                <label todo="true">[Hint]</label>
+                <label>Ayuda</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>

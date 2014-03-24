@@ -31,7 +31,7 @@
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Number</display-name>
-            <display-name lang="es" todo="true">[Number]</display-name>
+            <display-name lang="es">Número</display-name>
             <display-name lang="fi">Numero</display-name>
             <display-name lang="fr">Nombre</display-name>
             <display-name lang="ru" todo="true">[Number]</display-name>

@@ -31,7 +31,7 @@
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dialog Multi Selector</display-name>
-            <display-name lang="es" todo="true">[Dialog Multi Selector]</display-name>
+            <display-name lang="es">Diálogo multiselector</display-name>
             <display-name lang="fi">Dialogin monivalitsin</display-name>
             <display-name lang="fr">Dialogue liste multiple</display-name>
             <display-name lang="ru">Несколько из диалога</display-name>
@@ -234,7 +234,7 @@
                         <xf:value ref="value"/>
                     </xf:itemset>
                 </xf:select>
-            </xxf:dialog> 
+            </xxf:dialog>
         </xxbl:global>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -261,7 +261,7 @@
                             <xsl:variable name="label" select="/fr:dialog-select/xf:label"/>
                             <xsl:if test="$label/@ref"><xsl:attribute name="select" select="$label/@ref"/></xsl:if>
                             <xsl:value-of select="$label"/>
-                        </xxf:sequence> 
+                        </xxf:sequence>
                     </xf:var>
 
                     <!-- Internal selection control providing access to the itemset -->

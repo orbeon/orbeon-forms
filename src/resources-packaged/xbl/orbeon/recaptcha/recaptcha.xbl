@@ -25,7 +25,7 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="http://api.recaptcha.net/js/recaptcha_ajax.js"/>
+    <xbl:script src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"/>
     <xbl:script src="/xbl/orbeon/recaptcha/recaptcha.js"/>
 
     <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="focus binding lhha">
@@ -55,8 +55,8 @@
                     </verify-request>
                 </xf:instance>
                 <xf:instance id="verify-response-text"><verify-response/></xf:instance>
-                <!-- Calls reCAPTCHA API: http://code.google.com/apis/recaptcha/docs/verify.html -->
-                <xf:submission id="verify-submission" resource="http://api-verify.recaptcha.net/verify"
+                <!-- Calls reCAPTCHA API: https://developers.google.com/recaptcha/docs/verify -->
+                <xf:submission id="verify-submission" resource="http://www.google.com/recaptcha/api/verify"
                         ref="instance('verify-request')" method="post" serialization="application/x-www-form-urlencoded"
                         replace="text" targetref="instance('verify-response-text')"/>
             </xf:model>

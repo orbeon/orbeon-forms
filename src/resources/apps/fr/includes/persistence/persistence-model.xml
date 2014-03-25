@@ -42,6 +42,11 @@
     <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
                                            and $autosave-delay gt 0
                                            and normalize-space(xxf:get-request-header('orbeon-username')) != ''
+                                           and frf:javaAllAuthorizedOperations(
+                                                    xxf:instance('fr-form-metadata')/permissions,
+                                                    xxf:get-request-header('orbeon-username'),
+                                                    xxf:get-request-header('orbeon-group')
+                                               ) = ('*', 'update')
                                            and $mode = ('new', 'edit')
                                            and not($is-fb)"/>
 

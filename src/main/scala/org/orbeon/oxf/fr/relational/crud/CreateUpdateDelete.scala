@@ -62,7 +62,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             ps.executeQuery()
         }
 
-        // Build case case with first row of result
+        // Create Row object with first row of result
         if (resultSet.next()) {
             val row = new Row(resultSet.getTimestamp("created"),
                               if (req.forData) Option(resultSet.getString("username" )) else None,

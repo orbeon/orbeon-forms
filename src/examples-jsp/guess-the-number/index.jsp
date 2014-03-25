@@ -32,8 +32,6 @@
         <xh:style type="text/css">
             .row { margin-top: 10px }
         </xh:style>
-        <xh:link rel="stylesheet" href="/fr/style/bootstrap/css/bootstrap.css" type="text/css"/>
-        <xh:link rel="stylesheet" href="/fr/style/form-runner-bootstrap-override.css" type="text/css"/>
     </xh:head>
     <xh:body>
         <xh:div class="container">

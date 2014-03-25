@@ -101,6 +101,8 @@
                                 </xf:dispatch>
                                 <!-- Dispatch success event -->
                                 <!-- NOTE: With Form Runner this hides the component, so make sure this is done last.
+                                     Ideally, we would manage to dispatch the event as the last operation of the whole
+                                     action. There doesn't seem to be an elegant way to do this with XForms actions.
                                      See https://github.com/orbeon/orbeon-forms/issues/1627 -->
                                 <xf:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
                             </xf:action>

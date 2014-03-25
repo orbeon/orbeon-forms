@@ -1,1 +1,0 @@
-This directory contains some older XForms examples that have been retired.

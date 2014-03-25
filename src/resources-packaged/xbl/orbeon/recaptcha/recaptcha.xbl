@@ -81,7 +81,13 @@
 
                         <xf:action ev:event="fr-verify">
                             <xf:var name="did-enter-value" value="response != ''"/>
-                            <!-- Do verification if user entered a value -->
+                            <!-- No user value entered by the user: just dispatch an error -->
+                            <xf:action if="not($did-enter-value)">
+                                <xf:dispatch targetid="fr-recaptcha" name="fr-verify-error">
+                                    <xf:property name="fr-error-code" value="'empty'"/>
+                                </xf:dispatch>
+                            </xf:action>
+                            <!-- User value entered by the user: do verification -->
                             <xf:action if="$did-enter-value">
                                 <xf:message level="xxf:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
                                 <!-- Call API doing the verification -->
@@ -92,18 +98,14 @@
                                 <!-- Parse the response -->
                                 <xf:var name="lines" value="tokenize(instance('verify-response-text'), '\n')"/>
                                 <xf:var name="is-success" value="$lines[1] = 'true'"/>
-                                <!-- Dispatch success event -->
-                                <xf:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
                                 <!-- Dispatch failure event -->
                                 <xf:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
                                     <xf:property name="fr-error-code" value="$lines[2]"/>
                                 </xf:dispatch>
-                            </xf:action>
-                            <!-- When no response is provided, just dispatch an error -->
-                            <xf:action if="not($did-enter-value)">
-                                <xf:dispatch targetid="fr-recaptcha" name="fr-verify-error">
-                                    <xf:property name="fr-error-code" value="'empty'"/>
-                                </xf:dispatch>
+                                <!-- Dispatch success event -->
+                                <!-- NOTE: With Form Runner this hides the component, so make sure this is done last.
+                                     See https://github.com/orbeon/orbeon-forms/issues/1627 -->
+                                <xf:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
                             </xf:action>
                         </xf:action>
 

@@ -26,34 +26,44 @@
                     instance="photos" action="/xforms-jsp/flickr-search/service-search.jsp"/>
         </xf:model>
         <xh:style type="text/css">
-            h1 { display: inline; padding-right: 10px; }
-            .paragraph { margin-bottom: 1em; }
-            .flickr-image { width: 75px; height:75 px; border: none }
-            .back { display: block; margin-top: .5em }
+            .row { margin-top: 10px }
         </xh:style>
+        <xh:link rel="stylesheet" href="/fr/style/bootstrap/css/bootstrap.css" type="text/css"/>
+        <xh:link rel="stylesheet" href="/fr/style/form-runner-bootstrap-override.css" type="text/css"/>
     </xh:head>
     <xh:body>
-        <xh:h1>Flickr Search</xh:h1>
-        <xh:div class="paragraph">
-            <xf:group>
-                <xf:input ref="instance('query')">
-                    <xf:label>Search:</xf:label>
-                    <xf:help>Enter a Flickr search tag</xf:help>
-                    <xf:hint>Enter a Flickr search tag</xf:hint>
-                </xf:input>
-                <xf:trigger>
-                    <xf:label>Flickr Search</xf:label>
-                </xf:trigger>
-                <xf:send submission="do-query" ev:event="DOMActivate"/>
-            </xf:group>
+        <xh:div class="container">
+            <xh:h1>Flickr Search</xh:h1>
+            <xh:div class="row">
+                <xh:div class="span9">
+                    <xf:input ref="instance('query')">
+                        <xf:label>Search:</xf:label>
+                        <xf:hint appearance="minimal">Enter a Flickr search tag</xf:hint>
+                    </xf:input>
+                    <xf:trigger>
+                        <xf:label>Flickr Search</xf:label>
+                    </xf:trigger>
+                    <xf:send submission="do-query" ev:event="DOMActivate"/>
+                </xh:div>
+            </xh:div>
+            <xh:div class="row">
+                <xh:div class="span9">
+                    <xh:ul class="thumbnails">
+                        <xf:repeat ref="photo[position() le 50]">
+                            <xh:li class="span1">
+                                <xh:a href="{@page}" class="thumbnail">
+                                    <xh:img class="flickr-image" src="{@url}"/>
+                                </xh:a>
+                            </xh:li>
+                        </xf:repeat>
+                    </xh:ul>
+                </xh:div>
+            </xh:div>
+            <xh:div class="row">
+                <xh:div class="span9">
+                    <xh:a class="back" href="/">Back to Orbeon Forms Examples</xh:a>
+                </xh:div>
+            </xh:div>
         </xh:div>
-        <xh:div>
-            <xf:repeat ref="photo[position() le 50]">
-                <xh:a href="{@page}">
-                    <xh:img class="flickr-image" src="{@url}"/>
-                </xh:a>
-            </xf:repeat>
-        </xh:div>
-        <xh:a class="back" href="/">Back to Orbeon Forms Examples</xh:a>
     </xh:body>
 </xh:html>

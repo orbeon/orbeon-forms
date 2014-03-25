@@ -30,8 +30,8 @@ import org.xml.sax.InputSource
 
 trait CreateUpdateDelete extends RequestResponse with Common {
 
-    case class Row(created: sql.Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
-    def existingRow(connection: Connection, req: Request): Option[Row] = {
+    private case class Row(created: sql.Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
+    private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
         val table = tableName(req)
@@ -77,9 +77,9 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         }
     }
 
-    def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Unit = {
+    private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Unit = {
 
-        val table  = tableName(req)
+        val table = tableName(req)
 
         // Do insert
         locally {
@@ -177,46 +177,71 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 ps.executeUpdate()
             }
         }
+    }
 
-        // If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name -->
-        if (req.forData && req.dataPart.get.isDraft) {
+    /**
+     * If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name.
+     *
+     * - In the query, in the last_modified_time != ... part of the query, the additional level of nesting required
+     *   on MySQL; see: http://stackoverflow.com/a/45498/5295.
+     */
+    private def deleteDraftOnSaveData(connection: Connection, req: Request): Unit = {
+        val table = tableName(req)
+        val ps = connection.prepareStatement(
+            s"""delete from $table
+                where
+                    app = ?
+                    and form = ?
+                    and document_id = ?
+                    ${if (req.forAttachment) "and file_name = ?" else ""}
+                    and draft = 'Y'
+                    and last_modified_time !=
+                        (
+                            select last_modified_time from
+                            (
+                                select max(last_modified_time) last_modified_time
+                                from $table
+                                where
+                                    app = ?
+                                    and form = ?
+                                    and document_id = ?
+                                    ${if (req.forAttachment) "and file_name = ?" else ""}
+                                    and draft = 'Y'
+                            ) t
+                        )
+                """.stripMargin)
 
-            // In the last_modified_time != ... part of the query, the additional level of nesting required
-            // on MySQL http://stackoverflow.com/a/45498/5295
+        val position = Iterator.from(1)
+
+        // Run twice as the the same values are used in the inner
+        for (i ← 1 to 2) {
+            ps.setString(position.next(), req.app)
+            ps.setString(position.next(), req.form)
+            ps.setString(position.next(), req.dataPart.get.documentId)
+            if (req.forAttachment) ps.setString(position.next(), req.filename.get)
+        }
+
+        ps.executeUpdate()
+    }
+
+    /**
+     * We want to delete drafts in the following two cases:
+     * - Data is deleted, in which case we don't want to keep corresponding drafts
+     * - A draft is explicitly deleted, which can be done from the summary page -->
+     */
+    private def deleteDraft(connection: Connection, req: Request): Unit = {
+        for (table ← Seq("orbeon_form_data", "orbeon_form_data_attach")) {
             val ps = connection.prepareStatement(
                 s"""delete from $table
-                    where
-                        app = ?
-                        and form = ?
-                        and document_id = ?
-                        ${if (req.forAttachment) "and file_name = ?" else ""}
-                        and draft = 'Y'
-                        and last_modified_time !=
-                            (
-                                select last_modified_time from
-                                (
-                                    select max(last_modified_time) last_modified_time
-                                    from $table
-                                    where
-                                        app = ?
-                                        and form = ?
-                                        and document_id = ?
-                                        ${if (req.forAttachment) "and file_name = ?" else ""}
-                                        and draft = 'Y'
-                                ) t
-                            )
+                    where      app         = ?
+                           and form        = ?
+                           and document_id = ?
+                           and draft = 'Y'
                     """.stripMargin)
-
             val position = Iterator.from(1)
-
-            // Run twice as the the same values are used in the inner
-            for (i ← 1 to 2) {
-                ps.setString(position.next(), req.app)
-                ps.setString(position.next(), req.form)
-                ps.setString(position.next(), req.dataPart.get.documentId)
-                if (req.forAttachment) ps.setString(position.next(), req.filename.get)
-            }
-
+            ps.setString(position.next(), req.app)
+            ps.setString(position.next(), req.form)
+            ps.setString(position.next(), req.dataPart.get.documentId)
             ps.executeUpdate()
         }
     }
@@ -276,12 +301,20 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 if (nothingToDelete) throw HttpStatusCodeException(404)
             }
 
+            // Checks
             checkVersionInitial()
             val existing = existingRow(connection, req)
             checkAuthorized(existing)
             checkVersionWithExisting(existing)
             checkDocExistsForDelete(existing)
+
+            // Update database
             store(connection, req, existing, delete)
+            if (! delete && req.forData && req.dataPart.get.isDraft)
+                deleteDraftOnSaveData(connection, req)
+            if (delete && req.forData)
+                deleteDraft(connection, req)
+
             httpResponse.setStatus(if (delete) 204 else 201)
         }
     }

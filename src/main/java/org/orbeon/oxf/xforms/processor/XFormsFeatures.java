@@ -56,6 +56,8 @@ public class XFormsFeatures {
                 }
             },
             // Other standard stylesheets
+            new ResourceConfig("/apps/fr/style/bootstrap/css/bootstrap.css", "/apps/fr/style/bootstrap/css/bootstrap.min.css"),
+            new ResourceConfig("/apps/fr/style/form-runner-bootstrap-override.css", null),
             new ResourceConfig("/config/theme/xforms.css", null),
             new ResourceConfig("/config/theme/error.css", null)
     };

@@ -61,7 +61,7 @@
             </xh:div>
             <xh:div class="row">
                 <xh:div class="span9">
-                    <xh:a class="back" href="/">Back to Orbeon Forms Examples</xh:a>
+                    <xh:a class="back" href="/home/xforms">Back to Orbeon Forms Examples</xh:a>
                 </xh:div>
             </xh:div>
         </xh:div>

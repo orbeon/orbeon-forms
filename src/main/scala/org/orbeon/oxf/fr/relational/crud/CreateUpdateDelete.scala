@@ -68,8 +68,9 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                               if (req.forData) Option(resultSet.getString("username" )) else None,
                               if (req.forData) Option(resultSet.getString("groupname")) else None,
                               if (req.forData) Option(resultSet.getInt("form_version")) else None)
-            // Query should return at most one row
-            assert(! resultSet.next())
+            // The query could return multiple rows if we have both a draft and non-draft, but the `created`,
+            // `username`, `groupname`, and `form_version` must be the same on all rows, so it doesn't matter from
+            // which row we read this from.
             Some(row)
         } else {
             None

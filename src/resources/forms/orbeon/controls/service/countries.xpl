@@ -34,7 +34,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="countries.xml"/>
         <p:input name="request" href="#request"/>
-        <p:input name="instance" href="#instance" debug="instance"/>
+        <p:input name="instance" href="#instance"/>
         <p:input name="config">
             <countries xsl:version="2.0">
                 <xsl:variable

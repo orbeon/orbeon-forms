@@ -1,96 +1,3 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-.clearfix {
-  *zoom: 1;
-}
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
-  line-height: 0;
-}
-.clearfix:after {
-  clear: both;
-}
-.hide-text {
-  font: 0/0 a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-}
-.input-block-level {
-  display: block;
-  width: 100%;
-  min-height: 30px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-.fr-border {
-  padding: 0;
-  margin-bottom: 10px;
-  background-color: #f5f5f5;
-  border: 1px solid #e3e3e3;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-.help-icon {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url(bootstrap/img/glyphicons-halflings.png);
-  background-repeat: no-repeat;
-  background-position: -120px -96px;
-}
-.narrow-td {
-  width: 1px;
-}
-.fr-plain-checkbox-container {
-  width: 1px;
-}
-.fr-plain-checkbox-container label {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-  text-indent: 0;
-}
-.fr-plain-checkbox-container label input[type="checkbox"] {
-  float: none;
-  margin: 0;
-}
-.fr-plain-checkbox-container label .label {
-  vertical-align: middle;
-}
-.orbeon {
-  /* ***** Utilities ************************************************************************************************** */
-  /* ***** Portlet reset *********************************************************************************************** */
-  /* ***** XForms Controls ******************************************************************************************** */
-  /* ***** General Layout ********************************************************************************************* */
-  /* ***** Repeats **************************************************************************************************** */
-  /* ***** Dialogs **************************************************************************************************** */
-  /* ***** Sections *************************************************************************************************** */
-  /* ***** Grids ****************************************************************************************************** */
-  /* ***** View, PDF, email ******************************************************************************************* */
-}
 .orbeon .navbar .navbar-inner .container .fr-status-icons {
   display: block;
   float: right;
@@ -279,8 +186,6 @@
   float: right;
   padding-left: 10px;
   padding-right: 10px;
-  /* Space between the image and the text in a button, only for the buttons bar
-           (not other buttons in the form which might contain just an image) */
 }
 .orbeon .fr-buttons .fr-buttons-message div {
   display: inline;
@@ -456,9 +361,6 @@
 .orbeon .fr-grid tbody tr td {
   vertical-align: top;
   width: auto;
-  /*overflow: hidden*/
-  /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
-                                                                       absolute positioning of the cell editors, this crops overlays, in particular the date picker */
 }
 .orbeon .fr-grid .xforms-help {
   float: left;
@@ -559,8 +461,6 @@
 }
 .orbeon #fr-view {
   margin-bottom: 10px;
-  /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-           http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
 }
 .orbeon #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
   *width: 13em;

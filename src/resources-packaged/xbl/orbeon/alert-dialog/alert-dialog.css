@@ -1,7 +1,5 @@
 .xbl-fr-alert-dialog {
   width: 400px;
-  /* overrides YUI reset so numbers in enumeration do show */
-
 }
 .xbl-fr-alert-dialog ol {
   padding-left: 3em;

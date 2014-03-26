@@ -14,15 +14,15 @@
 @warning: lighten(@orange, 15%);
 @info: @textColor;
 
-@import "bootstrap-src/less/variables";
-@import "bootstrap-src/less/mixins";
-@import "form-runner-common";
+@import (reference) "bootstrap-src/less/variables";
+@import (reference) "bootstrap-src/less/mixins";
+@import (reference) "form-runner-common";
 
 body.orbeon { background-color: @frBackground }
 
 .orbeon {
 
-    /* ***** Headings (titles and sections) ***************************************************************************** */
+    // ***** Headings (titles and sections) ****************************************************************************
     h2, h3 {
         #gradient > .vertical(#fff, #eee);
         margin: 0;
@@ -45,7 +45,7 @@ body.orbeon { background-color: @frBackground }
         line-height: 135%;
     }
 
-    /* ***** Controls**************************************************************************************************** */
+    // ***** Controls***************************************************************************************************
 
     // Copied over Bootstrap styles as we can't reuse them simply as mixins
     // Ideally this would be in box-select.less
@@ -73,7 +73,7 @@ body.orbeon { background-color: @frBackground }
         .xforms-help-panel .xforms-help-group { list-style-type: square }
     }
 
-    /* ***** Other ****************************************************************************************************** */
+    // ***** Other *****************************************************************************************************
 
     .fr-orbeon-version {
         text-align: center;
@@ -348,7 +348,7 @@ body.orbeon { background-color: @frBackground }
     }
 }
 
-/* ***** Print and PDF ********************************************************************************************** */
+// ***** Print and PDF *************************************************************************************************
 
 // This is also used for PDF generation
 @media print {

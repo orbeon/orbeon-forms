@@ -1,17 +1,27 @@
-/**
- * The structure of the HTML as seen by the browser can be summaries as follows:
- *
- *      div class="xbl-fr-autocomplete"
- *          div class="yui-ac"                                                              position: static (overrides YUI: relative, see comment below)
- *              span class="xforms-input"
- *                  input class="xforms-input-input"    Input in which users type           width: 140px, position: static (overrides YUI relative, see comment below)
- *              div class="xbl-fr-select1-button"       Component showing full itemset
- *              div class="yui-ac-container"                                                position: absolute
- *                  div class="yui-ac-content"          Suggestions                         position: absolute, overflow: hidden, width: 140px
- *
- *
- * For testing, to keep the suggestion list open while interacting with Firefox, disabled the display: none on the <div class="yui-ac-content">.
- */
+// Copyright (C) 2012 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+//  The structure of the HTML as seen by the browser can be summaries as follows:
+//
+//       div class="xbl-fr-autocomplete"
+//           div class="yui-ac"                                                              position: static (overrides YUI: relative, see comment below)
+//               span class="xforms-input"
+//                   input class="xforms-input-input"    Input in which users type           width: 140px, position: static (overrides YUI relative, see comment below)
+//               div class="xbl-fr-select1-button"       Component showing full itemset
+//               div class="yui-ac-container"                                                position: absolute
+//                   div class="yui-ac-content"          Suggestions                         position: absolute, overflow: hidden, width: 140px
+// 
+// 
+//  For testing, to keep the suggestion list open while interacting with Firefox, disabled the display: none on the <div class="yui-ac-content">.
 
 .xbl-fr-autocomplete {
 
@@ -46,6 +56,6 @@
         height: 28px;                           // TODO: @baseLineHeight + 8px or better, as done in form-runner-bootstrap-override.less
         margin-left: 3px;                       // Get the button to show as if it was merged with the text field (well, almost)
         padding-top: 0; padding-bottom: 0;      // Remove top padding so the bottom shows vertically centered
-        img { *max-width: none }                // Overwide the max-width: 100% in Bootstrap to get IE7 to display the image
+        img { *max-width: none }                // Override the max-width: 100% in Bootstrap to get IE7 to display the image
     }
 }

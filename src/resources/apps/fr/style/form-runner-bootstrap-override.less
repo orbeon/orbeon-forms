@@ -10,7 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import "form-runner-common";
+@import (reference) "form-runner-common";
 
 @controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
 @textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
@@ -232,7 +232,7 @@ body.orbeon {
         .border-radius(4px);
     }
 
-    // Force white icons on primary buttons icons
+    // Force white icons
     .btn-danger i, .btn-warning i, .btn-primary i, .btn-inverse i, .navbar-inverse i {
         background-image: url(bootstrap/img/glyphicons-halflings-white.png)
     }

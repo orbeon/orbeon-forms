@@ -199,11 +199,11 @@
         popoverOffset.left = (function() {
             switch (true) {
                 case placement == 'right':
-                    return elPos.offset.left + elPos.width + arrowWidth
+                    return elPos.offset.left + elPos.width + arrowWidth;
                 case placement == 'left':
-                    return elPos.offset.left - popover.outerWidth() - arrowWidth
+                    return elPos.offset.left - popover.outerWidth() - arrowWidth;
                 case _.contains(['top', 'bottom'], placement):
-                    return elPos.offset.left
+                    return elPos.offset.left;
                 case placement == 'over':
                     return elPos.offset.left + elPos.width - popover.outerWidth() - padding;
                 default:

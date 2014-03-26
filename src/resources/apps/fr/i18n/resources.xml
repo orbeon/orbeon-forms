@@ -593,16 +593,16 @@
                 <section-name>Nombre de Sección</section-name>
             </labels>
             <grid>
-                <insert-above todo="true">[Insert Above]</insert-above>
-                <insert-below todo="true">[Insert Below]</insert-below>
-                <move-up todo="true">[Move Up]</move-up>
-                <move-down todo="true">[Move Down]</move-down>
-                <remove todo="true">[Remove]</remove>
+                <insert-above>Insertar Arriba</insert-above>
+                <insert-below>Insertar Debajo</insert-below>
+                <move-up>Mover Arriba</move-up>
+                <move-down>Mover Debajo</move-down>
+                <remove>Remover</remove>
             </grid>
         </components>
-        <untitled-form todo="true">[Untitled Form]</untitled-form>
+        <untitled-form>Formulario sin Título</untitled-form>
         <errors>
-            <summary-title todo="true">[Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
+            <summary-title>Su formulario {1,choice,0#no tiene ningún mensaje|1#tiene los siguientes '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;tiene los siguientes '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
             <form-title todo="true">[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
             <none>No hay errores en el formulario</none>
             <unsaved>Cambios sin salvar</unsaved>
@@ -628,7 +628,7 @@
                 <import>&lt;i class="icon-upload"/&gt; Importar</import>
                 <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
                 <edit>&lt;i class="icon-pencil"/&gt; Editar</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+                <duplicate>&lt;i class="icon-file"/&gt; Duplicar</duplicate>
             </buttons>
             <titles>
                 <summary-title>Resumen</summary-title>
@@ -720,8 +720,8 @@
                 <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
 
                 <!-- Warning dialog -->
-                <validation-dialog-review todo="true">[Review]</validation-dialog-review>
-                <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
+                <validation-dialog-review>Revisar</validation-dialog-review>
+                <validation-dialog-continue>Continuar</validation-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
@@ -732,14 +732,14 @@
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
                 <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino guarda los datos.</clear-confirm-message>
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
-                <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
-                <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <confirmation-dialog-title>Confirmación</confirmation-dialog-title>
+                <confirmation-dialog-message>Ésta seguro de continuar ?</confirmation-dialog-message>
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
-                <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
-                <validation-dialog-message todo="true">[Your form {1,choice,0#does not contain any messages|1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.]</validation-dialog-message>
+                <validation-dialog-title>Revisar mensajes de validación del Formulario</validation-dialog-title>
+                <validation-dialog-message>Su formulario {1,choice,0#no tiene ningún mensaje|1#tiene un '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. Pueder optar por revisarlos {1,choice,1#it|1&lt;them} primero o ignorar {1,choice,1#it|1&lt;them} y continuar la opración.</validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Haga clic aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
+                <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
                 <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
                 <upload-start>Subidad de archivos ha comenzado</upload-start>
                 <upload-cancel>Subidad de archivos cancelada por el usuario</upload-cancel>
@@ -748,15 +748,15 @@
                 <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
             </messages>
             <drafts>
-                <found-draft todo="true">[Found draft]</found-draft>
-                <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
-                <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
-                <start-new todo="true">[Start from scratch]</start-new>
+                <found-draft>Borrador encontrado</found-draft>
+                <found-drafts>Borradores encontrados</found-drafts>
+                <found-draft-for-document>Luego que este documento se guardo, un borrador fue auto guardado, y pueden contener una actualización. Desea abrir el documento guardado o abrir el último borrador ?</found-draft-for-document>
+                <found-draft-for-never-saved>Hay un borrador de este formulario. Desea empezar con un formulario en blanco o con el borrador</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Hay varios borradores de este formulario. Desea empezar con un formulario en blanco o con alguno de los borradores ?</found-drafts-for-never-saved>
+                <open-saved>Abrir document guardado</open-saved>
+                <open-draft>Abrir borrador auto-guardado</open-draft>
+                <view-drafts>Ver borrador auto-guardado</view-drafts>
+                <start-new>Empezar con un formulario en blanco</start-new>
             </drafts>
             <labels>
                 <errors>Resumen de errores</errors>
@@ -797,54 +797,54 @@
         <home>
             <title>Incio Form Runner</title>
             <buttons>
-                <unpublish todo="true">[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
-                <publish todo="true">[&lt;i class="icon-globe"/&gt; Publish]</publish>
-                <cancel todo="true">[Cancel]</cancel>
-                <connect todo="true">[Connect]</connect>
-                <select todo="true">[Select]</select>
-                <operation todo="true">[Operation]</operation>
-                <all todo="true">[All]</all>
-                <none todo="true">[None]</none>
-                <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
-                <published-local todo="true">[Published local forms]</published-local>
-                <unpublished-remote todo="true">[Unpublished remote forms]</unpublished-remote>
-                <published-remote todo="true">[Published remote forms]</published-remote>
-                <newer-local todo="true">[Forms that are newer locally]</newer-local>
-                <newer-remote todo="true">[Forms that are newer remotely]</newer-remote>
-                <publish-local todo="true">[Publish local forms]</publish-local>
-                <unpublish-local todo="true">[Unpublish local forms]</unpublish-local>
-                <publish-remote todo="true">[Publish remote forms]</publish-remote>
-                <unpublish-remote todo="true">[Unpublish remote forms]</unpublish-remote>
-                <push-to-remote todo="true">[Push to remote]</push-to-remote>
-                <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
-                <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
-                <navigate-new todo="true">[Navigate to New]</navigate-new>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+                <cancel>Cancelar</cancel>
+                <connect>Conectar</connect>
+                <select>Seleccionar</select>
+                <operation>Operación</operation>
+                <all>Todos</all>
+                <none>Ninguno</none>
+                <unpublished-local>Despublicar formularios locales</unpublished-local>
+                <published-local>Publicar formularios locales</published-local>
+                <unpublished-remote>Despublicar formularios remotos</unpublished-remote>
+                <published-remote>Publicar formularios remotos</published-remote>
+                <newer-local>Fomularios locales nuevos</newer-local>
+                <newer-remote>Formularios remotos nuevos</newer-remote>
+                <publish-local>Publicar formularios locales</publish-local>
+                <unpublish-local>Despublicar formularios locales</unpublish-local>
+                <publish-remote>Publicar formularios remotos</publish-remote>
+                <unpublish-remote>Despublicar formularios remotos</unpublish-remote>
+                <push-to-remote>Poner como Remoto</push-to-remote>
+                <pull-from-remote>Sacar Remoto</pull-from-remote>
+                <navigate-summary>Ir al resumen</navigate-summary>
+                <navigate-new>Ir a nuevo</navigate-new>
             </buttons>
             <titles>
-                <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
-                <credentials todo="true">[Remote Server Credentials]</credentials>
-                <status>Status]</status>
-                <app todo="true">[App]</app>
-                <form todo="true">[Form]</form>
-                <title todo="true">[Title]</title>
-                <view todo="true">[View]</view>
-                <new todo="true">[New]</new>
-                <local todo="true">[Local]</local>
-                <remote todo="true">[Remote]</remote>
-                <form-identification todo="true">[Form Identification]</form-identification>
-                <last-modified todo="true">[Modified]</last-modified>
+                <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
+                <credentials>Credenciales del Servidor Remoto</credentials>
+                <status>Estado</status>
+                <app>Aplicación</app>
+                <form>Formulario</form>
+                <title>Título</title>
+                <view>Ver</view>
+                <new>Nuevo</new>
+                <local>Local</local>
+                <remote>Remoto</remote>
+                <form-identification>Identificación de Fomulario</form-identification>
+                <last-modified>Modificado</last-modified>
             </titles>
             <messages>
-                <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
+                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
             </messages>
             <labels>
-                <available todo="true">[Available]</available>
-                <unavailable todo="true">[Unavailable]</unavailable>
-                <library todo="true">[Library]</library>
-                <newer todo="true">[Newer]</newer>
-                <username todo="true">[Username]</username>
-                <password todo="true">[Password]</password>
+                <available>Disponibile</available>
+                <unavailable>No Disponibile</unavailable>
+                <library>Librería</library>
+                <newer>Más Nuevos</newer>
+                <username>Usuario</username>
+                <password>Contraseña</password>
             </labels>
         </home>
     </resource>

@@ -32,8 +32,8 @@ case class SchemaKey(urlString: String) extends CacheKey
 
 class MSVGrammarReaderController(
         containingDocument: XFormsContainingDocument,
-        dependencies:       SchemaDependencies,
-        baseURL:            Option[String]
+        dependencies      : SchemaDependencies,
+        baseURL           : Option[String]
     ) extends GrammarReaderController {
 
     def resolveEntity(publicId: String, systemId: String): InputSource = {
@@ -54,12 +54,14 @@ class MSVGrammarReaderController(
     }
 
     def warning(locators: Array[Locator], message: String): Unit = {
-        if (locators.nonEmpty) {
-            XFormsModelSchemaValidator.logger.warn(message)
-        } else {
-            val locations = locators map XMLUtils.toString mkString ", "
-            XFormsModelSchemaValidator.logger.warn(s"$locations: $message")
-        }
+
+        val formatted =
+            locators match {
+                case Array()  ⇒ message
+                case locators ⇒ s"${locators map XMLUtils.toString mkString ", "}: $message"
+            }
+
+        XFormsModelSchemaValidator.logger.warn(formatted)
     }
 
     def error(locators: Array[Locator], message: String, exception: Exception): Unit = {

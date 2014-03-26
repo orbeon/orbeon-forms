@@ -1,37 +1,3 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-/* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
-.orbeon {
-  /**
-     * XForms switch/case
-     * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
-     */
-  /* ***** Label, hint, help, alert *********************************************************************************** */
-  /* ***** Controls *********************************************************************************** */
-  /* ***** Indicators and messages ************************************************************************************ */
-  /* ***** Tree ******************************************************************************************************* */
-  /* Fix for Firefox issue when clicking on the first "-" in span mode
-       http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
-}
-.orbeon #xforms-form {
-  /**
-         * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
-         * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
-         * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
-         * doesn't require us to update disabled attributes on controls during the life of the page.
-         */
-}
 .orbeon #xforms-form .xforms-repeat-template,
 .orbeon #xforms-form .xforms-template,
 .orbeon #xforms-form .xforms-repeat-delimiter,
@@ -68,9 +34,6 @@
 .orbeon #xforms-form a.xforms-disabled,
 .orbeon #xforms-form .xforms-case-deselected a,
 .orbeon #xforms-form a.xforms-case-deselected {
-  /* Prevent links from being able to get the focus. See bug:
-               [ #315198 ] Non-relevant links and minimal triggers can get the focus
-               http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
   display: none;
 }
 .orbeon #xforms-form .xforms-disabled input,

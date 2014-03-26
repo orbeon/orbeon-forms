@@ -1,24 +1,23 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
+// Copyright (C) 2010 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-/* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
-
-// See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden
-
-// Make it a strong rule by using an id, as other selectors might use `display:` rules. In portals, CSS must be
-// rewritten properly for this to work.
 .orbeon {
+    // ***** Strong rules to hide disabled/non-relevant elements *******************************************************
+
+    // See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden
+
+    // Make it a strong rule by using an id, as other selectors might use `display:` rules. In portals, CSS must be
+    // rewritten properly for this to work.
+
     #xforms-form {
         .xforms-repeat-template,
         .xforms-template,
@@ -56,18 +55,17 @@
         a.xforms-disabled,
         .xforms-case-deselected a,
         a.xforms-case-deselected {
-            /* Prevent links from being able to get the focus. See bug:
-               [ #315198 ] Non-relevant links and minimal triggers can get the focus
-               http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
+            // Prevent links from being able to get the focus. See bug:
+            // [ #315198 ] Non-relevant links and minimal triggers can get the focus
+            // http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207
             display: none;
         }
 
-        /**
-         * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
-         * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
-         * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
-         * doesn't require us to update disabled attributes on controls during the life of the page.
-         */
+        // Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
+        // since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
+        // deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
+        // doesn't require us to update disabled attributes on controls during the life of the page.
+
         // Disabled
         .xforms-disabled {
             input, textarea, select, button {
@@ -97,15 +95,13 @@
         display: none;
     }
 
-    /**
-     * XForms switch/case
-     * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
-     */
+    // XForms switch/case
+    // http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
     .xforms-case-selected {
         position: static;
     }
 
-    /* ***** Label, hint, help, alert *********************************************************************************** */
+    // ***** Label, hint, help, alert **********************************************************************************
 
     .xforms-hint {
         display: none;
@@ -169,7 +165,7 @@
         background-position: left center;
     }
 
-    /* ***** Controls *********************************************************************************** */
+    // ***** Controls **************************************************************************************************
 
     // Prevent display of border when static read-only
     .xforms-static { border: none }
@@ -396,7 +392,7 @@
 
     .yui-tt-shadow { display: none }                // Remove shadow, which now looks tacky, and also for issue #581
 
-    /* ***** Indicators and messages ************************************************************************************ */
+    // ***** Indicators and messages ***********************************************************************************
 
     .xforms-loading-loading {
         background-color: #c44;
@@ -474,9 +470,9 @@
 
     #wait .bd { background-color: white }
 
-    /* ***** Tree ******************************************************************************************************* */
-    /* Fix for Firefox issue when clicking on the first "-" in span mode
-       http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
+    // ***** Tree ******************************************************************************************************
+    // Fix for Firefox issue when clicking on the first "-" in span mode
+    // http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207
     .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { display: block }
 
     // Yellow highlight for selected item

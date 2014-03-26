@@ -1,18 +1,16 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
+// Copyright (C) 2010 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import "../../../../apps/fr/style/form-runner-common";
+@import (reference) "../../../../apps/fr/style/form-runner-common";
 
 @darkBlue: #004B92;
 @lightBlue: #DEF;
@@ -137,7 +135,7 @@ body {
     .fb-nowrap { white-space: nowrap }
     .fb-hide-alert .xforms-visited > .xforms-alert.xforms-active { display: none }
 
-    /* ***** Toolbox **************************************************************************************************** */
+    // ***** Toolbox ***************************************************************************************************
 
     .fb-toolbox {
         position: fixed;
@@ -215,7 +213,7 @@ body {
         }
     }
 
-    /* ***** Dialogs **************************************************************************************************** */
+    // ***** Dialogs ***************************************************************************************************
 
     // All dialogs
     .xforms-dialog {
@@ -435,7 +433,7 @@ body {
         }
     }
 
-    /* ***** In-Place Editing ******************************************************************************************* */
+    // ***** In-Place Editing ******************************************************************************************
 
     // Label and hint editors
 
@@ -458,7 +456,7 @@ body {
         height: 36px;                               // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
     }
 
-    /* ***** Grid ******************************************************************************************************* */
+    // ***** Grid ******************************************************************************************************
 
     .fb {
 
@@ -567,7 +565,7 @@ body {
     .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
     .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
 
-    /* ***** Message **************************************************************************************************** */
+    // ***** Message ***************************************************************************************************
 
     // Size message so that it fits within bottom navbar, see #486
     .fr-messages, .fb-xpath-errors {
@@ -580,7 +578,7 @@ body {
         }
     }
 
-    /* ***** Layout ***************************************************************************************************** */
+    // ***** Layout ****************************************************************************************************
 
     #fr-view {
         display: block;                                                     // So we can get its width in `position.coffee`
@@ -648,7 +646,7 @@ body {
     }
 }
 
-/* ***** Other media ************************************************************************************************ */
+// ***** Other media ***************************************************************************************************
 
 // This is also used for PDF generation
 @media print {

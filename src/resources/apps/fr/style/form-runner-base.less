@@ -1,20 +1,18 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
+// Copyright (C) 2010 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 // NOTE: IE em factor: 0.9759
 
-@import "form-runner-common";
+@import (reference) "form-runner-common";
 
 .orbeon {
 
@@ -36,14 +34,14 @@
         h2 { margin-top: 0; }
     }
 
-    /* ***** Utilities ************************************************************************************************** */
+    // ***** Utilities *************************************************************************************************
     .fr-clear { clear: both }
 
     .fr-clear-container {
         .clearfix()
     }
 
-    /* ***** Portlet reset *********************************************************************************************** */
+    // ***** Portlet reset *********************************************************************************************
 
     // From YUI font.css, but applied to portlet body only
     .orbeon-portlet-body {
@@ -54,7 +52,7 @@
         *font: x-small;
     }
 
-    /* ***** XForms Controls ******************************************************************************************** */
+    // ***** XForms Controls *******************************************************************************************
 
     .xforms-noscript {
         // NOTE: In noscript mode, help appears last in a control for accessibility reasons
@@ -172,7 +170,7 @@
         border-bottom: 2px solid @frBorderColor;
     }
 
-    /* ***** General Layout ********************************************************************************************* */
+    // ***** General Layout ********************************************************************************************
 
     // Language and mode selectors
     .fr-language-choice, .fr-noscript-choice, .fr-goto-content, .fr-status-icons {
@@ -215,8 +213,8 @@
 
         .fr-buttons-message div { display: inline }
 
-        /* Space between the image and the text in a button, only for the buttons bar
-           (not other buttons in the form which might contain just an image) */
+        // Space between the image and the text in a button, only for the buttons bar
+        //   (not other buttons in the form which might contain just an image)
         .xforms-trigger button img { margin-right: 10px }
 
         .xforms-trigger button, .xforms-trigger input {
@@ -238,7 +236,7 @@
         }
     }
 
-    /* ***** Repeats **************************************************************************************************** */
+    // ***** Repeats ***************************************************************************************************
 
     // Repeats: shows as table (1 line per iteration; labels used as header of table)
     .fr-repeat-table {
@@ -295,7 +293,7 @@
         }
     }
 
-    /* ***** Dialogs **************************************************************************************************** */
+    // ***** Dialogs ***************************************************************************************************
 
     // Dialogs
     .xforms-dialog {
@@ -325,7 +323,7 @@
         width: 500px
     }
 
-    /* ***** Sections *************************************************************************************************** */
+    // ***** Sections **************************************************************************************************
 
     .xbl-fr-section {
         display: block;
@@ -386,7 +384,7 @@
         }
     }
 
-    /* ***** Grids ****************************************************************************************************** */
+    // ***** Grids *****************************************************************************************************
 
     .fr-grid {
 
@@ -398,8 +396,9 @@
         tbody tr td {
             vertical-align: top;
             width: auto;
-            /*overflow: hidden*/                                    /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
-                                                                       absolute positioning of the cell editors, this crops overlays, in particular the date picker */
+            // Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
+            // absolute positioning of the cell editors, this crops overlays, in particular the date picker
+            // overflow: hidden
         }
 
         .xforms-help {
@@ -421,7 +420,7 @@
         // Controls
         select,
         textarea,
-        input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
+        input[type="text"],             // Like Bootstrap, use all the specific types to exclude checkbox/radio
         input[type="password"],
         input[type="datetime"],
         input[type="datetime-local"],
@@ -509,8 +508,8 @@
 
         margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
 
-        /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-           http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
+        // Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
+        // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely
          .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
             { *width: 13em }
 
@@ -545,7 +544,7 @@
         }
     }
 
-    /* ***** View, PDF, email ******************************************************************************************* */
+    // ***** View, PDF, email ******************************************************************************************
 
     // Textarea in output mode can contain line breaks so try to keep them
     .xforms-textarea pre {

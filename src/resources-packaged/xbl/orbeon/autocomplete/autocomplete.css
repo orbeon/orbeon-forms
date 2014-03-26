@@ -1,17 +1,3 @@
-/**
- * The structure of the HTML as seen by the browser can be summaries as follows:
- *
- *      div class="xbl-fr-autocomplete"
- *          div class="yui-ac"                                                              position: static (overrides YUI: relative, see comment below)
- *              span class="xforms-input"
- *                  input class="xforms-input-input"    Input in which users type           width: 140px, position: static (overrides YUI relative, see comment below)
- *              div class="xbl-fr-select1-button"       Component showing full itemset
- *              div class="yui-ac-container"                                                position: absolute
- *                  div class="yui-ac-content"          Suggestions                         position: absolute, overflow: hidden, width: 140px
- *
- *
- * For testing, to keep the suggestion list open while interacting with Firefox, disabled the display: none on the <div class="yui-ac-content">.
- */
 .xbl-fr-autocomplete .xforms-input-input {
   position: static;
   width: 140px;

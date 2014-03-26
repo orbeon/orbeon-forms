@@ -79,8 +79,8 @@
     <xsl:variable name="is-show-explanation" select="p:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="captcha" as="xs:string" select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
-    <xsl:variable name="has-captcha" as="xs:boolean" select="$captcha = ('reCAPTCHA', 'SimpleCaptcha')"/>
+    <xsl:variable name="captcha-type" as="xs:string"  select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
+    <xsl:variable name="has-captcha"  as="xs:boolean" select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"/>
 
     <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
 

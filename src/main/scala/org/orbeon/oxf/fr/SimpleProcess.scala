@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{XPath, NetUtils, Logging}
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 import org.orbeon.scaxon.XML._
@@ -224,7 +223,7 @@ trait FormRunnerActions {
             refresh(PersistenceModel)
 
             // Mark data clean
-            val saveStatus = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
+            val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
             val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
             (saveStatus ++ autoSaveStatus) foreach (setvalue(_, "clean"))
 
@@ -270,7 +269,7 @@ trait FormRunnerActions {
 
     def tryCaptcha(params: ActionParams): Try[Any] =
         Try {
-            if (hasCaptcha && (persistenceInstance.rootElement \ "captcha" === "false"))
+            if (showCaptcha)
                 dispatch(name = "fr-verify", targetId = "captcha")
         }
 

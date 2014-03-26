@@ -230,34 +230,30 @@
     </xsl:template>
 
     <xsl:template match="fr:captcha" name="fr-captcha">
-        <!-- Captcha -->
         <xsl:if test="$has-captcha">
-            <xf:group model="fr-persistence-model" appearance="xxf:internal">
+            <xf:group id="fr-captcha-group" model="fr-persistence-model" ref=".[frf:showCaptcha()]" class="fr-captcha">
                 <xf:var name="captcha" value="instance('fr-persistence-instance')/captcha"/>
-                <xf:var name="mode"    value="xxf:instance('fr-parameters-instance')/mode"/>
-                <xf:group id="fr-captcha-group" ref=".[$mode = ('new', 'edit') and not(property('xxf:noscript')) and $captcha = 'false']" class="fr-captcha">
-                    <!-- Success: remember the captcha passed, which also influences validity -->
-                    <xf:action ev:event="fr-verify-done">
-                        <xf:setvalue ref="$captcha">true</xf:setvalue>
-                        <xf:revalidate model="fr-persistence-model"/>
-                        <xf:refresh/>
-                    </xf:action>
-                    <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
-                    <xf:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
-                    <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
-                    <xsl:if test="$captcha = 'reCAPTCHA'">
-                        <fr:recaptcha id="captcha" theme="clean" ref="$captcha">
-                            <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                            <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
-                        </fr:recaptcha>
-                    </xsl:if>
-                    <xsl:if test="$captcha = 'SimpleCaptcha'">
-                        <fr:simple-captcha id="captcha" ref="$captcha">
-                            <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                            <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
-                        </fr:simple-captcha>
-                    </xsl:if>
-                </xf:group>
+                <!-- Success: remember the captcha passed, which also influences validity -->
+                <xf:action ev:event="fr-verify-done">
+                    <xf:setvalue ref="$captcha">true</xf:setvalue>
+                    <xf:revalidate model="fr-persistence-model"/>
+                    <xf:refresh/>
+                </xf:action>
+                <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
+                <xf:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
+                <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
+                <xsl:if test="$captcha-type = 'reCAPTCHA'">
+                    <fr:recaptcha id="captcha" theme="clean" ref="$captcha">
+                        <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
+                        <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
+                    </fr:recaptcha>
+                </xsl:if>
+                <xsl:if test="$captcha-type = 'SimpleCaptcha'">
+                    <fr:simple-captcha id="captcha" ref="$captcha">
+                        <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
+                        <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
+                    </fr:simple-captcha>
+                </xsl:if>
             </xf:group>
         </xsl:if>
     </xsl:template>

@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.{Version, OXFException}
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
+import org.orbeon.oxf.xforms.control.controls.{XFormsSelectControl, XFormsSelect1Control}
 import org.orbeon.oxf.xforms.processor.XFormsToSomething
 import org.orbeon.oxf.xforms.processor.XFormsToSomething.Stage2CacheableState
 import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
@@ -138,15 +138,26 @@ class XFormsToSchema extends XFormsToSomething {
                 // For controls with an itemset, generate a xs:simpleType
                 val simpleTypeRestrictionElemOpt =
                     for {
-                        itemset       ← resolve(elemName + "-control") collectFirst { case s: XFormsSelect1Control if s.isRelevant ⇒ s.getItemset }
+                        control       ← resolve(elemName + "-control")
+                        select        ← collectByErasedType[XFormsSelect1Control](control)
+                        if select.isRelevant
+                        itemset       = select.getItemset
                         itemsetValues = itemset.children map (_.value)
                         if itemsetValues.nonEmpty
-                    } yield
-                        <xs:simpleType>
-                            <xs:restriction base="xs:string">
-                                { itemsetValues map (value ⇒ <xs:enumeration value={value}/>) }
-                            </xs:restriction>
-                        </xs:simpleType>
+                    } yield {
+                        val restriction =
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    {itemsetValues map (value ⇒ <xs:enumeration value={value}/>)}
+                                </xs:restriction>
+                            </xs:simpleType>
+                        if (select.isInstanceOf[XFormsSelectControl])
+                            <xs:simpleType>
+                                <xs:list>{ restriction }</xs:list>
+                            </xs:simpleType>
+                        else
+                            restriction
+                    }
 
                 // The xf:bind is for an attachment control if it has type="xs|xf:anyURI" and the corresponding control
                 // has a class 'fr-attachment'

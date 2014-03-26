@@ -350,8 +350,8 @@ trait FormRunnerActions {
         }
 
     private val TestCommonParams = List[(String, () ⇒ Boolean)](
-        NoscriptParam   → (() ⇒ XFormsProperties.isNoscript(containingDocument)),
-        EmbeddableParam → (() ⇒ containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) exists (_ == "true"))
+        NoscriptParam   → (() ⇒ isNoscript),
+        EmbeddableParam → (() ⇒ isEmbeddable)
     )
 
     private val CommonParamNames = TestCommonParams map (_._1) toSet
@@ -432,7 +432,7 @@ trait FormRunnerActions {
     def tryToggleNoscript(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), mode) = FormRunnerParams()
-            s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! XFormsProperties.isNoscript(containingDocument)).toString}"
+            s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! isNoscript).toString}"
         } flatMap
             tryChangeMode
 

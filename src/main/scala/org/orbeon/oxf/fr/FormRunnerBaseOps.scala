@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xforms.XFormsProperties
 
 trait FormRunnerBaseOps {
 
@@ -125,7 +126,12 @@ trait FormRunnerBaseOps {
     def persistenceInstance  = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
 
     // Whether the form has a captcha
-    def hasCaptcha = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
+    def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
+    def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
+    def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
+
+    def isNoscript    = XFormsProperties.isNoscript(containingDocument)
+    def isEmbeddable  = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) exists (_ == "true")
 
     // The standard Form Runner parameters
     case class FormRunnerParams(app: String, form: String, formVersion: String, document: Option[String], mode: String)

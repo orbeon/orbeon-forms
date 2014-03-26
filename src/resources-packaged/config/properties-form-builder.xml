@@ -54,7 +54,7 @@
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="home delete duplicate new"/>
 
     <!-- Available languages -->
-    <property as="xs:string" name="oxf.fr.available-languages.orbeon.builder"        value="en fr it de"/>
+    <property as="xs:string" name="oxf.fr.available-languages.orbeon.builder"        value="en fr es it de"/>
 
     <!-- In case somebody overrides with weaker properties -->
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"       value="true"/>

@@ -3899,7 +3899,7 @@ ORBEON.xforms.Init = {
                         parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
                     }
                 }
-            },
+            }
         });
 
         // Initialize DOM methods based on browser

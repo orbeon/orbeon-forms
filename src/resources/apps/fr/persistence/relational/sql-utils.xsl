@@ -82,13 +82,19 @@
     </xsl:function>
 
     <xsl:function name="f:namespaces">
-        <xsl:param name="query" as="element(query)"/>
-        <xsl:for-each select="in-scope-prefixes($query)">
-            <xsl:text>xmlns:</xsl:text>
-            <xsl:value-of select="."/>
-            <xsl:text>="</xsl:text>
-            <xsl:value-of select="namespace-uri-for-prefix(., $query)"/>
-            <xsl:text>" </xsl:text>
+        <xsl:param name="element" as="element(query)"/>
+        <xsl:param name="xpath"   as="xs:string"/>
+        <xsl:variable name="xpath-parts" select="tokenize($xpath, '/')" as="xs:string*"/>
+        <xsl:for-each select="in-scope-prefixes($element)">
+            <xsl:variable name="prefix" select="." as="xs:string"/>
+            <xsl:variable name="output-ns" select="exists($xpath-parts[starts-with(., $prefix)])" as="xs:boolean"/>
+            <xsl:if test="$output-ns">
+                <xsl:text>xmlns:</xsl:text>
+                <xsl:value-of select="."/>
+                <xsl:text>="</xsl:text>
+                <xsl:value-of select="namespace-uri-for-prefix(., $element)"/>
+                <xsl:text>" </xsl:text>
+            </xsl:if>
         </xsl:for-each>
     </xsl:function>
 

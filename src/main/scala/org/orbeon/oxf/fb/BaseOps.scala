@@ -27,7 +27,7 @@ trait BaseOps extends Logging {
     implicit def logger = containingDocument.getIndentedLogger("form-builder")
 
     // Minimal version of IE supported
-    val MinimalIEVersion = 9
+    val MinimalIEVersion = 10
 
     // Id of the xxf:dynamic control holding the edited form
     val DynamicControlId = "fb"

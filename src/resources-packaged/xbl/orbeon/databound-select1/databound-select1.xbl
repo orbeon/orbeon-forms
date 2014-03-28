@@ -115,7 +115,7 @@
                     <!-- Get sequence of values in the new itemset -->
                     <xf:var
                         name="new-values"
-                        value="xxf:itemset('select', 'xml', false())//value/string()"/>
+                        value="xxf:itemset('select1', 'xml', false())//value/string()"/>
                     <!-- If the current value is not in the new itemset, set it to blank -->
                     <xf:setvalue
                         if="not(xxf:binding('fr-databound-select1') = ($new-values, ''))"

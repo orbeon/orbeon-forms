@@ -314,16 +314,14 @@ body.orbeon { background-color: @frBackground }
         .xforms-textarea.xforms-static pre, .xforms-mediatype-text-html.xforms-static {
             cursor: not-allowed;
         }
-
-        // NOTE: The !important seems needed with FlyingSaucer, who knows why.
         .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
             &.xforms-static {
                 .xforms-selected, .xforms-deselected {
                     display: block;
                     min-height: @baseLineHeight;
-                    background-size: 14px !important;
-                    background-repeat: no-repeat !important;
-                    background-position: 0 3px !important;
+                    background-size: 14px;
+                    background-repeat: no-repeat;
+                    background-position: 0 3px;
                     cursor: not-allowed;
 
                     label {
@@ -331,10 +329,10 @@ body.orbeon { background-color: @frBackground }
                     }
                 }
                 .xforms-selected {
-                    background-image: url("images/glyphicons/checkbox-selected.png") !important;
+                    background-image: url("images/glyphicons/checkbox-selected.png");
                 }
                 .xforms-deselected {
-                    background-image: url("images/glyphicons/checkbox-deselected.png") !important;
+                    background-image: url("images/glyphicons/checkbox-deselected.png");
                 }
             }
         }
@@ -348,9 +346,30 @@ body.orbeon { background-color: @frBackground }
     }
 }
 
+// ***** Retina displays ***********************************************************************************************
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min--moz-device-pixel-ratio: 2),
+       only screen and (min-resolution: 2dppx),
+       only screen and (min-resolution: 192dpi) {
+    .orbeon {
+        .fr-mode-view, .fr-mode-pdf {
+            .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
+                &.xforms-static {
+                    .xforms-selected {
+                        background-image: url("images/glyphicons/checkbox-selected-2x.png");
+                    }
+                    .xforms-deselected {
+                        background-image: url("images/glyphicons/checkbox-deselected-2x.png");
+                    }
+                }
+            }
+        }
+    }
+}
+
 // ***** Print and PDF *************************************************************************************************
 
-// This is also used for PDF generation
 @media print {
 
     html {
@@ -360,6 +379,26 @@ body.orbeon { background-color: @frBackground }
     }
 
     .orbeon {
+
+        .fr-mode-view, .fr-mode-pdf {
+            .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
+                &.xforms-static {
+                    // NOTE: The !important seems needed with FlyingSaucer, who knows why.
+                    .xforms-selected, .xforms-deselected {
+                        background-size: 14px;
+                        background-repeat: no-repeat !important;
+                        background-position: 0 3px !important;
+                    }
+
+                    .xforms-selected {
+                        background-image: url("images/glyphicons/checkbox-selected-hd.png") !important;
+                    }
+                    .xforms-deselected {
+                        background-image: url("images/glyphicons/checkbox-deselected-hd.png") !important;
+                    }
+                }
+            }
+        }
 
         a, button.btn-link { color: black; text-decoration: none }
         .xforms-required label { background-image: none; padding-left: 0 }

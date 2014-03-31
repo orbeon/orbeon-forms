@@ -40,8 +40,17 @@
                 <!-- /*/document is available e.g. when editing or viewing a document -->
                 <xsl:variable name="document" select="/*/document" as="xs:string"/>
 
+                <!-- If we know the document id AND no data was POSTed to us, tell the persistence API, use the document
+                     id, otherwise pass the requested form version if there is one.
+
+                     The case where we have a document id and data was POSTed to us is the case of switching between
+                     modes or script/noscript. In that case, there is no data in the database and the persistence layer
+                     must use the version if any. -->
+                <xsl:variable name="use-document-id"                 select="$document != '' and empty(p:get-request-attribute('fr-form-data'))"/>
+                <xsl:variable name="specific-form-version-requested" select="/*/form-version != ''"/>
+
                 <!-- Create URI to persistence layer -->
-                <xsl:variable name="resource" select="concat('/fr/service/persistence/crud/', /*/app, '/', /*/form, '/form/form.xhtml', if ($document != '') then concat('?document=', $document) else '')"/>
+                <xsl:variable name="resource" select="concat('/fr/service/persistence/crud/', /*/app, '/', /*/form, '/form/form.xhtml', if ($use-document-id) then concat('?document=', $document) else '')"/>
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
                 </url>
@@ -54,17 +63,13 @@
                 <!-- Enable conditional GET -->
                 <cache-control><use-local-cache>true</use-local-cache><conditional-get>true</conditional-get></cache-control>
 
-                <!-- If we know the document id, tell the persistence API,
-                     otherwise pass the request form version, if there is one -->
-                <xsl:variable name="known-document-id"               select="$document != ''"/>
-                <xsl:variable name="specific-form-version-requested" select="/*/form-version != ''"/>
-                <xsl:if test="$known-document-id">
+                <xsl:if test="$use-document-id">
                     <header>
                         <name>Orbeon-For-Document-Id</name>
                         <value><xsl:value-of select="$document"/></value>
                     </header>
                 </xsl:if>
-                <xsl:if test="not($known-document-id) and $specific-form-version-requested">
+                <xsl:if test="not($use-document-id) and $specific-form-version-requested">
                     <header>
                         <name>Orbeon-Form-Definition-Version</name>
                         <value><xsl:value-of select="/*/form-version"/></value>
@@ -108,7 +113,7 @@
         <p:output name="data" id="after-xinclude" ref="data"/>
     </p:processor>
 
-    <!-- Store document in the request for further access down the line -->
+    <!-- Store document in the request for further access down the line. This is used by the Summary page. -->
     <p:processor name="oxf:scope-serializer">
         <p:input name="config">
             <config>

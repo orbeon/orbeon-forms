@@ -107,7 +107,7 @@ Event.onDOMReady ->
         Events.clickEvent.subscribe (event) ->
 
             # Show date picker on click on the input of type dates
-            isDate = f$.is '.xforms-type-date, .xforms-type-date', $ event.target
+            isDate = f$.is '.xforms-type-date', $ event.target
             canWrite = not f$.is '.xforms-readonly', $ event.control
             if isDate and canWrite
 

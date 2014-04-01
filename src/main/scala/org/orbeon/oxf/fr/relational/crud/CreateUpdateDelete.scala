@@ -34,7 +34,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
     private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
-        val table = tableName(req)
+        val table  = tableName(req)
         val resultSet = {
             val ps = connection.prepareStatement(
                 s"""select created ${req.forData.option(", username , groupname, form_version").mkString}

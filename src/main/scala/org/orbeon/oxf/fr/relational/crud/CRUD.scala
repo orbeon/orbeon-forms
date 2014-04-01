@@ -26,7 +26,7 @@ class CRUD
         with Read
         with CreateUpdateDelete {
 
-    override def start(pipelineContext: PipelineContext) {
+    override def start(pipelineContext: PipelineContext): Unit =
         try {
             val req = request
 
@@ -44,5 +44,4 @@ class CRUD
             case e: HttpStatusCodeException ⇒
                 httpResponse.setStatus(e.code)
         }
-    }
 }

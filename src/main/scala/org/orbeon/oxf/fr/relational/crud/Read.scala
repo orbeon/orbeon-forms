@@ -44,7 +44,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                        |    last_modified_time
                        |    ${if (req.forAttachment) ", file_content"          else s", $xmlCol xml"}
                        |    ${if (req.forData)       ", username, groupname"   else ""}
-                       |    ${if (req.forForm)       ", form_version"          else ""}
+                       |    , form_version
                        |from $table t
                        |    where (last_modified_time, $idCols)
                        |          in
@@ -89,7 +89,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 }
 
                 // Set form version header
-                if (req.forForm) {
+                locally {
                     val formVersion = resultSet.getInt("form_version")
                     httpResponse.setHeader("Orbeon-Form-Definition-Version", formVersion.toString)
                 }

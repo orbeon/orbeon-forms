@@ -290,9 +290,26 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             def checkVersionWithExisting(existing: Option[Row]): Unit = {
                 // Create: a specific version number is required
                 // Update: we're OK if a version is specified; we just won't use it
-                val badVersion = req.forData &&
-                        (! delete && existing.isEmpty && ! req.version.isInstanceOf[Specific])
-                if (badVersion) throw HttpStatusCodeException(400)
+
+                // Q: Why don't we compare the Specific version with the existing one and throw an error if the versions
+                // don't match? It seems reasonable to allow clients to pass a version, this way the same code can be
+                // used for create and for update. But if the version doesn't match during an update, it's obviously and
+                // error. It seems to me that we should compare the versions if provided. @ebruchez
+
+                def isUpdate =
+                    ! delete && existing.isEmpty
+
+                def isOptionalSpecificVersion =
+                    req.version match {
+                        case Unspecified | Specific(_) ⇒ true
+                        case _                         ⇒ false
+                    }
+
+                def badVersion =
+                    isUpdate && req.forData && ! isOptionalSpecificVersion
+
+                if (badVersion)
+                    throw HttpStatusCodeException(400)
             }
 
             def checkDocExistsForDelete(existing: Option[Row]): Unit = {

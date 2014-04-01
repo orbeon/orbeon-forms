@@ -375,7 +375,7 @@
                             $form,
                             instance('fr-duplicate-document'),
                             secure:randomHexId(),
-                            (event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value, 'latest')[1])
+                            event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value)
                     </xf:action>
                 </xf:action>
 

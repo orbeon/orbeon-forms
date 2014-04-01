@@ -298,7 +298,7 @@
         <xf:setvalue
             if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
             ref="instance('fr-create-update-submission-response')"/>
-        <xf:header ref=".[exists(event('form-version'))]">
+        <xf:header ref=".[normalize-space(event('form-version'))]">
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
             <xf:value value="event('form-version')"/>
         </xf:header>
@@ -314,7 +314,7 @@
             xxf:username="{event('username')}"
             xxf:password="{event('password')}"
             replace="none">
-        <xf:header ref=".[exists(event('form-version'))]">
+        <xf:header ref=".[normalize-space(event('form-version'))]">
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
             <xf:value value="event('form-version')"/>
         </xf:header>

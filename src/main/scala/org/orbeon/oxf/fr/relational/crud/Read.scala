@@ -32,9 +32,13 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             if (badVersion) throw HttpStatusCodeException(400)
 
             val resultSet = {
-                val table = tableName(req)
+                val table  = tableName(req)
                 val idCols = idColumns(req)
-                val xmlCol = if (req.provider == "oracle") "t.xml.getClobVal()" else "t.xml"
+                val xmlCol = req.provider match {
+                    case "oracle" ⇒ "t.xml.getClobVal()"
+                    case "db2"    ⇒ "xml2clob(t.xml)"
+                    case _        ⇒ "t.xml"
+                }
                 val ps = connection.prepareStatement(
                     s"""select
                        |    last_modified_time

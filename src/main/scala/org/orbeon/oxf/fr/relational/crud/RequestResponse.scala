@@ -43,30 +43,20 @@ trait RequestResponse {
 
     val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
     val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
+
     def request: Request = {
 
-        val version = {
-            val documentId = headerValue("orbeon-for-document-id")
-            documentId match {
-                case Some(id) ⇒ ForDocument(id)
-                case None ⇒
-                    val versionHeader = headerValue("orbeon-form-definition-version")
-                    versionHeader match {
-                        case None ⇒ Unspecified
-                        case Some("next") ⇒ Next
-                        case Some(v) ⇒ Specific(Integer.parseInt(v))
-                    }
-            }
-        }
+        val version =
+            Version(headerValue("orbeon-for-document-id"), headerValue("orbeon-form-definition-version"))
 
         NetUtils.getExternalContext.getRequest.getRequestPath match {
             case CrudFormPath(provider, app, form, filename) ⇒
                 val file = if (filename == "form.xhtml") None else Some(filename)
-                new Request(provider, app, form, file, version, None)
+                Request(provider, app, form, file, version, None)
             case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
                 val file = if (filename == "data.xml") None else Some(filename)
-                val dataPart = new DataPart(dataOrDraft == "draft", documentId)
-                new Request(provider, app, form, file, version, Some(dataPart))
+                val dataPart = DataPart(dataOrDraft == "draft", documentId)
+                Request(provider, app, form, file, version, Some(dataPart))
         }
 
     }

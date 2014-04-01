@@ -64,7 +64,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
         withOrbeonTables { connection =>
             val FormURL = "/crud/acme/address/form/form.xhtml"
 
-            // First time we put with "latest"
+            // First time we put with "latest" (AKA unspecified)
             val first = HttpRequest.XML(<gaga1/>)
             HttpAssert.put(FormURL, Unspecified, first, 201)
             HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody (first, Set.empty, Some(1)))
@@ -72,7 +72,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedCode(404))
             HttpAssert.del(FormURL, Specific(2), 404)
 
-            // Put again with "latest" updates the current version
+            // Put again with "latest" (AKA unspecified) updates the current version
             val second = <gaga2/>
             HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(second), 201)
             HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(second), Set.empty, Some(1)))

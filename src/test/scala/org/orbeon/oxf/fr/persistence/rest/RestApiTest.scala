@@ -120,8 +120,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             // Storing for specific form version
             val first = <gaga1/>
             HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(first), 201)
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, None))
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, None))
+            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
+            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
             HttpAssert.del(DataURL, Unspecified, 204)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(404))
 
@@ -187,11 +187,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 // Anonymous: no permission defined
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(None)), 201)
                 HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
-                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), AllOperations, None))
+                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), AllOperations, Some(1)))
 
                 // Anonymous: create and read
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
-                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), None))
+                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), Some(1)))
 
                 // Anonymous: just create, then can't read data
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create")))))), 201)
@@ -211,9 +211,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
                 // Everyone can read
                 HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
-                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), None), clerk)
-                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update"), None), manager)
-                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update", "delete"), None), admin)
+                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), Some(1)), clerk)
+                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update"), Some(1)), manager)
+                HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update", "delete"), Some(1)), admin)
 
                 // Only managers and admins can update
                 HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 403)
@@ -243,7 +243,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
                 val url = s"/crud/acme/address/data/123/file$position"
                 HttpAssert.put(url, Specific(1), bytes, 201)
-                HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, None))
+                HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, Some(1)))
             }
         }
     }
@@ -259,7 +259,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 val document = Dom4jUtils.createDocument |!> (_.add(element)) |> HttpRequest.XML
                 val url = s"/crud/acme/address/data/$position/data.xml"
                 HttpAssert.put(url, Specific(1), document, 201)
-                HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, None))
+                HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, Some(1)))
             }
         }
     }
@@ -274,8 +274,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             val DraftURL = "/crud/acme/address/draft/123/data.xml"
             HttpAssert.put(DataURL,  Specific(1), first, 201)
             HttpAssert.put(DraftURL, Unspecified, second, 201)
-            HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, None))
-            HttpAssert.get(DraftURL, Unspecified, HttpAssert.ExpectedBody(second, AllOperations, None))
+            HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, Some(1)))
+            HttpAssert.get(DraftURL, Unspecified, HttpAssert.ExpectedBody(second, AllOperations, Some(1)))
         }
     }
 }

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -29,7 +28,6 @@ import org.orbeon.oxf.xforms.analysis.model.Submission;
 import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.model.XFormsModelAction;
 import org.orbeon.oxf.xforms.state.InstanceState;
@@ -55,8 +53,6 @@ import java.util.*;
 public class XFormsModel extends XFormsModelBase implements XFormsEventObserver, XFormsObjectResolver {
 
     public static final String LOGGING_CATEGORY = "model";
-    public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
-    public final IndentedLogger indentedLogger;
 
     // Static representation of this model
     public final Model staticModel;
@@ -78,34 +74,23 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     private Map<String, ValueRepresentation> topLevelVariables = new LinkedHashMap<String, ValueRepresentation>();
 
     // Binds
-    private final XFormsModelBinds binds;
-    private final boolean mustBindValidate;
+    private final XFormsModelBinds _binds;
+    private final boolean _mustBindValidate;
 
-    // Schema validation
-    private XFormsModelSchemaValidator schemaValidator;
-    private boolean hasSchema;
+    public boolean mustBindValidate() { return _mustBindValidate; }
 
     // Container
     private final XBLContainer container;
     private final XFormsContextStack contextStack;    // context stack for evaluation, used by binds, submissions, event handlers
 
-    // Containing document
-    public final XFormsContainingDocument containingDocument;
-
-    public XFormsContainingDocument containingDocument() {
-        return containingDocument;
-    }
-
     public XFormsModel(XBLContainer container, String effectiveId, Model staticModel) {
+        super(container, effectiveId, staticModel);
 
         // Remember static model
         this.staticModel = staticModel;
 
         // Set container
         this.container = container;
-        this.containingDocument = container.getContainingDocument();
-
-        this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
 
         this.effectiveId = effectiveId;
 
@@ -156,8 +141,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
 
         // Create binds object
-        binds = XFormsModelBinds.create(this);
-        mustBindValidate = binds != null;
+        _binds = XFormsModelBinds.create(this);
+        _mustBindValidate = _binds != null;
 
         // Create context stack
         this.contextStack = new XFormsContextStack(container());
@@ -192,7 +177,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     }
 
     public IndentedLogger getIndentedLogger() {
-        return indentedLogger;
+        return indentedLogger();
     }
 
     public XFormsContextStack getContextStack() {
@@ -260,8 +245,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
 
         // Search binds
-        if (binds != null) {
-            final RuntimeBind bind = binds.resolveBind(targetStaticId, contextItem);
+        if (_binds != null) {
+            final RuntimeBind bind = _binds.resolveBind(targetStaticId, contextItem);
             if (bind != null)
                 return bind;
         }
@@ -342,33 +327,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     }
 
     public XFormsModelBinds getBinds() {
-        return binds;
-    }
-
-    private void loadSchemasIfNeeded() {
-        if (schemaValidator == null) {
-            final Element modelElement = staticModel.element();
-            schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
-            schemaValidator.loadSchemas(containingDocument);
-
-            hasSchema = schemaValidator.hasSchema();
-        }
-    }
-
-    public boolean hasSchema() {
-        return hasSchema;
-    }
-
-    public XFormsModelSchemaValidator getSchemaValidator() {
-        return schemaValidator;
-    }
-
-    public String[] getSchemaURIs() {
-        if (hasSchema) {
-            return schemaValidator.getSchemaURIs();
-        } else {
-            return null;
-        }
+        return _binds;
     }
 
     /**
@@ -376,15 +335,15 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
      */
     public void restoreState() {
         // Ensure schema are loaded
-        loadSchemasIfNeeded();
+        schemaValidator();
 
         // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
-        deferredActionContext.rebuild = true;
-        deferredActionContext.revalidate = true;
+        deferredActionContext().markRebuild();
+        deferredActionContext().markRevalidate(); // xxx REVALIDATE
 
         doRebuild();
-        if (binds != null)
-            binds.applyComputedExpressionBinds();
+        if (_binds != null)
+            _binds.applyComputedExpressionBinds();
         doRevalidate();
     }
 
@@ -403,7 +362,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 if (effectiveId.equals(state.modelEffectiveId())) {
                     // NOTE: Here instance must contain document
                     XFormsInstance.restoreInstanceFromState(this, state, INSTANCE_LOADER);
-                    indentedLogger.logDebug("restore", "restoring instance from dynamic state", "model effective id", effectiveId, "instance effective id", state.effectiveId());
+                    indentedLogger().logDebug("restore", "restoring instance from dynamic state", "model effective id", effectiveId, "instance effective id", state.effectiveId());
                 }
             }
         }
@@ -503,7 +462,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // 1. All XML Schema loaded (throws xforms-link-exception)
 
         try {
-            loadSchemasIfNeeded();
+            schemaValidator();
         } catch (Exception e) {
             final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
             Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(XFormsModel.this, schemaAttribute, e));
@@ -536,7 +495,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // TODO: a, b, c
 
         // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-        deferredActionContext.markStructuralChange();
+        deferredActionContext().markStructuralChange();
 
         if (rrr) {
             doRebuild();
@@ -547,7 +506,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
     private void loadInitialInstance(Instance instance) {
 
-        indentedLogger.startHandleOperation("load", "loading instance", "instance id", instance.staticId());
+        indentedLogger().startHandleOperation("load", "loading instance", "instance id", instance.staticId());
         {
             if (instance.useExternalContent()) {
                 // Load from @src or @resource
@@ -568,7 +527,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(XFormsModel.this, "", throwable));
             }
         }
-        indentedLogger.endHandleOperation();
+        indentedLogger().endHandleOperation();
     }
 
     private void setInlineInstance(Instance instance) {
@@ -582,7 +541,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
     private String resolveInstanceURL(Instance instance) {
         return XFormsUtils.resolveServiceURL(
-            containingDocument,
+            containingDocument(),
             instance.element(),
             instance.instanceSource().get(),
             ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
@@ -601,7 +560,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 final InstanceCaching caching = InstanceCaching.fromInstance(instance, resolveInstanceURL(instance), null);
                 final DocumentInfo documentInfo =
                     XFormsServerSharedInstancesCache.findContentOrLoad(
-                            indentedLogger,
+                            indentedLogger(),
                             instance,
                             caching,
                             instance.readonly(),
@@ -611,7 +570,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                     new XFormsInstance(
                         this,
                         instance,
-                        Option.<InstanceCaching>apply(caching),
+                        Option.apply(caching),
                         documentInfo,
                         instance.readonly(),
                         false,
@@ -623,7 +582,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 // the proper split between servlet path and path info is not done.
 
                 // TODO: Temporary. Use XFormsModelSubmission to load instances instead
-                if (!NetUtils.urlHasProtocol(instanceResource) && containingDocument.getContainerType().equals("portlet"))
+                if (!NetUtils.urlHasProtocol(instanceResource) && containingDocument().getContainerType().equals("portlet"))
                     throw new UnsupportedOperationException("<xf:instance src=\"\"> with relative path within a portlet");
 
                 // Use full resolved resource URL
@@ -656,24 +615,24 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // Connect using external protocol
 
         final Object instanceDocument;// Document or DocumentInfo
-        if (containingDocument.getURIResolver() == null) {
+        if (containingDocument().getURIResolver() == null) {
             // Connect directly if there is no resolver or if the instance is globally cached
             // NOTE: If there is no resolver, URLs of the form input:* are not allowed
 
             assert ! ProcessorImpl.isProcessorInputScheme(absoluteURLString);
 
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString);
+            if (indentedLogger().isDebugEnabled())
+                indentedLogger().logDebug("load", "getting document from URI", "URI", absoluteURLString);
 
             final URL absoluteResolvedURL = URLFactory.createURL(absoluteURLString);
 
             final scala.collection.immutable.Map<String, String[]> headers =
                 Connection.jBuildConnectionHeaders(absoluteResolvedURL.getProtocol(), instance.credentialsOrNull(), null,
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument), indentedLogger);
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument()), indentedLogger());
 
             final ConnectionResult connectionResult = Connection.jApply(
                 "GET", absoluteResolvedURL, instance.credentialsOrNull(), null,
-                headers, true, BaseSubmission.isLogBody(), indentedLogger).connect(true);
+                headers, true, BaseSubmission.isLogBody(), indentedLogger()).connect(true);
 
             try {
                 // Handle connection errors
@@ -698,19 +657,19 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         } else {
             // Optimized case that uses the provided resolver
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteURLString);
+            if (indentedLogger().isDebugEnabled())
+                indentedLogger().logDebug("load", "getting document from resolver", "URI", absoluteURLString);
 
             // TODO: Handle validating and handleXInclude!
 
             if (!instance.readonly()) {
-                instanceDocument = containingDocument.getURIResolver().readAsDom4j(
+                instanceDocument = containingDocument().getURIResolver().readAsDom4j(
                         absoluteURLString, instance.credentialsOrNull(),
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument()));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(XPath.GlobalConfiguration(),
+                instanceDocument = containingDocument().getURIResolver().readAsTinyTree(XPath.GlobalConfiguration(),
                         absoluteURLString, instance.credentialsOrNull(),
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument()));
             }
         }
 
@@ -724,20 +683,16 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // NOP
     }
 
-    private boolean hasInstancesAndBinds() {
-        return ! instances.isEmpty() && binds != null;
-    }
-
     public void doRebuild() {
 
         // Rebuild bind tree only if needed
-        if (deferredActionContext.rebuild) {
+        if (deferredActionContext().rebuild()) {
             // Re-evaluate top-level variables if needed
             resetAndEvaluateVariables();
 
             if (hasInstancesAndBinds()) {
                 // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
-                binds.rebuild();
+                _binds.rebuild();
 
                 // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
                 // TODO: Handle XPathDependencies
@@ -746,120 +701,11 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
             // have an immediate effect, and clear the corresponding flag."
-            deferredActionContext.rebuild = false;
+            deferredActionContext().clearRebuild();
         }
 
         // Notify dependencies
-        containingDocument.getXPathDependencies().rebuildDone(staticModel);
-    }
-
-    public void doRecalculate(boolean applyDefaults) {
-
-        // Recalculate only if needed
-        if (deferredActionContext.recalculate) {
-
-            final boolean hasVariables = ! staticModel.jVariablesSeq().isEmpty();
-
-            // Re-evaluate top-level variables if needed
-            if (hasInstancesAndBinds() || hasVariables)
-                resetAndEvaluateVariables();
-
-            if (hasInstancesAndBinds()) {
-                // Apply calculate binds
-                binds.applyCalculateBinds(applyDefaults);
-            }
-
-            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-            // have an immediate effect, and clear the corresponding flag."
-            deferredActionContext.recalculate = false;
-        }
-
-        // Notify dependencies
-        containingDocument.getXPathDependencies().recalculateDone(staticModel);
-    }
-
-
-    public void doRevalidate() {
-
-        Set<String> invalidInstances = null;
-
-        // Validate only if needed, including checking the flags, because if validation state is clean, validation
-        // being idempotent, revalidating is not needed.
-        if (deferredActionContext.revalidate) {
-            final boolean mustRevalidate = ! instances.isEmpty() && (mustBindValidate || hasSchema);
-            if (mustRevalidate) {
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
-
-                // Clear schema validation state
-                // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
-                for (final XFormsInstance instance: instances) {
-                    // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
-                    // The reason is that clearing this state can take quite some time
-                    final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
-                    if (instanceMightBeSchemaValidated) {
-                        DataModel.visitElementJava(instance.rootElement(), new DataModel.NodeVisitor() {
-                            public void visit(NodeInfo nodeInfo) {
-                                InstanceData.clearSchemaState(nodeInfo);
-                            }
-                        });
-                    }
-                }
-
-                // Run validation
-                invalidInstances = new LinkedHashSet<String>();
-
-                // Validate using schemas if needed
-                if (hasSchema) {
-                    // Apply schemas to all instances
-                    for (final XFormsInstance instance : instances) {
-                        // Currently we don't support validating read-only instances
-                        if (instance.isSchemaValidation()) {
-                            if (!schemaValidator.validateInstance(instance)) {
-                                // Remember that instance is invalid
-                                invalidInstances.add(instance.getEffectiveId());
-                            }
-                        }
-                    }
-                }
-
-                // Validate using binds if needed
-                if (mustBindValidate)
-                    binds.applyValidationBinds(invalidInstances);
-
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.endHandleOperation();
-            }
-
-            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-            // have an immediate effect, and clear the corresponding flag."
-            deferredActionContext.revalidate = false;
-        }
-
-        // Notify dependencies
-        containingDocument.getXPathDependencies().revalidateDone(staticModel);
-
-        if (invalidInstances != null) {
-            // Gather events to dispatch, at most one per instance, and only if validity has changed
-            // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
-            // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
-            // algorithm below.
-            List<XFormsEvent> eventsToDispatch = new ArrayList<XFormsEvent>();
-            for (final XFormsInstance instance : instances) {
-
-                final boolean previouslyValid = instance.valid();
-                final boolean currentlyValid  = ! invalidInstances.contains(instance.getEffectiveId());
-
-                if (previouslyValid != currentlyValid) {
-                    instance.valid_$eq(currentlyValid);
-                    eventsToDispatch.add(currentlyValid ? new XXFormsValidEvent(instance) : new XXFormsInvalidEvent(instance));
-                }
-            }
-
-            // Dispatch all events
-            for (final XFormsEvent event : eventsToDispatch)
-                Dispatch.dispatchEvent(event);
-        }
+        containingDocument().getXPathDependencies().rebuildDone(staticModel);
     }
 
     private void doRefresh() {
@@ -870,57 +716,18 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
         // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
         // FIXME: See https://github.com/orbeon/orbeon-forms/issues/1533
-        if (containingDocument.getControls().isRequireRefresh()) {
+        if (containingDocument().getControls().isRequireRefresh()) {
             container().synchronizeAndRefresh();
         }
     }
 
-    private final DeferredActionContext deferredActionContext = new DeferredActionContext();
-
-    public class DeferredActionContext {
-        public boolean rebuild;
-        public boolean recalculate;
-        public boolean revalidate;
-
-        public void markStructuralChange() {
-
-            // "XForms Actions that change the tree structure of instance data result in setting all four deferred update
-            // flags to true for the model over which they operate"
-
-            rebuild = true;
-            recalculate = true;
-            revalidate = true;
-
-            container().requireRefresh();
-        }
-
-        public void markValueChange(boolean isCalculate) {
-
-            // "XForms Actions that change only the value of an instance node results in setting the flags for
-            // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
-
-            if (!isCalculate) {
-                // Only set recalculate when we are not currently performing a recalculate (avoid infinite loop)
-                recalculate = true;
-            }
-
-            revalidate = true;
-
-            container().requireRefresh();
-        }
-    }
-
-    public DeferredActionContext getDeferredActionContext() {
-        return deferredActionContext;
-    }
-
     public void markValueChange(NodeInfo nodeInfo, boolean isCalculate) {
         // Set the flags
-        deferredActionContext.markValueChange(isCalculate);
+        deferredActionContext().markValueChange(isCalculate);
 
         // Notify dependencies of the change
         if (nodeInfo != null)
-            containingDocument.getXPathDependencies().markValueChanged(this, nodeInfo);
+            containingDocument().getXPathDependencies().markValueChanged(this, nodeInfo);
     }
 
 //    public void markMipChange(NodeInfo nodeInfo) {
@@ -931,40 +738,36 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
     public void markStructuralChange(XFormsInstance instance) {
         // Set the flags
-        deferredActionContext.markStructuralChange();
+        deferredActionContext().markStructuralChange();
 
         // Notify dependencies of the change
-        containingDocument.getXPathDependencies().markStructuralChange(this, instance);
+        containingDocument().getXPathDependencies().markStructuralChange(this, instance);
     }
 
     public void startOutermostActionHandler() {
         // NOP now that deferredActionContext is always created
     }
 
-    public boolean needRebuildRecalculateRevalidate() {
-        return deferredActionContext.rebuild || deferredActionContext.recalculate || deferredActionContext.revalidate;
-    }
-
     public void rebuildRecalculateRevalidateIfNeeded() {
         // Process deferred behavior
-        final DeferredActionContext currentDeferredActionContext = deferredActionContext;
+        final DeferredActionContext currentDeferredActionContext = deferredActionContext();
         // NOTE: We used to clear deferredActionContext , but this caused events to be dispatched in a different
         // order. So we are now leaving the flag as is, and waiting until they clear themselves.
 
-        if (currentDeferredActionContext.rebuild) {
-            containingDocument.startOutermostActionHandler();
+        if (currentDeferredActionContext.rebuild()) {
+            containingDocument().startOutermostActionHandler();
             Dispatch.dispatchEvent(new XFormsRebuildEvent(this));
-            containingDocument.endOutermostActionHandler();
+            containingDocument().endOutermostActionHandler();
         }
-        if (currentDeferredActionContext.recalculate) {
-            containingDocument.startOutermostActionHandler();
-            Dispatch.dispatchEvent(new XFormsRecalculateEvent(this));
-            containingDocument.endOutermostActionHandler();
+        if (currentDeferredActionContext.recalculateRevalidate()) {
+            containingDocument().startOutermostActionHandler();
+            Dispatch.dispatchEvent(new XFormsRecalculateEvent(this));// xxx REVALIDATE
+            containingDocument().endOutermostActionHandler();
         }
-        if (currentDeferredActionContext.revalidate) {
-            containingDocument.startOutermostActionHandler();
+        if (currentDeferredActionContext.revalidate()) {
+            containingDocument().startOutermostActionHandler();
             Dispatch.dispatchEvent(new XFormsRevalidateEvent(this));
-            containingDocument.endOutermostActionHandler();
+            containingDocument().endOutermostActionHandler();
         }
     }
 

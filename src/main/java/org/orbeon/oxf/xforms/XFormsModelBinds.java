@@ -81,7 +81,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         this.model = model;
 
         this.indentedLogger = model.getIndentedLogger();
-        this.containingDocument = model.containingDocument;
+        this.containingDocument = model.containingDocument();
         this.dependencies = this.containingDocument.getXPathDependencies();
 
         this.staticModel = model.getStaticModel();
@@ -564,7 +564,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
                 // There are possibly types defined in the schema
                 final String validationError
-                        = model.getSchemaValidator().validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), staticBind.locationData());
+                        = model.schemaValidator().validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), staticBind.locationData());
 
                 typeValid = validationError == null;
             } else {

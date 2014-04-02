@@ -26,13 +26,13 @@ trait RRRFunctions {
 }
 
 trait XFormsRebuildFunctions extends RRRFunctions {
-    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.getDeferredActionContext.rebuild = true
+    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.deferredActionContext.rebuild = true
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRebuildEvent(model)
 }
 
 trait XFormsRecalculateFunctions extends RRRFunctions {
     def setFlag(model: XFormsModel, applyDefaults: Boolean) = {
-        model.getDeferredActionContext.recalculate = true
+        model.deferredActionContext.recalculateRevalidate = true
         if (applyDefaults)
             model.getBinds.resetFirstCalculate()
     }
@@ -40,7 +40,7 @@ trait XFormsRecalculateFunctions extends RRRFunctions {
 }
 
 trait XFormsRevalidateFunctions extends RRRFunctions {
-    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.getDeferredActionContext.revalidate = true
+    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.deferredActionContext.revalidate = true // xxx REVALIDATE
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRevalidateEvent(model)
 }
 

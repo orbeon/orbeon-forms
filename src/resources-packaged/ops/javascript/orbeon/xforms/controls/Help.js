@@ -33,8 +33,8 @@
         var helpText            = Controls.getHelpMessage (controlEl[0]);
         var firstChildFormEl    = controlEl.find(':input').first();
         var el                  = firstChildFormEl.is('*') ? firstChildFormEl : controlEl; // [1]
-        var elPos               = getPosition(el);
-        var placement           = getPlacement(elPos);
+        var elPos               = Controls.getPosition(el);
+        var placement           = Controls.getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');
 
         // Hide other help popovers before (maybe) showing this one
@@ -46,7 +46,7 @@
             // For top placement, popover must be above the label
             if (placement == 'top') {
                 el = controlEl;
-                elPos = getPosition(el);
+                elPos = Controls.getPosition(el);
             }
 
             controlEl.popover({
@@ -71,69 +71,6 @@
         _.each($('form.xforms-form .xforms-help-popover'), function(popover) {
             $(popover).prev().popover('destroy');
         });
-    }
-
-    /**
-     * Get offset/width/height of element, dealing with case where element is inline
-     */
-    function getPosition(el) {
-        function getElPosition() {
-            return {
-                offset:    el.offset(),
-                width :    el.outerWidth(),
-                height:    el.outerHeight(),
-                scrollTop: $(document).scrollTop() // Will this work if we're in a scrollable area?
-            }
-        }
-
-        var pos;
-        if (el.is(':hidden')) {
-            var originalStyle = el.attr('style');
-            el.css('display', 'inline-block');
-            pos = getElPosition();
-            (_.isUndefined(originalStyle))
-                ? el.removeAttr('style')
-                : el.attr('style', originalStyle);
-        } else {
-            pos = getElPosition();
-        }
-
-        var overflowEl = $(_.find($(el).parents(), function(e) { return $(e).css('overflow') == 'auto'; }));
-        var overflowPos = {};
-        pos.margins = ! overflowEl.is('*')
-            ? { top: 0, right: 0, bottom: 0, left: 0 }
-            : (
-                overflowPos.offset = overflowEl.offset(),
-                overflowPos.width  = overflowEl.outerWidth(),
-                overflowPos.height = overflowEl.outerHeight(),
-                {
-                    top:    overflowPos.offset.top,
-                    right:  $(window).width()  - overflowPos.offset.left - overflowPos.width,
-                    bottom: $(window).height() - overflowPos.offset.top  - overflowPos.height,
-                    left:   overflowPos.offset.left
-                }
-              );
-
-        return pos;
-    }
-
-    /**
-     * Figure where we want to place the popover: right, left, top, bottom, or over
-     */
-    function getPlacement(elPos) {
-        var RequiredSpaceHorizontal = 420;
-        var RequiredSpaceVertical   = 300;
-        var space = {
-            left:   elPos.offset.left,
-            right:  $(window).width() - (elPos.offset.left + elPos.width),
-            top:    elPos.offset.top - elPos.scrollTop,
-            bottom: $(window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height)
-        };
-        return (space.right >= RequiredSpaceHorizontal || space.left >= RequiredSpaceHorizontal)
-             ?  space.right >= space.left ? 'right' : 'left'
-             : (space.top   >= RequiredSpaceVertical || space.bottom >= RequiredSpaceVertical)
-             ?  space.top   >= space.bottom ? 'top' : 'bottom'
-             : 'over';
     }
 
     /**

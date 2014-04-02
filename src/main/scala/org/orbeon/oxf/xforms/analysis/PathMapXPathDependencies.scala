@@ -127,10 +127,6 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         def isMIPInitiallyDirty(mip: StaticBind#MIP) =
             mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
-
-        // TODO: Scenario that can break this:
-        // recalculate → value change → xxf-value-changed → insert → calculateClean = false → recalculateDone → calculateClean = true
-        // although following rebuild will set calculateClean = false, this is not right and might still lead to issues
     }
 
     // State of models
@@ -319,7 +315,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         val updateResult: UpdateResult =
             cached match {
                 case Some(result) ⇒ result
-                case None ⇒ {
+                case None ⇒
                     val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
                     val tempResult = control.getBindingAnalysis match {
                         case None ⇒
@@ -341,8 +337,8 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
                     if (control.isWithinRepeat)
                         RefreshState.modifiedBindingCacheForRepeats += controlPrefixedId → tempResult
+
                     tempResult
-                }
             }
 
         if (updateResult.requireUpdate)

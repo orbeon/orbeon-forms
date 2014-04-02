@@ -365,7 +365,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                         }
                         if (p.resolvedRelevant || p.resolvedXXFormsCalculate) {
                             // Recalculate impacts relevance and calculated values
-                            modelForInstance.doRecalculate(false);
+                            modelForInstance.doRecalculateRevalidate(false);
                         }
                     }
                 } else {
@@ -1205,7 +1205,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         // can impact serializations that use type information, for example multipart. But in that case, here we decide
         // the optimization is worth it anyway.
         if (resolvedValidate && modelForInstance != null)
-            modelForInstance.doRevalidate();
+            modelForInstance.doRecalculateRevalidate(false);
 
         // Get selected nodes (re-root and prune)
         documentToSubmit = reRootAndPrune(currentNodeInfo, resolvedRelevant, resolvedAnnotate);

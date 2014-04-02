@@ -339,12 +339,13 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
         deferredActionContext().markRebuild();
-        deferredActionContext().markRevalidate(); // xxx REVALIDATE
+
+        // TODO: We used to not redo recalculations upon state restore. Does this cause a problem? Shouldn't
+        // recalculations not depend on the number of times they run anyway?
+        deferredActionContext().markRecalculateRevalidate();
 
         doRebuild();
-        if (_binds != null)
-            _binds.applyComputedExpressionBinds();
-        doRevalidate();
+        doRecalculateRevalidate(false);
     }
 
     /**
@@ -396,11 +397,13 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             final XFormsRecalculateEvent recalculateEvent = (XFormsRecalculateEvent) event;
-            doRecalculate(recalculateEvent.applyDefaults());
+            doRecalculateRevalidate(recalculateEvent.applyDefaults());
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            doRevalidate();
+            // Recalculate and revalidate are unified
+            // See https://github.com/orbeon/orbeon-forms/issues/1650
+            doRecalculateRevalidate(false);
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
@@ -449,7 +452,6 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // xforms-refresh are dispatched to the model element in sequence."
         Dispatch.dispatchEvent(new XFormsRebuildEvent(XFormsModel.this));
         Dispatch.dispatchEvent(new XFormsRecalculateEvent(XFormsModel.this));
-        Dispatch.dispatchEvent(new XFormsRevalidateEvent(XFormsModel.this));
         Dispatch.dispatchEvent(new XFormsRefreshEvent(XFormsModel.this));
     }
 
@@ -499,8 +501,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         if (rrr) {
             doRebuild();
-            doRecalculate(false);
-            doRevalidate();
+            doRecalculateRevalidate(false);
         }
     }
 
@@ -683,44 +684,6 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // NOP
     }
 
-    public void doRebuild() {
-
-        // Rebuild bind tree only if needed
-        if (deferredActionContext().rebuild()) {
-            // Re-evaluate top-level variables if needed
-            resetAndEvaluateVariables();
-
-            if (hasInstancesAndBinds()) {
-                // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
-                _binds.rebuild();
-
-                // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-                // TODO: Handle XPathDependencies
-                container().requireRefresh();
-            }
-
-            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-            // have an immediate effect, and clear the corresponding flag."
-            deferredActionContext().clearRebuild();
-        }
-
-        // Notify dependencies
-        containingDocument().getXPathDependencies().rebuildDone(staticModel);
-    }
-
-    private void doRefresh() {
-        // This is called in response to dispatching xforms-refresh to this model, whether using the xf:refresh
-        // action or by dispatching the event by hand.
-
-        // NOTE: If the refresh flag is not set, we do not call synchronizeAndRefresh() because that would only have the
-        // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
-        // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
-        // FIXME: See https://github.com/orbeon/orbeon-forms/issues/1533
-        if (containingDocument().getControls().isRequireRefresh()) {
-            container().synchronizeAndRefresh();
-        }
-    }
-
     public void markValueChange(NodeInfo nodeInfo, boolean isCalculate) {
         // Set the flags
         deferredActionContext().markValueChange(isCalculate);
@@ -761,12 +724,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
         if (currentDeferredActionContext.recalculateRevalidate()) {
             containingDocument().startOutermostActionHandler();
-            Dispatch.dispatchEvent(new XFormsRecalculateEvent(this));// xxx REVALIDATE
-            containingDocument().endOutermostActionHandler();
-        }
-        if (currentDeferredActionContext.revalidate()) {
-            containingDocument().startOutermostActionHandler();
-            Dispatch.dispatchEvent(new XFormsRevalidateEvent(this));
+            Dispatch.dispatchEvent(new XFormsRecalculateEvent(this));
             containingDocument().endOutermostActionHandler();
         }
     }

@@ -171,8 +171,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         // Do RRR as xforms-model-construct didn't do it
         for (model ← nestedContainer.models) {
             model.doRebuild()
-            model.doRecalculate(true)
-            model.doRevalidate()
+            model.doRecalculateRevalidate(applyDefaults = true)
         }
 
         // xforms-model-construct-done

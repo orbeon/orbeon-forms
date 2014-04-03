@@ -4,7 +4,6 @@ import org.dom4j._
 import org.orbeon.oxf.xforms._
 
 import analysis._
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.immutable.List
 import org.orbeon.oxf.xml.{ShareableXPathStaticContext, Dom4j, XMLReceiverHelper}
@@ -48,6 +47,7 @@ class StaticBind(
     trait MIP {
         val id: String
         val name: String
+        val level: ValidationLevel
         val isCalculateComputedMIP = CalculateMIPNames(name)
         val isValidateMIP          = ValidateMIPNames(name)
         val isCustomMIP            = ! isCalculateComputedMIP && ! isValidateMIP
@@ -55,6 +55,8 @@ class StaticBind(
 
     // Represent an XPath MIP
     class XPathMIP(val id: String, val name: String, expression: String) extends MIP {
+
+        val level: ValidationLevel = ErrorLevel
 
         // Compile the expression right away
         val compiledExpression = {
@@ -91,11 +93,13 @@ class StaticBind(
         }
     }
 
-    class ConstraintXPathMIP(id: String, name: String, expression: String, val level: ValidationLevel)
+    class ConstraintXPathMIP(id: String, name: String, expression: String, override val level: ValidationLevel)
         extends XPathMIP(id, name, expression)
 
     // The type MIP is not an XPath expression
-    class TypeMIP(val id: String, val name: String, val datatype: String) extends MIP
+    class TypeMIP(val id: String, val name: String, val datatype: String) extends MIP {
+        val level = ErrorLevel
+    }
 
     // Globally remember binds ids
     bindTree.bindIds += staticId
@@ -107,7 +111,7 @@ class StaticBind(
         bindTree.bindsByName += name → staticBind
 
     // Type MIP is special as it is not an XPath expression
-    private val typeMIPAsList =
+    val typeMIPAsList =
         for (value ← Option(element.attributeValue(TYPE_QNAME)).toList)
         yield new TypeMIP(staticId, TYPE, value)
 
@@ -342,6 +346,13 @@ object StaticBind {
     case object ErrorLevel   extends { val name = "error" }   with ValidationLevel
     case object WarningLevel extends { val name = "warning" } with ValidationLevel
     case object InfoLevel    extends { val name = "info" }    with ValidationLevel
+
+    implicit object LevelOrdering extends Ordering[ValidationLevel] {
+        override def compare(x: ValidationLevel, y: ValidationLevel) =
+            if (x == y) 0
+            else if (y == ErrorLevel || y == WarningLevel && x == InfoLevel) -1
+            else 1
+    }
 
     val LevelsByPriority = Seq(ErrorLevel, WarningLevel, InfoLevel): Seq[ValidationLevel]
     val LevelByName      = LevelsByPriority map (l ⇒ l.name → l) toMap

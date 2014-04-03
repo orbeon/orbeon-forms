@@ -118,31 +118,31 @@ private object XFormsValueChangeEvent {
 
 class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]) =
+    def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]) =
         this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
 }
 
 private object XXFormsConstraintsChangedEvent {
 
-    def constraintsForLevel(current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) =
+    def validationsForLevel(current: List[StaticBind#MIP], level: ValidationLevel) =
         current filter (_.level == level) map (_.id)
 
-    def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) = {
+    def diffValidations(previous: List[StaticBind#MIP], current: List[StaticBind#MIP], level: ValidationLevel) = {
         val previousIds = previous.map(_.id).toSet
-        constraintsForLevel(current, level) filterNot previousIds
+        validationsForLevel(current, level) filterNot previousIds
     }
 
-    def properties(level: Option[ValidationLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]): PropertyGetter = {
+    def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
         case "level"            ⇒ level map (_.name)
         case "constraints"      ⇒ Option(current map (_.id))
-        case "errors"           ⇒ Some(constraintsForLevel(current, ErrorLevel))
-        case "warnings"         ⇒ Some(constraintsForLevel(current, WarningLevel))
-        case "infos"            ⇒ Some(constraintsForLevel(current, InfoLevel))
-        case "added-errors"     ⇒ Some(diffConstraints(previous, current, ErrorLevel))
-        case "removed-errors"   ⇒ Some(diffConstraints(current, previous, ErrorLevel))
-        case "added-warnings"   ⇒ Some(diffConstraints(previous, current, WarningLevel))
-        case "removed-warnings" ⇒ Some(diffConstraints(current, previous, WarningLevel))
-        case "added-infos"      ⇒ Some(diffConstraints(previous, current, InfoLevel))
-        case "removed-infos"    ⇒ Some(diffConstraints(current, previous, InfoLevel))
+        case "errors"           ⇒ Some(validationsForLevel(current, ErrorLevel))
+        case "warnings"         ⇒ Some(validationsForLevel(current, WarningLevel))
+        case "infos"            ⇒ Some(validationsForLevel(current, InfoLevel))
+        case "added-errors"     ⇒ Some(diffValidations(previous, current, ErrorLevel))
+        case "removed-errors"   ⇒ Some(diffValidations(current, previous, ErrorLevel))
+        case "added-warnings"   ⇒ Some(diffValidations(previous, current, WarningLevel))
+        case "removed-warnings" ⇒ Some(diffValidations(current, previous, WarningLevel))
+        case "added-infos"      ⇒ Some(diffValidations(previous, current, InfoLevel))
+        case "removed-infos"    ⇒ Some(diffValidations(current, previous, InfoLevel))
     }
 }

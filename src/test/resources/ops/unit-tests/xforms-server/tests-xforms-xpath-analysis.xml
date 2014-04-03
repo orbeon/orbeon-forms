@@ -3403,15 +3403,19 @@
                                 <events>
                                     <event type="xforms-value-changed" target="price" indexes="1"/>
                                     <event type="xforms-invalid" target="price" indexes="1"/>
+                                    <event type="xxforms-constraints-changed" target="price" indexes="1"/>
                                     <event type="xforms-value-changed" target="line-total" indexes="1"/>
                                     <event type="xforms-invalid" target="line-total" indexes="1"/>
+                                    <event type="xxforms-constraints-changed" target="line-total" indexes="1"/>
                                     <event type="xforms-value-changed" target="subtotal" indexes=""/>
                                     <event type="xforms-value-changed" target="tax" indexes=""/>
                                     <event type="xforms-value-changed" target="total" indexes=""/>
                                     <event type="xforms-value-changed" target="price" indexes="1"/>
                                     <event type="xforms-valid" target="price" indexes="1"/>
+                                    <event type="xxforms-constraints-changed" target="price" indexes="1"/>
                                     <event type="xforms-value-changed" target="line-total" indexes="1"/>
                                     <event type="xforms-valid" target="line-total" indexes="1"/>
+                                    <event type="xxforms-constraints-changed" target="line-total" indexes="1"/>
                                     <event type="xforms-value-changed" target="subtotal" indexes=""/>
                                     <event type="xforms-value-changed" target="tax" indexes=""/>
                                     <event type="xforms-value-changed" target="total" indexes=""/>

@@ -2177,4 +2177,73 @@
         </output>
     </test>
 
+    <test description="#1533: Required and type MIPs don't count as failed validations" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model" xxf:expose-xpath-types="true">
+                        <xf:instance id="instance">
+                            <data>
+                                <my-number-1/>
+                                <my-number-2>abc</my-number-2>
+                                <my-number-3>-1</my-number-3>
+                                <my-number-4>101</my-number-4>
+                                <my-number-5>1.234</my-number-5>
+                                <my-number-6>-1.234</my-number-6>
+                                <my-number-7>12.34</my-number-7>
+                            </data>
+                        </xf:instance>
+
+                        <xf:bind id="required-bind" ref="*" required="true()"/>
+                        <xf:bind id="decimal-bind"  ref="*" type="xs:decimal"/>
+                        <xf:bind ref="*">
+                            <xf:constraint id="min"                value="if (string() castable as xs:decimal) then . ge 1.0   else true()"/>
+                            <xf:constraint id="max"                value="if (string() castable as xs:decimal) then . le 100.0 else true()"/>
+                            <xf:constraint id="two-decimal-places" value="if (string() castable as xs:decimal) then string-length(substring-after(string(), '.')) le 2 else true()"/>
+                        </xf:bind>
+
+                        <xf:bind ref="*">
+                            <xf:constraint id="even" level="warning" value="if (string() castable as xs:decimal) then . gt 50.0 else true()"/>
+                        </xf:bind>
+
+                        <xf:send event="xforms-ready" submission="submission"/>
+
+                        <xf:submission
+                            id="submission"
+                            method="post"
+                            resource="echo:"
+                            ref="instance()"
+                            xxf:annotate="error warning info"
+                            replace="all"
+                            validate="false"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="*">
+                        <xf:input ref=".">
+                            <xf:alert validation="required-bind" >A valid value is required.</xf:alert>
+                            <xf:alert validation="decimal-bind">Must be a decimal number.</xf:alert>
+                            <xf:alert validation="min">Must be greater or equal to 1.</xf:alert>
+                            <xf:alert validation="max">Must be less than or equal to 100.</xf:alert>
+                            <xf:alert validation="two-decimal-places">Must have two or fewer decimal places.</xf:alert>
+                            <xf:alert validation="even">Should be greater than 50.</xf:alert>
+                        </xf:input>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+           <data>
+                <my-number-1 xxf:error="&lt;ul&gt;&lt;li&gt;A valid value is required.&lt;/li&gt;&lt;li&gt;Must be a decimal number.&lt;/li&gt;&lt;/ul&gt;"/>
+                <my-number-2 xxf:error="Must be a decimal number.">abc</my-number-2>
+                <my-number-3 xxf:error="Must be greater or equal to 1.">-1</my-number-3>
+                <my-number-4 xxf:error="Must be less than or equal to 100.">101</my-number-4>
+                <my-number-5 xxf:error="Must have two or fewer decimal places.">1.234</my-number-5>
+                <my-number-6 xxf:error="&lt;ul&gt;&lt;li&gt;Must be greater or equal to 1.&lt;/li&gt;&lt;li&gt;Must have two or fewer decimal places.&lt;/li&gt;&lt;/ul&gt;">-1.234</my-number-6>
+                <my-number-7 xxf:warning="Should be greater than 50.">12.34</my-number-7>
+            </data>
+        </output>
+    </test>
+
 </group>

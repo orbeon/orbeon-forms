@@ -75,7 +75,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     
     // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
     def rebuild(): Unit =
-        withDebug("performing rebuild", Seq("model id" → model.getEffectiveId)) {
+        withDebug("performing rebuild", List("model id" → model.getEffectiveId)) {
 
             // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
     
@@ -126,6 +126,15 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
         if (InstanceData.getTypeValid(currentNode)) {
             // Then bother checking constraints
+
+            // TODO: what about scenario:
+            // 1. value type valid
+            // 2. constraint fails
+            // 3. value no longer type valid
+            // 4. value type valid again but would cause constraint to succeed
+            // 5. dependency not recomputed?
+            // ⇒ TODO: if type becomes valid, must re-evaluate all constraints
+
             for {
                 (level, mips) ← bindNode.staticBind.constraintsByLevel
             } locally {
@@ -141,22 +150,19 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 }
             }
         } else {
-            // Type is invalid and we don't want to risk running an XPath expression against an invalid node type
-            // This is a common scenario, e.g. <xf:bind type="xs:integer" constraint=". > 0"/>
-            // We clear all constraints in this case
-
-            // NOTE: The above is cleary a common scenario, but there is nothing requiring that the constraint use the
-            // value, e.g.: <xf:bind type="xs:integer" constraint="../foo > 0"/>. For now we still consider that an
-            // invalid type is handled separately from constraints. This might be the right thing to do or not.
-
-            // TODO: what about scenario:
-            // 1. value type valid
-            // 2. constraint fails
-            // 3. value no longer type valid
-            // 4. value type valid again but would cause constraint to succeed
-            // 5. dependency not recomputed?
-
-            bindNode.failedConstraints = BindNode.EmptyConstraints
+            // Type is invalid and we consider that we don't need to run additional constraint checks on the node. We
+            // used to say that "we don't want to risk running an XPath expression against an invalid node type", but
+            // that wasn't a good reason, e.g. it made sense for:
+            //
+            //    <xf:bind type="xs:integer" constraint=". > 0"/>
+            //
+            // but not so much for:
+            //
+            //    <xf:bind type="xs:integer" constraint="../foo > 0"/>
+            //
+            // So we now have a better rationale for not evaluating constraints in that case, which has nothing to do
+            // with attempting to evaluate XPath expression against an invalid node type.
+            bindNode.failedConstraints = BindNode.EmptyValidations
         }
 
         // Remember invalid instances
@@ -211,7 +217,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 // produce a meaningful result. We think that it is worth handling this condition slightly differently
                 // from other dynamic and static errors, so that users can just write expression without constant checks
                 // with `castable as` or `instance of`.
-                debug("typed value exception", Seq("node name" → e.nodeName, "expected type" → e.typeName, "actual value" → e.nodeValue))
+                debug("typed value exception", List("node name" → e.nodeName, "expected type" → e.typeName, "actual value" → e.nodeValue))
             case t ⇒
                 // All other errors dispatch an event and will cause the usual fatal-or-not behavior
                 val ve = OrbeonLocationException.wrapException(t,

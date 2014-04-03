@@ -187,7 +187,7 @@ trait FormRunnerActions {
             val level = paramByNameOrDefault(params, "level") map LevelByName getOrElse ErrorLevel
 
             if (countValidationsByLevel(level) > 0)
-                throw new OXFException(s"Data has failed constraints for level ${level.name}")
+                throw new OXFException(s"Data has failed validations for level ${level.name}")
         }
 
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =

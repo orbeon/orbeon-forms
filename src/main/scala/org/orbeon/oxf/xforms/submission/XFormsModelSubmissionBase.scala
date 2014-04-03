@@ -21,7 +21,8 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ListenersTrait
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, InstanceData}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.model.BindNode
 
 abstract class XFormsModelSubmissionBase extends ListenersTrait
 
@@ -40,11 +41,15 @@ object XFormsModelSubmissionBase {
             // Iterate data to gather elements with failed constraints
             doc.accept(new VisitorSupport() {
                 override def visit(element: Element): Unit = {
+                    val failedValidations = BindNode.failedValidationsForAllLevels(element)
                     for (level ← levelsToAnnotate) {
-                        val failedConstraints = InstanceData.failedConstraints(element).getOrElse(level, Nil)
-                        if (failedConstraints.nonEmpty) {
+                        // NOTE: Annotate all levels specified. If we decide to store only one level of validation
+                        // in bind nodes, then we would have to change this to take the highest level only and ignore
+                        // the other levels.
+                        val failedValidationsForLevel = failedValidations.getOrElse(level, Nil)
+                        if (failedValidationsForLevel.nonEmpty) {
                             val map = elementsToAnnotate.getOrElseUpdate(level, mutable.Map[Set[String], Element]())
-                            map += (failedConstraints map (_.id) toSet) → element
+                            map += (failedValidationsForLevel map (_.id) toSet) → element
                         }
                     }
                 }
@@ -65,12 +70,12 @@ object XFormsModelSubmissionBase {
                     // NOTE: We check on the whole set of constraint ids. Since the control reads in all the failed
                     // constraints for the level, the sets of ids must match.
                     for {
-                        level               ← control.alertLevel
-                        controlAlert        ← Option(control.getAlert)
-                        failedConstraintIds = (control.failedConstraints map (_.id) toSet)
-                        elementsMap         ← elementsToAnnotate.get(level)
-                        element             ← elementsMap.get(failedConstraintIds)
-                        qName               = QName.get(level.name, XXFORMS_NAMESPACE_SHORT)
+                        level                ← control.alertLevel
+                        controlAlert         ← Option(control.getAlert)
+                        failedValidationsIds = (control.failedValidations map (_.id) toSet)
+                        elementsMap          ← elementsToAnnotate.get(level)
+                        element              ← elementsMap.get(failedValidationsIds)
+                        qName                = QName.get(level.name, XXFORMS_NAMESPACE_SHORT)
                     } locally {
                         // There can be an existing attribute if more than one control bind to the same element
                         Option(element.attribute(qName)) match {

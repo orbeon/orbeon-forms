@@ -34,6 +34,8 @@ import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.model.BindNode
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
@@ -64,15 +66,15 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     private var _alertLevel: Option[ValidationLevel] = None
     def alertLevel = _alertLevel
 
-    private var _failedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
-    def failedConstraints = _failedConstraints
+    private var _failedValidations: List[StaticBind#MIP] = Nil
+    def failedValidations = _failedValidations
 
     // Previous values for refresh
     private var _wasReadonly = false
     private var _wasRequired = false
     private var _wasValid = true
     private var _wasAlertLevel: Option[ValidationLevel] = None
-    private var _wasFailedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
+    private var _wasFailedValidations: List[StaticBind#MIP] = Nil
 
     // Type
     private var _valueType: QName = null
@@ -122,25 +124,15 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
                 // Constraints
 
-                // Instance data stores all failed constraints
-                val allFailedConstraints = InstanceData.failedConstraints(nodeInfo)
+                // Instance data stores all failed validations
+                // If there is any type, required, or failed constraint, we have at least one failed failedValidation
+                // returned. The only exception is schema type validation, which can cause the node to be invalid, yet
+                // doesn't have an associated validation because it doesn't have a MIP. Conceivably, something could be
+                // associated with a type validation error.
+                val failedValidations = BindNode.failedValidationsForHighestLevel(nodeInfo)
 
-                // First identify the highest level. This means that e.g. if a control is on error, but doesn't have any
-                // matching alerts for the error level, then no alert shown. Alerts for lower levels, in particular, such as
-                // warnings, don't show. There may be no matching level.
-                val alertLevel = {
-                    def controlHasLevel(level: ValidationLevel) =
-                        level == ErrorLevel && ! isValid || allFailedConstraints.contains(level)
-
-                    LevelsByPriority find controlHasLevel
-                }
-
-                this._alertLevel = alertLevel
-
-                if (allFailedConstraints.nonEmpty)
-                    this._failedConstraints = alertLevel flatMap allFailedConstraints.get getOrElse Nil
-                else
-                    this._failedConstraints = Nil
+                this._alertLevel        = failedValidations map (_._1) orElse (! _valid option ErrorLevel)
+                this._failedValidations = failedValidations map (_._2) getOrElse Nil
 
                 // Custom MIPs
                 this._customMIPs = Option(InstanceData.collectAllCustomMIPs(nodeInfo)) map (_.toMap) getOrElse Map()
@@ -170,7 +162,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         this._customMIPs        = Map.empty[String, String]
 
         this._alertLevel   = None
-        this._failedConstraints = Nil
+        this._failedValidations = Nil
     }
 
     override def commitCurrentUIState(): Unit = {
@@ -215,9 +207,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         result
     }
 
-    final def wasFailedConstraintsCommit() = {
-        val result = _wasFailedConstraints
-        _wasFailedConstraints = _failedConstraints
+    final def wasFailedValidationsCommit() = {
+        val result = _wasFailedValidations
+        _wasFailedValidations = _failedValidations
         result
     }
 
@@ -433,13 +425,13 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         val requiredChanged     = wasRequiredCommit()         != isRequired
         val readonlyChanged     = wasReadonlyCommit()         != isReadonly
 
-        val previousConstraints = wasFailedConstraintsCommit()
-        val constraintsChanged  = previousConstraints         != failedConstraints
+        val previousValidations = wasFailedValidationsCommit()
+        val validationsChanged  = previousValidations         != failedValidations
 
         // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
-        // on the control's current validity and constraints. Because we don't have yet a way of taking those in as
-        // dependencies, we force dirty alerts whenever such constraints change upon refresh.
-        if (validityChanged || constraintsChanged)
+        // on the control's current validity and validations. Because we don't have yet a way of taking those in as
+        // dependencies, we force dirty alerts whenever such validations change upon refresh.
+        if (validityChanged || validationsChanged)
             forceDirtyAlert()
 
         // Value change
@@ -460,8 +452,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         if (isRelevant && readonlyChanged)
             Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this))
 
-        if (isRelevant && constraintsChanged)
-            Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, alertLevel, previousConstraints, failedConstraints))
+        if (isRelevant && validationsChanged)
+            Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, alertLevel, previousValidations, failedValidations))
     }
 }
 

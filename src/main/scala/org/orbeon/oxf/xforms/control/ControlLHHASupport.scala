@@ -36,8 +36,8 @@ trait ControlLHHASupport {
                 currentLHHA.handleMarkDirty()
 
     // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
-    // on the control's current validity and constraints. Because we don't have yet a way of taking those in as
-    // dependencies, we force dirty alerts whenever such constraints change upon refresh.
+    // on the control's current validity and validations. Because we don't have yet a way of taking those in as
+    // dependencies, we force dirty alerts whenever such validations change upon refresh.
     def forceDirtyAlert(): Unit = {
         val alert = lhha(XFormsConstants.LHHA.alert.ordinal)
         if (alert ne null)
@@ -137,10 +137,10 @@ object LHHASupport {
     //
     // - This depends on
     //     - the control validity
-    //     - failed constraints
-    //     - alerts in the UI matching constraints or not
+    //     - failed validations
+    //     - alerts in the UI matching validations or not
     // - If no alert is active for the control, return None.
-    // - Only alerts for the highest ConstraintLevel are returned.
+    // - Only alerts for the highest ValidationLevel are returned.
     //
     def gatherActiveAlerts(control: XFormsSingleNodeControl): Option[(ValidationLevel, List[LHHAAnalysis])] =
         if (control.isRelevant) {
@@ -149,29 +149,28 @@ object LHHASupport {
 
             def nonEmptyOption[T](l: List[T]) = l.nonEmpty option l
 
-            def alertsMatchingConstraints = {
-                val failedConstraintIds = control.failedConstraints.map(_.id).to[Set]
-                nonEmptyOption(staticAlerts filter (_.forValidations intersect failedConstraintIds nonEmpty))
+            def alertsMatchingValidations = {
+                val failedValidationsIds = control.failedValidations.map(_.id).to[Set]
+                nonEmptyOption(staticAlerts filter (_.forValidations intersect failedValidationsIds nonEmpty))
             }
 
-            // Find all alerts which match the given level, if there are any failed constraints for that level
-            // NOTE: ErrorLevel is handled specially: in addition to failed constraints, the level matches if the
-            // control is not valid. This is because a control can also be invalid due to a non-matching datatype or due
-            // to the required-but-empty condition.
+            // Find all alerts which match the given level, if there are any failed validations for that level
+            // NOTE: ErrorLevel is handled specially: in addition to failed validations, the level matches if the
+            // control is not valid for any reason including failed schema validation.
             def alertsMatchingLevel(level: ValidationLevel) =
                 nonEmptyOption(staticAlerts filter (_.forLevels(level)))
 
-            // Alerts that specify neither a constraint nor a level
+            // Alerts that specify neither a validations nor a level
             def alertsMatchingAny =
                 nonEmptyOption(staticAlerts filter (a ⇒ a.forValidations.isEmpty && a.forLevels.isEmpty))
 
-            // For that given level, identify all matching alerts if any, whether they match by constraint or by level.
-            // Alerts that specify neither a constraint nor a level are considered a default, that is they are not added
+            // For that given level, identify all matching alerts if any, whether they match by validations or by level.
+            // Alerts that specify neither a validation nor a level are considered a default, that is they are not added
             // if other alerts have already been matched.
             // Alerts are returned in document order
             control.alertLevel flatMap { level ⇒
 
-                val alerts = alertsMatchingConstraints orElse alertsMatchingLevel(level) orElse alertsMatchingAny getOrElse Nil
+                val alerts = alertsMatchingValidations orElse alertsMatchingLevel(level) orElse alertsMatchingAny getOrElse Nil
 
                 val matchingAlertIds = alerts map (_.staticId) toSet
                 val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))

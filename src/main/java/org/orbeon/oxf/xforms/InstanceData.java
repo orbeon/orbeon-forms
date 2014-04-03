@@ -51,6 +51,13 @@ public class InstanceData {// rename to DataNodeProperties once done
     // Annotations (used only for multipart submission as of 2010-12)
     private Map<String, String> transientAnnotations;
 
+    public List<BindNode> getBindNodes() {
+        if (bindNodes == null)
+            return Collections.emptyList();
+        else
+            return bindNodes;
+    }
+
     public static void addBindNode(NodeInfo nodeInfo, BindNode bindNode) {
         final InstanceData instanceData = getOrCreateInstanceData(nodeInfo, false);
         if (instanceData != READONLY_LOCAL_INSTANCE_DATA) {
@@ -145,16 +152,6 @@ public class InstanceData {// rename to DataNodeProperties once done
         return Model.DEFAULT_VALID();
     }
 
-    public boolean constraintsSatisfiedForLevel(StaticBind.ValidationLevel level) {
-
-        if (bindNodes != null && bindNodes.size() > 0)
-            for (final BindNode bindNode : bindNodes)
-                if (bindNode.constraintsSatisfiedForLevel(level) != Model.DEFAULT_CONSTRAINT())
-                    return ! Model.DEFAULT_CONSTRAINT();
-
-        return Model.DEFAULT_CONSTRAINT();
-    }
-
     public boolean getTypeValid() {
 
         if (schemaInvalid)
@@ -162,8 +159,8 @@ public class InstanceData {// rename to DataNodeProperties once done
 
         if (bindNodes != null && bindNodes.size() > 0)
             for (final BindNode bindNode : bindNodes)
-                if (bindNode.typeValid() != Model.DEFAULT_VALID())
-                    return !Model.DEFAULT_VALID();
+                if (! bindNode.typeValid())
+                    return ! Model.DEFAULT_VALID();
 
         return Model.DEFAULT_VALID();
     }
@@ -280,22 +277,6 @@ public class InstanceData {// rename to DataNodeProperties once done
     public static boolean getValid(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
         return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getValid();
-    }
-
-    public static scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(NodeInfo nodeInfo) {
-        return failedConstraints(getLocalInstanceData(nodeInfo, false));
-    }
-
-    public static scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(Node node) {
-        return failedConstraints(getLocalInstanceData(node));
-    }
-
-    private static scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(InstanceData existingInstanceData) {
-        final Object o = (existingInstanceData == null)
-                ? BindNode.jCollectFailedConstraints(null)
-                : BindNode.jCollectFailedConstraints(existingInstanceData.bindNodes);
-
-        return (scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>>) o;
     }
 
     public static boolean getTypeValid(NodeInfo nodeInfo) {
@@ -420,7 +401,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         return (existingInstanceData != null) ? existingInstanceData : createNewInstanceData(node);
     }
 
-    private static InstanceData getLocalInstanceData(NodeInfo nodeInfo, boolean forUpdate) {
+    public static InstanceData getLocalInstanceData(NodeInfo nodeInfo, boolean forUpdate) {
         if (nodeInfo instanceof VirtualNode) {
             return getLocalInstanceData(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else if (nodeInfo != null && ! forUpdate) {
@@ -432,7 +413,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         }
     }
 
-    private static InstanceData getLocalInstanceData(Node node) {
+    public static InstanceData getLocalInstanceData(Node node) {
 
         // Find data annotation on node
         final Object instanceData;

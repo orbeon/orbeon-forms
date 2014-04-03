@@ -37,19 +37,19 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
             // number-control
             assert(Some(ErrorLevel) === numberControl.alertLevel)
-            assert(DefaultAlertMessage == numberControl.getAlert)
+            assert(DefaultAlertMessage === numberControl.getAlert)
 
             setControlValue(NumberControlId, "a")
             assert(Some(ErrorLevel) === numberControl.alertLevel)
-            assert(DefaultAlertMessage == numberControl.getAlert)
+            assert(DefaultAlertMessage === numberControl.getAlert)
 
             setControlValue(NumberControlId, "10")
             assert(Some(ErrorLevel) === numberControl.alertLevel)
-            assert("Must be 50 or more" == numberControl.getAlert)
+            assert("Must be 50 or more" === numberControl.getAlert)
 
             setControlValue(NumberControlId, "50")
             assert(Some(WarningLevel) === numberControl.alertLevel)
-            assert("Should be 100 or more" == numberControl.getAlert)
+            assert("Should be 100 or more" === numberControl.getAlert)
 
             setControlValue(NumberControlId, "1000")
             assert(None === numberControl.alertLevel)

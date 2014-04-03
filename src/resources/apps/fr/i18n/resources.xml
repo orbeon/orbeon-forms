@@ -2384,8 +2384,8 @@
                 <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
                 <clear-confirm-message>Bekräfta att du vill rensa alla fält på denna sida. Värdena går förlorade om du inte har sparat dem.</clear-confirm-message>
                 <error-dialog-title>Operationen kunde inte fullföljas</error-dialog-title>
-                <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
-                <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <confirmation-dialog-title>Var god bekräfta</confirmation-dialog-title>
+                <confirmation-dialog-message>Vill du genomföra detta?</confirmation-dialog-message>
                 <submit-dialog-title>Formuläret skickat</submit-dialog-title>
                 <submit-dialog-message>Det ifyllda formuläret är skickat.</submit-dialog-message>
                 <validation-dialog-title>Granskning av giltighet</validation-dialog-title>

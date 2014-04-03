@@ -26,7 +26,7 @@ private object HttpAssert extends TestSupport {
 
     sealed trait Expected
     case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
-    case   class ExpectedCode(code: Integer) extends Expected
+    case   class ExpectedCode(code: Int) extends Expected
 
     def get(url: String, version: Version, expected: Expected, credentials: Option[HttpRequest.Credentials] = None): Unit = {
         val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
@@ -46,19 +46,19 @@ private object HttpAssert extends TestSupport {
                 val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
                 assert(expectedOperations === resultOperationsSet)
                 // Check form version
-                val resultFormVersion = headers.get("orbeon-form-definition-version").map(_.head).map(Integer.parseInt)
+                val resultFormVersion = headers.get("orbeon-form-definition-version").map(_.head).map(_.toInt)
                 assert(expectedFormVersion === resultFormVersion)
             case ExpectedCode(expectedCode) ⇒
                 assert(resultCode === expectedCode)
         }
     }
 
-    def put(url: String, version: Version, body: HttpRequest.Body, expectedCode: Integer, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+    def put(url: String, version: Version, body: HttpRequest.Body, expectedCode: Int, credentials: Option[HttpRequest.Credentials] = None): Unit = {
         val actualCode = HttpRequest.put(url, version, body, credentials)
         assert(actualCode === expectedCode)
     }
 
-    def del(url: String, version: Version, expectedCode: Integer, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+    def del(url: String, version: Version, expectedCode: Int, credentials: Option[HttpRequest.Credentials] = None): Unit = {
         val actualCode = HttpRequest.del(url, version, credentials)
         assert(actualCode === expectedCode)
     }

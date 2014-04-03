@@ -115,20 +115,26 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      */
     @Test def formDataVersionTest(): Unit = {
         withOrbeonTables { connection =>
-            val DataURL = "/crud/acme/address/data/123/data.xml"
+            val FirstDataURL = "/crud/acme/address/data/123/data.xml"
+            val SecondDataURL = "/crud/acme/address/data/456/data.xml"
 
             // Storing for specific form version
             val first = <gaga1/>
-            HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(first), 201)
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
-            HttpAssert.del(DataURL, Unspecified, 204)
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(404))
+            HttpAssert.put(FirstDataURL, Specific(1), HttpRequest.XML(first), 201)
+            HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
+            HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
+            HttpAssert.del(FirstDataURL, Unspecified, 204)
+            HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(404))
 
-            // Version must be specified when storing data
-            HttpAssert.put(DataURL, Unspecified       , HttpRequest.XML(first), 400)
-            HttpAssert.put(DataURL, Next              , HttpRequest.XML(first), 400)
-            HttpAssert.put(DataURL, ForDocument("123"), HttpRequest.XML(first), 400)
+            // Allow unspecified version for update
+            HttpAssert.put(FirstDataURL, Unspecified       , HttpRequest.XML(first), 201)
+
+            // But don't allow unspecified version for create
+            HttpAssert.put(SecondDataURL, Unspecified      , HttpRequest.XML(first), 400)
+
+            // Fail with next/for document
+            HttpAssert.put(FirstDataURL, Next              , HttpRequest.XML(first), 400)
+            HttpAssert.put(FirstDataURL, ForDocument("123"), HttpRequest.XML(first), 400)
         }
     }
 

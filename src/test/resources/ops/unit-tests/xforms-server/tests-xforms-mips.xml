@@ -2093,7 +2093,7 @@
                                 <number/>
                             </form>
                         </xf:instance>
-                        <xf:bind ref="text[1]" id="text-bind">
+                        <xf:bind ref="text" id="text-bind">
                             <xf:constraint id="length-constraint"    level="error"   value="string-length() gt 1"/>
                             <xf:constraint id="uppercase-constraint" level="error"   value="true()"/>
                         </xf:bind>
@@ -2102,12 +2102,19 @@
                         </xf:bind>
 
                         <xf:send event="xforms-ready" submission="submission"/>
-                        <xf:instance id="result"><result/></xf:instance>
-                        <xf:submission id="submission" method="post" resource="echo:" ref="instance()" xxf:annotate="error warning info" replace="instance" instance="result" validate="false"/>
+
+                        <xf:submission
+                            id="submission"
+                            method="post"
+                            resource="echo:"
+                            ref="instance()"
+                            xxf:annotate="error warning info"
+                            replace="all"
+                            validate="false"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:input id="my-input1" ref="text[1]">
+                    <xf:input id="my-input1" ref="text">
                         <xf:alert id="alert-1">All levels</xf:alert>
                         <xf:alert id="alert-2" level="error">Error level</xf:alert>
                         <xf:alert id="alert-3" level="warning">Warning level</xf:alert>
@@ -2115,15 +2122,6 @@
                         <xf:alert id="alert-5" validation="length-constraint">Length constraint</xf:alert>
                         <xf:alert id="alert-6" validation="uppercase-constraint">Uppercase constraint</xf:alert>
                         <xf:alert id="alert-7" validation="length-constraint uppercase-constraint">Both constraints</xf:alert>
-                    </xf:input>
-                    <xf:input id="my-input2" ref="text[2]">
-                        <xf:alert id="alert-8">All levels</xf:alert>
-                        <xf:alert id="alert-9" level="error">Error level</xf:alert>
-                        <xf:alert id="alert-10" level="warning">Warning level</xf:alert>
-                        <xf:alert id="alert-11" level="error warning">Error and warning level</xf:alert>
-                        <xf:alert id="alert-12" validation="length-constraint">Length constraint</xf:alert>
-                        <xf:alert id="alert-13" validation="uppercase-constraint">Uppercase constraint</xf:alert>
-                        <xf:alert id="alert-14" validation="length-constraint uppercase-constraint">Both constraints</xf:alert>
                     </xf:input>
                     <fr:number id="my-number" ref="number">
                         <xf:alert id="alert-15">All levels</xf:alert>
@@ -2134,46 +2132,10 @@
             </xh:html>
         </input>
         <output name="response">
-           <xxf:event-response>
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="result" model-id="model">
-                                <form>
-                                    <text xxf:error="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;"/>
-                                    <number xxf:warning="True warning constraint"/>
-                                </form>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-input1" alert="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/>
-                        <xxf:control id="my-input2" relevant="false"/>
-                        <xxf:control id="my-number" alert="True warning constraint" level="warning"/>
-                        <xxf:control id="my-number≡xf-7" class="xbl-fr-number-prefix"/>
-                        <xxf:attribute for="my-number≡xf-7" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-number≡xf-10" class="xbl-fr-number-suffix"/>
-                        <xxf:attribute for="my-number≡xf-10" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-number≡xf-13" class="xbl-fr-number-decimal-separator">.</xxf:control>
-                        <xxf:attribute for="my-number≡xf-13" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-number≡xf-16" class="xbl-fr-number-grouping-separator">,</xxf:control>
-                        <xxf:attribute for="my-number≡xf-16" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-number≡xf-19" class="xbl-fr-number-digits-after-decimal">0</xxf:control>
-                        <xxf:attribute for="my-number≡xf-19" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-number≡xf-26" level="warning"/>
-                        <xxf:control id="my-number≡xf-27" class="xbl-fr-number-xforms-input xforms-hidden" level="warning"/>
-                        <xxf:control class="fr-width-10em" id="my-number≡xf-28"/>
-                        <xxf:control id="my-number≡xf-30" class="add-on" relevant="false"/>
-                        <xxf:control id="my-number≡xf-31" relevant="false"/>
-                        <xxf:control id="my-number≡xf-32" class="add-on" relevant="false"/>
-                        <xxf:control id="my-number≡xf-33" relevant="false"/>
-                        <xxf:control id="my-number≡xf-34" relevant="false"/>
-                    </xxf:control-values>
-                    <xxf:script name="xf_15aff4236c7a122fe92ebe36872a441e3cd4d0bf" target-id="my-number≡formatted-value" observer-id="my-number≡xf-3"/>
-                </xxf:action>
-            </xxf:event-response>
+            <form>
+                <text xxf:error="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;"/>
+                <number xxf:warning="True warning constraint"/>
+            </form>
         </output>
     </test>
 

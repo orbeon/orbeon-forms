@@ -486,42 +486,42 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         def resultForMIP(mip: StaticBind#MIP) =
             if (modelState.isMIPInitiallyDirty(mip)) {
-                    // We absolutely must evaluate the MIP
-                    MustUpdateResultOne
-                } else  {
-                    // Check MIP dependencies for XPath and type MIPs
+                // We absolutely must evaluate the MIP
+                MustUpdateResultOne
+            } else  {
+                // Check MIP dependencies for XPath and type MIPs
 
-                    // Special case for type which is not an XPath expression
-                    // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
-                    // the value to type check has changed.
-                    val valueAnalysis = mip match {
-                        case xpathMIP: StaticBind#XPathMIP ⇒ Some(xpathMIP.analysis)
-                        case typeMIP: StaticBind#TypeMIP   ⇒ bind.getValueAnalysis
-                        case _                             ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
-                    }
-
-                    def dependsOnOtherModel(analysis: XPathAnalysis) = analysis.dependentModels exists (_ != model.prefixedId)
-
-                    val updateResult = valueAnalysis match {
-                        case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
-                            // Value dependencies are unknown OR we depend on another model
-                            // A this time, if we depend on another model, we have to update because we don't have
-                            // the other model's dependencies reliably available, e.g. if the other model has
-                            // already done a recalculate, its dependencies are cleared.
-                            MustUpdateResultOne
-                        case Some(analysis) ⇒
-                            // Value dependencies are known
-                            UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
-                        case _ ⇒
-                            throw new IllegalStateException(s"No value analysis found for xf:bind with name = $mipName")
-                    }
-
-                    if (updateResult.requireUpdate && logger.isDebugEnabled)
-                        logger.logDebug("dependencies", "MIP requires update",
-                            Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
-
-                    updateResult
+                // Special case for type which is not an XPath expression
+                // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
+                // the value to type check has changed.
+                val valueAnalysis = mip match {
+                    case xpathMIP: StaticBind#XPathMIP ⇒ Some(xpathMIP.analysis)
+                    case typeMIP: StaticBind#TypeMIP   ⇒ bind.getValueAnalysis
+                    case _                             ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
                 }
+
+                def dependsOnOtherModel(analysis: XPathAnalysis) = analysis.dependentModels exists (_ != model.prefixedId)
+
+                val updateResult = valueAnalysis match {
+                    case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
+                        // Value dependencies are unknown OR we depend on another model
+                        // A this time, if we depend on another model, we have to update because we don't have
+                        // the other model's dependencies reliably available, e.g. if the other model has
+                        // already done a recalculate, its dependencies are cleared.
+                        MustUpdateResultOne
+                    case Some(analysis) ⇒
+                        // Value dependencies are known
+                        UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
+                    case _ ⇒
+                        throw new IllegalStateException(s"No value analysis found for xf:bind with name = $mipName")
+                }
+
+                if (updateResult.requireUpdate && logger.isDebugEnabled)
+                    logger.logDebug("dependencies", "MIP requires update",
+                        Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
+
+                updateResult
+            }
 
         // Stats and return value
         // Require an update of all MIPs of the given name/level if at least one dependency fails

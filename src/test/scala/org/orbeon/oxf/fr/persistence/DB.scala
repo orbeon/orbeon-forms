@@ -43,11 +43,11 @@ private object DB {
         sql map (_.trim) filter (_.nonEmpty)
     }
 
-    def getTableNames(connection: Connection): Seq[String] = {
+    def getTableNames(connection: Connection): List[String] = {
         val statement = connection.createStatement
         val tableNames = ListBuffer[String]()
         val tablesResultSet = statement.executeQuery("show tables")
         while (tablesResultSet.next()) tableNames += tablesResultSet.getString(1)
-        tableNames
+        tableNames.toList
     }
 }

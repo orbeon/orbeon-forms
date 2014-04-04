@@ -31,6 +31,7 @@ import org.xml.sax.InputSource
 trait CreateUpdateDelete extends RequestResponse with Common {
 
     private case class Row(created: sql.Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
+
     private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
@@ -289,25 +290,29 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             }
 
             def checkVersionWithExisting(existing: Option[Row]): Unit = {
-                // Create: a specific version number is required
-                // Update: we're OK if a version is specified; we just won't use it
-
-                // Q: Why don't we compare the Specific version with the existing one and throw an error if the versions
-                // don't match? It seems reasonable to allow clients to pass a version, this way the same code can be
-                // used for create and for update. But if the version doesn't match during an update, it's obviously and
-                // error. It seems to me that we should compare the versions if provided. @ebruchez
 
                 def isUpdate =
+                    ! delete && existing.nonEmpty
+
+                def isCreate =
                     ! delete && existing.isEmpty
 
-                def isOptionalSpecificVersion =
+                def existingVersion =
+                    existing flatMap (_.formVersion)
+
+                def isUnspecifiedOrSpecificVersion =
                     req.version match {
-                        case Unspecified | Specific(_) ⇒ true
-                        case _                         ⇒ false
+                        case Unspecified       ⇒ true
+                        case Specific(version) ⇒ Some(version) == existingVersion
+                        case _                 ⇒ false
                     }
 
+                def isSpecificVersion =
+                    req.version.isInstanceOf[Specific]
+
                 def badVersion =
-                    isUpdate && req.forData && ! isOptionalSpecificVersion
+                    (req.forData && isUpdate && ! isUnspecifiedOrSpecificVersion) ||
+                    (req.forData && isCreate && ! isSpecificVersion)
 
                 if (badVersion)
                     throw HttpStatusCodeException(400)

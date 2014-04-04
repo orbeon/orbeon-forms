@@ -23,7 +23,7 @@ import java.util.{Map ⇒ JMap}
 import java.lang.String
 import collection.immutable.Nil
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._
 

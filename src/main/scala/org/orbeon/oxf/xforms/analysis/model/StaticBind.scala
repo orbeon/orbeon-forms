@@ -29,7 +29,7 @@ class StaticBind(
 
     staticBind ⇒
 
-    import StaticBind._
+    import ValidationLevels._
 
     def parentBind = parent match {
         case parentBind: StaticBind ⇒ Some(parentBind)
@@ -341,7 +341,7 @@ class StaticBind(
     }
 }
 
-object StaticBind {
+object ValidationLevels {
     sealed trait ValidationLevel { val name: String }
     case object ErrorLevel   extends { val name = "error" }   with ValidationLevel
     case object WarningLevel extends { val name = "warning" } with ValidationLevel

@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 
 /**
  * Interface to dependencies implementation.

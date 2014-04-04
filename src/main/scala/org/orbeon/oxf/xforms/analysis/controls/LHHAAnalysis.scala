@@ -23,7 +23,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 
 class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)

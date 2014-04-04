@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{InfoLevel, WarningLevel, ValidationLevel, ErrorLevel}
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)

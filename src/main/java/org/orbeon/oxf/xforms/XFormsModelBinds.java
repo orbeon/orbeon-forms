@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.StaticBind;
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels;
 import org.orbeon.oxf.xforms.model.BindNode;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.RuntimeBind;
@@ -221,7 +222,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             // Constraint
             // TODO: Add support for other constraint levels.
             if (bind.staticBind().constraintsByLevel().nonEmpty())
-                return BooleanValue.get(failedConstraintMIPs(StaticBind.jErrorLevel(), bindNode).isEmpty());
+                return BooleanValue.get(failedConstraintMIPs(ValidationLevels.jErrorLevel(), bindNode).isEmpty());
             else
                 return null;
         } else if (mipType.equals(XFormsConstants.CALCULATE_QNAME)) {

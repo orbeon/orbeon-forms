@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.model.BindNode
 import org.orbeon.oxf.util.ScalaUtils._
 

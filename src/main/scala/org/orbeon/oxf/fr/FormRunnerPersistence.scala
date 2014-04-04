@@ -22,7 +22,7 @@ import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 
 trait FormRunnerPersistence {

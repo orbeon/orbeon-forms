@@ -17,7 +17,7 @@ import collection.JavaConverters._
 import collection.breakOut
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xforms.{XFormsModelBinds, InstanceData}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
@@ -145,7 +145,7 @@ object BindNode {
             val buildersByLevel = collection.mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
 
             for {
-                level       ← StaticBind.LevelsByPriority
+                level       ← LevelsByPriority
                 bindNode    ← bindNodes
                 failed      = bindNode.failedValidationsForAllLevels.getOrElse(level, Nil)
                 if failed.nonEmpty

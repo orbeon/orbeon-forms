@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{XPath, NetUtils, Logging}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.scaxon.XML._
 import util.Try
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary

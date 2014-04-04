@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms._
 import XFormsControl._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import LHHASupport._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.controls.{StaticLHHASupport, LHHAAnalysis}
 import org.orbeon.oxf.util.ScalaUtils._
 

@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
-import org.orbeon.oxf.xforms.analysis.model.StaticBind;
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
@@ -52,7 +52,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled");
     }
 
-    private void addConstraintClasses(StringBuilder sb, scala.Option<StaticBind.ValidationLevel> constraintLevel) {
+    private void addConstraintClasses(StringBuilder sb, scala.Option<ValidationLevels.ValidationLevel> constraintLevel) {
         if (constraintLevel.isDefined()) {
             final String levelName = constraintLevel.get().name();
             if (sb.length() > 0)
@@ -324,7 +324,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 if (isAlert) {
                     if (control instanceof XFormsSingleNodeControl) {
                         final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                        final scala.Option<StaticBind.ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
+                        final scala.Option<ValidationLevels.ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
 
                         if (constraintLevel.isDefined()) {
                             if (classes.length() > 0)

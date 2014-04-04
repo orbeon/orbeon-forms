@@ -18,7 +18,7 @@ import collection.mutable
 import org.dom4j.{QName, Element, VisitorSupport, Document}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ListenersTrait
 import org.orbeon.oxf.xforms.XFormsContainingDocument

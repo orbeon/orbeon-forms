@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._

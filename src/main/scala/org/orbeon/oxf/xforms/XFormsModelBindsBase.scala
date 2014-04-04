@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent

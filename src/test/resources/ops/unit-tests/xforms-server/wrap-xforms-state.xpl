@@ -47,14 +47,25 @@
         <p:input name="annotated-document" href="#updated-document"/>
         <p:input name="data"><null xsi:nil="true"/></p:input>
         <p:input name="instance"><null xsi:nil="true"/></p:input>
-        <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
+        <p:output name="response" id="encoded-response"/>
     </p:processor>
 
     <!-- Decode -->
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#encoded-response"/>
-        <p:input name="config" href="wrap-server-decode.xsl"/>
-        <p:output name="data" ref="response"/>
-    </p:processor>
+    <p:choose href="#encoded-response">
+        <p:when test="/document[contains(@content-type, 'xml')]">
+            <p:processor name="oxf:to-xml-converter">
+                <p:input name="config"><config/></p:input>
+                <p:input name="data" href="#encoded-response"/>
+                <p:output name="data" ref="response"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:unsafe-xslt">
+                <p:input name="data" href="#encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                <p:input name="config" href="wrap-server-decode.xsl"/>
+                <p:output name="data" ref="response"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
 </p:config>

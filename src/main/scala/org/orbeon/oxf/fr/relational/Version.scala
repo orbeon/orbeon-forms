@@ -14,7 +14,7 @@ object Version {
                 version match {
                     case None         ⇒ Unspecified
                     case Some("next") ⇒ Next
-                    case Some(v)      ⇒ Specific(Integer.parseInt(v))
+                    case Some(v)      ⇒ Specific(v.toInt)
                 }
         }
 }

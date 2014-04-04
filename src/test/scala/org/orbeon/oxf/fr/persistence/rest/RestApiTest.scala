@@ -116,7 +116,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     @Test def formDataVersionTest(): Unit = {
         withOrbeonTables { connection =>
             val FirstDataURL = "/crud/acme/address/data/123/data.xml"
-            val SecondDataURL = "/crud/acme/address/data/456/data.xml"
 
             // Storing for specific form version
             val first = <gaga1/>
@@ -126,11 +125,16 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             HttpAssert.del(FirstDataURL, Unspecified, 204)
             HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(404))
 
-            // Allow unspecified version for update
-            HttpAssert.put(FirstDataURL, Unspecified       , HttpRequest.XML(first), 201)
+            // Don't allow unspecified version for create
+            HttpAssert.put(FirstDataURL, Unspecified       , HttpRequest.XML(first), 400)
+            HttpAssert.put(FirstDataURL, Specific(1)       , HttpRequest.XML(first), 201)
 
-            // But don't allow unspecified version for create
-            HttpAssert.put(SecondDataURL, Unspecified      , HttpRequest.XML(first), 400)
+            // Allow unspecified or correct version for update
+            HttpAssert.put(FirstDataURL, Unspecified      , HttpRequest.XML(first), 201)
+            HttpAssert.put(FirstDataURL, Specific(1)      , HttpRequest.XML(first), 201)
+
+            // But don't allow incorrect version for update
+            HttpAssert.put(FirstDataURL, Specific(2)      , HttpRequest.XML(first), 400)
 
             // Fail with next/for document
             HttpAssert.put(FirstDataURL, Next              , HttpRequest.XML(first), 400)

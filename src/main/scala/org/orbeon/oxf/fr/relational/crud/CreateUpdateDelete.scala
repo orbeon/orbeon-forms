@@ -108,7 +108,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                     |    ${if (! req.forAttachment) ", ?" else ""}
                     |    ${if (req.forData)         ", ?, ?" else ""}
                     |)
-                    |"""".stripMargin)
+                    |""".stripMargin)
 
             // For put/update, reads the request either as bytes or XML
             object RequestReader {

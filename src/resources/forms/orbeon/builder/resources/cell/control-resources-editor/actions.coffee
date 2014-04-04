@@ -39,6 +39,7 @@ labelHintEditor = _.memoize ->
     editor.textfield = $('<input type="text">')
     editor.checkbox  = $('<input type="checkbox">')
     editor.container = $('<div class="fb-label-editor">').append(editor.textfield).append(editor.checkbox)
+    editor.container.hide()
     $('.fb-main').append(editor.container)
     # Register event listeners
     editor.checkbox.on('click', -> labelHintEditor().textfield.focus())

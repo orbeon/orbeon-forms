@@ -29,19 +29,19 @@ trait Common extends RequestResponse with FormRunnerPersistence {
         val versionResult = {
             val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
             val ps = connection.prepareStatement(
-                s"""select max(form_version)
-                   |  from $table
-                   | where (last_modified_time, app, form, form_version) in
-                   |       (
-                   |             select max(last_modified_time) last_modified_time, app, form, form_version
-                   |               from $table
-                   |              where app = ?
-                   |                    and form = ?
-                   |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
-                   |           group by app, form, form_version
-                   |       )
-                   |   and deleted = 'N'
-                 """.stripMargin)
+                s"""|select max(form_version)
+                    |  from $table
+                    | where (last_modified_time, app, form, form_version) in
+                    |       (
+                    |             select max(last_modified_time) last_modified_time, app, form, form_version
+                    |               from $table
+                    |              where app = ?
+                    |                    and form = ?
+                    |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
+                    |           group by app, form, form_version
+                    |       )
+                    |   and deleted = 'N'
+                    |""".stripMargin)
                           ps.setString(1, app)
                           ps.setString(2, form)
             docId.foreach(ps.setString(3, _))

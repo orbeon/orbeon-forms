@@ -37,22 +37,22 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         val table  = tableName(req)
         val resultSet = {
             val ps = connection.prepareStatement(
-                s"""select created ${req.forData.option(", username , groupname, form_version").mkString}
-                   |  from $table
-                   | where (last_modified_time, $idCols)
-                   |       in
-                   |       (
-                   |             select max(last_modified_time) last_modified_time, $idCols
-                   |               from $table
-                   |              where app  = ?
-                   |                    and form = ?
-                   |                    ${if (! req.forData)     "and form_version = ?" else ""}
-                   |                    ${if (req.forData)       "and document_id  = ?" else ""}
-                   |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
-                   |           group by $idCols
-                   |       )
-                   |       and deleted = 'N'
-                 """.stripMargin)
+                s"""|select created ${req.forData.option(", username , groupname, form_version").mkString}
+                    |  from $table
+                    | where (last_modified_time, $idCols)
+                    |       in
+                    |       (
+                    |             select max(last_modified_time) last_modified_time, $idCols
+                    |               from $table
+                    |              where app  = ?
+                    |                    and form = ?
+                    |                    ${if (! req.forData)     "and form_version = ?" else ""}
+                    |                    ${if (req.forData)       "and document_id  = ?" else ""}
+                    |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
+                    |           group by $idCols
+                    |       )
+                    |       and deleted = 'N'
+                    |""".stripMargin)
             val position = Iterator.from(1)
             ps.setString(position.next(), req.app)
             ps.setString(position.next(), req.form)
@@ -85,28 +85,29 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         locally {
             val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
             val ps = connection.prepareStatement(
-                s"""insert into $table
-                    (
-                                                       created, last_modified_time, last_modified_by
-                                                     , app, form, form_version
-                        ${if (req.forData)          ", document_id"             else ""}
-                                                     , deleted
-                        ${if (req.forData)          ", draft"                   else ""}
-                        ${if (req.forAttachment)    ", file_name, file_content" else ""}
-                        ${if (! req.forAttachment) s", $xmlCol"                 else ""}
-                        ${if (req.forData)          ", username, groupname"     else ""}
-                    )
-                    values
-                    (
-                                                   ?, ?, ?
-                                                   , ?, ?, ?
-                        ${if (req.forData)         ", ?"    else ""}
-                                                   , ${if (delete) "'Y'" else "'N'"}
-                        ${if (req.forData)         ", ?"    else ""}
-                        ${if (req.forAttachment)   ", ?, ?" else ""}
-                        ${if (! req.forAttachment) ", ?" else ""}
-                        ${if (req.forData)         ", ?, ?" else ""}
-                    )""".stripMargin)
+                s"""|insert into $table
+                    |(
+                    |                                   created, last_modified_time, last_modified_by
+                    |                                 , app, form, form_version
+                    |    ${if (req.forData)          ", document_id"             else ""}
+                    |                                 , deleted
+                    |    ${if (req.forData)          ", draft"                   else ""}
+                    |    ${if (req.forAttachment)    ", file_name, file_content" else ""}
+                    |    ${if (! req.forAttachment) s", $xmlCol"                 else ""}
+                    |    ${if (req.forData)          ", username, groupname"     else ""}
+                    |)
+                    |values
+                    |(
+                    |                               ?, ?, ?
+                    |                               , ?, ?, ?
+                    |    ${if (req.forData)         ", ?"    else ""}
+                    |                               , ${if (delete) "'Y'" else "'N'"}
+                    |    ${if (req.forData)         ", ?"    else ""}
+                    |    ${if (req.forAttachment)   ", ?, ?" else ""}
+                    |    ${if (! req.forAttachment) ", ?" else ""}
+                    |    ${if (req.forData)         ", ?, ?" else ""}
+                    |)
+                    |"""".stripMargin)
 
             // For put/update, reads the request either as bytes or XML
             object RequestReader {
@@ -163,13 +164,13 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         if (req.forData && ! req.dataPart.get.isDraft && ! req.forAttachment) {
             for (table ←  Set("orbeon_form_data", "orbeon_form_data_attach")) {
                 val ps = connection.prepareStatement(
-                    s"""delete from $table
-                        where
-                            app             = ?
-                            and form        = ?
-                            and document_id = ?
-                            and draft       = 'Y'
-                        """.stripMargin)
+                    s"""|delete from $table
+                        |where
+                        |    app             = ?
+                        |    and form        = ?
+                        |    and document_id = ?
+                        |    and draft       = 'Y'
+                        |""".stripMargin)
                 val position = Iterator.from(1)
                 ps.setString(position.next(), req.app)
                 ps.setString(position.next(), req.form)
@@ -188,28 +189,28 @@ trait CreateUpdateDelete extends RequestResponse with Common {
     private def deleteDraftOnSaveData(connection: Connection, req: Request): Unit = {
         val table = tableName(req)
         val ps = connection.prepareStatement(
-            s"""delete from $table
-                where
-                    app = ?
-                    and form = ?
-                    and document_id = ?
-                    ${if (req.forAttachment) "and file_name = ?" else ""}
-                    and draft = 'Y'
-                    and last_modified_time !=
-                        (
-                            select last_modified_time from
-                            (
-                                select max(last_modified_time) last_modified_time
-                                from $table
-                                where
-                                    app = ?
-                                    and form = ?
-                                    and document_id = ?
-                                    ${if (req.forAttachment) "and file_name = ?" else ""}
-                                    and draft = 'Y'
-                            ) t
-                        )
-                """.stripMargin)
+            s"""|delete from $table
+                |where
+                |    app = ?
+                |    and form = ?
+                |    and document_id = ?
+                |    ${if (req.forAttachment) "and file_name = ?" else ""}
+                |    and draft = 'Y'
+                |    and last_modified_time !=
+                |        (
+                |            select last_modified_time from
+                |            (
+                |                select max(last_modified_time) last_modified_time
+                |                from $table
+                |                where
+                |                    app = ?
+                |                    and form = ?
+                |                    and document_id = ?
+                |                    ${if (req.forAttachment) "and file_name = ?" else ""}
+                |                    and draft = 'Y'
+                |            ) t
+                |        )
+                |""".stripMargin)
 
         val position = Iterator.from(1)
 
@@ -232,12 +233,12 @@ trait CreateUpdateDelete extends RequestResponse with Common {
     private def deleteDraft(connection: Connection, req: Request): Unit = {
         for (table ← Seq("orbeon_form_data", "orbeon_form_data_attach")) {
             val ps = connection.prepareStatement(
-                s"""delete from $table
-                    where      app         = ?
-                           and form        = ?
-                           and document_id = ?
-                           and draft = 'Y'
-                    """.stripMargin)
+                s"""|delete from $table
+                    |where      app         = ?
+                    |       and form        = ?
+                    |       and document_id = ?
+                    |       and draft = 'Y'
+                    |""".stripMargin)
             val position = Iterator.from(1)
             ps.setString(position.next(), req.app)
             ps.setString(position.next(), req.form)

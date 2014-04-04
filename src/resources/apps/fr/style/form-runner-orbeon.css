@@ -358,6 +358,7 @@ body.orbeon {
 .orbeon .fr-mode-view .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items {
   border: none;
   height: auto;
+  overflow-y: visible;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;

@@ -2911,14 +2911,18 @@ ORBEON.xforms.Events = {
             if ((YAHOO.util.Dom.hasClass(control, "xforms-input") && !YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))
                     || YAHOO.util.Dom.hasClass(control, "xforms-secret")) {
                 if (event.keyCode == 10 || event.keyCode == 13) {
-                    // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
-                    YAHOO.util.Event.preventDefault(event);
                     // Send a value change and DOM activate
                     var events = [
                         new ORBEON.xforms.server.AjaxServer.Event(null, control.id, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value"),
                         new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "DOMActivate")
                     ];
                     ORBEON.xforms.server.AjaxServer.fireEvents(events, false);
+                    // This prevents Chrome/Firefox from dispatching a 'change' event on event, making them more
+                    // like IE, which in this case is more compliant to the spec.
+                    YAHOO.util.Event.preventDefault(event);
+                    // Force a change event if the value has changed, creating a new "change point", which the
+                    // browser will use to dispatch a `change` event in the future. Also see issue #1207.
+                    $(target).blur().focus();
                 }
             }
         }

@@ -19,14 +19,14 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.fr.FormRunnerPermissions._
 
-trait RequestResponse {
+case class DataPart(isDraft: Boolean, documentId: String)
+case class Request(provider: String, app: String, form: String, filename: Option[String], version: Version, dataPart: Option[DataPart]) {
+    def forForm = ! dataPart.isDefined
+    def forData =   dataPart.isDefined
+    def forAttachment = filename.isDefined
+}
 
-    case class DataPart(isDraft: Boolean, documentId: String)
-    case class Request(provider: String, app: String, form: String, filename: Option[String], version: Version, dataPart: Option[DataPart]) {
-        def forForm = ! dataPart.isDefined
-        def forData =   dataPart.isDefined
-        def forAttachment = filename.isDefined
-    }
+trait RequestResponse {
 
     def tableName(request: Request): String =
         Seq(
@@ -38,8 +38,10 @@ trait RequestResponse {
 
     def httpRequest = NetUtils.getExternalContext.getRequest
     def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
+
     def requestUsername : Option[String] = headerValue(OrbeonUsernameHeaderName)
-    def requestGroup: Option[String] = headerValue(OrbeonGroupHeaderName)
+    def requestGroup: Option[String]     = headerValue(OrbeonGroupHeaderName)
+    def requestFlatView                  = headerValue("orbeon-create-flat-view") == Some("true")
 
     val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
     val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
@@ -49,7 +51,7 @@ trait RequestResponse {
         val version =
             Version(headerValue("orbeon-for-document-id"), headerValue("orbeon-form-definition-version"))
 
-        NetUtils.getExternalContext.getRequest.getRequestPath match {
+        httpRequest.getRequestPath match {
             case CrudFormPath(provider, app, form, filename) ⇒
                 val file = if (filename == "form.xhtml") None else Some(filename)
                 Request(provider, app, form, file, version, None)
@@ -58,9 +60,7 @@ trait RequestResponse {
                 val dataPart = DataPart(dataOrDraft == "draft", documentId)
                 Request(provider, app, form, file, version, Some(dataPart))
         }
-
     }
 
     def httpResponse = NetUtils.getExternalContext.getResponse
-
 }

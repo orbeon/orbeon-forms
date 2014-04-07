@@ -23,10 +23,39 @@ import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
+import org.orbeon.oxf.util.{XPath, StringBuilderWriter, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
+import org.orbeon.saxon.om.DocumentInfo
+
+private object RequestReader {
+
+    def requestInputStream(): InputStream = {
+        RequestGenerator.getRequestBody(PipelineContext.get) match {
+            case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
+            case _               ⇒ NetUtils.getExternalContext.getRequest.getInputStream
+        }
+    }
+
+    def bytes(): Array[Byte] = {
+        val os = new ByteArrayOutputStream
+        NetUtils.copyStream(requestInputStream(), os)
+        os.toByteArray
+    }
+
+    def xmlString(): String = {
+        val transformer = TransformerUtils.getXMLIdentityTransformer
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+        val writer = new StringBuilderWriter()
+        val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
+        transformer.transform(source, new StreamResult(writer))
+        writer.toString
+    }
+
+    def xmlDocument(): DocumentInfo =
+        TransformerUtils.readTinyTree(XPath.GlobalConfiguration, requestInputStream(), "", false, false)
+}
 
 trait CreateUpdateDelete extends RequestResponse with Common {
 
@@ -110,31 +139,6 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                     |)
                     |""".stripMargin)
 
-            // For put/update, reads the request either as bytes or XML
-            object RequestReader {
-                def requestInputStream(): InputStream = {
-                    RequestGenerator.getRequestBody(PipelineContext.get) match {
-                        case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-                        case _ ⇒ httpRequest.getInputStream
-                    }
-                }
-
-                def bytes(): Array[Byte] = {
-                    val os = new ByteArrayOutputStream
-                    NetUtils.copyStream(requestInputStream(), os)
-                    os.toByteArray
-                }
-
-                def xml(): String = {
-                    val transformer = TransformerUtils.getXMLIdentityTransformer
-                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-                    val writer = new StringBuilderWriter()
-                    val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
-                    transformer.transform(source, new StreamResult(writer))
-                    writer.toString
-                }
-            }
-
             val position = Iterator.from(1)
             val now = new Timestamp(System.currentTimeMillis())
 
@@ -151,7 +155,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                                          ps.setNull(position.next(), if (req.forAttachment) Types.BLOB else Types.CLOB)
             } else {
                 if (req.forAttachment)   ps.setBytes (position.next(), RequestReader.bytes())
-                if (! req.forAttachment) ps.setString(position.next(), RequestReader.xml())
+                if (! req.forAttachment) ps.setString(position.next(), RequestReader.xmlString())
             }
             if (req.forData) {
                                          ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))
@@ -337,6 +341,10 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 deleteDraftOnSaveData(connection, req)
             if (delete && req.forData)
                 deleteDraft(connection, req)
+
+            // Create flat view if needed
+            if (requestFlatView && req.provider == "oracle" && req.forForm && ! delete && req.form != "library")
+                FlatView.createFlatView(req, connection)
 
             httpResponse.setStatus(if (delete) 204 else 201)
         }

@@ -84,6 +84,10 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
         findAncestorContainers(descendantOrSelf, includeSelf) filter IsRepeat
 
+    // Find all ancestor sections from leaf to root
+    def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+        findAncestorContainers(descendantOrSelf, includeSelf) filter IsSection
+
     // For XPath callers
     def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =
         findRepeatIterationName(inDoc, controlName) getOrElse ""

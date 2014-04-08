@@ -128,9 +128,9 @@
                     fbf:renameControlIfNeeded($form, $old-name, $new-name)
                 </xf:action>
                 <!-- Write classes -->
-                <xf:var name="classes" value="string-join(distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes))), ' ')"/>
+                <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                 <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', $classes)"/>
+                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
                 <!-- Update custom XBL properties -->
                 <xf:action iterate="$i/fb:control-details/*">
                     <xf:var name="position" value="position()"/>

@@ -62,7 +62,7 @@ private object FlatView {
         ps.executeUpdate()
     }
 
-    def extractPathsCols(document: DocumentInfo): List[(String, String)] = {
+    def collectControls(document: DocumentInfo): Iterator[(NodeInfo, NodeInfo)] = {
 
         import FormRunner._
 
@@ -76,13 +76,23 @@ private object FlatView {
         def isDirectLeafControl(control: NodeInfo) =
             ! IsContainer(control) && findAncestorRepeats(control).isEmpty && findAncestorSections(control).size <= 1
 
+        for {
+            topLevelSection ← topLevelSections.to[Iterator]
+            control         ← descendantControls(topLevelSection)
+            if isDirectLeafControl(control)
+        } yield
+            (topLevelSection, control)
+    }
+
+    def extractPathsCols(document: DocumentInfo): List[(String, String)] = {
+
+        import FormRunner._
+
         def pathsCols =
             for {
-                topLevelSection ← topLevelSections.to[List]
-                control         ← descendantControls(topLevelSection)
-                if isDirectLeafControl(control)
-                sectionName     = controlName(topLevelSection attValue "id")
-                leafControlName = controlName(control attValue "id")
+                (section, control) ← collectControls(document).to[List]
+                sectionName        = controlName(section attValue "id")
+                leafControlName    = controlName(control attValue "id")
             } yield
                 (sectionName + "/" + leafControlName, fitValues(xmlToSQLId(sectionName), xmlToSQLId(leafControlName), MaxNameLength))
 
@@ -96,15 +106,15 @@ private object FlatView {
         object Guesser {
             var guessCounter = 0
 
-            @tailrec def guessNewCol(col: String): String = {
+            @tailrec def nextValue(value: String): String = {
                 guessCounter += 1
                 val guessCounterString = guessCounter.toString
 
-                val guess = s"${col take (maxLength - guessCounterString.length)}$guessCounterString"
+                val guess = s"${value take (maxLength - guessCounterString.length)}$guessCounterString"
                 if (! seen(guess))
                     guess
                 else
-                    guessNewCol(col)
+                    nextValue(value)
             }
         }
         
@@ -116,7 +126,7 @@ private object FlatView {
                 if (! seen(value))
                     value
                 else
-                    Guesser.guessNewCol(value)
+                    Guesser.nextValue(value)
 
             b += cleanValue
             seen += cleanValue

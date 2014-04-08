@@ -63,7 +63,7 @@ trait FormRunnerPDF {
         }
 
         def getStaticId(e: NodeInfo) =
-            getStaticIdFromId(e attValue "id")
+            getStaticIdFromId(e.id)
 
         def ancestorContainers(e: NodeInfo) =
             control ancestor * filter isContainer reverse
@@ -72,7 +72,7 @@ trait FormRunnerPDF {
             ancestorContainers(e) :+ e map getStaticId map FormRunner.controlName
 
         def suffixAsSeq(e: NodeInfo) =
-            nonEmptyOrNone(getEffectiveIdSuffix(e attValue "id")).toList
+            nonEmptyOrNone(getEffectiveIdSuffix(e.id)).toList
 
         // Join everything with "$" for PDF
         nameParts(control) ++ suffixAsSeq(control) mkString "$"

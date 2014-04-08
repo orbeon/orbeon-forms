@@ -341,7 +341,7 @@ trait ContainerOps extends ControlOps {
     def updateTemplates(inDoc: NodeInfo): Unit =
         for {
             templateInstance ← templateInstanceElements(inDoc)
-            name             = controlName(templateInstance attValue "id")
+            name             = controlName(templateInstance.id)
             bind             ← findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name)
         } locally {
             ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))

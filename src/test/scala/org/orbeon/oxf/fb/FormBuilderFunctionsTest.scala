@@ -174,7 +174,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
             // Check that the <fr:text ref=""> points to the corresponding <text> resource
             locally {
-                val controlName = FormRunner.controlName(frExplanation.attValue("id"))
+                val controlName = FormRunner.controlName(frExplanation.id)
                 val actualRef = frExplanation.child("*:text").head.attValue("ref")
                 val expectedRef = "$form-resources/" ++ controlName ++ "/text"
                 assert(actualRef === expectedRef)

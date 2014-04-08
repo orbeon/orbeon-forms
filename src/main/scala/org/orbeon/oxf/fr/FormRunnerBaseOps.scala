@@ -80,7 +80,7 @@ trait FormRunnerBaseOps {
 
     // Find all template instances
     def templateInstanceElements(inDoc: NodeInfo) =
-        findModelElement(inDoc) \ "*:instance" filter (_ attValue "id" endsWith TemplateSuffix)
+        findModelElement(inDoc) \ "*:instance" filter (_.id endsWith TemplateSuffix)
 
     // Get the root element of instances
     def formInstanceRoot(inDoc: NodeInfo)      = inlineInstanceRootElement(inDoc, "fr-form-instance").get
@@ -91,7 +91,7 @@ trait FormRunnerBaseOps {
     def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
         findModelElement(inDoc) \ "*:bind" find {
             // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-            bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.attValue("id")) ||
+            bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.id) ||
                     bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
         }
 

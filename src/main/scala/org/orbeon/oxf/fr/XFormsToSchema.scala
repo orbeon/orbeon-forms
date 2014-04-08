@@ -264,7 +264,7 @@ class XFormsToSchema extends XFormsToSomething {
                     for {
                         sectionNode     ← findControlNodeForBind(bind, "*:section")
                         componentNode   ← findComponentNodeForSection(sectionNode)
-                        sectionStaticId = sectionNode.attValue("id")
+                        sectionStaticId = sectionNode.id
                     } yield
                         (findComponentBindNodes(componentNode) getOrElse Nil, resolverForSectionComponent(sectionStaticId))
 

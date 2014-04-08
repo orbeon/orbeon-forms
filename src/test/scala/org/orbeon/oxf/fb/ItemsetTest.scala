@@ -177,13 +177,13 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
                 val addedControl = {
                     val selectionControls = TransformerUtils.urlToTinyTree("oxf:/forms/orbeon/builder/xbl/selection-controls.xbl")
                     val selectionBindings = selectionControls.rootElement.child("binding")
-                    val radioBinding = selectionBindings.find(_.attValue("id") == "fb-input-select1-full").get
+                    val radioBinding = selectionBindings.find(_.id == "fb-input-select1-full").get
                     ToolboxOps.insertNewControl(doc, radioBinding)
                     doc.descendant("select1").last
                 }
 
                 // Extract from the resource the part just about this control
-                val controlName = FormRunner.controlName(addedControl.attValue("id"))
+                val controlName = FormRunner.controlName(addedControl.id)
                 <resources>{
                     FormBuilder.resourcesRoot.child(*) map (resourceForLang ⇒
                         <resource lang={resourceForLang.attValue("lang")}>{

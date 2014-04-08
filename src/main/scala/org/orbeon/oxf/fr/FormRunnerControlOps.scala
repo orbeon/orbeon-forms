@@ -56,7 +56,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     // Find a control id by name
     def findControlIdByName(inDoc: NodeInfo, controlName: String) =
-        findControlByName(inDoc, controlName) map (_ attValue "id")
+        findControlByName(inDoc, controlName) map (_.id)
 
     // XForms callers: find a control element by name or null (the empty sequence)
     def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String) =

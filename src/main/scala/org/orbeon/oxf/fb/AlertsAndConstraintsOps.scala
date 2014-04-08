@@ -341,7 +341,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             }
 
             def constraintFromElement(e: NodeInfo) = {
-                val id = e attValue "id"
+                val id = e.id
                 ConstraintValidation(nonEmptyOrNone(id), nonEmptyOrNone(e attValue LEVEL_QNAME) map LevelByName getOrElse ErrorLevel, e att "value", findAlertForId(id))
             }
 
@@ -360,7 +360,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             constraintExpressionOpt map { expression ⇒
 
                 val level           = Validation.fromXML(validationElem)
-                val constraintIdOpt = nonEmptyOrNone(validationElem attValue "id") orElse Some(newIds.next())
+                val constraintIdOpt = nonEmptyOrNone(validationElem.id) orElse Some(newIds.next())
                 val useDefaultAlert = validationElem \@ "default-alert" === "true"
 
                 def alertOpt = {

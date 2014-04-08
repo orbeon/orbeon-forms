@@ -74,7 +74,7 @@ object DataModel {
 //        def ancestorOrSelfBindsWithNames(bind: NodeInfo) =
 //            bind ancestorOrSelf (XF → "bind") collect bindWithName
 //
-//        val allContainerNames = getAllContainerControlsWithIds(inDoc) map (e ⇒ controlName(e attValue "id")) toSet
+//        val allContainerNames = getAllContainerControlsWithIds(inDoc) map (e ⇒ controlName(e.id)) toSet
 //
 //        foreachBindWithName(inDoc) { child ⇒
 //            def path = (ancestorOrSelfBindsWithNames(child) map (_ attValue "name") reverse) mkString "/"

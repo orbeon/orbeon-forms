@@ -71,7 +71,7 @@ private object FlatView {
 
         def descendantControls(container: NodeInfo) =
             container descendant * filter
-                (e ⇒ isIdForControl(e attValue "id"))
+                (e ⇒ isIdForControl(e.id))
 
         def isDirectLeafControl(control: NodeInfo) =
             ! IsContainer(control) && findAncestorRepeats(control).isEmpty && findAncestorSections(control).size <= 1
@@ -91,8 +91,8 @@ private object FlatView {
         def pathsCols =
             for {
                 (section, control) ← collectControls(document).to[List]
-                sectionName        = controlName(section attValue "id")
-                leafControlName    = controlName(control attValue "id")
+                sectionName        = controlName(section.id)
+                leafControlName    = controlName(control.id)
             } yield
                 (sectionName + "/" + leafControlName, fitValues(xmlToSQLId(sectionName), xmlToSQLId(leafControlName), MaxNameLength))
 

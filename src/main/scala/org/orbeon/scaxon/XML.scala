@@ -316,6 +316,7 @@ object XML {
         def attValue(attName: QName)  = /@(attName).stringValue
         def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
+        def id = attValue("id")
 
         def self(test: Test) = find(Axis.SELF, test)
         def parent(test: Test) = find(Axis.PARENT, test)

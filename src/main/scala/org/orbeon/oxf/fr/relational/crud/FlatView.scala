@@ -19,6 +19,7 @@ import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import org.orbeon.scaxon.XML._
 import scala.annotation.tailrec
 import scala.collection.mutable
+import scala.collection.immutable.Seq
 
 private object FlatView {
 
@@ -77,7 +78,7 @@ private object FlatView {
 
         def pathsCols =
             for {
-                topLevelSection ← topLevelSections
+                topLevelSection ← topLevelSections.to[List]
                 control         ← descendantControls(topLevelSection)
                 if isDirectLeafControl(control)
                 sectionName     = controlName(topLevelSection attValue "id")
@@ -85,41 +86,43 @@ private object FlatView {
             } yield
                 (sectionName + "/" + leafControlName, fitValues(xmlToSQLId(sectionName), xmlToSQLId(leafControlName), MaxNameLength))
 
-        def fixupDuplicates(s: Seq[(String, String)]) = {
+        pathsCols map (_._1) zip fixupDuplicates(pathsCols map (_._2), PrefixedMetadataColumns, MaxNameLength)
+    }
 
-            val b = mutable.ListBuffer[(String, String)]()
-            val seen = mutable.HashSet[String](PrefixedMetadataColumns: _*)
+    def fixupDuplicates(values: Seq[String], initialValues: Seq[String], maxLength: Int): List[String] = {
 
-            object Guesser {
-                var guessCounter = 0
+        val seen = mutable.HashSet[String](initialValues: _*)
 
-                @tailrec def guessNewCol(col: String): String = {
-                    guessCounter += 1
-                    val guessCounterString = guessCounter.toString
+        object Guesser {
+            var guessCounter = 0
 
-                    val guess = s"${col take (MaxNameLength - guessCounterString.length)}$guessCounterString"
-                    if (! seen(guess))
-                        guess
-                    else
-                        guessNewCol(col)
-                }
+            @tailrec def guessNewCol(col: String): String = {
+                guessCounter += 1
+                val guessCounterString = guessCounter.toString
+
+                val guess = s"${col take (maxLength - guessCounterString.length)}$guessCounterString"
+                if (! seen(guess))
+                    guess
+                else
+                    guessNewCol(col)
             }
+        }
+        
+        val b = mutable.ListBuffer[String]()
 
-            for (pathCol @ (path, col) ← s) {
-                if (! seen(col)) {
-                    b += pathCol
-                    seen += col
-                } else {
-                    val newCol = Guesser.guessNewCol(col)
-                    b += path → newCol
-                    seen += newCol
-                }
-            }
+        for (value ← values) {
 
-            b.result()
+            val cleanValue =
+                if (! seen(value))
+                    value
+                else
+                    Guesser.guessNewCol(value)
+
+            b += cleanValue
+            seen += cleanValue
         }
 
-        fixupDuplicates(pathsCols)
+        b.result()
     }
 
     // Create an acceptable SQL name from an XML NCName (but accept any input)

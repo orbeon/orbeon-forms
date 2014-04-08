@@ -1,0 +1,184 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <my-first-section>
+                        <my-input/>
+                    </my-first-section>
+                    <section-with-long-name>
+                        <my-control-with-a-pretty-long-name/>
+                        <my-control-with-a-pretty-long-name-too/>
+                    </section-with-long-name>
+                    <section-with-long-name-too>
+                        <short/>
+                        <my-control-with-a-pretty-long-name-really/>
+                    </section-with-long-name-too>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-first-section-bind" name="my-first-section" ref="my-first-section">
+                    <xf:bind id="my-input-bind" name="my-input" ref="my-input"/>
+                </xf:bind>
+                <xf:bind id="section-with-long-name-bind" ref="section-with-long-name"
+                         name="section-with-long-name">
+                    <xf:bind id="my-control-with-a-pretty-long-name-bind"
+                             ref="my-control-with-a-pretty-long-name"
+                             name="my-control-with-a-pretty-long-name"/>
+                    <xf:bind id="my-control-with-a-pretty-long-name-too-bind"
+                             ref="my-control-with-a-pretty-long-name-too"
+                             name="my-control-with-a-pretty-long-name-too"/>
+                </xf:bind>
+                <xf:bind id="section-with-long-name-too-bind" ref="section-with-long-name-too"
+                         name="section-with-long-name-too">
+                    <xf:bind id="short-bind" ref="short" name="short"/>
+                    <xf:bind id="my-control-with-a-pretty-long-name-really-bind"
+                             ref="my-control-with-a-pretty-long-name-really"
+                             name="my-control-with-a-pretty-long-name-really"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- All form resources -->
+            <!-- Don't make readonly by default in case a service modifies the resources -->
+            <xf:instance id="fr-form-resources" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <short>
+                            <label/>
+                            <hint/>
+                        </short>
+                        <my-control-with-a-pretty-long-name-really>
+                            <label/>
+                            <hint/>
+                        </my-control-with-a-pretty-long-name-really>
+                        <my-control-with-a-pretty-long-name>
+                            <label/>
+                            <hint/>
+                        </my-control-with-a-pretty-long-name>
+                        <my-control-with-a-pretty-long-name-too>
+                            <label/>
+                            <hint/>
+                        </my-control-with-a-pretty-long-name-too>
+                        <my-first-section>
+                            <label>Section 1</label>
+                        </my-first-section>
+                        <section-with-long-name>
+                            <label>Section 2</label>
+                            <help/>
+                        </section-with-long-name>
+                        <section-with-long-name-too>
+                            <label>Section 3</label>
+                            <help/>
+                        </section-with-long-name-too>
+                        <my-input>
+                            <label/>
+                            <hint/>
+
+                        </my-input>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="my-first-section-control" bind="my-first-section-bind" class="">
+                    <xf:label ref="$form-resources/my-first-section/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="my-input-control" bind="my-input-bind" class="">
+                                    <xf:label ref="$form-resources/my-input/label"/>
+                                    <xf:hint ref="$form-resources/my-input/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-with-long-name-control" bind="section-with-long-name-bind" class="">
+                    <xf:label ref="$form-resources/section-with-long-name/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="my-control-with-a-pretty-long-name-control"
+                                          bind="my-control-with-a-pretty-long-name-bind"
+                                          class="">
+                                    <xf:label ref="$form-resources/my-control-with-a-pretty-long-name/label"/>
+                                    <xf:hint ref="$form-resources/my-control-with-a-pretty-long-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="my-control-with-a-pretty-long-name-too-control"
+                                          bind="my-control-with-a-pretty-long-name-too-bind"
+                                          class="">
+                                    <xf:label ref="$form-resources/my-control-with-a-pretty-long-name-too/label"/>
+                                    <xf:hint ref="$form-resources/my-control-with-a-pretty-long-name-too/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-with-long-name-too-control" bind="section-with-long-name-too-bind"
+                            class="">
+                    <xf:label ref="$form-resources/section-with-long-name-too/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="short-control" bind="short-bind" class="">
+                                    <xf:label ref="$form-resources/short/label"/>
+                                    <xf:hint ref="$form-resources/short/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="my-control-with-a-pretty-long-name-really-control"
+                                          bind="my-control-with-a-pretty-long-name-really-bind"
+                                          class="">
+                                    <xf:label ref="$form-resources/my-control-with-a-pretty-long-name-really/label"/>
+                                    <xf:hint ref="$form-resources/my-control-with-a-pretty-long-name-really/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

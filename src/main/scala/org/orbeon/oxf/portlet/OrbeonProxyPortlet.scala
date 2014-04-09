@@ -308,7 +308,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             CookieManager.processResponseSetCookieHeaders(requestDetails.session, connection, newURL)
 
             connection
-        } catch{
+        } catch {
             case NonFatal(t) ⇒
                 val is = connection.getInputStream
                 if (is ne null)

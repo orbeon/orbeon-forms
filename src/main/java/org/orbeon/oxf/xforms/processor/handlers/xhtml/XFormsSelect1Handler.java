@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.SelectAppearanceTrait;
 import org.orbeon.oxf.xforms.control.LHHAValue;
@@ -97,10 +98,18 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
 
-        if (isFull) {
+        final boolean isStaticReadonly = isStaticReadonly(xformsControl);
+
+        final boolean allowFullStaticReadonly =
+              isMultiple && XFormsProperties.isReadonlyAppearanceStaticSelectFull(containingDocument) ||
+            ! isMultiple && XFormsProperties.isReadonlyAppearanceStaticSelect1Full(containingDocument);
+
+        final boolean mustOutputFull = isBooleanInput || (isFull && (allowFullStaticReadonly || ! isStaticReadonly));
+
+        if (mustOutputFull) {
             // Full appearance, also in static readonly mode
-            outputFull(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, isMultiple, isBooleanInput, isStaticReadonly(xformsControl));
-        } else  if (! isStaticReadonly(xformsControl)) {
+            outputFull(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, isMultiple, isBooleanInput, isStaticReadonly);
+        } else  if (! isStaticReadonly) {
             if (appearanceTrait != null && appearanceTrait.isTree()) {
                 // xxf:tree appearance
 

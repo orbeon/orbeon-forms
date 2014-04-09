@@ -42,6 +42,8 @@ public class XFormsProperties {
     public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
     public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
     public static final String READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
+    public static final String READONLY_APPEARANCE_STATIC_SELECT_PROPERTY  = "readonly-appearance.static.select";
+    public static final String READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY = "readonly-appearance.static.select1";
 
     public static final String ORDER_PROPERTY = "order";
     public static final String DEFAULT_ORDER_PROPERTY = "label control help alert hint";
@@ -197,6 +199,8 @@ public class XFormsProperties {
                                 + " property value value: " + stringValue, locationData);
                 }
             },
+            new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT_PROPERTY, "full", false),
+            new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY, "full", false),
             new PropertyDefinition(ORDER_PROPERTY, DEFAULT_ORDER_PROPERTY, false),
             new PropertyDefinition(LABEL_ELEMENT_NAME_PROPERTY, "label", false),
             new PropertyDefinition(HINT_ELEMENT_NAME_PROPERTY, "span", false),
@@ -473,6 +477,14 @@ public class XFormsProperties {
 
     public static String getReadonlyAppearance(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, READONLY_APPEARANCE_PROPERTY);
+    }
+
+    public static boolean isReadonlyAppearanceStaticSelectFull(XFormsContainingDocument containingDocument) {
+        return "full".equals(getStringProperty(containingDocument, READONLY_APPEARANCE_STATIC_SELECT_PROPERTY));
+    }
+
+    public static boolean isReadonlyAppearanceStaticSelect1Full(XFormsContainingDocument containingDocument) {
+        return "full".equals(getStringProperty(containingDocument, READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY));
     }
 
     public static String getOrder(XFormsContainingDocument containingDocument) {

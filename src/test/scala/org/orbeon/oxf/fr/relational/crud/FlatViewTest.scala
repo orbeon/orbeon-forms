@@ -26,7 +26,7 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
     @Test def fixupDuplicatesTest(): Unit = {
 
         val values   = List("foo", "foo", "bar", "foo", "baz", "bar", "qux")
-        val expected = List("foo", "fo1", "bar", "fo2", "baz", "ba3", "qu4")
+        val expected = List("foo", "fo1", "bar", "fo2", "baz", "ba1", "qu1")
 
         val result = FlatView.fixupDuplicates(values, List("qux"), values map (_.length) max)
 

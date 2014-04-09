@@ -103,19 +103,15 @@ private object FlatView {
 
         val seen = mutable.HashSet[String](initialValues: _*)
 
-        object Guesser {
-            var guessCounter = 0
+        @tailrec def nextValue(value: String, counter: Int = 1): String = {
 
-            @tailrec def nextValue(value: String): String = {
-                guessCounter += 1
-                val guessCounterString = guessCounter.toString
+            val guessCounterString = counter.toString
+            val guess = s"${value take (maxLength - guessCounterString.length)}$guessCounterString"
 
-                val guess = s"${value take (maxLength - guessCounterString.length)}$guessCounterString"
-                if (! seen(guess))
-                    guess
-                else
-                    nextValue(value)
-            }
+            if (! seen(guess))
+                guess
+            else
+                nextValue(value, counter + 1)
         }
         
         val b = mutable.ListBuffer[String]()
@@ -126,7 +122,7 @@ private object FlatView {
                 if (! seen(value))
                     value
                 else
-                    Guesser.nextValue(value)
+                    nextValue(value)
 
             b += cleanValue
             seen += cleanValue
@@ -152,9 +148,9 @@ private object FlatView {
         val usable = max - 1
         val half   = usable / 2
 
-        if (left.length + right.length <= usable)            left                             + "_" + right
+        if (left.length + right.length <= usable)            left                             + "_" +  right
         else if (left.length > half && right.length > half) (left take half)                  + "_" + (right take half)
-        else if (left.length > half)                        (left take usable - right.length) + "_" + right
+        else if (left.length > half)                        (left take usable - right.length) + "_" +  right
         else                                                 left                             + "_" + (right take usable - left.length)
     }
 

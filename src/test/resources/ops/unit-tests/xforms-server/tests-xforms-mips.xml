@@ -2246,4 +2246,53 @@
         </output>
     </test>
 
+    <test description="#1662: Error when referring to nested bind with a variable" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model xxf:custom-mips="fr:gaga fr:toto">
+                        <xf:instance>
+                            <outer>
+                                <inner1>foo</inner1>
+                                <inner2>
+                                    <inner3>bar</inner3>
+                                </inner2>
+                            </outer>
+                        </xf:instance>
+                        <xf:bind         ref="instance()" name="outer"  id="outer-bind"   fr:gaga="$inner1" fr:toto="$inner3" >
+                            <xf:bind     ref="inner1"     name="inner1" id="inner1-bind"  fr:gaga="$inner1" fr:toto="$inner3"/>
+                            <xf:bind     ref="inner2"     name="inner2" id="inner12-bind" fr:gaga="$inner1" fr:toto="$inner3">
+                                <xf:bind ref="inner3"     name="inner3" id="inner3-bind"  fr:gaga="$inner1" fr:toto="$inner3"/>
+                            </xf:bind>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="my-input-1" bind="inner1-bind"/>
+                    <xf:input id="my-input-2" bind="inner3-bind"/>
+                    <xf:output id="my-output-1"
+                        value="string-join(
+                                   for $bind in ('outer-bind', 'inner1-bind', 'inner2-bind', 'inner3-bind')
+                                   return
+                                       for $mip in ('fr:gaga', 'fr:toto')
+                                       return xxf:custom-mip(bind($bind), $mip), ' ')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+               <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input-1" class="+fr-gaga-foo +fr-toto-bar">foo</xxf:control>
+                        <xxf:control id="my-input-2" class="+fr-gaga-foo +fr-toto-bar">bar</xxf:control>
+                        <xxf:control id="my-output-1">foo bar foo bar foo bar</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

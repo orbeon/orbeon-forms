@@ -87,11 +87,18 @@ object BindVariableResolver {
     def findAncestorOrSelfWithName(bindNode: BindNode, name: String) =
         bindNode.ancestorOrSelfBindNodes find (_.staticBind.name == name)
 
-    // NOTE: This requires that a branch doesn't start with the other.
     def findStaticAncestry(branch1Opt: Option[List[StaticBind]], branch2: List[StaticBind]) =
         branch1Opt match {
             case Some(branch1) ⇒
-                branch1.ensuring(_.nonEmpty).iterator zip branch2.ensuring(_.nonEmpty).iterator collectFirst {
+
+                // branch2 can start with branch1 but not the opposite
+                require(! branch1.startsWith(branch2))
+
+                // Zip all with nulls so we can support case where branch2 start with branch1 and test on that below
+                val zipIterator =
+                    branch1.ensuring(_.nonEmpty).iterator zipAll (branch2.ensuring(_.nonEmpty).iterator, null, null)
+
+                zipIterator collectFirst {
                     case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
                         (bindOnBranch2.parentBind, bindOnBranch2)
                 }

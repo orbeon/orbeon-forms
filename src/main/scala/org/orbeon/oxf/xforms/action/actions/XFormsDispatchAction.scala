@@ -133,7 +133,7 @@ object XFormsDispatchAction {
 
             XFormsAPI.containingDocument.addDelayedEvent(
                 name,
-                target.getId,
+                target.getEffectiveId,
                 bubbles,
                 cancelable,
                 delay,

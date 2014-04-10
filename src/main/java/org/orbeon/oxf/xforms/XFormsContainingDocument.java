@@ -666,7 +666,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Schedule an event for delayed execution, following xf:dispatch/@delay semantics.
      *
      * @param eventName         name of the event to dispatch
-     * @param targetStaticId    static id of the target to dispatch to
+     * @param targetEffectiveId id of the target to dispatch to
      * @param bubbles           whether the event bubbles
      * @param cancelable        whether the event is cancelable
      * @param delay             delay after which to dispatch the event
@@ -674,12 +674,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param showProgress      whether to show the progress indicator when submitting the event
      * @param progressMessage   message to show if the progress indicator is visible
      */
-    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay,
+    public void addDelayedEvent(String eventName, String targetEffectiveId, boolean bubbles, boolean cancelable, int delay,
                                 boolean isMaxDelay, boolean showProgress, String progressMessage) {
         if (delayedEvents == null)
             delayedEvents = new ArrayList<DelayedEvent>();
 
-        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay,
+        delayedEvents.add(new DelayedEvent(eventName, targetEffectiveId, bubbles, cancelable, System.currentTimeMillis() + delay,
                 isMaxDelay, showProgress, progressMessage));
     }
 
@@ -690,7 +690,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     public static class DelayedEvent {
         // Event information
         private final String eventName;
-        private final String targetStaticId;
+        private final String targetEffectiveId;
         private final boolean bubbles;
         private final boolean cancelable;
         // Meta information
@@ -699,10 +699,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         private final boolean showProgress;
         private final String progressMessage;
 
-        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time,
+        public DelayedEvent(String eventName, String targetEffectiveId, boolean bubbles, boolean cancelable, long time,
                             boolean isMaxDelay, boolean showProgress, String progressMessage) {
             this.eventName = eventName;
-            this.targetStaticId = targetStaticId;
+            this.targetEffectiveId = targetEffectiveId;
             this.bubbles = bubbles;
             this.cancelable = cancelable;
             this.time = time;
@@ -717,7 +717,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
             eventElement.addAttribute("name", eventName);
-            eventElement.addAttribute("source-control-id", targetStaticId);
+            eventElement.addAttribute("source-control-id", targetEffectiveId);
             eventElement.addAttribute("bubbles", Boolean.toString(bubbles));
             eventElement.addAttribute("cancelable", Boolean.toString(cancelable));
 

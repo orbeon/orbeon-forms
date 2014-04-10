@@ -389,7 +389,7 @@ object XXFormsDynamicControl {
             val all =
                 for {
                     ancestor ← ancestorsFromRoot
-                    id = ancestor.attValue("id")
+                    id = ancestor.id
                     if id.nonEmpty
                     prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
                     binding ← partAnalysis.getBinding(prefixedId)

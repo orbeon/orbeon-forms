@@ -85,6 +85,6 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
         )
 
         for ((expected, left, right) ← expectedForValues)
-            assert(expected === FlatView.fitValues(left, right, 7))
+            assert(expected === FlatView.joinParts(left, right, 7))
     }
 }

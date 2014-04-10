@@ -38,11 +38,10 @@ private object FlatView {
         val appXML  = xmlToSQLId(req.app)
         val formXML = xmlToSQLId(req.form)
 
-        val tableName = TablePrefix + fitValues(appXML, formXML, MaxNameLength - TablePrefix.length)
+        val tableName = TablePrefix + joinParts(appXML, formXML, MaxNameLength - TablePrefix.length)
 
         val metadataCols = MetadataColumns zip PrefixedMetadataColumns
-        val userCols     = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" →  col }
-
+        val userCols     = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" → col }
         val allCols      = metadataCols ++ userCols
 
         // NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations
@@ -95,7 +94,7 @@ private object FlatView {
                 sectionName        = controlNameFromId(section.id)
                 controlName        = controlNameFromId(control.id)
             } yield
-                (sectionName + "/" + controlName, fitValues(xmlToSQLId(sectionName), xmlToSQLId(controlName), MaxNameLength))
+                (sectionName + "/" + controlName, joinParts(xmlToSQLId(sectionName), xmlToSQLId(controlName), MaxNameLength))
 
         pathsCols map (_._1) zip fixupDuplicates(pathsCols map (_._2), PrefixedMetadataColumns, MaxNameLength)
     }
@@ -145,15 +144,18 @@ private object FlatView {
         .reverse
 
     // Try to truncate reasonably smartly when needed to maximize the characters we keep
-    def fitValues(left: String, right: String, max: Int) = {
+    def fitParts(left: String, right: String, max: Int) = {
         val usable = max - 1
         val half   = usable / 2
 
-        if (left.length + right.length <= usable)            left                             + "_" +  right
-        else if (left.length > half && right.length > half) (left take half)                  + "_" + (right take half)
-        else if (left.length > half)                        (left take usable - right.length) + "_" +  right
-        else                                                 left                             + "_" + (right take usable - left.length)
+        if (left.size + right.size <= usable)            left                           →  right
+        else if (left.size > half && right.size > half) (left take half)                → (right take half)
+        else if (left.size > half)                      (left take usable - right.size) →  right
+        else                                             left                           → (right take usable - left.size)
     }
+
+    def joinParts(left: String, right: String, max: Int) =
+        fitParts(left, right, max).productIterator mkString "_"
 
     def escapeSQL(s: String) =
         s.replaceAllLiterally("'", "''")

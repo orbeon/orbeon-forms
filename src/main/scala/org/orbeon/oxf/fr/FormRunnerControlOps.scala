@@ -30,14 +30,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     val LHHANames   = LHHAInOrder.to[Set]
 
     // Get the control name based on the control, bind, grid, section or template id
-    def controlName(controlOrBindId: String) =
+    def controlNameFromId(controlOrBindId: String) =
         getStaticIdFromId(controlOrBindId) match {
             case ControlName(name, _) ⇒ name
             case _ ⇒ null
         }
 
     // Whether the given id is for a control (given its reserved suffix)
-    def isIdForControl(controlOrBindId: String) = controlName(controlOrBindId) ne null
+    def isIdForControl(controlOrBindId: String) = controlNameFromId(controlOrBindId) ne null
 
     // Whether the give node corresponds to a control
     // TODO: should be more restrictive
@@ -68,7 +68,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // Get the control's name based on the control element
     def getControlNameOpt(control: NodeInfo) =
         (control \@ "id" headOption) flatMap
-            (id ⇒ Option(controlName(id.stringValue)))
+            (id ⇒ Option(controlNameFromId(id.stringValue)))
 
     def hasName(control: NodeInfo) = getControlNameOpt(control).isDefined
 

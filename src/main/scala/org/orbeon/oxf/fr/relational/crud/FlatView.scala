@@ -20,6 +20,7 @@ import org.orbeon.scaxon.XML._
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.immutable.Seq
+import RequestReader._
 
 private object FlatView {
 
@@ -40,7 +41,7 @@ private object FlatView {
         val tableName = TablePrefix + fitValues(appXML, formXML, MaxNameLength - TablePrefix.length)
 
         val metadataCols = MetadataColumns zip PrefixedMetadataColumns
-        val userCols     = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" →  col }
+        val userCols     = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" →  col }
 
         val allCols      = metadataCols ++ userCols
 
@@ -91,10 +92,10 @@ private object FlatView {
         def pathsCols =
             for {
                 (section, control) ← collectControls(document).to[List]
-                sectionName        = controlName(section.id)
-                leafControlName    = controlName(control.id)
+                sectionName        = controlNameFromId(section.id)
+                controlName        = controlNameFromId(control.id)
             } yield
-                (sectionName + "/" + leafControlName, fitValues(xmlToSQLId(sectionName), xmlToSQLId(leafControlName), MaxNameLength))
+                (sectionName + "/" + controlName, fitValues(xmlToSQLId(sectionName), xmlToSQLId(controlName), MaxNameLength))
 
         pathsCols map (_._1) zip fixupDuplicates(pathsCols map (_._2), PrefixedMetadataColumns, MaxNameLength)
     }

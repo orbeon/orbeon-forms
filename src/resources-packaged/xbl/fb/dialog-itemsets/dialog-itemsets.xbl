@@ -30,7 +30,7 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
                 <xf:delete ref="(items, template)/item"/>           <!-- Clear local items and template -->
 
-                <xf:var name="control-name"     value="fbf:controlName(event('control-element')/@id)"/>
+                <xf:var name="control-name"     value="fbf:controlNameFromId(event('control-element')/@id)"/>
                 <xf:setvalue ref="control-name" value="$control-name"/>
                 <xf:setvalue ref="control-type" value="event('control-element')/local-name()"/>
                 <xf:setvalue ref="appearance"   value="event('control-element')/@appearance"/>

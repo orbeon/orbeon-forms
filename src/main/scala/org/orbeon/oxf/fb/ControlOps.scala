@@ -383,7 +383,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(inDoc: NodeInfo) =
-        fbFormInstance.idsIterator filter isIdForControl map controlName toSet
+        fbFormInstance.idsIterator filter isIdForControl map controlNameFromId toSet
 
     // For XForms callers
     def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator =

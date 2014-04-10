@@ -349,11 +349,11 @@
     </xf:instance>
 
     <xf:action ev:observer="fb" ev:event="fb-update-section-label" xxf:phantom="true">
-        <xf:setvalue ref="$current-resources/*[name() = fbf:controlName(event('xxf:targetid'))]/label" value="event('label')"/>
+        <xf:setvalue ref="$current-resources/*[name() = fbf:controlNameFromId(event('xxf:targetid'))]/label" value="event('label')"/>
     </xf:action>
     <xf:action ev:observer="fb" ev:event="fb-update-control-lhha" xxf:phantom="true">
-        <xf:setvalue ref="$current-resources/*[name() = fbf:controlName(event('xxf:targetid'))]/*[name() = event('lhha')]" value="event('value')"/>
-        <xf:action type="xpath">fbf:setControlLHHAMediatype(instance('fb-form-instance'), fbf:controlName(event('xxf:targetid')), event('lhha'), event('isHtml') = 'true')</xf:action>
+        <xf:setvalue ref="$current-resources/*[name() = fbf:controlNameFromId(event('xxf:targetid'))]/*[name() = event('lhha')]" value="event('value')"/>
+        <xf:action type="xpath">fbf:setControlLHHAMediatype(instance('fb-form-instance'), fbf:controlNameFromId(event('xxf:targetid')), event('lhha'), event('isHtml') = 'true')</xf:action>
     </xf:action>
     <xf:var name="variables" value="instance('fb-variables')"/>
     <xf:var name="selected-cell" value="$variables/selected-cell"/>

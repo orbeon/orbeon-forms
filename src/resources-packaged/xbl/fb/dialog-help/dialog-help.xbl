@@ -34,7 +34,7 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
-                <xf:setvalue ref="control-name" value="fbf:controlName(event('control-id'))"/>
+                <xf:setvalue ref="control-name" value="fbf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="help" value="fbf:getControlHelpOrEmpty(../control-name)"/>
 
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->

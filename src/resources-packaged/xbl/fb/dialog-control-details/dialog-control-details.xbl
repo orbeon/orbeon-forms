@@ -31,7 +31,7 @@
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <xf:setvalue ref="original-control-name" value="fbf:controlName(event('control-id'))"/>
+                <xf:setvalue ref="original-control-name" value="fbf:controlNameFromId(event('control-id'))"/>
                 <xf:setvalue ref="control-name"          value="$i/original-control-name"/>
 
                 <xf:setvalue ref="$i/control-names"      value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>

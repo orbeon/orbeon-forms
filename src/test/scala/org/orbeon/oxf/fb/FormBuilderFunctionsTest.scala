@@ -53,8 +53,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Basic functions
-            assert(controlName(controlId(Control1)) === Control1)
-            assert(controlName(bindId(Control1)) === Control1)
+            assert(controlNameFromId(controlId(Control1)) === Control1)
+            assert(controlNameFromId(bindId(Control1)) === Control1)
 
             // Find control element
             assert(findControlByName(doc, Control1).get.qname === (XF → "input"))
@@ -174,7 +174,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
             // Check that the <fr:text ref=""> points to the corresponding <text> resource
             locally {
-                val controlName = FormRunner.controlName(frExplanation.id)
+                val controlName = FormRunner.controlNameFromId(frExplanation.id)
                 val actualRef = frExplanation.child("*:text").head.attValue("ref")
                 val expectedRef = "$form-resources/" ++ controlName ++ "/text"
                 assert(actualRef === expectedRef)

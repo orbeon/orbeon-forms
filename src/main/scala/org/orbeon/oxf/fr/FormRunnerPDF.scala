@@ -69,7 +69,7 @@ trait FormRunnerPDF {
             control ancestor * filter isContainer reverse
 
         def nameParts(e: NodeInfo) =
-            ancestorContainers(e) :+ e map getStaticId map FormRunner.controlName
+            ancestorContainers(e) :+ e map getStaticId map FormRunner.controlNameFromId
 
         def suffixAsSeq(e: NodeInfo) =
             nonEmptyOrNone(getEffectiveIdSuffix(e.id)).toList

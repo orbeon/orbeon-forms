@@ -183,7 +183,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
                 }
 
                 // Extract from the resource the part just about this control
-                val controlName = FormRunner.controlName(addedControl.id)
+                val controlName = FormRunner.controlNameFromId(addedControl.id)
                 <resources>{
                     FormBuilder.resourcesRoot.child(*) map (resourceForLang ⇒
                         <resource lang={resourceForLang.attValue("lang")}>{

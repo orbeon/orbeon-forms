@@ -43,7 +43,7 @@ object ToolboxOps {
         ensureEmptyTd(doc) match {
             case Some(gridTd) ⇒
 
-                val newControlName = controlName(nextId(doc, "control"))
+                val newControlName = controlNameFromId(nextId(doc, "control"))
 
                 // Insert control template
                 val newControlElement: NodeInfo =
@@ -237,7 +237,7 @@ object ToolboxOps {
 
         val (into, after) = findSectionInsertionPoint(inDoc)
 
-        val newSectionName = controlName(nextId(inDoc, "section"))
+        val newSectionName = controlNameFromId(nextId(inDoc, "section"))
         val precedingSectionName = after flatMap getControlNameOpt
 
         // Obtain ids first
@@ -292,7 +292,7 @@ object ToolboxOps {
 
         val (into, after, grid) = findGridInsertionPoint(inDoc)
 
-        val newGridName = controlName(nextId(inDoc, "grid"))
+        val newGridName = controlNameFromId(nextId(inDoc, "grid"))
         val templateInstanceId = templateId(newGridName)
 
         // Handle data template
@@ -422,7 +422,7 @@ object ToolboxOps {
                     // Check if id is already in use
                     if (byId(td, controlId(requestedName)).isDefined) {
                         // If so create new id
-                        val newName = controlName(nextId(td, "control"))
+                        val newName = controlNameFromId(nextId(td, "control"))
 
                         // Rename everything
                         // TODO: don't rename in place

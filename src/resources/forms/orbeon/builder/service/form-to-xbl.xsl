@@ -134,7 +134,7 @@
         <!-- TODO: for now consider any component in the "fr" namespace, but need to do better -->
 
         <!-- Section name -->
-        <xsl:variable name="section-name" select="fbf:controlName(@id)" as="xs:string"/>
+        <xsl:variable name="section-name" select="fbf:controlNameFromId(@id)" as="xs:string"/>
 
         <!-- Section bind -->
         <xsl:variable name="section-bind" select="$fr-form-model//xf:bind[@id = concat($section-name, '-bind')]" as="element(xf:bind)"/>
@@ -153,7 +153,7 @@
 
         <!-- ==== Repeats ========================================================================================== -->
 
-        <xsl:variable name="repeat-ids" select="$fr-section//*[fbf:isRepeat(.)]/fbf:templateId(fbf:controlName(@id))"/>
+        <xsl:variable name="repeat-ids" select="$fr-section//*[fbf:isRepeat(.)]/fbf:templateId(fbf:controlNameFromId(@id))"/>
         <xsl:variable name="repeat-templates" select="$fr-form-model/xf:instance[@id = $repeat-ids]" as="element()*"/>
 
         <!-- ==== Actions and services ============================================================================= -->

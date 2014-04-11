@@ -2504,4 +2504,284 @@
             </labels>
         </home>
     </resource>
+    <resource xml:lang="nl">
+        <common>
+            <formats>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
+                <day-this-year>[MNn,*-3] [D]</day-this-year>
+                <short-date>[D01]-[M01]-[Y01]</short-date>
+            </formats>
+        </common>
+        <components>
+            <labels>
+                <open-section>Sectie tonen</open-section>
+                <close-section>Sectie verbergen</close-section>
+                <section-name>Sectienaam</section-name>
+            </labels>
+            <grid>
+                <insert-above>Boven invoegen</insert-above>
+                <insert-below>Onder invoegen</insert-below>
+                <move-up>Omhoog</move-up>
+                <move-down>Omlaag</move-down>
+                <remove>Verwijderen</remove>
+            </grid>
+        </components>
+        <untitled-form>Naamloos form</untitled-form>
+        <errors>
+            <summary-title>Uw form {1,choice,
+                0#bevat geen berichten|
+                1#bevat de volgende '{0,choice,0#fout|1#waarschuwing|2#melding ter info|3#melding}'|
+                1&lt;bevat de volgende '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Fout|1#Waarschuwing|2#Melding ter info|3#Melding}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Fouten|1#Waarschuwingen|2#Meldingen ter info|3#Meldingen}' - }{2}</form-title>
+            <none>Geen fouten op form</none>
+            <unsaved>Niet-bewaarde wijzigingen</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon Forms bevestiging</subject>
+            <body>Bijgevoegd het form in PDF en XML-structuur.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D] [MNn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Review</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Verwijderen</delete>
+                <import>&lt;i class="icon-upload"/&gt; Importeren</import>
+                <new>&lt;i class="icon-plus"/&gt; Nieuw</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Bewerken</edit><!-- unused as of 2013-04-05 -->
+                <duplicate>&lt;i class="icon-file"/&gt; Dupliceren</duplicate>
+            </buttons>
+            <titles>
+                <summary-title>Samenvatting</summary-title>
+                <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
+                <created>Aangemaakt</created>
+                <last-modified>Bewerkt</last-modified>
+                <selected>Geselecteerd</selected>
+                <refresh>Deze bewerking zal de pagina doen verversen</refresh>
+                <toc>Inhoudsopgave</toc>
+                <description>Omschrijving</description>
+                <help>Help</help>
+                <error-count>Fout in uw form</error-count>
+                <errors-count>Fouten in uw form</errors-count>
+            </titles>
+            <search>
+                <search>Zoeken</search>
+                <search-forms>&lt;i class="icon-search"/&gt; Forms zoeken</search-forms>
+                <show-options>Zoekopties tonen</show-options>
+                <close-options>Zoektopties sluiten</close-options>
+                <returned>Zoekactie leverde {0,number,integer} van {1,number,integer} documenten.</returned>
+            </search>
+            <paging>
+                <to>tot</to>
+                <of>van</of>
+            </paging>
+            <messages>
+                <no-form-found>Er zijn geen formgegevens gevonden.</no-form-found>
+                <delete-confirmation>Weet u zeker dat u één of meerdere form wilt verwijderen? Merk op dat u door het verwijderen van een opgeslagen document, ook de bijbehorende conceptversies verwijdert.</delete-confirmation>
+            </messages>
+            <labels>
+                <draft>Concept</draft>
+                <read-only>Alleen-lezen</read-only>
+                <language-choice>Taal kiezen</language-choice>
+                <form-choice>Een form kiezen</form-choice>
+                <free-search>Vrij zoeken</free-search>
+                <any>[Elke]</any>
+                <previous>Vorige</previous>
+                <next>Volgende</next>
+                <script>Volledige versie</script>
+                <noscript>Toegankelijke versie</noscript>
+                <refresh>Verversen</refresh>
+                <close-box>[sluiten]</close-box>
+                <help-back>Terug</help-back>
+                <goto-content>Ga naar inhoud</goto-content>
+            </labels>
+            <formats>
+                <date>[D] [MNn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Opslaan</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Opslaan</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Opslaan</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
+                <email>&lt;i class="icon-envelope"/&gt; E-mail</email>
+                <validate>&lt;i class="icon-ok"/&gt; Valideren</validate>
+
+                <!-- Legacy buttons -->
+                <submit>&lt;i class="icon-arrow-right"/&gt; Indienen</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Sturen</workflow-send>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <summary>&lt;i class="icon-list"/&gt; Samenvatting</summary>
+                <close>&lt;i class="icon-remove"/&gt; Sluiten</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Wissen</clear>
+                <cancel>Anulleren</cancel>
+                <save-locally>Lokaal bewaren</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
+                <submit-dialog-keep>Waarden behouden en sluiten</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Venster sluiten</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <validation-dialog-review>Review</validation-dialog-review>
+                <validation-dialog-continue>Doorgaan</validation-dialog-continue>
+            </buttons>
+            <messages>
+                <save-success>Document succesvol bewaard!</save-success>
+                <save-draft-success>Concept succesvol bewaard!</save-draft-success>
+                <email-success>E-mail succesvol verstuurd!</email-success>
+                <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
+                <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
+                <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
+                <clear-confirm-message>Weet u zeker dat alle velden op deze pagina wilt wissen? Uw gegevens zijn weg als u deze niet hebt opgeslagen.</clear-confirm-message>
+                <error-dialog-title>Kon actie niet voltooien</error-dialog-title>
+                <confirmation-dialog-title>Bevestiging</confirmation-dialog-title>
+                <confirmation-dialog-message>Weet u zeker dat u door wilt gaan?</confirmation-dialog-message>
+                <submit-dialog-title>Form ingediend</submit-dialog-title>
+                <submit-dialog-message>Uw informatie is ingediend, bedankt.</submit-dialog-message>
+                <validation-dialog-title>Review form-validatiemeldingen</validation-dialog-title>
+                <validation-dialog-message>Uw form {1,choice,
+                    0#bevat geen meldingen|
+                    1#bevat één '{0,choice,0#fout|1#waarschuwing|2#melding ter info|3#melding}'|
+                    1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}. U kunt {1,choice,1#deze|1&lt;deze} eerst bekijken of negerenen doorgaan met de bewerking.</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Klik hier om het document te openen. De informatie die u hebt ingevoerd wordt weergegeven zoals deze was toen u uw werk heeft opgeslagen.</saved-locally-open>
+                <upload-in-progress>Er zijn bestanduploads bezig. Probeer opnieuw als de bestandupload is voltooid of geannuleerd.</upload-in-progress>
+                <upload-start>Upload gestart</upload-start>
+                <upload-cancel>Upload geannuleerd door de gebruiker</upload-cancel>
+                <upload-done>Upload voltooid</upload-done>
+                <upload-error>Er was een probleem tijdens de upload. Probeer opnieuw.</upload-error>
+                <upload-error-size>Het geüploade bestand is te groot. De maximale, toegestane grootte is {0,number,integer} bytes en de huidige, ontvangen grootte is {1,number,integer} bytes.</upload-error-size>
+            </messages>
+            <drafts>
+                <found-draft>Concept gevonden</found-draft>
+                <found-drafts>Concepten gevonden</found-drafts>
+                <found-draft-for-document>Nadat dit document is opgeslagen, is er een concept automatisch opgeslagen met daarin mogelijk aanvullend werk. Wilt u het bewaarde document openen, of het automatisch opgeslagen concept?</found-draft-for-document>
+                <found-draft-for-never-saved>Er is een concept van dit form automatisch opgeslagen. Wilt u helemaal opnieuw beginnen of het automatisch bewaarde concept openen?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Er zijn diverse, automatisch bewaarde concepten voor dit form. Wilt u helemaal opnieuw beginnen of de automatisch bewaarde concepten bekijken (en er mogelijk een van bewerken)?</found-drafts-for-never-saved>
+                <open-saved>Open bewaard document</open-saved>
+                <open-draft>Open auto-bewaard concept</open-draft>
+                <view-drafts>Toon auto-bewaarde concepten</view-drafts>
+                <start-new>Start opnieuw</start-new>
+            </drafts>
+            <labels>
+                <language-choice>Taal</language-choice>
+                <errors>Samenvatting van fouten</errors>
+                <check-errors-in-form>Dit form bevat fouten</check-errors-in-form>
+                <error-details>Toon foutdetails</error-details>
+                <confirm>Bevestigen</confirm>
+                <alert>Ontbrekende of incorrecte waarde</alert>
+
+                <captcha-label>Captcha</captcha-label>
+                <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Dit is een alleen-lezen weergave van uw gegevens.
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Lokaal opslaan</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Klik op de knop Opslaan hieronder om uw formgegevens als een HTML-bestand op uw computer op te slaan.
+                    </p>
+                    <p>
+                        Om uw formgegevens opnieuw te openen:
+                    </p>
+                    <ul>
+                        <li>Open het HTML-bestand in uw browser (door er dubbel op te klikken, of het in het browservenster te slepen).</li>
+                        <li>Klik op de knop Open die wordt weergegeven om te bevestigen.</li>
+                    </ul>
+                    <p>
+                        <b>WAARSCHUWING:</b> Er worden geen gegevens op de server opgeslagen en als u het bestand verwijdert zijn alle opgeslagen gegevens weg.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Form Runner Home</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Publicatie verwijderen</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Publiceren</publish>
+                <cancel>Annuleren</cancel>
+                <connect>Verbinden</connect>
+                <select>Selecteren</select>
+                <operation>Bewerking</operation>
+                <all>Alles</all>
+                <none>Niets</none>
+                <unpublished-local>Niet-gepubliceerde lokale forms</unpublished-local>
+                <published-local>Gepubliceerde lokale forms</published-local>
+                <unpublished-remote>Niet-gepubliceerde externe forms</unpublished-remote>
+                <published-remote>Gepubliceerde externe forms</published-remote>
+                <newer-local>Forms die lokaal nieuwer zijn</newer-local>
+                <newer-remote>Forms die extern nieuwer zijn</newer-remote>
+                <publish-local>Alle lokale forms publiceren</publish-local>
+                <unpublish-local>Publicatie verwijderen van alle lokale forms</unpublish-local>
+                <publish-remote>Externe forms publiceren</publish-remote>
+                <unpublish-remote>Publicatie verwijderen van alle externe forms</unpublish-remote>
+                <push-to-remote>Naar extern sturen</push-to-remote>
+                <pull-from-remote>Van extern ophalen</pull-from-remote>
+                <navigate-summary>Naar samenvatting</navigate-summary>
+                <navigate-new>Naar nieuw</navigate-new>
+            </buttons>
+            <titles>
+                <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
+                <credentials>Accountgegevens externe server</credentials>
+                <status>Status</status>
+                <app>Applicatie</app>
+                <form>Form</form>
+                <title>Titel</title>
+                <view>Weergave</view>
+                <new>Nieuw</new>
+                <local>Lokaal</local>
+                <remote>Extern</remote>
+                <form-identification>Form-identificatie</form-identification>
+                <last-modified>Bewerkt</last-modified>
+            </titles>
+            <messages>
+                <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
+                <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen}?</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Beschikbaar</available>
+                <unavailable>Niet-beschikbaar</unavailable>
+                <library>Library</library>
+                <newer>Nieuwer</newer>
+                <username>Gebruiker</username>
+                <password>Wachtwoord</password>
+            </labels>
+        </home>
+    </resource>
 </resources>

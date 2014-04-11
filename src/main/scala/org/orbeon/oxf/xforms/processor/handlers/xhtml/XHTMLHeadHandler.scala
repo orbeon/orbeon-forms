@@ -67,7 +67,8 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
         helper.element("", XMLConstants.XINCLUDE_URI, "include",
             Array(
-                "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css.xml"), "fixup-xml-base", "false"
+                "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css.xml"),
+                "fixup-xml-base", "false"
             )
         )
 
@@ -461,7 +462,8 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
             // Output server events
             if (hasServerEvents) {
-                if (hasPaths || hasInitControls || hasKeyListeners) sb.append(',')
+                if (hasPaths || hasInitControls || hasKeyListeners)
+                    sb.append(',')
                 sb.append("\"server-events\":[")
                 val currentTime = System.currentTimeMillis
                 var first = true

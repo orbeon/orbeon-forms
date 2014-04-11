@@ -50,10 +50,6 @@ class XFormsToXHTML extends XFormsToSomething {
             outputResponseDocument(externalContext, indentedLogger, stage2CacheableState.template, containingDocument, xmlReceiver)
         else
             testOutputResponseState(containingDocument, indentedLogger, xmlReceiver)
-
-    private def testOutputResponseState(containingDocument: XFormsContainingDocument, indentedLogger: IndentedLogger, xmlReceiver: XMLReceiver): Unit =
-        if (! containingDocument.isGotSubmissionReplaceAll)
-            XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, null, xmlReceiver, false, true)
 }
 
 object XFormsToXHTML {
@@ -142,4 +138,11 @@ object XFormsToXHTML {
         }
         containingDocument.afterInitialResponse()
     }
+
+    def testOutputResponseState(
+            containingDocument   : XFormsContainingDocument,
+            indentedLogger       : IndentedLogger,
+            xmlReceiver          : XMLReceiver) =
+        if (! containingDocument.isGotSubmissionReplaceAll)
+            XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, null, xmlReceiver, false, true)
 }

@@ -259,8 +259,6 @@ class EventHandlerImpl(
         }
     }
 
-    def jObserversPrefixedIds = observersPrefixedIds.asJava
-
     final def isMatchByName(eventName: String) =
         isAllEvents || eventNames(eventName)
 

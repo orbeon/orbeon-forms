@@ -184,6 +184,7 @@ class XFormsControl(
     }
 
     def getJavaScriptInitialization: (String, String, String) = null
+    def javaScriptInitialization: Option[(String, String, String)] = Option(getJavaScriptInitialization)
 
     final def getCommonJavaScriptInitialization = {
         val appearances = getAppearances

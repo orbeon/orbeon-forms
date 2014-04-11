@@ -659,7 +659,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Return the list of messages to send to the client, null if none.
      */
     public List<Message> getMessagesToRun() {
-        return messagesToRun;
+        if (messagesToRun != null)
+            return messagesToRun;
+        else
+            return Collections.emptyList();
     }
 
     /**
@@ -684,7 +687,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public List<DelayedEvent> getDelayedEvents() {
-        return delayedEvents;
+        if (delayedEvents != null)
+            return delayedEvents;
+        else
+            return Collections.emptyList();
     }
 
     public static class DelayedEvent {
@@ -823,7 +829,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public List<Script> getScriptsToRun() {
-        return scriptsToRun;
+        if (scriptsToRun != null)
+            return scriptsToRun;
+        else
+            return Collections.emptyList();
     }
 
     /**
@@ -843,7 +852,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Return the list of loads to send to the client, null if none.
      */
     public List<Load> getLoadsToRun() {
-        return loadsToRun;
+        if (loadsToRun != null)
+            return loadsToRun;
+        else
+            return Collections.emptyList();
     }
 
     public static class Load {

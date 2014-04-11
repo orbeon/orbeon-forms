@@ -45,7 +45,7 @@ trait PartGlobalOps {
     // Events
     def hasHandlerForEvent(eventName: String): Boolean
     def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean
-    def getKeyHandlers: JList[EventHandler]
+    def keypressHandlers: Seq[EventHandler]
 
     // XBL
     def isComponent(binding: QName): Boolean

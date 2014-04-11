@@ -409,7 +409,7 @@ public class XFormsServer extends ProcessorImpl {
         // QUESTION: Do we actually need to cache if a xf:submission[@replace = 'all'] happened?
 
         final List loads = containingDocument.getLoadsToRun();
-        if (loads != null && loads.size() > 0) {
+        if (loads.size() > 0) {
             // Handle xf:load response
 
             // Get first load only
@@ -478,35 +478,31 @@ public class XFormsServer extends ProcessorImpl {
             {
                 final XFormsModelSubmission activeSubmission = containingDocument.getClientActiveSubmissionFirstPass();
                 final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
-                if (activeSubmission != null || (loads != null && loads.size() > 0)) {
+                if (activeSubmission != null || loads.size() > 0) {
                     final Document eventsDocument = Dom4jUtils.createDocument();
                     final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
 
                     // Check for xxforms-submit event
-                    {
-                        if (activeSubmission != null) {
-                            final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
-                            eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId());
-                            eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
-                            requireClientSubmission = true;
-                        }
+                    if (activeSubmission != null) {
+                        final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
+                        eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId());
+                        eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
+                        requireClientSubmission = true;
                     }
                     // Check for xxforms-load event (for portlet mode only!)
-                    {
-                        if (loads != null && loads.size() > 0) {
-                            for (XFormsContainingDocument.Load load: loads) {
-                                if (load.isReplace() && containingDocument.isPortletContainer() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
-                                    // We need to submit the event so that the portlet can load the new path
-                                    final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
-                                    // Dispatch to #document
-                                    eventElement.addAttribute("source-control-id", "#document");
-                                    eventElement.addAttribute("resource", load.getResource());
-                                    // NOTE: don't care about the target for portlets
-                                    eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
-                                    requireClientSubmission = true;
+                    if (loads.size() > 0) {
+                        for (XFormsContainingDocument.Load load: loads) {
+                            if (load.isReplace() && containingDocument.isPortletContainer() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
+                                // We need to submit the event so that the portlet can load the new path
+                                final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
+                                // Dispatch to #document
+                                eventElement.addAttribute("source-control-id", "#document");
+                                eventElement.addAttribute("resource", load.getResource());
+                                // NOTE: don't care about the target for portlets
+                                eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
+                                requireClientSubmission = true;
 
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
@@ -599,7 +595,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
                 {
                     final List<XFormsContainingDocument.DelayedEvent> delayedEvents = containingDocument.getDelayedEvents();
-                    if (delayedEvents != null && delayedEvents.size() > 0) {
+                    if (delayedEvents.size() > 0) {
                         final long currentTime = System.currentTimeMillis();
                         for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
                             delayedEvent.toSAX(ch, currentTime);
@@ -616,7 +612,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Output messages to display
                 {
                     final List<XFormsContainingDocument.Message> messages = containingDocument.getMessagesToRun();
-                    if (messages != null) {
+                    if (messages.size() > 0) {
                         outputMessagesInfo(ch, messages);
                     }
                 }
@@ -637,7 +633,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Output loads
                 {
                     final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
-                    if (loads != null && loads.size() > 0) {
+                    if (loads.size() > 0) {
                         outputLoadsInfo(ch, containingDocument, loads);
                     }
                 }
@@ -645,7 +641,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Output scripts
                 {
                     final List<XFormsContainingDocument.Script> scripts = containingDocument.getScriptsToRun();
-                    if (scripts != null) {
+                    if (scripts.size() > 0) {
                         outputScriptsInfo(ch, containingDocument, scripts);
                     }
                 }

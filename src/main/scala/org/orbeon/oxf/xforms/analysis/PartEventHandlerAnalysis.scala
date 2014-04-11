@@ -110,7 +110,7 @@ trait PartEventHandlerAnalysis {
         _handlersForObserver.get(observerPrefixedId) exists
             (handlers ⇒ handlers exists (_.isMatchByName(eventName)))
 
-    def getKeyHandlers = _keypressHandlers.asJava
+    def keypressHandlers = _keypressHandlers
 
     /**
      * Returns whether there is any event handler registered anywhere in the controls for the given event name.

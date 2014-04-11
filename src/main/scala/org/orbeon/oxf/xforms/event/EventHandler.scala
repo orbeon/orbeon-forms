@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.xml.dom4j.LocationData
-import java.util.{Set ⇒ JSet}
 
 // Static event handler
 trait EventHandler {
@@ -32,7 +31,7 @@ trait EventHandler {
 
     val isPhantom: Boolean
 
-    def jObserversPrefixedIds: JSet[String]
+    def observersPrefixedIds: Set[String]
     def eventNames: Set[String]
 
     def isMatchByName(eventName: String): Boolean

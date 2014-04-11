@@ -218,7 +218,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                 if (sb isEmpty) {
                     // First iteration
                     sb append "var opsXFormsProperties = {"
-                    helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array[String]("type", "text/javascript"))
+                    helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
                 } else
                     sb append ','
 
@@ -272,7 +272,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             scriptsToRun.nonEmpty || focusElementIdOpt.isDefined || messagesToRun.nonEmpty || dialogsToOpen.nonEmpty || javascriptLoads.nonEmpty
 
         if (hasScriptDefinitions || mustRunAnyScripts) {
-            helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array[String]("type", "text/javascript"))
+            helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
 
             if (hasScriptDefinitions)
                 outputScripts(uniqueClientScripts)
@@ -351,7 +351,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             javaScriptControlsAppearancesMap: collection.Map[String, collection.Map[String, collection.Seq[String]]]
         )(implicit helper: XMLReceiverHelper): Unit = {
 
-        helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array[String]("type", "text/javascript"))
+        helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
 
         // Produce JSON output
         val hasPaths = true

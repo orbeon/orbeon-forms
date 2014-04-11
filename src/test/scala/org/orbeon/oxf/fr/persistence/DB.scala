@@ -47,7 +47,10 @@ private object DB {
         val statement = connection.createStatement
         val tableNames = ListBuffer[String]()
         val tablesResultSet = statement.executeQuery("show tables")
-        while (tablesResultSet.next()) tableNames += tablesResultSet.getString(1)
+
+        while (tablesResultSet.next())
+            tableNames += tablesResultSet.getString(1)
+
         tableNames.toList
     }
 }

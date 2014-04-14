@@ -489,24 +489,14 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *       <xsl:if test="not(@method) and $container-type/* = 'portlet'">
          *         <xsl:attribute name="method">post</xsl:attribute>
          *       </xsl:if>
-         *       <xsl:choose>
-         *         <xsl:when test="@portlet:is-portlet-form = 'true'">
-         *           <xsl:apply-templates mode="norewrite"/>
-         *         </xsl:when>
-         *         <xsl:otherwise>
-         *           <xsl:apply-templates/>
-         *         </xsl:otherwise>
-         *       </xsl:choose>
+         *       <xsl:apply-templates/>
          *     </xsl:copy>
          *   </xsl:template>
          * </pre>
          *
          * If match is satisfied then modified event is sent to destination contentHandler.
          *
-         * @return null match is not satisfied,
-         *         new NoRewriteState( this, contentHandler, response,
-         *         , haveScriptAncestor ) if is-portlet-form='true', and this
-         *         otherwise.
+         * @return null match is not satisfied, this otherwise.
          * @throws SAXException if destination contentHandler throws SAXException
          */
         private State2 handleForm
@@ -532,12 +522,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     newAtts.addAttribute("", METHOD_ATT, METHOD_ATT, "", "post");
                 }
 
-                final String isPrtltFrm = atts.getValue("http://orbeon.org/oxf/xml/portlet", "is-portlet-form");
-                if ("true".equals(isPrtltFrm)) {
-                    ret = new NoRewriteState(this, xmlReceiver, response, scriptDepth, rewriteURI);
-                } else {
-                    ret = this;
-                }
+                ret = this;
                 xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             } else {
                 ret = null;

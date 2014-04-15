@@ -211,7 +211,7 @@ object OrbeonClientBase {
             |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
             |!> (_.setCapability("name", "Orbeon Forms unit tests"))
             |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
-            |!> (_.setCapability("version", "5"))
+            |!> (_.setCapability("version", "28"))
             |!> (_.setCapability("platform", Platform.XP))
         )
         val server = {

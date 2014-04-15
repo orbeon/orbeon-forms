@@ -14,7 +14,6 @@
 
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import collection.immutable.Seq
 import collection.mutable
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.URLRewriterUtils
@@ -31,6 +30,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import scala.collection.JavaConverters._
 import state.XFormsStateManager
+import XFormsUtils.{escapeJavaScript, namespaceId}
 
 // Handler for <xh:head>
 class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
@@ -44,10 +44,12 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         val xmlReceiver = handlerContext.getController.getOutput
 
         // Register control handlers on controller
-        locally {
-            val controller = handlerContext.getController
-            controller.registerHandler(classOf[XXFormsTextHandler].getName, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", XHTMLBodyHandler.ANY_MATCHER)
-        }
+        handlerContext.getController.registerHandler(
+            classOf[XXFormsTextHandler].getName,
+            XFormsConstants.XXFORMS_NAMESPACE_URI,
+            "text",
+            XHTMLBodyHandler.ANY_MATCHER
+        )
 
         // Declare xmlns:f
         formattingPrefix = handlerContext.findFormattingPrefixDeclare
@@ -204,7 +206,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             )
 
             // Gather all dynamic properties that are defined
-            Seq(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
+            List(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
         }
 
         // combine all static and dynamic properties
@@ -246,13 +248,13 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
         val uniqueClientScripts = containingDocument.getStaticOps.uniqueClientScripts
 
-        val scriptsToRun        = containingDocument.getScriptsToRun.asScala
-        val focusElementIdOpt   = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
-        val messagesToRun       = containingDocument.getMessagesToRun.asScala
+        val scriptsToRun      = containingDocument.getScriptsToRun.asScala
+        val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
+        val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
 
-        val dialogsToOpen  = {
+        val dialogsToOpen = {
             val dialogsMap =
-                Option(containingDocument.getControls.getCurrentControlTree.getDialogControls) map (_.asScala) getOrElse Map()
+                Option(containingDocument.getControls.getCurrentControlTree.getDialogControls) map (_.asScala) getOrElse Map.empty
 
             for {
                 control       ← dialogsMap.values
@@ -280,66 +282,44 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             if (mustRunAnyScripts) {
                 val sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ")
 
+                // NOTE: The order of xxf:script vs. javascript: loads should be preserved. It is not currently.
+
                 // Initial xxf:script executions if present
                 for (script ← scriptsToRun) {
-                    sb.append("ORBEON.xforms.server.Server.callUserScript(\"")
-                    sb.append(script.functionName)
-                    sb.append("\",\"")
-                    sb.append(XFormsUtils.namespaceId(containingDocument, script.targetEffectiveId))
-                    sb.append("\",\"")
-                    sb.append(XFormsUtils.namespaceId(containingDocument, script.observerEffectiveId))
-                    sb.append("\");")
+                    val name     = script.functionName
+                    val target   = namespaceId(containingDocument, script.targetEffectiveId)
+                    val observer = namespaceId(containingDocument, script.observerEffectiveId)
+
+                    sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer");"""
                 }
 
                 // javascript: loads
                 for (load ← javascriptLoads) {
-                    val body = XFormsUtils.escapeJavaScript(load.getResource.substring("javascript:".size))
-                    sb.append(s"""(function(){$body})();""")
+                    val body = escapeJavaScript(load.getResource.substring("javascript:".size))
+                    sb append s"""(function(){$body})();"""
                 }
 
-                // Initial xf:message to run if present
+                // Initial modal xf:message to run if present
                 if (messagesToRun.nonEmpty) {
-                    var foundModalMessage = false
-                    for (message ← messagesToRun) {
-                        if ("modal" == message.getLevel) {
-                            if (foundModalMessage) {
-                                sb.append(", ")
-                            } else {
-                                foundModalMessage = true
-                                sb.append("ORBEON.xforms.action.Message.showMessages([")
-                            }
-                            sb.append("\"")
-                            sb.append(XFormsUtils.escapeJavaScript(message.getMessage))
-                            sb.append("\"")
-                        }
-                    }
-                    if (foundModalMessage)
-                        sb.append("]);")
+                    val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.getMessage)}"""")
+                    quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
                 }
 
                 // Initial dialogs to open
                 for (dialogControl ← dialogsToOpen) {
-                    sb.append("ORBEON.xforms.Controls.showDialog(\"")
-                    sb.append(XFormsUtils.namespaceId(containingDocument, dialogControl.getEffectiveId))
-                    sb.append("\", ")
-                    if (dialogControl.getNeighborControlId ne null) {
-                        sb.append('"')
-                        sb.append(XFormsUtils.namespaceId(containingDocument, dialogControl.getNeighborControlId))
-                        sb.append('"')
-                    } else {
-                        sb.append("null")
-                    }
-                    sb.append(");")
+                    val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
+                    val neighbor = Option(dialogControl.getNeighborControlId) map (n ⇒ s""""${namespaceId(containingDocument, n)}"""") getOrElse "null"
+
+                    sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
                 }
 
                 // Initial setfocus if present
                 // Seems reasonable to do this after dialogs as focus might be within a dialog
                 focusElementIdOpt foreach { focusElementId ⇒
-                    sb.append("ORBEON.xforms.Controls.setFocus(\"")
-                    sb.append(XFormsUtils.namespaceId(containingDocument, focusElementId))
-                    sb.append("\");")
+                    sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, focusElementId)}");"""
                 }
-                sb.append(" }")
+                sb append " }"
+
                 helper.text(sb.toString)
             }
             helper.endElement()

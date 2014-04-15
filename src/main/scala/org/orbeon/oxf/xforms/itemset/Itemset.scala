@@ -80,10 +80,10 @@ class Itemset(multiple: Boolean) extends ItemContainer {
                         val nameValues =
                             for {
                                 (name, value) ← attributes
-                                escapedName = XFormsUtils.escapeJavaScript(getAttributeName(name))
-                                escapedValue = XFormsUtils.escapeJavaScript(value)
+                                escapedName   = XFormsUtils.escapeJavaScript(getAttributeName(name))
+                                escapedValue  = XFormsUtils.escapeJavaScript(value)
                             } yield
-                                '"' + escapedName +  """":"""" + escapedValue + '"'
+                                s""""$escapedName":"$escapedValue""""
 
                         sb.append(nameValues mkString ",")
 

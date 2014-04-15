@@ -18,8 +18,6 @@ import org.orbeon.oxf.client.FormBuilderOps
 import org.junit.Test
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.concurrent.Eventually._
-import org.scalatest.time.{Seconds, Span}
-import org.openqa.selenium.ElementNotVisibleException
 
 trait ControlResourcesEditor extends AssertionsForJUnit with FormBuilderOps with ShouldMatchers {
 
@@ -44,7 +42,7 @@ trait ControlResourcesEditor extends AssertionsForJUnit with FormBuilderOps with
         Builder.onNewForm {
 
             // Enter label and check it is set
-            {
+            locally {
                 // Click on label and check it is displayed
                 clickLabel(FirstControlLabel)
                 val textfield = eventually {
@@ -59,7 +57,7 @@ trait ControlResourcesEditor extends AssertionsForJUnit with FormBuilderOps with
             }
 
             // Bug #915: Label editor: label disappears
-            {
+            locally {
                 click on FirstControlLabel
                 click on FirstControlHint
                 click on Body

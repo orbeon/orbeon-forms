@@ -634,6 +634,9 @@
   .orbeon #xforms-form .btn-toolbar {
     font-size: .5px;
   }
+  .orbeon #xforms-form .fr-grid .xforms-output.xforms-mediatype-image img {
+    -fs-fit-images-to-width: 100%;
+  }
   .fr-page-break-before {
     page-break-before: always;
   }

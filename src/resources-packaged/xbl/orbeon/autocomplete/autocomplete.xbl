@@ -18,8 +18,6 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -98,20 +96,17 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-set-label" phase="target">
-                <!-- NOTE: This test won't be necessary anymore once this bug is fixed: http://goo.gl/n8wGO -->
-                <xf:action if="relevant = 'true'">
-                    <!--  HACK: Force a refresh so the setvalue will have an effect in the case where the fr-set-value is sent on xforms-ready. -->
-                    <!--  This case is tested by the unit test testSetLabelOnXFormsReady, and we'll hopefully soon be able to remove this refresh. -->
-                    <xf:refresh/>
-                    <xf:setvalue ref="textfield-value" value="event('label')"/>
-                    <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
-                    <xf:dispatch name="xforms-value-changed" targetid="search"/>
-                    <xf:dispatch name="update-external-value" targetid="component-inner-group">
-                        <xf:property name="ajax-response-processed" value="true()"/>
-                    </xf:dispatch>
-                </xf:action>
+                <!--  HACK: Force a refresh so the setvalue will have an effect in the case where the fr-set-value is sent on xforms-ready. -->
+                <!--  This case is tested by the unit test testSetLabelOnXFormsReady, and we'll hopefully soon be able to remove this refresh. -->
+                <xf:refresh/>
+                <xf:setvalue ref="textfield-value" value="event('label')"/>
+                <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
+                <xf:dispatch name="xforms-value-changed" targetid="search"/>
+                <xf:dispatch name="update-external-value" targetid="component-inner-group">
+                    <xf:property name="ajax-response-processed" value="true()"/>
+                </xf:dispatch>
             </xbl:handler>
-            <xbl:handler event="fr-value-selected">
+            <xbl:handler event="fr-value-selected" phase="target">
                 <xf:dispatch name="update-external-value" targetid="component-inner-group"/>
             </xbl:handler>
         </xbl:handlers>
@@ -129,7 +124,6 @@
                         <xf:model id="autocomplete-model">
                             <xf:instance id="local">
                                 <autocomplete>
-                                    <relevant>false</relevant>
                                     <readonly>false</readonly>
                                     <textfield-value/>
                                 </autocomplete>
@@ -255,11 +249,9 @@
                         </xf:action>
                         <!-- For the dynamic and resource mode, just reset the search field if the external value becomes empty -->
                         <xf:setvalue ev:event="xforms-value-changed" ev:observer="external-value" if="$dynamic-itemset and $binding = ''" ref="$local/textfield-value"/>
-                        <!-- Keep track of readonlyness and relevance -->
+                        <!-- Keep track of readonly -->
                         <xf:setvalue ev:observer="external-value" ev:event="xforms-readonly" ref="$local/readonly">true</xf:setvalue>
                         <xf:setvalue ev:observer="external-value" ev:event="xforms-readwrite" ref="$local/readonly">false</xf:setvalue>
-                        <xf:setvalue ev:observer="external-value" ev:event="xforms-enabled" ref="$local/relevant">true</xf:setvalue>
-                        <xf:setvalue ev:observer="external-value" ev:event="xforms-disabled" ref="$local/relevant">false</xf:setvalue>
 
                         <!-- - - - - - - - - - - - - - - - - - - MARKUP - - - - - - - - - - - - - - - - - - -->
 

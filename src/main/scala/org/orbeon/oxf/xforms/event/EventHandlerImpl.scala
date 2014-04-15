@@ -24,7 +24,6 @@ import control.XFormsComponentControl
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.Logging
 
-import collection.JavaConverters._
 import org.dom4j.{QName, Element}
 import xbl.Scope
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
@@ -215,16 +214,25 @@ class EventHandlerImpl(
         val (container, handlerEffectiveId, xpathContext) =
             eventObserver match {
 
-                // Observer is the XBL component itself but from the inside
+                // Observer is the XBL component itself but from the "inside"
                 case componentControl: XFormsComponentControl if isXBLHandler ⇒
 
-                    val xblContainer = componentControl.nestedContainer
-                    xblContainer.getContextStack.resetBindingContext()
-                    val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
+                    if (componentControl.canRunEventHandlers(event)) {
 
-                    val handlerEffectiveId = xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+                        val xblContainer = componentControl.nestedContainer
+                        xblContainer.getContextStack.resetBindingContext()
+                        val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 
-                    (xblContainer, handlerEffectiveId, stack)
+                        val handlerEffectiveId = xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+
+                        (xblContainer, handlerEffectiveId, stack)
+                    } else {
+                        debug("ignoring event dispatched to non-relevant component control", List(
+                            "name"       → event.name,
+                            "control id" → componentControl.effectiveId)
+                        )
+                        return
+                    }
 
                 // Regular observer
                 case _ ⇒
@@ -237,7 +245,8 @@ class EventHandlerImpl(
                             val stack = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
 
                             (handlerContainer, handlerEffectiveId, stack)
-                        case None ⇒ return
+                        case None ⇒
+                            return
                     }
             }
 
@@ -360,7 +369,7 @@ object EventHandlerImpl extends Logging {
                 // hopefully to ultimately remove this behavior. See:
                 // https://github.com/orbeon/orbeon-forms/issues/243
                 implicit val logger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-                debug("observing event in different scope (issue #243)", Seq(
+                debug("observing event in different scope (issue #243)", List(
                     "target id"             → targetObject.getEffectiveId,
                     "handler id"            → handler.prefixedId,
                     "observer id"           → eventObserver.getEffectiveId,

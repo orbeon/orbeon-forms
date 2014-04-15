@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{XXFormsComponentRootControl, InstanceMirror}
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent}
-import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
 import Dispatch.EventListener
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsInstance, BindingContext}
@@ -53,6 +53,10 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     // Create nested container upon creation
     createNestedContainer()
+
+    // React to external events only if we are relevant OR upon receiving xforms-disabled
+    def canRunEventHandlers(event: XFormsEvent) =
+        isRelevant || event.name == "xforms-disabled"
 
     private def createNestedContainer(): Unit = {
 

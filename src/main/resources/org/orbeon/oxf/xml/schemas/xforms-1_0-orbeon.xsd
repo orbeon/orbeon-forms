@@ -723,10 +723,8 @@
     </xsd:element>
     <xsd:element name="dispatch">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="xforms:property"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
@@ -736,6 +734,16 @@
             <xsd:attribute name="cancelable" type="xsd:boolean" use="optional" default="true"/>
             <xsd:attribute name="delay" type="xsd:integer" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="property">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+            <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
+            <xsd:attribute name="name" type="xsd:QName" use="required"/>
+            <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="as" type="xsd:string" use="optional"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="rebuild">
@@ -811,12 +819,8 @@
     </xsd:element>
     <xsd:element name="send">
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:choice>
-                        <xsd:any namespace="##other" processContents="lax"/>
-                    </xsd:choice>
-                </xsd:sequence>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="xforms:property"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="submission" type="xsd:NMTOKEN" use="required"/>

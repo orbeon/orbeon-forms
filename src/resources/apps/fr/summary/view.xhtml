@@ -639,7 +639,7 @@
 
                                                     <xh:td class="fr-summary-created">
                                                         <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}" target="_blank">
+                                                            <xh:a href="{$current-document-href}">
                                                                 <xf:output value="$created"/>
                                                             </xh:a>
                                                         </xf:group>
@@ -663,7 +663,7 @@
 
                                                     <xh:td class="fr-summary-modified">
                                                         <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}" target="_blank">
+                                                            <xh:a href="{$current-document-href}">
                                                                 <xf:output value="$last-modified"/>
                                                             </xh:a>
                                                         </xf:group>
@@ -717,7 +717,7 @@
                                                                                         )
                                                                                     else ."/>
                                                             <xf:group ref=".[$edit-view != '']">
-                                                                <xh:a href="{$current-document-href}" target="_blank">
+                                                                <xh:a href="{$current-document-href}">
                                                                     <xf:output value="$detail"/>
                                                                 </xh:a>
                                                             </xf:group>

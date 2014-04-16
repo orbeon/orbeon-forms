@@ -20,6 +20,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](http://www.or
 What's new in the latest releases
 ---------------------------------
 
+- [Orbeon Forms 4.5](http://blog.orbeon.com/2014/04/orbeon-forms-45.html)
 - [Orbeon Forms 4.4.1](http://blog.orbeon.com/2014/01/orbeon-forms-441-pe.html)
 - [Orbeon Forms 4.4](http://blog.orbeon.com/2013/11/orbeon-forms-44.html)
 - [Orbeon Forms 4.3.1](http://blog.orbeon.com/2013/08/orbeon-forms-431-pe.html)

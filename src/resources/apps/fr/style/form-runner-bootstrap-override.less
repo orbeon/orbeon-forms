@@ -237,7 +237,9 @@ body.orbeon {
     }
 
     // Force white icons
-    .btn-danger i, .btn-warning i, .btn-primary i, .btn-inverse i, .navbar-inverse i {
+    .btn-danger i, .btn-warning i, .btn-primary i, .btn-inverse i, .navbar-inverse i,
+    .xforms-trigger-appearance-xxforms-danger i, .xforms-trigger-appearance-xxforms-warning i,
+    .xforms-trigger-appearance-xxforms-primary i, .xforms-trigger-appearance-xxforms-inverse i, .navbar-inverse i {
         background-image: url(bootstrap/img/glyphicons-halflings-white.png)
     }
 
@@ -350,6 +352,25 @@ body.orbeon {
       background-color: transparent;
       background-image: none;
       cursor: default;
+    }
+
+    .xforms-trigger-appearance-xxforms-primary .btn {
+      .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-warning .btn {
+      .buttonBackground(@btnWarningBackground, @btnWarningBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-danger .btn {
+      .buttonBackground(@btnDangerBackground, @btnDangerBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-success .btn {
+      .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-info .btn {
+      .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight);
+    }
+    .xforms-trigger-appearance-xxforms-inverse .btn {
+      .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);
     }
 }
 

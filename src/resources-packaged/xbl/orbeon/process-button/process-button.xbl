@@ -24,7 +24,11 @@
 
         <xbl:template>
 
-            <xf:var name="button-name" xbl:attr="xbl:text=name">save</xf:var>
+            <xf:var name="button-name-avt" xbl:attr="xbl:text=name" xxbl:scope="outer">save</xf:var>
+            <xf:var name="button-name">
+                <xxf:sequence value="xxf:evaluate-avt($button-name-avt)" xxbl:scope="outer"/>
+            </xf:var>
+
             <xf:var name="fr-resources"><xxf:sequence xxbl:scope="outer" value="$fr-resources"/></xf:var>
             <!-- Q: Should modality be configured in properties? oxf.fr.detail.process.home.modal = false -->
             <xf:var name="modal" value="not($button-name = ('collapse-all', 'expand-all', 'home', 'summary', 'close', 'clear', 'validate', 'wizard-prev', 'wizard-next'))"/>

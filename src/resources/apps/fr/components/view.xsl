@@ -103,7 +103,7 @@
                         <!-- Optional inner buttons -->
                         <xsl:if test="exists($inner-buttons)">
                             <xsl:call-template name="fr-buttons-bar">
-                                <xsl:with-param name="buttons"           select="$inner-buttons" tunnel="yes"/>
+                                <xsl:with-param name="buttons-property"  select="'oxf.fr.detail.buttons.inner'" tunnel="yes"/>
                                 <xsl:with-param name="highlight-primary" select="false()"        tunnel="yes"/>
                                 <xsl:with-param name="inverse"           select="false()"        tunnel="yes"/>
                             </xsl:call-template>
@@ -121,7 +121,7 @@
             <!-- .orbeon is here to scope all Orbeon CSS rules -->
             <xsl:attribute name="class" select="string-join(('orbeon', concat('xforms-', if ($is-inline-hints) then 'disable' else 'enable', '-hint-as-tooltip'), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
-            <xf:group model="fr-form-model" id="fr-view" class="container{if ($fluid) then '-fluid' else ''} fr-view{concat(' fr-mode-', $mode)}" xxf:element="div">
+            <xf:group model="fr-form-model" id="fr-view" class="container{if ($fluid) then '-fluid' else ''} fr-view {{concat('fr-mode-', $fr-mode)}}" xxf:element="div">
                 <xh:div class="popover-container-right"/>
                 <xh:div class="popover-container-left"/>
                 <xsl:apply-templates select="if ($is-detail and not($is-form-builder)) then $default-page-template else node()"/>
@@ -132,42 +132,29 @@
     </xsl:template>
 
     <xsl:template match="fr:navbar" name="fr-navbar">
-        <xsl:variable name="header-classes" as="xs:string*" select="('navbar', 'navbar-inverse')"/>
-        <xh:div class="{string-join($header-classes, ' ')}">
+        <xf:group
+                xxf:element="div"
+                model="fr-form-model"
+                ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', $fr-app, $fr-form), '.')))]"
+                class="navbar navbar-inverse">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
-                    <xsl:if test="not($mode = ('email')) and not($hide-header)">
-                        <xsl:choose>
-                            <xsl:when test="$mode = 'view'">
-                                <!-- View header -->
-                                <xsl:variable name="default-objects" as="element()+">
-                                    <fr:logo/>
-                                    <fr:title/>
-                                </xsl:variable>
+                    <xsl:variable name="default-objects" as="element()+">
+                        <!-- These are typically to the right, but to help with IE7 we put them first. See:
+                             https://github.com/orbeon/orbeon-forms/issues/721 -->
+                        <fr:language-selector/>
+                        <fr:noscript-selector/>
+                        <fr:status-icons/>
+                        <fr:goto-content/>
+                        <!-- These are typically to the left -->
+                        <fr:logo/>
+                        <fr:title/>
+                    </xsl:variable>
 
-                                <xsl:apply-templates select="$default-objects"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <!-- Standard header -->
-                                <xsl:variable name="default-objects" as="element()+">
-                                    <!-- These are typically to the right, but to help with IE7 we put them first. See:
-                                         https://github.com/orbeon/orbeon-forms/issues/721 -->
-                                    <fr:language-selector/>
-                                    <fr:noscript-selector/>
-                                    <fr:status-icons/>
-                                    <fr:goto-content/>
-                                    <!-- These are typically to the left -->
-                                    <fr:logo/>
-                                    <fr:title/>
-                                </xsl:variable>
-
-                                <xsl:apply-templates select="$default-objects"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:if>
+                    <xsl:apply-templates select="$default-objects"/>
                 </xh:div>
             </xh:div>
-        </xh:div>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:hidden-controls" name="fr-hidden-controls">
@@ -312,7 +299,7 @@
 
     <xsl:template match="fr:language-selector">
         <!-- Switch language -->
-        <xh:div class="fr-language-choice">
+        <xf:group xxf:element="div" model="fr-form-model" ref=".[not($fr-mode = ('view', 'pdf', 'email'))]" class="fr-language-choice">
             <!-- Put default language first, then other languages -->
             <xf:var
                 name="available-languages"
@@ -329,41 +316,44 @@
                     </xf:itemset>
                 </fr:link-select1>
             </xf:group>
-        </xh:div>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:noscript-selector">
         <!-- Switch script/noscript -->
-        <xsl:if test="$mode = ('edit', 'new') and not($has-noscript-link = false()) and not($is-form-builder) and $is-noscript-support">
-            <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes a CSS  bug with IE 7:
-                 https://github.com/orbeon/orbeon-forms/issues/733 -->
-            <xh:div class="fr-noscript-choice" xml:space="preserve">
-                <xf:group appearance="xxf:internal">
-                    <xf:group ref=".[not(property('xxf:noscript'))]">
-                        <xf:trigger appearance="minimal">
-                            <xf:label xml:space="preserve">
-                                <xf:output value="$fr-resources/summary/labels/noscript"/>
-                            </xf:label>
-                        </xf:trigger>
-                    </xf:group>
-                    <xf:group ref=".[property('xxf:noscript')]">
-                        <xf:trigger appearance="minimal">
-                            <xf:label xml:space="preserve">
-                                <xf:output value="$fr-resources/summary/labels/script"/>
-                            </xf:label>
-                        </xf:trigger>
-                    </xf:group>
-                    <!-- React to activation of both triggers -->
-                    <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-                        process:runProcess('oxf.fr.detail.process', 'toggle-noscript')
-                    </xf:action>
-                </xf:group>
-            </xh:div>
-        </xsl:if>
+
+        <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes a CSS  bug with IE 7:
+             https://github.com/orbeon/orbeon-forms/issues/733 -->
+        <xf:group
+            xxf:element="div"
+            model="fr-form-model"
+            ref=".[$fr-mode = ('new', 'edit') and not(xxf:property(string-join(('oxf.fr.noscript-link', $fr-app, $fr-form), '.')) = false()) and property('xxf:noscript-support')]"
+            class="fr-noscript-choice"
+            xml:space="preserve">
+
+            <xf:group ref=".[not(property('xxf:noscript'))]">
+                <xf:trigger appearance="minimal">
+                    <xf:label xml:space="preserve">
+                        <xf:output value="$fr-resources/summary/labels/noscript"/>
+                    </xf:label>
+                </xf:trigger>
+            </xf:group>
+            <xf:group ref=".[property('xxf:noscript')]">
+                <xf:trigger appearance="minimal">
+                    <xf:label xml:space="preserve">
+                        <xf:output value="$fr-resources/summary/labels/script"/>
+                    </xf:label>
+                </xf:trigger>
+            </xf:group>
+            <!-- React to activation of both triggers -->
+            <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                process:runProcess('oxf.fr.detail.process', 'toggle-noscript')
+            </xf:action>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:goto-content">
-        <xsl:if test="$is-noscript">
+        <xf:group model="fr-form-model" ref=".[property('xxf:noscript')]">
             <!-- Group to scope variables -->
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->
@@ -371,7 +361,7 @@
                     <xf:output value="$fr-resources/summary/labels/goto-content"/>
                 </xh:a>
             </xf:group>
-        </xsl:if>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:version">
@@ -394,11 +384,6 @@
     <xsl:template name="fr-dialogs">
         <!-- Copy custom dialogs under fr:dialogs only (other dialogs will be left in place) -->
         <xsl:apply-templates select=".//fr:dialogs//xxf:dialog"/>
-
-        <!-- This model handles import/export -->
-        <xsl:if test="$bottom-buttons = 'save-locally'">
-            <xi:include href="oxf:/apps/fr/save-locally/save-locally-dialog.xml" xxi:omit-xml-base="true"/>
-        </xsl:if>
 
         <!-- Misc standard dialogs -->
         <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml"      xxi:omit-xml-base="true"/>
@@ -549,37 +534,42 @@
 
     </xsl:template>
 
-    <!-- Optional explanation message for view mode -->
+    <!-- Optional standard explanation message for view mode -->
     <xsl:template name="fr-explanation">
-        <xsl:if test="$is-show-explanation and $mode = ('view')">
-            <xh:div class="fr-explanation">
-                <xf:output value="$fr-resources/detail/view/explanation"/>
-            </xh:div>
-        </xsl:if>
+        <xf:group
+                xxf:element="div"
+                model="fr-form-model"
+                ref=".[$fr-mode = 'view' and xxf:property(string-join(('oxf.fr.detail.view.show-explanation', $fr-app, $fr-form), '.')) = true()]"
+                class="fr-explanation">
+            <xf:output value="$fr-resources/detail/view/explanation"/>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:status-icons" name="fr-status-icons">
         <!-- Status icons for detail page -->
-        <xsl:if test="$is-detail">
-            <xh:span class="fr-status-icons">
-                <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">
-                    <!-- Form has error or warning messages -->
-                    <xf:repeat ref="visible-counts/(@error, @warning, @info)[. gt 0]">
-                        <xh:span class="badge badge-{{if (name() = 'error') then 'important' else if (name() = 'warning') then 'warning' else 'info'}}">
-                            <xf:output value="."/>
-                        </xh:span>
-                    </xf:repeat>
-                </xf:group>
-                <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert = 0]" class="fr-validity-icon">
-                    <!-- Form has no error or warning messages -->
-                    <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
-                </xf:group>
-                <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
-                    <!-- Data is dirty -->
-                    <xh:i class="icon-hdd" title="{{$fr-resources/errors/unsaved}}"/>
-                </xf:group>
-            </xh:span>
-        </xsl:if>
+
+        <xf:group
+            model="fr-form-model"
+            ref=".[not($fr-mode = ('summary', 'home'))]"
+            class="fr-status-icons">
+
+            <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">
+                <!-- Form has error or warning messages -->
+                <xf:repeat ref="visible-counts/(@error, @warning, @info)[. gt 0]">
+                    <xh:span class="badge badge-{{if (name() = 'error') then 'important' else if (name() = 'warning') then 'warning' else 'info'}}">
+                        <xf:output value="."/>
+                    </xh:span>
+                </xf:repeat>
+            </xf:group>
+            <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert = 0]" class="fr-validity-icon">
+                <!-- Form has no error or warning messages -->
+                <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
+            </xf:group>
+            <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
+                <!-- Data is dirty -->
+                <xh:i class="icon-hdd" title="{{$fr-resources/errors/unsaved}}"/>
+            </xf:group>
+        </xf:group>
     </xsl:template>
 
     <!-- Success messages -->
@@ -595,50 +585,93 @@
     </xsl:template>
 
     <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">
-        <!-- $bottom-buttons by default, except in test mode -->
-        <xsl:param name="buttons"           tunnel="yes" as="xs:string*" select="if ($mode != 'test') then $bottom-buttons else 'validate'"/>
-        <xsl:param name="highlight-primary" tunnel="yes" as="xs:boolean" select="$mode != 'test'"/>
-        <xsl:param name="inverse"           tunnel="yes" as="xs:boolean" select="$mode = 'test'"/>
-        <!-- Buttons -->
-        <xsl:if test="not($hide-buttons-bar)">
-            <xh:span class="fr-buttons">
-                <xsl:choose>
-                    <!-- PDF mode: don't include anything -->
-                    <xsl:when test="$mode = 'pdf'"/>
-                    <!-- Use custom buttons -->
-                    <xsl:when test="exists($custom-buttons)">
-                        <!-- Copy all the content -->
-                        <xsl:apply-templates select="$custom-buttons/node()"/>
-                    </xsl:when>
-                    <!-- Use requested buttons -->
-                    <xsl:otherwise>
-                        <!-- Message shown next to the buttons -->
-                        <xh:span class="fr-buttons-message">
-                            <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
-                        </xh:span>
-                        <!-- List of buttons we include based on property -->
-                        <xsl:variable name="b" as="node()*">
-                            <xsl:for-each select="$buttons">
-                                <xsl:variable name="is-primary" select="$highlight-primary and position() = last()"/>
-                                <!--<xsl:variable name="is-primary" select="false()"/>-->
-                                <xsl:element name="fr:{.}-button">
-                                    <xsl:choose>
-                                        <xsl:when test="$inverse">
-                                            <xsl:attribute name="appearance">xxf:inverse</xsl:attribute>
-                                        </xsl:when>
-                                        <xsl:when test="$is-primary">
-                                            <xsl:attribute name="appearance">xxf:primary</xsl:attribute>
-                                        </xsl:when>
-                                    </xsl:choose>
-                                </xsl:element>
-                                <xsl:text> </xsl:text>
-                            </xsl:for-each>
+
+        <xsl:param name="buttons-property"  tunnel="yes" as="xs:string*"  select="()"/>
+        <xsl:param name="highlight-primary" tunnel="yes" as="xs:boolean?" select="()"/>
+        <xsl:param name="inverse"           tunnel="yes" as="xs:boolean?" select="()"/>
+
+        <!-- Nothing below must statically depend on the mode -->
+        <xsl:choose>
+            <xsl:when test="exists($custom-buttons)">
+                <xh:span class="fr-buttons">
+                    <xsl:apply-templates select="$custom-buttons/node()"/>
+                </xh:span>
+            </xsl:when>
+            <xsl:when test="not($hide-buttons-bar)">
+                <xf:group model="fr-form-model" class="fr-buttons">
+
+                    <xf:var name="buttons-property-override"  value="'{$buttons-property}'"/>
+                    <xf:var name="highlight-primary-override" value="'{$highlight-primary}'"/>
+                    <xf:var name="inverse-override"           value="'{$inverse}'"/>
+
+                    <xf:var
+                        name="highlight-primary"
+                        value="if ($highlight-primary-override = '') then $fr-mode != 'test' else xs:boolean($highlight-primary-override)"/>
+                    <xf:var
+                        name="inverse"
+                        value="if ($inverse-override = '')           then $fr-mode  = 'test' else xs:boolean($inverse-override)"/>
+
+                    <xf:var
+                        name="buttons-property"
+                        value="if (normalize-space($buttons-property-override))
+                               then $buttons-property-override
+                               else if ($fr-mode = 'view')
+                               then 'oxf.fr.detail.buttons.view'
+                               else 'oxf.fr.detail.buttons'"/>
+
+                    <xf:var
+                        name="buttons-names"
+                        value="if ($fr-mode = 'pdf')
+                               then ()
+                               else if ($fr-mode = 'test')
+                               then 'validate'
+                               else xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.')))"/>
+
+                    <!-- Message shown next to the buttons (empty by default) -->
+                    <xh:span class="fr-buttons-message">
+                        <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
+                    </xh:span>
+
+                    <xf:repeat ref="$buttons-names[position() le last()]">
+                        <xf:var name="button-name" value="."/>
+                        <xf:var name="pdf"         value="$button-name = 'pdf'"/>
+                        <xf:var name="primary"     value="$highlight-primary and position() = last()"/>
+                        <xf:var name="class"       value="concat('xforms-trigger-appearance-xxforms-',
+                                                                 if ($primary) then 'primary'
+                                                                 else if ($inverse) then 'inverse'
+                                                                 else 'default')"/>
+                        <xf:var name="ref"
+                                value="if ($button-name = 'wizard-prev')
+                                       then xxf:binding('fr-wizard-prev')
+                                       else if ($button-name = 'wizard-next')
+                                       then xxf:binding('fr-wizard-next')
+                                       else xxf:instance('fr-triggers-instance')/*[name() = (
+                                            if ($button-name = ('edit', 'workflow-edit'))
+                                            then 'can-update'
+                                            else if ($button-name = 'summary')
+                                            then 'can-access-summary'
+                                            else if ($button-name = 'refresh')
+                                            then 'noscript'
+                                            else if ($pdf)
+                                            then 'pdf'
+                                            else 'other')]"/>
+
+                        <!-- Because @appearance is static, use a CSS class instead for primary/inverse. This requires
+                             changes to form-runner-bootstrap-override.less, which is not the best solution. Ideally,
+                             we could find a dynamic way to set that class on the nested <button> so that standard
+                             Bootstrap rules apply. -->
+                        <fr:process-button name="{{$button-name}}" ref="$ref[not($pdf)]" class="{{$class}}"/>
+                        <xsl:variable name="pdf-button" as="element()">
+                            <fr:pdf-button ref="$ref[$pdf]"  class="{{$class}}"/>
                         </xsl:variable>
-                        <xsl:apply-templates select="$b"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xh:span>
-        </xsl:if>
+                        <xsl:apply-templates select="$pdf-button"/>
+
+                    </xf:repeat>
+
+                </xf:group>
+            </xsl:when>
+            <xsl:otherwise/>
+        </xsl:choose>
     </xsl:template>
 
     <!-- TOC: Top-level -->

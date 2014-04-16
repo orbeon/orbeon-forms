@@ -424,6 +424,7 @@
             <can-update/>
             <can-access-summary/>
             <pdf/>
+            <noscript/>
             <other/>
             <!-- TODO: Move out, this is Form Builder-specific -->
             <publish/>
@@ -449,9 +450,15 @@
         <xf:bind ref="can-access-summary"
                  relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')
                            or normalize-space(xxf:get-request-header('orbeon-username')) != ''"/>
+        <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
+                 relevant="empty(xxf:instance('fr-form-attachments')/pdf) or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and exf:readonly(../strict-submit)"/>
+
+        <xf:bind ref="noscript"
+                 relevant="property('xxf:noscript')"/>
+
         <!-- TODO: Move out, this is Form Builder-specific -->
         <xf:bind ref="publish"
                  readonly="not($persistence-instance/data-status = 'clean')

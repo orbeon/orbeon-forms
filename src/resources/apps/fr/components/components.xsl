@@ -23,8 +23,7 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:version="java:org.orbeon.oxf.common.Version">
+        xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="actions.xsl"/>
@@ -39,8 +38,6 @@
     <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
-
-    <xsl:variable name="is-pe" select="version:isPE()"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
     <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
@@ -65,7 +62,6 @@
     <xsl:variable name="is-ajax-section-collapse" select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="hide-logo" select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-header" select="p:property(string-join(('oxf.fr.detail.hide-header', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-footer" select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-top" select="p:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
@@ -73,10 +69,7 @@
     <xsl:variable name="custom-css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
     <xsl:variable name="js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.uri', $app, $form), '.'))))" as="xs:string*"/>
     <xsl:variable name="custom-js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
-    <xsl:variable name="bottom-buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
-    <xsl:variable name="bottom-buttons" select="p:split(p:property(string-join(($bottom-buttons-property, $app, $form), '.')))" as="xs:string*"/>
     <xsl:variable name="inner-buttons" select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))" as="xs:string*"/>
-    <xsl:variable name="is-show-explanation" select="p:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="captcha-type" as="xs:string"  select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
@@ -182,16 +175,16 @@
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]">
 
         <!-- Model receiving input parameters -->
-        <xf:model id="fr-parameters-model"
-                      xxf:external-events="{@xxf:external-events}{if ($mode = ('new', 'view', 'edit')) then ' fr-open-pdf' else ''}"
-                      xxf:readonly-appearance="{if ($mode = ('view', 'email') or ($mode = 'pdf' and not($has-pdf-template))) then 'static' else 'dynamic'}"
-                      xxf:encrypt-item-values="{not($mode = 'pdf' and $has-pdf-template)}"
-                      xxf:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
-                      xxf:offline="false"
-                      xxf:noscript="{$is-noscript}"
-                      xxf:noscript-support="{$is-noscript-support}"
-                      xxf:xforms11-switch="false"
-                      xxf:xpath-analysis="true">
+        <xf:model
+                id="fr-parameters-model"
+                xxf:external-events="{@xxf:external-events} fr-open-pdf"
+                xxf:readonly-appearance="{if ($mode = ('view', 'email') or ($mode = 'pdf' and not($has-pdf-template))) then 'static' else 'dynamic'}"
+                xxf:encrypt-item-values="{not($mode = 'pdf' and $has-pdf-template)}"
+                xxf:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
+                xxf:noscript="{$is-noscript}"
+                xxf:noscript-support="{$is-noscript-support}"
+                xxf:xforms11-switch="false"
+                xxf:xpath-analysis="true">
 
             <!-- Don't enable client events filtering for FB -->
             <xsl:if test="$is-form-builder">
@@ -296,7 +289,10 @@
 
             <!-- Variable exposing all the user roles -->
             <xf:var name="fr-roles" value="frf:orbeonRolesSequence()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
-            <!-- Variable exposing the form mode -->
+
+            <!-- Variable exposing the form app/form/mode -->
+            <xf:var name="fr-app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
+            <xf:var name="fr-form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
             <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode/string()"/>
 
             <!-- Bind to set the form instance read-only when necessary -->

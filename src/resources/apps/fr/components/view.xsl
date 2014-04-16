@@ -294,12 +294,13 @@
             value="({if (@paths) then concat(@paths, ', ') else ''}xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
                         xxf:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
 
-        <xh:p>
+        <xh:div class="alert">
+            <xh:button type="button" class="close" data-dismiss="alert">×</xh:button>
             <xf:output
                 class="fr-form-description"
                 model="fr-form-model"
                 value="$description"/>
-        </xh:p>
+        </xh:div>
     </xsl:template>
 
     <xsl:template match="fr:logo">

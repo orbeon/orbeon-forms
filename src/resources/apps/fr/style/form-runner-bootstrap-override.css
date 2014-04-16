@@ -17,6 +17,9 @@ body.orbeon {
 .orbeon a {
   text-decoration: underline;
 }
+.orbeon .alert {
+  margin-bottom: 10px;
+}
 .orbeon .navbar-inverse {
   margin: 10px 0;
 }

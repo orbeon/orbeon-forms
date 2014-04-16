@@ -45,14 +45,14 @@
         Search result, e.g.:
 
         <documents total="2" search-total="2" page-size="5" page-number="1" query="">
-            <document created="2008-07-28T18:43:59.363-07:00" last-modified="2008-07-28T18:43:59.363-07:00" name="329737EA7637FAC1BC8FD6139BDFAE97" offline="">
+            <document created="2008-07-28T18:43:59.363-07:00" last-modified="2008-07-28T18:43:59.363-07:00" name="329737EA7637FAC1BC8FD6139BDFAE97">
                 <details>
                     <detail>a</detail>
                     <detail>aa</detail>
                     <detail/>
                 </details>
             </document>
-            <document created="2008-07-25T17:31:19.016-07:00" last-modified="2008-07-25T17:34:33.503-07:00" name="C7AEA87DA2CC07680D97BC28A87EBAF5" offline="">
+            <document created="2008-07-25T17:31:19.016-07:00" last-modified="2008-07-25T17:34:33.503-07:00" name="C7AEA87DA2CC07680D97BC28A87EBAF5">
                 <details>
                     <detail>ab</detail>
                     <detail>ba</detail>

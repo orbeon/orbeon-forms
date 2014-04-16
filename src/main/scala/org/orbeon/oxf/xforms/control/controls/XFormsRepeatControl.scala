@@ -155,7 +155,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Find source information
         val (sourceNodeset, requestedSourceIndex) =
-            (bindingContext.nodeset, Integer.parseInt(dndStart(dndStart.length - 1)))
+            (bindingContext.nodeset, dndStart(dndStart.length - 1).toInt)
 
         if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size)
             throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData)

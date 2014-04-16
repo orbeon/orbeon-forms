@@ -284,7 +284,7 @@ object XFormsStaticStateImpl {
             require(idElement ne null)
             val lastId = XFormsUtils.getElementId(idElement)
             require(lastId ne null)
-            Integer.parseInt(lastId)
+            lastId.toInt
         }
 
         // Optional template as Base64

@@ -135,7 +135,7 @@ object BindNode {
     def failedValidationsForAllLevels(node: Node): Validations =
         collectFailedValidationsForAllLevels(Option(InstanceData.getLocalInstanceData(node)) map (_.getBindNodes.asScala) getOrElse Nil)
 
-    private def collectFailedValidationsForAllLevels(bindNodes: Seq[BindNode]): Validations = {
+    private def collectFailedValidationsForAllLevels(bindNodes: Seq[BindNode]): Validations =
         if (bindNodes.isEmpty)
             EmptyValidations
         else if (bindNodes.size == 1)
@@ -156,7 +156,6 @@ object BindNode {
 
             buildersByLevel.map { case (k, v) ⇒ k → v.result()} (breakOut)
         }
-    }
 
     // Get all failed constraints for the highest level only, combining BindNodes if needed
     def failedValidationsForHighestLevel(nodeInfo: NodeInfo)  =
@@ -166,9 +165,9 @@ object BindNode {
         collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
     
     private def collectFailedValidationsForLevel(bindNodes: Seq[BindNode], findLevel: BindNode ⇒ Option[ValidationLevel]): Option[(ValidationLevel, List[StaticBind#MIP])] =
-        if (bindNodes.isEmpty) {
+        if (bindNodes.isEmpty)
             None
-        } else {
+        else {
             val consideredLevels = bindNodes flatMap (node ⇒ findLevel(node) map (level ⇒ (level, node)))
             val highestLevelOpt  = consideredLevels.nonEmpty option (consideredLevels map (_._1) max)
 

@@ -35,9 +35,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="string"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="string"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
                 <group>

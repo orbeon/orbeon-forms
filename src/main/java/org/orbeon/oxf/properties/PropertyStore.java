@@ -78,17 +78,25 @@ public class PropertyStore {
             final Element propertyElement = (Element) i.next();
 
             // Extract attributes
-            final String processorName = propertyElement.attributeValue("processor-name");
             final String as = propertyElement.attributeValue("as");
-            final String name = propertyElement.attributeValue("name");
-            final String value = propertyElement.attributeValue("value");
-
-            if (as != null) {
+            if (as != null) { // currently schema requires @as
                 // Read QName
                 final QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
 
                 if (SUPPORTED_TYPES.get(typeQName) == null)
                     throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
+
+                final String processorName = propertyElement.attributeValue("processor-name");
+                final String name = propertyElement.attributeValue("name");
+
+                // Value can come from @value attribute or element text
+                final String value; {
+                    final String valueFromAttribute = propertyElement.attributeValue("value");
+                    if (valueFromAttribute == null)
+                        value = propertyElement.getText();
+                    else
+                        value = valueFromAttribute;
+                }
 
                 if (processorName != null) {
                     // Processor-specific property

@@ -65,8 +65,6 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         val newContainer = container.createChildContainer(this)
         // There may or may not be nested models
         newContainer.addAllModels()
-        // Make sure there is location data
-        newContainer.locationData = getLocationData
 
         _nestedContainer = Some(newContainer)
     }

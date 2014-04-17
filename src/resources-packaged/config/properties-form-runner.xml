@@ -199,33 +199,83 @@
     <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                         value='save(draft = "true")'/>
 
     <!-- Reusable processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*"                  value='pending-uploads recover (error-message("upload-in-progress") then success)'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*"                    value='visit-all then captcha then validate("error") recover (visit-all then expand-all then error-message("form-validation-error") then success)'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*"                  value='validate("warning") then validate("info") recover (xf:show("fr-validation-dialog") then suspend)'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validate-all.*.*"                     value='require-valid then review-messages'/>
     <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*"                      value='navigate("/")'/>
     <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*"                 value='navigate("/fr")'/>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*">
+        pending-uploads
+        recover (error-message("upload-in-progress") then success)
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*">
+        visit-all
+        then captcha
+        then validate("error")
+        recover (visit-all then expand-all then error-message("form-validation-error") then success)
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*">
+        validate("warning")
+        then validate("info")
+        recover (xf:show("fr-validation-dialog") then suspend)
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.validate-all.*.*">
+        require-valid
+        then review-messages
+    </property>
 
     <!-- Button processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='orbeon-home'/>
     <property as="xs:string"  name="oxf.fr.detail.process.summary.*.*"                          value='summary'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.close.*.*"                            value='navigate("oxf.fr.detail.close.uri") recover summary'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.save-final.*.*"                       value='require-uploads then validate-all then save then success-message("save-success") recover error-message("database-error")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*"                       value='save then success-message("save-draft-success") recover error-message("database-error")'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.review.*.*"                           value='require-uploads then validate-all then review'/>
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.send.*.*"                             value='require-uploads then validate-all then send("oxf.fr.detail.send.success")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.email.*.*"                            value='require-uploads then validate-all then email then success-message("email-success")'/>
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.refresh.*.*"                          value='visit-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-prev.*.*"                      value='wizard-prev'/>
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-next.*.*"                      value='wizard-next'/>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.close.*.*">
+        navigate("oxf.fr.detail.close.uri")
+        recover summary
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-final.*.*">
+        require-uploads
+        then validate-all
+        then save
+        then success-message("save-success")
+        recover error-message("database-error")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*">
+        save
+        then success-message("save-draft-success")
+        recover error-message("database-error")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.review.*.*">
+        require-uploads
+        then validate-all
+        then review
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.send.*.*">
+        require-uploads
+        then validate-all
+        then send("oxf.fr.detail.send.success")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.email.*.*">
+        require-uploads
+        then validate-all
+        then email
+        then success-message("email-success")
+    </property>
+
     <!-- Legacy buttons and processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.save.*.*"                             value='save-final'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.submit.*.*"                           value='require-uploads then validate-all then save then success-message("save-success") then result-dialog recover error-message("database-error")'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.submit.*.*">
+        require-uploads
+        then validate-all
+        then save
+        then success-message("save-success")
+        then result-dialog
+        recover error-message("database-error")
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.workflow-review.*.*"                  value='review'/>
     <property as="xs:string"  name="oxf.fr.detail.process.workflow-edit.*.*"                    value='edit'/>
     <property as="xs:string"  name="oxf.fr.detail.process.workflow-send.*.*"                    value=''/><!-- if empty, process is generated based on legacy properties -->
@@ -254,9 +304,22 @@
     <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="*"/>
 
     <!-- Home page internal processes -->
-    <property as="xs:string"  name="oxf.fr.home.process.load-local"                             value='xf:send("read-local-metadata") then xf:dispatch("process-results")'/>
-    <property as="xs:string"  name="oxf.fr.home.process.load-remote"                            value='xf:send("read-remote-metadata") then xf:dispatch("store-credentials") recover ask-credentials then load-local'/>
-    <property as="xs:string"  name="oxf.fr.home.process.ask-credentials"                        value='xf:show("fr-credentials-dialog") then suspend then load-remote'/>
+    <property as="xs:string"  name="oxf.fr.home.process.load-local">
+        xf:send("read-local-metadata")
+        then xf:dispatch("process-results")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.load-remote">
+        xf:send("read-remote-metadata")
+        then xf:dispatch("store-credentials")
+        recover ask-credentials
+        then load-local
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.ask-credentials">
+        xf:show("fr-credentials-dialog")
+        then suspend
+        then load-remote
+    </property>
+
     <property as="xs:string"  name="oxf.fr.home.process.credentials-ok"                         value='resume'/>
     <property as="xs:string"  name="oxf.fr.home.process.credentials-cancel"                     value='abort then load-local'/>
 

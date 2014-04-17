@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
@@ -174,9 +175,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                                     XFormsURIResolver uriResolver, ExternalContext.Response response) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
 
-        // Remember location data
-        setLocationData(staticState.locationData());
-
         // Create UUID for this document instance
         this.uuid = SecureUtils.randomHexId();
 
@@ -218,7 +216,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             try {
                 initialize();
             } catch (Exception e) {
-                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "initializing XForms containing document"));
             }
         }
         indentedLogger.endHandleOperation();
@@ -322,7 +320,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 assert this.staticState.isClientStateHandling();
             }
 
-            setLocationData(this.staticState.locationData());
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
@@ -334,7 +331,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         try {
             restoreDynamicState(xformsState.dynamicState());
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
+            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "re-initializing XForms containing document"));
         }
         indentedLogger.endHandleOperation();
     }
@@ -626,7 +623,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     public void setGotSubmissionReplaceAll() {
         if (this.gotSubmissionReplaceAll)
-            throw new ValidationException("Unable to run a second submission with replace=\"all\" within a same action sequence.", getLocationData());
+            throw new OXFException("Unable to run a second submission with replace=\"all\" within a same action sequence.");
 
         this.gotSubmissionReplaceAll = true;
     }
@@ -637,7 +634,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     public void setGotSubmissionRedirect() {
         if (this.gotSubmissionRedirect)
-            throw new ValidationException("Unable to run a second submission with replace=\"all\" redirection within a same action sequence.", getLocationData());
+            throw new OXFException("Unable to run a second submission with replace=\"all\" redirection within a same action sequence.");
 
         this.gotSubmissionRedirect = true;
     }

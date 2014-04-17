@@ -264,10 +264,8 @@ public class XFormsContextStack {
         assert scope != null;
 
         final LocationData locationData; {
-            if (keepLocationData)
-                locationData = (bindingElement == null)
-                    ? container.getLocationData()
-                    : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
+            if (keepLocationData && bindingElement != null)
+                locationData = new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
             else
                 locationData = null;
         }

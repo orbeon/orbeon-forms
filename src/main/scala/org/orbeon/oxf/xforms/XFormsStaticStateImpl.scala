@@ -46,7 +46,6 @@ class XFormsStaticStateImpl(
     require(digest ne null)
 
     val getIndentedLogger = Loggers.getIndentedLogger("analysis")
-    val locationData = staticStateDocument.locationData
 
     // Create top-level part once vals are all initialized
     val topLevelPart = new PartAnalysisImpl(this, None, startScope, metadata, staticStateDocument)
@@ -271,12 +270,6 @@ object XFormsStaticStateImpl {
         def xblElements = rootControl.elements(XBL_XBL_QNAME).asInstanceOf[JList[Element]].asScala
 
         // TODO: if staticStateDocument contains XHTML document, get controls and models from there
-
-        // Extract location data
-        val locationData = staticStateElement.attributeValue("system-id") match {
-            case systemId: String ⇒ new LocationData(systemId, staticStateElement.attributeValue("line").toInt, staticStateElement.attributeValue("column").toInt)
-            case _ ⇒ null
-        }
 
         // Return the last id generated
         def lastId: Int = {

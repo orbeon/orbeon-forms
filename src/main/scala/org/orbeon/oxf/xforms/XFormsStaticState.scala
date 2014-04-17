@@ -21,7 +21,6 @@ import org.orbeon.oxf.xml.ContentHandlerHelper
 
 trait XFormsStaticState {
 
-    def locationData: LocationData
     def getIndentedLogger: IndentedLogger
 
     def digest: String

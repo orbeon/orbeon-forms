@@ -57,7 +57,7 @@ import java.util.*;
  *
  * Structure:
  *
- * <static-state xmlns:xxf="..." system-id="..." is-html="..." ...>
+ * <static-state xmlns:xxf="..." is-html="..." ...>
  *   <root>
  *     <!-- E.g. AVT on xhtml:html -->
  *     <xxf:attribute .../>
@@ -162,13 +162,6 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private void outputFirstElementIfNeeded() throws SAXException {
         if (mustOutputFirstElement) {
             final AttributesImpl attributesImpl = new AttributesImpl();
-
-            // Add location information
-            if (locationData != null) {
-                attributesImpl.addAttribute("", "system-id", "system-id", ContentHandlerHelper.CDATA, locationData.getSystemID());
-                attributesImpl.addAttribute("", "line", "line", ContentHandlerHelper.CDATA, Integer.toString(locationData.getLine()));
-                attributesImpl.addAttribute("", "column", "column", ContentHandlerHelper.CDATA, Integer.toString(locationData.getCol()));
-            }
             
             // Add is HTML information
             attributesImpl.addAttribute("", "is-html", "is-html", ContentHandlerHelper.CDATA, isHTMLDocument?"true":"false");

@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 
 trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
 
-    def locationData: LocationData
     def getIndentedLogger: IndentedLogger
 
     def isTopLevel: Boolean

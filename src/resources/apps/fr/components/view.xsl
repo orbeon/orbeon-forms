@@ -294,13 +294,14 @@
             value="({if (@paths) then concat(@paths, ', ') else ''}xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
                         xxf:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
 
-        <xh:div class="alert">
-            <xh:button type="button" class="close" data-dismiss="alert">×</xh:button>
+        <xf:group xxf:element="div" ref=".[normalize-space($description)]" class="alert">
+            <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
+                 xf:output, which will cause an error. -->
             <xf:output
                 class="fr-form-description"
                 model="fr-form-model"
                 value="$description"/>
-        </xh:div>
+        </xf:group>
     </xsl:template>
 
     <xsl:template match="fr:logo">

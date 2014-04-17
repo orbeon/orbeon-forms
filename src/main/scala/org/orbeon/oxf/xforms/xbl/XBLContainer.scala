@@ -75,7 +75,6 @@ class XBLContainer(
 
     val containingDocument = ancestorsIterator collectFirst { case cd: XFormsContainingDocument ⇒ cd } get
 
-    var locationData: LocationData = null
     val contextStack = new XFormsContextStack(self)
 
     private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = ArrayBuffer()
@@ -93,8 +92,6 @@ class XBLContainer(
     def getContainingDocument = containingDocument
     def getContextStack = contextStack
     final def getPartAnalysis = partAnalysis
-    def getLocationData = locationData
-    def setLocationData(locationData: LocationData) = self.locationData = locationData
 
     // Create a new container child of the given control
     def createChildContainer(associatedControl: XFormsComponentControl)  =

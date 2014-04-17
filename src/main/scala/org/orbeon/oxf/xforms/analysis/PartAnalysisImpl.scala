@@ -59,7 +59,6 @@ class PartAnalysisImpl(
 
     partAnalysis ⇒
 
-    def locationData = staticState.locationData
     def getIndentedLogger = staticState.getIndentedLogger
 
     private def iterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] = new Iterator[PartAnalysis] {

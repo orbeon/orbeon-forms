@@ -431,10 +431,6 @@ body.orbeon {
     color: black;
     text-decoration: none;
   }
-  .orbeon .xforms-required label {
-    background-image: none;
-    padding-left: 0;
-  }
   .orbeon .container {
     width: 100%;
   }

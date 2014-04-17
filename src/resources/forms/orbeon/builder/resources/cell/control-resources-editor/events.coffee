@@ -58,5 +58,5 @@ $ ->
             if   repeat.is('*') \
             then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
             else container.find('.xforms-label')
-        Builder.resourceEditorStartEdit()
-
+        if (Builder.resourceEditorCurrentLabelHint.is('*'))
+            Builder.resourceEditorStartEdit()

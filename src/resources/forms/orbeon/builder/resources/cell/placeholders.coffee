@@ -29,8 +29,8 @@ $ ->
         button:
             selector: '.fr-grid-content > .xforms-trigger-appearance-full'
             editInputSelector: '#fb-edit-label'
-            placeholderOutputSelector: '#fb-placeholder-label'
-            placeholderContainerSelector: '.btn'
+            placeholderOutputSelector: '.fb-message-enter-label'
+            placeholderContainerSelector: 'span.btn'
             initialValueSelector: 'button'
             createMock: (element) ->
                 button = f$.find 'button', element                                                                      # Hide actual button
@@ -43,7 +43,7 @@ $ ->
         link:
             selector: '.fr-grid-content > .xforms-trigger-appearance-minimal'
             editInputSelector: '#fb-edit-label'
-            placeholderOutputSelector: '#fb-placeholder-label'
+            placeholderOutputSelector: '.fb-message-enter-label'
             placeholderContainerSelector: '.fb-mock-link'
             initialValueSelector: 'a'
             createMock: (element) ->

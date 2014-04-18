@@ -295,28 +295,37 @@ body.orbeon {
   border-bottom: none;
   margin: 0;
 }
+.orbeon .fr-mode-view .xforms-static > label,
 .orbeon .fr-mode-pdf .xforms-static > label,
-.orbeon .fr-mode-view .xforms-static > label {
+.orbeon .fr-mode-email .xforms-static > label {
   cursor: default;
 }
-.orbeon .fr-mode-pdf .xforms-textarea.xforms-static pre,
 .orbeon .fr-mode-view .xforms-textarea.xforms-static pre,
+.orbeon .fr-mode-pdf .xforms-textarea.xforms-static pre,
+.orbeon .fr-mode-email .xforms-textarea.xforms-static pre,
+.orbeon .fr-mode-view .xforms-mediatype-text-html.xforms-static,
 .orbeon .fr-mode-pdf .xforms-mediatype-text-html.xforms-static,
-.orbeon .fr-mode-view .xforms-mediatype-text-html.xforms-static {
+.orbeon .fr-mode-email .xforms-mediatype-text-html.xforms-static {
   cursor: not-allowed;
 }
-.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
-.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
-.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
-.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+.orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
-.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-deselected,
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
 .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
-.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+.orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
   display: block;
   min-height: 20px;
   background-size: 14px;
@@ -324,38 +333,51 @@ body.orbeon {
   background-position: 0 3px;
   cursor: not-allowed;
 }
-.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected label,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected label,
-.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-selected label,
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected label,
-.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected label,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected label,
+.orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-selected label,
 .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected label,
-.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected label,
+.orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-selected label,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected label,
-.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-deselected label,
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-deselected label,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected label,
 .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected label,
-.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected label {
+.orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected label {
   cursor: not-allowed;
 }
-.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
-.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-selected,
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-selected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
 .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
-.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
+.orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
   background-image: url("images/glyphicons/checkbox-selected.png");
 }
-.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
 .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
-.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-deselected,
 .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
 .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
-.orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+.orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
   background-image: url("images/glyphicons/checkbox-deselected.png");
 }
+.orbeon .fr-mode-view .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items,
 .orbeon .fr-mode-pdf .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items,
-.orbeon .fr-mode-view .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items {
+.orbeon .fr-mode-email .xbl-fr-box-select .xforms-static.xforms-select-appearance-full .xforms-items {
   border: none;
   height: auto;
   overflow-y: visible;
@@ -367,18 +389,24 @@ body.orbeon {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (min-resolution: 2dppx), only screen and (min-resolution: 192dpi) {
   .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
-  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
+  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
     background-image: url("images/glyphicons/checkbox-selected-2x.png");
   }
   .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
-  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
     background-image: url("images/glyphicons/checkbox-deselected-2x.png");
   }
 }
@@ -396,34 +424,46 @@ body.orbeon {
   }
   .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
-  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
     background-size: 14px;
     background-repeat: no-repeat !important;
     background-position: 0 3px !important;
   }
   .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-selected,
   .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
-  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
+  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-selected,
+  .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-selected {
     background-image: url("images/glyphicons/checkbox-selected-hd.png") !important;
   }
   .orbeon .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-pdf .xforms-select-appearance-full.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-select-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-view .xforms-select1-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-pdf .xforms-select1-appearance-full.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-select1-appearance-full.xforms-static .xforms-deselected,
   .orbeon .fr-mode-view .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
-  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
+  .orbeon .fr-mode-pdf .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected,
+  .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
     background-image: url("images/glyphicons/checkbox-deselected-hd.png") !important;
   }
   .orbeon a,

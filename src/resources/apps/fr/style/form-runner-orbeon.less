@@ -304,7 +304,7 @@ body.orbeon { background-color: @frBackground }
         }
     }
 
-    .fr-mode-pdf, .fr-mode-view {
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
 
         .xforms-static > label {
             cursor: default;
@@ -353,7 +353,7 @@ body.orbeon { background-color: @frBackground }
        only screen and (min-resolution: 2dppx),
        only screen and (min-resolution: 192dpi) {
     .orbeon {
-        .fr-mode-view, .fr-mode-pdf {
+        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
             .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
                 &.xforms-static {
                     .xforms-selected {
@@ -380,7 +380,7 @@ body.orbeon { background-color: @frBackground }
 
     .orbeon {
 
-        .fr-mode-view, .fr-mode-pdf {
+        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
             .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
                 &.xforms-static {
                     // NOTE: The !important seems needed with FlyingSaucer, who knows why.

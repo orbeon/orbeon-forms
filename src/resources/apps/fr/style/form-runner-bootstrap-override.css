@@ -313,21 +313,26 @@ body.orbeon {
   cursor: default;
 }
 @media print {
-  .orbeon .fr-mode-pdf .xforms-field {
+  .orbeon .fr-mode-pdf .xforms-field,
+  .fr-mode-email .xforms-field {
     height: 24px;
     line-height: 24px;
     background-color: red;
   }
-  .orbeon .fr-mode-pdf .fr-grid-1 .xforms-field {
+  .orbeon .fr-mode-pdf .fr-grid-1 .xforms-field,
+  .fr-mode-email .fr-grid-1 .xforms-field {
     width: 98.5%;
   }
-  .orbeon .fr-mode-pdf .fr-grid-2 .xforms-field {
+  .orbeon .fr-mode-pdf .fr-grid-2 .xforms-field,
+  .fr-mode-email .fr-grid-2 .xforms-field {
     width: 97%;
   }
-  .orbeon .fr-mode-pdf .fr-grid-3 .xforms-field {
+  .orbeon .fr-mode-pdf .fr-grid-3 .xforms-field,
+  .fr-mode-email .fr-grid-3 .xforms-field {
     width: 95.5%;
   }
-  .orbeon .fr-mode-pdf .fr-grid-4 .xforms-field {
+  .orbeon .fr-mode-pdf .fr-grid-4 .xforms-field,
+  .fr-mode-email .fr-grid-4 .xforms-field {
     width: 94%;
   }
 }

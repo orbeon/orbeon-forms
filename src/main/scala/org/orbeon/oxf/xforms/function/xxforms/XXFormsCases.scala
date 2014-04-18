@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.{SequenceIterator, EmptyIterator}
+import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.oxf.util.ScalaUtils._
 
 /**
@@ -25,7 +24,10 @@ import org.orbeon.oxf.util.ScalaUtils._
  */
 class XXFormsCases extends XFormsFunction with FunctionSupport {
     override def iterate(xpathContext: XPathContext): SequenceIterator =
-        relevantControl(0)(xpathContext) flatMap
-            collectByErasedType[XFormsSwitchControl] map
-            (control ⇒ asIterator(control.getChildrenCases.asScala map (_.getId))) getOrElse EmptyIterator.getInstance
+        asIterator(
+            relevantControl(0)(xpathContext)             flatMap
+                collectByErasedType[XFormsSwitchControl] map
+                (_.getChildrenCases map (_.getId))       getOrElse
+                Nil
+        )
 }

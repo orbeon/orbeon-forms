@@ -46,17 +46,15 @@
 
                     <!-- Section configuration -->
                     <xsl:variable name="editable"          select="exists(@edit-ref)"/>
-                    <xsl:variable name="mode"              select="@mode"/>
                     <xsl:variable name="ancestor-sections" select="count(ancestor::fr:section)"/><!-- TODO -->
                     <xsl:variable name="collapse"          select="not(@collapse = 'false')"/>
                     <xsl:variable name="animate"           select="not(@animate = 'false')"/>
                     <xsl:variable name="readonly"          select="@readonly = 'true'"/>
                     <xsl:variable name="is-repeat"         select="@repeat = 'true' or exists(minOccurs | @maxOccurs | @min | @max)"/>
 
-                    <xsl:variable name="initially-open" as="xs:boolean" select="$mode = ('view', 'pdf') or not(@open = 'false')"/>
-
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
+
                         <xsl:if test="$editable">
                             <!-- Variables for design time -->
                             <xf:var name="fb-section" value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
@@ -72,6 +70,10 @@
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">
 
+                                <xf:var
+                                    name="initially-open"
+                                    value="xxf:instance('fr-parameters-instance')/mode/string() = ('view', 'pdf', 'email') or not('{@open}' = 'false')"/>
+
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">
                                     <xsl:attribute name="class" select="'fr-section-title'"/>
@@ -81,7 +83,7 @@
                                         <!-- A bit tricky: the switch is further below, and xxf:case('switch') can
                                              return () if the switch is not yet initialized. In that case, it means we
                                              are just becoming relevant, so use the value of $initially-open. -->
-                                        <xf:var name="open" value="(for $switch in xxf:case('switch') return $switch = 'case-open', {if ($initially-open) then 'true()' else 'false()'})[1]"/>
+                                        <xf:var name="open" value="(for $switch in xxf:case('switch') return $switch = 'case-open', $initially-open)[1]"/>
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
                                             <xf:toggle ev:event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>
@@ -113,9 +115,9 @@
                                      https://github.com/orbeon/orbeon-forms/issues/927 -->
                                 <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="{$editable}">
                                     <!-- Closed section -->
-                                    <xf:case id="case-closed" selected="{not($initially-open)}"/>
+                                    <xf:case id="case-closed" selected="{{not($initially-open)}}"/>
                                     <!-- Open section -->
-                                    <xf:case id="case-open" selected="{$initially-open}">
+                                    <xf:case id="case-open" selected="{{$initially-open}}">
                                         <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">

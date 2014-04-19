@@ -28,6 +28,9 @@ trait ControlXPathSupport {
     private def getNamespaceMappings =
         if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
 
+    def evaluateBooleanAvt(attributeValue: String) =
+        evaluateAvt(attributeValue) == "true"
+
     /**
      * Evaluate an attribute of the control as an AVT.
      *

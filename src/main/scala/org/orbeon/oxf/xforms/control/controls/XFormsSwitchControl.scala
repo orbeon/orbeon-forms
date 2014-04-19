@@ -74,7 +74,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         val caseElements = Dom4j.elements(element, XFORMS_CASE_QNAME)
 
         def isDefaultSelected(element: Element) =
-            evaluateAvt(element.attributeValue("selected")) == "true"
+            Option(element.attributeValue("selected")) exists evaluateBooleanAvt
 
         caseElements find
             isDefaultSelected map

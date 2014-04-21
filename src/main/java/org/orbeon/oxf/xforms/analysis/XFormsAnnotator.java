@@ -159,13 +159,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             final String xformsElementId = reusableStringArray[0];
 
             // Handle full update annotation
-            if (stackElement.isXXForms() && localname.equals("dynamic")) {
-                // Remember this subtree has a full update
-
-                putMark(xformsElementId);
-                // Add a class to help the client
-                 attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
-            } else if (templateSAXStore != null) {
+            if (templateSAXStore != null) {
                 // Remember mark if xxf:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {

@@ -728,7 +728,7 @@ public class XFormsServer extends ProcessorImpl {
             state1 = null;
 
         indentedLogger.startHandleOperation("", "computing differences");
-        new ControlsComparator(containingDocument, valueChangeControlIds, isTestMode).diffJava(ch, state1, state2);
+        new ControlsComparator(containingDocument, valueChangeControlIds, isTestMode).diffJava(ch.getXmlReceiver(), state1, state2);
         indentedLogger.endHandleOperation();
     }
 

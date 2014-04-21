@@ -17,10 +17,10 @@ import java.{util ⇒ ju}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsProperties
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{XXFormsDynamicControl, XFormsRepeatControl}
 import org.orbeon.oxf.xforms.processor.handlers._
@@ -32,8 +32,9 @@ import org.xml.sax.helpers.AttributesImpl
 import scala.collection.JavaConverters._
 import scala.util.control.Breaks
 
-class ControlsComparator(containingDocument: XFormsContainingDocument, valueChangeControlIds: collection.Set[String], isTestMode: Boolean) {
-    
+class ControlsComparator(containingDocument: XFormsContainingDocument, valueChangeControlIds: collection.Set[String], isTestMode: Boolean)
+    extends XMLReceiverSupport {
+
     def this(containingDocument: XFormsContainingDocument, valueChangeControlIds: ju.Set[String], isTestMode: Boolean) =
         this(containingDocument, Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String], isTestMode)
 
@@ -42,10 +43,21 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
     private val breaks = new Breaks
     import breaks._
 
-    def diffJava(receiver: XMLReceiverHelper, left: ju.List[XFormsControl], right: ju.List[XFormsControl]) =
-        diff(if (left ne null) left.asScala else Nil, if (right ne null) right.asScala else Nil, bufferingForFullUpdate = false)(receiver)
+    def diffJava(
+            receiver: XMLReceiver,
+            left    : ju.List[XFormsControl],
+            right   : ju.List[XFormsControl]) =
+        diffChildren(
+            if (left  ne null) left.asScala  else Nil,
+            if (right ne null) right.asScala else Nil,
+            None)(receiver)
 
-    def diff(left: Seq[XFormsControl], right: Seq[XFormsControl], bufferingForFullUpdate: Boolean)(receiver: XMLReceiverHelper): Unit =
+    private def diffChildren(
+            left             : Seq[XFormsControl],
+            right            : Seq[XFormsControl],
+            fullUpdateBuffer : Option[SAXStore])(
+            implicit receiver: XMLReceiver): Unit = {
+
         if (right.nonEmpty) {
 
             assert(left.size == right.size || left.isEmpty, "illegal state when comparing controls")
@@ -55,207 +67,255 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
                 control1Opt                = Option(control1OrNull)
             } locally {
 
-                outputSingleControlDiffIfNeeded(control1Opt, control2)(receiver)
+                // 1: Diffs for current control
+                outputSingleControlDiffIfNeeded(control1Opt, control2)
 
-                if (reachedFullUpdateThreshold(bufferingForFullUpdate)(receiver))
+                if (fullUpdateBuffer exists (_.getAttributesCount >= FullUpdateThreshold))
                     break()
 
+                // 2: Diffs for descendant controls if any
                 def getMark(control: XFormsControl) =
                     containingDocument.getStaticOps.getMark(control.getPrefixedId)
 
-                def getFullUpdateMark(control: XFormsControl) =
-                    if (bufferingForFullUpdate || control2.isInstanceOf[XXFormsDynamicControl] || control2.isInstanceOf[XFormsComponentControl])
-                        None
-                    else
-                        getMark(control)
+                // Custom extractor to make match below nicer
+                object ControlWithMark {
+                    def unapply(c: XFormsControl) = if (fullUpdateBuffer.isEmpty) getMark(c) else None
+                }
 
-                if (control2.hasStructuralChange) {
-                    // xxf:dynamic proper OR top-level XBL within xxf:dynamic
+                // Some controls require special processing, as well as xxf:update="full"
+                val specificProcessingTookPlace =
+                    control2 match {
+                        case c: XXFormsDynamicControl ⇒
+                            if (c.hasStructuralChange) {
+                                assert(fullUpdateBuffer.isEmpty, "xxf:dynamic nested within full update is not supported")
 
-                    assert(! bufferingForFullUpdate, "xxf:dynamic or XBL full update nested within full update are not supported")
+                                def replay(r: XMLReceiver) =
+                                    element("", XXFORMS_NAMESPACE_URI, "dynamic", List("id" → c.effectiveId))(r)
 
-                    // Force immediate full update for this control
-                    val mark = getMark(control2).ensuring(_.isDefined, "missing mark").get
-                    processFullUpdateForContent(mark, control2)(receiver)
-                } else
-                    getFullUpdateMark(control2) match {
-                        case Some(mark) ⇒
-                            // Found xxf:update="full"
-                            val buffer = new XMLReceiverHelper(new SAXStore)
+                                processFullUpdateForContent(c, replay)
+                                true
+                            } else
+                                false
+                        case c: XFormsComponentControl ⇒
+                            if (c.hasStructuralChange) {
+                                assert(fullUpdateBuffer.isEmpty, "XBL full update nested within full update is not supported")
+
+                                val mark =
+                                    getMark(c).ensuring(_.isDefined, "missing mark").get
+
+                                processFullUpdateForContent(c, mark.replay)
+                                true
+                            } else
+                                false
+                        case c@ControlWithMark(mark) ⇒
                             tryBreakable {
-                                outputDescendantControlsDiffs(control1Opt, control2, bufferingForFullUpdate = true)(buffer)
+                                // Output to buffer
+                                val buffer = new SAXStore
+                                outputDescendantControlsDiffs(control1Opt, c, Some(buffer))(buffer)
                                 // Incremental updates did not trigger full updates, replay the output
-                                buffer.getXmlReceiver.asInstanceOf[SAXStore].replay(receiver.getXmlReceiver)
+                                buffer.replay(receiver)
                             } catchBreak {
                                 // Incremental updates did trigger full updates
-                                processFullUpdateForContent(mark, control2)(receiver)
+                                processFullUpdateForContent(c, mark.replay)
                             }
-
-                        case None ⇒
-                            // Regular update
-                            outputDescendantControlsDiffs(control1Opt, control2, bufferingForFullUpdate)(receiver)
+                            true
+                        case _ ⇒
+                            false
                     }
-            }
-        } else {
-            assert(left.isEmpty, "illegal state when comparing controls")
-        }
-    
-    private def isValueChangeControl(control: XFormsControl) =
-        valueChangeControlIds(control.getEffectiveId)
-    
-    private def outputSingleControlDiffIfNeeded(control1Opt: Option[XFormsControl], control2: XFormsControl)(receiver: XMLReceiverHelper): Unit =
-        // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
-        if (control2.supportAjaxUpdates && (isValueChangeControl(control2) || ! control2.equalsExternal(control1Opt.orNull))) {
-            // Q: Do we need a distinction between new iteration AND control just becoming relevant?
-            control2.outputAjaxDiff(receiver, control1Opt.orNull, new AttributesImpl, isNewlyVisibleSubtree = control1Opt.isEmpty)
-        }
 
-    private def outputDescendantControlsDiffs(control1Opt: Option[XFormsControl], control2: XFormsControl, bufferingForFullUpdate: Boolean)(receiver: XMLReceiverHelper): Unit =
+                if (! specificProcessingTookPlace)
+                    outputDescendantControlsDiffs(control1Opt, control2, fullUpdateBuffer)
+            }
+        } else
+            assert(left.isEmpty, "illegal state when comparing controls")
+    }
+
+    // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
+    // Q: Do we need a distinction between new iteration AND control just becoming relevant?
+    private def outputSingleControlDiffIfNeeded(
+            control1Opt      : Option[XFormsControl],
+            control2         : XFormsControl)(
+            implicit receiver: XMLReceiver): Unit = {
+
+        if (control2.supportAjaxUpdates && (valueChangeControlIds(control2.effectiveId) || ! control2.equalsExternal(control1Opt.orNull)))
+            control2.outputAjaxDiff(new XMLReceiverHelper(receiver), control1Opt.orNull, new AttributesImpl, isNewlyVisibleSubtree = control1Opt.isEmpty)
+    }
+
+    private def outputDescendantControlsDiffs(
+            control1Opt      : Option[XFormsControl],
+            control2         : XFormsControl,
+            fullUpdateBuffer : Option[SAXStore])(
+            implicit receiver: XMLReceiver): Unit = {
+
         control2 match {
-            case containerControl2: XFormsContainerControl ⇒ 
+            case containerControl2: XFormsContainerControl ⇒
 
                 val children1 = control1Opt collect { case c: XFormsContainerControl ⇒ c.children } getOrElse Nil
                 val children2 = containerControl2.children
-                
+
                 control2 match {
                     case repeatControl: XFormsRepeatControl if children1.nonEmpty ⇒
                         val size1 = children1.size
                         val size2 = children2.size
                         if (size1 == size2) {
-                            diff(children1, children2, bufferingForFullUpdate)(receiver)
+                            diffChildren(children1, children2, fullUpdateBuffer)
                         } else if (size2 > size1) {
-                            outputCopyRepeatTemplate(repeatControl, size1 + 1, size2)(receiver)
-                            diff(children1, children2.view(0, size1), bufferingForFullUpdate)(receiver)
-                            diff(Nil, children2.view(size1, children2.size), bufferingForFullUpdate)(receiver)
+                            outputCopyRepeatTemplate(repeatControl, size1 + 1, size2)
+                            diffChildren(children1, children2.view(0, size1), fullUpdateBuffer)
+                            diffChildren(Nil, children2.view(size1, children2.size), fullUpdateBuffer)
                         } else if (size2 < size1) {
-                            outputDeleteRepeatTemplate(control2, size1 - size2)(receiver)
-                            diff(children1.view(0, size2), children2, bufferingForFullUpdate)(receiver)
+                            outputDeleteRepeatTemplate(control2, size1 - size2)
+                            diffChildren(children1.view(0, size2), children2, fullUpdateBuffer)
                         }
                     case repeatControl: XFormsRepeatControl if control1Opt.isEmpty ⇒
-                        // Handle new sub-xf:repeat
-        
-                        // Copy template instructions
+                        // New nested xf:repeat
                         val size2 = children2.size
                         if (size2 > 1) {
                             // don't copy the first template, which is already copied when the parent is copied
-                            outputCopyRepeatTemplate(repeatControl, 2, size2)(receiver)
+                            outputCopyRepeatTemplate(repeatControl, 2, size2)
                         } else if (size2 == 1) {
                             // NOP, the client already has the template copied
                         } else if (size2 == 0) {
                             // Delete first template
-                            outputDeleteRepeatTemplate(control2, 1)(receiver)
+                            outputDeleteRepeatTemplate(control2, 1)
                         }
+                        diffChildren(Nil, children2, fullUpdateBuffer)
 
-                        diff(Nil, children2, bufferingForFullUpdate)(receiver)
-                        
                     case repeatControl: XFormsRepeatControl if children1.isEmpty ⇒
                         val size2 = children2.size
                         if (size2 > 0) {
-                            outputCopyRepeatTemplate(repeatControl, 1, size2)(receiver)
-                            diff(Nil, children2, bufferingForFullUpdate)(receiver)
+                            outputCopyRepeatTemplate(repeatControl, 1, size2)
+                            diffChildren(Nil, children2, fullUpdateBuffer)
                         }
                     case _ ⇒
                         // Other grouping control
-                        diff(children1, children2, bufferingForFullUpdate)(receiver)
+                        diffChildren(children1, children2, fullUpdateBuffer)
                 }
             case _ ⇒
-                // NOP, not a grouping control 
+                // NOP, not a grouping control
         }
+    }
 
-    private def reachedFullUpdateThreshold(bufferingForFullUpdate: Boolean)(receiver: XMLReceiverHelper) =
-        bufferingForFullUpdate && receiver.getXmlReceiver.asInstanceOf[SAXStore].getAttributesCount >= FullUpdateThreshold
+    private def processFullUpdateForContent(
+            control : XFormsControl,
+            replay  : XMLReceiver ⇒ Unit)(
+            implicit receiver: XMLReceiver): Unit = {
 
-    private def processFullUpdateForContent(mark: SAXStore#Mark, control: XFormsControl)(receiver: XMLReceiverHelper): Unit = {
+        def setupController = {
 
-        val controller = new ElementHandlerController
-        XHTMLBodyHandler.registerHandlers(controller, containingDocument)
+            implicit val controller = new ElementHandlerController
 
-        // Register handlers on controller
-        locally {
-            val hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs
+            import XFormsToXHTML.register
 
-            // Register a handler for AVTs on HTML elements
-            // TODO: this should be obtained per document, but we only know about this in the extractor
-            if (hostLanguageAVTs) {
-                controller.registerHandler(classOf[XXFormsAttributeHandler].getName, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", XHTMLBodyHandler.ANY_MATCHER)
-                controller.registerHandler(classOf[XHTMLElementHandler].getName, XMLConstants.XHTML_NAMESPACE_URI)
+            XHTMLBodyHandler.registerHandlers(controller, containingDocument)
+
+            // AVTs on HTML elements
+            if (XFormsProperties.isHostLanguageAVTs) {
+                register(classOf[XXFormsAttributeHandler], XXFORMS_NAMESPACE_URI, "attribute", any = true)
+                register(classOf[XHTMLElementHandler], XMLConstants.XHTML_NAMESPACE_URI)
             }
 
             // Swallow XForms elements that are unknown
-            controller.registerHandler(classOf[NullHandler].getName, XFormsConstants.XFORMS_NAMESPACE_URI)
-            controller.registerHandler(classOf[NullHandler].getName, XFormsConstants.XXFORMS_NAMESPACE_URI)
-            controller.registerHandler(classOf[NullHandler].getName, XFormsConstants.XBL_NAMESPACE_URI)
+            register(classOf[NullHandler], XFORMS_NAMESPACE_URI)
+            register(classOf[NullHandler], XXFORMS_NAMESPACE_URI)
+            register(classOf[NullHandler], XBL_NAMESPACE_URI)
+
+            controller
         }
 
-        // Create the output SAX pipeline:
-        //
-        // - perform URL rewriting
-        // - serialize to String
-        //
-        // NOTE: we could possibly hook-up the standard epilogue here, which would:
-        //
-        // - perform URL rewriting
-        // - apply the theme
-        // - serialize
-        //
-        // But this would raise some issues:
-        //
-        // - epilogue must match on xhtml:* instead of xhtml:html
-        // - themes must be modified to support XHTML fragments
-        // - serialization must output here, not to the ExternalContext OutputStream
-        //
-        // So for now, perform simple steps here, and later this can be revisited.
-        //
-        val externalContext = NetUtils.getExternalContext
-        controller.setOutput(new DeferredXMLReceiverImpl(
-            new XHTMLRewrite().getRewriteXMLReceiver(
-                externalContext.getResponse,
-                new HTMLFragmentSerializer(new ContentHandlerWriter(receiver.getXmlReceiver), true),
-                true)))
+        def setupOutputPipeline(controller: ElementHandlerController) = {
+            // Create the output SAX pipeline:
+            //
+            // - perform URL rewriting
+            // - serialize to String
+            //
+            // NOTE: we could possibly hook-up the standard epilogue here, which would:
+            //
+            // - perform URL rewriting
+            // - apply the theme
+            // - serialize
+            //
+            // But this would raise some issues:
+            //
+            // - epilogue must match on xhtml:* instead of xhtml:html
+            // - themes must be modified to support XHTML fragments
+            // - serialization must output here, not to the ExternalContext OutputStream
+            //
+            // So for now, perform simple steps here, and later this can be revisited.
+            //
+            val externalContext = NetUtils.getExternalContext
 
-        // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
-        val handlerContext = new HandlerContext(controller, containingDocument, externalContext, control.getEffectiveId) {
-            override def findXHTMLPrefix = ""
+            controller.setOutput(
+                new DeferredXMLReceiverImpl(
+                    new XHTMLRewrite().getRewriteXMLReceiver(
+                        externalContext.getResponse,
+                        new HTMLFragmentSerializer(new ContentHandlerWriter(receiver), true),
+                        true
+                    )
+                )
+            )
+
+            // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
+            val handlerContext = new HandlerContext(controller, containingDocument, externalContext, control.effectiveId) {
+                override def findXHTMLPrefix = ""
+            }
+
+            handlerContext.restoreContext(control)
+            controller.setElementHandlerContext(handlerContext)
         }
 
-        // Replay into SAX pipeline
-        handlerContext.restoreContext(control)
-        controller.setElementHandlerContext(handlerContext)
-        val attributesImpl = new AttributesImpl
-        attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control.getEffectiveId))
-        receiver.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "inner-html", attributesImpl)
-        locally {
+        // Setup everything and replay
+        withElement("xxf", XXFORMS_NAMESPACE_URI, "inner-html", List("id" → namespaceId(containingDocument, control.effectiveId))) {
+            val controller = setupController
+            setupOutputPipeline(controller)
+
             controller.startDocument()
-            mark.replay(controller)
+            replay(controller)
             controller.endDocument()
         }
-        receiver.endElement()
     }
 
-    protected def outputDeleteRepeatTemplate(xformsControl2: XFormsControl, count: Int)(receiver: XMLReceiverHelper): Unit =
-        if (! isTestMode) {
-            val repeatControlId = xformsControl2.getEffectiveId
-            val indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_SEPARATOR)
-            val templateId = if (indexOfRepeatHierarchySeparator == -1) repeatControlId else repeatControlId.substring(0, indexOfRepeatHierarchySeparator)
-            val parentIndexes = if (indexOfRepeatHierarchySeparator == -1) "" else repeatControlId.substring(indexOfRepeatHierarchySeparator + 1)
+    private def repeatDetails(id: String) = {
+        val separator = id.indexOf(REPEAT_SEPARATOR)
+        if (separator == -1)
+            (id, "")
+        else
+            (id.substring(0, separator), id.substring(separator + 1))
+    }
 
-            receiver.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements", Array(
-                "id", XFormsUtils.namespaceId(containingDocument, templateId),
-                "parent-indexes", parentIndexes,
-                "count", "" + count))
+    private def outputDeleteRepeatTemplate(
+            control          : XFormsControl,
+            count            : Int)(
+            implicit receiver: XMLReceiver): Unit =
+        if (! isTestMode) {
+
+            val (templateId, parentIndexes) = repeatDetails(control.effectiveId)
+
+            element("xxf", XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+                List(
+                    "id"             → namespaceId(containingDocument, templateId),
+                    "parent-indexes" → parentIndexes,
+                    "count"          → count.toString
+                )
+            )
         }
 
-    protected def outputCopyRepeatTemplate(repeatControl: XFormsRepeatControl, startSuffix: Int, endSuffix: Int)(receiver: XMLReceiverHelper): Unit =
+    private def outputCopyRepeatTemplate(
+            control          : XFormsRepeatControl,
+            startSuffix      : Int,
+            endSuffix        : Int)(
+            implicit receiver: XMLReceiver): Unit =
         if (! isTestMode) {
-            val repeatControlId = repeatControl.getEffectiveId
-            val indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_SEPARATOR)
-            val parentIndexes = if (indexOfRepeatHierarchySeparator == -1) "" else repeatControlId.substring(indexOfRepeatHierarchySeparator + 1)
 
-            // Get prefixed id without suffix as templates are global
-            receiver.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template", Array(
-                "id", XFormsUtils.namespaceId(containingDocument, repeatControl.getPrefixedId),
-                "parent-indexes", parentIndexes,
-                "start-suffix", Integer.toString(startSuffix),
-                "end-suffix", Integer.toString(endSuffix)))
+            val (_, parentIndexes) = repeatDetails(control.effectiveId)
+
+            element("xxf", XXFORMS_NAMESPACE_URI, "copy-repeat-template",
+                List(
+                    "id"             → namespaceId(containingDocument, control.prefixedId), // templates are global
+                    "parent-indexes" → parentIndexes,
+                    "start-suffix"   → startSuffix.toString,
+                    "end-suffix"     → endSuffix.toString
+                )
+            )
         }
 }

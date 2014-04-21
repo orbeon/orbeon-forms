@@ -54,6 +54,9 @@ class XFormsToXHTML extends XFormsToSomething {
 
 object XFormsToXHTML {
 
+    def register[T](clazz: Class[T], ns: String, elementName: String = null, any: Boolean = false)(implicit controller: ElementHandlerController) =
+        controller.registerHandler(clazz.getName, ns, elementName, if (any) XHTMLBodyHandler.ANY_MATCHER else null)
+
     def outputResponseDocument(
             externalContext    : ExternalContext,
             indentedLogger     : IndentedLogger,
@@ -80,7 +83,7 @@ object XFormsToXHTML {
             XMLUtils.streamNullDocument(xmlReceiver)
         } else {
             // 3. Regular case: produce an XHTML document out
-            val controller = new ElementHandlerController
+            implicit val controller = new ElementHandlerController
             
             // Register handlers on controller (the other handlers are registered by the body handler)
             locally {
@@ -88,9 +91,6 @@ object XFormsToXHTML {
 
                 import XMLConstants.{XHTML_NAMESPACE_URI ⇒ XH}
                 import XFormsConstants.{XFORMS_NAMESPACE_URI⇒ XF, XXFORMS_NAMESPACE_URI ⇒ XXF, XBL_NAMESPACE_URI}
-
-                def register[T](clazz: Class[T], ns: String, elementName: String = null, any: Boolean = false) =
-                    controller.registerHandler(clazz.getName, ns, elementName, if (any) XHTMLBodyHandler.ANY_MATCHER else null)
                 
                 if (isHTMLDocument) {
                     register(classOf[XHTMLHeadHandler], XH, "head")

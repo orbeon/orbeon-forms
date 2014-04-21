@@ -44,7 +44,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                         |    last_modified_time
                         |    ${if (req.forAttachment) ", file_content"          else s", $xmlCol xml"}
                         |    ${if (req.forData)       ", username, groupname"   else ""}
-                        |    , form_version
+                        |    , form_version, deleted
                         |from $table t
                         |    where (last_modified_time, $idCols)
                         |          in
@@ -58,7 +58,6 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                         |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
                         |            group by $idCols
                         |          )
-                        |    and deleted = 'N'
                         |""".stripMargin)
 
                 val position = Iterator.from(1)
@@ -74,6 +73,12 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             }
 
             if (resultSet.next()) {
+
+                // We can't always return a 403 instead of a 410/404, so we decided it's OK to divulge to unauthorized
+                // users that the data exists or existed
+                val deleted = resultSet.getString("deleted") == "Y"
+                if (deleted)
+                    throw new HttpStatusCodeException(410)
 
                 // Check user can read and set Orbeon-Operations header
                 if (req.forData) {

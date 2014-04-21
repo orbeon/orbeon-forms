@@ -167,7 +167,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 catch { case NonFatal(t) ⇒
                     getRootThrowable(t) match {
                         case e: HttpRedirectException                            ⇒ ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
-                        case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                        // We don't have a "deleted" route at this point, and thus run the not found route when we found a "resource" to be deleted
+                        case e: HttpStatusCodeException if Set(404, 410)(e.code) ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
                         case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
                         case e: ResourceNotFoundException                        ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
                         case e                                                   ⇒ if (route.isPage) runErrorRoute(t)          else sendError(t)

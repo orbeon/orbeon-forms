@@ -40,7 +40,6 @@ trait Common extends RequestResponse with FormRunnerPersistence {
                     |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
                     |           group by app, form, form_version
                     |       )
-                    |   and deleted = 'N'
                     |""".stripMargin)
                           ps.setString(1, app)
                           ps.setString(2, form)

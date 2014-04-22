@@ -65,7 +65,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean) = existsInParts(_.hasHandlerForEvent(eventName, includeAllEvents))
     def keypressHandlers = collectInParts(_.keypressHandlers)
 
-    def getMark(prefixedId: String) = findInParts(_.getMark(prefixedId)).orNull
+    def getMark(prefixedId: String) = findInPartsOpt(_.getMark(prefixedId))
 
     def findControlAnalysis(prefixedId: String) = findInParts(_.getControlAnalysis(prefixedId))
     def getControlAnalysis(prefixedId: String)  = findControlAnalysis(prefixedId).orNull

@@ -28,7 +28,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 trait PartGlobalOps {
 
     // Global
-    def getMark(prefixedId: String): SAXStore#Mark
+    def getMark(prefixedId: String): Option[SAXStore#Mark]
 
     // Models
     def getModelsForScope(scope: Scope): Seq[Model]

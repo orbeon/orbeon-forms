@@ -65,7 +65,7 @@ trait Marks {
     private val marks = new HashMap[String, SAXStore#Mark]
 
     def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
-    def getMark(prefixedId: String) = marks.get(prefixedId).orNull
+    def getMark(prefixedId: String) = marks.get(prefixedId)
 
     private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsUtils.isTopLevelId(prefixedId) ⇒ mark }
     def hasTopLevelMarks = topLevelMarks.nonEmpty

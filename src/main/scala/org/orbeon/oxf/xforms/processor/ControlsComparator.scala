@@ -21,8 +21,8 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.{XXFormsDynamicControl, XFormsRepeatControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler
@@ -41,6 +41,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
     private val FullUpdateThreshold = XFormsProperties.getAjaxFullUpdateThreshold(containingDocument)
 
     private val breaks = new Breaks
+
     import breaks._
 
     def diffJava(
@@ -107,7 +108,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
                                 true
                             } else
                                 false
-                        case c@ControlWithMark(mark) ⇒
+                        case c @ ControlWithMark(mark) ⇒
                             tryBreakable {
                                 // Output to buffer
                                 val buffer = new SAXStore
@@ -275,13 +276,11 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
         }
     }
 
-    private def repeatDetails(id: String) = {
-        val separator = id.indexOf(REPEAT_SEPARATOR)
-        if (separator == -1)
-            (id, "")
-        else
-            (id.substring(0, separator), id.substring(separator + 1))
-    }
+    private def repeatDetails(id: String) =
+        id.indexOf(REPEAT_SEPARATOR) match {
+            case -1    ⇒ (id, "")
+            case index ⇒ (id.substring(0, index), id.substring(index + 1))
+        }
 
     private def outputDeleteRepeatTemplate(
             control          : XFormsControl,

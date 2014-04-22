@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerHelper, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml._
 import org.xml.sax._
 import XMLConstants._
@@ -26,7 +26,7 @@ import XMLConstants._
 /**
  * Handle xf:upload.
  */
-class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with HandlerHelper {
+class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with XMLReceiverSupport {
 
     protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) {
         val uploadControl = control.asInstanceOf[XFormsUploadControl]

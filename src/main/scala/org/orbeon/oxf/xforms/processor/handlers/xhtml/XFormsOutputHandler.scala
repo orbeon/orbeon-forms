@@ -14,17 +14,17 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{XMLReceiverSupport, XMLUtils, XMLReceiverHelper}
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerHelper, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI,FORMATTING_URL_TYPE_QNAME}
 import org.apache.commons.lang3.StringUtils
 import XMLReceiverHelper._
 import org.orbeon.oxf.xforms.XFormsConstants._
 
-trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerHelper {
+trait XFormsOutputHandler extends XFormsControlLifecyleHandler with XMLReceiverSupport {
     protected def getContainerAttributes(uri: String, localname: String, attributes: Attributes, effectiveId: String, outputControl: XFormsSingleNodeControl) = {
         // Add custom class
         val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, outputControl, true)

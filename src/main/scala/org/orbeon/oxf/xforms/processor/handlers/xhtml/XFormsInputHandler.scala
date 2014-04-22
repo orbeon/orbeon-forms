@@ -19,23 +19,21 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.itemset.Itemset
-import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.{XMLReceiverSupport, XMLReceiverHelper, XMLUtils}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import XFormsBaseHandlerXHTML._
 import XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
-import org.orbeon.oxf.xforms.processor.handlers.HandlerHelper
 
 /**
  * Handle xf:input.
  *
  * TODO: Subclasses per appearance.
  */
-class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with HandlerHelper { // repeating = false
+class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with XMLReceiverSupport { // repeating = false
 
     private var placeHolderInfo: XFormsInputControl.PlaceHolderInfo = _
 

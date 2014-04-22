@@ -98,7 +98,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             // Delete the latest version
             HttpAssert.del(FormURL, Unspecified, 204)
             HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpRequest.XML(fourth), Set.empty, Some(1)))
-            HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedCode(404))
+            HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedCode(410))
             HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(fourth), Set.empty, Some(1)))
 
             // After a delete the version number is reused
@@ -123,7 +123,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
             HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(first), AllOperations, Some(1)))
             HttpAssert.del(FirstDataURL, Unspecified, 204)
-            HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(404))
+            HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(410))
 
             // Don't allow unspecified version for create
             HttpAssert.put(FirstDataURL, Unspecified       , HttpRequest.XML(first), 400)

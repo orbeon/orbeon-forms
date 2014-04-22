@@ -66,7 +66,9 @@
             bottom: $(window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height)
         };
         return (space.right >= RequiredSpaceHorizontal || space.left >= RequiredSpaceHorizontal)
-             ?  space.right >= space.left ? 'right' : 'left'
+             ? // If space to the left and right are the same (e.g. title with wide page), display to the left, which
+               // will be closer to the text of the title
+               space.right > space.left ? 'right' : 'left'
              : (space.top   >= RequiredSpaceVertical || space.bottom >= RequiredSpaceVertical)
              ?  space.top   >= space.bottom ? 'top' : 'bottom'
              : 'over';

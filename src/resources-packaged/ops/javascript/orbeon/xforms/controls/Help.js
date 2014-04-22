@@ -32,7 +32,7 @@
         var labelText           = Controls.getLabelMessage(controlEl[0]);
         var helpText            = Controls.getHelpMessage (controlEl[0]);
         var firstChildFormEl    = controlEl.find(':input').first();
-        var el                  = firstChildFormEl.is('*') ? firstChildFormEl : controlEl; // [1]
+        var el                  = firstChildFormEl.is(':visible') ? firstChildFormEl : controlEl; // [1]
         var elPos               = Controls.getPosition(el);
         var placement           = Controls.getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');
@@ -123,8 +123,12 @@
         var popoverOffset = popover.offset();
         popoverOffset.top = (function() {
             switch (true) {
-                case _.contains(['right', 'left'], placement) && (popoverOffset.top - elPos.scrollTop < padding):
-                    return elPos.margins.top + elPos.scrollTop + padding;
+                case _.contains(['right', 'left'], placement):
+                    // Similar to the way Bootstrap would position the popover
+                    var bootstrapTop = elPos.offset.top + (elPos.height - popover.outerHeight()) / 2;
+                    // Top of the popover "against" the top of the viewport (modulo margin and padding)
+                    var topOfViewportTop = elPos.margins.top + elPos.scrollTop + padding;
+                    return Math.max(bootstrapTop, topOfViewportTop);
                 case placement == 'top':
                     return elPos.offset.top - popover.outerHeight() - arrowHeight;
                 case placement == 'over':

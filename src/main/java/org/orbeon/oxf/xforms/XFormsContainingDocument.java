@@ -249,34 +249,45 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     private void initializeRequestInformation() {
-        final ExternalContext externalContext = NetUtils.getExternalContext();
-        final ExternalContext.Request request = externalContext.getRequest();
 
-        // Remember if filter provided separate deployment information
-        final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
-        this.deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
+        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
+
+        if (request != null) {
+            // Remember if filter provided separate deployment information
+            final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
+            this.deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
                     : "integrated".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.integrated
                     : XFormsConstants.DeploymentType.standalone;
 
-        // Try to get request context path
-        this.requestContextPath = request.getClientContextPath("/");
+            // Try to get request context path
+            this.requestContextPath = request.getClientContextPath("/");
 
-        // Base URI for path resolution
-        {
-            // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
-            final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
-            // NOTE: We used to have response.rewriteRenderURL() on this, but why?
-            if (rendererBaseURI != null)
-                this.requestPath = rendererBaseURI;
-            else
-                this.requestPath = request.getRequestPath();
+            // Base URI for path resolution
+            {
+                // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
+                final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
+                // NOTE: We used to have response.rewriteRenderURL() on this, but why?
+                if (rendererBaseURI != null)
+                    this.requestPath = rendererBaseURI;
+                else
+                    this.requestPath = request.getRequestPath();
+            }
+
+            this.requestHeaders = immutableHeadersMap(request);
+            this.requestParameters = immutableParametersMap(request);
+
+            this.containerType = request.getContainerType();
+            this.containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace(), "");
+        } else {
+            // Special case when we run outside the context of a request
+            this.deploymentType = XFormsConstants.DeploymentType.standalone;
+            this.requestContextPath = "";
+            this.requestPath = "/";
+            this.requestHeaders = emptyImmutableMap();
+            this.requestParameters = emptyImmutableMap();
+            this.containerType = "servlet";
+            this.containerNamespace = "";
         }
-
-        this.requestHeaders = immutableHeadersMap(request);
-        this.requestParameters = immutableParametersMap(request);
-
-        this.containerType = request.getContainerType();
-        this.containerNamespace = StringUtils.defaultIfEmpty(externalContext.getRequest().getContainerNamespace(), "");
     }
 
     /**

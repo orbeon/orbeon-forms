@@ -17,7 +17,7 @@ import analysis._
 import collection.JavaConversions._
 import collection.JavaConverters._
 import org.orbeon.oxf.xml._
-import dom4j.{LocationDocumentResult, LocationData}
+import dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.XMLConstants._
 import java.util.{List ⇒ JList, Set ⇒ JSet, Map ⇒ JMap}
 import org.orbeon.oxf.xforms.XFormsConstants._

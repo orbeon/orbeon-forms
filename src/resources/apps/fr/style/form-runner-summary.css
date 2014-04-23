@@ -87,6 +87,10 @@
   margin-bottom: 0;
   float: left;
 }
+.orbeon .pagination .fr-paging-numbers > span {
+  min-width: 125px;
+  text-align: center;
+}
 .orbeon .fr-buttons {
   display: block;
   float: right;

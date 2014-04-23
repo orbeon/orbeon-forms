@@ -32,18 +32,14 @@ import org.xml.sax.helpers.AttributesImpl
 import scala.collection.JavaConverters._
 import scala.util.control.Breaks
 
-class ControlsComparator(containingDocument: XFormsContainingDocument, valueChangeControlIds: collection.Set[String], isTestMode: Boolean)
+class ControlsComparator(document: XFormsContainingDocument, valueChangeControlIds: collection.Set[String], isTestMode: Boolean)
     extends XMLReceiverSupport {
 
+    // For Java callers
     def this(containingDocument: XFormsContainingDocument, valueChangeControlIds: ju.Set[String], isTestMode: Boolean) =
         this(containingDocument, Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String], isTestMode)
 
-    private val FullUpdateThreshold = XFormsProperties.getAjaxFullUpdateThreshold(containingDocument)
-
-    private val breaks = new Breaks
-
-    import breaks._
-
+    // For Java callers
     def diffJava(
             receiver: XMLReceiver,
             left    : ju.List[XFormsControl],
@@ -52,8 +48,13 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
             if (left  ne null) left.asScala  else Nil,
             if (right ne null) right.asScala else Nil,
             None)(receiver)
+    
+    private val FullUpdateThreshold = XFormsProperties.getAjaxFullUpdateThreshold(document)
 
-    private def diffChildren(
+    private val breaks = new Breaks
+    import breaks._
+
+    def diffChildren(
             left             : Seq[XFormsControl],
             right            : Seq[XFormsControl],
             fullUpdateBuffer : Option[SAXStore])(
@@ -76,7 +77,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
 
                 // 2: Diffs for descendant controls if any
                 def getMark(control: XFormsControl) =
-                    containingDocument.getStaticOps.getMark(control.getPrefixedId)
+                    document.getStaticOps.getMark(control.getPrefixedId)
 
                 // Custom extractor to make match below nicer
                 object ControlWithMark {
@@ -88,7 +89,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
                     control2 match {
                         case c: XXFormsDynamicControl ⇒
                             if (c.hasStructuralChange) {
-                                assert(fullUpdateBuffer.isEmpty, "xxf:dynamic nested within full update is not supported")
+                                assert(fullUpdateBuffer.isEmpty, "xxf:dynamic within full update is not supported")
 
                                 def replay(r: XMLReceiver) =
                                     element("", XXFORMS_NAMESPACE_URI, "dynamic", List("id" → c.effectiveId))(r)
@@ -99,7 +100,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
                                 false
                         case c: XFormsComponentControl ⇒
                             if (c.hasStructuralChange) {
-                                assert(fullUpdateBuffer.isEmpty, "XBL full update nested within full update is not supported")
+                                assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")
 
                                 val mark =
                                     getMark(c).ensuring(_.isDefined, "missing mark").get
@@ -131,15 +132,20 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
             assert(left.isEmpty, "illegal state when comparing controls")
     }
 
-    // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
-    // Q: Do we need a distinction between new iteration AND control just becoming relevant?
     private def outputSingleControlDiffIfNeeded(
             control1Opt      : Option[XFormsControl],
             control2         : XFormsControl)(
             implicit receiver: XMLReceiver): Unit = {
-
-        if (control2.supportAjaxUpdates && (valueChangeControlIds(control2.effectiveId) || ! control2.equalsExternal(control1Opt.orNull)))
-            control2.outputAjaxDiff(new XMLReceiverHelper(receiver), control1Opt.orNull, new AttributesImpl, isNewlyVisibleSubtree = control1Opt.isEmpty)
+        // Force a change for controls whose values changed in the request
+        // Q: Do we need a distinction between new iteration AND control just becoming relevant?
+        if (control2.supportAjaxUpdates &&
+                (valueChangeControlIds(control2.effectiveId) || ! control2.equalsExternal(control1Opt.orNull)))
+            control2.outputAjaxDiff(
+                new XMLReceiverHelper(receiver),
+                control1Opt.orNull,
+                new AttributesImpl,
+                isNewlyVisibleSubtree = control1Opt.isEmpty
+            )
     }
 
     private def outputDescendantControlsDiffs(
@@ -208,7 +214,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
 
             import XFormsToXHTML.register
 
-            XHTMLBodyHandler.registerHandlers(controller, containingDocument)
+            XHTMLBodyHandler.registerHandlers(controller, document)
 
             // AVTs on HTML elements
             if (XFormsProperties.isHostLanguageAVTs) {
@@ -257,7 +263,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
             )
 
             // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
-            val handlerContext = new HandlerContext(controller, containingDocument, externalContext, control.effectiveId) {
+            val handlerContext = new HandlerContext(controller, document, externalContext, control.effectiveId) {
                 override def findXHTMLPrefix = ""
             }
 
@@ -266,7 +272,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
         }
 
         // Setup everything and replay
-        withElement("xxf", XXFORMS_NAMESPACE_URI, "inner-html", List("id" → namespaceId(containingDocument, control.effectiveId))) {
+        withElement("xxf", XXFORMS_NAMESPACE_URI, "inner-html", List("id" → namespaceId(document, control.effectiveId))) {
             val controller = setupController
             setupOutputPipeline(controller)
 
@@ -292,7 +298,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
 
             element("xxf", XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
                 List(
-                    "id"             → namespaceId(containingDocument, templateId),
+                    "id"             → namespaceId(document, templateId),
                     "parent-indexes" → parentIndexes,
                     "count"          → count.toString
                 )
@@ -300,7 +306,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
         }
 
     private def outputCopyRepeatTemplate(
-            control          : XFormsRepeatControl,
+            control          : XFormsControl,
             startSuffix      : Int,
             endSuffix        : Int)(
             implicit receiver: XMLReceiver): Unit =
@@ -310,7 +316,7 @@ class ControlsComparator(containingDocument: XFormsContainingDocument, valueChan
 
             element("xxf", XXFORMS_NAMESPACE_URI, "copy-repeat-template",
                 List(
-                    "id"             → namespaceId(containingDocument, control.prefixedId), // templates are global
+                    "id"             → namespaceId(document, control.prefixedId), // templates are global
                     "parent-indexes" → parentIndexes,
                     "start-suffix"   → startSuffix.toString,
                     "end-suffix"     → endSuffix.toString

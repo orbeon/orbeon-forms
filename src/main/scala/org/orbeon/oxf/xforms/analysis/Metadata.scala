@@ -19,7 +19,7 @@ import collection.immutable.TreeMap
 import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import java.util.{Map ⇒ JMap}
 import org.dom4j.io.DocumentSource
-import org.orbeon.oxf.resources.{ResourceNotFoundException, ResourceManagerWrapper}
+import org.orbeon.oxf.resources.{ResourceManager, ResourceNotFoundException, ResourceManagerWrapper}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -112,17 +112,22 @@ trait Bindings {
         this.lastModified = math.max(this.lastModified, lastModified)
     }
 
-    // Check if the binding includes are up to date.
-    def checkBindingsIncludes =
-        try {
-            // true if all last modification dates are at most equal to our last modification date
-            bindingIncludes.toStream map
-                (ResourceManagerWrapper.instance.lastModified(_, false)) forall
-                    (_ <= this.lastModified)
-        } catch {
-            // If a resource cannot be found, consider that something has changed
-            case e: ResourceNotFoundException ⇒ false
-        }
+    private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
+        val last = rm.lastModified(path, true)
+        last != -1 && last <= this.lastModified
+    }
+
+    // Whether the binding includes are up to date
+    def bindingsIncludesAreUpToDate = {
+        implicit val rm = ResourceManagerWrapper.instance
+        bindingIncludes.iterator forall pathExistsAndIsUpToDate
+    }
+
+    // For debugging only
+    def debugOutOfDateBindingsIncludesJava = {
+        implicit val rm = ResourceManagerWrapper.instance
+        bindingIncludes.iterator filterNot pathExistsAndIsUpToDate mkString ", "
+    }
 }
 
 // Handling of namespaces

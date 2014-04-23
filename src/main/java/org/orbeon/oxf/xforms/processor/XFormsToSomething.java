@@ -184,7 +184,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                 final XFormsStaticState staticState;
                 {
                     final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(stage2CacheableState.staticStateDigest);
-                    if (cachedState != null && cachedState.topLevelPart().metadata().checkBindingsIncludes()) {
+                    if (cachedState != null && cachedState.topLevelPart().metadata().bindingsIncludesAreUpToDate()) {
                         // Found static state in cache
                         indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
 
@@ -193,7 +193,9 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         // Not found static state in cache OR it is out of date, create static state from input
                         // NOTE: In out of date case, could clone static state and reprocess instead?
                         if (cachedState != null)
-                            indentedLogger.logDebug("", "found out-of-date static state by digest in cache");
+                            indentedLogger.logDebug("",
+                                "found out-of-date static state by digest in cache for: "
+                                    + cachedState.topLevelPart().metadata().debugOutOfDateBindingsIncludesJava());
                         else
                             indentedLogger.logDebug("", "did not find static state by digest in cache");
 
@@ -239,7 +241,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
 
         {
             final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateBits.staticStateDigest);
-            if (cachedState != null && cachedState.topLevelPart().metadata().checkBindingsIncludes()) {
+            if (cachedState != null && cachedState.topLevelPart().metadata().bindingsIncludesAreUpToDate()) {
                 // Found static state in cache
                 indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
 
@@ -248,7 +250,9 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                 // Not found static state in cache OR it is out of date, create and initialize static state object
                 // NOTE: In out of date case, could clone static state and reprocess instead?
                 if (cachedState != null)
-                    indentedLogger.logDebug("", "found out-of-date static state by digest in cache");
+                    indentedLogger.logDebug("",
+                                "found out-of-date static state by digest in cache for: "
+                                    + cachedState.topLevelPart().metadata().debugOutOfDateBindingsIncludesJava());
                 else
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
 

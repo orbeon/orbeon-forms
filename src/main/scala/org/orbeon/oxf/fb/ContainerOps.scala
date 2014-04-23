@@ -323,7 +323,7 @@ trait ContainerOps extends ControlOps {
 
         def holderForBind(bind: NodeInfo): NodeInfo = {
 
-            val controlName = findBindName(bind)
+            val controlName = getBindNameOrEmpty(bind)
 
             val fromBinding =
                 findCurrentBindingByName(inDoc, controlName, bindings) map

@@ -99,5 +99,5 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
             bind          ← findBindByName(inDoc, controlName)
             iterationBind ← bind / "*:bind" headOption // there should be only a single nested bind
         } yield
-            findBindName(iterationBind)
+            getBindNameOrEmpty(iterationBind)
 }

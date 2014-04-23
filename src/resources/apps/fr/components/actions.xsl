@@ -109,8 +109,8 @@
             <!-- First language -->
             <!-- PERF: Optimize this in a single insert. -->
             <xf:action iterate="$response-items">
-                <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/@value}"/>
-                <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/@value}"/>
+                <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]}"/>
+                <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]}"/>
                 <xf:insert
                     context="$resource-holders[1]"
                     ref="*"

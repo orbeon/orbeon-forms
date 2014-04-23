@@ -41,13 +41,15 @@
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">
                 <!-- Mark all controls as visited -->
-                <xxf:setvisited iterate="xxf:split(instance('fr-state-instance')/observers)" control="{.}" visited="true" recurse="true"/>
+                <xf:var name="observers" xxbl:scope="outer"><xxf:sequence value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
+                <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="true" recurse="true" xxbl:scope="outer"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
-                <xxf:setvisited iterate="xxf:split(instance('fr-state-instance')/observers)" control="{.}" visited="false" recurse="true"/>
+                <xf:var name="observers" xxbl:scope="outer"><xxf:sequence value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
+                <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="false" recurse="true" xxbl:scope="outer"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
@@ -184,17 +186,11 @@ Inserting error information into error list:
                             xbl:attr="xbl:text=incremental"/>
 
                         <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
-                        <xf:var name="observer" xbl:attr="xbl:text=observer"/>
-
-                        <xf:var name="observers" xxbl:scope="inner">
-                            <xxf:sequence value="for $o in xxf:split($observer) return xxf:absolute-id($o)" xxbl:scope="outer"/>
-
-                            <xf:setvalue
-                                ev:event="xforms-enabled"
-                                ref="instance('fr-state-instance')/observers"
-                                value="string-join($observers, ' ')"/>
-
-                        </xf:var>
+                        <xf:setvalue
+                            ev:event="xforms-enabled"
+                            xxbl:scope="inner"
+                            ref="instance('fr-state-instance')/observers"
+                            xbl:attr="xbl:text=observer"/>
 
                         <!-- Make sure the model is recalculated when there is a chance visited controls might have
                              changed. We do this because there is no dependency handling wit h the xxf:visited()

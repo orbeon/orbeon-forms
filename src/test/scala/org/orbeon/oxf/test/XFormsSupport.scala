@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsSingleNodeControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsValueControl, XFormsSingleNodeControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget, XFormsCustomEvent, Dispatch}
 import org.orbeon.oxf.xforms.processor.XFormsServer
@@ -102,10 +102,11 @@ trait XFormsSupport extends MockitoSugar {
         getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, null)
 
     def resolveControl(staticOrAbsoluteId: String)       = resolveObject(staticOrAbsoluteId) collect { case c: XFormsControl ⇒ c }
+    def resolveComponent(staticOrAbsoluteId: String)     = resolveObject(staticOrAbsoluteId) collect { case c: XFormsComponentControl ⇒ c }
     def resolveValueControl(staticOrAbsoluteId: String)  = resolveObject(staticOrAbsoluteId) collect { case c: XFormsValueControl ⇒ c }
     def resolveModel(staticOrAbsoluteId: String)         = resolveObject(staticOrAbsoluteId) collect { case m: XFormsModel   ⇒ m }
     def resolveObject(staticOrAbsoluteId: String)        = document.resolveObjectByIdInScope("#document", staticOrAbsoluteId)
-    
+
     def getControl(controlEffectiveId: String)           = getObject(controlEffectiveId).asInstanceOf[XFormsControl]
     def getSingleNodeControl(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsSingleNodeControl]
     def getValueControl(controlEffectiveId: String)      = getObject(controlEffectiveId).asInstanceOf[XFormsValueControl]

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
 import java.{util ⇒ ju}
 import org.orbeon.oxf.util.ScalaUtils._
+import org.apache.commons.lang3.StringUtils
 
 trait ResourcesOps extends BaseOps {
 
@@ -216,7 +217,7 @@ trait ResourcesOps extends BaseOps {
         allLangs(resourcesRoot) map (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
     def findResourceHolderForLang(controlName: String, lang: String, resources: NodeInfo) =
-        findResourceHoldersWithLang(controlName, resources) collectFirst { case (`lang`, holder) ⇒ holder }
+        findResourceHoldersWithLang(controlName ensuring (StringUtils.isNotBlank(_)), resources) collectFirst { case (`lang`, holder) ⇒ holder }
 
     // Find control resource holders
     def findResourceHolders(controlName: String): Seq[NodeInfo] =
@@ -232,7 +233,12 @@ trait ResourcesOps extends BaseOps {
 
     // For the given bind and lang, find all associated resource holders
     def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resources: NodeInfo) =
-        FormBuilder.iterateSelfAndDescendantBinds(rootBind) map findBindName flatMap (findResourceHolderForLang(_, lang, resources))
+        for {
+            bindNode ← FormBuilder.iterateSelfAndDescendantBinds(rootBind)
+            bindName ← findBindName(bindNode)
+            holder   ← findResourceHolderForLang(bindName, lang, resources)
+        } yield
+            holder
 
     // Same for XPath callers
     def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resources: NodeInfo): SequenceIterator =

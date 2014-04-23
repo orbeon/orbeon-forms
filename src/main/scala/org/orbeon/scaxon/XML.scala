@@ -289,6 +289,7 @@ object XML {
         def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         // Return an element's attributes
+        // Q: Should functions taking a String match on no namespace only?
         def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
         def \@(attName: String): Seq[NodeInfo] = /@(attName)
         def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
@@ -316,6 +317,18 @@ object XML {
         def attValue(attName: QName)  = /@(attName).stringValue
         def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
+
+        def attValueOpt(attName: String) = /@(attName) match {
+            case Seq() ⇒ None
+            case s     ⇒ Some(s.stringValue)
+        }
+
+        def attValueOpt(attName: QName) = /@(attName) match {
+            case Seq() ⇒ None
+            case s     ⇒ Some(s.stringValue)
+        }
+
+        def idOpt = attValueOpt("id")
 
         def self(test: Test) = find(Axis.SELF, test)
         def parent(test: Test) = find(Axis.PARENT, test)

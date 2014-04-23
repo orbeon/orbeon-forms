@@ -93,8 +93,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
 
     // Canonical way: use the `name` attribute
-    def findBindName(bind: NodeInfo) =
+    def getBindNameOrEmpty(bind: NodeInfo) =
         bind attValue "name"
+
+    def findBindName(bind: NodeInfo) =
+        bind attValueOpt "name"
 
     def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
         nodes exists (element ⇒ (element attValue "mediatype") == "text/html")

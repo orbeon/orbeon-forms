@@ -220,12 +220,6 @@ object OrbeonClientBase {
             new URL("http://" + username + ":" + password + "@localhost:4445/wd/hub")
         }
         _driver = new RemoteWebDriver(server, capabilities)
-
-        // Set default timeout when searching for an element
-        // (Note that this doesn't solve all our problems: the element could be in the DOM, but not visible yet,
-        // or its value not set properly, or with HTML replacement we might be getting an element that will be replaced
-        // at the next Ajax response.)
-        driver.manage.timeouts.implicitlyWait(DefaultTimeout.totalNanos, TimeUnit.NANOSECONDS)
     }
 
     @AfterClass

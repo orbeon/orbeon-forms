@@ -49,7 +49,7 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
             if (right ne null) right.asScala else Nil,
             None)(receiver)
     
-    private val FullUpdateThreshold = XFormsProperties.getAjaxFullUpdateThreshold(document)
+    private val FullUpdateThreshold = document.getAjaxFullUpdateThreshold
 
     private val breaks = new Breaks
     import breaks._

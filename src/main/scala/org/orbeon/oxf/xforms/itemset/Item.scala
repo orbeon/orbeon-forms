@@ -28,7 +28,7 @@ case class Item(
     help: Option[LHHAValue],
     hint: Option[LHHAValue],
     value: String,
-    attributes: Map[QName, String])(val position: Int, encode: Boolean) extends ItemContainer {
+    attributes: Map[QName, String])(val position: Int) extends ItemContainer {
 
     require(help.isEmpty || help.get.label.nonEmpty)
     require(hint.isEmpty || hint.get.label.nonEmpty)
@@ -47,8 +47,8 @@ case class Item(
 
     def jAttributes = attributes.asJava
 
-    def externalValue   = Option(value) map (v ⇒ if (encode) position.toString else v) getOrElse ""
-    def javaScriptValue = escapeJavaScript(externalValue)
+    def externalValue(encode: Boolean)   = Option(value) map (v ⇒ if (encode) position.toString else v) getOrElse ""
+    def javaScriptValue(encode: Boolean) = escapeJavaScript(externalValue(encode))
 
     def javaScriptLabel(locationData: LocationData) =
         Option(label) map (_.javaScriptValue(locationData)) getOrElse ""
@@ -64,19 +64,17 @@ case class Item(
     // reach compiler-generated case class equals. Is there a better way?
     override def equals(other: Any) = other match {
         case other: Item ⇒
-            label         == other.label         &&
-            help          == other.help          &&
-            hint          == other.hint          &&
-            externalValue == other.externalValue &&
-            attributes    == other.attributes    &&
+            label                         == other.label         &&
+            help                          == other.help          &&
+            hint                          == other.hint          &&
+            externalValue(encode = false) == other.externalValue(encode = false) &&
+            attributes                    == other.attributes    &&
             super.equals(other)
         case _ ⇒ false
     }
 }
 
 object Item {
-
-    // Value is encoded if requested, except with single selection if the value is empty [WHY?]
-    def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: LHHAValue, help: Option[LHHAValue], hint: Option[LHHAValue], value: String): Item =
-        Item(label, help, hint, value, if (attributes eq null) Map.empty else attributes.asScala.toMap)(position, encode)
+    def apply(position: Int, isMultiple: Boolean, attributes: JMap[QName, String], label: LHHAValue, help: Option[LHHAValue], hint: Option[LHHAValue], value: String): Item =
+        Item(label, help, hint, value, if (attributes eq null) Map.empty else attributes.asScala.toMap)(position)
 }

@@ -41,9 +41,9 @@ public class ControlTree implements ExternalCopyable {
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
-    public ControlTree(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger) {
+    public ControlTree(IndentedLogger indentedLogger) {
         this.indentedLogger = indentedLogger;
-        this.controlIndex = new ControlIndex(containingDocument.getStaticState().isNoscript());
+        this.controlIndex = new ControlIndex();
     }
 
     /**
@@ -291,11 +291,6 @@ public class ControlTree implements ExternalCopyable {
         return controlIndex.getDialogControls();
     }
 
-    /**
-     * Return the list of xf:select[@appearance = 'full'] in noscript mode.
-     *
-     * @return LinkedHashMap<String effectiveId, XFormsSelectControl control>
-     */
     public Map<String, XFormsControl> getSelectFullControls() {
         // Delegate
         return controlIndex.getSelectFullControls();

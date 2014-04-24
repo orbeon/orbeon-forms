@@ -76,7 +76,7 @@ object ClientEvents extends Logging {
 
             // Process events for noscript mode if needed
             val clientEventsAfterNoscript =
-                if (doc.getStaticState.isNoscript)
+                if (doc.noscript)
                     reorderNoscriptEvents(clientEvents, doc)
                 else
                     clientEvents
@@ -250,8 +250,8 @@ object ClientEvents extends Logging {
 
             // Whether an external event name is explicitly allowed by the configuration.
             def isExplicitlyAllowedExternalEvent = {
-                val externalEventsMap = doc.getStaticState.getAllowedExternalEvents
-                ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsMap.contains(event.name)
+                val externalEventsMap = doc.getStaticState.allowedExternalEvents
+                ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsMap(event.name)
             }
 
             // This is also a security measure that also ensures that somebody is not able to change values in an instance

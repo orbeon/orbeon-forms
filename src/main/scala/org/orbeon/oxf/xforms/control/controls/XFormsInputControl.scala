@@ -19,7 +19,6 @@ import java.util.{GregorianCalendar, Calendar}
 import org.dom4j.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
@@ -94,10 +93,10 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
         // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
         // the encrypted value of "true". So we do not encrypt values.
 
-        val isNoscript = containingDocument.getStaticState.isNoscript
+        val isNoscript = containingDocument.noscript
 
         // Whether the day precedes the month in dates
-        def dayMonth = XFormsProperties.getDateFormatInput(containingDocument).startsWith("[D")
+        def dayMonth = containingDocument.getDateFormatInput.startsWith("[D")
 
         getBuiltinTypeName match {
             case "boolean"                ⇒ normalizeBooleanString(externalValue)
@@ -172,7 +171,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 "(xs:" +
                 valueType +
                 "($v), '" +
-                XFormsProperties.getTypeInputFormat(containingDocument, valueType) +
+                containingDocument.getTypeInputFormat(valueType) +
                 "', 'en', (), ()) else $v"
 
             evaluateAsString(xpathExpression, Option(boundItem), XFormsValueControl.FormatNamespaceMapping, variables.asJava)

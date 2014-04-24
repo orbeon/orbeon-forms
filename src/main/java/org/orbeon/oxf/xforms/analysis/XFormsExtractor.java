@@ -15,17 +15,11 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -34,7 +28,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Stack;
 
 /**
  * This ContentHandler extracts XForms information from an XHTML document and creates a static state document.
@@ -82,14 +77,12 @@ import java.util.*;
  *   <template>base64</template>
  * </static-state>
  */
-public class XFormsExtractor extends ForwardingXMLReceiver {
+public class XFormsExtractor extends XFormsExtractorBase {
 
     public static final QName LAST_ID_QNAME = new QName("last-id");
 
     private Locator locator;
     private LocationData locationData;
-
-    private Map<String, Object> properties = new HashMap<String, Object>();
 
     private int level;
 
@@ -187,49 +180,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
             outputFirstElementIfNeeded();
             super.endElement("", "root", "root");
 
-            // Output non-default properties
-            {
-                final PropertySet propertySet = Properties.instance().getPropertySet();
-                for (Iterator i = XFormsProperties.getPropertyDefinitionEntryIterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String propertyName = (String) currentEntry.getKey();
-                    final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
-
-                    final Object defaultPropertyValue = propertyDefinition.defaultValue; // value can be String, Boolean, Integer
-                    final Object actualPropertyValue = properties.get(propertyName); // value can be String, Boolean, Integer
-                    if (actualPropertyValue == null) {
-                        // Property not defined in the document, try to obtain from global properties
-                        final Object globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue);
-
-                        // If the global property is different from the default, add it
-                        if (!globalPropertyValue.equals(defaultPropertyValue)) {
-                            propertyDefinition.validate(globalPropertyValue, locationData);
-                            properties.put(propertyName, globalPropertyValue);
-                        }
-
-                    } else {
-                        // Property defined in the document
-
-                        // If the property is identical to the default, remove it
-                        if (actualPropertyValue.equals(defaultPropertyValue))
-                            properties.remove(propertyName);
-                        else
-                            propertyDefinition.validate(actualPropertyValue, locationData);
-                    }
-                }
-
-                // Create attributes
-                final AttributesImpl newAttributes = new AttributesImpl();
-                for (final Map.Entry<String, Object> currentEntry : properties.entrySet()) {
-                    final String propertyName = currentEntry.getKey();
-                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxf:" + propertyName, XMLReceiverHelper.CDATA, currentEntry.getValue().toString());
-                }
-
-                super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                super.startElement("", "properties", "properties", newAttributes);
-                super.endElement("", "properties", "properties");
-                super.endPrefixMapping("xxforms");
-            }
+            outputNonDefaultProperties();
 
             if (isTopLevel) {
                 // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
@@ -247,9 +198,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
                 // - we are in noscript mode and told to store the template statically
                 // - OR if there are top-level marks
                 final boolean isStoreNoscriptTemplate =
-                    templateUnderConstruction != null &&
-                    XFormsStaticStateImpl.isNoscriptJava(properties) &&
-                    XFormsProperties.NOSCRIPT_TEMPLATE_STATIC_VALUE.equals(XFormsStaticStateImpl.<String>getPropertyJava(properties, XFormsProperties.NOSCRIPT_TEMPLATE));
+                    templateUnderConstruction != null && isStoreNoscriptTemplate();
 
                 if (isStoreNoscriptTemplate || metadata.hasTopLevelMarks()) {
                     final String templateName = "template";
@@ -340,7 +289,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
 
         // Handle properties of the form @xxf:* when outside of models or controls
         if (! inXFormsOrExtension && ! isXFormsOrExtension) {
-            handleProperties(attributes);
+            addPropertiesIfAny(attributes);
         }
         
         if (level == 0 && isTopLevel) {
@@ -357,7 +306,7 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
 
                 // Handle properties on top-level model elements
                 if (isXForms && localname.equals("model")) {
-                    handleProperties(attributes);
+                    addPropertiesIfAny(attributes);
                 }
 
                 outputFirstElementIfNeeded();
@@ -589,32 +538,5 @@ public class XFormsExtractor extends ForwardingXMLReceiver {
         if (inPreserve) {
             super.processingInstruction(target, data);
         }
-    }
-
-    private void handleProperties(Attributes attributes) {
-        final int attributesCount = attributes.getLength();
-        for (int i = 0; i < attributesCount; i++) {
-            final String attributeURI = attributes.getURI(i);
-            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attributeURI)) {
-                // Found xxf:* attribute
-                addProperty(attributes.getLocalName(i), attributes.getValue(i));
-            }
-        }
-    }
-
-    private void addProperty(String name, String stringValue) {
-
-        final Object propertyValue = XFormsProperties.parseProperty(name, stringValue);
-        if (propertyValue == null) {
-            // Invalid property or other problem
-            return;
-        }
-
-        if (properties.get(name) != null) {
-            // Property by this name already specified, ignore it as we take the first occurrence into account
-            return;
-        }
-
-        properties.put(name, propertyValue);
     }
 }

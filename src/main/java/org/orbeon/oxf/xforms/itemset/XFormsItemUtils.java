@@ -104,7 +104,6 @@ public class XFormsItemUtils {
         contextStack.setBinding(select1Control.bindingContext());
 
         // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
-        final boolean isEncodeItemValues = select1Control.isEncodeValues();
         Dom4jUtils.visitSubtree(select1Control.element(), new Dom4jUtils.VisitorListener() {
 
             private int position = 0;
@@ -128,7 +127,7 @@ public class XFormsItemUtils {
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     final Map<QName, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncodeItemValues, attributes, label, Option.apply(help), Option.apply(hint), StringUtils.defaultString(value)));
+                    currentContainer.addChildItem(Item.apply(position++, isMultiple, attributes, label, Option.apply(help), Option.apply(hint), StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
                     // xf:itemset
@@ -205,7 +204,7 @@ public class XFormsItemUtils {
                                         // a leaf item, so we prune such non-relevant items later.
 
                                         final Map<QName, String> attributes = getAttributes(element);
-                                        currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncodeItemValues, attributes, label, Option.apply(help), Option.apply(hint), value));
+                                        currentContainer.addChildItem(Item.apply(position++, isMultiple, attributes, label, Option.apply(help), Option.apply(hint), value));
                                     } else {
                                         // TODO: handle xf:copy
                                         throw new ValidationException("xf:copy is not yet supported.", select1Control.getLocationData());
@@ -232,7 +231,7 @@ public class XFormsItemUtils {
                         // NOTE: returned label can be null in some cases
 
                         final Map<QName, String> attributes = getAttributes(element);
-                        final Item newContainer = Item.apply(position++, isMultiple, isEncodeItemValues, attributes, label, Option.<LHHAValue>apply(null), Option.<LHHAValue>apply(null), null);
+                        final Item newContainer = Item.apply(position++, isMultiple, attributes, label, Option.<LHHAValue>apply(null), Option.<LHHAValue>apply(null), null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }

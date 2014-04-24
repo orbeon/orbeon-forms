@@ -130,7 +130,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                     value
 
             def doProxyURI(uri: String, lastModified: Long) =
-                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument)))
+                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Option(containingDocument.getForwardSubmissionHeaders))
 
             val typeName = getBuiltinTypeName
 

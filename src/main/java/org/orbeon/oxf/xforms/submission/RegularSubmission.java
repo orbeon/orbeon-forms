@@ -17,10 +17,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -51,7 +49,7 @@ public class RegularSubmission extends BaseSubmission {
 
         // Headers
         final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
-        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+        final String headersToForward = containingDocument.getForwardSubmissionHeaders();
 
         final scala.collection.immutable.Map<String, String[]> headers =
             Connection.buildConnectionHeadersWithSOAP(p.actualHttpMethod, p2.credentials, sp.actualRequestMediatype,

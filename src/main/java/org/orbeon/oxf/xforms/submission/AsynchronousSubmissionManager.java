@@ -21,7 +21,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 import java.util.Map;
@@ -58,7 +57,7 @@ public class AsynchronousSubmissionManager {
         if (hasPendingAsynchronousSubmissions()) {
             // NOTE: Could get isShowProgress() from submission, but default must be false
             containingDocument.addDelayedEvent(XFormsEvents.XXFORMS_POLL, containingDocument.getEffectiveId(),
-                        false, false, XFormsProperties.getSubmissionPollDelay(containingDocument), true, false, null);
+                        false, false, containingDocument.getSubmissionPollDelay(), true, false, null);
         }
     }
 

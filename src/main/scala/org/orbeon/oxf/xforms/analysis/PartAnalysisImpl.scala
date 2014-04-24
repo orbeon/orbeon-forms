@@ -29,7 +29,7 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
+import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
 import org.orbeon.oxf.xml.XMLUtils.DebugXML
 
 /**
@@ -80,8 +80,7 @@ class PartAnalysisImpl(
 
     def isTopLevel = startScope.isTopLevelScope
 
-    def getProperty[T](propertyName: String) = staticStateDocument.getProperty[T](propertyName)
-    val isExposeXPathTypes = getProperty[Boolean](P.EXPOSE_XPATH_TYPES_PROPERTY)
+    def isExposeXPathTypes = staticState.staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
 
     /**
      * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not

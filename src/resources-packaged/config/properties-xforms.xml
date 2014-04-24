@@ -111,7 +111,7 @@
     <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"           value=""/> <!-- space separated list of element namespaces that can contain avts in their attributes1 -->
     <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"           value=""/> <!-- space separated list of attribute names that contain references to id's -->
     <property as="xs:boolean" name="oxf.xforms.noscript"                                    value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.noscript-support"                            value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.noscript-support"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.async-portlet-load"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>

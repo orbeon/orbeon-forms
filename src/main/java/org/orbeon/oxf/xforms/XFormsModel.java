@@ -629,7 +629,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
             final scala.collection.immutable.Map<String, String[]> headers =
                 Connection.jBuildConnectionHeaders(absoluteResolvedURL.getProtocol(), instance.credentialsOrNull(), null,
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument()), indentedLogger());
+                        containingDocument().getForwardSubmissionHeaders(), indentedLogger());
 
             final ConnectionResult connectionResult = Connection.jApply(
                 "GET", absoluteResolvedURL, instance.credentialsOrNull(), null,
@@ -666,11 +666,11 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             if (!instance.readonly()) {
                 instanceDocument = containingDocument().getURIResolver().readAsDom4j(
                         absoluteURLString, instance.credentialsOrNull(),
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument()));
+                        containingDocument().getForwardSubmissionHeaders());
             } else {
                 instanceDocument = containingDocument().getURIResolver().readAsTinyTree(XPath.GlobalConfiguration(),
                         absoluteURLString, instance.credentialsOrNull(),
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument()));
+                        containingDocument().getForwardSubmissionHeaders());
             }
         }
 

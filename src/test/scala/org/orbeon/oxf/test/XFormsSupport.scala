@@ -98,8 +98,10 @@ trait XFormsSupport extends MockitoSugar {
     def isValid(controlId: String)    = getSingleNodeControl(controlId).isValid
     def getType(controlId: String)    = getSingleNodeControl(controlId).valueType
 
-    def getItemset(controlId: String) =
-        getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, null)
+    def getItemset(controlId: String) = {
+        val select1 = getObject(controlId).asInstanceOf[XFormsSelect1Control]
+        select1.getItemset.getJSONTreeInfo(null, select1.mustEncodeValues, null)
+    }
 
     def resolveControl(staticOrAbsoluteId: String)       = resolveObject(staticOrAbsoluteId) collect { case c: XFormsControl ⇒ c }
     def resolveComponent(staticOrAbsoluteId: String)     = resolveObject(staticOrAbsoluteId) collect { case c: XFormsComponentControl ⇒ c }

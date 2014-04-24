@@ -31,7 +31,7 @@ public interface XFormsStateLifecycle {
 
     String getClientEncodedStaticState(XFormsContainingDocument containingDocument);
     String getClientEncodedDynamicState(XFormsContainingDocument containingDocument);
-    void afterInitialResponse(XFormsContainingDocument containingDocument);
+    void afterInitialResponse(XFormsContainingDocument containingDocument, AnnotatedTemplate template);
 
     RequestParameters extractParameters(Document request, boolean isInitialState);
 

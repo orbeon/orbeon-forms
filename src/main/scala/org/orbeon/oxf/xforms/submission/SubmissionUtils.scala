@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel, XFormsProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import scala.util.control.NonFatal
@@ -60,7 +60,7 @@ object SubmissionUtils {
             logBody = BaseSubmission.isLogBody)(model.indentedLogger).connect(saveState = true)
 
     private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
-        Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument))
+        Option(containingDocument.getForwardSubmissionHeaders)
 
     def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): Map[String, Array[String]] = {
         try {

@@ -14,23 +14,16 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.controller.PageFlowControllerProcessor;
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.analytics.RequestStats;
-import org.orbeon.oxf.xforms.analytics.RequestStatsImpl;
 import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -38,7 +31,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.script.ScriptInterpreter;
 import org.orbeon.oxf.xforms.state.*;
@@ -46,7 +38,6 @@ import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -66,36 +57,12 @@ import java.util.concurrent.locks.Lock;
  * o Contains XForms controls
  * o Handles event handlers hierarchy
  */
-public class XFormsContainingDocument extends XBLContainer implements XFormsDocumentLifecycle, Cacheable, XFormsObject {
-
-    // Special id name for the top-level containing document
-    public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "#document";
-
-    // Per-document current logging indentation
-    private final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();
-
-    private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
-
-    private void registerLogger(Logger globalLogger, Set<String> debugConfig, String category) {
-        loggersMap.put(category, new IndentedLogger(globalLogger, globalLogger.isDebugEnabled() && debugConfig.contains(category), indentation, category));
-    }
-
-    /**
-     * Return a logger given a category.
-     */
-    public IndentedLogger getIndentedLogger(String loggingCategory) {
-        if (! loggersMap.containsKey(loggingCategory))
-            registerLogger(XFormsServer.logger, XFormsProperties.getDebugLogging(), loggingCategory);
-
-        return loggersMap.get(loggingCategory);
-    }
+public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
     private String uuid;        // UUID of this document
     private long sequence = 1;  // sequence number of changes to this document
 
     private SAXStore lastAjaxResponse; // last Ajax response for retry feature
-
-    private final IndentedLogger indentedLogger = getIndentedLogger("document");
 
     // Global XForms function library
     private static FunctionLibrary functionLibrary = XFormsFunctionLibrary.instance();
@@ -123,15 +90,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private final StaticStateGlobalOps staticOps;
     private XFormsControls xformsControls;
 
-    // Request information
-    private XFormsConstants.DeploymentType deploymentType;
-    private String requestContextPath;
-    private String requestPath;
-    private scala.collection.immutable.Map<String, String[]> requestHeaders;
-    private scala.collection.immutable.Map<String, String[]> requestParameters;
-    private String containerType;
-    private String containerNamespace;
-    private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
 
     // Other state
     private Set<String> pendingUploads;
@@ -148,10 +106,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private List<DelayedEvent> delayedEvents;
     private List<XFormsError.ServerError> serverErrors;
     private Set<String> controlsStructuralChanges;
-    private RequestStats requestStats = RequestStatsImpl.apply();
-
-    // Page template for noscript mode if stored in dynamic state (otherwise stored in static state)
-    private AnnotatedTemplate template;
 
     private final XPathDependencies xpathDependencies;
 
@@ -167,13 +121,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      *
      * Used by XFormsToXHTML.
      *
-     * @param staticState         static state object
-     * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
-     * @param response                  optional response for handling replace="all" during initialization
+     * @param staticState static state object
+     * @param uriResolver URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
+     * @param response    optional response for handling replace="all" during initialization
      */
-    public XFormsContainingDocument(XFormsStaticState staticState, AnnotatedTemplate template,
-                                    XFormsURIResolver uriResolver, ExternalContext.Response response) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
+    public XFormsContainingDocument(XFormsStaticState staticState, XFormsURIResolver uriResolver, ExternalContext.Response response) {
+        super();
 
         // Create UUID for this document instance
         this.uuid = SecureUtils.randomHexId();
@@ -181,31 +134,22 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Initialize request information
         {
             initializeRequestInformation();
-            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PathMatchers());
-            if (this.versionedPathMatchers == null)
-                this.versionedPathMatchers = Collections.emptyList();
+            initializePathMatchers();
         }
 
-        indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
+        indentedLogger().startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
         {
             // Remember static state
             this.staticState = staticState;
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
 
-            // Remember annotated page template if needed
-            {
-                this.template = staticState.isDynamicNoscriptTemplate() ? template : null;
-
-                if (this.template != null && indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.template.saxStore().getApproximateSize()));
-                }
-            }
+            // NOTE: template is not stored right away, as it depends on the evaluation of the noscript property.
 
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
             // Whether we support updates
             // NOTE: Reading the property requires the static state set above
-            this.supportUpdates = ! XFormsProperties.isNoUpdates(this);
+            this.supportUpdates = ! isNoUpdates();
 
             // Remember parameters used during initialization
             this.uriResolver = uriResolver;
@@ -219,7 +163,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "initializing XForms containing document"));
             }
         }
-        indentedLogger.endHandleOperation();
+        indentedLogger().endHandleOperation();
     }
 
     // This is called upon the first creation of the XForms engine
@@ -248,48 +192,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         });
     }
 
-    private void initializeRequestInformation() {
-
-        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
-
-        if (request != null) {
-            // Remember if filter provided separate deployment information
-            final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
-            this.deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
-                    : "integrated".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.integrated
-                    : XFormsConstants.DeploymentType.standalone;
-
-            // Try to get request context path
-            this.requestContextPath = request.getClientContextPath("/");
-
-            // Base URI for path resolution
-            {
-                // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
-                final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
-                // NOTE: We used to have response.rewriteRenderURL() on this, but why?
-                if (rendererBaseURI != null)
-                    this.requestPath = rendererBaseURI;
-                else
-                    this.requestPath = request.getRequestPath();
-            }
-
-            this.requestHeaders = immutableHeadersMap(request);
-            this.requestParameters = immutableParametersMap(request);
-
-            this.containerType = request.getContainerType();
-            this.containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace(), "");
-        } else {
-            // Special case when we run outside the context of a request
-            this.deploymentType = XFormsConstants.DeploymentType.standalone;
-            this.requestContextPath = "";
-            this.requestPath = "/";
-            this.requestHeaders = emptyImmutableMap();
-            this.requestParameters = emptyImmutableMap();
-            this.containerType = "servlet";
-            this.containerNamespace = "";
-        }
-    }
-
     /**
      * Restore an XFormsContainingDocument from XFormsState only.
      *
@@ -299,7 +201,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param disableUpdates    whether to disable updates (for recreating initial document upon browser back)
      */
     public XFormsContainingDocument(XFormsState xformsState, boolean disableUpdates) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
+        super();
 
         // 1. Restore the static state
         {
@@ -309,14 +211,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateDigest.get());
                 if (cachedState != null) {
                     // Found static state in cache
-                    indentedLogger.logDebug("", "found static state by digest in cache");
+                    indentedLogger().logDebug("", "found static state by digest in cache");
                     this.staticState = cachedState;
                 } else {
                     // Not found static state in cache, create static state from input
-                    indentedLogger.logDebug("", "did not find static state by digest in cache");
-                    indentedLogger.startHandleOperation("initialization", "restoring static state");
+                    indentedLogger().logDebug("", "did not find static state by digest in cache");
+                    indentedLogger().startHandleOperation("initialization", "restoring static state");
                     this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
-                    indentedLogger.endHandleOperation();
+                    indentedLogger().endHandleOperation();
 
                     // Store in cache
                     XFormsStaticStateCache.instance().storeDocument(this.staticState);
@@ -325,7 +227,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 assert this.staticState.isServerStateHandling();
             } else {
                 // Not digest provided, create static state from input
-                indentedLogger.logDebug("", "did not find static state by digest in cache");
+                indentedLogger().logDebug("", "did not find static state by digest in cache");
                 this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
 
                 assert this.staticState.isClientStateHandling();
@@ -334,17 +236,17 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
-            this.supportUpdates = ! disableUpdates && ! XFormsProperties.isNoUpdates(this);
+            this.supportUpdates = ! disableUpdates && ! isNoUpdates();
         }
 
         // 2. Restore the dynamic state
-        indentedLogger.startHandleOperation("initialization", "restoring containing document");
+        indentedLogger().startHandleOperation("initialization", "restoring containing document");
         try {
             restoreDynamicState(xformsState.dynamicState());
         } catch (Exception e) {
             throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "re-initializing XForms containing document"));
         }
-        indentedLogger.endHandleOperation();
+        indentedLogger().endHandleOperation();
     }
 
     private void restoreDynamicState(final DynamicState dynamicState) {
@@ -352,28 +254,15 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.uuid = dynamicState.uuid();
         this.sequence = dynamicState.sequence();
 
-        indentedLogger.logDebug("initialization", "restoring dynamic state for UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
+        indentedLogger().logDebug("initialization", "restoring dynamic state for UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
 
         // Restore request information
-        if (dynamicState.decodeDeploymentTypeJava() != null) {
-            // Normal case where information below was previously serialized
-            this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava());
-            this.requestContextPath = dynamicState.decodeRequestContextPathJava();
-            this.requestPath = dynamicState.decodeRequestPathJava();
-            this.requestHeaders = dynamicState.decodeRequestHeadersJava();
-            this.requestParameters = dynamicState.decodeRequestParametersJava();
-            this.containerType = dynamicState.decodeContainerTypeJava();
-            this.containerNamespace = dynamicState.decodeContainerNamespaceJava();
-        } else {
-            // Use information from the request
-            // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
-            initializeRequestInformation();
-        }
+        restoreRequestInformation(dynamicState);
+        restorePathMatchers(dynamicState);
+        restoreTemplate(dynamicState);
 
         // Restore other encoded objects
-        this.versionedPathMatchers = dynamicState.decodePathMatchersJava();
         this.pendingUploads = new HashSet<String>(dynamicState.decodePendingUploadsJava()); // make copy as must be mutable
-        this.template = dynamicState.decodeAnnotatedTemplateJava();
         this.lastAjaxResponse = dynamicState.decodeLastAjaxResponseJava();
 
         // Scope the containing document for the XForms API
@@ -446,71 +335,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return xformsControls;
     }
 
-    public XFormsConstants.DeploymentType getDeploymentType() {
-        return deploymentType;
-    }
-
-    /**
-     * Return the context path of the request that generated the XForms page.
-     */
-    public String getRequestContextPath() {
-        return requestContextPath;
-    }
-
-    /**
-     * Return the path of the request that generated the XForms page.
-     */
-    public String getRequestPath() {
-        return requestPath;
-    }
-
-    public scala.collection.immutable.Map<String, String[]> getRequestHeaders() {
-        return requestHeaders;
-    }
-
-    public scala.collection.immutable.Map<String, String[]> getRequestParameters() {
-        return requestParameters;
-    }
-
-    /**
-     * Return the container type that generated the XForms page, either "servlet" or "portlet".
-     */
-    public String getContainerType() {
-        return containerType;
-    }
-
-    public boolean isPortletContainer() {
-        return "portlet".equals(containerType);
-    }
-
-    /**
-     * Return the container namespace that generated the XForms page. Always "" for servlets.
-     */
-    public String getContainerNamespace() {
-        return containerNamespace;
-    }
-
-    /**
-     * Return path matchers for versioned resources mode.
-     *
-     * @return  List of PathMatcher
-     */
-    public List<URLRewriterUtils.PathMatcher> getVersionedPathMatchers() {
-        return versionedPathMatchers;
-    }
-
     /**
      * Return dependencies implementation.
      */
     public final XPathDependencies getXPathDependencies() {
         return xpathDependencies;
-    }
-
-    /**
-     * Return the page template if available. Only for noscript mode.
-     */
-    public AnnotatedTemplate getTemplate() {
-        return template;
     }
 
     /**
@@ -528,7 +357,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     public XFormsStaticState getStaticState() {
         return staticState;
     }
-
 
     public StaticStateGlobalOps getStaticOps() {
         return staticOps;
@@ -598,14 +426,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         
         this.serverErrors = null;
 
-        this.requestStats = RequestStatsImpl.apply();
+        clearRequestStats();
 
         if (this.controlsStructuralChanges != null)
             this.controlsStructuralChanges.clear();
-    }
-
-    public RequestStats getRequestStats() {
-        return requestStats;
     }
 
     /**
@@ -811,13 +635,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger.logWarning("", "xxf:script will be ignored because two-pass submission started", "script id", script.prefixedId());
+            indentedLogger().logWarning("", "xxf:script will be ignored because two-pass submission started", "script id", script.prefixedId());
             return;
         }
 
         // Warn that scripts won't run in noscript mode (duh)
-        if (staticState.isNoscript())
-            indentedLogger.logWarning("noscript", "script won't run in noscript mode", "script id", script.prefixedId());
+        if (noscript())
+            indentedLogger().logWarning("noscript", "script won't run in noscript mode", "script id", script.prefixedId());
 
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList<Script>();
@@ -935,7 +759,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
     
     public void addServerError(XFormsError.ServerError serverError) {
-        final int maxErrors = XFormsProperties.getShowMaxRecoverableErrors(this);
+        final int maxErrors = getShowMaxRecoverableErrors();
         if (maxErrors > 0) {
             if (serverErrors == null)
                 serverErrors = new ArrayList<XFormsError.ServerError>();
@@ -1086,12 +910,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     private void createControlsAndModels() {
-
-        // Create XForms controls
-        xformsControls = new XFormsControls(this);
-
-        // Add models
         addAllModels();
+        xformsControls = new XFormsControls(this);
     }
 
     public void initializeNestedControls() {
@@ -1121,10 +941,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public XFormsEvent getCurrentEvent() {
         return (eventStack.size() == 0) ? null : eventStack.peek();
-    }
-
-    public IndentedLogger indentedLogger() {
-        return indentedLogger;
     }
 
     @Override

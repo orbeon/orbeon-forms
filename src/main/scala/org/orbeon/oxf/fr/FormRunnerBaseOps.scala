@@ -130,7 +130,7 @@ trait FormRunnerBaseOps {
     def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
     def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
 
-    def isNoscript    = XFormsProperties.isNoscript(containingDocument)
+    def isNoscript    = containingDocument.noscript
     def isEmbeddable  = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) exists (_ == "true")
 
     // The standard Form Runner parameters

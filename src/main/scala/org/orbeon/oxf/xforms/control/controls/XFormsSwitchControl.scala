@@ -17,7 +17,6 @@ import java.{util ⇒ ju}
 import org.dom4j.Element
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.{ControlLocalSupport, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.Dispatch
@@ -222,7 +221,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         if (localXForms11Switch ne null)
             localXForms11Switch.toBoolean
         else
-            XFormsProperties.isXForms11Switch(containingDocument)
+            containingDocument.isXForms11Switch
     }
 
     override def valueType = null

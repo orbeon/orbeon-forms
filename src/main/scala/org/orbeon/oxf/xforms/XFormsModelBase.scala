@@ -18,14 +18,17 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 import java.{util ⇒ ju}
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.{BindNode, DataModel}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.JavaConverters._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{StructuredQName, NodeInfo}
 import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
 import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
 import collection.mutable
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.common.ValidationException
 
 abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: String, val staticModel: Model) extends Logging {
 
@@ -209,6 +212,27 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     protected def doRefresh(): Unit =
         if (containingDocument.getControls.isRequireRefresh)
             container.synchronizeAndRefresh()
+
+    def getDefaultEvaluationContext: BindingContext
+
+    val variableResolver =
+        (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
+            staticModel.bindsByName.get(variableQName.getLocalName) match {
+                case Some(targetStaticBind) ⇒
+                    // Variable value is a bind nodeset to resolve
+                    BindVariableResolver.resolveClosestBind(
+                        modelBinds          = getBinds,
+                        contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
+                        targetStaticBind    = targetStaticBind
+                    ) getOrElse
+                        (throw new IllegalStateException)
+                case None ⇒
+                    // Try top-level model variables
+                    val modelVariables = getDefaultEvaluationContext.getInScopeVariables
+                    // NOTE: With XPath analysis on, variable scope has been checked statically
+                    Option(modelVariables.get(variableQName.getLocalName)) getOrElse
+                        (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
+            }
 }
 
 class DeferredActionContext(container: XBLContainer) {

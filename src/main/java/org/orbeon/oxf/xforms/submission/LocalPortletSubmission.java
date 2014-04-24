@@ -23,7 +23,6 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.net.URI;
@@ -105,7 +104,7 @@ public class LocalPortletSubmission extends BaseSubmission {
 
         // Headers
         final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
-        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+        final String headersToForward = containingDocument.getForwardSubmissionHeaders();
 
         final String submissionEffectiveId = submission.getEffectiveId();
 

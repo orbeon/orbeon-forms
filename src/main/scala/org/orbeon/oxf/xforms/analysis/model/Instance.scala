@@ -101,7 +101,11 @@ trait InstanceMetadata {
     val timeToLive = Instance.timeToLiveOrDefault(element)
     val handleXInclude = false
 
-    val exposeXPathTypes = Option(element.attributeValue(XXFORMS_EXPOSE_XPATH_TYPES_QNAME)) map (_ == "true") getOrElse ! readonly && partExposeXPathTypes
+    // lazy because depends on property, which depends on top-level model being set in XFormsStaticStateImpl!
+    lazy val exposeXPathTypes =
+        Option(element.attributeValue(XXFORMS_EXPOSE_XPATH_TYPES_QNAME)) map
+        (_ == "true") getOrElse
+        ! readonly && partExposeXPathTypes
 
     val (indexIds, indexClasses) = {
         val tokens = attSet(element, XXFORMS_INDEX_QNAME)

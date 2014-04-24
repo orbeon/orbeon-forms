@@ -31,6 +31,9 @@ import ScalaUtils._
 
 trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait with ChildrenLHHAItemsetsAndActionsTrait {
 
+    if  (element.attributeValue("selection") == "open")
+        throw new ValidationException("Open selection is currently not supported.", locationData)
+
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
@@ -38,14 +41,8 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             "exists((xf:choices | xf:item | xf:itemset)/(., .//xf:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData, null).asInstanceOf[Boolean]
 
-    val isNorefresh = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
-
-    if  (element.attributeValue("selection") == "open")
-        throw new ValidationException("Open selection is currently not supported.", locationData)
-
-    val isEncodeValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map
-        (_.toBoolean) getOrElse
-            part.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY)
+    val isNorefresh      = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
+    val mustEncodeValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map (_.toBoolean)
 
     private var itemsetAnalysis: Option[XPathAnalysis] = None
     private var _itemsetAnalyzed = false
@@ -212,7 +209,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         }
 
                         val attributes = SelectionControlUtil.getAttributes(element)
-                        currentContainer.addChildItem(Item(position, isMultiple, isEncodeValues, attributes, label, help, hint, value))
+                        currentContainer.addChildItem(Item(position, isMultiple, attributes, label, help, hint, value))
                         position += 1
 
                     case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
@@ -223,7 +220,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
                         findNestedLHHValue(LABEL_QNAME, required = false) foreach { label ⇒
                             val attributes = SelectionControlUtil.getAttributes(element)
-                            val newContainer = Item(position, isMultiple, isEncodeValues, attributes, label, None, None, null)
+                            val newContainer = Item(position, isMultiple, attributes, label, None, None, null)
                             position += 1
                             currentContainer.addChildItem(newContainer)
                             currentContainer = newContainer

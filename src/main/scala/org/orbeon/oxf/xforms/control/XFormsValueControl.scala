@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsModelBinds, XFormsProperties}
+import org.orbeon.oxf.xforms.XFormsModelBinds
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
@@ -151,13 +151,20 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         assert(isRelevant)
         assert(getValue ne null)
 
-        Option(getBuiltinTypeName) flatMap
-            (typeName ⇒ Option(XFormsProperties.getTypeOutputFormat(containingDocument, typeName))) flatMap
-                (evaluateAsString(
-                    _,
-                    Option(StringValue.makeStringValue(getValue)),
-                    FormatNamespaceMapping,
-                    getContextStack.getCurrentBindingContext.getInScopeVariables))
+        def evaluateFormat(format: String) =
+            evaluateAsString(
+               format,
+               Option(StringValue.makeStringValue(getValue)),
+               FormatNamespaceMapping,
+               getContextStack.getCurrentBindingContext.getInScopeVariables
+           )
+
+        for {
+            typeName ← Option(getBuiltinTypeName)
+            format   ← containingDocument.getTypeOutputFormat(typeName)
+            value    ← evaluateFormat(format)
+        } yield
+            value
     }
 
     /**

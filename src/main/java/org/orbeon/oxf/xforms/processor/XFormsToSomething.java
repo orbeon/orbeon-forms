@@ -154,7 +154,13 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToSomething.this, processorOutput,
                                 pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                        containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.template, uriResolver, PipelineResponse.getResponse(xmlReceiver, externalContext));
+
+                        containingDocument[0] =
+                            new XFormsContainingDocument(
+                                staticState[0],
+                                uriResolver,
+                                PipelineResponse.getResponse(xmlReceiver, externalContext)
+                            );
 
                         // Gather set caching dependencies
                         gatherInputDependencies(containingDocument[0], indentedLogger, stage1CacheableState);
@@ -208,8 +214,15 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                     }
                 }
 
-                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToSomething.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.template, uriResolver, PipelineResponse.getResponse(xmlReceiver, externalContext));
+                final XFormsURIResolver uriResolver =
+                    new XFormsURIResolver(XFormsToSomething.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
+
+                containingDocument[0] =
+                    new XFormsContainingDocument(
+                        staticState,
+                        uriResolver,
+                        PipelineResponse.getResponse(xmlReceiver, externalContext)
+                    );
             } else {
                 assert !cachedStatus[0];
                 indentedLogger.logDebug("", "annotated document and static state digest not obtained from cache.");
@@ -219,7 +232,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             produceOutput(pipelineContext, outputName, externalContext, indentedLogger, stage2CacheableState, containingDocument[0], xmlReceiver);
 
             // Notify state manager
-            XFormsStateManager.instance().afterInitialResponse(containingDocument[0]);
+            XFormsStateManager.instance().afterInitialResponse(containingDocument[0], stage2CacheableState.template);
 
         } catch (Throwable e) {
             indentedLogger.logDebug("", "throwable caught during initialization.");
@@ -374,7 +387,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
 
     private void gatherInputDependencies(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, Stage1CacheableState stage1CacheableState) {
 
-        final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+        final String forwardSubmissionHeaders = containingDocument.getForwardSubmissionHeaders();
 
         // Add static instance source dependencies for top-level models
         // TODO: check all models/instances

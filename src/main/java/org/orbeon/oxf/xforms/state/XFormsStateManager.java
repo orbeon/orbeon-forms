@@ -65,14 +65,11 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * Called after the initial response is sent without error.
      *
      * Implementation: cache the document and/or store its initial state.
-     *
-     * @param containingDocument    containing document
      */
-    public void afterInitialResponse(XFormsContainingDocument containingDocument) {
-        if (! XFormsProperties.isNoUpdates(containingDocument)) {
-            // Remember this UUID in the session
+    public void afterInitialResponse(XFormsContainingDocument containingDocument, AnnotatedTemplate template) {
+        if (! containingDocument.isNoUpdates()) {
+            containingDocument.setTemplateIfNeeded(template);
             addDocumentToSession(containingDocument.getUUID());
-
             cacheOrStore(containingDocument, true);
         }
     }
@@ -570,8 +567,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * Called after sending a successful update response.
      *
      * Implementation: cache the document and/or store its current state.
-     *
-     * @param containingDocument    containing document
      */
     public void afterUpdateResponse(XFormsContainingDocument containingDocument) {
         // Notify document that we are done sending the response
@@ -590,7 +585,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             // No heartbeat for client state. Is that reasonable?
             return -1;
         } else {
-            final boolean isSessionHeartbeat = XFormsProperties.isSessionHeartbeat(containingDocument);
+            final boolean isSessionHeartbeat = containingDocument.isSessionHeartbeat();
             final ExternalContext.Session session = externalContext.getRequest().getSession(FORCE_SESSION_CREATION);
 
             final long heartbeatDelay;

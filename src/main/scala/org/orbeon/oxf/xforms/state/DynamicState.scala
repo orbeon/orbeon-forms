@@ -272,7 +272,7 @@ object DynamicState {
             toByteSeq(document.getVersionedPathMatchers.asScala.toList),
             Option(document.getControls.getFocusedControl) map (_.getEffectiveId),
             toByteSeq(document.getPendingUploads.asScala.toSet),
-            Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
+            document.getTemplate map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),
             toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
             toByteSeq(controlsToSerialize)
@@ -287,5 +287,5 @@ object DynamicState {
 
     // Encode the given document to a string representation
     def encodeDocumentToString(document: XFormsContainingDocument, compress: Boolean, isForceEncryption: Boolean): String =
-        DynamicState(document).encodeToString(compress, isForceEncryption || XFormsProperties.isClientStateHandling(document))
+        DynamicState(document).encodeToString(compress, isForceEncryption || document.isClientStateHandling)
 }

@@ -2204,7 +2204,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model" xxf:noscript="true">
+                    <xf:model id="model" xxf:noscript-support="true" xxf:noscript="true">
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>

@@ -45,11 +45,10 @@
 
     <xsl:variable name="is-detail" select="not($mode = ('summary', 'home', ''))" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
-    <xsl:variable name="is-noscript-support" select="not($fr-form-model/@xxf:noscript-support = 'false')" as="xs:boolean"/>
+    <xsl:variable name="is-noscript-support" select="$fr-form-model/@xxf:noscript-support = 'true'" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'
                                                 and $is-noscript-support" as="xs:boolean"/>
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
-    <xsl:variable name="has-pdf-template" select="normalize-space(/xh:html/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf) != ''"/>
 
     <!-- Properties -->
     <xsl:variable name="has-version" select="p:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
@@ -177,12 +176,18 @@
         <!-- Model receiving input parameters -->
         <xf:model
                 id="fr-parameters-model"
-                xxf:external-events="{@xxf:external-events} fr-open-pdf"
-                xxf:readonly-appearance="{if ($mode = ('view', 'email') or ($mode = 'pdf' and not($has-pdf-template))) then 'static' else 'dynamic'}"
-                xxf:encrypt-item-values="{not($mode = 'pdf' and $has-pdf-template)}"
-                xxf:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
-                xxf:noscript="{$is-noscript}"
+                xxf:readonly-appearance="{{for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                                           return
+                                               if ($mode = ('view', 'email') or ($mode = 'pdf' and normalize-space(xxf:instance('fr-form-attachments')/pdf) = ''))
+                                               then 'static'
+                                               else 'dynamic'}}"
+                xxf:encrypt-item-values="{{for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                                           return not($mode = 'pdf' and normalize-space(xxf:instance('fr-form-attachments')/pdf) != '')}}"
+                xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
+                xxf:order="{{if (property('xxf:noscript')) then 'label control alert hint help' else 'help label control alert hint'}}"
+
                 xxf:noscript-support="{$is-noscript-support}"
+                xxf:external-events="{@xxf:external-events} fr-open-pdf"
                 xxf:xforms11-switch="false"
                 xxf:xpath-analysis="true">
 

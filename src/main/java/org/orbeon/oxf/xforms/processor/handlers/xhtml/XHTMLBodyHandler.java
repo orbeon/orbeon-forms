@@ -98,8 +98,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         sb.append(handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
 
         // Hint/help appearance classes
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "hint", new QName(XFormsProperties.getHintAppearance(containingDocument)));
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "help", new QName(XFormsProperties.getHelpAppearance(containingDocument)));
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "hint", new QName(containingDocument.getHintAppearance()));
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "help", new QName(containingDocument.getHelpAppearance()));
 
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
@@ -167,7 +167,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             });
 
             // Ajax loading indicator
-            if (XFormsProperties.isAjaxShowLoadingIcon(containingDocument)) {
+            if (containingDocument.isAjaxShowLoadingIcon()) {
 
                 helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-loading" });
                 helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed
@@ -290,7 +290,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         final Matcher triggerSubmitMinimalMatcher = new AppearanceMatcher(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // in noscript mode, use the full appearance
-                return ! containingDocument.getStaticState().isNoscript() && super.doesMatch(attributes, handlerContext);
+                return ! containingDocument.noscript() && super.doesMatch(attributes, handlerContext);
             }
         };
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
@@ -350,7 +350,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Other controls
         controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea", ANY_MATCHER);
-        if (!containingDocument.getStaticState().isNoscript())
+        if (!containingDocument.noscript())
             controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
         else
             controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);

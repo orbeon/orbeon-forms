@@ -100,7 +100,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     public boolean isHTMLDisabled(XFormsControl control) {
         return (control instanceof XFormsSingleNodeControl)
             && ((XFormsSingleNodeControl) control).isReadonly()
-            && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
+            && ! containingDocument.staticReadonly();
     }
     
     public boolean isNonRelevant(XFormsControl control) {

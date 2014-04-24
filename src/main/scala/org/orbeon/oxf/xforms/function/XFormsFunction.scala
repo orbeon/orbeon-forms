@@ -166,7 +166,9 @@ abstract class XFormsFunction extends SystemFunction {
                 prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
                 if prefix.nonEmpty
                 uri = namespaceResolver.getURIForPrefix(prefix, true)
-            } staticContext.declareNamespace(prefix, uri)
+            } locally {
+                staticContext.declareNamespace(prefix, uri)
+            }
         }
     }
 

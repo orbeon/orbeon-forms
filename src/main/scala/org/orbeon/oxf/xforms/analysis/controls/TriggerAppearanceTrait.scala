@@ -36,9 +36,7 @@ trait TriggerAppearanceTrait extends AppearanceTrait {
         //   markup.
 
         val updated =
-            if (part.staticState.isNoscript && isMinimal)
-                initialAppearances - XFORMS_MINIMAL_APPEARANCE_QNAME + XXFORMS_MINIMAL_APPEARANCE_QNAME
-            else if (! isMinimal && ! isCompact)
+            if (! isMinimal && ! isCompact)
                 initialAppearances + XFORMS_FULL_APPEARANCE_QNAME
             else
                 initialAppearances

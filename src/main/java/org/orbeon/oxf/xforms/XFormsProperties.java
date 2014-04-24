@@ -13,18 +13,16 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.JPropertySet;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.*;
 
 public class XFormsProperties {
 
-	private static final String[] EMPTY_STRING_ARRAY = new String[]{};
+	public static final String[] EMPTY_STRING_ARRAY = new String[]{};
 
 	public static final String XFORMS_PROPERTY_PREFIX = "oxf.xforms.";
 
@@ -58,66 +56,67 @@ public class XFormsProperties {
 
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
 
-    private static final String OPTIMIZE_GET_ALL_PROPERTY = "optimize-get-all";
-    private static final String OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY = "optimize-local-submission";
-    private static final String LOCAL_SUBMISSION_FORWARD_PROPERTY = "local-submission-forward";
-    private static final String LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
-    private static final String LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
-//    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
+    public static final String OPTIMIZE_GET_ALL_PROPERTY = "optimize-get-all";
+    public static final String OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY = "optimize-local-submission";
+    public static final String LOCAL_SUBMISSION_FORWARD_PROPERTY = "local-submission-forward";
+    public static final String LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
+    public static final String LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
+//    public static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
+
     public static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
-    private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
-    private static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
-    private static final String NO_UPDATES = "no-updates";
+    public static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
+    public static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
+    public static final String NO_UPDATES = "no-updates";
 
-    private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
-    private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
+    public static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
+    public static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
 
-    private static final String DATE_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "date";
-    private static final String DATETIME_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "dateTime";
-    private static final String TIME_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "time";
-    private static final String DECIMAL_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "decimal";
-    private static final String INTEGER_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "integer";
-    private static final String FLOAT_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "float";
-    private static final String DOUBLE_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "double";
+    public static final String DATE_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "date";
+    public static final String DATETIME_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "dateTime";
+    public static final String TIME_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "time";
+    public static final String DECIMAL_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "decimal";
+    public static final String INTEGER_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "integer";
+    public static final String FLOAT_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "float";
+    public static final String DOUBLE_FORMAT_PROPERTY = TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + "double";
 
-    private static final String DATE_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "date";
-    private static final String TIME_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "time";
+    public static final String DATE_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "date";
+    public static final String TIME_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "time";
 
-    private static final String DATEPICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
-    private static final String DATEPICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
-    private static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
-    private static final String SHOW_RECOVERABLE_ERRORS_PROPERTY = "show-recoverable-errors";
+    public static final String DATEPICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
+    public static final String DATEPICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
+    public static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
+    public static final String SHOW_RECOVERABLE_ERRORS_PROPERTY = "show-recoverable-errors";
 
-    private static final String LOGIN_PAGE_DETECTION_REGEXP = "login-page-detection-regexp";
-    private static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
-    private static final String CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
+    public static final String LOGIN_PAGE_DETECTION_REGEXP = "login-page-detection-regexp";
+    public static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
+    public static final String CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
 
-    private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
+    public static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
-    private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
-    private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
-    private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
-    private static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY = "delay-before-close-minimal-dialog";
-    private static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
-    private static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
-    private static final String DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY = "delay-before-upload-progress-refresh";
-    private static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
-    private static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
-    private static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
+    public static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
+    public static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
+    public static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
+    public static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY = "delay-before-close-minimal-dialog";
+    public static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
+    public static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
+    public static final String DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY = "delay-before-upload-progress-refresh";
+    public static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
+    public static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
+    public static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 
-    private static final String REVISIT_HANDLING_PROPERTY = "revisit-handling";
+    public static final String REVISIT_HANDLING_PROPERTY = "revisit-handling";
     public static final String REVISIT_HANDLING_RESTORE_VALUE = "restore";
     public static final String REVISIT_HANDLING_RELOAD_VALUE = "reload";
 
     public static final String HELP_HANDLER_PROPERTY = "help-handler";
-    private static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
+    public static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
     public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
     public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "";
 
-    private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
+    public static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
     // TODO: Make these global properties, see https://github.com/orbeon/orbeon-forms/issues/1391
-    private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
+    public static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
     public static final String RETRY_DELAY_INCREMENT = "retry.delay-increment";
     public static final String RETRY_MAX_DELAY = "retry.max-delay";
 
@@ -130,9 +129,9 @@ public class XFormsProperties {
 
     // TODO: Make this a global property: right now it is used 1/2 global, 1/2 document
     public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
-    private static final boolean CACHE_DOCUMENT_DEFAULT = true;
+    public static final boolean CACHE_DOCUMENT_DEFAULT = true;
 
-    private static final String DATATABLE_INIT_IN_VIEWPORT = "xbl.fr.datatable.init-in-viewport";
+    public static final String DATATABLE_INIT_IN_VIEWPORT = "xbl.fr.datatable.init-in-viewport";
 
     public static final String SANITIZE_PROPERTY = "sanitize";
 
@@ -160,9 +159,9 @@ public class XFormsProperties {
             isPropagateToClient = propagateToClient;
         }
 
-        public Object parseProperty(String value) {
+        public final Object parseProperty(String value) {
             if (defaultValue instanceof Integer) {
-                return new Integer(value);
+                return Integer.parseInt(value);
             } else if (defaultValue instanceof Boolean) {
                 return Boolean.valueOf(value);
             } else {
@@ -173,7 +172,7 @@ public class XFormsProperties {
         public void validate(Object value, LocationData locationData) {}
     }
 
-    private static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
+    public static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
             new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false) {
                 @Override
                 public void validate(Object value, LocationData locationData) {
@@ -191,7 +190,7 @@ public class XFormsProperties {
                 @Override
                 public void validate(Object value, LocationData locationData) {
                     final String stringValue = value.toString();
-                    if (!(stringValue.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
+                    if (! XFormsUtils.maybeAVT(stringValue) && !(stringValue.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
                             || stringValue.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
                         throw new ValidationException("Invalid xxf:" + name
                                 + " property value value: " + stringValue, locationData);
@@ -263,9 +262,9 @@ public class XFormsProperties {
             new PropertyDefinition(DATATABLE_INIT_IN_VIEWPORT, false, true)
     };
 
-    private static final Map<Object, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;
+    public static final Map<String, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;
     static {
-        final Map<Object, PropertyDefinition> tempMap = new HashMap<Object, PropertyDefinition>();
+        final Map<String, PropertyDefinition> tempMap = new HashMap<String, PropertyDefinition>();
         for (final PropertyDefinition propertyDefinition: SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS) {
             tempMap.put(propertyDefinition.name, propertyDefinition);
         }
@@ -273,40 +272,40 @@ public class XFormsProperties {
     }
 
     // Global properties
-    private static final String GZIP_STATE_PROPERTY = XFORMS_PROPERTY_PREFIX + "gzip-state"; // global but could possibly be per document
-    private static final boolean GZIP_STATE_DEFAULT = true;
+    public static final String GZIP_STATE_PROPERTY = XFORMS_PROPERTY_PREFIX + "gzip-state"; // global but could possibly be per document
+    public static final boolean GZIP_STATE_DEFAULT = true;
 
-    private static final String HOST_LANGUAGE_AVTS_PROPERTY = XFORMS_PROPERTY_PREFIX + "host-language-avts"; // global but should be per document
-    private static final String ADDITIONAL_AVT_ELEMENT_NAMESPACES = XFORMS_PROPERTY_PREFIX + "additional-avt-element-namespaces"; // global but should be per document
-    private static final String ADDITIONAL_REF_ID_ATTRIBUTE_NAMES = XFORMS_PROPERTY_PREFIX + "additional-ref-id-attribute-names"; // global but should be per document
-    private static final boolean HOST_LANGUAGE_AVTS_DEFAULT = false;
+    public static final String HOST_LANGUAGE_AVTS_PROPERTY = XFORMS_PROPERTY_PREFIX + "host-language-avts"; // global but should be per document
+    public static final String ADDITIONAL_AVT_ELEMENT_NAMESPACES = XFORMS_PROPERTY_PREFIX + "additional-avt-element-namespaces"; // global but should be per document
+    public static final String ADDITIONAL_REF_ID_ATTRIBUTE_NAMES = XFORMS_PROPERTY_PREFIX + "additional-ref-id-attribute-names"; // global but should be per document
+    public static final boolean HOST_LANGUAGE_AVTS_DEFAULT = false;
 
-    private static final String MINIMAL_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "minimal-resources";
-    private static final boolean MINIMAL_RESOURCES_PROPERTY_DEFAULT = true;
+    public static final String MINIMAL_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "minimal-resources";
+    public static final boolean MINIMAL_RESOURCES_PROPERTY_DEFAULT = true;
 
-    private static final String COMBINE_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "combine-resources";
-    private static final boolean COMBINE_RESOURCES_PROPERTY_DEFAULT = true;
+    public static final String COMBINE_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "combine-resources";
+    public static final boolean COMBINE_RESOURCES_PROPERTY_DEFAULT = true;
 
-    private static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources";
-    private static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
+    public static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources";
+    public static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
 
-    private static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.javascript-at-bottom";
-    private static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
+    public static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.javascript-at-bottom";
+    public static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
 
-    private static final String ENCODE_VERSION_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.encode-version";
-    private static final boolean ENCODE_VERSION_PROPERTY_DEFAULT = true;
+    public static final String ENCODE_VERSION_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.encode-version";
+    public static final boolean ENCODE_VERSION_PROPERTY_DEFAULT = true;
 
-    private static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
+    public static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
 
-    private static final String ASYNC_PORTLET_LOAD_PROPERTY = XFORMS_PROPERTY_PREFIX + "async-portlet-load";
+    public static final String ASYNC_PORTLET_LOAD_PROPERTY = XFORMS_PROPERTY_PREFIX + "async-portlet-load";
 
-    private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
-    private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
+    public static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
+    public static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
-    private static final String DEBUG_LOG_XPATH_ANALYSIS_PROPERTY = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
-    private static final String DEBUG_REQUEST_STATS_PROPERTY      = XFORMS_PROPERTY_PREFIX + "debug.log-request-stats";
+    public static final String DEBUG_LOG_XPATH_ANALYSIS_PROPERTY = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
+    public static final String DEBUG_REQUEST_STATS_PROPERTY      = XFORMS_PROPERTY_PREFIX + "debug.log-request-stats";
 
-    private static final String LOCATION_MODE_PROPERTY = XFORMS_PROPERTY_PREFIX + "location-mode";
+    public static final String LOCATION_MODE_PROPERTY = XFORMS_PROPERTY_PREFIX + "location-mode";
 
     // == Global properties ============================================================================================
     /**
@@ -317,22 +316,6 @@ public class XFormsProperties {
      */
     public static PropertyDefinition getPropertyDefinition(String propertyName) {
         return SUPPORTED_DOCUMENT_PROPERTIES.get(propertyName);
-    }
-
-    /**
-     * Return an iterator over property definition entries.
-     *
-     * @return  Iterator<Entry<String,PropertyDefinition>> mapping a property name to a definition
-     */
-    public static Iterator<Map.Entry<Object,PropertyDefinition>> getPropertyDefinitionEntryIterator() {
-        return SUPPORTED_DOCUMENT_PROPERTIES.entrySet().iterator();
-    }
-
-    public  static Object parseProperty(String propertyName, String propertyValue) {
-        assert propertyName != null && propertyValue != null;
-
-        final PropertyDefinition propertyDefinition = getPropertyDefinition(propertyName);
-        return (propertyDefinition == null) ? null : propertyDefinition.parseProperty(propertyValue);
     }
 
     public static Set<String> getDebugLogging() {
@@ -424,160 +407,4 @@ public class XFormsProperties {
     public static boolean isKeepLocation() {
         return ! Properties.instance().getPropertySet().getString(LOCATION_MODE_PROPERTY, "none").equals("none");
     }
-
-    // == XForms document properties ===================================================================================
-
-    public static String getStateHandling(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, STATE_HANDLING_PROPERTY);
-    }
-
-    public static boolean isClientStateHandling(XFormsContainingDocument containingDocument) {
-        return getStateHandling(containingDocument).equals(STATE_HANDLING_CLIENT_VALUE);
-    }
-
-    public static boolean isOptimizeGetAllSubmission(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, OPTIMIZE_GET_ALL_PROPERTY);
-    }
-
-    public static boolean isLocalSubmissionForward(XFormsContainingDocument containingDocument) {
-        // Try new property first
-        final boolean newPropertyValue = getBooleanProperty(containingDocument, LOCAL_SUBMISSION_FORWARD_PROPERTY);
-        if (!newPropertyValue)
-            return newPropertyValue;
-
-        // Then old property
-        return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY);
-    }
-
-    public static boolean isLocalSubmissionInclude(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, LOCAL_SUBMISSION_INCLUDE_PROPERTY);
-    }
-
-    public static boolean isLocalInstanceInclude(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, LOCAL_INSTANCE_INCLUDE_PROPERTY);
-    }
-
-    public static boolean isAjaxShowLoadingIcon(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, AJAX_SHOW_LOADING_ICON_PROPERTY);
-    }
-
-    public static int getShowMaxRecoverableErrors(XFormsContainingDocument containingDocument) {
-        return getIntegerProperty(containingDocument, SHOW_RECOVERABLE_ERRORS_PROPERTY);
-    }
-
-    public static String getNoscriptTemplate(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, NOSCRIPT_TEMPLATE);
-    }
-
-    public static String getReadonlyAppearance(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, READONLY_APPEARANCE_PROPERTY);
-    }
-
-    public static boolean isReadonlyAppearanceStaticSelectFull(XFormsContainingDocument containingDocument) {
-        return "full".equals(getStringProperty(containingDocument, READONLY_APPEARANCE_STATIC_SELECT_PROPERTY));
-    }
-
-    public static boolean isReadonlyAppearanceStaticSelect1Full(XFormsContainingDocument containingDocument) {
-        return "full".equals(getStringProperty(containingDocument, READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY));
-    }
-
-    public static String getOrder(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, ORDER_PROPERTY);
-    }
-
-    public static String getLabelElementName(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, LABEL_ELEMENT_NAME_PROPERTY);
-    }
-
-    public static String getHintElementName(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, HINT_ELEMENT_NAME_PROPERTY);
-    }
-
-    public static String getHelpElementName(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, HELP_ELEMENT_NAME_PROPERTY);
-    }
-
-    public static String getAlertElementName(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, ALERT_ELEMENT_NAME_PROPERTY);
-    }
-
-    public static String getHintAppearance(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, HINT_APPEARANCE_PROPERTY);
-    }
-
-    public static String getHelpAppearance(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, HELP_APPEARANCE_PROPERTY);
-    }
-
-    public static boolean isStaticReadonlyAppearance(XFormsContainingDocument containingDocument) {
-        return getReadonlyAppearance(containingDocument).equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE);
-    }
-
-    public static String getTypeOutputFormat(XFormsContainingDocument containingDocument, String typeName) {
-        return getStringProperty(containingDocument, TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + typeName);
-    }
-
-    public static boolean isExposeXPathTypes(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, EXPOSE_XPATH_TYPES_PROPERTY);
-    }
-
-    public static String getTypeInputFormat(XFormsContainingDocument containingDocument, String typeName) {
-        return getStringProperty(containingDocument, TYPE_INPUT_FORMAT_PROPERTY_PREFIX + typeName);
-    }
-
-    public static boolean isSessionHeartbeat(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, SESSION_HEARTBEAT_PROPERTY);
-    }
-
-    public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument) {
-        // Get from XForms property first, otherwise use global default
-        final String result = getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
-        if (StringUtils.isNotBlank(result))
-            return result;
-        else
-            return Connection.getForwardHeaders();
-    }
-
-    public static int getSubmissionPollDelay(XFormsContainingDocument containingDocument) {
-        return getIntegerProperty(containingDocument, ASYNC_SUBMISSION_POLL_DELAY);
-    }
-
-    public static int getAjaxFullUpdateThreshold(XFormsContainingDocument containingDocument) {
-        return getIntegerProperty(containingDocument, AJAX_UPDATE_FULL_THRESHOLD);
-    }
-
-    public static boolean isNoUpdates(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, NO_UPDATES);
-    }
-
-    public static boolean isXForms11Switch(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, XFORMS11_SWITCH_PROPERTY);
-    }
-
-    public static boolean isNoscript(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY);
-    }
-
-    public static String getDateFormatInput(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, DATE_FORMAT_INPUT_PROPERTY);
-    }
-
-    // == Helpers ======================================================================================================
-
-    public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        return containingDocument.getStaticState().getProperty(propertyName);
-    }
-
-    private static boolean getBooleanProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        return containingDocument.getStaticState().getBooleanProperty(propertyName);
-    }
-
-    private static String getStringProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        return containingDocument.getStaticState().getStringProperty(propertyName);
-    }
-
-    private static int getIntegerProperty(XFormsContainingDocument containingDocument, String propertyName) {
-        return containingDocument.getStaticState().getIntegerProperty(propertyName);
-    }
-
 }

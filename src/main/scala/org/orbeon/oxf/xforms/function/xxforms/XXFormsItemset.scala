@@ -35,7 +35,7 @@ class XXFormsItemset extends XFormsFunction with FunctionSupport {
 
                 if (format == "json")
                     // Return a string
-                    itemset.getJSONTreeInfo(controlValueForSelection, select1Control.getLocationData)
+                    itemset.getJSONTreeInfo(controlValueForSelection, select1Control.mustEncodeValues, select1Control.getLocationData)
                 else
                     // Return an XML document
                     itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, select1Control.getLocationData)

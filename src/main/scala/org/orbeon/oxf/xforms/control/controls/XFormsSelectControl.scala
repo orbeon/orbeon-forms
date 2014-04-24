@@ -49,7 +49,7 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
             val newUIValues = valueAsSet(externalValue)
 
             val matches: Item ⇒ Boolean =
-                if (isEncodeValues)
+                if (mustEncodeValues)
                     item ⇒ newUIValues(item.position.toString)
                 else
                     item ⇒ newUIValues(item.value)
@@ -102,7 +102,7 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
                         item ← itemset.allItemsIterator
                         if instanceValues(item.value)
                     } yield
-                        item.externalValue
+                        item.externalValue(mustEncodeValues)
 
                 // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
                 // there might be duplicates.

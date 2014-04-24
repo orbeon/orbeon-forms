@@ -64,13 +64,13 @@ public class HandlerContext {
         this.externalContext = externalContext;
         this.topLevelControlEffectiveId = topLevelControlEffectiveId;
 
-        this.documentOrder = StringUtils.split(XFormsProperties.getOrder(containingDocument));
-        this.labelElementName = XFormsProperties.getLabelElementName(containingDocument);
-        this.hintElementName = XFormsProperties.getHintElementName(containingDocument);
-        this.helpElementName = XFormsProperties.getHelpElementName(containingDocument);
-        this.alertElementName = XFormsProperties.getAlertElementName(containingDocument);
+        this.documentOrder = StringUtils.split(containingDocument.lhhacOrder());
+        this.labelElementName = containingDocument.getLabelElementName();
+        this.hintElementName = containingDocument.getHintElementName();
+        this.helpElementName = containingDocument.getHelpElementName();
+        this.alertElementName = containingDocument.getAlertElementName();
 
-        this.isNoscript = containingDocument.getStaticState().isNoscript();
+        this.isNoscript = containingDocument.noscript();
 
         // Top-level part is containing document
         this.partAnalysisStack = new Stack<PartAnalysis>();

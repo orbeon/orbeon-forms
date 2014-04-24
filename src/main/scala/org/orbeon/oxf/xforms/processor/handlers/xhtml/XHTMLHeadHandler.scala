@@ -167,8 +167,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     private def outputConfigurationProperties(xhtmlPrefix: String, versionedResources: Boolean)(implicit helper: XMLReceiverHelper): Unit = {
 
         // Gather all static properties that need to be sent to the client
-        val staticProperties = containingDocument.getStaticState.getNonDefaultProperties filter
-            { case (propertyName, _) ⇒ getPropertyDefinition(propertyName).isPropagateToClient }
+        val staticProperties = containingDocument.getStaticState.clientNonDefaultProperties
 
         val dynamicProperties = {
 

@@ -174,7 +174,7 @@ public class XFormsServer extends ProcessorImpl {
                         // We are good: process request and produce new sequence number
                         try {
                             // Run events if any
-                            final boolean isNoscript = containingDocument.getStaticState().isNoscript();
+                            final boolean isNoscript = containingDocument.noscript();
 
                             // Set URL rewriter resource path information based on information in static state
                             if (containingDocument.getVersionedPathMatchers() != null && containingDocument.getVersionedPathMatchers().size() > 0) {
@@ -429,10 +429,8 @@ public class XFormsServer extends ProcessorImpl {
                 if (containingDocument.getStaticState().template().isDefined())
                     template = containingDocument.getStaticState().template().get();
                 else
-                    template = containingDocument.getTemplate();
+                    template = containingDocument.getTemplate().get();
             }
-            if (template == null)
-                throw new OXFException("Missing template in static and dynamic state for noscript mode.");// shouldn't happen!
 
             indentedLogger.logDebug("response", "handling noscript response for XHTML output");
             XFormsToXHTML.outputResponseDocument(externalContext, indentedLogger, template, containingDocument, xmlReceiver);

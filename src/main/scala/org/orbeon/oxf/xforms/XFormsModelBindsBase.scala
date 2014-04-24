@@ -17,7 +17,7 @@ import collection.JavaConverters._
 import collection.{mutable ⇒ m}
 import java.{util ⇒ ju}
 import org.orbeon.errorified.Exceptions
-import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
@@ -25,12 +25,10 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{DataModel, BindIteration, BindNode, RuntimeBind}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.dom4j.TypedNodeWrapper
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.{NodeInfo, StructuredQName, Item}
+import org.orbeon.saxon.om.{NodeInfo, Item}
 import scala.util.control.NonFatal
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
@@ -196,7 +194,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             contextPosition    = bindNode.position,
             compiledExpression = xpathMIP.compiledExpression,
             functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
-            variableResolver   = variableResolver
+            variableResolver   = model.variableResolver
         ).asInstanceOf[Boolean]
 
     protected def evaluateStringExpression(bindNode: BindNode, xpathMIP: StaticXPathMIP): String =
@@ -206,7 +204,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             contextPosition    = bindNode.position,
             compiledExpression = xpathMIP.compiledExpression,
             functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
-            variableResolver   = variableResolver
+            variableResolver   = model.variableResolver
         )
 
     protected def handleMIPXPathException(throwable: Throwable, bindNode: BindNode, xpathMIP: StaticXPathMIP, message: String): Unit = {
@@ -289,23 +287,4 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 handleMIPXPathException(e, bindNode, bindNode.staticBind.getCalculate, "evaluating XForms custom bind")
                 null
         }
-
-    private val variableResolver =
-        (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
-            staticModel.bindsByName.get(variableQName.getLocalName) match {
-                case Some(targetStaticBind) ⇒
-                    // Variable value is a bind nodeset to resolve
-                    BindVariableResolver.resolveClosestBind(
-                        modelBinds          = this,
-                        contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
-                        targetStaticBind    = targetStaticBind
-                    ) getOrElse
-                        (throw new IllegalStateException)
-                case None ⇒
-                    // Try top-level model variables
-                    val modelVariables = model.getDefaultEvaluationContext.getInScopeVariables
-                    // NOTE: With XPath analysis on, variable scope has been checked statically
-                    Option(modelVariables.get(variableQName.getLocalName)) getOrElse
-                        (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
-            }
 }

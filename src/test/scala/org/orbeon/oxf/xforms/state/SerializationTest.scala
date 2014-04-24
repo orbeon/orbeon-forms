@@ -65,7 +65,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
             override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) {
                 // Mark all elements with an id
                 Option(attributes.getValue("id")) foreach
-                    (saxStore.getMark(_))
+                    saxStore.getMark
 
                 super.startElement(uri, localname, qName, attributes)
             }
@@ -84,8 +84,9 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         )
 
         // All actual documents
-        val actualDocs = deserializedSAXStore.getMarks.asScala map
-            (TransformerUtils.saxStoreMarkToDom4jDocument(_))
+        val actualDocs =
+            deserializedSAXStore.getMarks.asScala map
+                TransformerUtils.saxStoreMarkToDom4jDocument
 
         // Compare all
         assert(actualDocs.size === expectedDocs.size)
@@ -114,7 +115,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                          xmlns:xh="http://www.w3.org/1999/xhtml"
                          xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xh:head>
-                        <xf:model xxf:noscript="false">
+                        <xf:model xxf:noscript-support="false" xxf:noscript="false">
                             <xf:instance id="instance">
                                 <value/>
                             </xf:instance>
@@ -124,7 +125,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
 
             assert(! doc.getStaticState.template.isDefined)
-            assert(doc.getTemplate eq null)
+            assert(doc.getTemplate.isEmpty)
         }
 
         // Template stored in the static state because of noscript mode
@@ -134,7 +135,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                          xmlns:xh="http://www.w3.org/1999/xhtml"
                          xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xh:head>
-                        <xf:model xxf:noscript="true">
+                        <xf:model xxf:noscript-support="true" xxf:noscript="true">
                             <xf:instance id="instance">
                                 <value/>
                             </xf:instance>
@@ -144,7 +145,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
 
             assert(doc.getStaticState.template.isDefined)
-            assert(doc.getTemplate eq null)
+            assert(doc.getTemplate.isEmpty)
         }
 
         // Template stored in the dynamic state because of noscript mode
@@ -154,7 +155,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                          xmlns:xh="http://www.w3.org/1999/xhtml"
                          xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xh:head>
-                        <xf:model xxf:noscript="true" xxf:noscript-template="dynamic">
+                        <xf:model xxf:noscript-support="true" xxf:noscript="true" xxf:noscript-template="dynamic">
                             <xf:instance id="instance">
                                 <value/>
                             </xf:instance>
@@ -163,7 +164,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:html>
 
             assert(! doc.getStaticState.template.isDefined)
-            assert(doc.getTemplate ne null)
+            assert(doc.getTemplate.isDefined)
         }
 
         // Template stored in the static state because of full updates
@@ -173,7 +174,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                          xmlns:xh="http://www.w3.org/1999/xhtml"
                          xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xh:head>
-                        <xf:model xxf:noscript="false">
+                        <xf:model xxf:noscript-support="false" xxf:noscript="false">
                             <xf:instance id="instance">
                                 <value/>
                             </xf:instance>
@@ -185,7 +186,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:html>
 
             assert(doc.getStaticState.template.isDefined)
-            assert(doc.getTemplate eq null)
+            assert(doc.getTemplate.isEmpty)
         }
     }
 

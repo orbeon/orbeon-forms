@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -62,8 +61,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 "container type", request.getContainerType(),
                 "norewrite", Boolean.toString(submission.isURLNorewrite()),
                 "url type", submission.getUrlType(),
-                "local-submission-forward", Boolean.toString(XFormsProperties.isLocalSubmissionForward(containingDocument)),
-                "local-submission-include", Boolean.toString(XFormsProperties.isLocalSubmissionInclude(containingDocument))
+                "local-submission-forward", Boolean.toString(containingDocument.isLocalSubmissionForward()),
+                "local-submission-include", Boolean.toString(containingDocument.isLocalSubmissionInclude())
             );
         }
 
@@ -101,7 +100,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         if (p.isReplaceAll) {
             // replace="all"
-            if (!XFormsProperties.isLocalSubmissionForward(containingDocument)) {
+            if (! containingDocument.isLocalSubmissionForward()) {
                 if (isDebugEnabled)
                     indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                             "reason", "forward submissions are disallowed in properties");
@@ -109,7 +108,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             }
         } else {
             // replace="instance|text|none"
-            if (!XFormsProperties.isLocalSubmissionInclude(containingDocument)) {
+            if (! containingDocument.isLocalSubmissionInclude()) {
                 if (isDebugEnabled)
                     indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                             "reason", "include submissions are disallowed in properties");
@@ -143,7 +142,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         // Headers
         final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
-        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+        final String headersToForward = containingDocument.getForwardSubmissionHeaders();
 
         final String submissionEffectiveId = submission.getEffectiveId();
 

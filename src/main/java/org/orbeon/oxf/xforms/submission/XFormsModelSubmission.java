@@ -482,7 +482,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 final String resolvedActionOrResourceVal = resolvedActionOrResource;
                 submitDoneOrErrorRunnable = new Runnable() {
                     public void run() {
-                        if (pVal != null && pVal.isDeferredSubmissionSecondPass && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
+                        if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward()) {
                             // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
                             throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xf:submission", "processing submission");
                         } else {
@@ -853,7 +853,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 resolvedXXFormsAnnotate = serialize ? resolvedAnnotateString : null;
             }
 
-            isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
+            isHandlingClientGetAll = containingDocument.isOptimizeGetAllSubmission() && actualHttpMethod.equals("GET")
                     && isReplaceAll
                     && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
                     && avtXXFormsUsername == null // can't optimize if there are authentication credentials
@@ -867,7 +867,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             // NOTE: Method can be null e.g. in a portlet render request
             final String method = NetUtils.getExternalContext().getRequest().getMethod();
 
-            isNoscript = containingDocument.getStaticState().isNoscript();
+            isNoscript = containingDocument.noscript();
             isAllowDeferredSubmission = !isNoscript && !(method != null && method.equals("GET"));
 
             isPossibleDeferredSubmission = isReplaceAll && !isHandlingClientGetAll && !containingDocument.isInitializing();

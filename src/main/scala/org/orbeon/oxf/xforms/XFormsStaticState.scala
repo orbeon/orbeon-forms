@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.Set
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xml.dom4j.LocationData
 import state.AnnotatedTemplate
 import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.util.XPath.CompiledExpression
 
 trait XFormsStaticState {
 
@@ -25,8 +24,7 @@ trait XFormsStaticState {
 
     def digest: String
     def encodedState: String
-    def getAllowedExternalEvents: Set[String]   // later make more generic
-    def isDynamicNoscriptTemplate: Boolean
+    def allowedExternalEvents: Set[String]
     def template: Option[AnnotatedTemplate]
 
     def topLevelPart: PartAnalysis
@@ -34,17 +32,15 @@ trait XFormsStaticState {
     def isCacheDocument: Boolean
     def isClientStateHandling: Boolean
     def isServerStateHandling: Boolean
-    def isNoscript: Boolean
     def isHTMLDocument: Boolean
 
     def isXPathAnalysis: Boolean
     def sanitizeInput: String ⇒ String
 
-    def getNonDefaultProperties: Map[String, AnyRef]
-    def getProperty[T](propertyName: String): T
-    def getStringProperty(propertyName: String): String
-    def getBooleanProperty(propertyName: String): Boolean
-    def getIntegerProperty(propertyName: String): Int
+    def staticProperty(name: String): Any
+    def staticBooleanProperty(name: String): Boolean
+    def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression]
+    def clientNonDefaultProperties: Map[String, AnyRef]
 
     def toXML(helper: XMLReceiverHelper)
     def dumpAnalysis()

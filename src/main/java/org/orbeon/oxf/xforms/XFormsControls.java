@@ -67,7 +67,7 @@ public class XFormsControls implements XFormsObjectResolver {
         this.xpathDependencies = containingDocument.getXPathDependencies();
 
         // Create minimal tree
-        initialControlTree = new ControlTree(containingDocument, indentedLogger);
+        initialControlTree = new ControlTree(indentedLogger);
         currentControlTree = initialControlTree;
     }
 
@@ -131,7 +131,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
             // Create new controls tree
             // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxf:case()
-            currentControlTree = initialControlTree = new ControlTree(containingDocument, indentedLogger);
+            currentControlTree = initialControlTree = new ControlTree(indentedLogger);
 
             // Set this here so that while initialize() runs below, refresh events will find the flag set
             initialized = true;

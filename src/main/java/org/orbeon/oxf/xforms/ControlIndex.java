@@ -13,15 +13,12 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 
 import java.util.*;
 
 public class ControlIndex {
-
-    private final boolean isNoscript;   // whether we are in noscript mode
 
     // Index of all controls in the tree by effective id
     // Order is desired so we iterate controls in the order they were added
@@ -31,9 +28,7 @@ public class ControlIndex {
     // No need for order here
     private Map<String, Map<String, XFormsControl>> controlTypes = new HashMap<String, Map<String, XFormsControl>>();
 
-    ControlIndex(boolean noscript) {
-        isNoscript = noscript;
-    }
+    ControlIndex() {}
 
     /**
      * Index a single controls.
@@ -94,11 +89,11 @@ public class ControlIndex {
         // xf:upload
         // xf:repeat
         // xxf:dialog
-        // xf:select[@appearance = 'full'] in noscript mode
+        // xf:select[@appearance = 'full']
         return control instanceof XFormsUploadControl
                 || control instanceof XFormsRepeatControl
                 || control instanceof XXFormsDialogControl
-                || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
+                || (control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
     public XFormsControl getControl(String effectiveId) {
@@ -125,12 +120,6 @@ public class ControlIndex {
     public Map<String, XFormsControl> getDialogControls() {
         return (controlTypes != null) ? controlTypes.get(XFormsConstants.XXFORMS_DIALOG_NAME) : null;
     }
-
-    /**
-     * Return the list of xf:select[@appearance = 'full'] in noscript mode.
-     *
-     * @return LinkedHashMap
-     */
     public Map<String, XFormsControl> getSelectFullControls() {
         final Map<String, XFormsControl> result = (controlTypes != null) ? controlTypes.get("select") : null;
         return (result == null) ? Collections.<String, XFormsControl>emptyMap() : result;

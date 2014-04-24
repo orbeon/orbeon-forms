@@ -273,8 +273,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     override def isStaticReadonly = isReadonly && hasStaticReadonlyAppearance
 
     def hasStaticReadonlyAppearance =
-        XFormsProperties.isStaticReadonlyAppearance(containingDocument) ||
-            XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) // TODO: determine statically
+        containingDocument.staticReadonly ||
+            XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
     override def setFocus(inputOnly: Boolean): Boolean = Focus.focusWithEvents(this)
 

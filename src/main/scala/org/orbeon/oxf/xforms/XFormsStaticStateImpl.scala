@@ -14,12 +14,11 @@
 package org.orbeon.oxf.xforms
 
 import analysis._
-import collection.JavaConversions._
 import collection.JavaConverters._
 import org.orbeon.oxf.xml._
 import dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.XMLConstants._
-import java.util.{List ⇒ JList, Set ⇒ JSet, Map ⇒ JMap}
+import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.common.{OXFException, Version}
@@ -32,6 +31,9 @@ import org.dom4j.{Element, Document}
 import org.orbeon.oxf.util.{XPath, Whitespace, StringReplacer, NumberUtils}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.util.XPath.CompiledExpression
 
 class XFormsStaticStateImpl(
         val encodedState: String,
@@ -45,7 +47,7 @@ class XFormsStaticStateImpl(
     require(encodedState ne null)
     require(digest ne null)
 
-    val getIndentedLogger = Loggers.getIndentedLogger("analysis")
+    implicit val getIndentedLogger = Loggers.getIndentedLogger("analysis")
 
     // Create top-level part once vals are all initialized
     val topLevelPart = new PartAnalysisImpl(this, None, startScope, metadata, staticStateDocument)
@@ -58,29 +60,60 @@ class XFormsStaticStateImpl(
     def toXML(helper: XMLReceiverHelper) = topLevelPart.toXML(helper)
 
     // Properties
-    lazy val allowedExternalEvents = stringOptionToSet(Option(getProperty[String](P.EXTERNAL_EVENTS_PROPERTY)))
-    lazy val isNoscript            = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
+    lazy val allowedExternalEvents = stringOptionToSet(Option(staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY)))
     lazy val isHTMLDocument        = staticStateDocument.isHTMLDocument
-    lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
+    lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
 
-    lazy val sanitizeInput    = StringReplacer(getProperty[String](P.SANITIZE_PROPERTY))(getIndentedLogger)
+    lazy val sanitizeInput         = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
 
-    def isCacheDocument       = staticStateDocument.isCacheDocument
-    def isClientStateHandling = staticStateDocument.isClientStateHandling
-    def isServerStateHandling = staticStateDocument.isServerStateHandling
+    def isCacheDocument       = staticBooleanProperty(P.CACHE_DOCUMENT_PROPERTY)
+    def isClientStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
+    def isServerStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
 
-    // Whether to keep the annotated template in the document itself (dynamic state)
-    // See: http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-state-handling#TOC-Handling-of-the-HTML-template
-    def isDynamicNoscriptTemplate = isNoscript && ! template.isDefined
+    private lazy val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
+        staticStateDocument.nonDefaultProperties map { case (name, rawPropertyValue) ⇒
+            name → {
+                val maybeAVT = XFormsUtils.maybeAVT(rawPropertyValue)
+                topLevelPart.defaultModel match {
+                    case Some(model) if maybeAVT ⇒
+                        Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, XFormsFunctionLibrary, avt = true))
+                    case None if maybeAVT ⇒
+                        throw new IllegalArgumentException("can only evaluate AVT properties if a model is present")
+                    case _ ⇒
+                        Left(P.getPropertyDefinition(name).parseProperty(rawPropertyValue))
+                }
+            }
+        }
 
-    def getProperty[T](propertyName: String): T = staticStateDocument.getProperty[T](propertyName)
+    // For properties which can be AVTs
+    def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression] =
+        nonDefaultPropertiesOnly.getOrElse(name, Left(P.getPropertyDefinition(name).defaultValue))
 
-    // Legacy methods
-    def getAllowedExternalEvents: JSet[String]       = allowedExternalEvents
-    def getNonDefaultProperties: Map[String, AnyRef] = staticStateDocument.nonDefaultProperties
-    def getStringProperty(propertyName: String)      = getProperty[String](propertyName)
-    def getBooleanProperty(propertyName: String)     = getProperty[Boolean](propertyName)
-    def getIntegerProperty(propertyName: String)     = getProperty[Int](propertyName)
+    def stringPropertyMaybeAsExpression(name: String): Either[String, CompiledExpression] =
+        propertyMaybeAsExpression(name: String).left map (_.toString)
+
+    def booleanPropertyMaybeAsExpression(name: String): Either[Boolean, CompiledExpression] =
+        propertyMaybeAsExpression(name: String).left map (_.asInstanceOf[Boolean])
+    
+    def intPropertyMaybeAsExpression(name: String): Either[Int, CompiledExpression] =
+        propertyMaybeAsExpression(name: String).left map (_.asInstanceOf[Int])
+
+    // For properties known to be static
+    override def staticProperty(name: String) =
+        propertyMaybeAsExpression(name).left.get
+
+    def staticStringProperty(name: String) =
+        stringPropertyMaybeAsExpression(name).left.get
+
+    def staticBooleanProperty(name: String) =
+        booleanPropertyMaybeAsExpression(name).left.get
+
+    def staticIntProperty(name: String) =
+        intPropertyMaybeAsExpression(name).left.get
+
+    // 2014-05-02: Used by XHTMLHeadHandler only
+    def clientNonDefaultProperties = staticStateDocument.nonDefaultProperties filter
+        { case (propertyName, _) ⇒ getPropertyDefinition(propertyName).isPropagateToClient }
 }
 
 object XFormsStaticStateImpl {
@@ -94,7 +127,7 @@ object XFormsStaticStateImpl {
             XML_EVENTS_PREFIX    → XML_EVENTS_NAMESPACE_URI,
             XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
             XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI
-        ))
+        ).asJava)
 
     // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
     // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
@@ -229,25 +262,16 @@ object XFormsStaticStateImpl {
         (template, create(staticStateXML, digest, metadata, AnnotatedTemplate(template)))
     }
 
-    def getPropertyJava[T](nonDefaultProperties: JMap[String, AnyRef], propertyName: String) =
-        getProperty[T](nonDefaultProperties.asScala, propertyName)
+    def isStoreNoscriptTemplate(nonDefaultProperties: collection.Map[String, String]) = {
 
-    private def defaultPropertyValue(propertyName: String) =
-        Option(P.getPropertyDefinition(propertyName)) map (_.defaultValue) orNull
+        def defaultPropertyValueAsString(propertyName: String) =
+            P.getPropertyDefinition(propertyName).defaultValue.toString
 
-    def getProperty[T](nonDefaultProperties: collection.Map[String, AnyRef], propertyName: String): T =
-        nonDefaultProperties.getOrElse(propertyName, defaultPropertyValue(propertyName)).asInstanceOf[T]
+        def propertyAsString(propertyName: String) =
+            nonDefaultProperties.getOrElse(propertyName, defaultPropertyValueAsString(propertyName))
 
-    // For Java callers
-    def isNoscriptJava(nonDefaultProperties: JMap[String, AnyRef]) =
-        isNoscript(nonDefaultProperties.asScala)
-
-    // Determine, based on configuration and properties, whether noscript is allowed and enabled
-    def isNoscript(nonDefaultProperties: collection.Map[String, AnyRef]) = {
-        val noscriptRequested =
-            getProperty[Boolean](nonDefaultProperties, P.NOSCRIPT_PROPERTY) &&
-                getProperty[Boolean](nonDefaultProperties, P.NOSCRIPT_SUPPORT_PROPERTY)
-        Version.instance.isPEFeatureEnabled(noscriptRequested, P.NOSCRIPT_PROPERTY)
+        propertyAsString(P.NOSCRIPT_SUPPORT_PROPERTY).toBoolean &&
+            propertyAsString(P.NOSCRIPT_TEMPLATE) == P.NOSCRIPT_TEMPLATE_STATIC_VALUE
     }
 
     // Represent the static state XML document resulting from the extractor
@@ -269,7 +293,7 @@ object XFormsStaticStateImpl {
         def rootControl = staticStateElement.element("root")
         def xblElements = rootControl.elements(XBL_XBL_QNAME).asInstanceOf[JList[Element]].asScala
 
-        // TODO: if staticStateDocument contains XHTML document, get controls and models from there
+        // TODO: if staticStateDocument contains XHTML document, get controls and models from there?
 
         // Return the last id generated
         def lastId: Int = {
@@ -290,20 +314,12 @@ object XFormsStaticStateImpl {
                 element       ← Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
                 attribute     ← Dom4j.attributes(element)
                 propertyName  = attribute.getName
-                propertyValue = P.parseProperty(propertyName, attribute.getValue)
+                propertyValue = attribute.getValue
             } yield
                 (propertyName, propertyValue)
         } toMap
-
-        // Get a property by name
-        def getProperty[T](propertyName: String): T =
-            XFormsStaticStateImpl.getProperty[T](nonDefaultProperties, propertyName)
-
-        def isCacheDocument = getProperty[Boolean](P.CACHE_DOCUMENT_PROPERTY)
-        def isClientStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
-        def isServerStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
         
-        val isHTMLDocument  = Option(staticStateElement.attributeValue("is-html")) exists (_ == "true")
+        val isHTMLDocument = Option(staticStateElement.attributeValue("is-html")) exists (_ == "true")
         
         def getOrComputeDigest(digest: Option[String]) =
             digest getOrElse {
@@ -311,6 +327,13 @@ object XFormsStaticStateImpl {
                 TransformerUtils.writeDom4j(xmlDocument, digestContentHandler)
                 NumberUtils.toHexString(digestContentHandler.getResult)
             }
+
+        private def isClientStateHandling = {
+            def nonDefault = nonDefaultProperties.get(P.STATE_HANDLING_PROPERTY) map (_ == STATE_HANDLING_CLIENT_VALUE)
+            def default    = P.getPropertyDefinition(P.STATE_HANDLING_PROPERTY).defaultValue.toString == STATE_HANDLING_CLIENT_VALUE
+
+            nonDefault getOrElse default
+        }
         
         // Get the encoded static state
         // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.

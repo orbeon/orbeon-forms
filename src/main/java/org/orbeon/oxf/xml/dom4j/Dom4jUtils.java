@@ -561,7 +561,6 @@ public class Dom4jUtils {
             if (unprefixedIsNoNamespace) {
                 namespaceURI = "";
             } else {
-
                 final String nsURI = namespaces.get(prefix);
                 namespaceURI = nsURI == null ? "" : nsURI;
             }

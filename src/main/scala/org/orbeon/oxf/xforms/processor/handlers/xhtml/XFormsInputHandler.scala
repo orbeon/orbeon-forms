@@ -66,7 +66,8 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with XMLRec
             // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
             // the encrypted value of "true". So we do not encrypt values.
             // NOTE: Put null label so that it is not output at all
-            itemset.addChildItem(Item(0, isMultiple, encode = false, attributes = null, label = null, help = None, hint = None, value = "true"))
+            // encode = false,
+            itemset.addChildItem(Item(0, isMultiple, attributes = null, label = null, help = None, hint = None, value = "true"))
 
             // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
             val select1Handler = new XFormsSelect1Handler {

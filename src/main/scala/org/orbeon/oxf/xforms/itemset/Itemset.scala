@@ -41,7 +41,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
         (allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList) asJava
 
     // Return the list of items as a JSON tree
-    def getJSONTreeInfo(controlValue: String, locationData: LocationData): String = {
+    def getJSONTreeInfo(controlValue: String, encode: Boolean, locationData: LocationData): String = {
         // Produce a JSON fragment with hierarchical information
 
         val sb = new StringBuilder
@@ -69,7 +69,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
                         sb.append(h)
                     }
                     sb.append("""","value":"""")
-                    sb.append(item.javaScriptValue)
+                    sb.append(item.javaScriptValue(encode))
                     sb.append('"')
 
                     // Item attributes if any

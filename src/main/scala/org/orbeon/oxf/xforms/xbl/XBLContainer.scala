@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import collection.JavaConverters._
+import collection.mutable
 import java.util.{List ⇒ JList}
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.XFormsContainerControl
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -27,15 +30,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventFactory
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
-import org.orbeon.oxf.util.StringConversions
-import collection.JavaConverters._
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import collection.mutable
-import collection.mutable.ArrayBuffer
 
 /**
  * Represent an XBL container of models and controls.
@@ -77,7 +73,7 @@ class XBLContainer(
 
     val contextStack = new XFormsContextStack(self)
 
-    private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = ArrayBuffer()
+    private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = mutable.ArrayBuffer()
     def childrenXBLContainers = _childrenXBLContainers.iterator
 
     def effectiveId = _effectiveId
@@ -154,16 +150,6 @@ class XBLContainer(
     // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container control
     // componentControl will be null if we are at the top-level
     def isRelevant: Boolean = (associatedControl eq null) || associatedControl.isRelevant
-
-    // Helper for XFormsContainingDocument
-    def immutableHeadersMap(request: Request): Map[String, Array[String]] =
-        request.getHeaderValuesMap.asScala.toMap
-
-    // Helper for XFormsContainingDocument
-    def immutableParametersMap(request: Request): Map[String, Array[String]] =
-        request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray toMap // mapValues ok because of toMap
-
-    def emptyImmutableMap[T, U] = Map.empty[T, U]
 }
 
 trait ModelContainer {
@@ -199,6 +185,7 @@ trait ModelContainer {
         for (model ← models)
             Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()))
 
+    def defaultModel    = _models.headOption
     def getDefaultModel = _models.headOption.orNull
 
     // Get a list of all the models in this container

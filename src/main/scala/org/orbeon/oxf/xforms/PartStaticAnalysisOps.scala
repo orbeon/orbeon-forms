@@ -25,7 +25,7 @@ trait PartStaticAnalysisOps {
     def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping
 
     def getModel(prefixedId: String): Model
-    def getDefaultModelForScope(scope: Scope): Model
+    def getDefaultModelForScope(scope: Scope): Option[Model]
     def getModelByInstancePrefixedId(prefixedId: String): Model
     def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
     def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String

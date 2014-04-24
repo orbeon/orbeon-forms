@@ -31,6 +31,7 @@ import org.xml.sax.helpers.AttributesImpl
 import collection.mutable
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 import scala.util.control.NonFatal
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 
 /**
  * Represents an xf:select1 control.
@@ -47,7 +48,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     // This is a var just for getBackCopy
     private[XFormsSelect1Control] var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
 
-    def isEncodeValues  = staticControl.isEncodeValues
+    def mustEncodeValues = XFormsSelect1Control.mustEncodeValues(containingDocument, staticControl)
     def isFullAppearance = staticControl.isFull
 
     override def onCreate() {
@@ -102,7 +103,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         val itemset       = getItemset ensuring (_ ne null)
 
         // Find the position of the first matching value
-        val updatedValue = itemset.allItemsIterator find (_.value == internalValue) map (_.externalValue) orNull
+        val updatedValue = itemset.allItemsIterator find (_.value == internalValue) map (_.externalValue(mustEncodeValues)) orNull
 
         setExternalValue(updatedValue)
     }
@@ -139,7 +140,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
             val currentItemValue = currentItem.value
 
             val itemWasSelected = existingValue == currentItemValue
-            val itemIsSelected  = currentItem.externalValue == newExternalValue
+            val itemIsSelected  = currentItem.externalValue(mustEncodeValues) == newExternalValue
 
             // Handle xforms-select / xforms-deselect
             if (! itemWasSelected && itemIsSelected)
@@ -206,7 +207,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
             val itemset = getItemset
             if (itemset ne null) {
-                val result = itemset.getJSONTreeInfo(null, getLocationData)
+                val result = itemset.getJSONTreeInfo(null, mustEncodeValues, getLocationData)
                 if (result.nonEmpty)
                     ch.text(result)
             }
@@ -239,4 +240,7 @@ object XFormsSelect1Control {
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
             containingDocument.getStaticOps.getSelect1Analysis(prefixedId).staticItemset orNull
         }
+    
+    def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait) =
+        control.mustEncodeValues getOrElse containingDocument.encodeItemValues
 }

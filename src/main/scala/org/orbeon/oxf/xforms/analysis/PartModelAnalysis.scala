@@ -37,8 +37,11 @@ trait PartModelAnalysis extends TransientState {
     def getInstances(modelPrefixedId: String) =
         modelsByPrefixedId.get(modelPrefixedId).toSeq flatMap (_.instances.values) asJava
 
+    def defaultModel =
+        getDefaultModelForScope(startScope)
+
     def getDefaultModelForScope(scope: Scope) =
-        modelsByScope.get(scope) flatMap (_.headOption) orNull
+        modelsByScope.get(scope) flatMap (_.headOption)
 
     def getModelByScopeAndBind(scope: Scope, bindStaticId: String) =
         modelsByScope.get(scope) flatMap

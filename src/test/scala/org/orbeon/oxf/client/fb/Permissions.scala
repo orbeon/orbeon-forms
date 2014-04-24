@@ -43,12 +43,12 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
 
                     // Clerks can read
                     _ ← clickOn(AddPermission)
-                    _ ← textField(role(2)).value = "clerk"
+                    _ ← textField(role(4)).value = "clerk"
                     _ ← clickOn(checkbox(2, "read"))
 
                     // Admins can do everything
                     _ ← clickOn(AddPermission)
-                    _ ← patientlySendKeys(role(3), "admin")
+                    _ ← patientlySendKeys(role(5), "admin")
                     _ ← clickOn(checkbox(3, "update"))
                     _ ← assert(checkbox(checkbox(3, "read")).isSelected)
                     // Read auto-selected when selecting update
@@ -69,12 +69,12 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
                     _ ← assert(! checkbox(checkbox(1, "read"  )).isSelected)
                     _ ← assert(! checkbox(checkbox(1, "update")).isSelected)
                     _ ← assert(! checkbox(checkbox(1, "delete")).isSelected)
-                    _ ← assert(textField(role(2)).value === "admin")
+                    _ ← assert(textField(role(4)).value === "admin")
                     _ ← assert(  checkbox(checkbox(2, "create")).isSelected)
                     _ ← assert(  checkbox(checkbox(2, "read"  )).isSelected)
                     _ ← assert(  checkbox(checkbox(2, "update")).isSelected)
                     _ ← assert(  checkbox(checkbox(2, "delete")).isSelected)
-                    _ ← assert(textField(role(3)).value === "clerk")
+                    _ ← assert(textField(role(5)).value === "clerk")
                     _ ← assert(  checkbox(checkbox(3, "create")).isSelected)
                     _ ← assert(  checkbox(checkbox(3, "read"  )).isSelected)
                     _ ← assert(! checkbox(checkbox(3, "update")).isSelected)

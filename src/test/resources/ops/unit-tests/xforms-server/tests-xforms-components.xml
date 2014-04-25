@@ -451,17 +451,17 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary≡body" class="fr-error-summary-body fr-level-error"/>
-                        <xxf:control id="my-summary≡xf-115⊙1">1</xxf:control>
-                        <xxf:control id="my-summary≡xf-116⊙1" relevant="false"/>
-                        <xxf:attribute for="my-summary≡xf-117⊙1" name="href"/>
-                        <xxf:control id="my-summary≡xf-119⊙1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-120⊙1" class="fr-error-label" label="Note"/>
+                        <xxf:control id="my-summary≡xf-112⊙1">1</xxf:control>
+                        <xxf:control id="my-summary≡xf-113⊙1" relevant="false"/>
+                        <xxf:attribute for="my-summary≡xf-114⊙1" name="href"/>
+                        <xxf:control id="my-summary≡xf-116⊙1" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-117⊙1" class="fr-error-label" label="Note"/>
                         <xxf:control id="my-summary≡ao⊙1" class="fr-error-alert fr-error-alert-error">Invalid note</xxf:control>
-                        <xxf:control id="my-summary≡xf-115⊙2">2</xxf:control>
-                        <xxf:control id="my-summary≡xf-116⊙2" relevant="false"/>
-                        <xxf:attribute for="my-summary≡xf-117⊙2" name="href"/>
-                        <xxf:control id="my-summary≡xf-119⊙2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-120⊙2" class="fr-error-label" label="Last name"/>
+                        <xxf:control id="my-summary≡xf-112⊙2">2</xxf:control>
+                        <xxf:control id="my-summary≡xf-113⊙2" relevant="false"/>
+                        <xxf:attribute for="my-summary≡xf-114⊙2" name="href"/>
+                        <xxf:control id="my-summary≡xf-116⊙2" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-117⊙2" class="fr-error-label" label="Last name"/>
                         <xxf:control id="my-summary≡ao⊙2" class="fr-error-alert fr-error-alert-error">Invalid last name</xxf:control>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>

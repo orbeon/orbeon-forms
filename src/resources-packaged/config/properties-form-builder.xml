@@ -12,33 +12,55 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors"
-            xmlns:xi="http://www.w3.org/2001/XInclude">
-
-    <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb"                       value="http://orbeon.org/oxf/xml/form-builder"/>
+            xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Toolbox -->
-    <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*"               value="oxf:/forms/orbeon/builder/xbl/text-controls.xbl
-                                                                                            oxf:/xbl/orbeon/tinymce/tinymce.xbl
-                                                                                            oxf:/xbl/orbeon/explanation/explanation.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
-                                                                                            oxf:/xbl/orbeon/us-phone/us-phone.xbl
-                                                                                            oxf:/xbl/orbeon/number/number.xbl
-                                                                                            oxf:/xbl/orbeon/currency/currency.xbl
-                                                                                            oxf:/xbl/orbeon/us-state/us-state.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*"           value="oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
-                                                                                            oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
-                                                                                            oxf:/xbl/orbeon/fields-date/fields-date.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*"          value="oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
-                                                                                            oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
-                                                                                            oxf:/xbl/orbeon/box-select/box-select.xbl
-                                                                                            oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
-                                                                                            oxf:/xbl/orbeon/autocomplete/autocomplete.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*"         value="oxf:/forms/orbeon/builder/xbl/attachment-controls.xbl
-                                                                                            oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
-                                                                                            oxf:/xbl/orbeon/attachment/attachment.xbl
-                                                                                            oxf:/xbl/orbeon/wpaint/wpaint.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.button.uri.*.*"             value="oxf:/forms/orbeon/builder/xbl/button-controls.xbl"/>
+    <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/text-controls.xbl
+        oxf:/xbl/orbeon/tinymce/tinymce.xbl
+        oxf:/xbl/orbeon/explanation/explanation.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/text-controls.xbl
+        oxf:/xbl/orbeon/tinymce/tinymce.xbl
+        oxf:/xbl/orbeon/explanation/explanation.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
+        oxf:/xbl/orbeon/us-phone/us-phone.xbl
+        oxf:/xbl/orbeon/number/number.xbl
+        oxf:/xbl/orbeon/currency/currency.xbl
+        oxf:/xbl/orbeon/us-state/us-state.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
+        oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
+        oxf:/xbl/orbeon/fields-date/fields-date.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*">
+        oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
+        oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
+        oxf:/xbl/orbeon/box-select/box-select.xbl
+        oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
+        oxf:/xbl/orbeon/autocomplete/autocomplete.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/attachment-controls.xbl
+        oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
+        oxf:/xbl/orbeon/attachment/attachment.xbl
+        oxf:/xbl/orbeon/wpaint/wpaint.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.button.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/button-controls.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb"                       value="http://orbeon.org/oxf/xml/form-builder"/>
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>

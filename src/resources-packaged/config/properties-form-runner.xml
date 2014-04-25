@@ -319,19 +319,36 @@
         then suspend
         then load-remote
     </property>
-
-    <property as="xs:string"  name="oxf.fr.home.process.credentials-ok"                         value='resume'/>
-    <property as="xs:string"  name="oxf.fr.home.process.credentials-cancel"                     value='abort then load-local'/>
-
-    <property as="xs:string"  name="oxf.fr.home.process.publish-local"                          value='xf:dispatch("confirm-local-publish")    then suspend then xf:dispatch("local-publish")'/>
-    <property as="xs:string"  name="oxf.fr.home.process.unpublish-local"                        value='xf:dispatch("confirm-local-unpublish")  then suspend then xf:dispatch("local-unpublish")'/>
-    <property as="xs:string"  name="oxf.fr.home.process.publish-remote"                         value='xf:dispatch("confirm-remote-publish")   then suspend then xf:dispatch("remote-publish")'/>
-    <property as="xs:string"  name="oxf.fr.home.process.unpublish-remote"                       value='xf:dispatch("confirm-remote-unpublish") then suspend then xf:dispatch("remote-unpublish")'/>
-    <property as="xs:string"  name="oxf.fr.home.process.local-to-remote"                        value='xf:dispatch("confirm-local-to-remote")  then suspend then xf:dispatch("local-to-remote")'/>
-    <property as="xs:string"  name="oxf.fr.home.process.remote-to-local"                        value='xf:dispatch("confirm-remote-to-local")  then suspend then xf:dispatch("remote-to-local")'/>
-
-    <property as="xs:string"  name="oxf.fr.home.process.confirmation-ok"                        value='resume'/>
-    <property as="xs:string"  name="oxf.fr.home.process.confirmation-cancel"                    value='abort'/>
+    <property as="xs:string"  name="oxf.fr.home.process.credentials-ok">
+        resume
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.credentials-cancel">
+        abort then load-local
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.publish-local">
+        xf:dispatch("confirm-local-publish")    then suspend then xf:dispatch("local-publish")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.unpublish-local">
+        xf:dispatch("confirm-local-unpublish")  then suspend then xf:dispatch("local-unpublish")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.publish-remote">
+        xf:dispatch("confirm-remote-publish")   then suspend then xf:dispatch("remote-publish")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.unpublish-remote">
+        xf:dispatch("confirm-remote-unpublish") then suspend then xf:dispatch("remote-unpublish")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.local-to-remote">
+        xf:dispatch("confirm-local-to-remote")  then suspend then xf:dispatch("local-to-remote")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.remote-to-local">
+        xf:dispatch("confirm-remote-to-local")  then suspend then xf:dispatch("remote-to-local")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.confirmation-ok">
+        resume
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.confirmation-cancel">
+        abort
+    </property>
 
     <property as="xs:anyURI"  name="oxf.fr.production-server-uri"                               value=""/>
 

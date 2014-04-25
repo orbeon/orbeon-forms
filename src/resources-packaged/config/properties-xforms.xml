@@ -55,14 +55,27 @@
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
 
     <!-- Formats -->
-    <property as="xs:string"  name="oxf.xforms.format.output.date"                      value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', xxf:lang(), (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.dateTime"                  value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01]', xxf:lang(), (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.time"                      value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01]', xxf:lang(), (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.decimal"                   value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.integer"                   value="if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.float"                     value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.double"                    value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
-
+    <property as="xs:string"  name="oxf.xforms.format.output.date">
+        if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', xxf:lang(), (), ()) else .
+    </property>
+    <property as="xs:string"  name="oxf.xforms.format.output.dateTime">
+        if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01]', xxf:lang(), (), ()) else .
+    </property>
+    <property as="xs:string"  name="oxf.xforms.format.output.time">
+        if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01]', xxf:lang(), (), ()) else .
+    </property>
+    <property as="xs:string"  name="oxf.xforms.format.output.decimal">
+        if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else .
+    </property>
+    <property as="xs:string"  name="oxf.xforms.format.output.integer">
+        if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else .
+    </property>
+    <property as="xs:string"  name="oxf.xforms.format.output.float">
+        if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .
+    </property>
+    <property as="xs:string"  name="oxf.xforms.format.output.double">
+        if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .
+    </property>
 
     <property as="xs:string"  name="oxf.xforms.format.input.date"                       value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
     <property as="xs:string"  name="oxf.xforms.format.input.time"                       value="[h]:[m]:[s] [P,*-2]"/> <!-- [h]:[m]:[s] [P,*-2]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
@@ -127,42 +140,48 @@
 
     <!-- Whitespace handling for XForms documents -->
     <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                     value="normalize"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize"                   value="
-                                                                                                xf|model,
-                                                                                                xbl|xbl"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.preserve"                    value="
-                                                                                                xf|instance > *,
-                                                                                                xf|var,
-                                                                                                xxf|var,
-                                                                                                xf|variable,
-                                                                                                xxf|variable,
-                                                                                                exf|variable,
-                                                                                                xf|setvalue,
-                                                                                                xf|value,
-                                                                                                xxf|sequence,
-                                                                                                xxf|script,
-                                                                                                xf|action[type=xpath],
-                                                                                                xs|schema"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.collapse"                    value="
-                                                                                                xf|label,
-                                                                                                xf|help,
-                                                                                                xf|hint,
-                                                                                                xf|alert,
-                                                                                                xf|message,
-                                                                                                xbl|template,
-                                                                                                xxbl|global"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize">
+        xf|model,
+        xbl|xbl
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.preserve">
+        xf|instance > *,
+        xf|var,
+        xxf|var,
+        xf|variable,
+        xxf|variable,
+        exf|variable,
+        xf|setvalue,
+        xf|value,
+        xxf|sequence,
+        xxf|script,
+        xf|action[type=xpath],
+        xs|schema
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.collapse">
+        xf|label,
+        xf|help,
+        xf|hint,
+        xf|alert,
+        xf|message,
+        xbl|template,
+        xxbl|global
+    </property>
     <property as="xs:string"  name="oxf.xforms.whitespace.html.default"                     value="normalize"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.normalize"                   value="
-                                                                                                xh|html"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.preserve"                    value="
-                                                                                                xh|pre,
-                                                                                                xh|textarea,
-                                                                                                xh|script,
-                                                                                                xh|style,
-                                                                                                xh|template"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.collapse"                    value="
-                                                                                                xh|title,
-                                                                                                xh|body"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.normalize">
+        xh|html
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.preserve">
+        xh|pre,
+        xh|textarea,
+        xh|script,
+        xh|style,
+        xh|template
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.collapse">
+        xh|title,
+        xh|body
+    </property>
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>

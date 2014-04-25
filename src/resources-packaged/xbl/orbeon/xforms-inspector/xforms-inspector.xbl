@@ -53,8 +53,8 @@
             <!-- Local model -->
             <xf:model id="inspector-model">
                 <xf:action ev:event="xforms-enabled" ev:observer="inspector-group" ev:target="inspector-group">
-                    <!-- Initialize itemset -->
-                    <xf:action iterate="for $m in xxf:list-models() return if ($m != xxf:absolute-id('inspector-model')) then $m else ()">
+                    <!-- Initialize itemset, excluding the inspector's model -->
+                    <xf:action iterate="xxf:list-models()[. != xxf:absolute-id('inspector-model')]">
                         <xf:var name="current-model-id" value="." as="xs:string"/>
                         <xf:action context="instance('inspector-itemset')">
                             <xf:insert context="." ref="model" origin="xxf:element('model', xxf:attribute('id', $current-model-id))"/>

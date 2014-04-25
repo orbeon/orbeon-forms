@@ -433,7 +433,7 @@
                                     <!-- Whether errors are shown incrementally or not -->
                                     <incremental/>
                                     <!-- Absolute ids of observers -->
-                                    <observers/>
+                                    <observers>my-group</observers>
                                     <!-- Whether the form is valid or invalid -->
                                     <valid>false</valid>
                                     <!-- Number of alerts, total vs. per level -->

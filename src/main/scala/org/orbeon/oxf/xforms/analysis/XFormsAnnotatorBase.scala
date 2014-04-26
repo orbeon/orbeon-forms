@@ -30,10 +30,10 @@ abstract class XFormsAnnotatorBase(templateReceiver: XMLReceiver, extractorRecei
     def isInPreserve: Boolean
 
     // Name of container elements that require the use of separators for handling visibility
-    // Q: no "td"?
     private val SeparatorAppearanceElements = Set(
         "table",
         "tbody",
+        "colgroup",
         "thead",
         "tfoot",
         "tr",

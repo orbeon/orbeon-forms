@@ -8,7 +8,7 @@ create table orbeon_form_definition (
     form               varchar(255),
     form_version       int not null,
     deleted            char(1) not null,
-    xml                mediumtext
+    xml                mediumtext collate utf8_unicode_ci
 )   engine = InnoDB;
 
 create table orbeon_form_definition_attach (
@@ -35,7 +35,7 @@ create table orbeon_form_data (
     document_id        varchar(255),
     draft              char(1) not null,
     deleted            char(1) not null,
-    xml                mediumtext
+    xml                mediumtext collate utf8_unicode_ci
 )   engine = InnoDB;
 
 create table orbeon_form_data_attach (

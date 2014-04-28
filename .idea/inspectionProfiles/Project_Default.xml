@@ -142,6 +142,34 @@
     <inspection_tool class="Method with Unit result type defined with equals sign" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MethodNameSameAsClassName" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="NoExplicitFinalizeCalls" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="OperationOnCollection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="simplificationTypeChecked">
+        <array>
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="false" />
+        </array>
+      </option>
+      <option name="simplificationTypeChecked">
+        <array>
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="true" />
+          <option value="false" />
+        </array>
+      </option>
+    </inspection_tool>
     <inspection_tool class="ParameterNamingConvention" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="m_regex" value="[a-z][A-Za-z]*" />
       <option name="m_minLength" value="1" />

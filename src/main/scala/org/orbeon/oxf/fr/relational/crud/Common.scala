@@ -25,6 +25,20 @@ trait Common extends RequestResponse with FormRunnerPersistence {
 
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[CRUD]), "")
 
+    /**
+     * Finds in the database what form version is used for an app/form and optional document id:
+     *
+     * 1. If only the app/form are provided, it returns the latest version of a published, non-deleted, form.
+     *    We wouldn't want to return a version of a deleted published form, as running a GET for the latest
+     *    form definition for an app/form, we would here return the version of a deleted form (and then 404 as we
+     *    can't find that form in the database).
+     * 2. If the document id is provided, it returns the form version used for that document. We could return the
+     *    form version for a deleted document, but decided against it for consistency with what we do when returning
+     *    the form version for app/form. (A benefit of returning the version of a deleted data is that this could
+     *    allow Form Runner to return a 510 to the browser. Without it, since Form Runner starts by reading the form
+     *    definition, it will fail if that version isn't found. But this isn't a real benefit since right now the
+     *    Page Flow Controller doesn't know how to return a 510.)
+     */
     def formVersion(connection: Connection, app: String, form: String, docId: Option[String]): Option[Int] = {
         val versionResult = {
             val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
@@ -40,6 +54,7 @@ trait Common extends RequestResponse with FormRunnerPersistence {
                     |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
                     |           group by app, form, form_version
                     |       )
+                    |   and deleted = 'N'
                     |""".stripMargin)
                           ps.setString(1, app)
                           ps.setString(2, form)

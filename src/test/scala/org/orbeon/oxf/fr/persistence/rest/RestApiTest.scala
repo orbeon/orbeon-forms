@@ -60,7 +60,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     /**
      * Test new form versioning introduced in 4.5, for form definitions.
      */
-    /*@Test*/ def formDefinitionVersionTest(): Unit = {
+    @Test def formDefinitionVersionTest(): Unit = {
         withOrbeonTables { connection =>
             val FormURL = "/crud/acme/address/form/form.xhtml"
 
@@ -113,7 +113,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     /**
      * Test new form versioning introduced in 4.5, for form data
      */
-    /*@Test*/ def formDataVersionTest(): Unit = {
+    @Test def formDataVersionTest(): Unit = {
         withOrbeonTables { connection =>
             val FirstDataURL = "/crud/acme/address/data/123/data.xml"
 
@@ -145,7 +145,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     /**
      * Get form definition corresponding to a document
      */
-    /*@Test*/ def formForDataTest(): Unit = {
+    @Test def formForDataTest(): Unit = {
         withOrbeonTables { connection =>
             val FormURL       = "/crud/acme/address/form/form.xhtml"
             val FirstDataURL  = "/crud/acme/address/data/123/data.xml"
@@ -167,7 +167,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     /**
      * Data permissions
      */
-    /*@Test*/ def permissionsTest(): Unit = {
+    @Test def permissionsTest(): Unit = {
 
         withOrbeonTables { connection =>
             import Permissions._
@@ -247,7 +247,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     }
 
     // Try uploading files of 1 KB, 1 MB, and 10 MB
-    /*@Test*/ def attachmentsTest(): Unit = {
+    @Test def attachmentsTest(): Unit = {
         withOrbeonTables { connection =>
             for ((size, position) ← Seq(1024, 1024*1024, 10*1024*1024).zipWithIndex) {
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
@@ -259,7 +259,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     }
 
     // Try uploading files of 1 KB, 1 MB, and 5 MB
-    /*@Test*/ def largeXMLDocumentsTest(): Unit = {
+    @Test def largeXMLDocumentsTest(): Unit = {
         withOrbeonTables { connection =>
             for ((size, position) ← Seq(1024, 1024*1024, 5*1024*1024).zipWithIndex) {
                 val string = new Array[Char](size)
@@ -274,7 +274,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
         }
     }
 
-    /*@Test*/ def draftsTest(): Unit = {
+    @Test def draftsTest(): Unit = {
         withOrbeonTables { connection =>
 
             // Draft and non-draft are different

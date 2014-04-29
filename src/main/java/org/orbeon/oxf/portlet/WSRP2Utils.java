@@ -84,6 +84,7 @@ public class WSRP2Utils {
         }
     }
 
+    // FIXME: Duplicated from XFormsUtils, see https://github.com/orbeon/orbeon-forms/issues/960
     public static String escapeXMLMinimal(String str) {
         str = str.replace("&", "&amp;");
         str = str.replace("<", "&lt;");

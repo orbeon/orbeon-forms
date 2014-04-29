@@ -466,6 +466,20 @@ body.orbeon {
   .orbeon .fr-mode-email .xforms-input.xforms-type-boolean.xforms-static .xforms-deselected {
     background-image: url("images/glyphicons/checkbox-deselected-hd.png") !important;
   }
+  .orbeon a[href] {
+    text-decoration: underline;
+  }
+  .orbeon a[href]:link,
+  .orbeon a[href]:visited {
+    color: #0088cc !important;
+  }
+  .orbeon a[href="#"] {
+    text-decoration: none;
+  }
+  .orbeon a[href="#"]:link,
+  .orbeon a[href="#"]:visited {
+    color: #333333 !important;
+  }
   .orbeon a,
   .orbeon button.btn-link {
     color: black;

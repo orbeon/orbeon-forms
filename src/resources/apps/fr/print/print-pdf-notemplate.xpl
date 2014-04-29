@@ -16,9 +16,9 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:xf="http://www.w3.org/2002/xforms">
 
     <!-- Unrolled XHTML+XForms -->
     <p:param type="input" name="xforms"/>
@@ -71,20 +71,29 @@
                 <!--
                     See:
 
+                    https://github.com/orbeon/orbeon-forms/issues/1694
                     https://github.com/orbeon/orbeon-forms/issues/1288
                     https://github.com/orbeon/orbeon-forms/issues/1515
                     https://github.com/orbeon/orbeon-forms/issues/264
-
-                    The issue is with all anchors, so now filter all <a> elements.
                  -->
                 <xsl:template match="*:a">
-                    <span>
-                        <!-- Filter all attributes specific to <a> as per HTML 5 -->
-                        <xsl:apply-templates select="@* except (@shape, @href, @target, @download, @ping, @rel, @hreflang, @type) | node()"/>
-                    </span>
+                    <a>
+                        <!-- Filter all attributes specific to <a> as per HTML 5 except @href -->
+                        <xsl:apply-templates select="@* except (@shape, @target, @download, @ping, @rel, @hreflang, @type) | node()"/>
+                    </a>
                 </xsl:template>
+
                 <!-- These are unneeded and can make iText choke (values too long) -->
                 <xsl:template match="*:input[@type = 'hidden']"/>
+
+                <!-- Link URLs in fields -->
+                <xsl:template match="*:pre[p:has-class('xforms-textarea', ..)] | *:span[p:has-class('xforms-field') and p:has-class('xforms-input', ..)]">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*"/>
+                        <xsl:apply-templates select="saxon:parse(frf:addLinkAnchors(string()))"/>
+                    </xsl:copy>
+                </xsl:template>
+
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
                 <xsl:template match="*:form">
                     <xsl:copy>

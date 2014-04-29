@@ -400,6 +400,20 @@ body.orbeon { background-color: @frBackground }
             }
         }
 
+        a[href] {
+            text-decoration: underline;
+            &:link, &:visited {
+                color: @linkColor !important;
+            }
+        }
+
+        a[href="#"] {
+            text-decoration: none;
+            &:link, &:visited {
+                color: @textColor !important;
+            }
+        }
+
         a, button.btn-link { color: black; text-decoration: none }
 
         .container {

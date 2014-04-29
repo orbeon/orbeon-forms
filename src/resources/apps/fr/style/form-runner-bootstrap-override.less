@@ -386,5 +386,8 @@ body.orbeon {
                 width: 94%;
             }
         }
+
+        // Bootstrap adds `content: " (" attr(href) ")"` and `content: " (" attr(title) ")"`
+        a[href]:after, abbr[title]:after { content: ""; }
     }
 }

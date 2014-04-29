@@ -335,4 +335,10 @@ body.orbeon {
   .fr-mode-email .fr-grid-4 .xforms-field {
     width: 94%;
   }
+  .orbeon .fr-mode-pdf a[href]:after,
+  .fr-mode-email a[href]:after,
+  .orbeon .fr-mode-pdf abbr[title]:after,
+  .fr-mode-email abbr[title]:after {
+    content: "";
+  }
 }

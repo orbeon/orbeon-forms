@@ -15,11 +15,12 @@ package org.orbeon.oxf.fr
 
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
+import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
+import org.orbeon.oxf.util.URLFinder
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 
 trait FormRunnerPDF {
 
@@ -77,4 +78,8 @@ trait FormRunnerPDF {
         // Join everything with "$" for PDF
         nameParts(control) ++ suffixAsSeq(control) mkString "$"
     }
+
+    // Add HTTP/HTTPS anchors to a plain string
+    def addLinkAnchors(s: String) =
+        URLFinder.addLinkAnchors(s)
 }

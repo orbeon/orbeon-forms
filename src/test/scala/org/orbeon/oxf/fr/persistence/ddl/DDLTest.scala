@@ -11,10 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence
+package org.orbeon.oxf.fr.persistence.ddl
 
 import java.sql.Connection
 import org.junit.Test
+import org.orbeon.oxf.fr.persistence.DB
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 

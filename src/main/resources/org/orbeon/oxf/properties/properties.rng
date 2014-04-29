@@ -54,9 +54,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="boolean"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="boolean"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
                 <group>
@@ -70,9 +73,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="integer"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="integer"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
                 <group>
@@ -86,9 +92,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="date"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="date"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
                 <group>
@@ -102,9 +111,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="dateTime"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="dateTime"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
                 <group>
@@ -118,9 +130,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="QName"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="QName"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
                 <group>
@@ -134,9 +149,12 @@
                             </data>
                         </attribute>
                     </choice>
-                    <attribute name="value">
-                        <data type="anyURI"/>
-                    </attribute>
+                    <choice>
+                        <attribute name="value">
+                            <data type="anyURI"/>
+                        </attribute>
+                        <text/>
+                    </choice>
                 </group>
 
             </choice>

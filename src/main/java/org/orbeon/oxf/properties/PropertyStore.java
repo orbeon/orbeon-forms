@@ -93,7 +93,7 @@ public class PropertyStore {
                 final String value; {
                     final String valueFromAttribute = propertyElement.attributeValue("value");
                     if (valueFromAttribute == null)
-                        value = propertyElement.getText();
+                        value = propertyElement.getText().trim(); // trim as attributes are normalized
                     else
                         value = valueFromAttribute;
                 }

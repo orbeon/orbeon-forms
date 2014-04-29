@@ -40,24 +40,22 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                     case _        ⇒ "t.xml"
                 }
                 val ps = connection.prepareStatement(
-                    s"""|select
-                        |    last_modified_time
-                        |    ${if (req.forAttachment) ", file_content"          else s", $xmlCol xml"}
-                        |    ${if (req.forData)       ", username, groupname"   else ""}
-                        |    , form_version, deleted
-                        |from $table t
-                        |    where (last_modified_time, $idCols)
-                        |          in
-                        |          (
-                        |              select max(last_modified_time) last_modified_time, $idCols
-                        |                from $table
-                        |               where app  = ?
+                    s"""|SELECT  t.last_modified_time
+                        |        ${if (req.forAttachment) ", t.file_content"            else s", $xmlCol xml"}
+                        |        ${if (req.forData)       ", t.username, t.groupname"   else ""}
+                        |        , t.form_version, t.deleted
+                        |FROM    $table t,
+                        |        (
+                        |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+                        |              FROM   $table
+                        |             WHERE   app  = ?
                         |                     and form = ?
                         |                     ${if (req.forForm)       "and form_version = ?"              else ""}
                         |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
                         |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
-                        |            group by $idCols
-                        |          )
+                        |            GROUP BY ${idCols.mkString(", ")}
+                        |        ) m
+                        |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
                         |""".stripMargin)
 
                 val position = Iterator.from(1)

@@ -43,18 +43,18 @@ trait Common extends RequestResponse with FormRunnerPersistence {
         val versionResult = {
             val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
             val ps = connection.prepareStatement(
-                s"""|select max(form_version)
-                    |  from $table
-                    | where (last_modified_time, app, form, form_version) in
+                s"""|SELECT max(t.form_version)
+                    |FROM   $table t,
                     |       (
-                    |             select max(last_modified_time) last_modified_time, app, form, form_version
-                    |               from $table
-                    |              where app = ?
-                    |                    and form = ?
+                    |           SELECT   max(last_modified_time) last_modified_time, app, form, form_version
+                    |           FROM     $table
+                    |           WHERE    app = ?
+                    |                    AND form = ?
                     |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
-                    |           group by app, form, form_version
-                    |       )
-                    |   and deleted = 'N'
+                    |           GROUP BY app, form, form_version
+                    |       ) m
+                        |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
+                    |       AND t.deleted = 'N'
                     |""".stripMargin)
                           ps.setString(1, app)
                           ps.setString(2, form)
@@ -84,14 +84,17 @@ trait Common extends RequestResponse with FormRunnerPersistence {
     }
 
     // List of columns that identify a row
-    def idColumns(req: Request): String =
-        Seq(
+    def idColumns(req: Request): List[String] =
+        List(
             Some("app"), Some("form"),
             req.forForm       option "form_version",
             req.forData       option "document_id",
             req.forData       option "draft",
             req.forAttachment option "file_name"
-        ).flatten.mkString(", ")
+        ).flatten
+
+    def idColumnsList(req: Request): String = idColumns(req).mkString(", ")
+    def joinColumns(cols: Seq[String], t1: String, t2: String) = cols.map(c ⇒ s"$t1.$c = $t2.$c").mkString(" AND ")
 
     // Given a user/group name coming from the data, tells us what operations we can do in this data, assuming that
     // it is for the current request app/form

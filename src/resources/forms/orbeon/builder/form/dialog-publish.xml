@@ -145,12 +145,24 @@
 
         <!-- Publish form operation -->
         <xf:action ev:event="fb-publish-form" type="xpath">
-            (: First make sure XBL bindings for section templates are present :)
             for $annotated in
-                xxf:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                    ('data', 'bindings'),
-                    (xxf:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', xxf:instance('fb-form-instance'), 'data'), xxf:instance('fb-components-instance')),
-                    'data')
+                xxf:call-xpl(
+                    'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                    (
+                        'data',
+                        'bindings'
+                    ),
+                    (
+                        xxf:call-xpl(
+                            'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                            'data',
+                            xxf:instance('fb-form-instance'),
+                            'data'
+                        ),
+                        xxf:instance('fb-components-instance')
+                    ),
+                    'data'
+                )
             return
                 fbf:publish($annotated, event('app'), event('form'), event('document'))
         </xf:action>

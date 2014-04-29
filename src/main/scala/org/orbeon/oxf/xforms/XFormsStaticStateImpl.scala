@@ -284,7 +284,7 @@ object XFormsStaticStateImpl {
         def template = Option(staticStateElement.element("template")) map (_.getText)
 
         // Extract properties
-        // NOTE: XFormsExtractorContentHandler takes care of propagating only non-default properties
+        // NOTE: XFormsExtractor takes care of propagating only non-default properties
         val nonDefaultProperties = {
             for {
                 element       ← Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)

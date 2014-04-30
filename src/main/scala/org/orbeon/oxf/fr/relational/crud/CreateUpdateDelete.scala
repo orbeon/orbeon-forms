@@ -126,7 +126,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                     |       ${if (! req.forAttachment) s", $xmlCol"                 else ""}
                     |       ${if (req.forData)          ", username, groupname"     else ""}
                     |   )
-                    |VALUE
+                    |VALUES
                     |   (
                     |                                  ?, ?, ?
                     |                                  , ?, ?, ?

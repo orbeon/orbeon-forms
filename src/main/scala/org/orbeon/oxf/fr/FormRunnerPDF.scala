@@ -83,5 +83,5 @@ trait FormRunnerPDF {
 
     // Add HTTP/HTTPS hyperlinks to a plain string
     def hyperlinkURLs(s: String, hyperlinks: Boolean) =
-        replaceURLs(s, if (hyperlinks) insertHyperlink else insertPlaceholderHyperlink)
+        replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 }

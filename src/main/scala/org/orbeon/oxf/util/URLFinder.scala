@@ -13,25 +13,34 @@
  */
 package org.orbeon.oxf.util
 
-import scala.util.matching.Regex.Match
 import org.orbeon.oxf.xml.XMLUtils._
 import scala.util.matching.Regex
 
 object URLFinder {
 
-    def insertHyperlink(s: String) =
-        s"""<a href="$s">$s</a>"""
-
-    def insertPlaceholderHyperlink(s: String) =
-        s"""<a>$s</a>"""
+    def replaceWithHyperlink  (s: String) = s"""<a href="$s">$s</a>"""
+    def replaceWithPlaceholder(s: String) = s"""<a>$s</a>"""
 
     // Replace HTTP/HTTPS URLs in a plain string
-    def replaceURLs(s: String, insert: String ⇒ String) = {
+    def replaceURLs(s: String, replace: String ⇒ String) = {
 
-        def matchToAnchor(m: Match) =
-            insert(escapeXMLMinimal(Regex.quoteReplacement(m.toString)))
+        // We don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text between URLs
 
-        "<span>" + URLMatchRegex.replaceAllIn(s, matchToAnchor _) + "</span>"
+        val sb = new StringBuilder("<span>")
+        var afterPreviousMatch = 0
+
+        for (m ← URLMatchRegex.findAllMatchIn(s)) {
+            val before = m.before
+            val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
+            sb append escapeXMLMinimal(precedingUnmatched.toString)
+            sb append replace(escapeXMLMinimal(Regex.quoteReplacement(m.toString)))
+            afterPreviousMatch = m.end
+        }
+
+        sb append s.substring(afterPreviousMatch)
+        sb append "</span>"
+
+        sb.toString
     }
 
     def findAllLinks(s: String) =

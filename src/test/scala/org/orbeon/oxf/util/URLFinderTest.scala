@@ -43,19 +43,19 @@ class URLFinderTest extends AssertionsForJUnit {
     @Test def testHyperlinkURLs(): Unit = {
 
         val input =
-            """Music is an art (https://en.wikipedia.org/wiki/Art).
-              |
-              |URL with parameters: http://example.org/a=1&b=2.
-              |
-              |From Wikipedia (https://en.wikipedia.org/wiki/Music).""".stripMargin
+            """- Music is an art (https://en.wikipedia.org/wiki/Art).
+              |- URL with parameters: http://example.org/a=1&b=2.
+              |- Dungeons & Dragons
+              |- if (a < b) 42 else 0
+              |- From Wikipedia (https://en.wikipedia.org/wiki/Music).""".stripMargin
 
         val expected =
-            """<span>Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
-              |
-              |URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
-              |
-              |From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).</span>""".stripMargin
+            """<span>- Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
+              |- URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
+              |- Dungeons &amp; Dragons
+              |- if (a &lt; b) 42 else 0
+              |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).</span>""".stripMargin
 
-        assert(expected === replaceURLs(input, insertHyperlink))
+        assert(expected === replaceURLs(input, replaceWithHyperlink))
     }
 }

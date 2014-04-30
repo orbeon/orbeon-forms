@@ -20,6 +20,8 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.resources.URLFactory
+import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
@@ -28,9 +30,14 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
         val values   = List("foo", "foo", "bar", "foo", "baz", "bar", "qux")
         val expected = List("foo", "fo1", "bar", "fo2", "baz", "ba1", "qu1")
 
-        val result = FlatView.fixupDuplicates(values, List("qux"), values map (_.length) max)
+        def fixupDuplicates(values: Iterator[String], initialValues: Seq[String], maxLength: Int): Iterator[String] = {
+            val seen = mutable.HashSet[String](initialValues: _*)
+            values map (v ⇒ FlatView.resolveDuplicate(v, maxLength)(seen))
+        }
 
-        assert(expected === result)
+        val result = fixupDuplicates(values.iterator, List("qux"), values map (_.length) max)
+
+        assert(expected === result.to[List])
     }
 
     @Test def extractPathsColsTest(): Unit = {
@@ -59,7 +66,7 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
         )
 
         for ((url, expected) ← expectedForDocuments)
-            assert(expected === FlatView.extractPathsCols(readDocument(url)))
+            assert(expected === FlatView.extractPathsCols(readDocument(url)).to[List])
     }
 
     @Test def xmlToSQLIdTest(): Unit = {

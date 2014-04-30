@@ -19,13 +19,13 @@ import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import org.orbeon.scaxon.XML._
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.collection.immutable.Seq
 import RequestReader._
 
 private object FlatView {
 
     val MetadataColumns         = List("document_id", "created", "last_modified_time", "last_modified_by") map (_.toUpperCase)
     val PrefixedMetadataColumns = MetadataColumns map (col ⇒ s"METADATA_$col")
+    val MetadataPairs           = MetadataColumns zip PrefixedMetadataColumns
     val MaxNameLength           = 30
     val TablePrefix             = "ORBEON_F_"
 
@@ -39,10 +39,8 @@ private object FlatView {
         val formXML = xmlToSQLId(req.form)
 
         val tableName = TablePrefix + joinParts(appXML, formXML, MaxNameLength - TablePrefix.length)
-
-        val metadataCols = MetadataColumns zip PrefixedMetadataColumns
-        val userCols     = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" → col }
-        val allCols      = metadataCols ++ userCols
+        val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" → col }
+        val allCols   = MetadataPairs.iterator ++ userCols
 
         // NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations
         val ps = connection.prepareStatement(
@@ -81,27 +79,27 @@ private object FlatView {
             control         ← descendantControls(topLevelSection)
             if isDirectLeafControl(control)
         } yield
-            (topLevelSection, control)
+           topLevelSection → control
     }
 
-    def extractPathsCols(document: DocumentInfo): List[(String, String)] = {
+    def extractPathsCols(document: DocumentInfo): Iterator[(String, String)] = {
 
         import FormRunner._
 
-        def pathsCols =
-            for {
-                (section, control) ← collectControls(document).to[List]
-                sectionName        = controlNameFromId(section.id)
-                controlName        = controlNameFromId(control.id)
-            } yield
-                (sectionName + "/" + controlName, joinParts(xmlToSQLId(sectionName), xmlToSQLId(controlName), MaxNameLength))
+        val seen = mutable.HashSet[String](PrefixedMetadataColumns: _*)
 
-        pathsCols map (_._1) zip fixupDuplicates(pathsCols map (_._2), PrefixedMetadataColumns, MaxNameLength)
+        for {
+            (section, control) ← collectControls(document)
+            sectionName        = controlNameFromId(section.id)
+            controlName        = controlNameFromId(control.id)
+            path               = sectionName + "/" + controlName
+            col                = joinParts(xmlToSQLId(sectionName), xmlToSQLId(controlName), MaxNameLength)
+            uniqueCol          = resolveDuplicate(col, MaxNameLength)(seen)
+        } yield
+            path → uniqueCol
     }
 
-    def fixupDuplicates(values: Seq[String], initialValues: Seq[String], maxLength: Int): List[String] = {
-
-        val seen = mutable.HashSet[String](initialValues: _*)
+    def resolveDuplicate(value: String, maxLength: Int)(seen: mutable.HashSet[String]): String = {
 
         @tailrec def nextValue(value: String, counter: Int = 1): String = {
 
@@ -113,22 +111,16 @@ private object FlatView {
             else
                 nextValue(value, counter + 1)
         }
-        
-        val b = mutable.ListBuffer[String]()
 
-        for (value ← values) {
+        val cleanValue =
+            if (! seen(value))
+                value
+            else
+                nextValue(value)
 
-            val cleanValue =
-                if (! seen(value))
-                    value
-                else
-                    nextValue(value)
+        seen += cleanValue
 
-            b += cleanValue
-            seen += cleanValue
-        }
-
-        b.result()
+        cleanValue
     }
 
     // Create an acceptable SQL name from an XML NCName (but accept any input)

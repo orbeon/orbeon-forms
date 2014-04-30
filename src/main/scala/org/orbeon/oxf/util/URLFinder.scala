@@ -21,19 +21,20 @@ object URLFinder {
     def replaceWithHyperlink  (s: String) = s"""<a href="$s">$s</a>"""
     def replaceWithPlaceholder(s: String) = s"""<a>$s</a>"""
 
-    // Replace HTTP/HTTPS URLs in a plain string
+    // Replace HTTP/HTTPS URLs in a plain string and return an HTML fragment
     def replaceURLs(s: String, replace: String ⇒ String) = {
-
-        // We don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text between URLs
 
         val sb = new StringBuilder("<span>")
         var afterPreviousMatch = 0
 
+        // Don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text between URLs
         for (m ← URLMatchRegex.findAllMatchIn(s)) {
             val before = m.before
             val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
+
             sb append escapeXMLMinimal(precedingUnmatched.toString)
             sb append replace(escapeXMLMinimal(Regex.quoteReplacement(m.toString)))
+
             afterPreviousMatch = m.end
         }
 
@@ -43,7 +44,7 @@ object URLFinder {
         sb.toString
     }
 
-    def findAllLinks(s: String) =
+    def findURLs(s: String) =
         URLMatchRegex.findAllIn(s) map Regex.quoteReplacement
 
     // Useful resources:
@@ -57,14 +58,9 @@ object URLFinder {
     // - https://github.com/android/platform_frameworks_base/blob/master/core/java/android/util/Patterns.java
     // - http://blog.codinghorror.com/the-problem-with-urls/
 
-    private val RegexpDomains =
-        """[a-z]{2,13}"""
-
-    private val BalancedParensOneLevelDeep =
-        """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
-
-    private val BalancedParens =
-        """\([^\s]+?\)"""
+    private val RegexpDomains              = """[a-z]{2,13}"""
+    private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
+    private val BalancedParens             = """\([^\s]+?\)"""
 
     // NOTE: String interpolation works bizarrely with triple quotes: backslash escapes are interpreted. So we escape
     // the backslashes.

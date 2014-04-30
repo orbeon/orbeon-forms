@@ -37,10 +37,10 @@ class URLFinderTest extends AssertionsForJUnit {
         )
 
         for ((in, out) ← expected)
-            assert(out === findAllLinks(in).to[List])
+            assert(out === findURLs(in).to[List])
     }
 
-    @Test def testHyperlinkURLs(): Unit = {
+    @Test def testReplaceURLs(): Unit = {
 
         val input =
             """- Music is an art (https://en.wikipedia.org/wiki/Art).

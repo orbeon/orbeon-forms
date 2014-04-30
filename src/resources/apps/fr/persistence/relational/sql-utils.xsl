@@ -81,7 +81,7 @@
         <xsl:value-of select="replace($text, '''', '''''')"/>
     </xsl:function>
 
-    <xsl:function name="f:namespaces">
+    <xsl:function name="f:namespaces" as="xs:string*">
         <xsl:param name="element" as="element(query)"/>
         <xsl:param name="xpath"   as="xs:string"/>
         <xsl:variable name="xpath-parts" select="tokenize($xpath, '/')" as="xs:string*"/>
@@ -89,13 +89,19 @@
             <xsl:variable name="prefix" select="." as="xs:string"/>
             <xsl:variable name="output-ns" select="exists($xpath-parts[starts-with(., $prefix)])" as="xs:boolean"/>
             <xsl:if test="$output-ns">
-                <xsl:text>xmlns:</xsl:text>
-                <xsl:value-of select="."/>
-                <xsl:text>="</xsl:text>
-                <xsl:value-of select="namespace-uri-for-prefix(., $element)"/>
-                <xsl:text>" </xsl:text>
+                <xsl:sequence select="concat(., '=&quot;', namespace-uri-for-prefix(., $element), '&quot;')"/>
             </xsl:if>
         </xsl:for-each>
+    </xsl:function>
+
+    <xsl:function name="f:oracle-namespaces" as="xs:string">
+        <xsl:param name="namespaces" as="xs:string*"/>
+        <xsl:sequence select="string-join(for $n in $namespaces return concat('xmlns:', $n), ' ')"/>
+    </xsl:function>
+
+    <xsl:function name="f:db2-sqlserver-namespaces" as="xs:string">
+        <xsl:param name="namespaces" as="xs:string*"/>
+        <xsl:sequence select="string-join(for $n in $namespaces return concat('declare namespace ', $n, ';'), ' ')"/>
     </xsl:function>
 
 </xsl:stylesheet>

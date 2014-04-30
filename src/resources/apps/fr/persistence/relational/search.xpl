@@ -167,7 +167,7 @@
                                 <xsl:variable name="query">
                                     select
                                         d.created, d.last_modified_time, d.document_id, d.xml, d.username, d.groupname, d.draft,
-                                        <xsl:if test="/search/provider = ('oracle', 'db2')">row_number() over (order by d.created desc) row_number</xsl:if>
+                                        <xsl:if test="/search/provider = ('oracle', 'db2', 'sqlserver')">row_number() over (order by d.created desc) row_number</xsl:if>
                                         <xsl:if test="/search/provider = 'mysql'">
                                             <!-- MySQL lacks row_number, see http://stackoverflow.com/a/1895127/5295 -->
                                             @rownum := @rownum + 1 row_number
@@ -230,43 +230,45 @@
                                             )
                                         </xsl:if>
                                     ) d
-                                    <xsl:if test="/search/provider = 'mysql'">, (select @rownum := 0) r</xsl:if>
-                                    order by d.created desc
+                                    <xsl:if test="/search/provider = 'mysql'">
+                                        , (select @rownum := 0) r
+                                        ORDER BY d.created desc
+                                    </xsl:if>
                                 </xsl:variable>
 
                                 <!-- Get total number of document in collection for this app/form
                                      - the count includes drafts, whether returned or not, except for anonymous users, who can't use the draft functionality  -->
                                 <sql:execute>
                                     <sql:query>
-                                        select
+                                        SELECT
                                             (
-                                                select count(*) from orbeon_form_data data
-                                                where
-                                                    (
-                                                        app, form, document_id,
-                                                        last_modified_time, draft
-                                                    )
-                                                    in
-                                                    (
-                                                        select
-                                                            app, form, document_id,
-                                                            max(last_modified_time) last_modified_time, draft
-                                                        from orbeon_form_data
-                                                        where
-                                                            app = <sql:param type="xs:string" select="/search/app"/>
-                                                            and form = <sql:param type="xs:string" select="/search/form"/>
-                                                            <xsl:if test="/search/@orbeon-username = ''"> and draft = 'N'</xsl:if>
-                                                        group by app, form, document_id, draft
-                                                    )
-                                                    and deleted = 'N'
-                                                    <xsl:copy-of select="f:owner-group-condition('data')"/>
+                                                SELECT count(*)
+                                                FROM   orbeon_form_data d,
+                                                       (
+                                                           SELECT
+                                                               app, form, document_id,
+                                                               max(last_modified_time) last_modified_time, draft
+                                                           FROM orbeon_form_data
+                                                           WHERE
+                                                               app = <sql:param type="xs:string" select="/search/app"/>
+                                                               and form = <sql:param type="xs:string" select="/search/form"/>
+                                                               <xsl:if test="/search/@orbeon-username = ''"> and draft = 'N'</xsl:if>
+                                                           GROUP BY app, form, document_id, draft
+                                                       ) m
+                                                WHERE  d.app = m.app
+                                                       AND d.form = m.form
+                                                       AND d.document_id = m.document_id
+                                                       AND d.last_modified_time = m.last_modified_time
+                                                       AND d.draft = m.draft
+                                                       AND d.deleted = 'N'
+                                                       <xsl:copy-of select="f:owner-group-condition('data')"/>
                                             ) total,
                                             (
-                                                select count(*) from (<xsl:copy-of select="$query"/>) a
+                                                SELECT count(*)
+                                                FROM   (<xsl:copy-of select="$query"/>) a
                                             ) search_total
-                                        from
-                                            <xsl:if test="/search/provider = ('mysql', 'oracle')">dual</xsl:if>
-                                            <xsl:if test="/search/provider = 'db2'">sysibm.sysdummy1</xsl:if>
+                                        <xsl:if test="/search/provider = ('mysql', 'oracle')">FROM dual</xsl:if>
+                                        <xsl:if test="/search/provider = 'db2'">FROM sysibm.sysdummy1</xsl:if>
                                     </sql:query>
                                     <sql:result-set>
                                         <sql:row-iterator>
@@ -278,24 +280,28 @@
                                 <!-- Get details -->
                                 <sql:execute>
                                     <sql:query>
-                                        select created, last_modified_time, document_id, username, groupname, draft
+                                        SELECT created, last_modified_time, document_id, username, groupname, draft
                                             <!-- Go over detail columns and extract data from XML -->
                                             <xsl:for-each select="/search/query[@path]">
                                                 <xsl:choose>
-                                                    <xsl:when test="/search/provider = 'mysql' ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
-                                                    <xsl:when test="/search/provider = 'oracle'">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(., @path)"/>')</xsl:when>
-                                                    <xsl:when test="/search/provider = 'db2'   ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'mysql'    ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'oracle'   ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'db2'      ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
+                                                    <!-- Even when there is just one value, SQL Server seems to want the (…)[1]; see http://stackoverflow.com/a/1302199/5295 -->
+                                                    <xsl:when test="/search/provider = 'sqlserver'">, xml.value('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> (<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>)[1]', 'nvarchar(255)')</xsl:when>
                                                 </xsl:choose>
                                                 detail_<xsl:value-of select="position()"/>
                                             </xsl:for-each>
-                                        from
+                                        FROM
                                             (
-                                                select *
-                                                from ( <xsl:copy-of select="$query"/> ) a
-                                                where row_number
-                                                    <xsl:variable name="start-offset-zero-based" select="(/search/page-number - 1) * /search/page-size"/>
-                                                    between <xsl:value-of select="$start-offset-zero-based + 1"/>
-                                                    and     <xsl:value-of select="$start-offset-zero-based + /search/page-size"/>
+                                                SELECT  *
+                                                FROM    (
+                                                            <xsl:copy-of select="$query"/>
+                                                        ) a
+                                                WHERE   row_number
+                                                        <xsl:variable name="start-offset-zero-based" select="(/search/page-number - 1) * /search/page-size"/>
+                                                        BETWEEN <xsl:value-of select="$start-offset-zero-based + 1"/>
+                                                        AND     <xsl:value-of select="$start-offset-zero-based + /search/page-size"/>
                                             ) a
                                     </sql:query>
                                     <sql:result-set>
@@ -344,10 +350,13 @@
                                         and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
-                                        and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(., @path)"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                        and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'db2'">
-                                        and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/> = "<xsl:value-of select="f:escape-sql(.)"/>"]')
+                                        and XMLEXISTS ('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> $XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/> = "<xsl:value-of select="f:escape-sql(.)"/>"]')
+                                    </xsl:when>
+                                    <xsl:when test="$search/search/provider = 'sqlserver'">
+                                        and xml.value('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> (<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>)[1]', 'nvarchar(255)') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                 </xsl:choose>
                             </xsl:when>
@@ -358,10 +367,13 @@
                                         and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
-                                        and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(., @path)"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                        and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'db2'">
-                                        and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
+                                        and XMLEXISTS('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> $XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
+                                    </xsl:when>
+                                    <xsl:when test="$search/search/provider = 'sqlserver'">
+                                        and xml.value('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> (<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>)[1]', 'nvarchar(255)') like '%<xsl:value-of select="f:escape-sql(.)"/>%'
                                     </xsl:when>
                                 </xsl:choose>
                             </xsl:otherwise>
@@ -378,6 +390,11 @@
                             </xsl:when>
                             <xsl:when test="$search/search/provider = 'db2'">
                                 and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
+                            </xsl:when>
+                            <xsl:when test="$search/search/provider = 'sqlserver'">
+                                <!-- We don't do a substring search, at apparently this isn't supported by the full-text index.
+                                     http://social.msdn.microsoft.com/Forums/sqlserver/en-US/02ebc411-0fcf-40ee-9963-3f64ed4409bb -->
+                                and contains(xml, <sql:param type="xs:string" select="/search/query[not(@path)]"/>)
                             </xsl:when>
                         </xsl:choose>
                     </xsl:if>

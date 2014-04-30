@@ -40,7 +40,7 @@ class URLFinderTest extends AssertionsForJUnit {
             assert(out === findAllLinks(in).to[List])
     }
 
-    @Test def testAddLinkAnchors(): Unit = {
+    @Test def testHyperlinkURLs(): Unit = {
 
         val input =
             """Music is an art (https://en.wikipedia.org/wiki/Art).
@@ -56,6 +56,6 @@ class URLFinderTest extends AssertionsForJUnit {
               |
               |From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).</span>""".stripMargin
 
-        assert(expected === addLinkAnchors(input))
+        assert(expected === replaceURLs(input, insertHyperlink))
     }
 }

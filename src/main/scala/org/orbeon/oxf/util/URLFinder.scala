@@ -19,14 +19,17 @@ import scala.util.matching.Regex
 
 object URLFinder {
 
-    // Add HTTP/HTTPS anchors to a plain string
-    def addLinkAnchors(s: String) = {
+    def insertHyperlink(s: String) =
+        s"""<a href="$s">$s</a>"""
 
-        def matchToAnchor(m: Match) = {
-            val r = escapeXMLMinimal(Regex.quoteReplacement(m.toString))
+    def insertPlaceholderHyperlink(s: String) =
+        s"""<a>$s</a>"""
 
-            s"""<a href="$r">$r</a>"""
-        }
+    // Replace HTTP/HTTPS URLs in a plain string
+    def replaceURLs(s: String, insert: String ⇒ String) = {
+
+        def matchToAnchor(m: Match) =
+            insert(escapeXMLMinimal(Regex.quoteReplacement(m.toString)))
 
         "<span>" + URLMatchRegex.replaceAllIn(s, matchToAnchor _) + "</span>"
     }

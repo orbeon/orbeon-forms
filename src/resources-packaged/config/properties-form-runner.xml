@@ -92,6 +92,7 @@
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/> <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.pdf.hyperlinks.*.*"                           value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                              value="false"/>

@@ -79,7 +79,9 @@ trait FormRunnerPDF {
         nameParts(control) ++ suffixAsSeq(control) mkString "$"
     }
 
-    // Add HTTP/HTTPS anchors to a plain string
-    def addLinkAnchors(s: String) =
-        URLFinder.addLinkAnchors(s)
+    import URLFinder._
+
+    // Add HTTP/HTTPS hyperlinks to a plain string
+    def hyperlinkURLs(s: String, hyperlinks: Boolean) =
+        replaceURLs(s, if (hyperlinks) insertHyperlink else insertPlaceholderHyperlink)
 }

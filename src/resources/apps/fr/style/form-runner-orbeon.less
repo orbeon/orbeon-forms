@@ -400,6 +400,7 @@ body.orbeon { background-color: @frBackground }
             }
         }
 
+        // All regular links with href
         a[href] {
             text-decoration: underline;
             &:link, &:visited {
@@ -407,6 +408,7 @@ body.orbeon { background-color: @frBackground }
             }
         }
 
+        // In particular section titles have hyperlinks like this
         a[href="#"] {
             text-decoration: none;
             &:link, &:visited {

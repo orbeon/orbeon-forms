@@ -46,6 +46,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     // Runs the SQL, and returns the DDL for the tables as defined in the database
     private def sqlToDDL(connection: Connection, sql: Seq[String]): Map[String, String] = {
         val statement = connection.createStatement
+        sql foreach statement.executeUpdate
         DB.getTableNames(connection).map { tableName ⇒
             val tableResultSet = statement.executeQuery("show create table " + tableName)
             tableResultSet.next()

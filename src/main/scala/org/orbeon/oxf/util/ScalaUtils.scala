@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.util
 
+import collection.generic.CanBuildFrom
+import java.io.{Writer, Reader, OutputStream, InputStream}
+import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
+import org.apache.log4j.Logger
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
-import org.apache.log4j.Logger
-import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
-import collection.mutable
-import collection.generic.CanBuildFrom
 import reflect.ClassTag
-import scala.util.{Success, Failure, Try}
+import scala.collection.mutable
 import scala.util.control.NonFatal
-import java.io.{Writer, Reader, OutputStream, InputStream}
+import scala.util.{Success, Failure, Try}
 
 object ScalaUtils extends PathOps {
 
@@ -166,6 +166,12 @@ object ScalaUtils extends PathOps {
     implicit class IteratorWrapper[T](val i: Iterator[T]) extends AnyVal {
         def nextOption = i.hasNext option i.next()
     }
+
+    object IteratorExt {
+        def iterateWhile[T](cond: ⇒ Boolean, elem: ⇒ T): Iterator[T] =
+            Iterator.continually(cond option elem).takeWhile(_.isDefined).flatten
+    }
+    implicit def fromIteratorExt(i: Iterator.type) = IteratorExt
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
     // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.

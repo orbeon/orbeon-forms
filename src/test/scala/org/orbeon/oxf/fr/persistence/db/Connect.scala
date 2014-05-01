@@ -44,15 +44,7 @@ private[persistence] object Connect {
     }
 
     def getTableNames(connection: Connection): List[String] = {
-        val tablesResultSet = connection.createStatement.executeQuery("show tables")
-        val tableNames = ListBuffer[String]()
-        while (tablesResultSet.next())
-            tableNames += tablesResultSet.getString(1)
-        println(tableNames.mkString(", "))
-        tableNames.toList
-
-        //val x = Stream.continually(tablesResultSet.next() option tablesResultSet.getString(1)).takeWhile(_.isDefined).flatten
-
-        // Boolean Value List[Value]
+        val tableNameResultSet = connection.createStatement.executeQuery("show tables")
+        Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
     }
 }

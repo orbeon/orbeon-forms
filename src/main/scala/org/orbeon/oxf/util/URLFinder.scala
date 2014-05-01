@@ -38,7 +38,7 @@ object URLFinder {
             afterPreviousMatch = m.end
         }
 
-        sb append s.substring(afterPreviousMatch)
+        sb append escapeXMLMinimal(s.substring(afterPreviousMatch))
         sb append "</span>"
 
         sb.toString

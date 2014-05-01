@@ -47,14 +47,16 @@ class URLFinderTest extends AssertionsForJUnit {
               |- URL with parameters: http://example.org/a=1&b=2.
               |- Dungeons & Dragons
               |- if (a < b) 42 else 0
-              |- From Wikipedia (https://en.wikipedia.org/wiki/Music).""".stripMargin
+              |- From Wikipedia (https://en.wikipedia.org/wiki/Music).
+              |- if (a < b) 42 else 0""".stripMargin
 
         val expected =
             """<span>- Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
               |- URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
               |- Dungeons &amp; Dragons
               |- if (a &lt; b) 42 else 0
-              |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).</span>""".stripMargin
+              |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).
+              |- if (a &lt; b) 42 else 0</span>""".stripMargin
 
         assert(expected === replaceURLs(input, replaceWithHyperlink))
     }

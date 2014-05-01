@@ -25,7 +25,7 @@ import org.scalatest.junit.AssertionsForJUnit
 import scala.Some
 import scala.util.Random
 import scala.xml.Elem
-import org.orbeon.oxf.fr.persistence.DB
+import org.orbeon.oxf.fr.persistence.db.{SQL, Connect}
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -39,18 +39,18 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     val AllOperations = Set("create", "read", "update", "delete")
 
     private def withOrbeonTables[T](block: java.sql.Connection ⇒ T) {
-        DB.asTomcat { connection ⇒
+        Connect.asTomcat { connection ⇒
             val statement = connection.createStatement
             try {
                 // Create tables
-                val createDDL = DB.readSQL(s"${DB.Base}/mysql-4_5.sql")
+                val createDDL = SQL.read("mysql-4_5.sql")
                 createDDL foreach statement.executeUpdate
 
                 // Run the interesting code
                 block(connection)
             } finally {
                 // Clean-up database dropping tables
-                (DB.getTableNames(connection)
+                (Connect.getTableNames(connection)
                     map ("drop table " + _)
                     foreach statement.executeUpdate)
             }

@@ -15,9 +15,9 @@ package org.orbeon.oxf.fr.persistence.ddl
 
 import java.sql.Connection
 import org.junit.Test
-import org.orbeon.oxf.fr.persistence.DB
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.fr.persistence.db._
 
 /**
  * Test the DDL we provide to create and update databases.
@@ -25,39 +25,54 @@ import org.scalatest.junit.AssertionsForJUnit
 class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     private def withNewDatabase[T](block: Connection ⇒ T): T = {
-
+        val createUserAndDatabase = Config.provider match {
+            case MySQL     ⇒ Seq("create user orbeon_ddl@localhost identified by 'orbeon_ddl'",
+                                  "create database orbeon_ddl",
+                                  "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost")
+            case SQLServer ⇒ Seq("CREATE DATABASE orbeon_ddl")
+            case _         ⇒ ???
+        }
+        val dropUserAndDatabase = Config.provider match {
+            case MySQL     ⇒ Seq("drop user orbeon_ddl@localhost",
+                                  "drop database orbeon_ddl")
+            case SQLServer ⇒ Seq("DROP DATABASE orbeon_ddl")
+            case _         ⇒ ???
+        }
         try {
-            val createUserAndDatabase = Seq(
-                "create user orbeon_ddl@localhost identified by 'orbeon_ddl'",
-                "create database orbeon_ddl",
-                "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost"
-            )
-            DB.asRoot(createUserAndDatabase foreach _.createStatement.executeUpdate)
-            DB.asOrbeon(block)
+            Connect.asRoot(createUserAndDatabase foreach _.createStatement.executeUpdate)
+            Connect.asDDL(block)
         } finally {
-            val dropUserAndDatabase = Seq(
-                "drop user orbeon_ddl@localhost",
-                "drop database orbeon_ddl"
-            )
-            DB.asRoot(dropUserAndDatabase foreach _.createStatement.executeUpdate)
+            Connect.asRoot(dropUserAndDatabase foreach _.createStatement.executeUpdate)
         }
     }
 
     // Runs the SQL, and returns the DDL for the tables as defined in the database
-    private def sqlToDDL(connection: Connection, sql: Seq[String]): Map[String, String] = {
-        val statement = connection.createStatement
-        sql foreach statement.executeUpdate
-        DB.getTableNames(connection).map { tableName ⇒
-            val tableResultSet = statement.executeQuery("show create table " + tableName)
-            tableResultSet.next()
-            val tableDDL = tableResultSet.getString(2)
-            (tableName, tableDDL)
-        }.toMap
+    private def sqlToDDL(sql: Seq[String]): Map[String, String] = {
+        withNewDatabase { connection ⇒
+            val statement = connection.createStatement
+            sql foreach statement.executeUpdate
+            Connect.getTableNames(connection).map { tableName ⇒
+                val tableResultSet = statement.executeQuery("show create table " + tableName)
+                tableResultSet.next()
+                val tableDDL = tableResultSet.getString(2)
+                (tableName, tableDDL)
+            }.toMap
+        }
     }
 
     @Test def createAndUpgradeTest(): Unit = {
-        val updateDDL = withNewDatabase(sqlToDDL(_, DB.readSQL(s"${DB.Base}/mysql-4_3.sql") ++ DB.readSQL(s"${DB.Base}/mysql-4_3-to-4_4.sql")))
-        val createDDL = withNewDatabase(sqlToDDL(_, DB.readSQL(s"${DB.Base}/mysql-4_4.sql")))
-        assert(updateDDL === createDDL)
+        Config.provider match {
+            case MySQL ⇒
+                val upgradeTo4_4DDL = sqlToDDL(SQL.read("mysql-4_3.sql") ++ SQL.read("mysql-4_3-to-4_4.sql"))
+                val  straight4_4DDL = sqlToDDL(SQL.read("mysql-4_4.sql"))
+                //val upgradeTo4_5DDL = sqlToDDL(SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
+                //val  straight4_5DDL = sqlToDDL(SQL.read("mysql-4_5.sql"))
+                assert(upgradeTo4_4DDL === straight4_4DDL)
+                //assert(upgradeTo4_5DDL === straight4_5DDL)
+            case SQLServer ⇒
+                // No assertions, but at least test that DDL runs
+                sqlToDDL(SQL.read("sqlserver-4_6.sql"))
+            case _ ⇒ ???
+        }
     }
 }

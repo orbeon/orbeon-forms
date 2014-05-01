@@ -23,13 +23,13 @@ class URLFinderTest extends AssertionsForJUnit {
     @Test def testFindURLs(): Unit = {
 
         val expected = List(
-            """www.google.com"""                                           → List("www.google.com"),
-            """http://www.google.com"""                                    → List("http://www.google.com"),
-            """https://www.google.com"""                                   → List("https://www.google.com"),
-            """http://www.google.com,"""                                   → List("http://www.google.com"),
-            """http://www.google.com."""                                   → List("http://www.google.com"),
-            """http://www.google.com:"""                                   → List("http://www.google.com"),
-            """this (http://www.google.com) works"""                       → List("http://www.google.com"),
+            """www.google.com"""                                           → List("""www.google.com"""),
+            """http://www.google.com"""                                    → List("""http://www.google.com"""),
+            """https://www.google.com"""                                   → List("""https://www.google.com"""),
+            """http://www.google.com,"""                                   → List("""http://www.google.com"""),
+            """http://www.google.com."""                                   → List("""http://www.google.com"""),
+            """http://www.google.com:"""                                   → List("""http://www.google.com"""),
+            """this (http://www.google.com) works"""                       → List("""http://www.google.com"""),
             """this http://userid:password@example.com:8080/, works"""     → List("""http://userid:password@example.com:8080/"""),
             """this http://223.255.255.254, works"""                       → List("""http://223.255.255.254"""),
             """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" → List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),

@@ -27,7 +27,7 @@ object URLFinder {
         val sb = new StringBuilder("<span>")
         var afterPreviousMatch = 0
 
-        // Don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text between URLs
+        // Don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text around URLs
         for (m ← URLMatchRegex.findAllMatchIn(s)) {
             val before = m.before
             val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
@@ -62,8 +62,7 @@ object URLFinder {
     private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
     private val BalancedParens             = """\([^\s]+?\)"""
 
-    // NOTE: String interpolation works bizarrely with triple quotes: backslash escapes are interpreted. So we escape
-    // the backslashes.
+    // NOTE: All backslashes are escaped below because interpolation with triple quotes interprets backslash escapes.
     private val URLMatchRegex =
         s"""(?xi)
             \\b

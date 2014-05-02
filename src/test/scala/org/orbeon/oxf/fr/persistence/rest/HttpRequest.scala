@@ -22,6 +22,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.util.Try
 import org.orbeon.oxf.fr.FormRunnerPermissions._
+import org.orbeon.oxf.fr.persistence.db.Config
 
 private object HttpRequest {
 
@@ -37,7 +38,7 @@ private object HttpRequest {
     private def request(url: String, method: String, version: Version, body: Option[Body], credentials: Option[Credentials]): ConnectionResult = {
         val documentUrl = URLFactory.createURL(MySQLBase + url)
         val headers = {
-            val dataSourceHeader  = Seq("Orbeon-Datasource" → Array("mysql_tomcat"))
+            val dataSourceHeader  = Seq("Orbeon-Datasource" → Array(Config.provider.name ++ "_tomcat"))
             val contentTypeHeader = body.map {
                     case XML   (_) ⇒ "application/xml"
                     case Binary(_) ⇒ "application/octet-stream"

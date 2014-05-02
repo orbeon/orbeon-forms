@@ -25,7 +25,10 @@ import org.scalatest.junit.AssertionsForJUnit
 import scala.Some
 import scala.util.Random
 import scala.xml.Elem
-import org.orbeon.oxf.fr.persistence.db.{SQL, Connect}
+import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.relational.Specific
+import scala.Some
+import org.orbeon.oxf.fr.relational.ForDocument
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -43,16 +46,23 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
             val statement = connection.createStatement
             try {
                 // Create tables
-                val createDDL = SQL.read("mysql-4_5.sql")
+                val sql = Config.provider match {
+                    case MySQL     ⇒ "mysql-4_5.sql"
+                    case SQLServer ⇒ "sqlserver-4_6.sql"
+                    case _         ⇒ ???
+                }
+                val createDDL = SQL.read(sql)
                 createDDL foreach statement.executeUpdate
-
                 // Run the interesting code
                 block(connection)
             } finally {
                 // Clean-up database dropping tables
                 (Connect.getTableNames(connection)
-                    map ("drop table " + _)
+                    map ("DROP TABLE " + _)
                     foreach statement.executeUpdate)
+                // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
+                if (Config.provider == SQLServer)
+                    statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")
             }
         }
     }

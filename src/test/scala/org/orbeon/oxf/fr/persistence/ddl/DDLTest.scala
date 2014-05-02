@@ -18,6 +18,7 @@ import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * Test the DDL we provide to create and update databases.
@@ -46,16 +47,42 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
         }
     }
 
-    // Runs the SQL, and returns the DDL for the tables as defined in the database
-    private def sqlToDDL(sql: Seq[String]): Map[String, String] = {
+    /**
+     * Runs the SQL, and returns the information about the tables as defined in the database. The form in which this
+     * information is returned varies depending on the database, hence the Any return type.
+     */
+    private def sqlToTableInfo(sql: Seq[String]): Any = {
         withNewDatabase { connection ⇒
             val statement = connection.createStatement
             sql foreach statement.executeUpdate
             Connect.getTableNames(connection).map { tableName ⇒
-                val tableResultSet = statement.executeQuery("show create table " + tableName)
-                tableResultSet.next()
-                val tableDDL = tableResultSet.getString(2)
-                (tableName, tableDDL)
+                val tableInfo = Config.provider match {
+                    case MySQL ⇒
+                        // MySQL can give us the DDL that could be used to create that table
+                        val tableResultSet = statement.executeQuery("SHOW CREATE TABLE " + tableName)
+                        tableResultSet.next()
+                        tableResultSet.getString(2)
+                    case SQLServer ⇒
+                        //
+                        val tableInfoResultSet = {
+                            val ps = connection.prepareStatement(
+                                """SELECT   *
+                                  |FROM     information_schema.columns
+                                  |WHERE    table_name = ?
+                                  |ORDER BY ordinal_position
+                                  |""".stripMargin)
+                            ps.setString(1, tableName)
+                            ps.executeQuery()
+                        }
+                        def tableInfo() = {
+                            val interestingColumns = Seq("column_name", "is_nullable", "data_type")
+                            for (col ← interestingColumns) yield
+                                col → tableInfoResultSet.getObject(col)
+                        }
+                        Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
+                    case _ ⇒ ???
+                }
+                (tableName, tableInfo)
             }.toMap
         }
     }
@@ -63,15 +90,15 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     @Test def createAndUpgradeTest(): Unit = {
         Config.provider match {
             case MySQL ⇒
-                val upgradeTo4_4DDL = sqlToDDL(SQL.read("mysql-4_3.sql") ++ SQL.read("mysql-4_3-to-4_4.sql"))
-                val  straight4_4DDL = sqlToDDL(SQL.read("mysql-4_4.sql"))
-                val upgradeTo4_5DDL = sqlToDDL(SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
-                val  straight4_5DDL = sqlToDDL(SQL.read("mysql-4_5.sql"))
-                assert(upgradeTo4_4DDL === straight4_4DDL)
-                assert(upgradeTo4_5DDL === straight4_5DDL)
+                val upgradeTo4_4 = sqlToTableInfo(SQL.read("mysql-4_3.sql") ++ SQL.read("mysql-4_3-to-4_4.sql"))
+                val  straight4_4 = sqlToTableInfo(SQL.read("mysql-4_4.sql"))
+                val upgradeTo4_5 = sqlToTableInfo(SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
+                val  straight4_5 = sqlToTableInfo(SQL.read("mysql-4_5.sql"))
+                assert(upgradeTo4_4 === straight4_4)
+                assert(upgradeTo4_5 === straight4_5)
             case SQLServer ⇒
-                // No assertions, but at least test that DDL runs
-                sqlToDDL(SQL.read("sqlserver-4_6.sql"))
+                // No assertions for now (we don't have upgrades yet), but at least test that DDL runs
+                sqlToTableInfo(SQL.read("sqlserver-4_6.sql"))
             case _ ⇒ ???
         }
     }

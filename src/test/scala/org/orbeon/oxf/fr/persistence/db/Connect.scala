@@ -44,7 +44,12 @@ private[persistence] object Connect {
     }
 
     def getTableNames(connection: Connection): List[String] = {
-        val tableNameResultSet = connection.createStatement.executeQuery("show tables")
+        val query = Config.provider match {
+            case MySQL     ⇒ "SHOW TABLES"
+            case SQLServer ⇒ "SELECT table_name FROM information_schema.tables"
+            case _         ⇒ ???
+        }
+        val tableNameResultSet = connection.createStatement.executeQuery(query)
         Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
     }
 }

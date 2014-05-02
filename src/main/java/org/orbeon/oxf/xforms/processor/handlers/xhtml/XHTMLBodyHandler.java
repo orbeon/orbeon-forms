@@ -306,7 +306,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
-                // XFormsAnnotatorContentHandler adds this appearance if needed
+                // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
                 return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
@@ -326,7 +326,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // NOTE: We use the same handlers for switch as we do for group
         controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
-                // XFormsAnnotatorContentHandler adds this appearance if needed
+                // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
                 return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);

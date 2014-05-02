@@ -39,10 +39,9 @@ import java.util.Map;
  *   - produces xxf:attribute elements
  * - finds title information and produces xxf:text elements
  *
- * NOTE: There was a thought of merging this with XFormsExtractorContentHandler but we need a separate annotated
- * document in XFormsToXHTML to produce the output. So if we modify this, we should modify it so that two separate
- * ContentHandler (at least two separate outputs) are produced, one for the annotated output, another for the extracted
- * output.
+ * NOTE: There was a thought of merging this with XFormsExtractor but we need a separate annotated document in
+ * XFormsToXHTML to produce the output. So if we modify this, we should modify it so that two separate XMLReceiver (at
+ * least two separate outputs) are produced, one for the annotated output, another for the extracted output.
  */
 public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver {
 

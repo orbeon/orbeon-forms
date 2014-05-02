@@ -32,7 +32,7 @@ case object TitleState extends State
 
 case class ElementDetails(start: StartElement, parent: Option[ElementDetails], level: Int, previousState: State)
 
-// Attempt to rewrite XFormsAnnotatorContentHandler as an FSM
+// Attempt to rewrite XFormsAnnotator as an FSM
 class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[ElementDetails]] with XMLReceiver {
 
     private val HtmlHead = new QName(XHTML_NAMESPACE_URI, "head")

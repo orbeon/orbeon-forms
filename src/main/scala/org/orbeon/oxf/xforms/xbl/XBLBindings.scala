@@ -67,7 +67,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
      * o use separate outer/inner scope IdGenerator
      *   o more complex
      *   o requires to know inner/outer scope at annotation time
-     *   o requires XFormsAnnotatorContentHandler to provide start/end of XForms element
+     *   o requires XFormsAnnotator to provide start/end of XForms element
      *
      * As of 2009-09-14, we use an IdGenerator shared among top-level and all XBL bindings.
      */

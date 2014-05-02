@@ -181,35 +181,60 @@ trait AlertsAndConstraintsOps extends ControlOps {
             LevelByName(validationElem attValue "level")
     }
 
-    case class RequiredValidation(level: ValidationLevel, required: Boolean) extends Validation {
+    // Required is either a simple boolean or a custom XPath expression
+    case class RequiredValidation(level: ValidationLevel, required: Either[Boolean, String]) extends Validation {
+
+        import RequiredValidation._
 
         def write(inDoc: NodeInfo, controlName: String): Unit =
-            updateMip(inDoc, controlName, Required.name, if (required) "true()" else "")
+            updateMip(
+                inDoc,
+                controlName,
+                Required.name,
+                eitherToXPath(required, keepFalse = false)
+            )
 
         def toXML(forLang: String): Elem =
-            <validation type={Required.name} level={level.name}><required>{required.toString}</required></validation>
+            <validation type={Required.name} level={level.name}><required>{eitherToXPath(required, keepFalse = true)}</required></validation>
     }
 
     object RequiredValidation {
-        def fromForm(inDoc: NodeInfo, controlName: String): RequiredValidation = {
-            // FB only handles true() and false() at this time and other values are overwritten
-            val required = getMip(inDoc, controlName, Required.name) exists (_ == "true()")
-            // NOTE: Set a blank id because we don't want that attribute to roundtrip
-            RequiredValidation(ErrorLevel, required)
-        }
+
+        def fromForm(inDoc: NodeInfo, controlName: String): RequiredValidation =
+            RequiredValidation(
+                ErrorLevel,
+                xpathOptToEither(getMip(inDoc, controlName, Required.name))
+            )
 
         def fromXML(validationElem: NodeInfo): Option[RequiredValidation] = {
             require(validationElem \@ "type" === Required.name)
 
             val level    = Validation.fromXML(validationElem)
-            val required = validationElem \ Required.name === "true"
-            Some(RequiredValidation(level, required))
+            val required = validationElem \ Required.name stringValue
+
+            Some(RequiredValidation(level, xpathOptToEither(nonEmptyOrNone(required))))
         }
+
+        private def xpathOptToEither(opt: Option[String]): Either[Boolean, String] =
+            opt match {
+                case Some("true()")         ⇒ Left(true)
+                case Some("false()") | None ⇒ Left(false)    // normalize missing MIP to false()
+                case Some(xpath)            ⇒ Right(xpath)
+            }
+
+        private def eitherToXPath(required: Either[Boolean, String], keepFalse: Boolean) =
+            required match {
+                case Left(true)                  ⇒ "true()"
+                case Left(false) if keepFalse    ⇒ "false()"
+                case Left(false) if ! keepFalse  ⇒ ""        // empty value causes MIP to be removed
+                case Right(xpath)                ⇒ xpath
+            }
     }
 
-    case class DatatypeValidation(level: ValidationLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
-
-        require(builtinType.isDefined || schemaType.isDefined)
+    // For a builtin type, keep the plain type name and whether the type implied requiredness. For a schema type, keep
+    // the type qualified name so we can separate custom types in different namespaces, yet not have to do namespace
+    // resolution when creating a DatatypeValidation instance.
+    case class DatatypeValidation(level: ValidationLevel, datatype: Either[(String, Boolean), String]) extends Validation {
 
         def write(inDoc: NodeInfo, controlName: String): Unit = {
 
@@ -239,7 +264,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             val bind = findBindByName(inDoc, controlName).get
 
             this match {
-                case DatatypeValidation(_, Some(builtinType), _, required) ⇒
+                case DatatypeValidation(_, Left((builtinType, required))) ⇒
                     // If a builtin type, we just have a local name
                     val nsURI =
                         if (XFormsTypeNames(builtinType) || ! required && XFormsVariationTypeNames(builtinType))
@@ -251,7 +276,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     val prefix = bind.nonEmptyPrefixesForURI(nsURI).sorted.head
 
                     new QName(builtinType, new Namespace(prefix, nsURI))
-                case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
+                case DatatypeValidation(_, Right(schemaType))  ⇒
                     // Schema type OTOH comes with a prefix if needed
                     val localname = parseQName(schemaType)._2
                     val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
@@ -264,12 +289,24 @@ trait AlertsAndConstraintsOps extends ControlOps {
             }
         }
 
-        def toXML(forLang: String): Elem =
+        def toXML(forLang: String): Elem = {
+
+            val builtinTypeString = datatype match {
+                case Left((name, _)) ⇒ name
+                case _               ⇒ ""
+            }
+
+            val builtinTypeRequired = datatype match {
+                case Left((_, required)) ⇒ required.toString
+                case _                   ⇒ ""
+            }
+
             <validation type="datatype" level={level.name}>
-                <builtin-type>{builtinType.getOrElse("")}</builtin-type>
-                <schema-type>{schemaType.getOrElse("")}</schema-type>
-                <required>{required.toString}</required>
+                <builtin-type>{builtinTypeString}</builtin-type>
+                <builtin-type-required>{builtinTypeRequired}</builtin-type-required>
+                <schema-type>{datatype.right.getOrElse("")}</schema-type>
             </validation>
+        }
     }
 
     object DatatypeValidation {
@@ -279,36 +316,37 @@ trait AlertsAndConstraintsOps extends ControlOps {
             val bind    = findBindByName(inDoc, controlName).get // require the bind
             val typeMIP = getMip(inDoc, controlName, "type")
 
-            val (builtinType, schemaType, required) =
+            val builtinOrSchemaType =
                 typeMIP match {
                     case Some(typ) ⇒
 
-                        val qName = bind.resolveQName(typ)
-
-                        val isBuiltinType   = Set(XF, XS)(qName.getNamespaceURI)
-                        val isRequired      = qName.getNamespaceURI == XS
+                        val qName         = bind.resolveQName(typ)
+                        val isBuiltinType = Set(XF, XS)(qName.getNamespaceURI)
 
                         if (isBuiltinType)
-                            (Some(qName.getName), None, isRequired)
+                            Left(qName.getName → (qName.getNamespaceURI == XS))
                         else // FIXME: Handle namespace and prefix for schema type
-                            (None, Some(typ), isRequired)
+                            Right(typ)
                     case None ⇒
                         // No specific type means we are a string
-                        (Some("string"), None, false)
+                        Left("string" → false)
                 }
 
-            DatatypeValidation(ErrorLevel, builtinType, schemaType, required)
+            DatatypeValidation(ErrorLevel, builtinOrSchemaType)
         }
 
         def fromXML(validationElem: NodeInfo): Option[DatatypeValidation] = {
             require(validationElem \@ "type" === "datatype")
 
-            val level       = Validation.fromXML(validationElem)
-            val builtinType = nonEmptyOrNone(validationElem \ "builtin-type" stringValue)
-            val schemaType  = nonEmptyOrNone(validationElem \ "schema-type"  stringValue)
-            val required    = validationElem \ Required.name === "true"
+            val level               = Validation.fromXML(validationElem)
+            val builtinTypeString   = nonEmptyOrNone(validationElem \ "builtin-type" stringValue)
+            val builtinTypeRequired = nonEmptyOrNone(validationElem \ "builtin-type-required" stringValue) exists (_ == "true")
+            val builtinType         = builtinTypeString map (_ → builtinTypeRequired)
+            val schemaType          = nonEmptyOrNone(validationElem \ "schema-type"  stringValue)
 
-            Some(DatatypeValidation(level, builtinType, schemaType, required))
+            val datatype = Either.cond(schemaType.isDefined, schemaType.get, builtinType.get)
+
+            Some(DatatypeValidation(level, datatype))
         }
     }
 

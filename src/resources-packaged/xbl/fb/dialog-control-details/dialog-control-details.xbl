@@ -91,11 +91,25 @@
                     context="$validations"
                     origin="fbf:readValidationsAsXML($form, $i/control-name)"/>
 
-                <!-- Force required if the datatype implies it -->
+                <!--
+                    Force required if the datatype implies it.
+
+                    In general we want:
+
+                        type == xs:* => required == true()
+
+                    But we don't write over a custom required XPath expression, as that would be data loss. The
+                    inconsistency will be resolved upon write, as, for a builtin type:
+
+                        required == false() | customXPath => type == xf:*
+
+                    NOTE: datatype validation uses true/false, and required validation uses true()/false()/customXPath.
+                -->
                 <xf:setvalue
-                    if="$validations/validation[@type = 'datatype']/required = 'true'"
+                    if="$validations/validation[@type = 'datatype']/builtin-type-required = 'true'
+                        and $validations/validation[@type = 'required']/required = 'false()'"
                     ref="$validations/validation[@type = 'required']/required"
-                    value="'true'"/>
+                    value="'true()'"/>
 
                 <!-- Read MIPs -->
                 <xf:setvalue ref="$i/relevant"   value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
@@ -244,11 +258,13 @@
                         readonly="false()"
                         calculate="if (../@type = 'constraint' and ../@level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
 
+                    <xf:bind ref=".[@type = 'required']" name="required-validation"/>
+
                     <!-- Keep required in sync -->
                     <xf:bind ref=".[@type = 'datatype']" name="datatype-validation">
                         <xf:bind
-                            ref="required"
-                            calculate="../../validation[@type = 'required']/required"/> <!-- calculate="$required-validation/required -->
+                            ref="builtin-type-required"
+                            calculate="if (../../validation[@type = 'required']/required = 'true()') then 'true' else 'false'"/>
                     </xf:bind>
 
                     <xf:bind
@@ -367,12 +383,18 @@
                                 <xh:td>
                                     <xf:group>
                                         <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
-
+                                        <xf:var name="current" value="."/>
                                         <xf:select1 ref=".[@type = 'required']/required" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/required/label"/>
                                             <xf:itemset ref="$resources/dialog-control-details/required/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
+                                                <xf:label ref="."/>
+                                                <!-- Tricky bits: map @id to XPath and handle case where we switch from
+                                                     true() or false() to XPath -->
+                                                <xf:value ref="if (@id = 0)
+                                                               then 'true()'
+                                                               else if (@id = 1)
+                                                               then 'false()'
+                                                               else string($current/required[not(. = ('true()', 'false()'))])"/>
                                             </xf:itemset>
                                         </xf:select1>
 

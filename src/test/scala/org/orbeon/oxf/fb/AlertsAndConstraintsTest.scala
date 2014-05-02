@@ -23,6 +23,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 import scala.xml.Elem
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels.ErrorLevel
 
 class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
@@ -262,12 +263,12 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             locally {
                 val newValidations = Array(
                     <validation type="required" level="error">
-                        <required>true</required>
+                        <required>true()</required>
                     </validation>,
                     <validation type="datatype" level="error">
                         <builtin-type>string</builtin-type>
+                        <builtin-type-required>false</builtin-type-required>
                         <schema-type/>
-                        <required>false</required>
                     </validation>
                 )
 
@@ -276,17 +277,19 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
                 assert("true()" === (bind att "required" stringValue))
                 assert(bind att "type" isEmpty)
+
+                assert(RequiredValidation(ErrorLevel, Left(true)) === RequiredValidation.fromForm(doc, Control1))
             }
 
             locally {
                 val newValidations = Array(
                     <validation type="required" level="error">
-                        <required>false</required>
+                        <required>false()</required>
                     </validation>,
                     <validation type="datatype" level="error">
                         <builtin-type>decimal</builtin-type>
+                        <builtin-type-required>false</builtin-type-required>
                         <schema-type/>
-                        <required>false</required>
                     </validation>
                 )
 
@@ -295,17 +298,19 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
                 assert(bind att "required" isEmpty)
                 assert("xf:decimal" === (bind att "type" stringValue))
+
+                assert(RequiredValidation(ErrorLevel, Left(false)) === RequiredValidation.fromForm(doc, Control1))
             }
 
             locally {
                 val newValidations = Array(
                     <validation type="required" level="error">
-                        <required>true</required>
+                        <required>true()</required>
                     </validation>,
                     <validation type="datatype" level="error">
                         <builtin-type>decimal</builtin-type>
+                        <builtin-type-required>true</builtin-type-required>
                         <schema-type/>
-                        <required>true</required>
                     </validation>
                 )
 
@@ -314,6 +319,20 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
                 assert("true()"     === (bind att "required" stringValue))
                 assert("xs:decimal" === (bind att "type" stringValue))
+
+                assert(RequiredValidation(ErrorLevel, Left(true)) === RequiredValidation.fromForm(doc, Control1))
+            }
+
+            locally {
+                val newValidations = Array(
+                    <validation type="required" level="error">
+                        <required>../foo = 'bar'</required>
+                    </validation>
+                )
+
+                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+
+                assert(RequiredValidation(ErrorLevel, Right("../foo = 'bar'")) === RequiredValidation.fromForm(doc, Control1))
             }
         }
 
@@ -324,12 +343,12 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
             val newValidations = Array(
                 <validation type="required" level="error">
-                    <required>true</required>
+                    <required>true()</required>
                 </validation>,
                 <validation type="datatype" level="error">
                     <builtin-type/>
+                    <builtin-type-required/>
                     <schema-type>foo:email</schema-type>
-                    <required>false</required>
                 </validation>
             )
 
@@ -352,12 +371,12 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
             val newValidations = Array(
                 <validation type="required" level="error">
-                    <required>true</required>
+                    <required>true()</required>
                 </validation>,
                 <validation type="datatype" level="error">
                     <builtin-type/>
+                    <builtin-type-required/>
                     <schema-type>rating</schema-type>
-                    <required>false</required>
                 </validation>
             )
 

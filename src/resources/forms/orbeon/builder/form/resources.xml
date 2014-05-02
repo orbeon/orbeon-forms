@@ -383,14 +383,9 @@
             <required>
                 <label>Required</label>
                 <hint>Whether the data is required</hint>
-                <item>
-                    <label>Yes</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>No</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Yes</item>
+                <item id="1">No</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Constraint</label>
@@ -1265,14 +1260,9 @@
             <required>
                 <label>Obligatoire</label>
                 <hint>Est-ce que la donnée est obligatoire</hint>
-                <item>
-                    <label>Oui</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Non</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Oui</item>
+                <item id="1">Non</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Contrainte</label>
@@ -2147,14 +2137,9 @@
             <required>
                 <label>Påkrevd</label>
                 <hint>Hvorvidt feltet er påkrevd eller ikke</hint>
-                <item>
-                    <label>Ja</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Nei</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Ja</item>
+                <item id="1">Nei</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Restriksjon</label>
@@ -3027,14 +3012,9 @@
             <required>
                 <label>Обязательное</label>
                 <hint>Является ли поле обязательным</hint>
-                <item>
-                    <label>Да</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Нет</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Да</item>
+                <item id="1">Нет</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Ограничение</label>
@@ -3913,14 +3893,9 @@
             <required>
                 <label>Richiesto</label>
                 <hint>Se è necessario immettere i dati</hint>
-                <item>
-                    <label>Sì</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>No</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Sì</item>
+                <item id="1">No</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Condizione</label>
@@ -4799,14 +4774,9 @@
             <required>
                 <label>Erforderlich</label>
                 <hint>Ob die Eingabe erforderlich ist</hint>
-                <item>
-                    <label>Ja</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Nein</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Ja</item>
+                <item id="1">Nein</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Bedingung</label>
@@ -5689,14 +5659,9 @@
             <required>
                 <label>Pakollinen</label>
                 <hint>Pakollinen data?</hint>
-                <item>
-                    <label>Kyllä</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Ei</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Kyllä</item>
+                <item id="1">Ei</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Rajoite</label>
@@ -6574,14 +6539,9 @@
             <required>
                 <label>Requerido</label>
                 <hint>Indica si el dato es requerido</hint>
-                <item>
-                    <label>Si</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>No</label>
-                    <value>false</value>
-                </item>
+                <item id="0">Si</item>
+                <item id="1">No</item>
+                <item id="2">XPath</item>
             </required>
             <constraint>
                 <label>Restricción</label>

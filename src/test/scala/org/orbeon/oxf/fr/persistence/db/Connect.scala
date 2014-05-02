@@ -13,10 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
-import java.io.StringWriter
 import java.sql.{DriverManager, Connection}
 import org.orbeon.oxf.util.ScalaUtils._
-import scala.collection.mutable.ListBuffer
 
 private[persistence] object Connect {
 
@@ -50,6 +48,7 @@ private[persistence] object Connect {
             case _         ⇒ ???
         }
         val tableNameResultSet = connection.createStatement.executeQuery(query)
-        Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
+        val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
+        tableNamesList ensuring (_.length > 0)
     }
 }

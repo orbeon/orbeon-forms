@@ -316,7 +316,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             val bind    = findBindByName(inDoc, controlName).get // require the bind
             val typeMIP = getMip(inDoc, controlName, "type")
 
-            val builtinOrSchemaType =
+            val builtinOrSchemaType: Either[(String, Boolean), String] =
                 typeMIP match {
                     case Some(typ) ⇒
 

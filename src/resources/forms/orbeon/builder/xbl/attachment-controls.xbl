@@ -30,9 +30,10 @@
         <display-name lang="es">Archivos Adjuntos</display-name>
         <display-name lang="fi">Liitteet</display-name>
         <display-name lang="fr">Fichiers joints</display-name>
-        <display-name lang="ru">[Attachments]</display-name>
+        <display-name lang="ru" todo="true">Attachments</display-name>
         <display-name lang="it">Allegati</display-name>
         <display-name lang="de">Anhänge</display-name>
+        <display-name lang="sv" todo="true">Attachments</display-name>
         <display-name lang="nl">Bijlagen</display-name>
     </metadata>
 

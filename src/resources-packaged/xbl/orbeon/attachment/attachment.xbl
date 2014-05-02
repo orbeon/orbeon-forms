@@ -67,8 +67,10 @@
                         <resource xml:lang="es"><download>Bajar Archivo</download></resource>
                         <resource xml:lang="fi"><download>Lataa</download></resource>
                         <resource xml:lang="fr"><download>Télécharger</download></resource>
-                        <resource xml:lang="de"><download>Herunterladen</download></resource>
+                        <resource xml:lang="ru"><download>Download</download></resource>
                         <resource xml:lang="it"><download>Scaricare</download></resource>
+                        <resource xml:lang="de"><download>Herunterladen</download></resource>
+                        <resource xml:lang="sv" todo="true"><download>Download</download></resource>
                         <resource xml:lang="nl" todo="true"><download>Download</download></resource>
                     </resources>
                 </xf:instance>

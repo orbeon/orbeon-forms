@@ -44,17 +44,17 @@ private object FlatView {
 
         // NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations
         val ps = connection.prepareStatement(
-            s"""|create or replace view $tableName as
-                |select
+            s"""|CREATE OR REPLACE VIEW $tableName AS
+                |SELECT
                 |    ${allCols map { case (col, name) ⇒ col + " " + name } mkString ", "}
-                |from (
-                |    select d.*, dense_rank() over (partition by document_id order by last_modified_time desc) as latest
-                |    from orbeon_form_data d
-                |    where
+                |FROM (
+                |    SELECT d.*, DENSE_RANK() OVER (PARTITION BY document_id ORDER BY last_modified_time DESC) AS LATEST
+                |    FROM orbeon_form_data d
+                |    WHERE
                 |        app = '${escapeSQL(req.app)}'
                 |        and form = '${escapeSQL(req.form)}'
                 |)
-                |where latest = 1 and deleted = 'N'
+                |WHERE latest = 1 AND deleted = 'N'
                 |""".stripMargin)
 
         ps.executeUpdate()

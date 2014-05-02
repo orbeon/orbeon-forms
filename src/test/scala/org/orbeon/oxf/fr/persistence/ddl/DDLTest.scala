@@ -63,7 +63,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
                         tableResultSet.next()
                         tableResultSet.getString(2)
                     case SQLServer ⇒
-                        //
+                        // On SQL Server, we get the description of the Orbeon tables from SQL Server metadata tables
                         val tableInfoResultSet = {
                             val ps = connection.prepareStatement(
                                 """SELECT   *

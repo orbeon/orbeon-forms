@@ -46,6 +46,7 @@
             <fb:display-name lang="de">Bearbeitbares Bild</fb:display-name>
             <fb:display-name lang="it">Immagine modificabile</fb:display-name>
             <fb:display-name lang="sv">Noteringar till bild</fb:display-name>
+            <fb:display-name lang="nl">Afbeelding annotatie</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/apps/fr/style/images/silk/paintbrush.png</fb:small-icon>
                 <fb:large-icon>/apps/fr/style/images/silk/paintbrush.png</fb:large-icon>
@@ -105,6 +106,10 @@
                         <resource xml:lang="sv">
                             <canvas-not-supported>För att kunna göra noteringar måste webbläsaren stödja HTML5 canvas</canvas-not-supported>
                             <annotated-image>Bild med noteringar</annotated-image>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <canvas-not-supported>Voor annotaties op afbeeldingen, moet uw browser het HTML5 canvas ondersteunen</canvas-not-supported>
+                            <annotated-image>Geannoteerde afbeelding</annotated-image>
                         </resource>
                     </resources>
                 </xf:instance>

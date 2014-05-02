@@ -36,6 +36,7 @@
             <fb:display-name lang="ru" todo="true">[Explanation]</fb:display-name>
             <fb:display-name lang="de" todo="true">[Explanation]</fb:display-name>
             <fb:display-name lang="it" todo="true">[Explanation]</fb:display-name>
+            <fb:display-name lang="nl">Uitleg</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/apps/fr/style/images/silk/layout.png</fb:small-icon>
                 <fb:large-icon>/apps/fr/style/images/silk/layout.png</fb:large-icon>

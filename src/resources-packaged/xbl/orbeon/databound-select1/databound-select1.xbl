@@ -34,6 +34,7 @@
             <fb:display-name lang="de">Daten Dropdown-Liste</fb:display-name>
             <fb:display-name lang="it">Tendina dati</fb:display-name>
             <fb:display-name lang="sv">Dynamisk rullgardinsmeny</fb:display-name>
+            <fb:display-name lang="nl">Selectie met dynamische gegevens</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
                 <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
@@ -62,6 +63,7 @@
                     <xf:label lang="it">URL della risorsa</xf:label>
                     <xf:label lang="de">URL der Ressource</xf:label>
                     <xf:label lang="sv">Resursens adress</xf:label>
+                    <xf:label lang="nl">Resource URL</xf:label>
                     <xf:hint lang="en">HTTP URL returning data used to populate the dropdown</xf:hint>
                     <xf:hint lang="es">HTTP URL retornando datos para poblar la lista</xf:hint>
                     <xf:hint lang="fi">HTTP URL palauttaa pudotusvalikon täyttämiseen käytettyä dataa</xf:hint>
@@ -70,6 +72,7 @@
                     <xf:hint lang="it">URL HTTP che da i dati per il menu a tendina</xf:hint>
                     <xf:hint lang="de">HTTP URL die die Inhalte für das Dropdown-Menü liefert</xf:hint>
                     <xf:hint lang="sv">Vanligen en Internetadress som börjar med http://</xf:hint>
+                    <xf:hint lang="nl">HTTP URL als bron voor de gegevens in de selectie</xf:hint>
                 </xf:input>
                 <xf:input ref="xf:itemset/@ref">
                     <xf:label ref="$resources/dialog-actions/items/label"/>

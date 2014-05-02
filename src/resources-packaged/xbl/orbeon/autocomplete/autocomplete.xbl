@@ -38,6 +38,7 @@
             <display-name lang="it">Completamento automatico</display-name>
             <display-name lang="de">Autovervollständigung</display-name>
             <display-name lang="sv">Autoförslag</display-name>
+            <display-name lang="nl">Auto-aanvullen</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/autocomplete.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/autocomplete.png</large-icon>
@@ -67,6 +68,7 @@
                     <xf:label lang="it">URI della risorsa</xf:label>
                     <xf:label lang="de">URI der Ressource</xf:label>
                     <xf:label lang="sv">Resursens adress</xf:label>
+                    <xf:label lang="nl">Resource URI</xf:label>
                     <xf:hint lang="en">HTTP URI returning data used for the suggestions</xf:hint>
                     <xf:hint lang="es">HTTP URI retornando datos usados en las sugerencias</xf:hint>
                     <xf:hint lang="fi">HTTP URI palauttaa ehdotuksiin käytettyä dataa</xf:hint>
@@ -74,6 +76,7 @@
                     <xf:hint lang="de">HTTP URI welche die Daten für den Hinweis liefert</xf:hint>
                     <xf:hint lang="it">URI HTTP che da i dati per il suggerimento</xf:hint>
                     <xf:hint lang="sv">Vanligen en Internetadress som börjar med http://</xf:hint>
+                    <xf:hint lang="nl">HTTP URI met de gegevens voor suggesties</xf:hint>
                 </xf:input>
                 <xf:input ref="xf:itemset/@ref">
                     <xf:label ref="$resources/dialog-actions/items/label"/>

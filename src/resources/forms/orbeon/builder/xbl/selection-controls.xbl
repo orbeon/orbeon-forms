@@ -33,6 +33,7 @@
         <display-name lang="ru">Элементы выбора</display-name>
         <display-name lang="de">Auswahl-Bedienelemente</display-name>
         <display-name lang="it">Controlli di selezione</display-name>
+        <display-name lang="nl">Selectie-elementen</display-name>
     </metadata>
 
     <xbl:binding id="fb-input-select1-full" element="xf|select1">
@@ -44,6 +45,7 @@
             <display-name lang="ru">Радио-кнопки</display-name>
             <display-name lang="de">Exklusive Auswahl</display-name>
             <display-name lang="it">Scelta unica</display-name>
+            <display-name lang="nl">Keuzerondje</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
@@ -76,6 +78,7 @@
             <display-name lang="ru">Галочки</display-name>
             <display-name lang="de">Mehrfachauswahl</display-name>
             <display-name lang="it">Scelta multipla</display-name>
+            <display-name lang="nl">Selectievakjes</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
@@ -108,6 +111,7 @@
             <display-name lang="ru">Один из контейнера</display-name>
             <display-name lang="de">Scrollbare Liste</display-name>
             <display-name lang="it">Elenco scrollabile</display-name>
+            <display-name lang="nl">Schuifbare lijst</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
@@ -139,6 +143,7 @@
             <display-name lang="ru">[Boolean Input]</display-name>
             <display-name lang="de">Boolsche Eingabe</display-name>
             <display-name lang="it">Campo boolean</display-name>
+            <display-name lang="nl">Booleaanse invoer</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>

@@ -32,6 +32,7 @@
             <display-name lang="ru">Телефон в формате США</display-name>
             <display-name lang="de">US Telefonnummer</display-name>
             <display-name lang="it">Numero di telefono US</display-name>
+            <display-name lang="nl">Amerikaans telefoonnummer</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/telephone.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/telephone.png</large-icon>

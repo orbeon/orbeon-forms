@@ -39,6 +39,7 @@
             <display-name lang="de">Karte</display-name>
             <display-name lang="it">Mappa</display-name>
             <display-name lang="sv">Karta</display-name>
+            <display-name lang="nl">Kaart</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>

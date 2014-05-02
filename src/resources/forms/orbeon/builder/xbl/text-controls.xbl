@@ -33,6 +33,7 @@
         <display-name lang="ru">Элементы ввода текста</display-name>
         <display-name lang="de">Text-Bedienelemente</display-name>
         <display-name lang="it">Controlli di testo</display-name>
+        <display-name lang="nl">Tekst-elementen</display-name>
     </metadata>
 
     <xbl:binding id="fb-input" element="xf|input">
@@ -44,6 +45,7 @@
             <display-name lang="ru">Однострочное поле</display-name>
             <display-name lang="de">Textfeld</display-name>
             <display-name lang="it">Campo di testo</display-name>
+            <display-name lang="nl">Invoerveld</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
@@ -70,6 +72,7 @@
             <display-name lang="ru">Многострочное поле</display-name>
             <display-name lang="de">Textbereich</display-name>
             <display-name lang="it">Area di testo</display-name>
+            <display-name lang="nl">Tekstveld</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/textarea.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
@@ -96,6 +99,7 @@
             <display-name lang="ru">Неизменяемый текст</display-name>
             <display-name lang="de">Textausgabe</display-name>
             <display-name lang="it">Testo statico</display-name>
+            <display-name lang="nl">Tekstuitvoer</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/text_align_left.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/text_align_left.png</large-icon>
@@ -122,6 +126,7 @@
             <display-name lang="ru">Пароль</display-name>
             <display-name lang="de">Passwortfeld</display-name>
             <display-name lang="it">Campo password</display-name>
+            <display-name lang="nl">Wachtwoordveld</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/key.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/key.png</large-icon>

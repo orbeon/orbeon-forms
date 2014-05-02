@@ -39,6 +39,7 @@
             <display-name lang="it">Data a tendina</display-name>
             <display-name lang="de">Dropdown-Datum</display-name>
             <display-name lang="sv">Datumväljare med rullgardinsmeny</display-name>
+            <display-name lang="nl">Selectie datum</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
@@ -129,6 +130,11 @@
                         <resource xml:lang="sv">
                             <year>År</year>
                             <month>Månad</month>
+                            <day>Dag</day>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <year>Jaar</year>
+                            <month>Maand</month>
                             <day>Dag</day>
                         </resource>
                     </resources>

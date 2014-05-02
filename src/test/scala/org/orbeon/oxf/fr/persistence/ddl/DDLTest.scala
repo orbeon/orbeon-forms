@@ -51,7 +51,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
      * Runs the SQL, and returns the information about the tables as defined in the database. The form in which this
      * information is returned varies depending on the database, hence the Any return type.
      */
-    private def sqlToTableInfo(sql: Seq[String]): Any = {
+    private def sqlToTableInfo(sql: Seq[String]): Map[String, Any] = {
         withNewDatabase { connection ⇒
             val statement = connection.createStatement
             sql foreach statement.executeUpdate
@@ -80,6 +80,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
                                 col → tableInfoResultSet.getObject(col)
                         }
                         Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
+
                     case _ ⇒ ???
                 }
                 (tableName, tableInfo)

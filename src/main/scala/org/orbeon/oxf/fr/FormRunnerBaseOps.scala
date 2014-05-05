@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.XFormsProperties
 
 trait FormRunnerBaseOps {
 

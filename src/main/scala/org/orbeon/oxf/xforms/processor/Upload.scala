@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.pipeline.api.{PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.servlet.ServletExternalContext.DEFAULT_HEADER_ENCODING

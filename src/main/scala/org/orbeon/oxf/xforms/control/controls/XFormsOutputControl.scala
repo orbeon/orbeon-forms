@@ -21,7 +21,6 @@ import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsError
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.OutputControl
 import org.orbeon.oxf.xforms.control._

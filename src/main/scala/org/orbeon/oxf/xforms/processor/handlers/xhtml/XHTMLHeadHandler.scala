@@ -79,7 +79,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl)
 
         // Scripts
-        if (! handlerContext.isNoScript && ! XFormsProperties.isReadonly(containingDocument)) {
+        if (! handlerContext.isNoScript) {
 
             // Main JavaScript resources
             outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl)

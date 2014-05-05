@@ -137,9 +137,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 // Custom MIPs
                 this._customMIPs = Option(InstanceData.collectAllCustomMIPs(nodeInfo)) map (_.toMap) getOrElse Map()
 
-                // Handle global read-only setting
-                if (XFormsProperties.isReadonly(containingDocument))
-                    this._readonly = true
             case atomicValue: AtomicValue ⇒
                 // Control is not bound to a node (i.e. bound to an atomic value)
                 setAtomicValueMIPs()

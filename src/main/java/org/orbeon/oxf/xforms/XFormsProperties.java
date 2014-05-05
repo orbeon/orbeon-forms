@@ -57,7 +57,6 @@ public class XFormsProperties {
     public static final String HELP_APPEARANCE_PROPERTY = "help.appearance";
 
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
-    private static final String READONLY_PROPERTY = "readonly";
 
     private static final String OPTIMIZE_GET_ALL_PROPERTY = "optimize-get-all";
     private static final String OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY = "optimize-local-submission";
@@ -188,7 +187,6 @@ public class XFormsProperties {
             new PropertyDefinition(NOSCRIPT_SUPPORT_PROPERTY, true, false),
             new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
             new PropertyDefinition(NOSCRIPT_TEMPLATE, NOSCRIPT_TEMPLATE_STATIC_VALUE, false),
-            new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false) {
                 @Override
                 public void validate(Object value, LocationData locationData) {
@@ -465,10 +463,6 @@ public class XFormsProperties {
 
     public static int getShowMaxRecoverableErrors(XFormsContainingDocument containingDocument) {
         return getIntegerProperty(containingDocument, SHOW_RECOVERABLE_ERRORS_PROPERTY);
-    }
-
-    public static boolean isReadonly(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, READONLY_PROPERTY);
     }
 
     public static String getNoscriptTemplate(XFormsContainingDocument containingDocument) {

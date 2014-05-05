@@ -243,34 +243,35 @@
                         calculate="bind('default-alert')"/>
                 </xf:bind>
 
-                <xf:bind ref="validations/validation">
-                    <xf:bind
-                        ref="@type"
-                        readonly="true()"/>
+                <xf:bind ref="validations">
 
-                    <xf:bind
-                        ref="@level"
-                        readonly="../@type = ('required', 'datatype')"/>
+                    <!-- NOTE: There can be at most one required validation for now -->
+                    <xf:bind ref="validation[@type = 'required']" name="required-validation"/>
 
-                    <xf:bind
-                        ref="@default-alert"
-                        type="xs:boolean"
-                        readonly="false()"
-                        calculate="if (../@type = 'constraint' and ../@level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
-
-                    <xf:bind ref=".[@type = 'required']" name="required-validation"/>
-
-                    <!-- Keep required in sync -->
-                    <xf:bind ref=".[@type = 'datatype']" name="datatype-validation">
+                    <xf:bind ref="validation">
                         <xf:bind
-                            ref="builtin-type-required"
-                            calculate="if (../../validation[@type = 'required']/required = 'true()') then 'true' else 'false'"/>
-                    </xf:bind>
+                            ref="@type"
+                            readonly="true()"/>
 
-                    <xf:bind
-                        ref="constraint/@expression"
-                        type="xxf:xpath2"
-                        required="false()"/>
+                        <xf:bind
+                            ref="@level"
+                            readonly="../@type = ('required', 'datatype')"/>
+
+                        <xf:bind
+                            ref="@default-alert"
+                            type="xs:boolean"
+                            readonly="false()"
+                            calculate="if (../@type = 'constraint' and ../@level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
+
+                        <!-- Keep required in sync -->
+                        <xf:bind ref=".[@type = 'datatype']/builtin-type-required"
+                                 calculate="if ($required-validation/required = 'true()') then 'true' else 'false'"/>
+
+                        <xf:bind
+                            ref="constraint/@expression"
+                            type="xxf:xpath2"
+                            required="false()"/>
+                    </xf:bind>
                 </xf:bind>
 
                 <xf:bind

@@ -5,7 +5,7 @@ create table orbeon_form_definition (
     app                varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     form               varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     form_version       int not null,
-    deleted            char(1) not null,
+    deleted            char(1)                                   COLLATE utf8_bin        NOT NULL,
     xml                mediumtext             CHARACTER SET utf8 COLLATE utf8_unicode_ci
 )   engine = InnoDB;
 
@@ -16,7 +16,7 @@ create table orbeon_form_definition_attach (
     app                varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     form               varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     form_version       int not null,
-    deleted            char(1) not null,
+    deleted            char(1)                                   COLLATE utf8_bin        NOT NULL,
     file_name          varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     file_content       longblob
 )   engine = InnoDB;
@@ -31,8 +31,8 @@ create table orbeon_form_data (
     form               varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     form_version       int not null,
     document_id        varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
-    draft              char(1) not null,
-    deleted            char(1) not null,
+    draft              char(1)                                   COLLATE utf8_bin        NOT NULL,
+    deleted            char(1)                                   COLLATE utf8_bin        NOT NULL,
     xml                mediumtext             CHARACTER SET utf8 COLLATE utf8_unicode_ci
 )   engine = InnoDB;
 
@@ -46,8 +46,8 @@ create table orbeon_form_data_attach (
     form               varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     form_version       int not null,
     document_id        varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
-    draft              char(1) not null,
-    deleted            char(1) not null,
+    draft              char(1)                                   COLLATE utf8_bin        NOT NULL,
+    deleted            char(1)                                   COLLATE utf8_bin        NOT NULL,
     file_name          varchar(255)           CHARACTER SET utf8 COLLATE utf8_bin,
     file_content       longblob
 )   engine = InnoDB;

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -29,13 +28,6 @@ trait XMLReceiverSupport {
 
     def element(prefix: String, uri: String, localName: String, atts: Attributes)(implicit receiver: XMLReceiver) =
         withElement(prefix, uri, localName, atts) {}
-
-    def withFormattingPrefix[T](body: String ⇒ T)(implicit context: HandlerContext): T = {
-        val formattingPrefix = context.findFormattingPrefixDeclare
-        val result = body(formattingPrefix)
-        context.findFormattingPrefixUndeclare(formattingPrefix)
-        result
-    }
 
     def addAttributes(attributesImpl: AttributesImpl, atts: List[(String, String)]): Unit = {
         atts foreach {

@@ -81,9 +81,10 @@
 
                 <!-- Write classes -->
                 <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $new-name)"/>
-                <xf:var name="classes" value="string-join(distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes))), ' ')"/>
+
+                <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                 <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', $classes)"/>
+                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
 
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="dialog" if="event('xxf:targetid') != 'cancel-button'">

@@ -44,8 +44,8 @@
                 <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then fbf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
                 <xf:setvalue ref="$i/custom-iteration-name"          value="$i/original-custom-iteration-name"/>
 
-                <xf:setvalue ref="$i/min-repeat"                     value="fbf:getMin($form, $i/control-name)"/>
-                <xf:setvalue ref="$i/max-repeat"                     value="fbf:getMaxOrEmpty($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
 
                 <xf:setvalue ref="$i/relevant"                       value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"                       value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
@@ -81,8 +81,8 @@
                     fbf:updateMip($form, $new-name, 'readonly', $i/readonly),
                     fbf:setRepeatProperties($form, $new-name,
                                             $i/is-repeat = true(),
-                                            xs:integer($i/min-repeat),
-                                            if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1,
+                                            $i/min-repeat,
+                                            $i/max-repeat,
                                             $i/custom-iteration-name/string())
                 </xf:action>
 
@@ -163,12 +163,21 @@
                          required="$i/is-custom-iteration-name = true()"
                          constraint="$i/is-custom-iteration-name = false() or . = $i/original-custom-iteration-name or not(. = xxf:split($i/control-names))"/>
 
-                <xf:bind ref="min-repeat" type="xs:nonNegativeInteger" calculate="normalize-space()" readonly="false()"/>
-                <xf:bind ref="max-repeat"
-                         type="xf:positiveInteger"
-                         constraint="not(string() castable as xs:integer) or not(string($i/min-repeat) castable as xs:integer) or xs:integer(.) ge xs:integer($i/min-repeat)"
+                <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
+                <xf:bind ref="min-repeat | max-repeat"
+                         type="xxf:xpath2"
                          calculate="normalize-space()"
                          readonly="false()"/>
+
+                <xf:bind ref="min-repeat"
+                         required="../is-repeat = true()"
+                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 0)"/>
+
+                <xf:bind ref="max-repeat"
+                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 1)"/>
+
+                <xf:bind ref="max-repeat"
+                         constraint="../is-repeat = false() or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer and xs:integer(.) lt xs:integer(../min-repeat))"/>
 
             </xf:model>
         </xbl:implementation>

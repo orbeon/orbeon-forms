@@ -494,12 +494,12 @@
             <min>
                 <label>Minimum Number of Repetitions</label>
                 <alert>Incorrect value</alert>
-                <hint>Non-negative number</hint>
+                <hint>Non-negative number or XPath expression</hint>
             </min>
             <max>
                 <label>Maximum Number of Repetitions</label>
                 <alert>Incorrect value</alert>
-                <hint>Positive number</hint>
+                <hint>Positive number or XPath expression</hint>
             </max>
             <other>Other</other>
             <one>One repetition</one>
@@ -1371,12 +1371,12 @@
             <min>
                 <label>Nombre minimum de répétitions</label>
                 <alert>Valeur incorrecte</alert>
-                <hint>Nombre non-négatif</hint>
+                <hint>Nombre non-négatif ou expression XPath</hint>
             </min>
             <max>
                 <label>Nombre maximum de répétitions</label>
                 <alert>Valeur incorrecte</alert>
-                <hint>Nombre positif</hint>
+                <hint>Nombre positif ou expression XPath</hint>
             </max>
             <other>Autre</other>
             <one>Une répétition</one>
@@ -2248,12 +2248,12 @@
             <min>
                 <label todo="true">[Minimum Number of Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Non-negative number]</hint>
+                <hint todo="true">[Non-negative number or XPath expression]</hint>
             </min>
             <max>
                 <label todo="true">[Maximum Number of Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
-                <hint todo="true">[Positive number]</hint>
+                <hint todo="true">[Positive number or XPath expression]</hint>
             </max>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
@@ -3123,12 +3123,12 @@
             <min>
                 <label>Минимальное количество повторений</label>
                 <alert>Некорректное значение</alert>
-                <hint>Неотрицательное число</hint>
+                <hint todo="true">Неотрицательное число [or XPath expression]</hint>
             </min>
             <max>
                 <label>Максимальное количество повторений</label>
                 <alert>Некорректное значение</alert>
-                <hint>Положительное число</hint>
+                <hint todo="true">Положительное число [or XPath expression]</hint>
             </max>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
@@ -4004,12 +4004,12 @@
             <min>
                 <label>Numero minimo di ripetizioni</label>
                 <alert>Valore non corretto</alert>
-                <hint>Numero non-negativo</hint>
+                <hint>Numero non-negativo o espressione XPath</hint>
             </min>
             <max>
                 <label>Numero massimo di ripetizioni</label>
                 <alert>Valore non corretto</alert>
-                <hint>Numero positivo</hint>
+                <hint>Numero positivo o espressione XPath</hint>
             </max>
             <other>Altro</other>
             <one>Una ripetizione</one>
@@ -4885,12 +4885,12 @@
             <min>
                 <label>Mindestanzahl an Wiederholungen</label>
                 <alert>Ungültiger Wert</alert>
-                <hint>Nicht negativer Zahlenwert</hint>
+                <hint>Nicht negativer Zahlenwert oder XPath-Ausdruck</hint>
             </min>
             <max>
                 <label>Maximalanzahl an Wiederholungen</label>
                 <alert>Ungültiger Wert</alert>
-                <hint>Positive Zahl</hint>
+                <hint>Positive Zahl oder XPath-Ausdruck</hint>
             </max>
             <other>Anderes</other>
             <one>Eine Wiederholung</one>
@@ -5770,12 +5770,12 @@
             <min>
                 <label>Toistojen vähimmäismäärä</label>
                 <alert>Virheellinen arvo</alert>
-                <hint>Positiivinen numero</hint>
+                <hint todo="true">Positiivinen numero [or XPath expression]</hint>
             </min>
             <max>
                 <label>Toistojen maksimimäärä</label>
                 <alert>Virheellinen arvo</alert>
-                <hint>Positiivinen numero</hint>
+                <hint todo="true">Positiivinen numero [or XPath expression]</hint>
             </max>
             <other>Muu</other>
             <one>Yksi toisto</one>
@@ -6650,12 +6650,12 @@
             <min>
                 <label>Número mínimo de Repeticiones</label>
                 <alert>Valor incorrecto</alert>
-                <hint>Número positivo</hint>
+                <hint>Número positivo o expresión XPath</hint>
             </min>
             <max>
                 <label>Número Máximo de Repeticiones</label>
                 <alert>Valor Incorrecto</alert>
-                <hint>Número positivo</hint>
+                <hint>Número positivo o expresión XPath</hint>
             </max>
             <other>Otro</other>
             <one>Una Repetición</one>

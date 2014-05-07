@@ -28,7 +28,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
             // Enable repeat
             locally {
-                setRepeatProperties(doc, "my-section", repeat = true, -1, -1, "")
+                setRepeatProperties(doc, "my-section", repeat = true, "", "", "")
     
                 val expected =
                     elemToDom4j(
@@ -101,12 +101,22 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
             // Change min/max
             locally {
-                setRepeatProperties(doc, "foo", repeat = true, 1, 2, "")
+                setRepeatProperties(doc, "foo", repeat = true, "1", "2", "")
 
                 val section = findControlByName(doc, "foo").get
 
                 assert("1" === section.attValue("min"))
                 assert("2" === section.attValue("max"))
+            }
+
+            // Change min/max
+            locally {
+                setRepeatProperties(doc, "foo", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "")
+
+                val section = findControlByName(doc, "foo").get
+
+                assert("{1 + 1}" === section.attValue("min"))
+                assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
             }
 
             // Move section into it
@@ -135,8 +145,8 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
             // Disable repeat
             locally {
-                setRepeatProperties(doc, "foo", repeat = false, -1, -1, "")
-                
+                setRepeatProperties(doc, "foo", repeat = false, "", "", "")
+
                 val expected =
                     elemToDom4j(
                         <form>

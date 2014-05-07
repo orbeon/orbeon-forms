@@ -371,7 +371,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         require(Model.AllMIPNames(mipName))
         val mipQName = convertMIP(mipName)
 
-        findBindByName(inDoc, controlName) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
+        findBindByName(inDoc, controlName) flatMap (_ attValueOpt mipQName)
     }
 
     private def convertMIP(mipName: String) =

@@ -29,7 +29,7 @@ import org.orbeon.scaxon.XML._
 trait GridOps extends ContainerOps {
 
     case class Cell(td: NodeInfo, rowspan: Int, missing: Boolean) {
-        def originalRowspan = getRowspan(td)
+        def originalRowspan = getNormalizedRowspan(td)
         def originalRowspan_= (newRowSpan: Int): Unit = ensureAttribute(td, "rowspan", newRowSpan.toString)
     }
 
@@ -38,20 +38,20 @@ trait GridOps extends ContainerOps {
         findAncestorContainers(descendantOrSelf, includeSelf) filter IsGrid head
 
     // Extract the rowspan of a td (default is 1 if there is no attribute)
-    private def getRowspan(td: NodeInfo) =  attValueOption(td \@ "rowspan") map (_.toInt) getOrElse 1
+    private def getNormalizedRowspan(td: NodeInfo) =  td attValueOpt "rowspan" map (_.toInt) getOrElse 1
 
     // For the previous row of prepared cells, and a new row of tds, return the new row of prepared cells
     private def newCellsRow(previousRow: Seq[Cell], tds: Seq[NodeInfo]): Seq[Cell] = previousRow match {
         case Seq() ⇒
             // First row: start with initial rowspans
-            tds map (td ⇒ Cell(td, getRowspan(td), missing = false))
+            tds map (td ⇒ Cell(td, getNormalizedRowspan(td), missing = false))
         case _ ⇒
             // Subsequent rows
             val tdsIterator = tds.toIterator
             previousRow map {
                 case Cell(_, 1, _) ⇒
                     val td = tdsIterator.next()
-                    Cell(td, getRowspan(td), missing = false)
+                    Cell(td, getNormalizedRowspan(td), missing = false)
                 case Cell(td, rowspan, _) ⇒
                     Cell(td, rowspan - 1, missing = true)
             }
@@ -385,14 +385,46 @@ trait GridOps extends ContainerOps {
         }
     }
 
-    def getMin(doc: NodeInfo, gridName: String) =
-        findControlByName(doc, gridName) flatMap (grid ⇒ attValueOption(grid \@ "min")) map (_.toInt) getOrElse 0
+    // @mi/@max can be simple AVTs, i.e. AVTs which cover the whole attribute, e.g. "{my-min}"
+    // The main reason to do this instead of making @min/@max plain XPath expressions is that @max also supports the
+    // literal "none" (and "unbounded" for backward compatibility).
+    private val SimpleAVTRegex = """^\{([^{^}]+)\}$""".r
 
-    def getMax(doc: NodeInfo, gridName: String) =
-        findControlByName(doc, gridName) flatMap (grid ⇒ attValueOption(grid \@ "max")) map (_.toInt)
+    private def trimSimpleAVT(s: String) = s match {
+        case SimpleAVTRegex(v) ⇒ v
+        case v                 ⇒ v
+    }
 
-    // XForms callers: get the grid's max attribute or null (the empty sequence)
-    def getMaxOrEmpty(doc: NodeInfo, gridName: String) = getMax(doc, gridName) map (_.toString) orNull
+    // NOTE: Value can be a simple AVT
+    def getNormalizedMin(doc: NodeInfo, gridName: String) =
+        findControlByName(doc, gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
+
+    private val NoMaximum = Set("none", "unbounded")
+
+    // NOTE: Value can be a simple AVT
+    def getNormalizedMax(doc: NodeInfo, gridName: String) =
+        findControlByName(doc, gridName) flatMap (_ attValueOpt "max") filterNot NoMaximum map trimSimpleAVT
+
+    // XForms callers: get the grid's normalized max attribute, the empty sequence if no maximum
+    def getNormalizedMaxOrEmpty(doc: NodeInfo, gridName: String) =
+        getNormalizedMax(doc, gridName).orNull
+
+    // Convert a min/max value to a value suitable to be written to the @min/@max attributes.
+    //
+    // - blank value                → None
+    // - non-positive integer value → None
+    // - positive integer value     → Some(int: String)
+    // - any other value            → Some("{expression}")
+    def minMaxForAttribute(s: String) = nonEmptyOrNone(s) flatMap { value ⇒
+        try {
+            val int = value.toInt
+            int > 0 option int.toString
+        } catch {
+            case _: NumberFormatException ⇒
+                val escaped = value.replaceAllLiterally("{", "{{").replaceAllLiterally("}", "}}")
+                Some(s"{$escaped}")
+        }
+    }
 
     // Get the x/y position of a td given Cell information
     private def tdCoordinates(td: NodeInfo, cells: Seq[Seq[Cell]]): (Int, Int) = {

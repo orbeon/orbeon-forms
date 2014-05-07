@@ -107,9 +107,6 @@ object XML {
     val hasIdValue: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element /@ "id" === id
     val exists: (Seq[Item]) ⇒ Boolean = (items) ⇒ items.nonEmpty
 
-    // Get the value of the first attribute passed if any
-    def attValueOption(atts: Seq[NodeInfo]) = atts.headOption map (_.getStringValue)
-
     // Node test
     abstract class Test {
         def test(nodeInfo: NodeInfo): NodeTest

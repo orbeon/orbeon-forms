@@ -148,7 +148,7 @@ object XFormsAPI {
         if (oldName != newName) {
             val newNodeInfo = nodeInfo.getNodeKind match {
                 case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
-                case ATTRIBUTE_NODE ⇒ attributeInfo(newName, attValueOption(nodeInfo).get)
+                case ATTRIBUTE_NODE ⇒ attributeInfo(newName, nodeInfo.stringValue)
                 case _ ⇒ throw new IllegalArgumentException
             }
 
@@ -189,7 +189,8 @@ object XFormsAPI {
             case Seq(att, _*) ⇒ setvalue(att, value)
         }
 
-    def toggleAttribute(element: NodeInfo, attName: QName, value: String, set: Boolean): Unit =
+    // NOTE: The value is by-name
+    def toggleAttribute(element: NodeInfo, attName: QName, value: ⇒ String, set: Boolean): Unit =
         if (set)
             ensureAttribute(element, attName, value.toString)
         else

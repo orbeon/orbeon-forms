@@ -38,8 +38,8 @@
                 <xf:setvalue ref="original-control-name" value="fbf:getContainerNameOrEmpty(event('grid'))"/>
                 <xf:setvalue ref="control-name"          value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/min-repeat"         value="fbf:getMin($form, $i/control-name)"/>
-                <xf:setvalue ref="$i/max-repeat"         value="fbf:getMaxOrEmpty($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/min-repeat"         value="fbf:getNormalizedMin($form, $i/control-name)"/>
+                <xf:setvalue ref="$i/max-repeat"         value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
 
                 <xf:setvalue ref="$i/relevant"           value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"           value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
@@ -74,8 +74,8 @@
                     fbf:updateMip($form, $new-name, 'relevant', $i/relevant),
                     fbf:updateMip($form, $new-name, 'readonly', $i/readonly),
                     fbf:setRepeatProperties($form, $new-name, true(),
-                                            xs:integer($i/min-repeat),
-                                            if (string($i/max-repeat) castable as xs:integer) then xs:integer($i/max-repeat) else -1,
+                                            $i/min-repeat,
+                                            $i/max-repeat,
                                             ())
                 </xf:action>
 
@@ -135,11 +135,21 @@
 
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
 
-                <xf:bind ref="min-repeat" type="xs:nonNegativeInteger" calculate="normalize-space()" readonly="false()"/>
+                <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
+                <xf:bind ref="min-repeat | max-repeat"
+                         type="xxf:xpath2"
+                         calculate="normalize-space()"
+                         readonly="false()"/>
+
+                <xf:bind ref="min-repeat"
+                         required="../is-repeat = true()"
+                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 0)"/>
+
                 <xf:bind ref="max-repeat"
-                         type="xf:positiveInteger"
-                         constraint="not(string() castable as xs:integer) or not(string(../min-repeat) castable as xs:integer) or xs:integer(.) ge xs:integer(../min-repeat)"
-                         calculate="normalize-space()" readonly="false()"/>
+                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 1)"/>
+
+                <xf:bind ref="max-repeat"
+                         constraint="../is-repeat = false() or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer and xs:integer(.) lt xs:integer(../min-repeat))"/>
 
             </xf:model>
         </xbl:implementation>

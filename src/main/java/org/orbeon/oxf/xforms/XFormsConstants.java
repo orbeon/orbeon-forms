@@ -47,6 +47,7 @@ public class XFormsConstants {
         ALLOWED_XXFORMS_ELEMENTS.add("var");
         ALLOWED_XXFORMS_ELEMENTS.add("variable");
         ALLOWED_XXFORMS_ELEMENTS.add("sequence");
+        ALLOWED_XXFORMS_ELEMENTS.add("value");
         ALLOWED_XXFORMS_ELEMENTS.add("attribute");
         ALLOWED_XXFORMS_ELEMENTS.add("text");
         ALLOWED_XXFORMS_ELEMENTS.add("context");
@@ -187,6 +188,7 @@ public class XFormsConstants {
     public static final QName XFORMS_VARIABLE_QNAME = new QName("variable", XFORMS_NAMESPACE);
     public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
     public static final QName XXFORMS_SEQUENCE_QNAME = new QName("sequence", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_VALUE_QNAME = new QName("value", XXFORMS_NAMESPACE);
 
     public static final String XML_EVENTS_PREFIX = "ev";
     public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";

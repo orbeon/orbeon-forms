@@ -273,7 +273,7 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xf:group appearance="xxf:internal" xsl:version="2.0">
                 <xf:var name="binding" as="node()?">
-                    <xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                    <xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
                 </xf:var>
                 <xf:group ref="$binding" id="container">
                     <!-- Trigger that starts spell checking -->

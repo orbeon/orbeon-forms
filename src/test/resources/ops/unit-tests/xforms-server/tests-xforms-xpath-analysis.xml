@@ -1964,7 +1964,7 @@
         </output>
     </test>
 
-    <test description="Basic xf:var/xxf:sequence" name="oxf:java">
+    <test description="Basic xf:var/xxf:value" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -1989,13 +1989,13 @@
                 <xh:body>
 
                     <xf:var id="vsum" name="sum">
-                        <xxf:sequence value="$foo + $bar"/>
+                        <xxf:value value="$foo + $bar"/>
                     </xf:var>
                     <xf:var id="vproduct" name="product">
-                        <xxf:sequence ref="foo" value=". * $bar"/>
+                        <xxf:value ref="foo" value=". * $bar"/>
                     </xf:var>
                     <xf:var id="vdifference" name="difference" ref="foo">
-                        <xxf:sequence value=". - $bar"/>
+                        <xxf:value value=". - $bar"/>
                     </xf:var>
 
                     <xf:output id="osum" value="$sum"/>
@@ -2161,7 +2161,7 @@
         </output>
     </test>
 
-    <test description="XBL xf:var/xxf:sequence" name="oxf:java">
+    <test description="XBL xf:var/xxf:value" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -2181,10 +2181,10 @@
                         </xf:instance>
 
                         <xf:var id="vfoo" name="foo">
-                            <xxf:sequence  value="foo"/>
+                            <xxf:value  value="foo"/>
                         </xf:var>
                         <xf:var id="vbar" name="bar">
-                            <xxf:sequence  value="bar"/>
+                            <xxf:value  value="bar"/>
                         </xf:var>
                     </xf:model>
                     <xbl:xbl>
@@ -2200,7 +2200,7 @@
 
                                 <xf:var id="iv" name="internal" value="."/>
                                 <xf:var id="ov" name="external">
-                                    <xxf:sequence xbl:attr="value=ref" xxbl:scope="outer"/>
+                                    <xxf:value xbl:attr="value=ref" xxbl:scope="outer"/>
                                 </xf:var>
                                 <xf:var id="ro" name="readonly" value="exf:readonly($external)"/>
 
@@ -6156,7 +6156,7 @@
                                     <xf:var id="v1" name="v1" value="."/>
 
                                     <xf:var id="v2" name="v2" xxbl:scope="inner">
-                                        <xxf:sequence value="$v1" xxbl:scope="outer"/>
+                                        <xxf:value value="$v1" xxbl:scope="outer"/>
                                     </xf:var>
                                     <xf:output id="output1" value="$v2" xxbl:scope="inner"/>
 
@@ -6164,7 +6164,7 @@
                                     <xf:var id="v3" name="v3" value="." xxbl:scope="inner"/>
 
                                     <xf:var id="v4" name="v4">
-                                        <xxf:sequence value="$v3" xxbl:scope="inner"/>
+                                        <xxf:value value="$v3" xxbl:scope="inner"/>
                                     </xf:var>
                                     <xf:output id="output2" value="$v4"/>
                                 </xf:group>

@@ -53,7 +53,7 @@
                                     <xf:group id="component-inner-group" appearance="xxf:internal" xxbl:scope="inner">
 
                                         <xf:var name="result" as="node()?">
-                                            <xxf:sequence value="." xxbl:scope="outer"/>
+                                            <xxf:value value="." xxbl:scope="outer"/>
                                         </xf:var>
 
                                         <!--<xf:var name="inner" value="." as="node()?"/>-->
@@ -190,7 +190,7 @@
                                                 <xf:group id="component-inner-group" appearance="xxf:internal" xxbl:scope="inner">
 
                                                     <xf:var id="result-variable" name="result" as="node()?">
-                                                        <xxf:sequence value="." xxbl:scope="outer"/>
+                                                        <xxf:value value="." xxbl:scope="outer"/>
                                                     </xf:var>
 
                                                     <!-- React to update to bound node -->
@@ -480,7 +480,7 @@
                                                 <xf:group id="component-inner-group" appearance="xxf:internal" xxbl:scope="inner">
 
                                                     <xf:var name="result" as="node()?">
-                                                        <xxf:sequence value="." xxbl:scope="outer"/>
+                                                        <xxf:value value="." xxbl:scope="outer"/>
                                                     </xf:var>
 
                                                     <!-- React to update to bound node -->
@@ -966,7 +966,7 @@
                                         <xbl:template>
                                             <xf:group xxbl:scope="outer">
                                                 <xf:var name="result" as="node()?" xxbl:scope="inner">
-                                                    <xxf:sequence value="." xxbl:scope="outer"/>
+                                                    <xxf:value value="." xxbl:scope="outer"/>
                                                 </xf:var>
                                                 <!-- Use prefix myexf declared only in this XBL binding, and use on element with id "clash" -->
                                                 <xf:output id="clash" value="myexf:readonly($result)" xxbl:scope="inner">
@@ -982,7 +982,7 @@
                                         <xbl:template>
                                             <xf:group xxbl:scope="outer">
                                                 <xf:var name="result" as="node()?" xxbl:scope="inner">
-                                                    <xxf:sequence value="." xxbl:scope="outer"/>
+                                                    <xxf:value value="." xxbl:scope="outer"/>
                                                 </xf:var>
                                                 <!-- Element with id "clash" doesn't have the myexf prefix used by the other component -->
                                                 <xf:output id="clash" ref="$result" xxbl:scope="inner">
@@ -2247,7 +2247,7 @@
 
                                         <!-- Variable pointing to external single-node binding -->
                                         <xf:var name="result" as="node()?">
-                                            <xxf:sequence value="." xxbl:scope="outer"/>
+                                            <xxf:value value="." xxbl:scope="outer"/>
                                         </xf:var>
 
                                         <xf:output id="my-inner-output" ref="$result"/>
@@ -2313,7 +2313,7 @@
 
                                         <!-- Variable pointing to external single-node binding -->
                                         <xf:var name="result" as="node()?">
-                                            <xxf:sequence value="." xxbl:scope="outer"/>
+                                            <xxf:value value="." xxbl:scope="outer"/>
                                         </xf:var>
 
                                         <xf:select1 id="my-inner-select1" ref="$result">
@@ -2396,7 +2396,7 @@
                                     <xf:output value="."/>
 
                                     <xf:var name="result" as="node()?" xxbl:scope="inner">
-                                        <xxf:sequence value="." xxbl:scope="outer"/>
+                                        <xxf:value value="." xxbl:scope="outer"/>
                                     </xf:var>
 
                                     <xf:group>
@@ -3091,7 +3091,7 @@
                             <xbl:template>
                                 <xf:group xbl:attr="ref" xxbl:scope="outer" id="outer-group">
                                     <xf:var name="result" xxbl:scope="inner">
-                                        <xxf:sequence value="." xxbl:scope="outer"/>
+                                        <xxf:value value="." xxbl:scope="outer"/>
                                     </xf:var>
                                     <xf:group xxbl:scope="inner" ref="$result" id="inner-group">
                                         <!-- Here xf:label and xf:input are copied within an inner group -->
@@ -3455,7 +3455,7 @@
                                     </xf:model>
                                     <xf:var id="v1" name="v1" value="."/>
                                     <xf:var id="v2" name="v2" xxbl:scope="inner">
-                                        <xxf:sequence value="$v1" xxbl:scope="outer"/>
+                                        <xxf:value value="$v1" xxbl:scope="outer"/>
                                     </xf:var>
                                     <xf:output id="my-output" value="$v2" xxbl:scope="inner"/>
                                 </xf:group>
@@ -3711,7 +3711,7 @@
                             <xbl:template>
                                 <xf:group>
                                     <xf:var name="repeat-index" id="my-var">
-                                        <xxf:sequence value="index('my-repeat')" xxbl:scope="outer" id="my-sequence"/>
+                                        <xxf:value value="index('my-repeat')" xxbl:scope="outer" id="my-sequence"/>
                                     </xf:var>
                                     <xf:repeat id="my-repeat" xxbl:scope="outer" ref="1"/>
                                     <xf:output value="$repeat-index" id="my-output"/>
@@ -3759,7 +3759,7 @@
                             <xbl:template>
                                 <xf:group id="group1" xxbl:scope="outer">
                                     <xf:group id="group2" xxbl:scope="inner">
-                                        <xf:var name="v2"><xxf:sequence value="$v1" xxbl:scope="outer"/></xf:var>
+                                        <xf:var name="v2"><xxf:value value="$v1" xxbl:scope="outer"/></xf:var>
                                         <xf:output id="o2" value="$v2"/>
                                     </xf:group>
                                 </xf:group>

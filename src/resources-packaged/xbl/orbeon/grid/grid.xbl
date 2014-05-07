@@ -107,33 +107,33 @@
 
                         <xsl:if test="$is-repeat">
                             <xf:var name="repeat-context">
-                                <xxf:sequence value="." xxbl:scope="outer"/>
+                                <xxf:value value="." xxbl:scope="outer"/>
                             </xf:var>
                             <xf:var name="repeat-sequence">
-                                <xxf:sequence value="{$repeat-expression}" xxbl:scope="outer"/>
+                                <xxf:value value="{$repeat-expression}" xxbl:scope="outer"/>
                             </xf:var>
                             <xsl:if test="not($readonly)">
                                 <xf:var name="repeat-template">
-                                    <xxf:sequence value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
+                                    <xxf:value value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
                                 </xf:var>
                             </xsl:if>
                             <xf:var name="repeat-index">
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
-                                <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
+                                <xxf:value value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
                             <!-- NOTE: We need a better way to get the Form Runner mode. -->
                             <xf:var name="view-mode" value="xxf:readonly($repeat-context) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
                             <xf:var name="min-avt" xxbl:scope="outer"><xsl:value-of select="($root/@min, $root/@minOccurs, 0)[1]"/></xf:var>
                             <xf:var name="min">
-                                <xxf:sequence value="xxf:evaluate-avt($min-avt)" xxbl:scope="outer"/>
+                                <xxf:value value="xxf:evaluate-avt($min-avt)" xxbl:scope="outer"/>
                                 <!-- Don't add those yet as the context becomes empty once the iteration count falls to 0. -->
                                 <!-- xbl:attr="model context ref bind" -->
                             </xf:var>
 
                             <xf:var name="max-avt" xxbl:scope="outer"><xsl:value-of select="($root/@max, $root/@maxOccurs, 'none')[1]"/></xf:var>
                             <xf:var name="max">
-                                <xxf:sequence value="xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
+                                <xxf:value value="xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
                                 <!-- Don't add those yet as the context becomes empty once the iteration count falls to 0. -->
                                 <!-- xbl:attr="model context ref bind" -->
                             </xf:var>
@@ -227,9 +227,9 @@
                                                            have a good solution for that.
                                                     -->
                                                     <xf:var xxbl:scope="outer" name="control-binding" context="{$repeat-expression}">
-                                                        <xxf:sequence value=".">
+                                                        <xxf:value value=".">
                                                             <xsl:apply-templates select="$control/(@bind, @model, @context, @ref)"/>
-                                                        </xxf:sequence>
+                                                        </xxf:value>
                                                     </xf:var>
                                                     <!-- Point to control binding if any, dummy value otherwise
                                                          and make sure there is an empty value. -->
@@ -261,7 +261,7 @@
 
                                                     <xf:var name="remove-constraint">
                                                         <!-- Evaluate the constraint in the context of the iteration -->
-                                                        <xxf:sequence value="{$remove-constraint}" xxbl:scope="outer"/>
+                                                        <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
                                                     </xf:var>
 
                                                     <xf:var name="can-classes" value="
@@ -514,7 +514,7 @@
                     <xsl:param name="input-class" as="attribute(class)?"/>
                     <xsl:if test="exists($input-class)">
                         <xf:var name="class-avt" xxbl:scope="outer"><xsl:value-of select="$input-class"/>                                  </xf:var>
-                        <xf:var name="class-value"                 ><xxf:sequence xxbl:scope="outer" value="xxf:evaluate-avt($class-avt)"/></xf:var>
+                        <xf:var name="class-value"                 ><xxf:value xxbl:scope="outer" value="xxf:evaluate-avt($class-avt)"/></xf:var>
                     </xsl:if>
                 </xsl:function>
 

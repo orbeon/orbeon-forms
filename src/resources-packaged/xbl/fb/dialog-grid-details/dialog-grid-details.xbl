@@ -157,7 +157,7 @@
             <xf:group id="container" appearance="xxf:internal">
 
                 <!-- Bindings specified on control -->
-                <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
                 <xxf:dialog id="dialog" appearance="full" level="modal">
                     <xf:label ref="$resources/dialog-grid-details/label"/>

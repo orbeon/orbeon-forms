@@ -110,7 +110,7 @@
             <!-- When the component is initialized or when resources URL changes, update our internal itemset -->
             <xf:var name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
             <xf:var name="resource">
-                <xxf:sequence value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+                <xxf:value value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
                     <xf:send if="normalize-space($resource)" submission="get-itemset">

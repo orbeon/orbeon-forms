@@ -82,7 +82,7 @@
         </xxbl:global>
         <xbl:template>
             <xf:group appearance="xxf:internal" id="container">
-                <xf:var name="binding" as="node()?"><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xf:var>
+                <xf:var name="binding" as="node()?"><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xf:var>
                 <!-- For access to label with xxf:label() -->
                 <xf:group appearance="xxf:internal" ref="$binding" id="group-with-label">
                     <xbl:content includes=":root > xf|label"/>

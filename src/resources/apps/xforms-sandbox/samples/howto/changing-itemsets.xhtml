@@ -51,9 +51,9 @@
                 <xbl:template>
                     <xf:group appearance="xxf:internal" id="container">
                         <!-- Pointers to nodes in the outside world -->
-                        <xf:var name="value"><xxf:sequence xbl:attr="value=value-ref" xxbl:scope="outer"/></xf:var>
-                        <xf:var name="label"><xxf:sequence xbl:attr="value=label-ref" xxbl:scope="outer"/></xf:var>
-                        <xf:var name="valid"><xxf:sequence xbl:attr="value=valid-ref" xxbl:scope="outer"/></xf:var>
+                        <xf:var name="value"><xxf:value xbl:attr="value=value-ref" xxbl:scope="outer"/></xf:var>
+                        <xf:var name="label"><xxf:value xbl:attr="value=label-ref" xxbl:scope="outer"/></xf:var>
+                        <xf:var name="valid"><xxf:value xbl:attr="value=valid-ref" xxbl:scope="outer"/></xf:var>
                         <xf:var name="alert" value="."/>
                         <xf:var name="is-readonly" value="exf:readonly($value)"/>
                         <!-- Expose a "value" for the itemset, so we can have an event when it changes -->

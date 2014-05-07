@@ -98,14 +98,14 @@
                         </xsl:template>
                         <xsl:template match="xf:repeat">
                             <xf:var name="sortOrder" xxbl:scope="outer">
-                                <xxf:sequence value="order" xxbl:scope="inner"/>
+                                <xxf:value value="order" xxbl:scope="inner"/>
                             </xf:var>
                             <xf:var name="sortKey" xxbl:scope="outer">
-                                <xxf:sequence value="key" xxbl:scope="inner"/>
+                                <xxf:value value="key" xxbl:scope="inner"/>
                             </xf:var>
                             <xf:var name="ref" value="{@ref}" xxbl:scope="outer"/>
                             <xf:var name="rewrittenref" xxbl:scope="outer">
-                                <xxf:sequence xxbl:scope="outer"
+                                <xxf:value xxbl:scope="outer"
                                     select="
                                 
                                 if ($sortKey = 'none') 

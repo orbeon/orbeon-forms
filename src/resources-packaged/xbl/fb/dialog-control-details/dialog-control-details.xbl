@@ -284,7 +284,7 @@
         <xbl:template>
             <!-- Bindings specified on control -->
             <!-- LATER: Use xxf:r(). Need to find solution for itemset resources. -->
-            <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
             <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-details">
                 <xf:label ref="$resources/dialog-control-details/label"/>

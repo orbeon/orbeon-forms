@@ -41,14 +41,14 @@
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">
                 <!-- Mark all controls as visited -->
-                <xf:var name="observers" xxbl:scope="outer"><xxf:sequence value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
+                <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="true" recurse="true" xxbl:scope="outer"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
-                <xf:var name="observers" xxbl:scope="outer"><xxf:sequence value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
+                <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="false" recurse="true" xxbl:scope="outer"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
@@ -296,7 +296,7 @@ Inserting error information into error list:
                             <xf:group ref="()" xbl:attr="model context ref={$level}s-count-ref" appearance="xxf:internal">
                                 <xf:group ref="instance('fr-state-instance')/counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
                                     <xf:var name="ref" as="item()?">
-                                        <xxf:sequence value="." xxbl:scope="outer"/>
+                                        <xxf:value value="." xxbl:scope="outer"/>
                                     </xf:var>
                                     <xf:var name="v" as="xs:integer" value="xs:integer(.)">
                                         <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
@@ -308,7 +308,7 @@ Inserting error information into error list:
                             <xf:group ref="()" xbl:attr="model context ref=visible-{$level}s-count-ref" appearance="xxf:internal">
                                 <xf:group ref="instance('fr-state-instance')/visible-counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
                                     <xf:var name="ref" as="item()?">
-                                        <xxf:sequence value="." xxbl:scope="outer"/>
+                                        <xxf:value value="." xxbl:scope="outer"/>
                                     </xf:var>
                                     <xf:var name="v" as="xs:integer" value="xs:integer(.)">
                                         <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
@@ -321,7 +321,7 @@ Inserting error information into error list:
                         <xf:group ref="()" xbl:attr="model context ref=valid-ref" appearance="xxf:internal">
                             <xf:group ref="instance('fr-state-instance')/valid" xxbl:scope="inner" appearance="xxf:internal">
                                 <xf:var name="ref" as="item()?">
-                                    <xxf:sequence value="." xxbl:scope="outer"/>
+                                    <xxf:value value="." xxbl:scope="outer"/>
                                 </xf:var>
                                 <xf:var name="valid" as="xs:boolean" value="xs:boolean(.)">
                                     <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="$valid"/>
@@ -333,9 +333,9 @@ Inserting error information into error list:
                         <xsl:variable name="fr-errors" select="/*/fr:errors" as="element(fr:errors)*"/>
                         <xsl:if test="exists($fr-errors)">
                             <xf:var name="global-errors" xxbl:scope="inner">
-                                <xxf:sequence value="({string-join($fr-errors/@ref, ',')})" xxbl:scope="outer">
+                                <xxf:value value="({string-join($fr-errors/@ref, ',')})" xxbl:scope="outer">
                                     <xsl:copy-of select="$fr-errors/ancestor-or-self::*/namespace::*"/>
-                                </xxf:sequence>
+                                </xxf:value>
                             </xf:var>
                         </xsl:if>
 

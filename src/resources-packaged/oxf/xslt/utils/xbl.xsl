@@ -36,7 +36,7 @@
                 <!-- Parameter bound to a node -->
                 <!-- Create an input field with all the binding attributes of the nested element, i.e. fr:foo/fr:bar/@ref -->
                 <xf:var name="{$property}">
-                    <xxf:sequence xxbl:attr="{$prefix}:{$property}/(@model | @context | @ref | @bind)" value="." xxbl:scope="outer"/>
+                    <xxf:value xxbl:attr="{$prefix}:{$property}/(@model | @context | @ref | @bind)" value="." xxbl:scope="outer"/>
                 </xf:var>
                 <xf:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
                     <xxf:script ev:event="xforms-value-changed">

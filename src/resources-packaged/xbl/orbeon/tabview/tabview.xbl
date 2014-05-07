@@ -70,9 +70,9 @@
                         <xsl:for-each select="fr:tab">
                             <!-- Point to whatever the fr:tab is bound to, if anything -->
                             <xf:var name="fr-tab-binding-{position()}">
-                                <xxf:sequence xxbl:scope="outer" value=".">
+                                <xxf:value xxbl:scope="outer" value=".">
                                     <xsl:copy-of select="@model | @context | @ref | @bind"/>
-                                </xxf:sequence>
+                                </xxf:value>
                             </xf:var>
                             <!--  Is this tab relevant -->
                             <xf:var name="fr-tab-relevance-{position()}"

@@ -73,9 +73,9 @@
         <xbl:template>
 
             <!-- Bindings specified on control -->
-            <xf:var name="body"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=body-ref"/></xf:var>
-            <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
-            <xf:var name="fr-resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
+            <xf:var name="body"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=body-ref"/></xf:var>
+            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+            <xf:var name="fr-resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
 
             <xf:var name="is-new-form"      value="mode = 'new'"/>
             <xf:var name="is-save-as"       value="mode = 'save-as'"/>

@@ -202,7 +202,7 @@
                 </xh:div>
 
                 <!-- Input, only shown if user has an instance 'fr-xforms-inspector-input' -->
-                <xf:var name="external-input"><xxf:sequence value="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xf:var>
+                <xf:var name="external-input"><xxf:value value="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xf:var>
                 <xf:var name="internal-input" value="instance('inspector-instance')/input"/>
                 <xf:group ref=".[exists($external-input)]">
                     <xh:div class="fr-xforms-inspector-block fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">

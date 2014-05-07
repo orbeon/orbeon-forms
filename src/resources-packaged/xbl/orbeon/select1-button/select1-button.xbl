@@ -48,7 +48,7 @@
                             <xf:action ev:event="#all" ev:propagate="stop"/>
 
                             <!-- Variable pointing to external single-node binding -->
-                            <xf:var name="external-value" as="node()?"><xxf:sequence value="." xxbl:scope="outer"/></xf:var>
+                            <xf:var name="external-value" as="node()?"><xxf:value value="." xxbl:scope="outer"/></xf:var>
 
                             <!-- HACK: Whether we are Form Runner-read-only -->
                             <xf:var name="readonly" value="xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>

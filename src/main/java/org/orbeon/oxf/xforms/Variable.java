@@ -15,12 +15,10 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
-import org.orbeon.oxf.xforms.analysis.controls.ViewTrait;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -47,7 +45,6 @@ public class Variable {
     private final VariableAnalysisTrait staticVariable;
     private final XFormsContainingDocument containingDocument;
 
-    private final Element variableElement;
     private final Element valueElement;
 
     public final String variableName;
@@ -59,21 +56,20 @@ public class Variable {
     public Variable(VariableAnalysisTrait staticVariable, XFormsContainingDocument containingDocument) {
         this.staticVariable = staticVariable;
         this.containingDocument = containingDocument;
-        this.variableElement = ((ElementAnalysis) staticVariable).element();
 
-        this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
-        if (variableName == null)
-            throw new ValidationException("xf:var, xxf:variable or exf:variable element must have a \"name\" attribute", getLocationData());
+        final Element variableElement = ((ElementAnalysis) staticVariable).element();
 
-        // Handle xxf:sequence
-        final Element sequenceElement = variableElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
+        this.variableName = staticVariable.name();
+
+        // Handle nested xxf:value
+        final Element sequenceElement = VariableAnalysis.valueOrSequenceElementJava(variableElement);
         if (sequenceElement == null) {
             this.valueElement = variableElement;
         } else {
             this.valueElement = sequenceElement;
         }
 
-        this.expression = VariableAnalysis.valueOrSelectAttribute(valueElement);
+        this.expression = VariableAnalysis.valueOrSelectAttributeJava(valueElement);
     }
 
     private void evaluate(XFormsContextStack contextStack, String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
@@ -83,7 +79,7 @@ public class Variable {
         } else {
             // There is a select attribute
 
-            final boolean pushContext = pushOuterContext || staticVariable.hasSequence();
+            final boolean pushContext = pushOuterContext || staticVariable.hasNestedValue();
             if (pushContext) {
                 // Push binding for evaluation, so that @context and @model are evaluated
                 final Scope variableValueScope = staticVariable.valueScope();

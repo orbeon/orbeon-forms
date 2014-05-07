@@ -55,7 +55,7 @@
             <xf:group appearance="xxf:internal" xsl:version="2.0">
                 <!-- Propagate @class with AVT to span (Q: do we need to?) -->
                 <xf:var name="class-avt" xxbl:scope="outer" xbl:attr="xbl:text=class"/>
-                <xf:var name="class"><xxf:sequence value="xxf:evaluate-avt($class-avt)" xxbl:scope="outer"/></xf:var>
+                <xf:var name="class"><xxf:value value="xxf:evaluate-avt($class-avt)" xxbl:scope="outer"/></xf:var>
                 <xh:span class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
                     <xh:span class="first-child">
                         <!-- Store @tabindex into hidden span -->

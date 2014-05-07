@@ -40,7 +40,7 @@
                         <xf:group xxbl:scope="inner" appearance="xxf:internal">
                             <!-- Variable pointing to external single-node binding -->
                             <xf:var name="result" as="node()?">
-                                <xxf:sequence value="." xxbl:scope="outer"/>
+                                <xxf:value value="." xxbl:scope="outer"/>
                             </xf:var>
 
                             <!-- Div in which the chart is rendered -->

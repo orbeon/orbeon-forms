@@ -63,8 +63,8 @@
         <xbl:template>
             <xf:group appearance="xxf:internal" id="container">
 
-                <xf:var name="form"           ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
-                <xf:var name="resources"      ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="form"           ><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+                <xf:var name="resources"      ><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
                 <xf:var name="ui"             value="instance('ui')"/>
                 <xf:var name="model"          value="$form/xh:head/xf:model"/>
                 <xf:var name="body"           value="$form/xh:body"/>

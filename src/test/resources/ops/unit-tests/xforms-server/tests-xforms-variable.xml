@@ -416,7 +416,7 @@
         </output>
     </test>
 
-    <test description="Simple xxf:sequence within xf:var" name="oxf:pipeline">
+    <test description="Simple xxf:sequence/xxf:value within xf:var" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -451,7 +451,7 @@
                             <xxf:sequence value="$foo + $bar"/>
                         </xf:var>
                         <xf:var name="product">
-                            <xxf:sequence ref="foo" value=". * $bar"/>
+                            <xxf:value ref="foo" value=". * $bar"/>
                         </xf:var>
                         <xf:group id="group2">
                             <xf:action ev:event="my-event">
@@ -831,7 +831,5 @@
             </xxf:event-response>
         </output>
     </test>
-
-
 
 </group>

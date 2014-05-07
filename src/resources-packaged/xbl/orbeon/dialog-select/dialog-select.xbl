@@ -253,16 +253,16 @@
 
                     <!-- Variable pointing to external single-node binding -->
                     <xf:var name="binding" id="binding-var" as="node()?">
-                        <xxf:sequence value="." xxbl:scope="outer"/>
+                        <xxf:value value="." xxbl:scope="outer"/>
                     </xf:var>
 
                     <!-- Variable containing the label, so we can pass it to the dialog -->
                     <xf:var name="label">
-                        <xxf:sequence xxbl:scope="outer">
+                        <xxf:value xxbl:scope="outer">
                             <xsl:variable name="label" select="/fr:dialog-select/xf:label"/>
                             <xsl:if test="$label/@ref"><xsl:attribute name="select" select="$label/@ref"/></xsl:if>
                             <xsl:value-of select="$label"/>
-                        </xxf:sequence>
+                        </xxf:value>
                     </xf:var>
 
                     <!-- Internal selection control providing access to the itemset -->

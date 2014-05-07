@@ -73,8 +73,8 @@
         <xbl:template>
             <xf:group appearance="xxf:internal" id="container">
 
-                <xf:var name="metadata" ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=metadata-ref"/></xf:var>
-                <xf:var name="resources"><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="metadata" ><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref=metadata-ref"/></xf:var>
+                <xf:var name="resources"><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
                 <xf:var name="ui"       value="instance('ui')"/>
 
                 <!-- On dialog open, copy permissions from metadata into our UI representation -->

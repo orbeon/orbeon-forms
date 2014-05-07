@@ -106,7 +106,7 @@
         </xbl:implementation>
         <xbl:template>
             <!-- Bindings specified on control -->
-            <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
             <!-- Actual dialog -->
             <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">

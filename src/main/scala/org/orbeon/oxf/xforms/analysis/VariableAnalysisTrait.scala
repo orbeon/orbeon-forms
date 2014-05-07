@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.analysis
 
 import controls.ViewTrait
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.common.ValidationException
 
 /**
  * Trait representing a variable element, whether in the model or in the view.
@@ -24,47 +25,48 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
     variableSelf ⇒
 
+    import VariableAnalysis._
+
     // Variable name and value
-    val name = element.attributeValue(XFormsConstants.NAME_QNAME)
+    val name = element.attributeValue(NAME_QNAME)
+    if (name eq null)
+        throw new ValidationException(s"`${element.getQualifiedName}` element must have a `name` attribute", ElementAnalysis.createLocationData(element))
+    
+    // Lazy because accessing scopeModel
+    private lazy val nestedAnalysis =
+        valueOrSequenceElement(element) map { valueElement ⇒
+            new SimpleElementAnalysis(staticStateContext, valueElement, Some(variableSelf), None, getChildElementScope(valueElement)) {
 
-    private lazy val sequenceAnalysis =
-        element.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME) match { // lazy because accessing scopeModel
-            case sequenceElement: Element ⇒
-                Some(new SimpleElementAnalysis(staticStateContext, sequenceElement, Some(variableSelf), None, getChildElementScope(sequenceElement)) {
+                nestedSelf ⇒
 
-                    sequenceSelf ⇒
-
-                    override protected def computeValueAnalysis =
-                        Some(VariableAnalysis.valueOrSelectAttribute(element) match {
-                            // @value or @select
-                            case value: String ⇒ analyzeXPath(sequenceSelf.getChildrenContext, value)
-                            // Value is constant
-                            case _ ⇒ StringAnalysis() // TODO: store constant value?
-                        })
-
-                    // If in same scope as xf:var, in-scope variables are the same as xxf:var because we don't
-                    // want the variable defined by xf:var to be in-scope for xxf:sequence. Otherwise, use
-                    // default algorithm.
-
-                    // TODO: This is bad architecture as we duplicate the logic in ViewTrait.
-                    override lazy val inScopeVariables =
-                        if (variableSelf.scope == sequenceSelf.scope)
-                            variableSelf.inScopeVariables
-                        else
-                            getRootVariables ++ sequenceSelf.treeInScopeVariables
-
-                    override protected def getRootVariables = variableSelf match {
-                        case _: ViewTrait ⇒ sequenceSelf.model match { case Some(model) ⇒ model.variablesMap; case None ⇒ Map() }
-                        case _ ⇒ Map()
+                override protected def computeValueAnalysis =
+                    valueOrSelectAttribute(element) match {
+                        case Some(value) ⇒ Some(analyzeXPath(nestedSelf.getChildrenContext, value))
+                        case None        ⇒ Some(StringAnalysis()) // TODO: store constant value?
                     }
-                })
-            case _ ⇒ None
+
+                // If in same scope as xf:var, in-scope variables are the same as xxf:var because we don't
+                // want the variable defined by xf:var to be in-scope for xxf:value. Otherwise, use
+                // default algorithm.
+
+                // TODO: This is bad architecture as we duplicate the logic in ViewTrait.
+                override lazy val inScopeVariables =
+                    if (variableSelf.scope == nestedSelf.scope)
+                        variableSelf.inScopeVariables
+                    else
+                        getRootVariables ++ nestedSelf.treeInScopeVariables
+
+                override protected def getRootVariables = variableSelf match {
+                    case _: ViewTrait ⇒ nestedSelf.model match { case Some(model) ⇒ model.variablesMap; case None ⇒ Map() }
+                    case _            ⇒ Map()
+                }
+            }
         }
 
-    // Scope of xf:var OR nested xxf:sequence if present
-    lazy val (hasSequence, valueScope, valueNamespaceMapping, valueStaticId) = sequenceAnalysis match {
-        case Some(sequenceAnalysis) ⇒
-            (true, sequenceAnalysis.scope, sequenceAnalysis.namespaceMapping, sequenceAnalysis.staticId)
+    // Scope of xf:var OR nested xxf:value if present
+    lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) = nestedAnalysis match {
+        case Some(nestedAnalysis) ⇒
+            (true, nestedAnalysis.scope, nestedAnalysis.namespaceMapping, nestedAnalysis.staticId)
         case None ⇒
             (false, scope, namespaceMapping, staticId)
     }
@@ -72,31 +74,35 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
     def variableAnalysis = getValueAnalysis
 
     override def computeValueAnalysis =
-        sequenceAnalysis match {
-            case Some(sequenceAnalysis) ⇒
-                // Value is provided by nested xxf:sequence/@value
-                sequenceAnalysis.analyzeXPath()
-                sequenceAnalysis.getValueAnalysis
+        nestedAnalysis match {
+            case Some(nestedAnalysis) ⇒
+                // Value is provided by nested xxf:value/@value
+                nestedAnalysis.analyzeXPath()
+                nestedAnalysis.getValueAnalysis
             case None ⇒
-                // No nested xxf:sequence element
-                Some(VariableAnalysis.valueOrSelectAttribute(element) match {
-                    // @value or @select
-                    case value: String ⇒ analyzeXPath(getChildrenContext, value)
-                    // Value is constant
-                    case _ ⇒ StringAnalysis() // TODO: store constant value?
-                })
+                // No nested xxf:value element
+                valueOrSelectAttribute(element) match {
+                    case Some(value) ⇒ Some(analyzeXPath(getChildrenContext, value))
+                    case _           ⇒ Some(StringAnalysis()) // TODO: store constant value?
+                }
         }
 }
 
 object VariableAnalysis {
+    
+    def valueOrSelectAttributeJava(element: Element) =
+        valueOrSelectAttribute(element).orNull
 
-    def valueOrSelectAttribute(element: Element) = {
-        val select = element.attributeValue(XFormsConstants.SELECT_QNAME)
-        if (select ne null) select else element.attributeValue(XFormsConstants.VALUE_QNAME)
-    }
+    def valueOrSelectAttribute(element: Element) =
+        Option(element.attributeValue(VALUE_QNAME)) orElse Option(element.attributeValue(SELECT_QNAME))
 
-    def variableScopesModelVariables(v: VariableAnalysisTrait) = {
-        // See https://github.com/orbeon/orbeon-forms/issues/1104 and https://github.com/orbeon/orbeon-forms/issues/1132
+    def valueOrSequenceElementJava(element: Element) =
+        valueOrSequenceElement(element).orNull
+    
+    def valueOrSequenceElement(element: Element) =
+        Option(element.element(XXFORMS_VALUE_QNAME)) orElse Option(element.element(XXFORMS_SEQUENCE_QNAME))
+
+    // See https://github.com/orbeon/orbeon-forms/issues/1104 and https://github.com/orbeon/orbeon-forms/issues/1132
+    def variableScopesModelVariables(v: VariableAnalysisTrait) =
         v.isInstanceOf[ViewTrait] || v.model != (v.parent flatMap (_.model))
-    }
 }

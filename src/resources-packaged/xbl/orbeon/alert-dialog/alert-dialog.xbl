@@ -161,7 +161,7 @@
                         </xf:label>
                         <!-- If a custom target is provided, dispatch to it -->
                         <xf:action ev:event="DOMActivate">
-                            <xf:var name="local"><xxf:sequence value="$local" xxbl:scope="inner"/></xf:var>
+                            <xf:var name="local"><xxf:value value="$local" xxbl:scope="inner"/></xf:var>
                             <xf:var name="targetid" value="normalize-space($local/{$handler})"/>
 
                             <xf:dispatch if="$targetid != ''" name="fr-{$handler}" targetid="{{$targetid}}">

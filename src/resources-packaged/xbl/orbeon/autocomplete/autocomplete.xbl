@@ -159,12 +159,12 @@
                         <xf:var name="dynamic-itemset" value="$mode = ('dynamic', 'resource')"/>
                         <!-- Declare a variable fr-search-value in outer scope so it can be used in the AVT -->
                         <xf:var name="fr-search-value" xxbl:scope="outer">
-                            <xxf:sequence value="$local/textfield-value" xxbl:scope="inner"/>
+                            <xxf:value value="$local/textfield-value" xxbl:scope="inner"/>
                         </xf:var>
                         <!-- Evaluate the resource AVT -->
                         <xsl:if test="exists(@resource)">
                             <xf:var name="resource" xbl:attr="xbl:text=resource" id="resource-variable">
-                                <xxf:sequence value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+                                <xxf:value value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                             </xf:var>
                         </xsl:if>
                         <!-- Define variables $has-labelref (xs:boolean) and $external-label (node()) -->
@@ -172,7 +172,7 @@
                         <xf:var name="has-labelref" value="$dynamic-itemset and $labelref != ''"/>
                         <!-- HACK: It is unfortunate that we have to duplicate in XSLT the logic already implement in XForms for $dynamic-itemset  -->
                         <xsl:if test="exists(@resource) or @dynamic-itemset = 'true'">
-                            <xf:var name="external-label"><xxf:sequence xbl:attr="value=labelref" xxbl:scope="outer"/></xf:var>
+                            <xf:var name="external-label"><xxf:value xbl:attr="value=labelref" xxbl:scope="outer"/></xf:var>
                         </xsl:if>
 
                         <!-- - - - - - - - - - - - - - - - - - - FUNCTIONS - - - - - - - - - - - - - - - - - - -->

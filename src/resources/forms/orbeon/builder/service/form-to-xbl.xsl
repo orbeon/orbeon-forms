@@ -311,7 +311,7 @@
 
                 <!-- Expose internally a variable pointing to Form Runner resources -->
                 <xf:var name="fr-resources" as="element()?">
-                    <xxf:sequence value="$fr-resources" xxbl:scope="outer"/>
+                    <xxf:value value="$fr-resources" xxbl:scope="outer"/>
                 </xf:var>
 
                 <!-- Try to match the current form language, or use the first language available if not found -->

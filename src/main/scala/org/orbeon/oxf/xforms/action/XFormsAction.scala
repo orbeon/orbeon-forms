@@ -119,7 +119,7 @@ object XFormsAction {
                         (throw new OXFException(XXFORMS_CONTEXT_QNAME.getQualifiedName + " element must have a \"name\" attribute."))
 
                 value = VariableAnalysis.valueOrSelectAttribute(element) match {
-                    case valueOrSelect: String ⇒
+                    case Some(value) ⇒
                         // XPath expression
 
                         // Set context on context element
@@ -130,7 +130,7 @@ object XFormsAction {
                         val result = XPathCache.normalizeSingletons(XPathCache.evaluate(
                             actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
                             actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
-                            valueOrSelect,
+                            value,
                             actionInterpreter.getNamespaceMappings(element),
                             contextStack.getCurrentBindingContext.getInScopeVariables,
                             XFormsContainingDocument.getFunctionLibrary,
@@ -142,7 +142,7 @@ object XFormsAction {
                         contextStack.popBinding()
 
                         result
-                    case _ ⇒
+                    case None ⇒
                         // Literal text
                         element.getStringValue
                 }

@@ -232,7 +232,7 @@ trait ContainingDocumentRequestStats {
     def getRequestStats = _requestStats
     
     def clearRequestStats(): Unit = 
-        this._requestStats = RequestStatsImpl()
+        _requestStats = RequestStatsImpl()
 }
 
 trait ContainingDocumentRequest {
@@ -266,7 +266,7 @@ trait ContainingDocumentRequest {
                 val rendererDeploymentType =
                     request.getAttributesMap.get(RENDERER_DEPLOYMENT_ATTRIBUTE_NAME).asInstanceOf[String]
 
-                this._deploymentType =
+                _deploymentType =
                     rendererDeploymentType match {
                         case "separate"   ⇒ XFormsConstants.DeploymentType.separate
                         case "integrated" ⇒ XFormsConstants.DeploymentType.integrated
@@ -274,36 +274,36 @@ trait ContainingDocumentRequest {
                     }
                 
                 // Try to get request context path
-                this._requestContextPath = request.getClientContextPath("/")
+                _requestContextPath = request.getClientContextPath("/")
 
                 // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
                 // NOTE: We used to have response.rewriteRenderURL() on this, but why?
-                this._requestPath =
+                _requestPath =
                     Option(request.getAttributesMap.get(RENDERER_BASE_URI_ATTRIBUTE_NAME).asInstanceOf[String]) getOrElse
                     request.getRequestPath
 
-                this._requestHeaders =
+                _requestHeaders =
                     request.getHeaderValuesMap.asScala.toMap
 
-                this._requestParameters =
+                _requestParameters =
                     request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray toMap // mapValues ok because of toMap
 
-                this._containerType = request.getContainerType
-                this._containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
+                _containerType = request.getContainerType
+                _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
             case None ⇒ 
                 // Special case when we run outside the context of a request
-                this._deploymentType = XFormsConstants.DeploymentType.standalone
-                this._requestContextPath = ""
-                this._requestPath = "/"
-                this._requestHeaders = Map.empty
-                this._requestParameters = Map.empty
-                this._containerType = "servlet"
-                this._containerNamespace = ""
+                _deploymentType = XFormsConstants.DeploymentType.standalone
+                _requestContextPath = ""
+                _requestPath = "/"
+                _requestHeaders = Map.empty
+                _requestParameters = Map.empty
+                _containerType = "servlet"
+                _containerNamespace = ""
         }
     }
     
     protected def initializePathMatchers(): Unit =
-        this._versionedPathMatchers =
+        _versionedPathMatchers =
             Option(PipelineContext.get.getAttribute(PageFlowControllerProcessor.PathMatchers).asInstanceOf[ju.List[PathMatcher]]) getOrElse
                 ju.Collections.emptyList[PathMatcher]
     
@@ -311,13 +311,13 @@ trait ContainingDocumentRequest {
         dynamicState.deploymentType match {
             case Some(_) ⇒
                 // Normal case where information below was previously serialized
-                this._deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
-                this._requestContextPath = dynamicState.decodeRequestContextPathJava
-                this._requestPath = dynamicState.decodeRequestPathJava
-                this._requestHeaders = dynamicState.decodeRequestHeadersJava
-                this._requestParameters = dynamicState.decodeRequestParametersJava
-                this._containerType = dynamicState.decodeContainerTypeJava
-                this._containerNamespace = dynamicState.decodeContainerNamespaceJava
+                _deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
+                _requestContextPath = dynamicState.decodeRequestContextPathJava
+                _requestPath = dynamicState.decodeRequestPathJava
+                _requestHeaders = dynamicState.decodeRequestHeadersJava
+                _requestParameters = dynamicState.decodeRequestParametersJava
+                _containerType = dynamicState.decodeContainerTypeJava
+                _containerNamespace = dynamicState.decodeContainerNamespaceJava
             case None ⇒
                 // Use information from the request
                 // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
@@ -325,5 +325,5 @@ trait ContainingDocumentRequest {
         }
     
     protected def restorePathMatchers(dynamicState: DynamicState): Unit =
-        this._versionedPathMatchers = dynamicState.decodePathMatchersJava
+        _versionedPathMatchers = dynamicState.decodePathMatchersJava
 }

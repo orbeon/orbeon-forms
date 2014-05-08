@@ -26,7 +26,7 @@
 
             <xf:var name="button-name-avt" xbl:attr="xbl:text=name" xxbl:scope="outer">save</xf:var>
             <xf:var name="button-name">
-                <xxf:sequence value="xxf:evaluate-avt($button-name-avt)" xxbl:scope="outer"/>
+                <xxf:sequence xbl:attr="model context ref bind" value="xxf:evaluate-avt($button-name-avt)" xxbl:scope="outer"/>
             </xf:var>
 
             <xf:var name="fr-resources"><xxf:sequence xxbl:scope="outer" value="$fr-resources"/></xf:var>

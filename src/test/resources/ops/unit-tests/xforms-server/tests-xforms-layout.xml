@@ -2349,7 +2349,7 @@
                         <xh:span>
                             <xh:span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</xh:span>
                             <xh:span>Pellentesque gravida scelerisque leo, vel
-                                <xh:a href="http://orbeon.com/" shape="rect" target="_blank">viverra</xh:a>lacus dignissim nec.
+                                <xh:a href="http://orbeon.com/" target="_blank">viverra</xh:a>lacus dignissim nec.
                             </xh:span>
                         </xh:span>
                     </xh:label>

@@ -113,6 +113,9 @@ body.orbeon {
   *height: 24px;
   *line-height: 24px;
 }
+.orbeon .xforms-output label {
+  cursor: default;
+}
 .orbeon input[type="submit"],
 .orbeon input[type="reset"],
 .orbeon input[type="button"] {

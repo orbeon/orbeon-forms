@@ -1,3 +1,5 @@
+ALTER DATABASE CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 create table orbeon_form_definition (
     created            timestamp(6),
     last_modified_time timestamp(6),

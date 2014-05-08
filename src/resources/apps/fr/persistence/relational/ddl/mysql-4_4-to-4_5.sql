@@ -1,4 +1,4 @@
-alter database character set utf8 collate utf8_bin;
+alter database character set utf8 collate utf8_general_ci;
 
 alter table orbeon_form_definition
     change last_modified_by  last_modified_by  varchar(255) collate utf8_bin,

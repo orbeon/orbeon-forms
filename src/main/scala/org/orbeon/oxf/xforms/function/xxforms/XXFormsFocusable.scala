@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 Orbeon, Inc.
+ * Copyright (C) 2014 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.oxf.xforms.control.FocusableTrait
 
-class XXFormsVisited extends XFormsFunction with FunctionSupport {
+class XXFormsFocusable extends XFormsFunction with FunctionSupport {
     override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-        relevantControl(0)(xpathContext) map (_.visited)
+        relevantControl(0)(xpathContext) map (_.isInstanceOf[FocusableTrait])
 }

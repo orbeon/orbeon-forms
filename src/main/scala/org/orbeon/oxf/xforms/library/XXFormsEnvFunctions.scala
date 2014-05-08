@@ -183,6 +183,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(STRING, EXACTLY_ONE)
         )
 
+        Fun("focusable", classOf[XXFormsFocusable], 0, 1, BOOLEAN, ALLOWS_ZERO_OR_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
+
         Fun("absolute-id", classOf[XXFormsAbsoluteId], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )

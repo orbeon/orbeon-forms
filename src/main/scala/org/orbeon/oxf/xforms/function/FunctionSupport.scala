@@ -82,14 +82,15 @@ protected trait FunctionSupport extends XFormsFunction {
 
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)
-    def asItem(v: Option[String])    = v map stringToStringValue orNull
 
     implicit def stringIteratorToSequenceIterator(i: Iterator[String]): SequenceIterator = i map stringToStringValue
 
     implicit def itemSeqOptToIterator(v: Option[Seq[Item]])     = v map (s ⇒ new ListIterator(s.asJava)) getOrElse EmptyIterator.getInstance
     implicit def stringSeqOptToIterator(v: Option[Seq[String]]) = v map asIterator getOrElse EmptyIterator.getInstance
 
-    implicit def stringToStringValue(v: String)     = StringValue.makeStringValue(v)
-    implicit def booleanToBooleanValue(v: Boolean)  = BooleanValue.get(v)
-    implicit def stringOptToItem(v: Option[String]) = asItem(v)
+    implicit def stringToStringValue(v: String)       = StringValue.makeStringValue(v)
+    implicit def booleanToBooleanValue(v: Boolean)    = BooleanValue.get(v)
+
+    implicit def stringOptToItem(v: Option[String])   = v map stringToStringValue orNull
+    implicit def booleanOptToItem(v: Option[Boolean]) = v map booleanToBooleanValue orNull
 }

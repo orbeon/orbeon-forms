@@ -388,10 +388,12 @@ trait GridOps extends ContainerOps {
     // @mi/@max can be simple AVTs, i.e. AVTs which cover the whole attribute, e.g. "{my-min}"
     // The main reason to do this instead of making @min/@max plain XPath expressions is that @max also supports the
     // literal "none" (and "unbounded" for backward compatibility).
-    private val SimpleAVTRegex = """^\{([^{^}]+)\}$""".r
+    // NOTE: This doesn't check that the expression is syntactically correct, in particular it doesn't check that
+    // curly brackets are absent or escaped within the AVT.
+    private val SimpleAVTRegex = """^\{(.+)\}$""".r
 
     private def trimSimpleAVT(s: String) = s match {
-        case SimpleAVTRegex(v) ⇒ v
+        case SimpleAVTRegex(v) ⇒ v.replaceAllLiterally("{{", "{").replaceAllLiterally("}}", "}")
         case v                 ⇒ v
     }
 

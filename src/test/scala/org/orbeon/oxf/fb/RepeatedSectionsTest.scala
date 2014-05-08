@@ -107,6 +107,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
                 assert("1" === section.attValue("min"))
                 assert("2" === section.attValue("max"))
+
+                assert("1" === getNormalizedMin(doc, "foo"))
+                assert(Some("2") === getNormalizedMax(doc, "foo"))
             }
 
             // Change min/max
@@ -117,6 +120,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
                 assert("{1 + 1}" === section.attValue("min"))
                 assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
+
+                assert("1 + 1" === getNormalizedMin(doc, "foo"))
+                assert(Some("count(//*[contains(@foo, '{')])") === getNormalizedMax(doc, "foo"))
             }
 
             // Move section into it
@@ -163,6 +169,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                     )
     
                 assertXMLElementsCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+
+                assert("0" === getNormalizedMin(doc, "foo"))
+                assert(None === getNormalizedMax(doc, "foo"))
             }
         }
 }

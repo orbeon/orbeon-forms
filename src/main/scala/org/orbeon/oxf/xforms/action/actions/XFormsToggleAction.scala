@@ -41,6 +41,7 @@ class XFormsToggleAction extends XFormsAction {
         }
     }
 }
+
 object XFormsToggleAction {
 
     def toggle(caseControl: XFormsCaseControl, deferred: Boolean = true): Unit = {

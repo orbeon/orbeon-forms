@@ -51,7 +51,6 @@ public class AsynchronousSubmissionManager {
      * Add a special delay event to the containing document if there are pending submissions.
      *
      * This should be called just before sending an Ajax response.
-     *
      */
     public void addClientDelayEventIfNeeded() {
         if (hasPendingAsynchronousSubmissions()) {
@@ -129,7 +128,6 @@ public class AsynchronousSubmissionManager {
      *
      * Submissions are processed in the order in which they are made available upon termination by the completion
      * service.
-     *
      */
     public void processAllAsynchronousSubmissions() {
         final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(false, getSessionKey(containingDocument));
@@ -168,7 +166,6 @@ public class AsynchronousSubmissionManager {
      *
      * Submissions are processed in the order in which they are made available upon termination by the completion
      * service.
-     *
      */
     public void processCompletedAsynchronousSubmissions() {
         final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(false, getSessionKey(containingDocument));

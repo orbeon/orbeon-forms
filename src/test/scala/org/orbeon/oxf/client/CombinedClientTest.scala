@@ -26,6 +26,6 @@ class CombinedClientTest
     with FormRunnerSummary
     with OrbeonFormsDemoPath
     with ControlResourcesEditor
-    //with Permissions // Bug #1691
+    with Permissions
     with Currency
     with Grid

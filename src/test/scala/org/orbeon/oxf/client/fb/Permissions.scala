@@ -44,21 +44,21 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
                     // Clerks can read
                     _ ← clickOn(AddPermission)
                     _ ← textField(role(4)).value = "clerk"
-                    _ ← clickOn(checkbox(2, "read"))
+                    _ ← clickOn(checkbox(4, "read"))
 
                     // Admins can do everything
                     _ ← clickOn(AddPermission)
                     _ ← patientlySendKeys(role(5), "admin")
-                    _ ← clickOn(checkbox(3, "update"))
-                    _ ← assert(checkbox(checkbox(3, "read")).isSelected)
+                    _ ← clickOn(checkbox(5, "update"))
                     // Read auto-selected when selecting update
-                    _ ← clickOn(checkbox(3, "delete"))
+                    _ ← assert(checkbox(checkbox(5, "read")).isSelected)
+                    _ ← clickOn(checkbox(5, "delete"))
 
                     // Everyone can create
                     _ ← clickOn(checkbox(1, "create"))
-                    // Read auto-selected when selecting update
-                    _ ← assert(checkbox(checkbox(2, "read")).isSelected)
-                    _ ← assert(checkbox(checkbox(3, "read")).isSelected)
+                    // All the following rows get the create permission
+                    _ ← assert(checkbox(checkbox(4, "create")).isSelected)
+                    _ ← assert(checkbox(checkbox(5, "create")).isSelected)
 
                     // Save, reopen, and check the permissions are correct
                     _ ← clickOn(Apply)
@@ -70,15 +70,15 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
                     _ ← assert(! checkbox(checkbox(1, "update")).isSelected)
                     _ ← assert(! checkbox(checkbox(1, "delete")).isSelected)
                     _ ← assert(textField(role(4)).value === "admin")
-                    _ ← assert(  checkbox(checkbox(2, "create")).isSelected)
-                    _ ← assert(  checkbox(checkbox(2, "read"  )).isSelected)
-                    _ ← assert(  checkbox(checkbox(2, "update")).isSelected)
-                    _ ← assert(  checkbox(checkbox(2, "delete")).isSelected)
+                    _ ← assert(  checkbox(checkbox(4, "create")).isSelected)
+                    _ ← assert(  checkbox(checkbox(4, "read"  )).isSelected)
+                    _ ← assert(  checkbox(checkbox(4, "update")).isSelected)
+                    _ ← assert(  checkbox(checkbox(4, "delete")).isSelected)
                     _ ← assert(textField(role(5)).value === "clerk")
-                    _ ← assert(  checkbox(checkbox(3, "create")).isSelected)
-                    _ ← assert(  checkbox(checkbox(3, "read"  )).isSelected)
-                    _ ← assert(! checkbox(checkbox(3, "update")).isSelected)
-                    _ ← assert(! checkbox(checkbox(3, "delete")).isSelected)
+                    _ ← assert(  checkbox(checkbox(5, "create")).isSelected)
+                    _ ← assert(  checkbox(checkbox(5, "read"  )).isSelected)
+                    _ ← assert(! checkbox(checkbox(5, "update")).isSelected)
+                    _ ← assert(! checkbox(checkbox(5, "delete")).isSelected)
 
                     // Done, close dialog
                     _ ← clickOn(Apply)

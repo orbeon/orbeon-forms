@@ -141,7 +141,6 @@
 
                         <!-- Grid table -->
                         <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
-                                          @class,
                                           (: Control name might not be available (unclear why normalize-space() is needed) :)
                                           for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
                                           if ($is-repeat)

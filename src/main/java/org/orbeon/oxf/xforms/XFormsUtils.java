@@ -27,8 +27,6 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
-import org.orbeon.oxf.xforms.event.Dispatch;
-import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -330,28 +328,7 @@ public class XFormsUtils {
             }
         }
 
-        // Try to get linking attribute
-        // NOTE: This is deprecated in XForms 1.1
-        {
-            final String srcAttributeValue = childElement.attributeValue(XFormsConstants.SRC_QNAME);
-            final boolean hasSrcAttribute = srcAttributeValue != null;
-            if (hasSrcAttribute) {
-                try {
-                    // NOTE: This should probably be cached, but on the other hand almost nobody uses @src
-                    final String tempResult  = retrieveSrcValue(srcAttributeValue);
-                    if (containsHTML != null)
-                        containsHTML[0] = false; // NOTE: we could support HTML if the media type returned is text/html
-                    return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
-                } catch (IOException e) {
-                    // Dispatch xforms-link-error to model
-                    final XFormsModel currentModel = currentBindingContext.model();
-                    // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
-                    Dispatch.dispatchEvent(new XFormsLinkErrorEvent(currentModel, srcAttributeValue, e));
-                    // Exception when dereferencing the linking attribute
-                    return null;
-                }
-            }
-        }
+        // NOTE: Linking attribute is deprecated in XForms 1.1 and we no longer support it.
 
         // Try to get inline value
         {

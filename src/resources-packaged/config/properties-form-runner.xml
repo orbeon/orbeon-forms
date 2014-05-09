@@ -37,18 +37,21 @@
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.autosave"                         value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.autosave"                          value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.autosave"                            value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.autosave"                      value="true"/>
 
     <!-- Whether providers support permissions -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.permissions"                           value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.permissions"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.permissions"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.permissions"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.permissions"                   value="true"/>
 
     <!-- Whether providers support versioning -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.versioning"                            value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.versioning"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.versioning"                        value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.versioning"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.versioning"                    value="true"/>
 
     <!-- Whether providers are active -->
     <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->

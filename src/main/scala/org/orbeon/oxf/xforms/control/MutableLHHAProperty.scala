@@ -122,7 +122,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
                 // LHHA is direct child of control, evaluate within context
                 contextStack.setBinding(control.bindingContext)
                 contextStack.pushBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope)
-                val result = Option(XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, lhhaAnalysis.defaultToHTML, tempContainsHTML))
+                val result = Option(XFormsUtils.getElementValue(control.lhhaContainer, contextStack, control.effectiveId, lhhaElement, supportsHTML, lhhaAnalysis.defaultToHTML, tempContainsHTML))
                 contextStack.popBinding()
                 result
             } else {

@@ -30,6 +30,9 @@ trait ControlLHHASupport {
     // NOTE: var because of cloning
     private[ControlLHHASupport] var lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
 
+    // XBL Container in which dynamic LHHA elements like xf:output and AVTs evaluate
+    def lhhaContainer = container
+
     def markLHHADirty(): Unit =
         for (currentLHHA ← lhha)
             if (currentLHHA ne null)

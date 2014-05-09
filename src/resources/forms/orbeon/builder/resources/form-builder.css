@@ -418,24 +418,14 @@ body {
 }
 .orbeon .fb-publish-dialog .table {
   background-color: white;
-  table-layout: fixed;
+  table-layout: auto;
   margin-bottom: 10px;
 }
 .orbeon .fb-publish-dialog .table th {
   font-weight: bold;
   text-align: right;
-}
-.orbeon .fb-publish-dialog .fb-publish-details-grid table {
-  background-color: white;
-}
-.orbeon .fb-publish-dialog .fb-publish-details-grid table th {
-  text-align: right;
-  vertical-align: middle;
-  padding: 4px;
-}
-.orbeon .fb-publish-dialog .fb-publish-details-grid table td {
-  text-align: left;
-  vertical-align: middle;
+  white-space: nowrap;
+  width: 1px;
 }
 .orbeon .fb-publish-dialog .fb-publish-message {
   background-color: white;

@@ -518,7 +518,7 @@
         <dialog-publish>
             <label>Publish Form</label>
             <publish>Publish</publish>
-            <publish-success>The form was published successfully as version {1,number,integer}. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
+            <publish-success>The form definition was published successfully as version {1,number,integer}, with {0,choice,0#no attachments|1#1 attachment|1&lt;{0,number,integer} attachments}.</publish-success>
             <publish-error>There was an error during form publishing.</publish-error>
             <latest-published-version>Latest published version</latest-published-version>
             <create-new-version-item>create a new form definition with version number {0,number,integer}</create-new-version-item>
@@ -1403,7 +1403,7 @@
         <dialog-publish>
             <label>Publier le formulaire</label>
             <publish>Publier</publish>
-            <publish-success>Le formulaire a été publié avec succès sous la version {1,number,integer}. {0,choice,0#Aucun fichier joint n''a été publié|1#1 fichier joint a été publié|1&lt;{0,number,integer} fichiers joints ont été publiés}.</publish-success>
+            <publish-success>La définition de formulaire a été publiée avec succès sous la version {1,number,integer}, avec {0,choice,0#aucun fichiers joints|1#1 fichier joint|1&lt;{0,number,integer} fichiers joints}.</publish-success>
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <latest-published-version>Dernière version publiée</latest-published-version>
             <create-new-version-item>créer une nouvelle définition de formulaire avec numéro de version {0,number,integer}</create-new-version-item>

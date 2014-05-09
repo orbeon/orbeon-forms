@@ -386,26 +386,13 @@ body {
 
         .table {
             background-color: white;
-            table-layout: fixed;
+            table-layout: auto;
             margin-bottom: @fbGutter;
             th {
                 font-weight: bold;
                 text-align: right;
-            }
-        }
-
-        .fb-publish-details-grid table {
-            background-color: white;
-
-            th {
-                text-align: right;
-                vertical-align: middle;
-                padding: @frGridCellPadding;
-            }
-
-            td {
-                text-align: left;
-                vertical-align: middle;
+                white-space: nowrap;
+                .narrow-td()
             }
         }
 
@@ -436,7 +423,7 @@ body {
                 bottom: @buttonsAreaHeight;
                 .xbl-fr-code-mirror {
                     position: absolute;
-                    top: 0; bottom: 0;              // top: 0 can be overridded in dialogs where there is something above the main box
+                    top: 0; bottom: 0;              // top: 0 can be overridden in dialogs where there is something above the main box
                     left: 0; right: 0;
                 }
             }

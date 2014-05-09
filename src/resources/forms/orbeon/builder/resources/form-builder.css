@@ -413,14 +413,41 @@ body {
 .orbeon .fb-custom-xml-dialog .xforms-alert.xforms-active {
   display: block;
 }
-.orbeon #fb-publish-dialog {
-  width: 400px;
+.orbeon .fb-publish-dialog {
+  width: 500px;
 }
-.orbeon #fb-publish-dialog .fb-publish-message {
+.orbeon .fb-publish-dialog .table {
+  background-color: white;
+  table-layout: fixed;
+  margin-bottom: 10px;
+}
+.orbeon .fb-publish-dialog .table th {
+  font-weight: bold;
+  text-align: right;
+}
+.orbeon .fb-publish-dialog .fb-publish-details-grid table {
+  background-color: white;
+}
+.orbeon .fb-publish-dialog .fb-publish-details-grid table th {
+  text-align: right;
+  vertical-align: middle;
+  padding: 4px;
+}
+.orbeon .fb-publish-dialog .fb-publish-details-grid table td {
+  text-align: left;
+  vertical-align: middle;
+}
+.orbeon .fb-publish-dialog .fb-publish-message {
   background-color: white;
   border: 1px solid #DDDDDD;
   display: block;
-  padding: .5em;
+  padding: 10px;
+}
+.orbeon .fb-publish-dialog .fb-publish-message ol {
+  margin-bottom: 0;
+}
+.orbeon .fb-publish-dialog .alert {
+  display: block;
 }
 .orbeon .xxforms-set-height .xxforms-dialog-body {
   position: relative;

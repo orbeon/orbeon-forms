@@ -107,9 +107,11 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         }
     }
 
-    private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Unit = {
+    private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 
         val table = tableName(req)
+
+        val versionToSet = existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req))
 
         // Do insert
         locally {
@@ -147,7 +149,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                                          ps.setString(position.next(), requestUsername.getOrElse(null))
                                          ps.setString(position.next(), req.app)
                                          ps.setString(position.next(), req.form)
-                                         ps.setInt   (position.next(), existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req)))
+                                         ps.setInt   (position.next(), versionToSet)
             if (req.forData)             ps.setString(position.next(), req.dataPart.get.documentId)
             if (req.forData)             ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
             if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
@@ -182,6 +184,8 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 ps.executeUpdate()
             }
         }
+
+        versionToSet
     }
 
     /**
@@ -335,7 +339,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             checkDocExistsForDelete(existing)
 
             // Update database
-            store(connection, req, existing, delete)
+            val versionSet = store(connection, req, existing, delete)
             if (! delete && req.forData && req.dataPart.get.isDraft)
                 deleteDraftOnSaveData(connection, req)
             if (delete && req.forData)
@@ -344,6 +348,9 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             // Create flat view if needed
             if (requestFlatView && req.provider == "oracle" && req.forForm && ! delete && req.form != "library")
                 FlatView.createFlatView(req, connection)
+
+            // Inform caller of the form definition version used
+            httpResponse.setHeader("Orbeon-Form-Definition-Version", versionSet.toString)
 
             httpResponse.setStatus(if (delete) 204 else 201)
         }

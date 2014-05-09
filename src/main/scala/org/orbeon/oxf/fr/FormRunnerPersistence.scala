@@ -82,6 +82,9 @@ trait FormRunnerPersistence {
     def ownerGroupPermissionsSupported(app: String, form: String) =
         providerPropertyAsBoolean(findProvider(app, form, "data").get, "permissions", default = false)
 
+    def versioningSupported(app: String, form: String) =
+        providerPropertyAsBoolean(findProvider(app, form, "data").get, "versioning", default = false)
+
     def isActiveProvider(provider: String) =
         providerPropertyAsBoolean(provider, "active", default = true)
 
@@ -238,8 +241,17 @@ trait FormRunnerPersistence {
         // Do things in order, so we don't update path or save the data if any the upload fails
         saveAttachments()
         updatePaths()
-        saveData()
 
-        beforeURLs → afterURLs
+        // Save and try to retrieve returned version
+        val versionOpt =
+            for {
+                done     ← saveData()
+                headers  ← done.headers
+                versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase "Orbeon-Form-Definition-Version" ⇒ values }
+                version  ← versions.headOption
+            } yield
+                version
+
+        (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
     }
 }

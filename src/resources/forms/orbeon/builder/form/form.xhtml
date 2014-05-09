@@ -126,7 +126,10 @@
                 <xf:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
                     <xf:trigger id="fb-publish-button" ref=".">
                         <xf:label mediatype="text/html" value="$form-resources/publish-button/label"/>
-                        <xxf:show ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                        <xxf:show ev:event="DOMActivate" dialog="fb-publish-dialog">
+                            <xf:property name="app"  model="fr-form-model" value="$metadata-instance/application-name"/>
+                            <xf:property name="form" model="fr-form-model" value="$metadata-instance/form-name"/>
+                        </xxf:show>
                     </xf:trigger>
                 </xf:group>
 

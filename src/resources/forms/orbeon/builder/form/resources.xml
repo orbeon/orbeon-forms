@@ -517,16 +517,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Publish Form</label>
-            <publish>
-                <label>Publish</label>
-            </publish>
-            <publish-and-open>
-                <label>Publish and Open</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Open Published Form Summary Page</open-summary>
-                <open-new>Open Published Form New Page</open-new>
-            </messages>
+            <publish>Publish</publish>
+            <publish-success>The form was published successfully as version {1,number,integer}. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
+            <publish-error>There was an error during form publishing.</publish-error>
+            <latest-published-version>Latest published version</latest-published-version>
+            <create-new-version-item>create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help>
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Open Published Form Summary Page</open-summary>
+            <open-new>Open Published Form New Page</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Add Language</label>
@@ -863,9 +874,6 @@
             <delete-service>Are you sure you want to delete service</delete-service>
             <delete-action>Are you sure you want to delete action</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
-            <publish-form>Are you sure you want to publish this form? This will override the existing form with the following properties:</publish-form>
-            <publish-success>The form was published successfully. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
-            <publish-error>There was an error during form publishing.</publish-error>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
             <new-metadata-output>Please provide an application and form name, which will be used to identify your form (you can also change those later):</new-metadata-output>
             <edit-metadata-output/>
@@ -1394,16 +1402,28 @@
         </dialog-help>
         <dialog-publish>
             <label>Publier le formulaire</label>
-            <publish>
-                <label>Publier</label>
-            </publish>
-            <publish-and-open>
-                <label>Publier et ouvrir</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Ouvrir la page d'accueil du formulaire publié</open-summary>
-                <open-new>Ouvrir le formulaire publié en création</open-new>
-            </messages>
+            <publish>Publier</publish>
+            <publish-success>Le formulaire a été publié avec succès sous la version {1,number,integer}. {0,choice,0#Aucun fichier joint n''a été publié|1#1 fichier joint a été publié|1&lt;{0,number,integer} fichiers joints ont été publiés}.</publish-success>
+            <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
+            <latest-published-version>Dernière version publiée</latest-published-version>
+            <create-new-version-item>créer une nouvelle définition de formulaire avec numéro de version {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>remplacer la définition de formulaire avec numéro de version {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+                VEUILLEZ NOTER: Publier cette définition de formulaire va créer une nouvelle version dans la base de
+                données. Les données existantes dans la base de donnée seront visualisées et éditées avec la ou les
+                versions précédentes de la définition de formulaire qui sont associées avec ces données. La nouvelle
+                définition de formulaire sera utilisée pour créer de nouvelles données.
+            </create-new-version-help>
+            <overwrite-version-help>
+                VEUILLEZ NOTER: Cette action va remplacer la définition de formulaire existante. Si les changements que
+                vous avez faits à la définition de formulaire sont petits, par exemple renommer des libellés, la
+                définition de formulaire sera compatible avec les données existantes. Par contre les changements
+                structurels, tels que les ajouts, supressions, renommage, ou déplacement de contrôles, peuvent rendre
+                la définition de formulaire incompatible avec les données existantes. Il est recommandé d'être prudent
+                en remplaçant une définition de formulaire existante.
+            </overwrite-version-help>
+            <open-summary>Ouvrir la page d'accueil du formulaire publié</open-summary>
+            <open-new>Ouvrir le formulaire publié en création</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Ajouter une langue</label>
@@ -1740,9 +1760,6 @@
             <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
-            <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
-            <publish-success>Le formulaire a été publié avec succès. {0,choice,0#Aucun fichier joint n''a été publié|1#1 fichier joint a été publié|1&lt;{0,number,integer} fichiers joints ont été publiés}.</publish-success>
-            <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata-output>
             <edit-metadata-output/>
@@ -2271,16 +2288,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Publiser skjema</label>
-            <publish>
-                <label>Publiser</label>
-            </publish>
-            <publish-and-open>
-                <label>Publiser og åpne</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Åpne oppsummeringsside for det publiserte skjema</open-summary>
-                <open-new>Åpne publisert skjema i sluttbrukermodus</open-new>
-            </messages>
+            <publish>Publiser</publish>
+            <publish-success todo="true">Skjemaet ble publisert [as version {1,number,integer}]. [{0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.]</publish-success>
+            <publish-error>Det oppsto en feil ved publisering.</publish-error>
+            <latest-published-version todo="true">Latest published version</latest-published-version>
+            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help todo="true">
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Åpne oppsummeringsside for det publiserte skjema</open-summary>
+            <open-new>Åpne publisert skjema i sluttbrukermodus</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Legg til språk</label>
@@ -2617,9 +2645,6 @@
             <delete-service>Er du sikker på at du ønsker å slette sørvisen</delete-service>
             <delete-action>Er du sikker på at du ønsker å slette handlingen</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
-            <publish-form>Er du sikker på at du vil publisere skjemaet? Dette vil erstatte et eventuelt eksisterende skjema med samme egenskaper:</publish-form>
-            <publish-success>Skjemaet ble publisert. [{0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.]</publish-success>
-            <publish-error>Det oppsto en feil ved publisering.</publish-error>
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
             <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere):</new-metadata-output>
             <edit-metadata-output/>
@@ -3146,16 +3171,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Публикация формы</label>
-            <publish>
-                <label>Опубликовать</label>
-            </publish>
-            <publish-and-open>
-                <label>Опубликовать и открыть</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Открыть информацию об опубликованной форме</open-summary>
-                <open-new>Открыть страницу заполнения опубликованной формы</open-new>
-            </messages>
+            <publish>Опубликовать</publish>
+            <publish-success todo="true">Форма была успешно опубликована [as version {1,number,integer}]. [{0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.]</publish-success>
+            <publish-error>При публикации формы произошла ошибка.</publish-error>
+            <latest-published-version todo="true">Latest published version</latest-published-version>
+            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help todo="true">
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Открыть информацию об опубликованной форме</open-summary>
+            <open-new>Открыть страницу заполнения опубликованной формы</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Добавить язык</label>
@@ -3492,9 +3528,6 @@
             <delete-service>Вы уверены, что хотите удалить сервис?</delete-service>
             <delete-action>Вы уверены, что хотите удалить действие?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
-            <publish-form>Вы уверены, что хотите опубликовать эту форму? Это перезапишет существующую форму со следующими свойствами:</publish-form>
-            <publish-success>Форма была успешно опубликована. [{0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.]</publish-success>
-            <publish-error>При публикации формы произошла ошибка.</publish-error>
             <metadata-edit-title>Описание формы</metadata-edit-title>
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
             <edit-metadata-output/>
@@ -4027,16 +4060,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Pubblica modulo</label>
-            <publish>
-                <label>Pubblica</label>
-            </publish>
-            <publish-and-open>
-                <label>Pubblica e apri</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Elenca moduli già compilati</open-summary>
-                <open-new>Compila nuovo modulo</open-new>
-            </messages>
+            <publish>Pubblica</publish>
+            <publish-success todo="true">Il modulo è stato pubblicato con successo [as version {1,number,integer}]. {0,choice,0#No allegati sono|1#1 allegato è|1&lt;{0,number,integer}} stati pubblicati.</publish-success>
+            <publish-error>Si è riscontrato un errore durante la pubblicazione del modulo.</publish-error>
+            <latest-published-version todo="true">Latest published version</latest-published-version>
+            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help todo="true">
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Elenca moduli già compilati</open-summary>
+            <open-new>Compila nuovo modulo</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Aggiungi lingua</label>
@@ -4373,9 +4417,6 @@
             <delete-service>Sei sicuro di voler cancellare questo servizio?</delete-service>
             <delete-action>Sei sicuro di voler cancellare questa azione?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controlli|1#1 controllo|1&lt;{0,number,integer} controls} sarà cancellato.</controls-will-be-deleted>
-            <publish-form>Sei sicuro di voler pubblicare questo modulo? Il modulo esistente sarà soprascritto con le seguenti proprietà:</publish-form>
-            <publish-success>Il modulo è stato pubblicato con successo. {0,choice,0#No allegati sono|1#1 allegato è|1&lt;{0,number,integer}} stati pubblicati.</publish-success>
-            <publish-error>Si è riscontrato un errore durante la pubblicazione del modulo.</publish-error>
             <metadata-edit-title>metadati del modulo</metadata-edit-title>
             <new-metadata-output>Prego fornire un nome dell'applicazione e del modulo, che sarà usato per identificare il tuo modulo (è possibile cambiarlo più tardi):</new-metadata-output>
             <edit-metadata-output/>
@@ -4908,16 +4949,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Formular veröffentlichen</label>
-            <publish>
-                <label>Veröffentlichen</label>
-            </publish>
-            <publish-and-open>
-                <label>Veröffentlichen und öffnen</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
-                <open-new>Öffne leeres Formular </open-new>
-            </messages>
+            <publish>Veröffentlichen</publish>
+            <publish-success todo="true">Das Formular wurde erfolgreich veröffentlicht [as version {1,number,integer}]. {0,choice,0#Kein Anhang wurde|1#1 Anhang wurde|1&lt;{0,number,integer} Anhänge wurden} veröffentlicht.</publish-success>
+            <publish-error>Beim Aktivieren des Formulartyps sind Fehler aufgetreten.</publish-error>
+            <latest-published-version todo="true">Latest published version</latest-published-version>
+            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help todo="true">
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
+            <open-new>Öffne leeres Formular </open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Sprache hinzufügen</label>
@@ -5255,11 +5307,6 @@
             <delete-service>Are you sure you want to delete service</delete-service>
             <delete-action>Are you sure you want to delete action</delete-action>
             <controls-will-be-deleted>Bedienelemente werden gelöscht werden.</controls-will-be-deleted>
-            <publish-form>Sind Sie sicher, dass Sie dieses Formular veröffentlichen wollen? Dadurch wird das vorhandene Formular mit den folgenden Eigenschaften überschreiben:
-            </publish-form>
-            <publish-success>Das Formular wurde erfolgreich veröffentlicht. {0,choice,0#Kein Anhang wurde|1#1 Anhang wurde|1&lt;{0,number,integer} Anhänge wurden} veröffentlicht.
-            </publish-success>
-            <publish-error>Beim Aktivieren des Formulartyps sind Fehler aufgetreten.</publish-error>
             <metadata-edit-title>Formularmetadaten</metadata-edit-title>
             <new-metadata-output>Geben Sie bitte ihre Applikations-ID und eine Formulartyp-ID an.</new-metadata-output>
             <edit-metadata-output/>
@@ -5793,16 +5840,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Julkaise lomake</label>
-            <publish>
-                <label>Julkaise</label>
-            </publish>
-            <publish-and-open>
-                <label>Julkaise ja avaa</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
-                <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
-            </messages>
+            <publish>Julkaise</publish>
+            <publish-success todo="true">Lomake julkaistiin onnistuneesti [as version {1,number,integer}]. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
+            <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
+            <latest-published-version todo="true">Latest published version</latest-published-version>
+            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help todo="true">
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
+            <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Lisää kieli</label>
@@ -6139,9 +6197,6 @@
             <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
             <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
-            <publish-form>Haluatko varmasti julkaista tämän lomakkeen? Tämä teko syrjäyttää olemassaolevan lomakkeen seuraavilla ominaisuuksilla:</publish-form>
-            <publish-success>Lomake julkaistiin onnistuneesti. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
-            <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
             <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
             <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen (voit muuttaa näitä myöhemmin):</new-metadata-output>
             <edit-metadata-output/>
@@ -6673,16 +6728,27 @@
         </dialog-help>
         <dialog-publish>
             <label>Publicar Formulario</label>
-            <publish>
-                <label>Publicar</label>
-            </publish>
-            <publish-and-open>
-                <label>Publicar y Abrir</label>
-            </publish-and-open>
-            <messages>
-                <open-summary>Abrir Página de Resumen del Formulario Publicado  Open Published Form Summary Page</open-summary>
-                <open-new>Abrir nueva instancia del Formulario</open-new>
-            </messages>
+            <publish>Publicar</publish>
+            <publish-success todo="true">El formulario fue publicado satisfactoriamente [as version {1,number,integer}]. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
+            <publish-error>Hubo un error durante la publicación.</publish-error>
+            <latest-published-version todo="true">Latest published version</latest-published-version>
+            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <create-new-version-help todo="true">
+                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.
+            </overwrite-version-help>
+            <open-summary>Abrir Página de Resumen del Formulario Publicado  Open Published Form Summary Page</open-summary>
+            <open-new>Abrir nueva instancia del Formulario</open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Agregar Idioma</label>
@@ -7019,9 +7085,6 @@
             <delete-service>Está seguro de eliminar el Servicio?</delete-service>
             <delete-action>Está seguro de eliminar la Acción?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} serán eliminados.</controls-will-be-deleted>
-            <publish-form>Está seguro de Publicar el formulario? Esto sobre escribirá el formulario existente con las siguientes propiedades:</publish-form>
-            <publish-success>El formulario fue publicado satisfactoriamente. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
-            <publish-error>Hubo un error durante la publicación.</publish-error>
             <metadata-edit-title>Metadata del Formulario</metadata-edit-title>
             <new-metadata-output>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario (se pueden ingresar más adelante):</new-metadata-output>
             <edit-metadata-output/>

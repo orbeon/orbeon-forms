@@ -381,14 +381,47 @@ body {
     }
 
     // Publish dialog
-    #fb-publish-dialog {
-        width: 400px;
+    .fb-publish-dialog {
+        width: 500px;
+
+        .table {
+            background-color: white;
+            table-layout: fixed;
+            margin-bottom: @fbGutter;
+            th {
+                font-weight: bold;
+                text-align: right;
+            }
+        }
+
+        .fb-publish-details-grid table {
+            background-color: white;
+
+            th {
+                text-align: right;
+                vertical-align: middle;
+                padding: @frGridCellPadding;
+            }
+
+            td {
+                text-align: left;
+                vertical-align: middle;
+            }
+        }
 
         .fb-publish-message {
             background-color: white;
             border: 1px solid #DDDDDD;
             display: block;
-            padding: .5em;
+            padding: @fbGutter;
+
+            ol {
+                margin-bottom: 0;
+            }
+        }
+
+        .alert {
+            display: block;
         }
     }
 

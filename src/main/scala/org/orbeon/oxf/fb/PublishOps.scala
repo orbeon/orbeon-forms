@@ -19,14 +19,15 @@ import XML._
 import org.orbeon.oxf.fr.FormRunner._
 import scala.util.control.NonFatal
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 
 trait PublishOps {
 
     // Publish a form and its attachments
-    def publish(xhtml: NodeInfo, app: String, form: String, document: String): Unit = {
+    def publish(xhtml: NodeInfo, app: String, form: String, document: String, formVersion: String): Unit = {
 
         try {
-            val attachments =
+            val (beforeURLs, _, publishedVersion) =
                 putWithAttachments(
                     data              = xhtml.root,
                     toBaseURI         = "", // local publish
@@ -38,9 +39,10 @@ trait PublishOps {
                     // Using "next" for attachments works as attachments are saved first, and the persistence layer
                     // uses the latest version of the published forms (not attachments) to figure what the next
                     // version is
-                    formVersion       = Some("next")
+                    formVersion       = nonEmptyOrNone(formVersion)
                 )
-            setvalue(instanceRoot("fb-publish-instance").get / "attachments", attachments._1.size.toString)
+            setvalue(instanceRoot("fb-publish-instance").get / "published-attachments", beforeURLs.size.toString)
+            setvalue(instanceRoot("fb-publish-instance").get / "published-version",     publishedVersion.toString)
             toggle("fb-publish-dialog-success")
         } catch {
             case NonFatal(t) ⇒

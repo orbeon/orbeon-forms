@@ -202,7 +202,7 @@ trait FormRunnerActions {
             val isNew = modeElement.stringValue == "new"
 
             // Save
-            val (beforeURLs, afterURLs) = putWithAttachments(
+            val (beforeURLs, afterURLs, _) = putWithAttachments(
                 data              = formInstance.root,
                 toBaseURI         = "", // local save
                 fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),

@@ -29,8 +29,12 @@
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
     <!-- URL rewriting -->
-    <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$"/>
-    <property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms)/.*$"/>
+    <property as="xs:string"  name="oxf.url-rewriting.platform-paths">
+        ^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$
+    </property>
+    <property as="xs:string"  name="oxf.url-rewriting.app-paths">
+        ^/(apps|xbl|forms)/.*$
+    </property>
     <property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>
 
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
@@ -79,9 +83,15 @@
         Tomcat adds "Pragma", "Expires" and "Cache-Control" headers when resources are constrained,disabling caching if
         they are not set. We must re-set them to allow caching.
     -->
-    <property as="xs:string"  name="oxf.http.page.cache-headers"                     value="Cache-Control: private, max-age=0; Pragma:"/>
-    <property as="xs:string"  name="oxf.http.resource.cache-headers"                 value="Cache-Control: public; Pragma:"/>
-    <property as="xs:string"  name="oxf.http.nocache.cache-headers"                  value="Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"/>
+    <property as="xs:string"  name="oxf.http.page.cache-headers">
+        Cache-Control: private, max-age=0; Pragma:
+    </property>
+    <property as="xs:string"  name="oxf.http.resource.cache-headers">
+        Cache-Control: public; Pragma:
+    </property>
+    <property as="xs:string"  name="oxf.http.nocache.cache-headers">
+        Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0
+    </property>
 
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>

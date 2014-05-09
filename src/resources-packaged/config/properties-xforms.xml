@@ -13,7 +13,6 @@
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
-            xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xh="http://www.w3.org/1999/xhtml"
             xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -32,7 +31,9 @@
         * Global:   analysis server html resources state resolver utils
         * Data:     analysis-xbl-tree submission-body model-serialized-instance server-body html-static-state
      -->
-    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"                          value="document model submission control event action analysis server html process"/>
+    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug">
+        document model submission control event action analysis server html process
+    </property>
     <!--
         Error logging:
 
@@ -77,8 +78,10 @@
         if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .
     </property>
 
-    <property as="xs:string"  name="oxf.xforms.format.input.date"                       value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
-    <property as="xs:string"  name="oxf.xforms.format.input.time"                       value="[h]:[m]:[s] [P,*-2]"/> <!-- [h]:[m]:[s] [P,*-2]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
+    <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
+    <property as="xs:string"  name="oxf.xforms.format.input.date"                           value="[M]/[D]/[Y]"/>
+    <!-- [h]:[m]:[s] [P,*-2]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
+    <property as="xs:string"  name="oxf.xforms.format.input.time"                           value="[h]:[m]:[s] [P,*-2]"/>
 
     <!-- Other XForms options -->
     <property as="xs:string"  name="oxf.xforms.order"                                       value="label control help alert hint"/>
@@ -98,18 +101,22 @@
     <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="inline"/>
     <property as="xs:string"  name="oxf.xforms.help.appearance"                             value="dialog"/>
 
-    <property as="xs:boolean"  name="oxf.xforms.minimal-resources"                          value="true"/>
-    <property as="xs:boolean"  name="oxf.xforms.combine-resources"                          value="true"/>
-    <property as="xs:boolean"  name="oxf.xforms.cache-combined-resources"                   value="false"/>
-    <property as="xs:boolean"  name="oxf.xforms.resources.javascript-at-bottom"             value="true"/>
-    <property as="xs:boolean"  name="oxf.xforms.resources.encode-version"                   value="true"/>
-    <property as="xs:string"   name="oxf.xforms.resources.baseline"                         value="fr:button fr:tabview fr:autocomplete"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                          value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.combine-resources"                          value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"                   value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.resources.javascript-at-bottom"             value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                   value="true"/>
+    <property as="xs:string"  name="oxf.xforms.resources.baseline">
+        fr:button fr:tabview fr:autocomplete
+    </property>
 
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                          value="true"/>
-    <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"           value=""/> <!-- space separated list of element namespaces that can contain avts in their attributes1 -->
-    <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"           value=""/> <!-- space separated list of attribute names that contain references to id's -->
+    <!-- Space-separated list of element namespaces that can contain avts in their attributes1 -->
+    <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"           value=""/>
+    <!-- Space-separated list of attribute names that contain references to id's -->
+    <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"           value=""/>
     <property as="xs:boolean" name="oxf.xforms.noscript"                                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.noscript-support"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.async-portlet-load"                          value="false"/>
@@ -126,12 +133,13 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"        value="2000"/>
 
     <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                 value=""/>
-    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->
+    <!-- default | deferred -->
+    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
     <property as="xs:boolean" name="oxf.xforms.use-aria"                                    value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>     <!-- default will switch to true at some point -->
+    <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                               value="none"/>
 
@@ -209,15 +217,21 @@
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.max-characters"     value="60"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.tolerance"          value="20"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year"               value="year-from-date(current-date())"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
+        year-from-date(current-date())
+    </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->
-    <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon"                          value="http://orbeon.org/oxf/xml/form-runner"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon">
+        http://orbeon.org/oxf/xml/form-runner
+    </property>
 
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service"                value="https://www.google.com/tbproxy/spell?lang=en&amp;hl=en"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service">
+        https://www.google.com/tbproxy/spell?lang=en&amp;hl=en
+    </property>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.datatable.init-in-viewport"           value="false"/>
 
     <!--<property as="xs:NCName"  name="oxf.xforms.pipeline.trace.class"                        value="org.orbeon.oxf.processor.trace.StdOutTrace"/>-->

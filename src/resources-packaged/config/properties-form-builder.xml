@@ -60,7 +60,9 @@
         oxf:/forms/orbeon/builder/xbl/button-controls.xbl
     </property>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb"                       value="http://orbeon.org/oxf/xml/form-builder"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb">
+        http://orbeon.org/oxf/xml/form-builder
+    </property>
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
@@ -74,7 +76,9 @@
     <property as="xs:integer" name="oxf.fb.section.close"                            value="100"/>
 
     <!-- Form Builder summary page  -->
-    <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="home delete duplicate new"/>
+    <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder">
+        home delete duplicate new
+    </property>
 
     <!-- Available languages -->
     <property as="xs:string" name="oxf.fr.available-languages.orbeon.builder"        value="en fr es it de"/>

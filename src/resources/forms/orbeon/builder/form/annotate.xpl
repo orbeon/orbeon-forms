@@ -228,7 +228,7 @@
                 <!-- Convert minimal xf:select1 to fr:dropdown-select1 -->
                 <xsl:template match="xf:select1[@appearance = 'minimal']">
                     <fr:dropdown-select1>
-                        <xsl:apply-templates select="@* except @appearance | node() except xf:item[xf:label = '[Select...]']"/>
+                        <xsl:apply-templates select="@* except @appearance | node() except xf:item[xf:value = '']"/>
                     </fr:dropdown-select1>
                 </xsl:template>
 

@@ -49,6 +49,9 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     private var _nestedContainer: Option[XBLContainer] = None
     def nestedContainer = _nestedContainer.get
 
+    // If the component handles LHHA itself, they are considered under of the nested container
+    override def lhhaContainer = nestedContainer
+
     private var _listeners: Seq[(XFormsInstance, EventListener)] = Seq.empty
 
     // Create nested container upon creation

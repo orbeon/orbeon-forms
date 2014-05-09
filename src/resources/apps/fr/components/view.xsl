@@ -632,7 +632,7 @@
                         <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
                     </xh:span>
 
-                    <xf:repeat ref="$buttons-names[position() le last()]">
+                    <xf:repeat ref="$buttons-names">
                         <xf:var name="button-name" value="."/>
                         <xf:var name="pdf"         value="$button-name = 'pdf'"/>
                         <xf:var name="primary"     value="$highlight-primary and position() = last()"/>

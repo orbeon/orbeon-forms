@@ -572,16 +572,8 @@
 
 // This is also used for PDF generation
 @media print {
-    // Don't hide as there is no script running
-    html body form.xforms-initially-hidden { display: block }
 
-    // There should not be a <style> element in the body, but if there is hide it for Flying Saucer
-    style { display: none }
-
-    // This must not show in the PDF
-    noscript { display: none }
-
-    .orbeon #xforms-form { // make rules strong
+    .orbeon #xforms-form { // make contained rules strong
         .fr-status-icons,                                              // no status icons
         .xforms-loading-loading,                                       // no loading icon
         .xforms-upload-remove,                                         // upload remove button
@@ -597,36 +589,6 @@
         // Since only value is shown, no need for special height
         select[multiple], .xforms-select1-appearance-compact select, .xforms-select-appearance-compact select {
             height: auto;
-        }
-
-        // Flying Saucer doesn't like display: block and 0 font sizes
-        .clearfix:before, .clearfix:after,
-        .row:before, .row:after,
-        .row-fluid:before,
-        .row-fluid:after,
-        .container:before, .container:after,
-        .container-fluid:before, .container-fluid:after,
-        .dl-horizontal:before, .dl-horizontal:after,
-        .controls-row:before, .controls-row:after,
-        .form-actions:before, .form-actions:after,
-        .form-horizontal .control-group:before,
-        .form-horizontal .control-group:after,
-        .nav-tabs:before, .nav-pills:before,
-        .nav-tabs:after, .nav-pills:after,
-        .tabbable:before, .tabbable:after,
-        .navbar-inner:before, .navbar-inner:after,
-        .navbar-form:before, .navbar-form:after,
-        .pager:before, .pager:after,
-        .modal-footer:before, .modal-footer:after,
-        .thumbnails:before, .thumbnails:after,
-        .navbar-inner:before, .navbar-inner:after {
-            display: block;
-        }
-
-        .input-append, .input-prepend,
-        .btn-group,
-        .btn-toolbar {
-            font-size: .5px;
         }
 
         // See https://github.com/orbeon/orbeon-forms/issues/872

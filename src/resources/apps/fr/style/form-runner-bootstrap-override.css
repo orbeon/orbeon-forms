@@ -507,32 +507,83 @@ body.orbeon {
   background-color: #080808 \9;
 }
 @media print {
+  .orbeon #xforms-form .clearfix:before,
+  .orbeon #xforms-form .clearfix:after,
+  .orbeon #xforms-form .row:before,
+  .orbeon #xforms-form .row:after,
+  .orbeon #xforms-form .row-fluid:before,
+  .orbeon #xforms-form .row-fluid:after,
+  .orbeon #xforms-form .container:before,
+  .orbeon #xforms-form .container:after,
+  .orbeon #xforms-form .container-fluid:before,
+  .orbeon #xforms-form .container-fluid:after,
+  .orbeon #xforms-form .dl-horizontal:before,
+  .orbeon #xforms-form .dl-horizontal:after,
+  .orbeon #xforms-form .controls-row:before,
+  .orbeon #xforms-form .controls-row:after,
+  .orbeon #xforms-form .form-actions:before,
+  .orbeon #xforms-form .form-actions:after,
+  .orbeon #xforms-form .form-horizontal .control-group:before,
+  .orbeon #xforms-form .form-horizontal .control-group:after,
+  .orbeon #xforms-form .nav-tabs:before,
+  .orbeon #xforms-form .nav-pills:before,
+  .orbeon #xforms-form .nav-tabs:after,
+  .orbeon #xforms-form .nav-pills:after,
+  .orbeon #xforms-form .tabbable:before,
+  .orbeon #xforms-form .tabbable:after,
+  .orbeon #xforms-form .navbar-inner:before,
+  .orbeon #xforms-form .navbar-inner:after,
+  .orbeon #xforms-form .navbar-form:before,
+  .orbeon #xforms-form .navbar-form:after,
+  .orbeon #xforms-form .pager:before,
+  .orbeon #xforms-form .pager:after,
+  .orbeon #xforms-form .modal-footer:before,
+  .orbeon #xforms-form .modal-footer:after,
+  .orbeon #xforms-form .thumbnails:before,
+  .orbeon #xforms-form .thumbnails:after,
+  .orbeon #xforms-form .navbar-inner:before,
+  .orbeon #xforms-form .navbar-inner:after {
+    display: block;
+  }
+  .orbeon #xforms-form .input-append,
+  .orbeon #xforms-form .input-prepend,
+  .orbeon #xforms-form .btn-group,
+  .orbeon #xforms-form .btn-toolbar {
+    font-size: .5px;
+  }
+  .orbeon .fr-mode-view .xforms-field,
   .orbeon .fr-mode-pdf .xforms-field,
-  .fr-mode-email .xforms-field {
+  .orbeon .fr-mode-email .xforms-field {
     height: 24px;
     line-height: 24px;
     background-color: red;
   }
+  .orbeon .fr-mode-view .fr-grid-1 .xforms-field,
   .orbeon .fr-mode-pdf .fr-grid-1 .xforms-field,
-  .fr-mode-email .fr-grid-1 .xforms-field {
+  .orbeon .fr-mode-email .fr-grid-1 .xforms-field {
     width: 98.5%;
   }
+  .orbeon .fr-mode-view .fr-grid-2 .xforms-field,
   .orbeon .fr-mode-pdf .fr-grid-2 .xforms-field,
-  .fr-mode-email .fr-grid-2 .xforms-field {
+  .orbeon .fr-mode-email .fr-grid-2 .xforms-field {
     width: 97%;
   }
+  .orbeon .fr-mode-view .fr-grid-3 .xforms-field,
   .orbeon .fr-mode-pdf .fr-grid-3 .xforms-field,
-  .fr-mode-email .fr-grid-3 .xforms-field {
+  .orbeon .fr-mode-email .fr-grid-3 .xforms-field {
     width: 95.5%;
   }
+  .orbeon .fr-mode-view .fr-grid-4 .xforms-field,
   .orbeon .fr-mode-pdf .fr-grid-4 .xforms-field,
-  .fr-mode-email .fr-grid-4 .xforms-field {
+  .orbeon .fr-mode-email .fr-grid-4 .xforms-field {
     width: 94%;
   }
+  .orbeon .fr-mode-view a[href]:after,
   .orbeon .fr-mode-pdf a[href]:after,
-  .fr-mode-email a[href]:after,
+  .orbeon .fr-mode-email a[href]:after,
+  .orbeon .fr-mode-view abbr[title]:after,
   .orbeon .fr-mode-pdf abbr[title]:after,
-  .fr-mode-email abbr[title]:after {
+  .orbeon .fr-mode-email abbr[title]:after {
     content: "";
   }
 }

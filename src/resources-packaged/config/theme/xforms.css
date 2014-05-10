@@ -471,7 +471,15 @@
   width: 15em;
 }
 @media print {
-  .orbeon .xforms-loading-loading {
+  html body.orbeon .xforms-loading-loading,
+  html body .orbeon .xforms-loading-loading {
+    display: none;
+  }
+  html body .xforms-initially-hidden {
+    display: block;
+  }
+  html body noscript,
+  html body style {
     display: none;
   }
 }

@@ -503,5 +503,17 @@
 }
 
 @media print {
-    .orbeon .xforms-loading-loading { display: none }
+    html body {
+
+        // No loading indicator
+        &.orbeon, .orbeon {
+            .xforms-loading-loading { display: none }
+        }
+
+        // Don't hide form as there is no script able to remove the class
+        .xforms-initially-hidden { display: block }
+
+        // <noscript> must never show, and <style> can show due to a bug in Flying Saucer
+        noscript, style { display: none }
+    }
 }

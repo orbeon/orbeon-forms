@@ -562,15 +562,6 @@
   display: none;
 }
 @media print {
-  html body form.xforms-initially-hidden {
-    display: block;
-  }
-  style {
-    display: none;
-  }
-  noscript {
-    display: none;
-  }
   .orbeon #xforms-form .fr-status-icons,
   .orbeon #xforms-form .xforms-loading-loading,
   .orbeon #xforms-form .xforms-upload-remove,
@@ -589,50 +580,6 @@
   .orbeon #xforms-form .xforms-select1-appearance-compact select,
   .orbeon #xforms-form .xforms-select-appearance-compact select {
     height: auto;
-  }
-  .orbeon #xforms-form .clearfix:before,
-  .orbeon #xforms-form .clearfix:after,
-  .orbeon #xforms-form .row:before,
-  .orbeon #xforms-form .row:after,
-  .orbeon #xforms-form .row-fluid:before,
-  .orbeon #xforms-form .row-fluid:after,
-  .orbeon #xforms-form .container:before,
-  .orbeon #xforms-form .container:after,
-  .orbeon #xforms-form .container-fluid:before,
-  .orbeon #xforms-form .container-fluid:after,
-  .orbeon #xforms-form .dl-horizontal:before,
-  .orbeon #xforms-form .dl-horizontal:after,
-  .orbeon #xforms-form .controls-row:before,
-  .orbeon #xforms-form .controls-row:after,
-  .orbeon #xforms-form .form-actions:before,
-  .orbeon #xforms-form .form-actions:after,
-  .orbeon #xforms-form .form-horizontal .control-group:before,
-  .orbeon #xforms-form .form-horizontal .control-group:after,
-  .orbeon #xforms-form .nav-tabs:before,
-  .orbeon #xforms-form .nav-pills:before,
-  .orbeon #xforms-form .nav-tabs:after,
-  .orbeon #xforms-form .nav-pills:after,
-  .orbeon #xforms-form .tabbable:before,
-  .orbeon #xforms-form .tabbable:after,
-  .orbeon #xforms-form .navbar-inner:before,
-  .orbeon #xforms-form .navbar-inner:after,
-  .orbeon #xforms-form .navbar-form:before,
-  .orbeon #xforms-form .navbar-form:after,
-  .orbeon #xforms-form .pager:before,
-  .orbeon #xforms-form .pager:after,
-  .orbeon #xforms-form .modal-footer:before,
-  .orbeon #xforms-form .modal-footer:after,
-  .orbeon #xforms-form .thumbnails:before,
-  .orbeon #xforms-form .thumbnails:after,
-  .orbeon #xforms-form .navbar-inner:before,
-  .orbeon #xforms-form .navbar-inner:after {
-    display: block;
-  }
-  .orbeon #xforms-form .input-append,
-  .orbeon #xforms-form .input-prepend,
-  .orbeon #xforms-form .btn-group,
-  .orbeon #xforms-form .btn-toolbar {
-    font-size: .5px;
   }
   .orbeon #xforms-form .fr-grid .xforms-output.xforms-mediatype-image img {
     -fs-fit-images-to-width: 100%;

@@ -177,8 +177,6 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                 writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, oneValidation map elemToNodeInfo)
                 assertAlertsXML(oneValidation, readConstraintValidationsAsXML(doc, Control1))
 
-                val x = <gaga/>
-                val y: Document = x
                 val expectedResources: Document =
                     <resources>
                         <resource xml:lang="en">

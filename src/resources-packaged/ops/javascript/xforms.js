@@ -1876,7 +1876,7 @@ ORBEON.xforms.Controls = {
                 return legend.innerHTML;
         } else {
             var labelElement = ORBEON.xforms.Controls.getControlLHHA(control, "label");
-            return labelElement.innerHTML;
+            return labelElement == null ? "" : labelElement.innerHTML;
         }
     },
 

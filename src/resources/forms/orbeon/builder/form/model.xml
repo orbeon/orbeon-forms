@@ -67,11 +67,20 @@
     <xf:action ev:event="fr-annotate-data">
         <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
         <xf:var name="temp" value="xxf:create-document()"/>
-        <xf:insert context="$temp"
-                   origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                            ('data', 'bindings'),
-                                            (event('data'), instance('fb-components-instance')),
-                                            'data')"/>
+        <xf:insert
+            context="$temp"
+            origin="xxf:call-xpl(
+                        'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                        (
+                            'data',
+                            'bindings'
+                        ),
+                        (
+                            event('data'),
+                            instance('fb-components-instance')
+                        ),
+                        'data'
+                    )"/>
 
         <xf:action type="xpath">
             fbf:initializeGrids($temp),
@@ -312,10 +321,23 @@
     <!-- NOTE: Submit form to testing service with section templates XBL included -->
     <xf:submission
             id="fb-test-form-submission"
-            ref="xxf:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                  ('data', 'bindings'),
-                  (xxf:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data'), xxf:instance('fb-components-instance')),
-                  'data')"
+            ref="xxf:call-xpl(
+                     'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                     (
+                         'data',
+                         'bindings'
+                     ),
+                     (
+                         xxf:call-xpl(
+                             'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                             'data',
+                             instance('fb-form-instance'),
+                             'data'
+                         ),
+                         xxf:instance('fb-components-instance')
+                     ),
+                     'data'
+                 )"
             method="post"
             replace="all"
             resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test"
@@ -417,12 +439,16 @@
         <xf:bind ref="temp-type" readonly="true()"/>
     </xf:bind>
 
-    <!-- Submission to load the components library -->
-    <!-- NOTE: We only pass the app name, not the form name -->
-    <xf:submission id="fb-load-toolbox" serialization="none"
-                       method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
-                       replace="instance" instance="fb-components-instance"
-                       xxf:readonly="true" xxf:cache="true">
+    <!-- Submission to load the components library (see also home.xhtml) -->
+    <xf:submission
+        id="fb-load-toolbox"
+        serialization="none"
+        method="get"
+        resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
+        replace="instance"
+        instance="fb-components-instance"
+        xxf:readonly="true"
+        xxf:cache="true">
 
         <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
              NOTE: The data in fr-form-instance must be up to date! -->

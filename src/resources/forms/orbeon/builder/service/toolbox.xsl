@@ -24,13 +24,13 @@
 
     <!-- Find group names, e.g. "text", "selection", etc. -->
     <xsl:variable name="property-names" select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />
-    <xsl:variable name="unique-groups" select="distinct-values(for $v in $property-names return tokenize($v, '\.')[5])" as="xs:string*"/>
+    <xsl:variable name="unique-groups"  select="distinct-values(for $v in $property-names return tokenize($v, '\.')[5])" as="xs:string*"/>
 
     <!-- Iterate over groups -->
     <xsl:for-each select="$unique-groups">
 
         <xsl:variable name="resources-property" select="p:property(string-join(('oxf.fb.toolbox.group', ., 'uri', $app, $form), '.'))" as="xs:string"/>
-        <xsl:variable name="resources" select="for $uri in p:split($resources-property) return doc($uri)" as="document-node()*"/>
+        <xsl:variable name="resources"          select="for $uri in p:split($resources-property) return doc($uri)" as="document-node()*"/>
 
         <xsl:if test="$resources">
             <xbl:xbl>

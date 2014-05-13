@@ -264,6 +264,8 @@
                 <pull-from-remote>Pull from remote</pull-from-remote>
                 <navigate-summary>Navigate to Summary</navigate-summary>
                 <navigate-new>Navigate to New</navigate-new>
+                <upgrade-local>Upgrade local form definitions</upgrade-local>
+                <upgrade-remote>Upgrade remote form definitions</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirm Form Publish/Unpublish</publish-confirmation>
@@ -281,7 +283,7 @@
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
-                <publish-confirmation>Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
+                <publish-confirmation>Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Available</available>
@@ -549,6 +551,8 @@
                 <pull-from-remote>Transférer depuis le serveur distant</pull-from-remote>
                 <navigate-summary>Naviguer à la page de sommaire</navigate-summary>
                 <navigate-new>Naviguer à la page de création</navigate-new>
+                <upgrade-local>Mettre à jour les formulaires locaux</upgrade-local>
+                <upgrade-remote>Mettre à jour les formulaires distants</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmer la publication/dépublication de formulaire</publish-confirmation>
@@ -566,7 +570,7 @@
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
-                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#publier|1#dépublier} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
+                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#publier|1#dépublier|2#mettre à jour} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Disponible</available>
@@ -819,6 +823,8 @@
                 <pull-from-remote>Sacar Remoto</pull-from-remote>
                 <navigate-summary>Ir al resumen</navigate-summary>
                 <navigate-new>Ir a nuevo</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
@@ -836,7 +842,7 @@
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
-                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
+                <publish-confirmation todo="true">Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -1088,6 +1094,8 @@
                 <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
                 <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1105,7 +1113,7 @@
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -1355,6 +1363,8 @@
                 <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
                 <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation todo="true">[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1372,7 +1382,7 @@
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -1635,6 +1645,8 @@
                 <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
                 <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
@@ -1652,7 +1664,7 @@
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation>È sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+                <publish-confirmation todo="true">È sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#upgrade} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -1915,6 +1927,8 @@
                 <pull-from-remote>Hole vom Produktivsystem</pull-from-remote>
                 <navigate-summary>Gehe zu Liste</navigate-summary>
                 <navigate-new>Gehe zu Neu</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Bestätige veröffentlichen/ veröffentlichen rückgängig machen</publish-confirmation>
@@ -1932,7 +1946,7 @@
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
-                <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} die Formulare} {0,choice,0#veröffentlichen |1#nicht mehr öffentlich zugänglich haben} wollen?</publish-confirmation>
+                <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} die Formulare} {0,choice,0#veröffentlichen |1#nicht mehr öffentlich zugänglich haben|2#upgrade} wollen?</publish-confirmation>
             </messages>
             <labels>
                 <available>Verfügbar</available>
@@ -2195,6 +2209,8 @@
                 <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
                 <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Vahvista lomakkeen julkaisu/julkaisun poisto</publish-confirmation>
@@ -2212,7 +2228,7 @@
             </titles>
             <messages>
                 <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
-                <publish-confirmation>Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
+                <publish-confirmation todo="true">Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Saatavilla</available>
@@ -2475,6 +2491,8 @@
                 <pull-from-remote>Hämta från servern</pull-from-remote>
                 <navigate-summary>Gå till sammanställning</navigate-summary>
                 <navigate-new>Gå till Skapa</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
@@ -2492,7 +2510,7 @@
             </titles>
             <messages>
                 <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
-                <publish-confirmation>Bekräfta {0,choice,0#publicering|1#upphävande av publicering} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
+                <publish-confirmation todo="true">Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#upgrade} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
             </messages>
             <labels>
                 <available>Tillgänglig</available>
@@ -2755,6 +2773,8 @@
                 <pull-from-remote>Van extern ophalen</pull-from-remote>
                 <navigate-summary>Naar samenvatting</navigate-summary>
                 <navigate-new>Naar nieuw</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
@@ -2772,7 +2792,7 @@
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
-                <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen}?</publish-confirmation>
+                <publish-confirmation todo="true">Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgrade}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>

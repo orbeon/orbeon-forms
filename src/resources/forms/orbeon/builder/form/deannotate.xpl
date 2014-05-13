@@ -66,6 +66,7 @@
 
                 <xsl:template match="xf:group[p:has-class('fb-body')]">
                     <fr:body>
+                        <xsl:copy-of select="namespace::*"/>
                         <xsl:apply-templates select="node() except *[@class = 'fb-annotation']"/>
                     </fr:body>
                 </xsl:template>

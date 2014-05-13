@@ -137,6 +137,12 @@ trait FormRunnerHome {
     def canNavigateNew(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isNewAllowed)
 
+    def canUpgradeLocal(selection: String, forms: SequenceIterator) =
+        formsForSelection(selection, forms) forall (_.isLocal)
+
+    def canUpgradeRemote(selection: String, forms: SequenceIterator) =
+        formsForSelection(selection, forms) forall (_.isRemote)
+
     def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(
             data              = xhtml.root,

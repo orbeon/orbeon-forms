@@ -411,6 +411,12 @@
     <property as="xs:string"  name="oxf.fr.home.process.remote-to-local">
         xf:dispatch("confirm-remote-to-local")  then suspend then xf:dispatch("remote-to-local")
     </property>
+    <property as="xs:string"  name="oxf.fr.home.process.upgrade-local">
+        xf:dispatch("confirm-local-upgrade")    then suspend then xf:dispatch("local-upgrade")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.upgrade-remote">
+        xf:dispatch("confirm-remote-upgrade")   then suspend then xf:dispatch("remote-upgrade")
+    </property>
     <property as="xs:string"  name="oxf.fr.home.process.confirmation-ok">
         resume
     </property>

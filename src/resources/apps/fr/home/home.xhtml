@@ -50,6 +50,8 @@
 
                 <xf:var name="has-saved-credentials" value="normalize-space(username) and normalize-space(password)"/>
 
+                <xf:dispatch name="fr-clear" targetid="fr-form-model"/>
+
                 <xf:action type="xpath">
                     if (not($production-server-uri)) then
                         process:runProcessByName('oxf.fr.home.process', 'load-local')
@@ -58,6 +60,19 @@
                     else
                         process:runProcessByName('oxf.fr.home.process', 'ask-credentials')
                 </xf:action>
+            </xf:action>
+
+            <xf:action event="fr-clear">
+                <!-- Clear selection -->
+                <xf:setvalue ref="selection"/>
+
+                <!-- Don't keep potentially large instances -->
+                <xf:insert context="instance('fr-form')/root()"       origin="xxf:element('dummy')"/>
+                <xf:send submission="reset-toolbox"/>
+
+                <!-- Following doesn't work because instance is readonly and insert code thinks it's mutating -->
+                <!-- Ideal would be an xxf:reset-instance(s) action -->
+                <!--<xf:insert context="instance('fr-components')/root()" origin="xxf:element('dummy')"/>-->
             </xf:action>
 
             <xf:instance id="fr-form-instance">
@@ -81,6 +96,8 @@
                     <remote-to-local-action/>
                     <summary-action/>
                     <new-action/>
+                    <local-upgrade-action/>
+                    <remote-upgrade-action/>
 
                     <local-unpublish-select/>
                     <local-publish-select/>
@@ -108,6 +125,8 @@
                 <xf:bind ref="remote-to-local-action"  readonly="not(exists($selection) and frf:canPublishRemoteToLocal(../selection, $forms))"/>
                 <xf:bind ref="summary-action"          readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateSummary(../selection, $forms))"/>
                 <xf:bind ref="new-action"              readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateNew(../selection, $forms))"/>
+                <xf:bind ref="local-upgrade-action"    readonly="not(exists($selection) and frf:canUpgradeLocal(../selection, $forms))"/>
+                <xf:bind ref="remote-upgrade-action"   readonly="not(exists($selection) and frf:canUpgradeRemote(../selection, $forms))"/>
                 
                 <xf:bind ref="local-unpublish-select"  readonly="not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
                 <xf:bind ref="local-publish-select"    readonly="not(frf:canSelectPublishedLocal(../selection, $forms))"/>
@@ -252,27 +271,53 @@
             <!-- Start process in reaction to action button -->
             <xf:action
                     event="DOMActivate"
-                    observer="fr-publish-local-button fr-publish-remote-button fr-unpublish-local-button fr-unpublish-remote-button fr-local-to-remote-button fr-remote-to-local-button"
+                    observer="fr-publish-local-button   fr-publish-remote-button
+                              fr-unpublish-local-button fr-unpublish-remote-button
+                              fr-local-to-remote-button fr-remote-to-local-button
+                              fr-upgrade-local-button   fr-upgrade-remote-button"
                     type="xpath">
                 process:runProcessByName('oxf.fr.home.process', substring-before(substring-after(event('xxf:observerid'), 'fr-'), '-button'))
             </xf:action>
 
             <!-- Open confirmation dialog in response to process event -->
-            <xxf:show event="confirm-local-publish confirm-local-unpublish confirm-remote-publish confirm-remote-unpublish confirm-local-to-remote confirm-remote-to-local" dialog="publish-confirmation-dialog">
-                <xf:property name="message"
-                             value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
-                                        if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish')) then 1 else 0,
-                                        count($selection)
-                                    ))"/>
+            <xxf:show
+                    event="
+                        confirm-local-publish   confirm-local-unpublish
+                        confirm-remote-publish  confirm-remote-unpublish
+                        confirm-local-to-remote confirm-remote-to-local
+                        confirm-local-upgrade   confirm-remote-upgrade"
+                    dialog="publish-confirmation-dialog">
+
+                <xf:property
+                    name="message"
+                    value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
+                               if (event('xxf:type') = ('confirm-local-upgrade', 'confirm-remote-upgrade'))
+                               then 2
+                               else if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish'))
+                               then 1
+                               else 0,
+                               count($selection)
+                           ))"/>
             </xxf:show>
 
             <!-- Response to process event -->
-            <xf:action event="local-publish local-unpublish remote-publish remote-unpublish local-to-remote remote-to-local">
-                <xf:var name="local-read"          value="event('xxf:type') = ('local-publish', 'local-unpublish', 'local-to-remote')"/>
-                <xf:var name="local-write"         value="event('xxf:type') = ('local-publish', 'local-unpublish', 'remote-to-local')"/>
-                <xf:var name="toggle-to-publish"   value="event('xxf:type') = ('local-publish', 'remote-publish')"/>
+            <xf:action
+                    event="
+                        local-publish   local-unpublish
+                        remote-publish  remote-unpublish
+                        local-to-remote remote-to-local
+                        local-upgrade   remote-upgrade">
+
+                <xf:var name="local-read"          value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade')"/>
+                <xf:var name="local-write"         value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade')"/>
+                <xf:var name="toggle-to-publish"   value="event('xxf:type') = ('local-publish',   'remote-publish')"/>
                 <xf:var name="toggle-to-unpublish" value="event('xxf:type') = ('local-unpublish', 'remote-unpublish')"/>
                 <xf:var name="force-attachments"   value="event('xxf:type') = ('local-to-remote', 'remote-to-local')"/>
+                <xf:var name="upgrade"             value="event('xxf:type') = ('local-upgrade',   'remote-upgrade')"/>
+
+                <!-- Invalidate all instances so we don't find stale component libraries in cache -->
+                <xxf:invalidate-instances/>
+
                 <!-- Iterate until there is an error -->
                 <xf:setvalue ref="error"/>
                 <xf:action iterate="$selection" if="instance()/error = ''">
@@ -303,23 +348,60 @@
                                 origin="xxf:element('available', 'false')"/>
                         </xf:action>
 
-                        <xf:action type="xpath">
-                            frf:publish(
-                                instance('fr-form'),
-                                if ($local-write) then '' else $production-server-uri,
-                                $app,
-                                $form,
-                                if (not($local-write)) then instance()/username else (),
-                                if (not($local-write)) then instance()/password else (),
-                                $force-attachments
-                            )
+                        <!-- If we upgrade the form definition: retrieve toolbox -->
+                        <xf:send if="$upgrade" submission="read-toolbox">
+                            <xf:property name="app"  value="$app"/>
+                            <xf:property name="form" value="$form"/>
+                        </xf:send>
+
+                        <!-- If we upgrade the form definition: annotate, deannotate, and add components -->
+                        <xf:action if="instance()/error = ''" type="xpath">
+                            for $form-maybe-upgraded in
+                                if ($upgrade)
+                                   then
+                                       xxf:call-xpl(
+                                           'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                                           (
+                                               'data',
+                                               'bindings'
+                                           ),
+                                           (
+                                              xxf:call-xpl(
+                                                   'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                                                   'data',
+                                                   xxf:call-xpl(
+                                                       'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                       (
+                                                           'data',
+                                                           'bindings'
+                                                       ),
+                                                       (
+                                                           instance('fr-form'),
+                                                           xxf:element('components')
+                                                       ),
+                                                       'data'
+                                                   ),
+                                                   'data'
+                                               ),
+                                               instance('fr-components')
+                                           ),
+                                           'data'
+                                       )
+                                   else
+                                       instance('fr-form')
+                            return
+                                frf:publish(
+                                    $form-maybe-upgraded,
+                                    if ($local-write) then '' else $production-server-uri,
+                                    $app,
+                                    $form,
+                                    if (not($local-write)) then instance()/username else (),
+                                    if (not($local-write)) then instance()/password else (),
+                                    $force-attachments
+                                )
                         </xf:action>
                     </xf:action>
                 </xf:action>
-
-                <!-- Clear selection because foo/bar/true might become foo/bar/false -->
-                <xf:setvalue ref="selection"/>
-                <xf:delete ref="instance('fr-form')/*"/>
 
                 <!-- Update the view -->
                 <xf:dispatch name="fr-initialize" targetid="fr-form-model"/>
@@ -327,7 +409,7 @@
             </xf:action>
 
             <!-- Form definition -->
-            <xf:instance id="fr-form"><xh:html/></xf:instance>
+            <xf:instance id="fr-form"><dummy/></xf:instance>
 
             <xf:submission
                 id="read-form"
@@ -339,11 +421,42 @@
                 replace="instance"
                 instance="fr-form"/>
 
-            <xf:setvalue
-                event="xforms-submit-error"
-                observer="read-form"
-                ref="error"
-                value="'true'"/>
+            <!-- Components (see also Form Builder model.xml) -->
+            <!-- NOTE: Bother caching as we invalidate all instances first, and then we might go through many libraries,
+                 therefore emptying the cache. -->
+            <!-- NOTE: This is not ideal, because toolbox.xpl expects both app/form names, and this means we can't
+                 properly cache libraries anymore. Ideally we should be able to cache per library -->
+            <xf:instance id="fr-components"><dummy/></xf:instance>
+
+            <xf:submission
+                id="read-toolbox"
+                serialization="none"
+                method="get"
+                resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
+                replace="instance"
+                instance="fr-components"
+                xxf:readonly="true"/>
+
+            <xf:submission
+                id="reset-toolbox"
+                ref="xxf:element('dummy')"
+                method="put"
+                resource="echo:"
+                replace="instance"
+                instance="fr-components"
+                xxf:readonly="true"/>
+
+            <xf:action event="xforms-submit-error" observer="read-form read-toolbox">
+
+                <xf:setvalue
+                    ref="error"
+                    value="'true'"/>
+
+                <xf:action type="xpath">
+                    process:runProcess('oxf.fr.home.process', 'error-message("database-error")')
+                </xf:action>
+            </xf:action>
+
         </xf:model>
     </xh:head>
     <xh:body>
@@ -476,6 +589,17 @@
                                     <xf:trigger appearance="minimal" ref="summary-action" id="fr-new-button">
                                         <xf:label ref="$fr-resources/home/buttons/navigate-new"/>
                                         <xf:load event="DOMActivate" resource="/fr/{xxf:split($selection[1], '/')[1]}/{xxf:split($selection[1], '/')[2]}/new"/>
+                                    </xf:trigger>
+                                </li>
+                                <li class="divider"/>
+                                <li class="{if (xxf:readonly(local-upgrade-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" ref="local-upgrade-action" id="fr-upgrade-local-button">
+                                        <xf:label ref="$fr-resources/home/buttons/upgrade-local"/>
+                                    </xf:trigger>
+                                </li>
+                                <li class="{if (xxf:readonly(remote-upgrade-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" ref="remote-upgrade-action" id="fr--upgrade-remotebutton">
+                                        <xf:label ref="$fr-resources/home/buttons/upgrade-remote"/>
                                     </xf:trigger>
                                 </li>
                             </ul>

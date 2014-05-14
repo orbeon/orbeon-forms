@@ -173,6 +173,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         // See https://github.com/orbeon/orbeon-forms/issues/1316
         val documentElement = elementInfo("forms")
         XFormsAPI.insert(into = documentElement, origin = formElements)
+
+        response.setContentType("application/xml")
         TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
     }
 }

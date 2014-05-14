@@ -47,23 +47,21 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
         }
     }
 
+    case class TableMeta(tableName: String, colsMeta: Seq[ColMeta])
+    case class ColMeta(colName: String, meta: Set[ColKeyVal])
+    case class ColKeyVal(key: String, value: AnyRef)
+
     /**
      * Runs the SQL, and returns the information about the tables as defined in the database. The form in which this
      * information is returned varies depending on the database, hence the Any return type.
      */
-    private def sqlToTableInfo(sql: Seq[String]): Map[String, Any] = {
+    private def sqlToTableInfo(sql: Seq[String]): Set[TableMeta] = {
         withNewDatabase { connection ⇒
             val statement = connection.createStatement
             sql foreach statement.executeUpdate
             Connect.getTableNames(connection).map { tableName ⇒
-                val tableInfo = Config.provider match {
-                    case MySQL ⇒
-                        // MySQL can give us the DDL that could be used to create that table
-                        val tableResultSet = statement.executeQuery("SHOW CREATE TABLE " + tableName)
-                        tableResultSet.next()
-                        tableResultSet.getString(2)
-                    case SQLServer ⇒
-                        // On SQL Server, we get the description of the Orbeon tables from SQL Server metadata tables
+                Config.provider match {
+                    case MySQL | SQLServer ⇒
                         val tableInfoResultSet = {
                             val ps = connection.prepareStatement(
                                 """SELECT   *
@@ -74,17 +72,20 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
                             ps.setString(1, tableName)
                             ps.executeQuery()
                         }
-                        def tableInfo() = {
-                            val interestingColumns = Seq("column_name", "is_nullable", "data_type")
-                            for (col ← interestingColumns) yield
-                                col → tableInfoResultSet.getObject(col)
+                        def tableInfo(): ColMeta = {
+                            val colName = tableInfoResultSet.getString("column_name")
+                            val interestingKeys = Set("is_nullable", "data_type")
+                            val colKeyVals = for (metaKey ← interestingKeys) yield
+                                ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
+                            ColMeta(colName, colKeyVals)
                         }
-                        Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
+                        val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
+                        assert(colsMeta.length > 0)
+                        TableMeta(tableName, colsMeta)
 
                     case _ ⇒ ???
                 }
-                (tableName, tableInfo)
-            }.toMap
+            }.toSet
         }
     }
 

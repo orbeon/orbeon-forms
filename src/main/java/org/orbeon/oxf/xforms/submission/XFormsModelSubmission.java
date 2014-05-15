@@ -1092,7 +1092,11 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                                     documentToSubmit.getRootElement().getStringValue(),
                                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
-                        messageBody = SubmissionUtils.readByteArray(model, resolvedURI);
+                        try {
+                            messageBody = SubmissionUtils.readByteArray(model, resolvedURI);
+                        } catch(Exception e) {
+                            throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: binary serialization with anyURI type failed reading URL.", "serializing instance");
+                        }
                     }
                     defaultMediatypeForSerialization = "application/octet-stream";
                     queryString = null;

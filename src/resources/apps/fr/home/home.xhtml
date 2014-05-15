@@ -67,7 +67,7 @@
                 <xf:setvalue ref="selection"/>
 
                 <!-- Don't keep potentially large instances -->
-                <xf:insert context="instance('fr-form')/root()"       origin="xxf:element('dummy')"/>
+                <xf:insert ref="instance('fr-form')" origin="xxf:element('dummy')"/>
                 <xf:send submission="reset-toolbox"/>
 
                 <!-- Following doesn't work because instance is readonly and insert code thinks it's mutating -->
@@ -155,7 +155,8 @@
                 resource="/fr/service/persistence/form"
                 replace="instance"
                 targetref="instance('fr-metadata-local')">
-                <xf:delete event="xforms-submit" ref="instance('fr-metadata-local')/node()"/>
+
+                <xf:insert event="xforms-submit" ref="instance('fr-metadata-local')" origin="xxf:element('forms')"/>
                 <xf:setvalue event="xforms-submit-done" ref="instance()/initializing">false</xf:setvalue>
             </xf:submission>
 
@@ -168,7 +169,7 @@
                 resource="{$production-server-uri}/fr/service/persistence/form"
                 replace="instance"
                 targetref="instance('fr-metadata-remote')">
-                <xf:delete event="xforms-submit" ref="instance('fr-metadata-remote')/node()"/>
+                <xf:insert event="xforms-submit" ref="instance('fr-metadata-remote')" origin="xxf:element('forms')"/>
                 <xf:setvalue event="xforms-submit-done" ref="instance()/remote-successful">true</xf:setvalue>
             </xf:submission>
 
@@ -179,13 +180,13 @@
 
             <xf:action event="process-results">
 
-                <xf:delete ref="instance('fr-metadata')/*"/>
+                <xf:insert ref="instance('fr-metadata')" origin="xxf:element('forms')"/>
 
                 <xf:var name="temp" value="xxf:element('forms')"/>
 
                 <!-- Insert local data -->
                 <xf:insert context="$temp" origin="instance('fr-metadata-local')/*"/>
-                <xf:delete ref="instance('fr-metadata-local')/*"/>
+                <xf:insert ref="instance('fr-metadata-local')" origin="xxf:element('forms')"/>
 
                 <!-- Join remote data if present -->
                 <xf:action iterate="instance('fr-metadata-remote')/*">
@@ -212,7 +213,7 @@
                         origin="xxf:element('form', ($remote/application-name, $remote/form-name, $remote-elements))"/>
 
                 </xf:action>
-                <xf:delete ref="instance('fr-metadata-remote')/*"/>
+                <xf:insert ref="instance('fr-metadata-remote')" origin="xxf:element('forms')"/>
 
                 <!-- Annotate with permissions and remove -->
                 <xf:action iterate="$temp/form">

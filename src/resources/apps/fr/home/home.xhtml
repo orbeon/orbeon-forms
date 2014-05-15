@@ -182,75 +182,20 @@
 
                 <xf:insert ref="instance('fr-metadata')" origin="xxf:element('forms')"/>
 
+                <!-- Create root element -->
                 <xf:var name="temp" value="xxf:element('forms')"/>
 
-                <!-- Insert local data -->
-                <xf:insert context="$temp" origin="instance('fr-metadata-local')/*"/>
-                <xf:insert ref="instance('fr-metadata-local')" origin="xxf:element('forms')"/>
-
                 <!-- Join remote data if present -->
-                <xf:action iterate="instance('fr-metadata-remote')/*">
+                <xf:insert
+                    context="$temp"
+                    origin="frf:joinLocalAndRemoteMetadata(
+                                instance('fr-metadata-local')/*,
+                                instance('fr-metadata-remote')/*,
+                                xxf:instance('fb-permissions')
+                            )"/>
 
-                    <xf:var name="remote" value="."/>
-                    <xf:var name="local"  value="$temp/*[application-name = $remote/application-name and form-name = $remote/form-name]"/>
-
-                    <xf:var
-                        name="remote-elements"
-                        value="xxf:element('remote-title',              ($remote/title/@foobar, $remote/title/string())),
-                               xxf:element('remote-available',          $remote/available/string()),
-                               xxf:element('remote-last-modified-time', $remote/last-modified-time/string())"/>
-
-                    <xf:insert
-                        if="exists($local)"
-                        context="$local"
-                        ref="*"
-                        origin="$remote-elements"/>
-
-                    <xf:insert
-                        if="empty($local)"
-                        context="$temp"
-                        ref="*"
-                        origin="xxf:element('form', ($remote/application-name, $remote/form-name, $remote-elements))"/>
-
-                </xf:action>
+                <xf:insert ref="instance('fr-metadata-local')"  origin="xxf:element('forms')"/>
                 <xf:insert ref="instance('fr-metadata-remote')" origin="xxf:element('forms')"/>
-
-                <!-- Annotate with permissions and remove -->
-                <xf:action iterate="$temp/form">
-
-                    <xf:var
-                        name="has-admin-permissions"
-                        value="fbf:hasAdminPermissionsFor(xxf:instance('fb-permissions'), application-name, form-name)"/>
-
-                    <xf:insert
-                        context="."
-                        origin="xxf:attribute('operations',
-                                    string-join((frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions),
-                                                 if ($has-admin-permissions) then 'admin' else ()), ' '))"/>
-
-                    <!-- Hide the form if:
-
-                        - it doesn't have any metadata (should not happen but it if does, something is fishy)
-                        - current user doesn't have FB admin access AND:
-                            - form is unavailable
-                            - user has no operations associated with the form data
-                            - form is a library
-                     -->
-                    <xf:var
-                        name="hide-form"
-                        value="empty(*)
-                               or (
-                                   not($has-admin-permissions) and (
-                                       available = 'false'
-                                       or normalize-space(@operations) = ''
-                                       or form-name = 'library'
-                                   )
-                               )"/>
-
-                    <xf:delete
-                        if="$hide-form"
-                        ref="."/>
-                </xf:action>
 
                 <xf:insert
                     context="instance('fr-metadata')"
@@ -458,6 +403,34 @@
                 </xf:action>
             </xf:action>
 
+            <!-- Paging information -->
+            <xf:instance id="fr-paging-instance" xxf:expose-xpath-types="true">
+                <paging xmlns="">
+                    <total/>
+                    <search-total/>
+                    <page-size>20</page-size>
+                    <page-number>1</page-number>
+                    <page-count/>
+                    <from>0</from>
+                    <to>0</to>
+                    <prev-trigger/>
+                    <next-trigger/>
+                </paging>
+            </xf:instance>
+
+            <!-- Calculations for page navigation -->
+            <xf:bind ref="instance('fr-paging-instance')">
+                <xf:bind ref="* except (prev-trigger, next-trigger)" type="xs:integer"/>
+                <xf:bind ref="total"        calculate="count(instance('fr-metadata')/*)"/>
+                <xf:bind ref="search-total" calculate="../total"/>
+                <xf:bind ref="page-size"    calculate="(xxf:property('oxf.fr.home.page-size'), 20)[. castable as xs:integer][1]"/>
+                <xf:bind ref="page-count"   calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
+                <xf:bind ref="from"         calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
+                <xf:bind ref="to"           calculate="min((../page-number * ../page-size, ../search-total))"/>
+                <xf:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
+                <xf:bind ref="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
+            </xf:bind>
+
         </xf:model>
     </xh:head>
     <xh:body>
@@ -636,7 +609,7 @@
                             </xh:tr>
                         </xh:thead>
                         <xh:tbody>
-                            <xf:repeat ref="$forms">
+                            <xf:repeat ref="$forms[position() ge instance('fr-paging-instance')/from and position() le instance('fr-paging-instance')/to]" id="forms-repeat">
                                 <xf:var name="current"              value="."/>
                                 <xf:var name="local-available"      value="frf:isLocalAvailable(.)"/>
                                 <xf:var name="local-unavailable"    value="frf:isLocalUnavailable(.)"/>
@@ -742,6 +715,73 @@
                 </xf:group>
             </fr:row>
             <fr:row>
+                <div class="pagination pagination-left" xmlns="http://www.w3.org/1999/xhtml">
+                    <ul>
+                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
+                                <!-- https://github.com/orbeon/orbeon-forms/issues/1042 -->
+                                <xf:label>
+                                    <xh:i class="icon-step-backward"/>&#x200b;
+                                </xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
+                                    <xf:setindex repeat="forms-repeat" index="1"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </li>
+                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
+                                <xf:label>
+                                    <xh:i class="icon-chevron-left"/>&#x200b;
+                                </xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". - 1"/>
+                                    <xf:setindex repeat="forms-repeat" index="1"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </li>
+                        <!-- Some results -->
+                        <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
+                            <li>
+                                <span>
+                                    <xf:output value="max((instance('fr-paging-instance')/from, 0))"/>
+                                    <xf:output value="$fr-resources/summary/paging/to"/>
+                                    <xf:output value="max((instance('fr-paging-instance')/to, 0))"/>
+                                    <xf:output value="$fr-resources/summary/paging/of"/>
+                                    <xf:output value="instance('fr-paging-instance')/search-total"/>
+                                </span>
+                            </li>
+                        </xf:group>
+                        <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
+                            <!-- No results -->
+                        </xf:group>
+                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
+                                <xf:label>
+                                    <xh:i class="icon-chevron-right"/>&#x200b;
+                                </xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". + 1"/>
+                                    <xf:setindex repeat="forms-repeat" index="1"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </li>
+                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
+                                <xf:label>
+                                    <xh:i class="icon-step-forward"/>&#x200b;
+                                </xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
+                                    <xf:setindex repeat="forms-repeat" index="1"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </li>
+                    </ul>
+                </div>
+            </fr:row>
+            <fr:row>
+                <!--xxx<xf:output value="string-join(for $i in instance('fr-paging-instance')/* return (name($i), string($i)), ' ')"/>-->
                 <!--xxx <xf:output value="saxon:serialize(instance('fr-metadata'), 'xml')"/>-->
                 <fr:version/>
             </fr:row>

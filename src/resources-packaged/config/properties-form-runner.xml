@@ -424,6 +424,7 @@
         abort
     </property>
 
+    <property as="xs:integer" name="oxf.fr.home.page-size"                                      value="20"/>
     <property as="xs:anyURI"  name="oxf.fr.production-server-uri"                               value=""/>
 
 </properties>

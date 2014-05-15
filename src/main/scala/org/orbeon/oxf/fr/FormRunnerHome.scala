@@ -18,6 +18,8 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.xforms.action.XFormsAPI.insert
+import org.orbeon.oxf.fb.FormBuilder
 
 trait FormRunnerHome {
 
@@ -156,4 +158,65 @@ trait FormRunnerHome {
             password          = nonEmptyOrNone(password),
             formVersion       = Some("next")
         )
+
+    def joinLocalAndRemoteMetadata(local: SequenceIterator, remote: SequenceIterator, permissionInstance: NodeInfo): SequenceIterator = {
+
+        def makeKey(node: NodeInfo) =
+            (node / "application-name" stringValue, node / "form-name" stringValue)
+
+        val localIndex = asScalaIterator(local) collect {
+            case node: NodeInfo ⇒ makeKey(node) → node
+        } toMap
+
+        asScalaIterator(remote) collect { case remoteNode: NodeInfo ⇒
+
+            def remoteElement(name: String) =
+                elementInfo("remote-" + name, stringToStringValue(remoteNode elemValue name))
+
+            val remoteElements = List(
+                remoteElement("title"),
+                remoteElement("available"),
+                remoteElement("last-modified-time")
+            )
+
+            val appFormKey @ (app, form) = makeKey(remoteNode)
+
+            val hasAdminPermissions =
+                FormBuilder.hasAdminPermissionsFor(permissionInstance, app, form)
+
+            val formNode =
+                localIndex.get(appFormKey) match {
+                    case Some(localNode) ⇒
+                        insert(origin = remoteElements, into = localNode, after = localNode / *, doDispatch = false)
+                        localNode
+                    case None ⇒
+                        elementInfo("form", (remoteNode / "application-name" head) :: (remoteNode / "form-name" head) :: remoteElements)
+                }
+
+            if (formNode / * isEmpty) {
+                // Exclude form if it doesn't have any metadata (should not happen but it if does, something is fishy)
+                None
+            } else {
+
+                val operations =
+                    (hasAdminPermissions list "admin") :::
+                    FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember((formNode / "permissions" headOption).orNull).to[List]
+
+                // Exclude form if:
+                //
+                // - current user doesn't have FB admin access AND:
+                //     - form is a library
+                //     - user has no operations associated with the form data
+                //     - form is unavailable
+                if (! hasAdminPermissions && (form == "library") || operations.isEmpty || (formNode elemValue "available") == "false") {
+                    None
+                } else {
+                    // Add attribute with allowed operations
+                    insert(into = formNode, origin = attributeInfo("operations", operations mkString " "))
+                    Some(formNode)
+                }
+            }
+
+        } flatten
+    }
 }

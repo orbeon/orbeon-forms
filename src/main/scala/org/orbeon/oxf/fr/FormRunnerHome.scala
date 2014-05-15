@@ -57,13 +57,15 @@ trait FormRunnerHome {
         private val AdminOp    = "admin"
 
         def apply(form: NodeInfo): Form = {
-            val localTime  = form / "last-modified-time"
-            val remoteTime = form / "remote-last-modified-time"
 
-            Form(form / "application-name" stringValue,
-                form / "form-name" stringValue,
-                localTime.nonEmpty  option AvailableAndTime(! (form / "available"        === "false"), DateUtils.parseISODateOrDateTime(localTime.stringValue)),
-                remoteTime.nonEmpty option AvailableAndTime(! (form / "remote-available" === "false"), DateUtils.parseISODateOrDateTime(remoteTime.stringValue)),
+            val localTime  = form elemValueOpt "last-modified-time"
+            val remoteTime = form elemValueOpt "remote-last-modified-time"
+
+            Form(
+                form elemValue "application-name",
+                form elemValue "form-name",
+                localTime  map (v ⇒ AvailableAndTime((form elemValue "available")        != "false", DateUtils.parseISODateOrDateTime(v))),
+                remoteTime map (v ⇒ AvailableAndTime((form elemValue "remote-available") != "false", DateUtils.parseISODateOrDateTime(v))),
                 stringToSet(form /@ "operations")
             )
         }
@@ -80,7 +82,7 @@ trait FormRunnerHome {
         val appFormsSet = split[List](selection) map appForm toSet
 
         def formIsSelected(form: NodeInfo) =
-            appFormsSet((form / "application-name" stringValue) → (form / "form-name" stringValue))
+            appFormsSet((form elemValue "application-name") → (form elemValue "form-name"))
 
         collectForms(forms, formIsSelected)
     }
@@ -162,7 +164,7 @@ trait FormRunnerHome {
     def joinLocalAndRemoteMetadata(local: SequenceIterator, remote: SequenceIterator, permissionInstance: NodeInfo): SequenceIterator = {
 
         def makeKey(node: NodeInfo) =
-            (node / "application-name" stringValue, node / "form-name" stringValue)
+            (node elemValue "application-name", node elemValue "form-name")
 
         val localIndex = asScalaIterator(local) collect {
             case node: NodeInfo ⇒ makeKey(node) → node

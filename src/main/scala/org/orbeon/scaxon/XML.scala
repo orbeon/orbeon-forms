@@ -325,6 +325,19 @@ object XML {
             case Seq() ⇒ None
             case s     ⇒ Some(s.stringValue)
         }
+        
+        def elemValue(elemName: String) = /(elemName).stringValue
+        def elemValue(elemName: QName)  = /(elemName).stringValue
+        
+        def elemValueOpt(elemName: String) = /(elemName) match {
+            case Seq() ⇒ None
+            case s     ⇒ Some(s.stringValue)
+        }
+
+        def elemValueOpt(elemName: QName) = /(elemName) match {
+            case Seq() ⇒ None
+            case s     ⇒ Some(s.stringValue)
+        }
 
         def idOpt = attValueOpt("id")
 

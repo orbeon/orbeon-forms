@@ -1,3 +1,17 @@
+.orbeon .btn-toolbar {
+  display: block;
+  float: left;
+}
+.orbeon .pagination {
+  display: block;
+  float: right;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+.orbeon .pagination .fr-paging-numbers > span {
+  min-width: 125px;
+  text-align: center;
+}
 .orbeon .row .alert,
 .orbeon .row-fluid .alert {
   display: block;

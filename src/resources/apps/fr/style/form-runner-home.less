@@ -14,6 +14,23 @@
 
 .orbeon {
 
+    .btn-toolbar {
+        display: block;
+        float: left;
+    }
+
+    .pagination {
+        display: block;
+        float: right;
+        margin-top: 6px;
+        margin-bottom: 6px;
+
+        .fr-paging-numbers > span {
+            min-width: 125px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
+            text-align: center;
+        }
+    }
+
     .row .alert, .row-fluid .alert  {
         display: block;
         margin: 0;

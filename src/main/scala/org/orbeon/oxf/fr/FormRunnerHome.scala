@@ -71,9 +71,6 @@ trait FormRunnerHome {
         }
     }
 
-    private def collectNodes(forms: SequenceIterator) =
-        asScalaIterator(forms) collect { case form: NodeInfo ⇒ form }
-
     private def collectForms(forms: SequenceIterator, p: NodeInfo ⇒ Boolean = _ ⇒ true) =
         asScalaIterator(forms) collect { case form: NodeInfo if p(form) ⇒ Form(form) }
 
@@ -163,62 +160,73 @@ trait FormRunnerHome {
 
     def joinLocalAndRemoteMetadata(local: SequenceIterator, remote: SequenceIterator, permissionInstance: NodeInfo): SequenceIterator = {
 
-        def makeKey(node: NodeInfo) =
-            (node elemValue "application-name", node elemValue "form-name")
+        val combinedIndexIterator = {
 
-        val localIndex = asScalaIterator(local) collect {
-            case node: NodeInfo ⇒ makeKey(node) → node
-        } toMap
+            def makeAppFormKey(node: NodeInfo) =
+                (node elemValue "application-name", node elemValue "form-name")
 
-        asScalaIterator(remote) collect { case remoteNode: NodeInfo ⇒
+            def createIndex(it: SequenceIterator) = asScalaIterator(it) collect {
+                case node: NodeInfo ⇒ makeAppFormKey(node) → node
+            } toMap
 
-            def remoteElement(name: String) =
-                elementInfo("remote-" + name, stringToStringValue(remoteNode elemValue name))
+            val localIndex  = createIndex(local)
+            val remoteIndex = createIndex(remote)
 
-            val remoteElements = List(
-                remoteElement("title"),
-                remoteElement("available"),
-                remoteElement("last-modified-time")
-            )
+            (localIndex.keySet ++ remoteIndex.keySet).iterator map { key ⇒
+                key → (localIndex.get(key), remoteIndex.get(key))
+            }
+        }
 
-            val appFormKey @ (app, form) = makeKey(remoteNode)
+        def createNode(key: (String, String), localOpt: Option[NodeInfo], remoteOpt: Option[NodeInfo]): NodeInfo = {
 
-            val hasAdminPermissions =
-                FormBuilder.hasAdminPermissionsFor(permissionInstance, app, form)
+            def remoteElements(remoteNode: NodeInfo) = {
 
-            val formNode =
-                localIndex.get(appFormKey) match {
-                    case Some(localNode) ⇒
-                        insert(origin = remoteElements, into = localNode, after = localNode / *, doDispatch = false)
-                        localNode
-                    case None ⇒
-                        elementInfo("form", (remoteNode / "application-name" head) :: (remoteNode / "form-name" head) :: remoteElements)
-                }
+                def remoteElement(name: String) =
+                    elementInfo("remote-" + name, stringToStringValue(remoteNode elemValue name))
 
-            if (formNode / * isEmpty) {
-                // Exclude form if it doesn't have any metadata (should not happen but it if does, something is fishy)
-                None
-            } else {
-
-                val operations =
-                    (hasAdminPermissions list "admin") :::
-                    FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember((formNode / "permissions" headOption).orNull).to[List]
-
-                // Exclude form if:
-                //
-                // - current user doesn't have FB admin access AND:
-                //     - form is a library
-                //     - user has no operations associated with the form data
-                //     - form is unavailable
-                if (! hasAdminPermissions && (form == "library") || operations.isEmpty || (formNode elemValue "available") == "false") {
-                    None
-                } else {
-                    // Add attribute with allowed operations
-                    insert(into = formNode, origin = attributeInfo("operations", operations mkString " "))
-                    Some(formNode)
-                }
+                List(
+                    remoteElement("title"),
+                    remoteElement("available"),
+                    remoteElement("last-modified-time")
+                )
             }
 
-        } flatten
+            (localOpt, remoteOpt) match {
+                case (Some(localNode), None) ⇒
+                    localNode
+                case (None, Some(remoteNode)) ⇒
+                    elementInfo("form", (remoteNode / "application-name" head) :: (remoteNode / "form-name" head) :: remoteElements(remoteNode))
+                case (Some(localNode), Some(remoteNode)) ⇒
+                    insert(origin = remoteElements(remoteNode), into = localNode, after = localNode / *, doDispatch = false)
+                    localNode
+                case (None, None) ⇒
+                    throw new IllegalStateException
+            }
+        }
+
+        def relevantFormNode(formNode: NodeInfo, formName: String, hasAdminPermissions: Boolean, operations: List[String]): Boolean =
+            (formNode / * nonEmpty) &&
+            (hasAdminPermissions || ! (
+                formName == "library" ||
+                operations.isEmpty    ||
+                (formNode elemValue "available") == "false")
+            )
+
+        def addOperations(formNode: NodeInfo, operations: List[String]): Unit =
+            insert(into = formNode, origin = attributeInfo("operations", operations mkString " "))
+
+        import FormBuilder._
+
+        for {
+            (appFormKey @ (app, form), (localOpt, remoteOpt)) ← combinedIndexIterator
+            hasAdminPermissions = hasAdminPermissionsFor(permissionInstance, app, form)
+            newNode             = createNode(appFormKey, localOpt, remoteOpt)
+            permissionsElement  = (newNode / "permissions" headOption).orNull
+            operations          = (hasAdminPermissions list "admin") ::: allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).to[List]
+            if relevantFormNode(newNode, form, hasAdminPermissions, operations)
+        } yield {
+            addOperations(newNode, operations)
+            newNode
+        }
     }
 }

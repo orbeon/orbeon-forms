@@ -177,7 +177,7 @@ trait FormRunnerHome {
             }
         }
 
-        def createNode(key: (String, String), localOpt: Option[NodeInfo], remoteOpt: Option[NodeInfo]): NodeInfo = {
+        def createNode(localAndOrRemote: (Option[NodeInfo], Option[NodeInfo])): NodeInfo = {
 
             def remoteElements(remoteNode: NodeInfo) = {
 
@@ -191,7 +191,7 @@ trait FormRunnerHome {
                 )
             }
 
-            (localOpt, remoteOpt) match {
+            localAndOrRemote match {
                 case (Some(localNode), None) ⇒
                     localNode
                 case (None, Some(remoteNode)) ⇒
@@ -218,9 +218,9 @@ trait FormRunnerHome {
         import FormBuilder._
 
         for {
-            (appFormKey @ (app, form), (localOpt, remoteOpt)) ← combinedIndexIterator
+            ((app, form), localAndOrRemote) ← combinedIndexIterator
             hasAdminPermissions = hasAdminPermissionsFor(permissionInstance, app, form)
-            newNode             = createNode(appFormKey, localOpt, remoteOpt)
+            newNode             = createNode(localAndOrRemote)
             permissionsElement  = (newNode / "permissions" headOption).orNull
             operations          = (hasAdminPermissions list "admin") ::: allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).to[List]
             if relevantFormNode(newNode, form, hasAdminPermissions, operations)

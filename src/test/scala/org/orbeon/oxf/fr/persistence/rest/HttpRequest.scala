@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.persistence.db.Config
 
 private object HttpRequest {
 
-    private val MySQLBase = "http://localhost:8080/orbeon/fr/service/mysql"
+    private val PersistenceBase = "http://localhost:8080/orbeon/fr/service/persistence/"
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     case class Credentials(username: String, roles: Set[String], group: String)
@@ -36,9 +36,8 @@ private object HttpRequest {
     case class Binary(file: Array[Byte]) extends Body
 
     private def request(url: String, method: String, version: Version, body: Option[Body], credentials: Option[Credentials]): ConnectionResult = {
-        val documentUrl = URLFactory.createURL(MySQLBase + url)
+        val documentUrl = URLFactory.createURL(PersistenceBase + url)
         val headers = {
-            val dataSourceHeader  = Seq("Orbeon-Datasource" → Array(Config.provider.name ++ "_tomcat"))
             val contentTypeHeader = body.map {
                     case XML   (_) ⇒ "application/xml"
                     case Binary(_) ⇒ "application/octet-stream"
@@ -54,7 +53,7 @@ private object HttpRequest {
                 OrbeonGroupHeaderName    → Array(c.group),
                 OrbeonRolesHeaderName    → Array(c.roles.mkString(" "))
             )).toSeq.flatten
-            val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
+            val myHeaders = Seq(contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
             Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
         }
         val messageBody = body map {

@@ -15,7 +15,11 @@ package org.orbeon.oxf.fr.persistence.db
 
 private[persistence] sealed abstract class Provider(val name: String)
 
-private[persistence] case object MySQL     extends Provider("mysql")
+object Provider {
+    def all: List[Provider] = List(MySQL, SQLServer)
+}
+
 private[persistence] case object Oracle    extends Provider("oracle")
-private[persistence] case object DB2       extends Provider("db2")
+private[persistence] case object MySQL     extends Provider("mysql")
 private[persistence] case object SQLServer extends Provider("sqlserver")
+private[persistence] case object DB2       extends Provider("db2")

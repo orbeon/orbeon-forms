@@ -3,8 +3,18 @@ jdk:
   - oraclejdk7
 env:
   global:
+    # SAUCE_USERNAME
     - secure: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
+    # SAUCE_ACCESS_KEY
     - secure: "bAgBFLf9R51upNAWfHJyBsByveotFRwCUAWFIiVTgCGxAE5mhWFMZl9HsAL0oiacjzmQ03u2toboOdTH/tfm2bohtQZknFleO0rDhLyW3ZmYI65vmFm1uYVrbyzMI0l7t/Ws4gZW9SC5cUl7m2GjTnB/qKg/O6uohPU7uqf8KEU="
+    # RDS_PASSWORD
+    - secure: "PhGOPRzoUKHmJxytdzA78+veaDi6Xm1JzcTFb1tHIna1DV8gjSR7YHMuuxbJCrhF719ubGJlgE8LndLolkMGVq/3GL8XA6rV5RQeNZ+FnNgcQ+KCo4NYH8Zpyb3zn2Bp0L3Q1XSWjXoTEeVwjwDEVOpdBxLTvD+LorLVuC0cEMc="
+    # ORACLE_URL
+    - secure: "E2ux7UgwF6IuwpKdyg+i3XRzWJ77gAJyxkw1wHogsKhm7GRTYO22CQtMqrENV9jzqOEK8gOM3clFoNGgCFUatxnKru3vy2MXq5mx88EeQ0FoooaRAevtxev4G9wh8jizI9JH+LK4hidek+Wmm1NLChU4VphJ33co5Y7s9vZLKv4="
+    # MYSQL_URL
+    - secure: "bSY4+e7XeKIgcgRztTsBeNbXarlhGCsIz8j6lDlZfc+DfnHbb/MD8eJ05ndsr6ecgQsJIayKeeGVkUvniwKsUxwfHBDqV2fS194wnSOvcnsmtmAR/DmNVtFlfmMcJCLlMuGOlTp1LEqsnMG9kcWtNwOR8BYvyaLdUv36/NMPHHk="
+    # SQLSERVER_URL
+    - secure: "L/Pra2kMGn3AZ1sJb8nvOgxRnpK9/LWY0a4FuYHoQnA6KkjOQfujABHFQRjht8gcc0n0cQttWKsRWT3phTIPGD6YmB25/KT/CI5uKXnbBCMpM1JxhweKRz0P5uOJFO5pVAlkmYq6DwMxP3U/AMs7r4R/9CRyNYEnGEsbr30qphU="
 before_script:
   - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 install:

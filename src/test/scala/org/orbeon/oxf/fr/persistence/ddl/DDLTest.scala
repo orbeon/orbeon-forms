@@ -25,25 +25,25 @@ import org.orbeon.oxf.util.ScalaUtils._
  */
 class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    private def withNewDatabase[T](block: Connection ⇒ T): T = {
-        val createUserAndDatabase = Config.provider match {
+    private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
+        val createUserAndDatabase = provider match {
             case MySQL     ⇒ Seq("create user orbeon_ddl@localhost identified by 'orbeon_ddl'",
                                   "create database orbeon_ddl",
                                   "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost")
             case SQLServer ⇒ Seq("CREATE DATABASE orbeon_ddl")
             case _         ⇒ ???
         }
-        val dropUserAndDatabase = Config.provider match {
+        val dropUserAndDatabase = provider match {
             case MySQL     ⇒ Seq("drop user orbeon_ddl@localhost",
                                   "drop database orbeon_ddl")
             case SQLServer ⇒ Seq("DROP DATABASE orbeon_ddl")
             case _         ⇒ ???
         }
         try {
-            Connect.asRoot(createUserAndDatabase foreach _.createStatement.executeUpdate)
-            Connect.asDDL(block)
+            Connect.asRoot(provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
+            Connect.asDDL(provider)(block)
         } finally {
-            Connect.asRoot(dropUserAndDatabase foreach _.createStatement.executeUpdate)
+            Connect.asRoot(provider)(dropUserAndDatabase foreach _.createStatement.executeUpdate)
         }
     }
 
@@ -55,12 +55,12 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
      * Runs the SQL, and returns the information about the tables as defined in the database. The form in which this
      * information is returned varies depending on the database, hence the Any return type.
      */
-    private def sqlToTableInfo(sql: Seq[String]): Set[TableMeta] = {
-        withNewDatabase { connection ⇒
+    private def sqlToTableInfo(provider: Provider, sql: Seq[String]): Set[TableMeta] = {
+        withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
             sql foreach statement.executeUpdate
-            Connect.getTableNames(connection).map { tableName ⇒
-                Config.provider match {
+            Connect.getTableNames(provider, connection).map { tableName ⇒
+                provider match {
                     case MySQL | SQLServer ⇒
                         val tableInfoResultSet = {
                             val ps = connection.prepareStatement(
@@ -90,19 +90,17 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     }
 
     @Test def createAndUpgradeTest(): Unit = {
-        Config.provider match {
+        Provider.all.foreach {
             case MySQL ⇒
-                val upgradeTo4_4 = sqlToTableInfo(SQL.read("mysql-4_3.sql") ++ SQL.read("mysql-4_3-to-4_4.sql"))
-                val  straight4_4 = sqlToTableInfo(SQL.read("mysql-4_4.sql"))
-                val upgradeTo4_5 = sqlToTableInfo(SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
-                val  straight4_5 = sqlToTableInfo(SQL.read("mysql-4_5.sql"))
-                println("upgradeTo4_5", upgradeTo4_5)
-                println("straight4_5", straight4_5)
+                val upgradeTo4_4 = sqlToTableInfo(MySQL, SQL.read("mysql-4_3.sql") ++ SQL.read("mysql-4_3-to-4_4.sql"))
+                val straight4_4  = sqlToTableInfo(MySQL, SQL.read("mysql-4_4.sql"))
+                val upgradeTo4_5 = sqlToTableInfo(MySQL, SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
+                val straight4_5  = sqlToTableInfo(MySQL, SQL.read("mysql-4_5.sql"))
                 assert(upgradeTo4_4 === straight4_4)
                 assert(upgradeTo4_5 === straight4_5)
             case SQLServer ⇒
                 // No assertions for now (we don't have upgrades yet), but at least test that DDL runs
-                sqlToTableInfo(SQL.read("sqlserver-4_6.sql"))
+                sqlToTableInfo(SQLServer, SQL.read("sqlserver-4_6.sql"))
             case _ ⇒ ???
         }
     }

@@ -41,28 +41,32 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     val AllOperations = Set("create", "read", "update", "delete")
 
-    private def withOrbeonTables[T](block: java.sql.Connection ⇒ T) {
-        Connect.asTomcat { connection ⇒
-            val statement = connection.createStatement
-            try {
-                // Create tables
-                val sql = Config.provider match {
-                    case MySQL     ⇒ "mysql-4_5.sql"
-                    case SQLServer ⇒ "sqlserver-4_6.sql"
-                    case _         ⇒ ???
+    private def withOrbeonTables[T](block: (java.sql.Connection, String) ⇒ T) {
+        Provider.all foreach { provider ⇒
+            val crudPrefix = s"crud/${provider.name}/my-form/"
+            Connect.asTomcat(provider) { connection ⇒
+                val statement = connection.createStatement
+                try {
+                    // Create tables
+                    val sql = provider match {
+                        case Oracle    ⇒ "oracle_4_5.sql"
+                        case MySQL     ⇒ "mysql-4_5.sql"
+                        case SQLServer ⇒ "sqlserver-4_6.sql"
+                        case DB2       ⇒ "db2-4_4.sql"
+                    }
+                    val createDDL = SQL.read(sql)
+                    createDDL foreach statement.executeUpdate
+                    // Run the interesting code
+                    block(connection, crudPrefix)
+                } finally {
+                    // Clean-up database dropping tables
+                    (Connect.getTableNames(provider, connection)
+                        map ("DROP TABLE " + _)
+                        foreach statement.executeUpdate)
+                    // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
+                    if (provider == SQLServer)
+                        statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")
                 }
-                val createDDL = SQL.read(sql)
-                createDDL foreach statement.executeUpdate
-                // Run the interesting code
-                block(connection)
-            } finally {
-                // Clean-up database dropping tables
-                (Connect.getTableNames(connection)
-                    map ("DROP TABLE " + _)
-                    foreach statement.executeUpdate)
-                // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
-                if (Config.provider == SQLServer)
-                    statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")
             }
         }
     }
@@ -71,8 +75,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Test new form versioning introduced in 4.5, for form definitions.
      */
     @Test def formDefinitionVersionTest(): Unit = {
-        withOrbeonTables { connection =>
-            val FormURL = "/crud/acme/address/form/form.xhtml"
+        withOrbeonTables { (connection, crudPrefix) =>
+            val FormURL = crudPrefix ++ "form/form.xhtml"
 
             // First time we put with "latest" (AKA unspecified)
             val first = HttpRequest.XML(<gaga1/>)
@@ -124,8 +128,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Test new form versioning introduced in 4.5, for form data
      */
     @Test def formDataVersionTest(): Unit = {
-        withOrbeonTables { connection =>
-            val FirstDataURL = "/crud/acme/address/data/123/data.xml"
+        withOrbeonTables { (connection, crudPrefix) =>
+            val FirstDataURL = crudPrefix ++ "data/123/data.xml"
 
             // Storing for specific form version
             val first = <gaga1/>
@@ -156,10 +160,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Get form definition corresponding to a document
      */
     @Test def formForDataTest(): Unit = {
-        withOrbeonTables { connection =>
-            val FormURL       = "/crud/acme/address/form/form.xhtml"
-            val FirstDataURL  = "/crud/acme/address/data/123/data.xml"
-            val SecondDataURL = "/crud/acme/address/data/456/data.xml"
+        withOrbeonTables { (connection, crudPrefix) =>
+            val FormURL       = crudPrefix ++ "form/form.xhtml"
+            val FirstDataURL  = crudPrefix ++ "data/123/data.xml"
+            val SecondDataURL = crudPrefix ++ "data/456/data.xml"
             val first         = <gaga1/>
             val second        = <gaga2/>
             val data          = <gaga/>
@@ -179,7 +183,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      */
     @Test def permissionsTest(): Unit = {
 
-        withOrbeonTables { connection =>
+        withOrbeonTables { (connection, crudPrefix) =>
             import Permissions._
 
             def formDefinitionWithPermissions(permissions: Permissions): Elem =
@@ -195,14 +199,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                     </xh:head>
                 </xh:html>
 
-            val FormURL = "/crud/acme/address/form/form.xhtml"
+            val FormURL = crudPrefix ++ "form/form.xhtml"
             val data    = <data/>
             val clerk   = Some(HttpRequest.Credentials("tom", Set("clerk"  ), "clerk"))
             val manager = Some(HttpRequest.Credentials("jim", Set("manager"), "manager"))
             val admin   = Some(HttpRequest.Credentials("tim", Set("admin"  ), "admin"))
 
             {
-                val DataURL = "/crud/acme/address/data/123/data.xml"
+                val DataURL = crudPrefix ++ "data/123/data.xml"
 
                 // Anonymous: no permission defined
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(None)), 201)
@@ -218,7 +222,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
             }
             {
-                val DataURL = "/crud/acme/address/data/456/data.xml"
+                val DataURL = crudPrefix ++ "data/456/data.xml"
 
                 // More complex permissions based on roles
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(
@@ -258,10 +262,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     // Try uploading files of 1 KB, 1 MB, and 10 MB
     @Test def attachmentsTest(): Unit = {
-        withOrbeonTables { connection =>
+        withOrbeonTables { (connection, crudPrefix) =>
             for ((size, position) ← Seq(1024, 1024*1024, 10*1024*1024).zipWithIndex) {
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
-                val url = s"/crud/acme/address/data/123/file$position"
+                val url = crudPrefix ++ "data/123/file" ++ position.toString
                 HttpAssert.put(url, Specific(1), bytes, 201)
                 HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, Some(1)))
             }
@@ -270,14 +274,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     // Try uploading files of 1 KB, 1 MB, and 5 MB
     @Test def largeXMLDocumentsTest(): Unit = {
-        withOrbeonTables { connection =>
+        withOrbeonTables { (connection, crudPrefix) =>
             for ((size, position) ← Seq(1024, 1024*1024, 5*1024*1024).zipWithIndex) {
                 val string = new Array[Char](size)
                 for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
                 val text = Dom4jUtils.createText(new String(string))
                 val element = Dom4jUtils.createElement("gaga") |!> (_.add(text))
                 val document = Dom4jUtils.createDocument |!> (_.add(element)) |> HttpRequest.XML
-                val url = s"/crud/acme/address/data/$position/data.xml"
+                val url = crudPrefix ++ s"data/$position/data.xml"
                 HttpAssert.put(url, Specific(1), document, 201)
                 HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, Some(1)))
             }
@@ -285,13 +289,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     }
 
     @Test def draftsTest(): Unit = {
-        withOrbeonTables { connection =>
+        withOrbeonTables { (connection, crudPrefix) =>
 
             // Draft and non-draft are different
             val first  = HttpRequest.XML(<gaga1/>)
             val second = HttpRequest.XML(<gaga2/>)
-            val DataURL  = "/crud/acme/address/data/123/data.xml"
-            val DraftURL = "/crud/acme/address/draft/123/data.xml"
+            val DataURL  = crudPrefix ++ "data/123/data.xml"
+            val DraftURL = crudPrefix ++ "draft/123/data.xml"
             HttpAssert.put(DataURL,  Specific(1), first, 201)
             HttpAssert.put(DraftURL, Unspecified, second, 201)
             HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, Some(1)))

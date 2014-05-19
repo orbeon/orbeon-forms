@@ -18,32 +18,31 @@ import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
 
-    def asRoot  [T](block: Connection ⇒ T): T = asUser(None                 , block)
-    def asDDL   [T](block: Connection ⇒ T): T = asUser(Some("orbeon_ddl")   , block)
-    def asTomcat[T](block: Connection ⇒ T): T = asUser(Some("orbeon_tomcat"), block)
+    def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                 , block)
+    def asDDL   [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some("orbeon_ddl")   , block)
+    def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some("orbeon_tomcat"), block)
 
-    private def asUser[T](user: Option[String], block: Connection ⇒ T): T = {
-        val url = Config.provider match {
-            case MySQL     ⇒ Config.jdbcURL ++ user.getOrElse("")
-            case SQLServer ⇒ Config.jdbcURL ++ user.map(";databaseName=" ++ _).getOrElse("")
-            case _         ⇒ ???
+    private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
+        val url = provider match {
+            case MySQL     ⇒ System.getenv("MYSQL_URL")     ++ user.getOrElse("")
+            case SQLServer ⇒ System.getenv("SQLSERVER_URL") ++ user.map(";databaseName=" ++ _).getOrElse("")
+            case Oracle    ⇒ System.getenv("ORACLE_URL")
+            case DB2       ⇒ System.getenv("DB2_URL")
         }
-        val userName = Config.provider match {
-            case MySQL     ⇒ user.getOrElse("root")
-            case SQLServer ⇒ "orbeon"
-            case _         ⇒ ???
+        val userName = provider match {
+            case MySQL     ⇒ user.getOrElse("root") // TODO: As part of the DB setup, we could create an orbeon user for MySQL, to avoid this distinction here
+            case _         ⇒ "orbeon"
         }
-        val password = Config.provider match {
+        val password = provider match {
             case MySQL     ⇒ user.getOrElse("")
-            case SQLServer ⇒ "password"
-            case _         ⇒ ???
+            case _         ⇒ System.getenv("RDS_PASSWORD")
         }
         useAndClose(DriverManager.getConnection(url, userName, password))(block)
     }
 
-    def getTableNames(connection: Connection): List[String] = {
-        val query = Config.provider match {
-            case MySQL     ⇒ "SHOW TABLES"
+    def getTableNames(provider: Provider, connection: Connection): List[String] = {
+        val query = provider match {
+            case MySQL     ⇒ "SHOW TABLES" // TODO: using information_schema as done below should work for MySQL as well
             case SQLServer ⇒ "SELECT table_name FROM information_schema.tables"
             case _         ⇒ ???
         }

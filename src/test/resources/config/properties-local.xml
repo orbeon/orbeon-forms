@@ -2,8 +2,15 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
-    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                      value="mysql"/>
+
+    <property as="xs:string"  name="oxf.fr.persistence.provider.oracle.*.*"                 value="oracle"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.mysql.*.*"                  value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.sqlserver.*.*"              value="sqlserver"/>
+
+    <property as="xs:string"  name="oxf.fr.persistence.oracle.datasource"                   value="oracle_tomcat"/>
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                    value="mysql_tomcat"/>
+    <property as="xs:string"  name="oxf.fr.persistence.sqlserver.datasource"                value="sqlserver_tomcat"/>
+
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.data"      value="exist"/>             <!-- So we can find the imported data -->
 
     <property as="xs:string"  processor-name="oxf:page-flow" name="service-public-methods"  value="GET HEAD POST PUT DELETE"/>

@@ -61,7 +61,6 @@
     <!--<property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mongo"/>-->
     <property as="xs:anyURI"  name="oxf.fr.persistence.mongo.uri"                               value="/fr/service/mongo"/>
 
-    <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
         /apps/fr/style/orbeon-navbar-logo.png

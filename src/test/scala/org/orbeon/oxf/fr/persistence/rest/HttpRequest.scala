@@ -46,7 +46,7 @@ private object HttpRequest {
                 case Unspecified             ⇒ Nil
                 case Next                    ⇒ Seq("Orbeon-Form-Definition-Version" → Array("next"))
                 case Specific(version)       ⇒ Seq("Orbeon-Form-Definition-Version" → Array(version.toString))
-                case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id" → Array(documentId))
+                case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id"         → Array(documentId))
             }
             val credentialHeaders = credentials.map(c ⇒ Seq(
                 OrbeonUsernameHeaderName → Array(c.username),

@@ -24,8 +24,8 @@ private[persistence] object Connect {
 
     private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
         val url = provider match {
-            case MySQL     ⇒ System.getenv("MYSQL_URL")     ++ user.getOrElse("")
-            case SQLServer ⇒ System.getenv("SQLSERVER_URL") ++ user.map(";databaseName=" ++ _).getOrElse("")
+            case MySQL     ⇒ System.getenv("MYSQL_URL")     + user.getOrElse("")
+            case SQLServer ⇒ System.getenv("SQLSERVER_URL") + user.map(";databaseName=" + _).getOrElse("")
             case Oracle    ⇒ System.getenv("ORACLE_URL")
             case DB2       ⇒ System.getenv("DB2_URL")
         }

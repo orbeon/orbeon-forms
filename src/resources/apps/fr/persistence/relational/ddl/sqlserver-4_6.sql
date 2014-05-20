@@ -1,56 +1,57 @@
-create table orbeon_form_definition (
-    created            datetime,
-    last_modified_time datetime,
-    last_modified_by   nvarchar(255),
-    app                nvarchar(255),
-    form               nvarchar(255),
-    form_version       int not null,
-    deleted            char(1) not null,
-    xml                xml
+CREATE TABLE orbeon_form_definition (
+    created            DATETIME,
+    last_modified_time DATETIME,
+    last_modified_by   NVARCHAR(255),
+    app                NVARCHAR(255),
+    form               NVARCHAR(255),
+    form_version       int NOT NULL,
+    form_metadata      NVARCHAR(4000),
+    deleted            CHAR(1)        NOT NULL,
+    xml                XML
 );
 
-create table orbeon_form_definition_attach (
-    created            datetime,
-    last_modified_time datetime,
-    last_modified_by   nvarchar(255),
-    app                nvarchar(255),
-    form               nvarchar(255),
-    form_version       int not null,
-    deleted            char(1) not null,
-    file_name          nvarchar(255),
-    file_content       varbinary(max)
+CREATE TABLE orbeon_form_definition_attach (
+    created            DATETIME,
+    last_modified_time DATETIME,
+    last_modified_by   NVARCHAR(255),
+    app                NVARCHAR(255),
+    form               NVARCHAR(255),
+    form_version       INT NOT NULL,
+    deleted            CHAR(1) NOT NULL,
+    file_name          NVARCHAR(255),
+    file_content       VARBINARY(max)
 );
 
-create table orbeon_form_data (
+CREATE TABLE orbeon_form_data (
     id                 int identity(1, 1),
-    created            datetime,
-    last_modified_time datetime,
-    last_modified_by   nvarchar(255),
-    username           nvarchar(255),
-    groupname          nvarchar(255),
-    app                nvarchar(255),
-    form               nvarchar(255),
-    form_version       int not null,
-    document_id        nvarchar(255),
-    draft              char(1) not null,
-    deleted            char(1) not null,
-    xml                xml
+    created            DATETIME,
+    last_modified_time DATETIME,
+    last_modified_by   NVARCHAR(255),
+    username           NVARCHAR(255),
+    groupname          NVARCHAR(255),
+    app                NVARCHAR(255),
+    form               NVARCHAR(255),
+    form_version       INT NOT NULL,
+    document_id        NVARCHAR(255),
+    draft              CHAR(1) NOT NULL,
+    deleted            CHAR(1) NOT NULL,
+    xml                XML
 );
 
-create table orbeon_form_data_attach (
-    created            datetime,
-    last_modified_time datetime,
-    last_modified_by   nvarchar(255),
-    username           nvarchar(255),
-    groupname          nvarchar(255),
-    app                nvarchar(255),
-    form               nvarchar(255),
-    form_version       int not null,
-    document_id        nvarchar(255),
-    draft              char(1) not null,
-    deleted            char(1) not null,
-    file_name          nvarchar(255),
-    file_content       varbinary(max)
+CREATE TABLE orbeon_form_data_attach (
+    created            DATETIME,
+    last_modified_time DATETIME,
+    last_modified_by   NVARCHAR(255),
+    username           NVARCHAR(255),
+    groupname          NVARCHAR(255),
+    app                NVARCHAR(255),
+    form               NVARCHAR(255),
+    form_version       INT NOT NULL,
+    document_id        NVARCHAR(255),
+    draft              CHAR(1) NOT NULL,
+    deleted            CHAR(1) NOT NULL,
+    file_name          NVARCHAR(255),
+    file_content       VARBINARY(max)
 );
 
 CREATE FULLTEXT CATALOG orbeon_fulltext_catalog AS DEFAULT;

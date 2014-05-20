@@ -96,8 +96,12 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
                 val straight4_4  = sqlToTableInfo(MySQL, SQL.read("mysql-4_4.sql"))
                 val upgradeTo4_5 = sqlToTableInfo(MySQL, SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
                 val straight4_5  = sqlToTableInfo(MySQL, SQL.read("mysql-4_5.sql"))
+                val upgradeTo4_6 = sqlToTableInfo(MySQL, SQL.read("mysql-4_5.sql") ++ SQL.read("mysql-4_5-to-4_6.sql"))
+                val straight4_6  = sqlToTableInfo(MySQL, SQL.read("mysql-4_6.sql"))
+
                 assert(upgradeTo4_4 === straight4_4)
                 assert(upgradeTo4_5 === straight4_5)
+                assert(upgradeTo4_6 === straight4_6)
             case SQLServer ⇒
                 // No assertions for now (we don't have upgrades yet), but at least test that DDL runs
                 sqlToTableInfo(SQLServer, SQL.read("sqlserver-4_6.sql"))

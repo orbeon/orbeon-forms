@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.rest
 
 import org.junit.Test
+import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.relational.ForDocument
 import org.orbeon.oxf.fr.relational.Specific
 import org.orbeon.oxf.fr.relational.{Next, Unspecified}
@@ -22,13 +23,11 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
-import scala.Some
 import scala.util.Random
 import scala.xml.Elem
-import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.relational.Specific
-import scala.Some
-import org.orbeon.oxf.fr.relational.ForDocument
+import org.dom4j.Document
+import java.io.ByteArrayInputStream
+import org.orbeon.oxf.xml.Dom4j
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -41,23 +40,25 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     val AllOperations = Set("create", "read", "update", "delete")
 
-    private def withOrbeonTables[T](block: (java.sql.Connection, String) ⇒ T) {
+    private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"
+    private def metadataURL(provider: Provider) = s"form/${provider.name}/my-form"
+
+    private def withOrbeonTables[T](block: (java.sql.Connection, Provider) ⇒ T) {
         Provider.all foreach { provider ⇒
-            val crudPrefix = s"crud/${provider.name}/my-form/"
             Connect.asTomcat(provider) { connection ⇒
                 val statement = connection.createStatement
                 try {
                     // Create tables
                     val sql = provider match {
-                        case Oracle    ⇒ "oracle_4_5.sql"
-                        case MySQL     ⇒ "mysql-4_5.sql"
+                        case Oracle    ⇒ "oracle_4_6.sql"
+                        case MySQL     ⇒ "mysql-4_6.sql"
                         case SQLServer ⇒ "sqlserver-4_6.sql"
-                        case DB2       ⇒ "db2-4_4.sql"
+                        case DB2       ⇒ "db2-4_6.sql"
                     }
                     val createDDL = SQL.read(sql)
                     createDDL foreach statement.executeUpdate
                     // Run the interesting code
-                    block(connection, crudPrefix)
+                    block(connection, provider)
                 } finally {
                     // Clean-up database dropping tables
                     (Connect.getTableNames(provider, connection)
@@ -75,8 +76,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Test new form versioning introduced in 4.5, for form definitions.
      */
     @Test def formDefinitionVersionTest(): Unit = {
-        withOrbeonTables { (connection, crudPrefix) =>
-            val FormURL = crudPrefix ++ "form/form.xhtml"
+        withOrbeonTables { (connection, provider) ⇒
+
+            val FormURL = crudURLPrefix(provider) + "form/form.xhtml"
 
             // First time we put with "latest" (AKA unspecified)
             val first = HttpRequest.XML(<gaga1/>)
@@ -128,8 +130,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Test new form versioning introduced in 4.5, for form data
      */
     @Test def formDataVersionTest(): Unit = {
-        withOrbeonTables { (connection, crudPrefix) =>
-            val FirstDataURL = crudPrefix ++ "data/123/data.xml"
+        withOrbeonTables { (connection, provider) ⇒
+            val FirstDataURL = crudURLPrefix(provider) + "data/123/data.xml"
 
             // Storing for specific form version
             val first = <gaga1/>
@@ -160,10 +162,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Get form definition corresponding to a document
      */
     @Test def formForDataTest(): Unit = {
-        withOrbeonTables { (connection, crudPrefix) =>
-            val FormURL       = crudPrefix ++ "form/form.xhtml"
-            val FirstDataURL  = crudPrefix ++ "data/123/data.xml"
-            val SecondDataURL = crudPrefix ++ "data/456/data.xml"
+        withOrbeonTables { (connection, provider) ⇒
+            val FormURL       = crudURLPrefix(provider) + "form/form.xhtml"
+            val FirstDataURL  = crudURLPrefix(provider) + "data/123/data.xml"
+            val SecondDataURL = crudURLPrefix(provider) + "data/456/data.xml"
             val first         = <gaga1/>
             val second        = <gaga2/>
             val data          = <gaga/>
@@ -178,35 +180,36 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
         }
     }
 
+    import Permissions._
+
+    private def formDefinitionWithPermissions(permissions: Permissions): Elem =
+        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+            <xh:head>
+                <xf:model id="fr-form-model">
+                    <xf:instance id="fr-form-metadata">
+                        <metadata>
+                            { serialize(permissions).getOrElse("") }
+                        </metadata>
+                    </xf:instance>
+                </xf:model>
+            </xh:head>
+        </xh:html>
+
     /**
      * Data permissions
      */
     @Test def permissionsTest(): Unit = {
 
-        withOrbeonTables { (connection, crudPrefix) =>
-            import Permissions._
+        withOrbeonTables { (connection, provider) ⇒
 
-            def formDefinitionWithPermissions(permissions: Permissions): Elem =
-                <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
-                    <xh:head>
-                        <xf:model id="fr-form-model">
-                            <xf:instance id="fr-form-metadata">
-                                <metadata>
-                                    { serialize(permissions).getOrElse("") }
-                                </metadata>
-                            </xf:instance>
-                        </xf:model>
-                    </xh:head>
-                </xh:html>
-
-            val FormURL = crudPrefix ++ "form/form.xhtml"
+            val FormURL = crudURLPrefix(provider) + "form/form.xhtml"
             val data    = <data/>
             val clerk   = Some(HttpRequest.Credentials("tom", Set("clerk"  ), "clerk"))
             val manager = Some(HttpRequest.Credentials("jim", Set("manager"), "manager"))
             val admin   = Some(HttpRequest.Credentials("tim", Set("admin"  ), "admin"))
 
             {
-                val DataURL = crudPrefix ++ "data/123/data.xml"
+                val DataURL = crudURLPrefix(provider) + "data/123/data.xml"
 
                 // Anonymous: no permission defined
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(None)), 201)
@@ -222,7 +225,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
             }
             {
-                val DataURL = crudPrefix ++ "data/456/data.xml"
+                val DataURL = crudURLPrefix(provider) + "data/456/data.xml"
 
                 // More complex permissions based on roles
                 HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(
@@ -262,10 +265,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     // Try uploading files of 1 KB, 1 MB, and 10 MB
     @Test def attachmentsTest(): Unit = {
-        withOrbeonTables { (connection, crudPrefix) =>
+        withOrbeonTables { (connection, provider) ⇒
             for ((size, position) ← Seq(1024, 1024*1024, 10*1024*1024).zipWithIndex) {
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
-                val url = crudPrefix ++ "data/123/file" ++ position.toString
+                val url = crudURLPrefix(provider) + "data/123/file" + position.toString
                 HttpAssert.put(url, Specific(1), bytes, 201)
                 HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, Some(1)))
             }
@@ -274,14 +277,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     // Try uploading files of 1 KB, 1 MB, and 5 MB
     @Test def largeXMLDocumentsTest(): Unit = {
-        withOrbeonTables { (connection, crudPrefix) =>
+        withOrbeonTables { (connection, provider) ⇒
             for ((size, position) ← Seq(1024, 1024*1024, 5*1024*1024).zipWithIndex) {
                 val string = new Array[Char](size)
                 for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
                 val text = Dom4jUtils.createText(new String(string))
                 val element = Dom4jUtils.createElement("gaga") |!> (_.add(text))
                 val document = Dom4jUtils.createDocument |!> (_.add(element)) |> HttpRequest.XML
-                val url = crudPrefix ++ s"data/$position/data.xml"
+                val url = crudURLPrefix(provider) + s"data/$position/data.xml"
                 HttpAssert.put(url, Specific(1), document, 201)
                 HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, Some(1)))
             }
@@ -289,17 +292,55 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     }
 
     @Test def draftsTest(): Unit = {
-        withOrbeonTables { (connection, crudPrefix) =>
+        withOrbeonTables { (connection, provider) ⇒
 
             // Draft and non-draft are different
             val first  = HttpRequest.XML(<gaga1/>)
             val second = HttpRequest.XML(<gaga2/>)
-            val DataURL  = crudPrefix ++ "data/123/data.xml"
-            val DraftURL = crudPrefix ++ "draft/123/data.xml"
+            val DataURL  = crudURLPrefix(provider) + "data/123/data.xml"
+            val DraftURL = crudURLPrefix(provider) + "draft/123/data.xml"
             HttpAssert.put(DataURL,  Specific(1), first, 201)
             HttpAssert.put(DraftURL, Unspecified, second, 201)
             HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, Some(1)))
             HttpAssert.get(DraftURL, Unspecified, HttpAssert.ExpectedBody(second, AllOperations, Some(1)))
         }
     }
+
+    @Test def extractMetadata(): Unit =
+        withOrbeonTables { (connection, provider) ⇒
+
+            val FormURL     = crudURLPrefix(provider) + "form/form.xhtml"
+            val MetadataURL = metadataURL(provider)
+
+            HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
+
+            val expectedBody: Document =
+                <forms>
+                    <form>
+                        <permissions>
+                            <permission operations="read create"/>
+                        </permissions>
+                    </form>
+                </forms>
+
+            val (resultCode, _, resultBodyTry) = HttpRequest.get(MetadataURL, Unspecified, None)
+
+            assert(resultCode === 200)
+
+            def filterResultBody(bytes: Array[Byte]) = {
+
+                val doc = Dom4jUtils.readDom4j(new ByteArrayInputStream(bytes))
+
+                for {
+                    formElem             ← Dom4j.elements(doc.getRootElement, "form")
+                    lastModifiedTimeElem ← Dom4j.elements(formElem, "last-modified-time")
+                } locally {
+                    lastModifiedTimeElem.detach()
+                }
+
+                doc
+            }
+
+            assertXMLDocuments(filterResultBody(resultBodyTry.get), expectedBody)
+        }
 }

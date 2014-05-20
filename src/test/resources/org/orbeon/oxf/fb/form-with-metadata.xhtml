@@ -1,0 +1,115 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>ACME Order Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <section-1>
+                        <control-1/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>acme</application-name>
+                    <form-name>order</form-name>
+                    <title xml:lang="en">ACME Order Form</title>
+                    <description xml:lang="en">This is a form to order new stuff from ACME, Inc.</description>
+                    <title xml:lang="fr">Formulaire de commande ACME</title>
+                    <description xml:lang="fr">Ceci est un formulaire de commande pour ACME, Inc.</description>
+                    <permissions>
+                        <permission operations="read update delete">
+                            <group-member/>
+                        </permission>
+                        <permission operations="read update delete">
+                            <owner/>
+                        </permission>
+                        <permission operations="create"/>
+                    </permissions>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <!-- Don't make readonly by default in case a service modifies the resources -->
+            <xf:instance id="fr-form-resources" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1>
+                            <label>Untitled Section</label>
+                        </section-1>
+                        <control-1>
+                            <label/>
+                            <hint/>
+                            <alert/>
+                        </control-1>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <section-1>
+                            <label>Untitled Section</label>
+                        </section-1>
+                        <control-1>
+                            <label/>
+                            <hint/>
+                            <alert/>
+                        </control-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <fr:section id="section-1-control" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-1-control" bind="control-1-bind">
+                                    <xf:label ref="$form-resources/control-1/label"/>
+                                    <xf:hint ref="$form-resources/control-1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -72,31 +72,31 @@
                         <xsl:copy-of select="/request/sql:datasource"/>
                         <sql:execute>
                             <sql:query>
-                                select  d.xml<xsl:if test="/request/provider = 'oracle'">.getClobVal()</xsl:if> xml, d.last_modified_time last_modified_time
-                                from    orbeon_form_definition d,
+                                SELECT  d.form_metadata form_metadata, d.last_modified_time last_modified_time
+                                FROM    orbeon_form_definition d,
                                         (
-                                            select      app, form, max(last_modified_time) last_modified_time
-                                            from        orbeon_form_definition
+                                            SELECT      app, form, MAX(last_modified_time) last_modified_time
+                                            FROM        orbeon_form_definition
                                             <xsl:if test="/request/app != ''">
-                                                where
+                                                WHERE
                                                     <xsl:if test="/request/app != ''">
                                                         app = <sql:param type="xs:string" select="/request/app"/>
                                                     </xsl:if>
                                                     <xsl:if test="/request/form != ''">
-                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                        AND form = <sql:param type="xs:string" select="/request/form"/>
                                                     </xsl:if>
                                             </xsl:if>
-                                            group by    app, form
+                                            GROUP BY     app, form
                                         ) m
-                                where   d.app = m.app
-                                        and d.form = m.form
-                                        and d.last_modified_time = m.last_modified_time
-                                        and d.deleted = 'N'
+                                WHERE   d.app = m.app
+                                        AND d.form = m.form
+                                        AND d.last_modified_time = m.last_modified_time
+                                        AND d.deleted = 'N'
                             </sql:query>
                             <sql:result-set>
                                 <sql:row-iterator>
                                     <row>
-                                        <sql:get-column-value column="xml" type="odt:xmlFragment"/>
+                                        <sql:get-column-value column="form_metadata" type="odt:xmlFragment"/>
                                         <last-modified-time><sql:get-column-value column="last_modified_time" type="xs:dateTime"/></last-modified-time>
                                     </row>
                                 </sql:row-iterator>
@@ -117,7 +117,7 @@
                     <forms>
                         <xsl:for-each select="/sql-out/row">
                             <form>
-                                <xsl:copy-of select="xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*" copy-namespaces="no"/>
+                                <xsl:copy-of select="metadata/*" copy-namespaces="no"/>
                                 <xsl:copy-of select="last-modified-time" copy-namespaces="no"/>
                             </form>
                         </xsl:for-each>

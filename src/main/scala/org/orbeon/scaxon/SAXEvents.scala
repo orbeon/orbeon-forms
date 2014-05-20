@@ -13,10 +13,10 @@
  */
 package org.orbeon.scaxon
 
-import org.xml.sax.{Attributes, Locator}
-import javax.xml.namespace.QName
-import org.orbeon.oxf.xml.XMLUtils
 import collection.mutable.ListBuffer
+import javax.xml.namespace.QName
+import org.orbeon.oxf.xml.{XMLReceiverAdapter, XMLUtils}
+import org.xml.sax.{Attributes, Locator}
 
 // Representation of all SAX events that are useful
 // We skip: ignorableWhitespace, skippedEntity, startDTD/endDTD, startEntity/endEntity, and startCDATA/endCDATA.
@@ -87,4 +87,27 @@ object SAXEvents {
             result.toList
         }
     }
+}
+
+class DocumentAndElementsCollector extends XMLReceiverAdapter {
+
+    import org.orbeon.scaxon.SAXEvents._
+
+    private var _events: List[SAXEvent] = Nil
+    def events = _events.reverse
+
+    override def startDocument(): Unit = _events ::= StartDocument
+    override def endDocument(): Unit   = _events ::= EndDocument
+
+    override def startPrefixMapping(prefix: String, uri: String): Unit =
+        _events ::= StartPrefixMapping(prefix, uri)
+
+    override def endPrefixMapping(prefix: String): Unit =
+        _events ::= EndPrefixMapping(prefix)
+
+    override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit =
+        _events ::= StartElement(namespaceURI, localName, qName, atts)
+
+    override def endElement(namespaceURI: String, localName: String, qName: String): Unit =
+        _events ::= EndElement(namespaceURI, localName, qName)
 }

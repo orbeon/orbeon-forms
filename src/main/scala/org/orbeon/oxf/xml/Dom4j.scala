@@ -104,8 +104,9 @@ object Dom4j {
     // Return an element's directly nested elements
     def elements(e: Element): Seq[Element] = Dom4jUtils.elements(e).asScala
 
-    // Return an element's directly nested elements with the given QName
+    // Return an element's directly nested elements with the given name
     def elements(e: Element, qName: QName): Seq[Element] = Dom4jUtils.elements(e, qName).asScala
+    def elements(e: Element, name: String): Seq[Element] = Dom4jUtils.elements(e, name).asScala
 
     // Return the element's content as a mutable buffer
     def content(e: Element): Buffer[Node] = e.content.asInstanceOf[JList[Node]].asScala

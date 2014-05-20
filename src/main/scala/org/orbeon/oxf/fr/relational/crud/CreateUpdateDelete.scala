@@ -13,23 +13,47 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import java.io.{InputStream, ByteArrayOutputStream}
+import java.io.{Writer, InputStream, ByteArrayOutputStream}
 import java.sql
 import java.sql.{Types, Timestamp, Connection}
 import javax.xml.transform.OutputKeys
-import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{XPath, StringBuilderWriter, NetUtils}
-import org.orbeon.oxf.webapp.HttpStatusCodeException
-import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
+import org.orbeon.oxf.util.{Whitespace, XPath, StringBuilderWriter, NetUtils}
+import org.orbeon.oxf.xml._
 import org.xml.sax.InputSource
 import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
+import org.orbeon.oxf.fr.FormRunner.{XH, XF}
+import org.orbeon.oxf.fr.relational.Specific
+import org.orbeon.oxf.fr.relational.ForDocument
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.xml.JXQName
 
-private object RequestReader {
+object RequestReader {
+    
+    object IdAtt {
+        val IdQName = JXQName("id")
+        def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) ⇒ value }
+    }
+    
+    // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, JQName.unapply is
+    // called 17 times and IdAtt.unapply 2 times until the match is found, which is what is expected.
+    def isMetadataElement(stack: List[StartElement]): Boolean =
+        stack match {
+            case
+                StartElement(JXQName("", "metadata"), _)                         ::
+                StartElement(JXQName(XF, "instance"), IdAtt("fr-form-metadata")) ::
+                StartElement(JXQName(XF, "model"),    IdAtt("fr-form-model"))    ::
+                StartElement(JXQName(XH, "head"), _)                             ::
+                StartElement(JXQName(XH, "html"), _)                             ::
+                Nil ⇒ true
+            case _  ⇒ false
+        }
 
     def requestInputStream(): InputStream = {
         RequestGenerator.getRequestBody(PipelineContext.get) match {
@@ -44,13 +68,53 @@ private object RequestReader {
         os.toByteArray
     }
 
-    def xmlString(): String = {
-        val transformer = TransformerUtils.getXMLIdentityTransformer
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-        val writer = new StringBuilderWriter()
-        val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream()))
-        transformer.transform(source, new StreamResult(writer))
-        writer.toString
+    def dataAndMetadataAsString(metadata: Boolean): (String, Option[String]) =
+        dataAndMetadataAsString(requestInputStream(), metadata)
+
+    def dataAndMetadataAsString(inputStream: InputStream, metadata: Boolean): (String, Option[String]) = {
+        
+        def newTransformer = (
+            TransformerUtils.getXMLIdentityTransformer
+            |!> (_.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
+        )
+
+        def newIdentityReceiver(writer: Writer) = (
+            TransformerUtils.getIdentityTransformerHandler
+            |!> (_.getTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
+            |!> (_.setResult(new StreamResult(writer)))
+        )
+
+        val metadataWriterAndReceiver = metadata option {
+
+            val metadataWriter = new StringBuilderWriter()
+
+            // MAYBE: strip enclosing namespaces; remove description; truncate long titles
+            val metadataFilter =
+                new FilterReceiver(
+                    new WhitespaceXMLReceiver(
+                        newIdentityReceiver(metadataWriter),
+                        Whitespace.Normalize,
+                        (_, _, _, _) ⇒ Whitespace.Normalize
+                    ),
+                    isMetadataElement
+                )
+
+            (metadataWriter, metadataFilter)
+        }
+
+        val source     = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(inputStream))
+        val dataWriter = new StringBuilderWriter()
+
+        val resultReceiver = metadataWriterAndReceiver match {
+            case Some((_, metadataFilter)) ⇒
+                new TeeXMLReceiver(newIdentityReceiver(dataWriter), metadataFilter)
+            case None ⇒
+                newIdentityReceiver(dataWriter)
+        }
+
+        newTransformer.transform(source, new SAXResult(resultReceiver))
+
+        (dataWriter.toString, metadataWriterAndReceiver map (_._1.toString))
     }
 
     def xmlDocument(): DocumentInfo =
@@ -116,28 +180,31 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         // Do insert
         locally {
             val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
+
             val ps = connection.prepareStatement(
                 s"""|INSERT INTO $table
                     |   (
-                    |                                      created, last_modified_time, last_modified_by
-                    |                                    , app, form, form_version
-                    |       ${if (req.forData)          ", document_id"             else ""}
-                    |                                    , deleted
-                    |       ${if (req.forData)          ", draft"                   else ""}
-                    |       ${if (req.forAttachment)    ", file_name, file_content" else ""}
-                    |       ${if (! req.forAttachment) s", $xmlCol"                 else ""}
-                    |       ${if (req.forData)          ", username, groupname"     else ""}
+                    |                                                       created, last_modified_time, last_modified_by
+                    |                                                     , app, form, form_version
+                    |       ${if (req.forData)                           ", document_id"             else ""}
+                    |                                                     , deleted
+                    |       ${if (req.forData)                           ", draft"                   else ""}
+                    |       ${if (req.forAttachment)                     ", file_name, file_content" else ""}
+                    |       ${if (! req.forAttachment)                  s", $xmlCol"                 else ""}
+                    |       ${if (! req.forAttachment && ! req.forData)  ", form_metadata"           else ""}
+                    |       ${if (req.forData)                           ", username, groupname"     else ""}
                     |   )
                     |VALUES
                     |   (
-                    |                                  ?, ?, ?
-                    |                                  , ?, ?, ?
-                    |       ${if (req.forData)         ", ?"    else ""}
-                    |                                  , ${if (delete) "'Y'" else "'N'"}
-                    |       ${if (req.forData)         ", ?"    else ""}
-                    |       ${if (req.forAttachment)   ", ?, ?" else ""}
-                    |       ${if (! req.forAttachment) ", ?" else ""}
-                    |       ${if (req.forData)         ", ?, ?" else ""}
+                    |                                                   ?, ?, ?
+                    |                                                   , ?, ?, ?
+                    |       ${if (req.forData)                          ", ?"                 else ""}
+                    |                                                   , ${if (delete) "'Y'" else "'N'"}
+                    |       ${if (req.forData)                          ", ?"                 else ""}
+                    |       ${if (req.forAttachment)                    ", ?, ?"              else ""}
+                    |       ${if (! req.forAttachment)                  ", ?"                 else ""}
+                    |       ${if (! req.forAttachment && ! req.forData) ", ?"                 else ""}
+                    |       ${if (req.forData)                          ", ?, ?"              else ""}
                     |   )
                     |""".stripMargin)
 
@@ -155,9 +222,18 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
             if (delete) {
                                          ps.setNull(position.next(), if (req.forAttachment) Types.BLOB else Types.CLOB)
+
+                if (! req.forAttachment && ! req.forData)
+                                         ps.setNull(position.next(), Types.VARCHAR)
             } else {
-                if (req.forAttachment)   ps.setBytes (position.next(), RequestReader.bytes())
-                if (! req.forAttachment) ps.setString(position.next(), RequestReader.xmlString())
+                if (req.forAttachment) {
+                                         ps.setBytes(position.next(), RequestReader.bytes())
+                } else {
+                    val (form, metadataOpt) = RequestReader.dataAndMetadataAsString(metadata = ! req.forData)
+
+                                         ps.setString(position.next(), form)
+                    metadataOpt foreach (ps.setString(position.next(), _))
+                }
             }
             if (req.forData) {
                                          ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))

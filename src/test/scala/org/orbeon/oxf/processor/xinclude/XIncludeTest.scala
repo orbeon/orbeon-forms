@@ -13,30 +13,28 @@
  */
 package org.orbeon.oxf.processor.xinclude
 
-import javax.xml.namespace.QName
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.XMLUtils.ParserConfiguration.XINCLUDE_ONLY
-import org.orbeon.oxf.xml.{XMLReceiverAdapter, XMLUtils}
+import org.orbeon.oxf.xml.{JXQName, XMLUtils}
 import org.orbeon.scaxon.SAXEvents._
 import org.scalatest.junit.AssertionsForJUnit
-import org.xml.sax.Attributes
+import JXQName._
+import org.orbeon.scaxon.DocumentAndElementsCollector
 
 class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
-
-    implicit def tupleToQName(tuple: (String, String)) = new QName(tuple._1, tuple._2, "")
     
-    val XML    = "http://www.w3.org/XML/1998/namespace"
-    val XI     = "http://www.w3.org/2001/XInclude"
-    val HTML   = "http://www.w3.org/1999/xhtml"
-    val XForms = "http://www.w3.org/2002/xforms"
-    val SVG    = "http://www.w3.org/2000/svg"
+    val XML     = "http://www.w3.org/XML/1998/namespace"
+    val XI      = "http://www.w3.org/2001/XInclude"
+    val HTML    = "http://www.w3.org/1999/xhtml"
+    val XForms  = "http://www.w3.org/2002/xforms"
+    val SVG     = "http://www.w3.org/2000/svg"
 
-    val XMLBase: QName = XML → "base"
+    val XMLBase = JXQName(XML → "base")
 
-    @Test def basicInclude() {
+    @Test def basicInclude(): Unit = {
 
-        val collector = new Collector
+        val collector = new DocumentAndElementsCollector
         
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include11.xml", collector, XINCLUDE_ONLY, true)
         
@@ -45,12 +43,12 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
                 StartPrefixMapping("", HTML),
                 StartPrefixMapping("xf", XForms),
                 StartPrefixMapping("xi", XI),
-                    StartElement(HTML → "html", Atts(Seq())),
+                    StartElement(HTML → "html", Atts(Nil)),
                         StartPrefixMapping("xf", ""),
                         StartPrefixMapping("xi", ""),
                         StartPrefixMapping("svg", SVG),
                             StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include12.xml")))),
-                                StartElement(HTML → "div", Atts(Seq())),
+                                StartElement(HTML → "div", Atts(Nil)),
                                 EndElement(HTML → "div"),
                             EndElement(HTML → "body"),
                         EndPrefixMapping("xf"),
@@ -66,9 +64,9 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert(expected === collector.events)
     }
 
-    @Test def includeAtRoot() {
+    @Test def includeAtRoot(): Unit = {
 
-        val collector = new Collector
+        val collector = new DocumentAndElementsCollector
 
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include21.xml", collector, XINCLUDE_ONLY, true)
         
@@ -77,11 +75,11 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
                 StartPrefixMapping("", HTML),
                 StartPrefixMapping("xf", XForms),
                 StartPrefixMapping("xi", XI),
-                    StartElement(HTML → "html", Atts(Seq())),
+                    StartElement(HTML → "html", Atts(Nil)),
                         StartPrefixMapping("xf", ""),
                         StartPrefixMapping("xi", ""),
                             StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include23.xml")))),
-                                StartElement(HTML → "div", Atts(Seq())),
+                                StartElement(HTML → "div", Atts(Nil)),
                                 EndElement(HTML → "div"),
                             EndElement(HTML → "body"),
                         EndPrefixMapping("xf"),
@@ -96,9 +94,9 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert(expected === collector.events)
     }
 
-    @Test def noDuplicateNSEvents() {
+    @Test def noDuplicateNSEvents(): Unit = {
 
-        val collector = new Collector
+        val collector = new DocumentAndElementsCollector
 
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include31.xml", collector, XINCLUDE_ONLY, true)
 
@@ -106,7 +104,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
             StartDocument,
                 StartPrefixMapping("", HTML),
                 StartPrefixMapping("xf", XForms),
-                    StartElement(HTML → "html", Atts(Seq())),
+                    StartElement(HTML → "html", Atts(Nil)),
                         StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include32.xml")))),
                         EndElement(HTML → "body"),
                     EndElement(HTML → "html"),
@@ -118,9 +116,9 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert(expected === collector.events)
     }
 
-    @Test def siblingIncludes() {
+    @Test def siblingIncludes(): Unit = {
 
-        val collector = new Collector
+        val collector = new DocumentAndElementsCollector
 
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include41.xml", collector, XINCLUDE_ONLY, true)
 
@@ -128,7 +126,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
             StartDocument,
                 StartPrefixMapping("", HTML),
                 StartPrefixMapping("xf", XForms),
-                    StartElement(HTML → "html", Atts(Seq())),
+                    StartElement(HTML → "html", Atts(Nil)),
                         StartPrefixMapping("", ""),
                         StartPrefixMapping("xf", ""),
                         StartPrefixMapping("xh", HTML),
@@ -148,27 +146,5 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
         )
 
         assert(expected === collector.events)
-    }
-
-    // Collect the SAX events we are interested in
-    class Collector extends XMLReceiverAdapter {
-
-        private var _events: List[SAXEvent] = Nil
-        def events = _events.reverse
-
-        override def startDocument(): Unit = _events ::= StartDocument
-        override def endDocument(): Unit   = _events ::= EndDocument
-
-        override def startPrefixMapping(prefix: String, uri: String): Unit =
-            _events ::= StartPrefixMapping(prefix, uri)
-
-        override def endPrefixMapping(prefix: String): Unit =
-            _events ::= EndPrefixMapping(prefix)
-
-        override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit =
-            _events ::= StartElement(namespaceURI, localName, qName, atts)
-
-        override def endElement(namespaceURI: String, localName: String, qName: String): Unit =
-            _events ::= EndElement(namespaceURI, localName, qName)
     }
 }

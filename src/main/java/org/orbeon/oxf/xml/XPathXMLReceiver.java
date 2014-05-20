@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * This implementation requires that all searched XPath expressions be set beforehand.
  *
- * The class can be used as a regular ContentHandler, or can use a callback to start reading the
+ * The class can be used as a regular XMLReceiver, or can use a callback to start reading the
  * input SAX stream.
  *
  * Right now, only the first result asked will be streamed. All other results will be stored in SAX

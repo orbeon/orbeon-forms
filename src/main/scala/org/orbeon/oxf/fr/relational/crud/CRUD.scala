@@ -30,9 +30,9 @@ class CRUD
         try {
             val req = request
 
-            val PEProviders = Seq("oracle", "db2", "sqlserver")
-            if (PEProviders.contains(req.provider))
-                Version.instance.requirePEFeature("Enterprise relational database")
+//            val PEProviders = Seq("oracle", "db2", "sqlserver")
+//            if (PEProviders.contains(req.provider))
+//                Version.instance.requirePEFeature("Enterprise relational database")
 
             httpRequest.getMethod match {
                 case "GET"    ⇒ get(req)

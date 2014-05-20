@@ -33,6 +33,15 @@
                         username="orbeon_tomcat"
                         password="orbeon_tomcat"
                         url="jdbc:mysql://localhost:3306/orbeon_tomcat?useUnicode=true&amp;characterEncoding=UTF8"/>
+                    <Resource name="jdbc/sqlserver_tomcat" auth="Container" type="javax.sql.DataSource"
+                          initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"
+                          driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+                          validationQuery="select 1"
+                          testOnBorrow="true"
+                          poolPreparedStatements="true"
+                          username="orbeon"
+                          password="@RDS_PASSWORD@"
+                          url="@SQLSERVER_URL@;databaseName=orbeon_tomcat"/>
                 </Context>
             </Host>
         </Engine>

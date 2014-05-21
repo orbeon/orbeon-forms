@@ -41,11 +41,10 @@ private[persistence] object Connect {
     }
 
     def getTableNames(provider: Provider, connection: Connection): List[String] = {
-        val query = provider match {
-            case MySQL     ⇒ "SHOW TABLES" // TODO: using information_schema as done below should work for MySQL as well
-            case SQLServer ⇒ "SELECT table_name FROM information_schema.tables"
-            case _         ⇒ ???
-        }
+        val query = """SELECT table_name
+                      |  FROM information_schema.tables
+                      | WHERE table_name LIKE 'orbeon%'
+                      | """.stripMargin
         val tableNameResultSet = connection.createStatement.executeQuery(query)
         val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
         tableNamesList ensuring (_.length > 0)

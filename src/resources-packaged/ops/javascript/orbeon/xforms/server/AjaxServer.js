@@ -296,11 +296,12 @@
                     var formID = ORBEON.xforms.Globals.requestForm.id;
 
                     // Remove from this list of ids that changed the id of controls for
-                    // which we have received the keyup corresponding to the keydown
-                    for (var id  in ORBEON.xforms.Globals.changedIdsRequest) {
-                        if (ORBEON.xforms.Globals.changedIdsRequest[id] == 0)
-                            ORBEON.xforms.Globals.changedIdsRequest[id] = null;
-                    }
+                    // which we have received the keyup corresponding to the keydown.
+                    // From ECMAScript 5.1: "Properties of the object being enumerated may be deleted during enumeration."
+                    _.each(ORBEON.xforms.Globals.changedIdsRequest, function(value, key) {
+                        if (value == 0)
+                            $(ORBEON.xforms.Globals.changedIdsRequest).removeProp(key);
+                    });
 
                     ORBEON.xforms.Globals.requestIgnoreErrors = true;
                     var sendInitialDynamicState = false;

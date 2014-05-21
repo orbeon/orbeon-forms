@@ -1595,7 +1595,7 @@ ORBEON.xforms.Controls = {
                     ORBEON.util.Dom.setStringValue(output, newControlValue);
                 }
             }
-        } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
+        } else if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {
             // User has modified the value of this control since we sent our request:
             // so don't try to update it
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
@@ -1665,7 +1665,6 @@ ORBEON.xforms.Controls = {
             var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
             if (control.value != newControlValue) {
                 control.previousValue = newControlValue;
-                control.valueSetByXForms++;
                 control.value = newControlValue;
             }
             if (input.value != newControlValue)
@@ -2808,9 +2807,9 @@ ORBEON.xforms.Events = {
                 // Dispatch change event to upload control
                 ORBEON.xforms.Page.getControl(target).change();
             } else {
-                // When we move out from a field, we don't receive the keyup events corresponding to keypress
+                // When we move out from a field, we don't receive the keyup events corresponding to keydown
                 // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
-                if (ORBEON.xforms.Globals.changedIdsRequest[target.id] != null)
+                if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[target.id]))
                     ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
 
                 if (YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
@@ -2895,7 +2894,7 @@ ORBEON.xforms.Events = {
             ORBEON.xforms.Events.keydownEvent.fire({control: control, target: target});
             if (ORBEON.xforms.Events._isChangingKey(control, event.keyCode)) {
                 ORBEON.xforms.Globals.changedIdsRequest[control.id] =
-                    ORBEON.xforms.Globals.changedIdsRequest[control.id] == null ? 1
+                    (! _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) ? 1
                             : ORBEON.xforms.Globals.changedIdsRequest[control.id] + 1;
             }
         }
@@ -2932,7 +2931,9 @@ ORBEON.xforms.Events = {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
             // Remember we have received the keyup for this element
-            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
+            // NOTE: `changedIdsRequest` can be undefined in some cases. Test that it is a number before decrementing!
+            // It is unclear why this can be the case, but see https://github.com/orbeon/orbeon-forms/issues/1732.
+            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode) && _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[target.id]))
                 ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
             // Incremental control: treat keypress as a value change event
             if (YAHOO.util.Dom.hasClass(target, "xforms-incremental")) {

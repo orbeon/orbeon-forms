@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.db
 import org.orbeon.oxf.resources.URLFactory
 import java.io.{StringWriter, InputStreamReader}
 import org.orbeon.oxf.util.ScalaUtils._
+import scala.collection.mutable.ArrayBuffer
 
 private[persistence] object SQL {
 
@@ -23,12 +24,29 @@ private[persistence] object SQL {
 
     // Reads a sequence semicolon-separated of statements from a text file
     def read(file: String): Seq[String] = {
-        val url = Base ++ file
-        val inputStream = URLFactory.createURL(url).openStream()
-        val reader = new InputStreamReader(inputStream)
-        val writer = new StringWriter
-        copyReader(reader, writer)
-        val sql = writer.toString.split(";")
-        sql map (_.trim) filter (_.nonEmpty)
+        val fileContentAsString = {
+            val url = Base ++ file
+            val inputStream = URLFactory.createURL(url).openStream()
+            val reader = new InputStreamReader(inputStream)
+            val writer = new StringWriter
+            copyReader(reader, writer)
+            writer.toString
+        }
+
+        // Read line-by-line, consider a statement when line ends with `;` and doesn't start with spaces
+        var allStatements    = ArrayBuffer[String]()
+        var currentStatement = ArrayBuffer[String]()
+        fileContentAsString.split("\n") foreach { line ⇒
+            val isLastLineOfStatement = ! line.startsWith(" ") && line.endsWith(";")
+            // Remove the `;` separator if this is the last line
+            val partToKeep = if (isLastLineOfStatement) line.substring(0, line.length - 1) else line
+            currentStatement += partToKeep
+            if (isLastLineOfStatement) {
+                allStatements += currentStatement.mkString("\n")
+                currentStatement.clear()
+            }
+        }
+        allStatements.toSeq
     }
+
 }

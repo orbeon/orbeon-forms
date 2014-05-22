@@ -28,7 +28,7 @@ create table orbeon_form_data (
     username           varchar2(255),
     groupname          varchar2(255),
     app                varchar2(255) not null,
-    form               varchar2(255),
+    form               varchar2(255) not null,
     form_version       int not null,
     document_id        varchar2(255) not null,
     draft              char(1) not null,

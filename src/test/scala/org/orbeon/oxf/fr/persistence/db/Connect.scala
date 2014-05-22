@@ -24,14 +24,16 @@ private[persistence] object Connect {
 
     private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
         val url = provider match {
+            case Oracle    ⇒ System.getenv("ORACLE_URL")
             case MySQL     ⇒ System.getenv("MYSQL_URL")     + user.getOrElse("")
             case SQLServer ⇒ System.getenv("SQLSERVER_URL") + user.map(";databaseName=" + _).getOrElse("")
-            case Oracle    ⇒ System.getenv("ORACLE_URL")
             case DB2       ⇒ System.getenv("DB2_URL")
         }
         val userName = provider match {
+            case Oracle    ⇒ user.getOrElse("orbeon")
             case MySQL     ⇒ user.getOrElse("root") // TODO: As part of the DB setup, we could create an orbeon user for MySQL, to avoid this distinction here
-            case _         ⇒ "orbeon"
+            case SQLServer ⇒ "orbeon"
+            case DB2       ⇒ ???
         }
         val password = provider match {
             case MySQL     ⇒ user.getOrElse("")
@@ -41,11 +43,17 @@ private[persistence] object Connect {
     }
 
     def getTableNames(provider: Provider, connection: Connection): List[String] = {
-        val query = """SELECT table_name
-                      |  FROM information_schema.tables
-                      | WHERE table_name LIKE 'orbeon%'
-                      | """.stripMargin
-        val tableNameResultSet = connection.createStatement.executeQuery(query)
+        val query = provider match {
+            case Oracle ⇒
+                """SELECT table_name
+                  |  FROM all_tables
+                  | WHERE table_name LIKE 'ORBEON%'"""
+            case _ ⇒
+                """SELECT table_name
+                  |  FROM information_schema.tables
+                  | WHERE table_name LIKE 'orbeon%'"""
+        }
+        val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
         val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
         tableNamesList ensuring (_.length > 0)
     }

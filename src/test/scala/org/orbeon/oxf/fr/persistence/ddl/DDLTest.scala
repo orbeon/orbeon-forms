@@ -27,15 +27,21 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
         val createUserAndDatabase = provider match {
-            case MySQL     ⇒ Seq("create user orbeon_ddl@localhost identified by 'orbeon_ddl'",
-                                  "create database orbeon_ddl",
-                                  "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost")
+            case Oracle    ⇒ Seq("CREATE USER orbeon_ddl IDENTIFIED BY " ++ System.getenv("RDS_PASSWORD"),
+                                  "ALTER USER orbeon_ddl QUOTA UNLIMITED ON users",
+                                  "GRANT CREATE SESSION TO orbeon_ddl",
+                                  "GRANT CREATE TABLE   TO orbeon_ddl",
+                                  "GRANT CREATE TRIGGER TO orbeon_ddl")
+            case MySQL     ⇒ Seq("CREATE USER orbeon_ddl@localhost IDENTIFIED BY 'orbeon_ddl'",
+                                  "CREATE DATABASE orbeon_ddl",
+                                  "GRANT ALL PRIVILEGES ON orbeon_ddl.* TO orbeon_ddl@localhost")
             case SQLServer ⇒ Seq("CREATE DATABASE orbeon_ddl")
             case _         ⇒ ???
         }
         val dropUserAndDatabase = provider match {
-            case MySQL     ⇒ Seq("drop user orbeon_ddl@localhost",
-                                  "drop database orbeon_ddl")
+            case Oracle    ⇒ Seq("DROP USER orbeon_ddl CASCADE")
+            case MySQL     ⇒ Seq("DROP USER orbeon_ddl@localhost",
+                                  "DROP DATABASE orbeon_ddl")
             case SQLServer ⇒ Seq("DROP DATABASE orbeon_ddl")
             case _         ⇒ ???
         }
@@ -59,53 +65,61 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
         withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
             sql foreach statement.executeUpdate
+            val query = provider match {
+                // On Oracle, column order is "non-relevant", so we order by column name instead of position
+                case Oracle ⇒ """  SELECT *
+                                 |    FROM all_tab_cols
+                                 |   WHERE table_name = ?
+                                 |         AND NOT column_name LIKE 'SYS%'
+                                 |ORDER BY column_name"""
+                case _      ⇒ """   SELECT *
+                                 |    FROM information_schema.columns
+                                 |   WHERE table_name = ?
+                                 |ORDER BY ordinal_position"""
+            }
             Connect.getTableNames(provider, connection).map { tableName ⇒
-                provider match {
-                    case MySQL | SQLServer ⇒
-                        val tableInfoResultSet = {
-                            val ps = connection.prepareStatement(
-                                """SELECT   *
-                                  |FROM     information_schema.columns
-                                  |WHERE    table_name = ?
-                                  |ORDER BY ordinal_position
-                                  |""".stripMargin)
-                            ps.setString(1, tableName)
-                            ps.executeQuery()
-                        }
-                        def tableInfo(): ColMeta = {
-                            val colName = tableInfoResultSet.getString("column_name")
-                            val interestingKeys = Set("is_nullable", "data_type")
-                            val colKeyVals = for (metaKey ← interestingKeys) yield
-                                ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
-                            ColMeta(colName, colKeyVals)
-                        }
-                        val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
-                        assert(colsMeta.length > 0)
-                        TableMeta(tableName, colsMeta)
-
-                    case _ ⇒ ???
+                val tableInfoResultSet = {
+                    val ps = connection.prepareStatement(query.stripMargin)
+                    ps.setString(1, tableName)
+                    ps.executeQuery()
                 }
+                def tableInfo(): ColMeta = {
+                    val colName = tableInfoResultSet.getString("column_name")
+                    val interestingKeys = Set(if (provider == Oracle) "nullable" else "is_nullable", "data_type")
+                    val colKeyVals = for (metaKey ← interestingKeys) yield
+                        ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
+                    ColMeta(colName, colKeyVals)
+                }
+                val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
+                assert(colsMeta.length > 0)
+                TableMeta(tableName, colsMeta)
             }.toSet
         }
     }
 
+    private def assertSameTable(provider: Provider, from: String, to: String): Unit = {
+        val name = provider.name
+        val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
+        val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))
+        assert(upgrade === straight, s"$name from $from to $to")
+    }
+
     @Test def createAndUpgradeTest(): Unit = {
         Provider.all.foreach {
+            case Oracle ⇒
+                assertSameTable(Oracle, "4_3", "4_4")
+                assertSameTable(Oracle, "4_4", "4_5")
+                assertSameTable(Oracle, "4_5", "4_6")
             case MySQL ⇒
-                val upgradeTo4_4 = sqlToTableInfo(MySQL, SQL.read("mysql-4_3.sql") ++ SQL.read("mysql-4_3-to-4_4.sql"))
-                val straight4_4  = sqlToTableInfo(MySQL, SQL.read("mysql-4_4.sql"))
-                val upgradeTo4_5 = sqlToTableInfo(MySQL, SQL.read("mysql-4_4.sql") ++ SQL.read("mysql-4_4-to-4_5.sql"))
-                val straight4_5  = sqlToTableInfo(MySQL, SQL.read("mysql-4_5.sql"))
-                val upgradeTo4_6 = sqlToTableInfo(MySQL, SQL.read("mysql-4_5.sql") ++ SQL.read("mysql-4_5-to-4_6.sql"))
-                val straight4_6  = sqlToTableInfo(MySQL, SQL.read("mysql-4_6.sql"))
-
-                assert(upgradeTo4_4 === straight4_4)
-                assert(upgradeTo4_5 === straight4_5)
-                assert(upgradeTo4_6 === straight4_6)
+                assertSameTable(MySQL,  "4_3", "4_4")
+                assertSameTable(MySQL,  "4_4", "4_5")
+                assertSameTable(MySQL,  "4_5", "4_6")
             case SQLServer ⇒
                 // No assertions for now (we don't have upgrades yet), but at least test that DDL runs
                 sqlToTableInfo(SQLServer, SQL.read("sqlserver-4_6.sql"))
-            case _ ⇒ ???
+            case DB2 ⇒
+                assertSameTable(MySQL,  "4_3", "4_4")
+                assertSameTable(MySQL,  "4_4", "4_6")
         }
     }
 }

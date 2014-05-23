@@ -173,6 +173,10 @@
                             <param-name>oxf.xforms.renderer.context</param-name>
                             <param-value>/orbeon</param-value>
                         </init-param>
+                        <init-param>
+                            <param-name>oxf.xforms.renderer.default-encoding</param-name>
+                            <param-value>UTF-8</param-value>
+                        </init-param>
                     </xsl:with-param>
                 </xsl:call-template>
             </filter>

@@ -37,14 +37,19 @@ public class OrbeonXFormsFilter implements Filter {
 
     public static final String RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
     public static final String RESOURCE_PATHS_PARAMETER_NAME = "oxf.xforms.renderer.resources";
-    private static final String DEFAULT_ENCODING = "ISO-8859-1"; // must be this per Servlet spec
+    public static final String DEFAULT_ENCODING_PARAMETER_NAME = "oxf.xforms.renderer.default-encoding";
 
     private ServletContext servletContext;
     private String orbeonContextPath;
+    private String defaultEncoding = "ISO-8859-1"; // per antiquated Servlet spec, for backward compatibility
 
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
         orbeonContextPath = filterConfig.getInitParameter(RENDERER_CONTEXT_PARAMETER_NAME);
+
+        final String encoding = filterConfig.getInitParameter(DEFAULT_ENCODING_PARAMETER_NAME);
+        if (encoding != null)
+            defaultEncoding = encoding;
 
         // TODO: check orbeonContextPath format: starts with /, doesn't end with one, etc.
     }
@@ -80,7 +85,7 @@ public class OrbeonXFormsFilter implements Filter {
         } else {
             // Forward the request to the Orbeon Forms renderer
             final FilterRequestWrapper requestWrapper = new FilterRequestWrapper(httpRequest);
-            final FilterResponseWrapper responseWrapper = new FilterResponseWrapper(httpResponse);
+            final FilterResponseWrapper responseWrapper = new FilterResponseWrapper(httpResponse, defaultEncoding);
 
             // Execute filter
             filterChain.doFilter(requestWrapper, responseWrapper);
@@ -333,8 +338,11 @@ public class OrbeonXFormsFilter implements Filter {
 
     private static class FilterResponseWrapper extends HttpServletResponseWrapper {
 
-        public FilterResponseWrapper(HttpServletResponse response) {
+        private final String defaultEncoding;
+
+        public FilterResponseWrapper(HttpServletResponse response, String defaultEncoding) {
             super(response);
+            this.defaultEncoding = defaultEncoding;
         }
 
         private ByteArrayOutputStream byteArrayOutputStream;
@@ -446,7 +454,7 @@ public class OrbeonXFormsFilter implements Filter {
         @Override
         public String getCharacterEncoding() {
             // TODO: we don't support setLocale()
-            return (encoding == null) ? DEFAULT_ENCODING : encoding;
+            return (encoding == null) ? defaultEncoding : encoding;
         }
 
         public String getMediaType() {

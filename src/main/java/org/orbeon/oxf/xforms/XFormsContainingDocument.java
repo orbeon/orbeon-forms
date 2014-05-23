@@ -370,16 +370,16 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      */
     public XFormsObject getObjectByEffectiveId(String effectiveId) {
 
-        // Search in parent (models and this)
+        // Search in controls
         {
-            final XFormsObject resultObject = super.getObjectByEffectiveId(effectiveId);
+            final XFormsObject resultObject = xformsControls.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
 
-        // Search in controls
+        // Search in parent (models and this)
         {
-            final XFormsObject resultObject = xformsControls.getObjectByEffectiveId(effectiveId);
+            final XFormsObject resultObject = super.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }

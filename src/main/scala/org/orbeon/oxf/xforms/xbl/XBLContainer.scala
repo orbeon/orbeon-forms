@@ -380,7 +380,7 @@ trait ContainerResolver {
         // TODO: should this use sourceControlEffectiveId?
         val bindingId = containingDocument.getStaticOps.getBindingId(prefixedId)
         if (staticOrAbsoluteId == bindingId)
-            return containingDocument.getControls.getObjectByEffectiveId(effectiveId)
+            return containingDocument.getControlByEffectiveId(effectiveId)
 
         // 2. Search in directly contained models
         // NOTE: As of 2011-11, models don't use sourceEffectiveId

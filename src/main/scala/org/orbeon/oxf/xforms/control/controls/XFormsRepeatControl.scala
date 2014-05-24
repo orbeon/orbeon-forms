@@ -163,13 +163,13 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         // Find destination
         val (destinationNodeset, requestedDestinationIndex) = {
             val destinationControl =
-            if (dndEnd.length > 1) {
-                // DnD destination is a different repeat control
-                val containingRepeatEffectiveId = getPrefixedId + REPEAT_SEPARATOR + (dndEnd mkString REPEAT_INDEX_SEPARATOR_STRING)
-                containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId).asInstanceOf[XFormsRepeatControl]
-            } else
-                // DnD destination is the current repeat control
-                this
+                if (dndEnd.length > 1) {
+                    // DnD destination is a different repeat control
+                    val containingRepeatEffectiveId = getPrefixedId + REPEAT_SEPARATOR + (dndEnd mkString REPEAT_INDEX_SEPARATOR_STRING)
+                    containingDocument.getControlByEffectiveId(containingRepeatEffectiveId).asInstanceOf[XFormsRepeatControl]
+                } else
+                    // DnD destination is the current repeat control
+                    this
 
             (new ArrayList[Item](destinationControl.bindingContext.nodeset), dndEnd(dndEnd.length - 1).toInt)
         }

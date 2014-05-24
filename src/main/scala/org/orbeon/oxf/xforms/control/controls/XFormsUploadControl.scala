@@ -301,7 +301,7 @@ object XFormsUploadControl {
             (name, value, filename, mediatype, size) ← iterateFileElement(filesElement)
             // In case of xf:repeat, the name of the template will not match an existing control
             // In addition, only set value on forControl control if specified
-            uploadControl ← Option(containingDocument.getObjectByEffectiveId(name).asInstanceOf[XFormsUploadControl])
+            uploadControl ← Option(containingDocument.getControlByEffectiveId(name).asInstanceOf[XFormsUploadControl])
         } uploadControl.handleUploadedFile(value, filename, mediatype, size)
 
     // Check if an <xxf:files> element actually contains file uploads to process

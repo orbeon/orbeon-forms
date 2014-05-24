@@ -199,7 +199,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                             attributeControl = null;
                         } else if (attributeControlStaticId != null) {
                             final String attributeControlEffectiveId = XFormsUtils.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
-                            attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlEffectiveId);
+                            attributeControl = (XXFormsAttributeControl) containingDocument.getControlByEffectiveId(attributeControlEffectiveId);
                         } else {
                             // This should not happen
                             attributeControl = null;

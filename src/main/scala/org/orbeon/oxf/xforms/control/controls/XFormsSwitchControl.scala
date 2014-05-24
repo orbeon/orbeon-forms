@@ -127,7 +127,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
             null
 
     def selectedCase =
-        isRelevant option containingDocument.getControls.getObjectByEffectiveId(getSelectedCaseEffectiveId).asInstanceOf[XFormsCaseControl]
+        isRelevant option containingDocument.getControlByEffectiveId(getSelectedCaseEffectiveId).asInstanceOf[XFormsCaseControl]
 
     override def getBackCopy: AnyRef = {
         var cloned: XFormsSwitchControl = null

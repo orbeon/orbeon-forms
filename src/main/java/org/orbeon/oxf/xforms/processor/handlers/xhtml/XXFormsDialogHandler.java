@@ -37,7 +37,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         final String effectiveDialogId = handlerContext.getEffectiveId(attributes);
-        final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectByEffectiveId(effectiveDialogId));
+        final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getControlByEffectiveId(effectiveDialogId));
 
         // Find classes to add
 

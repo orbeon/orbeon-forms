@@ -49,8 +49,6 @@ public class XFormsActionInterpreter {
     private final XBLContainer _container;
     private final XFormsContainingDocument _containingDocument;
 
-    private final XFormsControls xformsControls;
-
     private final XFormsContextStack _actionXPathContext;
 
     public final Element outerActionElement;
@@ -66,8 +64,6 @@ public class XFormsActionInterpreter {
         this._containingDocument = container.getContainingDocument();
 
         this._indentedLogger = _containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY());
-
-        this.xformsControls = _containingDocument.getControls();
 
         this._actionXPathContext = actionXPathContext;
         this.outerActionElement = outerActionElement;
@@ -417,7 +413,7 @@ public class XFormsActionInterpreter {
 
                 final String effectiveId = EventHandlerImpl.replaceIdSuffix(result.getEffectiveId(), newSuffix);
 
-                return xformsControls.getObjectByEffectiveId(effectiveId);
+                return _containingDocument.getControlByEffectiveId(effectiveId);
             }
         }
     }

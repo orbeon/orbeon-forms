@@ -335,6 +335,10 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         return xformsControls;
     }
 
+    public XFormsControl getControlByEffectiveId(String effectiveId) {
+        return xformsControls.getObjectByEffectiveId(effectiveId);
+    }
+
     /**
      * Return dependencies implementation.
      */
@@ -370,9 +374,9 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      */
     public XFormsObject getObjectByEffectiveId(String effectiveId) {
 
-        // Search in controls
+        // Search in controls first because that's the fast way
         {
-            final XFormsObject resultObject = xformsControls.getObjectByEffectiveId(effectiveId);
+            final XFormsObject resultObject = getControlByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
@@ -745,7 +749,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         if (helpEffectiveControlId == null)
             return null;
 
-        final XFormsControl xformsControl = (XFormsControl) getObjectByEffectiveId(helpEffectiveControlId);
+        final XFormsControl xformsControl = getControlByEffectiveId(helpEffectiveControlId);
         // It doesn't make sense to tell the client to show help for an element that is non-relevant, but we allow readonly
         if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
             final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;

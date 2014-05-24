@@ -28,7 +28,7 @@ class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
 
             def getValue(controlId: String) = getValueControl(controlId).getValue
 
-            private def getValueControl(controlId: String) = containingDocument.getObjectByEffectiveId(controlId).asInstanceOf[XFormsValueControl]
+            private def getValueControl(controlId: String) = containingDocument.getControlByEffectiveId(controlId).asInstanceOf[XFormsValueControl]
         }
 
         private lazy val controls = new Controls

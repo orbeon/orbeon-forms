@@ -35,13 +35,13 @@ trait ControlEventSupport {
                     { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration ⇒ ri.getEffectiveId }
 
             // NOTE: It would be nice to review whether it makes sense to re-obtain controls by id in the code below. Is
-            // there a use case for it? Events canbe dispatched via setIndex(), which means that repeats and relevance
+            // there a use case for it? Events can be dispatched via setIndex(), which means that repeats and relevance
             // can change. But is there a better way?
             if (repeatIterationsToModify.nonEmpty) {
                 val controls = containingDocument.getControls
                 // Find all repeat iterations and controls again
                 for (repeatIterationEffectiveId ← repeatIterationsToModify) {
-                    val repeatIterationControl = controls.getObjectByEffectiveId(repeatIterationEffectiveId).asInstanceOf[XFormsRepeatIterationControl]
+                    val repeatIterationControl = containingDocument.getControlByEffectiveId(repeatIterationEffectiveId).asInstanceOf[XFormsRepeatIterationControl]
                     val newRepeatIndex = repeatIterationControl.iterationIndex
 
                     val indentedLogger = controls.getIndentedLogger

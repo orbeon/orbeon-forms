@@ -41,7 +41,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
         handlerContext.pushComponentContext(prefixedId)
 
         if (! handlerContext.isTemplate) {
-            containingDocument.getObjectByEffectiveId(effectiveId) match {
+            containingDocument.getControlByEffectiveId(effectiveId) match {
                 case control: XXFormsDynamicControl ⇒
                     // Output new scripts upon update if any
                     if (! containingDocument.isInitializing && control.newScripts.nonEmpty) {

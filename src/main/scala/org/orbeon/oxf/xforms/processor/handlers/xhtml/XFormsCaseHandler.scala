@@ -44,7 +44,7 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
         val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
         
         // Determine whether this case is visible
-        val caseControl = containingDocument.getControls.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsCaseControl]
+        val caseControl = containingDocument.getControlByEffectiveId(effectiveId).asInstanceOf[XFormsCaseControl]
         
         // This case is visible if it is selected or if the switch is read-only and we display read-only as static
         isVisible =

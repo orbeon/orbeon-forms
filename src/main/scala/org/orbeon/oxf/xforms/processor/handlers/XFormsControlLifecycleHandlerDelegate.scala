@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.control.XFormsControl
 import org.xml.sax.Attributes
 
 class XFormsControlLifecycleHandlerDelegate(handlerContext: HandlerContext, containingDocument: XFormsContainingDocument, attributes: Attributes) {
@@ -27,7 +26,7 @@ class XFormsControlLifecycleHandlerDelegate(handlerContext: HandlerContext, cont
         if (handlerContext.isTemplate)
             None
         else
-            Option(containingDocument.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsControl])
+            Option(containingDocument.getControlByEffectiveId(effectiveId))
 
     val currentControlOrNull = currentControlOpt.orNull
 }

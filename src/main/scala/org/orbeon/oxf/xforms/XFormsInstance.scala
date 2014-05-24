@@ -219,7 +219,7 @@ class XFormsInstance(
             for {
                 repeatControl ← repeatControls
                 // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
-                newRepeatControl ← Option(controls.getObjectByEffectiveId(repeatControl.getEffectiveId).asInstanceOf[XFormsRepeatControl])
+                newRepeatControl ← Option(containingDocument.getControlByEffectiveId(repeatControl.getEffectiveId).asInstanceOf[XFormsRepeatControl])
                 if newRepeatControl.getResolutionScope == instanceScope
             } yield
                 // Only update controls within same scope as modified instance

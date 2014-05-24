@@ -47,7 +47,7 @@ object XXFormsLang {
                 Some(value)
             case Some(AVTLangRef(att)) ⇒
                 // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
-                val attributeControl = containingDocument.getControls.getObjectByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
+                val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
                 Option(attributeControl.getExternalValue())
             case None ⇒
                 None

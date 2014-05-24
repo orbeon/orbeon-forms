@@ -55,7 +55,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandlerXML {
 	private boolean isCaseVisible(String effectiveId) {
 		boolean isVisible;
 		// Determine whether this case is visible
-        final XFormsCaseControl caseControl = (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId(effectiveId);
+        final XFormsCaseControl caseControl = (XFormsCaseControl) containingDocument.getControlByEffectiveId(effectiveId);
         if (!handlerContext.isTemplate() && caseControl != null) {
             // This case is visible if it is selected or if the switch is read-only and we display read-only as static
             isVisible = caseControl.isVisible();

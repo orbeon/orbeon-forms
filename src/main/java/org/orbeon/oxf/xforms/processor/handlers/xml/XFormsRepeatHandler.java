@@ -45,7 +45,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
         
         final int currentIteration = handlerContext.getCurrentIteration();
 
-        final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(effectiveId);
+        final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getControlByEffectiveId(effectiveId);
         final boolean isConcreteControl = repeatControl != null;
         
         if (isConcreteControl) {

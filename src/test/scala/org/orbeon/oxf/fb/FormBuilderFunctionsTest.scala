@@ -18,7 +18,6 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
 import org.orbeon.saxon.om._
@@ -472,8 +471,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             </xh:html>
 
         withContainingDocument(doc) {
-            val section1 = doc.getObjectByEffectiveId("section-1-section").asInstanceOf[XFormsControl]
-            val control1 = doc.getObjectByEffectiveId("control-1-control").asInstanceOf[XFormsControl]
+            val section1 = doc.getControlByEffectiveId("section-1-section")
+            val control1 = doc.getControlByEffectiveId("control-1-control")
 
             assert(true  === DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
             assert(false === DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node

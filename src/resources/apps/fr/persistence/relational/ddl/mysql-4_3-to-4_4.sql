@@ -31,11 +31,14 @@ update      orbeon_form_data_attach       set form_version = 1, draft = 'N';
 
 alter table orbeon_form_definition
     change form_version   form_version        int not null;
+
 alter table orbeon_form_definition_attach
     change form_version   form_version        int not null;
+
 alter table orbeon_form_data
     change form_version   form_version        int not null,
     change draft          draft               char(1) not null;
+
 alter table orbeon_form_data_attach
     change form_version   form_version        int not null,
     change draft          draft               char(1) not null;

@@ -39,7 +39,7 @@
                         poolPreparedStatements="true"
                         validationQuery="select 1 from dual"
                         testOnBorrow="true"
-                        username="orbeon_tomcat"
+                        username="orbeon"
                         password="@RDS_PASSWORD@"
                         url="@MYSQL_URL@/orbeon_tomcat?useUnicode=true&amp;characterEncoding=UTF8"/>
                     <Resource name="jdbc/sqlserver_tomcat" auth="Container" type="javax.sql.DataSource"

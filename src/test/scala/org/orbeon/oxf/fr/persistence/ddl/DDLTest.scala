@@ -32,16 +32,13 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
                                   "GRANT CREATE SESSION TO orbeon_ddl",
                                   "GRANT CREATE TABLE   TO orbeon_ddl",
                                   "GRANT CREATE TRIGGER TO orbeon_ddl")
-            case MySQL     ⇒ Seq("CREATE USER orbeon_ddl@localhost IDENTIFIED BY 'orbeon_ddl'",
-                                  "CREATE DATABASE orbeon_ddl",
-                                  "GRANT ALL PRIVILEGES ON orbeon_ddl.* TO orbeon_ddl@localhost")
+            case MySQL     ⇒ Seq("CREATE DATABASE orbeon_ddl")
             case SQLServer ⇒ Seq("CREATE DATABASE orbeon_ddl")
             case _         ⇒ ???
         }
         val dropUserAndDatabase = provider match {
             case Oracle    ⇒ Seq("DROP USER orbeon_ddl CASCADE")
-            case MySQL     ⇒ Seq("DROP USER orbeon_ddl@localhost",
-                                  "DROP DATABASE orbeon_ddl")
+            case MySQL     ⇒ Seq("DROP DATABASE orbeon_ddl")
             case SQLServer ⇒ Seq("DROP DATABASE orbeon_ddl")
             case _         ⇒ ???
         }

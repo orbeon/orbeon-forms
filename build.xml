@@ -728,6 +728,7 @@
                         <replace file="test/catalina_base/conf/server.xml">
                             <replacefilter token="@RDS_PASSWORD@"  value="${env.RDS_PASSWORD}"/>
                             <replacefilter token="@ORACLE_URL@"    value="${env.ORACLE_URL}"/>
+                            <replacefilter token="@MYSQL_URL@"     value="${env.MYSQL_URL}"/>
                             <replacefilter token="@SQLSERVER_URL@" value="${env.SQLSERVER_URL}"/>
                         </replace>
                         <!-- Run -->

@@ -41,7 +41,7 @@
                         testOnBorrow="true"
                         username="orbeon_tomcat"
                         password="orbeon_tomcat"
-                        url="jdbc:mysql://@MYSQL_URL@/orbeon_tomcat?useUnicode=true&amp;characterEncoding=UTF8"/>
+                        url="@MYSQL_URL@/orbeon_tomcat?useUnicode=true&amp;characterEncoding=UTF8"/>
                     <Resource name="jdbc/sqlserver_tomcat" auth="Container" type="javax.sql.DataSource"
                         initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"
                         driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"

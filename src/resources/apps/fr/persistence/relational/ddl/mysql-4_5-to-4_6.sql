@@ -1,5 +1,5 @@
 ALTER TABLE orbeon_form_definition
-    ADD form_metadata VARCHAR(4000) COLLATE utf8_bin;
+    ADD form_metadata VARCHAR(4000) COLLATE utf8_bin AFTER form_version;
 
 -- NOTE: The administrator must also republish forms to fully upgrade metadata. Here we only set basic app/form
 -- metadata, but because MySQL does not have proper XML extract functions we cannot extract the full metadata, including

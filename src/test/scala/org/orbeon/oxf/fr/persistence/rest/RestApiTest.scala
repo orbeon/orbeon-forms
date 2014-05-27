@@ -50,7 +50,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 try {
                     // Create tables
                     val sql = provider match {
-                        case Oracle    ⇒ "oracle_4_6.sql"
+                        case Oracle    ⇒ "oracle-4_6.sql"
                         case MySQL     ⇒ "mysql-4_6.sql"
                         case SQLServer ⇒ "sqlserver-4_6.sql"
                         case DB2       ⇒ "db2-4_6.sql"

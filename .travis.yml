@@ -12,7 +12,7 @@ env:
     # ORACLE_URL
     - secure: "E2ux7UgwF6IuwpKdyg+i3XRzWJ77gAJyxkw1wHogsKhm7GRTYO22CQtMqrENV9jzqOEK8gOM3clFoNGgCFUatxnKru3vy2MXq5mx88EeQ0FoooaRAevtxev4G9wh8jizI9JH+LK4hidek+Wmm1NLChU4VphJ33co5Y7s9vZLKv4="
     # MYSQL_URL
-    - secure: "bSY4+e7XeKIgcgRztTsBeNbXarlhGCsIz8j6lDlZfc+DfnHbb/MD8eJ05ndsr6ecgQsJIayKeeGVkUvniwKsUxwfHBDqV2fS194wnSOvcnsmtmAR/DmNVtFlfmMcJCLlMuGOlTp1LEqsnMG9kcWtNwOR8BYvyaLdUv36/NMPHHk="
+    - secure: "IKvPnrp4a8TajevrNkUjlBExo0+EiG0ANlH2ZOs+1ubjiWILNHhhFtcCpRSfaiGHFhFHEA5Sw8zhZc1i08cYfcMNd4d6EsmcI7XLRqv78mtH/WOGj/cykssmxjp0U2LXe7u4Y1bDwIuP8ipNRLnnKiuvWdFJJ7P5znYnEAZALpo="
     # SQLSERVER_URL
     - secure: "L/Pra2kMGn3AZ1sJb8nvOgxRnpK9/LWY0a4FuYHoQnA6KkjOQfujABHFQRjht8gcc0n0cQttWKsRWT3phTIPGD6YmB25/KT/CI5uKXnbBCMpM1JxhweKRz0P5uOJFO5pVAlkmYq6DwMxP3U/AMs7r4R/9CRyNYEnGEsbr30qphU="
 before_script:

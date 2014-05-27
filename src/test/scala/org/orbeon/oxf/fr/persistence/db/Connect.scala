@@ -31,14 +31,11 @@ private[persistence] object Connect {
         }
         val userName = provider match {
             case Oracle    ⇒ user.getOrElse("orbeon")
-            case MySQL     ⇒ user.getOrElse("root") // TODO: As part of the DB setup, we could create an orbeon user for MySQL, to avoid this distinction here
+            case MySQL     ⇒ "orbeon"
             case SQLServer ⇒ "orbeon"
             case DB2       ⇒ ???
         }
-        val password = provider match {
-            case MySQL     ⇒ user.getOrElse("")
-            case _         ⇒ System.getenv("RDS_PASSWORD")
-        }
+        val password = System.getenv("RDS_PASSWORD")
         useAndClose(DriverManager.getConnection(url, userName, password))(block)
     }
 
@@ -47,7 +44,8 @@ private[persistence] object Connect {
             case Oracle ⇒
                 """SELECT table_name
                   |  FROM all_tables
-                  | WHERE table_name LIKE 'ORBEON%'"""
+                  | WHERE table_name LIKE 'ORBEON%'
+                  |       AND owner = sys_context('USERENV', 'CURRENT_USER')"""
             case _ ⇒
                 """SELECT table_name
                   |  FROM information_schema.tables

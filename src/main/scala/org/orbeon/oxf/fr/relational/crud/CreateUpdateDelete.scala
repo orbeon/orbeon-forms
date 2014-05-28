@@ -35,12 +35,12 @@ import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.JXQName
 
 object RequestReader {
-    
+
     object IdAtt {
         val IdQName = JXQName("id")
         def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) ⇒ value }
     }
-    
+
     // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, JQName.unapply is
     // called 17 times and IdAtt.unapply 2 times until the match is found, which is what is expected.
     def isMetadataElement(stack: List[StartElement]): Boolean =
@@ -72,7 +72,7 @@ object RequestReader {
         dataAndMetadataAsString(requestInputStream(), metadata)
 
     def dataAndMetadataAsString(inputStream: InputStream, metadata: Boolean): (String, Option[String]) = {
-        
+
         def newTransformer = (
             TransformerUtils.getXMLIdentityTransformer
             |!> (_.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
@@ -332,6 +332,10 @@ trait CreateUpdateDelete extends RequestResponse with Common {
     }
 
     def change(req: Request, delete: Boolean): Unit = {
+
+        // Read before establishing a connection, so we don't use two simultaneous connections
+        val formMetadata = req.forData option readFormMetadata(req)
+
         RelationalUtils.withConnection { connection ⇒
 
             // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
@@ -355,13 +359,13 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                             val username      = existing.get.username
                             val groupname     = existing.get.group
                             val dataUserGroup = if (username.isEmpty || groupname.isEmpty) None else Some(username.get, groupname.get)
-                            val authorizedOps = authorizedOperations(req, dataUserGroup)
+                            val authorizedOps = authorizedOperations(formMetadata.get, dataUserGroup)
                             val requiredOp    = if (delete) "delete" else "update"
                             authorizedOps.contains(requiredOp)
                         } else {
                             // For deletes, if there is no data to delete, it is a 403 if could not read, update,
                             // or delete if it existed (otherwise code later will return a 404)
-                            val authorizedOps = authorizedOperations(req, None)
+                            val authorizedOps = authorizedOperations(formMetadata.get, None)
                             val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
                             authorizedOps.intersect(requiredOps).nonEmpty
                         }

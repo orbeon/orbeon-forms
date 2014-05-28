@@ -16,12 +16,17 @@ package org.orbeon.oxf.fr.relational.crud
 import java.io.OutputStreamWriter
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.relational.{Next, Unspecified, RelationalUtils}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
     def get(req: Request): Unit = {
+
+        // Read before establishing a connection, so we don't use two simultaneous connections
+        val formMetadata = req.forData option readFormMetadata(req)
+
         RelationalUtils.withConnection { connection ⇒
 
             val badVersion =
@@ -85,7 +90,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                         val groupname     = resultSet.getString("groupname")
                         if (username == null || groupname == null) None else Some(username, groupname)
                     }
-                    val operations = authorizedOperations(req, dataUserGroup)
+                    val operations = authorizedOperations(formMetadata.get, dataUserGroup)
                     if (! operations.contains("read"))
                         throw new HttpStatusCodeException(403)
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))

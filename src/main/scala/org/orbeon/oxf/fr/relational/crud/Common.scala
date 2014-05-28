@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 import org.orbeon.oxf.fr.{FormRunnerPersistence, FormRunner}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.scaxon.XML._
+import org.orbeon.saxon.om.DocumentInfo
 
 trait Common extends RequestResponse with FormRunnerPersistence {
 
@@ -96,11 +97,13 @@ trait Common extends RequestResponse with FormRunnerPersistence {
     def idColumnsList(req: Request): String = idColumns(req).mkString(", ")
     def joinColumns(cols: Seq[String], t1: String, t2: String) = cols.map(c ⇒ s"$t1.$c = $t2.$c").mkString(" AND ")
 
+    def readFormMetadata(req: Request): DocumentInfo =
+        readFormMetadata(req.app, req.form).ensuring(_.isDefined, "can't find form metadata for data").get
+
     // Given a user/group name coming from the data, tells us what operations we can do in this data, assuming that
     // it is for the current request app/form
-    def authorizedOperations(req: Request, dataUserGroup: Option[(String, String)]): Set[String] = {
-        val metadata    = readFormMetadata(req.app, req.form).ensuring(_.isDefined, "can't find form metadata for data").get
-        val permissions = (metadata / "forms" / "form" / "permissions").headOption
+    def authorizedOperations(formMetadata: DocumentInfo, dataUserGroup: Option[(String, String)]): Set[String] = {
+        val permissions = (formMetadata / "forms" / "form" / "permissions").headOption
         permissions match {
             case None                ⇒ Set("create", "read", "update", "delete")
             case Some(permissionsEl) ⇒

@@ -44,7 +44,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     private def metadataURL(provider: Provider) = s"form/${provider.name}/my-form"
 
     private def withOrbeonTables[T](block: (java.sql.Connection, Provider) ⇒ T) {
-        Provider.all.filter(_ != Oracle).foreach { provider ⇒
+        Provider.all.foreach { provider ⇒
             Connect.asTomcat(provider) { connection ⇒
                 val statement = connection.createStatement
                 try {

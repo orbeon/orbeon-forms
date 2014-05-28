@@ -54,8 +54,10 @@ private[persistence] object SQL {
         var allStatements    = ArrayBuffer[String]()
         var currentStatement = ArrayBuffer[String]()
         linesWithMarkers.foreach { case (line, isLastLineOfStatement) ⇒
-            // Remove the `;` separator if this is the last line
-            val partToKeep = if (isLastLineOfStatement) line.substring(0, line.length - 1) else line
+            // Remove the `;` separator if this is the last line, except at the end of
+            // a block (`END;`) where it is required by Oracle
+            val partToKeep = if (isLastLineOfStatement && ! line.endsWith("END;"))
+                line.substring(0, line.length - 1) else line
             currentStatement += partToKeep
             if (isLastLineOfStatement) {
                 allStatements += currentStatement.mkString("\n")

@@ -6747,7 +6747,7 @@
                 moving controls, the form definition might be incompatible with existing data. We recommend being
                 careful when overwriting an existing form definition version.
             </overwrite-version-help>
-            <open-summary>Abrir Página de Resumen del Formulario Publicado  Open Published Form Summary Page</open-summary>
+            <open-summary>Abrir Página de Resumen del Formulario Publicado</open-summary>
             <open-new>Abrir nueva instancia del Formulario</open-new>
         </dialog-publish>
         <dialog-add-language>

@@ -38,7 +38,7 @@ window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
         currentRepeaterId = repeaterId(e);
         currentRepeaterIteration = repeaterIteration(e);
 
-        // NOTE: Don't use dropdown('toggle') a that registers a new handler further down the DOM!
+        // NOTE: Don't use dropdown('toggle') as that registers a new handler further down the DOM!
         $(globalMenu).find(".dropdown-toggle").trigger("click");
 
         // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
@@ -46,6 +46,11 @@ window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
         // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
         // running.
         return false;
+    }
+
+    // Handle keyboard events that arrive on our button and delegate the to the Bootstrap menu button
+    function delegateKeyEventToBootstrapButton(e) {
+        $(globalMenu).find(".dropdown-toggle").trigger({ type: e.type, keyCode: e.keyCode });
     }
 
     function repeaterRow(e) {
@@ -81,11 +86,12 @@ window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
 
     if (globalMenu) {
         // Click on our own button moves and shows the menu
-        $(document).on('click.orbeon', '.fr-repeater-dropdown-button', moveAndShowMenu);
+        $(document).on('click.orbeon.repeater',   '.fr-repeater-dropdown-button', moveAndShowMenu);
+        $(document).on('keydown.orbeon.repeater', '.fr-repeater-dropdown-button', delegateKeyEventToBootstrapButton);
 
         // Listeners for all menu actions
         _.each(opNames, function(opName) {
-            $(document).on('click.orbeon', '.fr-repeater-dropdown-menu .fr-' + opName, actionFunction(opName));
+            $(document).on('click.orbeon.repeater', '.fr-repeater-dropdown-menu .fr-' + opName, actionFunction(opName));
         });
     }
 });

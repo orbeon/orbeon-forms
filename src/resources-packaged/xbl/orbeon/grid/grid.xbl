@@ -48,7 +48,7 @@
                 <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1">
                     <span class="caret"/>
                 </button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" role="menu">
                     <li class="fr-insert-above">
                         <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
                     </li>
@@ -296,7 +296,7 @@
                                                     <xsl:if test="$is-repeat and not($readonly) and $static-row-pos = 1">
                                                         <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
                                                             <xh:div class="dropdown">
-                                                                <xh:button class="btn btn-mini fr-grid-dropdown-button" tabindex="-1">
+                                                                <xh:button class="btn btn-mini fr-grid-dropdown-button">
                                                                     <xh:span class="caret"/>
                                                                 </xh:button>
                                                             </xh:div>

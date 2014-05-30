@@ -45,7 +45,7 @@
                 <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1">
                     <span class="caret"/>
                 </button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" role="menu">
                     <li class="fr-insert-above">
                         <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
                     </li>

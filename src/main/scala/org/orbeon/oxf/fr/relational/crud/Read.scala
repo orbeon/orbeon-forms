@@ -25,7 +25,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
     def get(req: Request): Unit = {
 
         // Read before establishing a connection, so we don't use two simultaneous connections
-        val formMetadata = req.forData option readFormMetadata(req)
+        val formMetadataForDataRequestOpt = req.forData option readFormMetadata(req)
 
         RelationalUtils.withConnection { connection ⇒
 
@@ -84,13 +84,13 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                     throw new HttpStatusCodeException(410)
 
                 // Check user can read and set Orbeon-Operations header
-                if (req.forData) {
+                formMetadataForDataRequestOpt foreach { formMetadata ⇒
                     val dataUserGroup = {
-                        val username      = resultSet.getString("username")
-                        val groupname     = resultSet.getString("groupname")
-                        if (username == null || groupname == null) None else Some(username, groupname)
+                        val username  = resultSet.getString("username")
+                        val groupname = resultSet.getString("groupname")
+                        (username != null && groupname != null) option (username → groupname)
                     }
-                    val operations = authorizedOperations(formMetadata.get, dataUserGroup)
+                    val operations = authorizedOperations(formMetadata, dataUserGroup)
                     if (! operations.contains("read"))
                         throw new HttpStatusCodeException(403)
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))

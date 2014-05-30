@@ -141,18 +141,17 @@
                         <xf:output value="$response" mediatype="text/html"/>
                     </xh:div>
                 </xf:group>
-                <xf:group ref=".[not(normalize-space($response) != '')]">
-                    <xh:div class="fb-publish-message">
-                        <xh:ul>
-                            <xf:repeat ref="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]">
-                                <xh:li>
-                                    <xh:a href="/fr/{$app}/{$form}/{.}" target="_blank">
-                                        <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
-                                    </xh:a>
-                                </xh:li>
-                            </xf:repeat>
-                        </xh:ul>
-                    </xh:div>
+                <xf:var name="buttons" value="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]"/>
+                <xf:group ref=".[not(normalize-space($response) != '') and exists($buttons)]" class="fb-publish-message">
+                    <xh:ul>
+                        <xf:repeat ref="$buttons">
+                            <xh:li>
+                                <xh:a href="/fr/{$app}/{$form}/{.}" target="_blank">
+                                    <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
+                                </xh:a>
+                            </xh:li>
+                        </xf:repeat>
+                    </xh:ul>
                 </xf:group>
             </xh:div>
             <xh:div class="fr-dialog-buttons">

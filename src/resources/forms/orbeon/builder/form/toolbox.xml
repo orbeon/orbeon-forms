@@ -219,7 +219,7 @@
         <!-- Services -->
         <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/http">
             <xf:group class="fb-hide-alert">
-                <xh:legend><xf:output ref="$form-resources/http-services/label"/></xh:legend>
+                <xf:label ref="$form-resources/http-services/label"/>
                 <!-- Repeat over existing services -->
                 <xf:repeat ref="$model/fb:submission[ends-with(@id, '-submission') and xxf:has-class('fr-service')]">
                     <xh:div class="fb-tool">
@@ -249,7 +249,7 @@
         <!-- Database services -->
         <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/database">
             <xf:group class="fb-hide-alert">
-                <xh:legend><xf:output ref="$form-resources/database-services/label"/></xh:legend>
+                <xf:label ref="$form-resources/database-services/label"/>
                 <!-- Repeat over existing services -->
                     <xf:repeat ref="$model/fb:submission[ends-with(@id, '-submission') and xxf:has-class('fr-database-service')]">
                         <xh:div class="fb-tool">
@@ -279,7 +279,7 @@
         <!-- Actions -->
         <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/actions">
             <xf:group class="fb-hide-alert">
-                <xh:legend><xf:output ref="$form-resources/actions/label"/></xh:legend>
+                <xf:label ref="$form-resources/actions/label"/>
                 <!-- Repeat over existing bindings -->
                 <xf:repeat ref="$model/fb:action[ends-with(@id, '-binding')]">
                     <xh:div class="fb-tool">

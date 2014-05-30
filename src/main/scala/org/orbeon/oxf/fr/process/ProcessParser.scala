@@ -1,8 +1,8 @@
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.fr.process
 
-import org.parboiled.scala._
-import org.parboiled.errors.{ErrorUtils, ParsingException}
 import org.apache.commons.lang3.StringEscapeUtils
+import org.parboiled.errors.{ErrorUtils, ParsingException}
+import org.parboiled.scala._
 
 object ProcessParser extends Parser {
 

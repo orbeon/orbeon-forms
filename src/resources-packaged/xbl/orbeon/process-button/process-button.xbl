@@ -38,7 +38,7 @@
                     xbl:attr="appearance"
                     class="fr-{$button-name}-button {if ($modal) then 'xforms-trigger-appearance-modal' else ''}">
                 <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/*[name() = $button-name]"/>
-                <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                     process:runProcessByName('oxf.fr.detail.process', $button-name)
                 </xf:action>
             </xf:trigger>

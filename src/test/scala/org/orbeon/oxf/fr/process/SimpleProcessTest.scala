@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.fr.process
 
 import org.junit.Test
 import ProcessParser._

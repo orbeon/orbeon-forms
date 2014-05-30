@@ -11,21 +11,24 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.fr.process
 
 import ProcessParser._
 import annotation.tailrec
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.fr.process.ProcessParser.ActionNode
+import org.orbeon.oxf.fr.process.ProcessParser.ConditionNode
+import org.orbeon.oxf.fr.process.ProcessParser.GroupNode
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XML._
 import scala.util.control.{NonFatal, ControlThrowable, Breaks}
 import util.{Success, Try}
-import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.oxf.util.XPath.FunctionContext
 
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {

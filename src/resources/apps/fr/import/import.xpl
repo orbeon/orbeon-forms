@@ -96,7 +96,7 @@
 
                                 <!-- Save -->
                                 <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
-                                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                                     process:runProcessByName('oxf.fr.detail.process', 'save-import')
                                 </xf:action>
 

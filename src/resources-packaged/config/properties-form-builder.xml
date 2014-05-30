@@ -74,7 +74,7 @@
     <property as="xs:boolean" name="oxf.fb.menu.services.database"                   value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.actions"                             value="true"/>
 
-    <property as="xs:string" name="oxf.fb.publish.buttons"                           value="new summary"/>
+    <property as="xs:string"  name="oxf.fb.publish.buttons"                          value="new summary"/>
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
     <property as="xs:integer" name="oxf.fb.grid.max-columns"                         value="4"/>
@@ -86,7 +86,7 @@
     </property>
 
     <!-- Available languages -->
-    <property as="xs:string" name="oxf.fr.available-languages.orbeon.builder"        value="en fr es it de"/>
+    <property as="xs:string"  name="oxf.fr.available-languages.orbeon.builder"       value="en fr es it de"/>
 
     <!-- In case somebody overrides with weaker properties -->
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"       value="true"/>

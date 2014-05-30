@@ -158,6 +158,8 @@ trait FormRunnerHome {
             formVersion       = Some("next")
         )
 
+    // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
+    // serialization. Here we juggle between XML and typed data.
     def joinLocalAndRemoteMetadata(local: SequenceIterator, remote: SequenceIterator, permissionInstance: NodeInfo): SequenceIterator = {
 
         val combinedIndexIterator = {
@@ -195,6 +197,7 @@ trait FormRunnerHome {
                 case (Some(localNode), None) ⇒
                     localNode
                 case (None, Some(remoteNode)) ⇒
+                    // Don't just use remoteNode, because we need `remote-` prefixes for remote data
                     elementInfo("form", (remoteNode / "application-name" head) :: (remoteNode / "form-name" head) :: remoteElements(remoteNode))
                 case (Some(localNode), Some(remoteNode)) ⇒
                     insert(origin = remoteElements(remoteNode), into = localNode, after = localNode / *, doDispatch = false)

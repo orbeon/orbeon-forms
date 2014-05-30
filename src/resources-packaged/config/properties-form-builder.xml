@@ -70,6 +70,9 @@
     <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fb.menu.custom-xml"                          value="false"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.services.http"                       value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.services.database"                   value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.actions"                             value="true"/>
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
     <property as="xs:integer" name="oxf.fb.grid.max-columns"                         value="4"/>

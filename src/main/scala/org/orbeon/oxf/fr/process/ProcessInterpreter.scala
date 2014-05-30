@@ -29,6 +29,7 @@ import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XML._
 import scala.util.control.{NonFatal, ControlThrowable, Breaks}
 import util.{Success, Try}
+import org.orbeon.oxf.xforms.XFormsUtils
 
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {
@@ -42,7 +43,7 @@ trait ProcessInterpreter extends Logging {
     def findProcessByName(scope: String, name: String): Option[String]
     def processError(t: Throwable): Unit
     def xpathContext: Item
-    def xpathFunctionLibrary: FunctionLibrary
+    implicit def xpathFunctionLibrary: FunctionLibrary
     def xpathFunctionContext: FunctionContext
     def writeSuspendedProcess(process: String): Unit
     def readSuspendedProcess: String
@@ -162,7 +163,7 @@ trait ProcessInterpreter extends Logging {
             def runCondition(condition: ConditionNode) = {
                 val ConditionNode(xpath, thenBranch, elseBranch) = condition
                 Try {
-                    evalOne(xpathContext, "boolean(" + xpath + ")", functionContext = xpathFunctionContext)(xpathFunctionLibrary).asInstanceOf[BooleanValue].getBooleanValue
+                    evaluateBoolean(xpath)
                 } flatMap { cond ⇒
                     if (cond)
                         runExpr(thenBranch)
@@ -261,4 +262,24 @@ trait ProcessInterpreter extends Logging {
     // Don't do anything
     def tryNop(params: ActionParams): Try[Any] =
         Success()
+
+    def evaluateBoolean(expr: String) =
+        evaluateOne("boolean(" + expr + ")").asInstanceOf[BooleanValue].getBooleanValue
+
+    def evaluateOne(expr: String) =
+        evalOne(
+            item            = xpathContext,
+            expr            = expr,
+            functionContext = xpathFunctionContext
+        )
+
+    def evaluateValueTemplate(valueTemplate: String) =
+        if (! XFormsUtils.maybeAVT(valueTemplate))
+            valueTemplate
+        else
+            evalValueTemplate(
+                item            = xpathContext,
+                expr            = valueTemplate,
+                functionContext = xpathFunctionContext
+            )
 }

@@ -46,24 +46,69 @@ object XML {
 
     // Convenience methods for the XPath API
     def evalOne(
-            item: Item,
-            expr: String,
-            namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
-            variables: Map[String, ValueRepresentation] = null,
-            reporter: Reporter = null,
-            functionContext: FunctionContext = null)(implicit library: FunctionLibrary = null): Item =
-        evaluateSingleKeepItems(Seq(item).asJava, 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, functionContext, null, null, reporter)
+            item            : Item,
+            expr            : String,
+            namespaces      : NamespaceMapping                 = BASIC_NAMESPACE_MAPPING,
+            variables       : Map[String, ValueRepresentation] = null,
+            reporter        : Reporter                         = null,
+            functionContext : FunctionContext                  = null)(
+            implicit library: FunctionLibrary                  = null
+    ): Item =
+        evaluateSingleKeepItems(
+            Seq(item).asJava,
+            1,
+            expr,
+            namespaces,
+            if (variables eq null) null else variables.asJava,
+            library,
+            functionContext,
+            null,
+            null,
+            reporter
+        )
 
     // Evaluate an XPath expression and return a Seq of native Java objects (String, Boolean, etc.), but NodeInfo
     // wrappers are preserved.
-    def eval(item: Item,
-            expr: String,
-            namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
-            variables: Map[String, ValueRepresentation] = null,
-            reporter: Reporter = null,
-            functionContext: FunctionContext = null)
-            (implicit library: FunctionLibrary = null): Seq[AnyRef] =
-        evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, functionContext, null, null, reporter).asScala
+    def eval(
+            item            : Item,
+            expr            : String,
+            namespaces      : NamespaceMapping                 = BASIC_NAMESPACE_MAPPING,
+            variables       : Map[String, ValueRepresentation] = null,
+            reporter        : Reporter                         = null,
+            functionContext : FunctionContext                  = null)(
+            implicit library: FunctionLibrary                  = null
+    ): Seq[AnyRef] =
+        evaluate(item,
+            expr,
+            namespaces,
+            if (variables eq null) null else variables.asJava,
+            library, functionContext,
+            null,
+            null,
+            reporter
+        ).asScala
+
+    // Evaluate an XPath expression as a value template
+    def evalValueTemplate(
+            item            : Item,
+            expr            : String,
+            namespaces      : NamespaceMapping                 = BASIC_NAMESPACE_MAPPING,
+            variables       : Map[String, ValueRepresentation] = null,
+            reporter        : Reporter                         = null,
+            functionContext : FunctionContext                  = null)(
+            implicit library: FunctionLibrary                  = null
+    ): String =
+        evaluateAsAvt(
+            item,
+            expr,
+            namespaces,
+            if (variables eq null) null else variables.asJava,
+            library,
+            functionContext,
+            null,
+            null,
+            reporter
+        )
 
     // Runtime conversion to NodeInfo (can fail!)
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]

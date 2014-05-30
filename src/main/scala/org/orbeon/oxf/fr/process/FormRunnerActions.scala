@@ -278,8 +278,8 @@ trait FormRunnerActions {
             implicit val formRunnerParams = FormRunnerParams()
 
             // Heuristic: If the parameter is anonymous, we take it as a URL or path if it looks like one. Otherwise, we
-            // consider it is a property. We could also look at whether the value looks like a property. To resolve
-            // ambiguity, we'll need to parse named parameters.
+            // consider it is a property. We could also look at whether the value looks like a property. It's better to
+            // be explicit and use `uri =` or `property =`.
             def isAbsolute(s: String) = s.startsWith("/") || NetUtils.urlHasProtocol(s)
 
             def fromParams = params.get(Some("uri")) orElse (params.get(None) filter isAbsolute)
@@ -289,7 +289,7 @@ trait FormRunnerActions {
                 formRunnerProperty(property)
             }
 
-            fromParams orElse fromProperties flatMap nonEmptyOrNone get
+            fromParams orElse fromProperties map evaluateValueTemplate flatMap nonEmptyOrNone get
         } flatMap
             tryNavigateTo
 

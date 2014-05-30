@@ -27,9 +27,6 @@
     <property name="src.dir" location="src"/>
     <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20131113.jar"/>
     <property name="catalina.home" value=""/>
-    <property name="mysql.driver" value="com.mysql.jdbc.Driver"/>
-    <property name="mysql.url"    value="jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF8"/>
-    <property name="mysql.jar"    value="lib/mysql-connector-java-5.1.26-bin.jar"/>
 
     <!-- Expose environment variables -->
     <property environment="env"/>
@@ -708,22 +705,15 @@
                 <if>
                     <not><isset property="skip.selenium"/></not>
                     <then>
-                        <!-- Create user and database used by Tomcat -->
-                        <sql driver="${mysql.driver}" url="${mysql.url}" userid="root" password="">
-                            <classpath><pathelement location="${mysql.jar}"/></classpath>
-                            create user     orbeon_tomcat@localhost identified by 'orbeon_tomcat';
-                            create database orbeon_tomcat;
-                            grant all privileges on orbeon_tomcat.* to orbeon_tomcat@localhost;
-                        </sql>
                         <!-- Uncompress Tomcat -->
                         <if>
                             <not><available file="build/apache-tomcat-${tomcat-version}"/></not>
                             <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
                         </if>
                         <!-- Put database driver in Tomcat's lib -->
-                        <copy file="${mysql.jar}"            todir="build/apache-tomcat-${tomcat-version}/lib"/>
-                        <copy file="lib/oracle/ojdbc6_g.jar" todir="build/apache-tomcat-${tomcat-version}/lib"/>
-                        <copy file="lib/sqljdbc4.jar"        todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="lib/mysql-connector-java-5.1.26-bin.jar" todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="lib/oracle/ojdbc6_g.jar"                 todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="lib/sqljdbc4.jar"                        todir="build/apache-tomcat-${tomcat-version}/lib"/>
                         <!-- Put URL and passwords in Tomcat's server.xml -->
                         <replace file="test/catalina_base/conf/server.xml">
                             <replacefilter token="@RDS_PASSWORD@"  value="${env.RDS_PASSWORD}"/>
@@ -817,12 +807,6 @@
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
                             <arg line="stop"/>
                         </java>
-                        <!-- Drop MySQL user and database used by Tomcat -->
-                        <sql driver="${mysql.driver}" url="${mysql.url}" userid="root" password="">
-                            <classpath><pathelement location="${mysql.jar}"/></classpath>
-                            drop user     orbeon_tomcat@localhost;
-                            drop database orbeon_tomcat;
-                        </sql>
                     </then>
                 </if>
             </sequential>

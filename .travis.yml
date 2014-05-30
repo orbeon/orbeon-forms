@@ -17,16 +17,3 @@ env:
     - secure: "L/Pra2kMGn3AZ1sJb8nvOgxRnpK9/LWY0a4FuYHoQnA6KkjOQfujABHFQRjht8gcc0n0cQttWKsRWT3phTIPGD6YmB25/KT/CI5uKXnbBCMpM1JxhweKRz0P5uOJFO5pVAlkmYq6DwMxP3U/AMs7r4R/9CRyNYEnGEsbr30qphU="
 before_script:
   - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
-install:
-  - "sudo apt-get remove mysql-common mysql-server-5.5 mysql-server-core-5.5 mysql-client-5.5 mysql-client-core-5.5"
-  - "sudo apt-get autoremove"
-  - "sudo apt-get install libaio1"
-  - "wget -O mysql-5.6.16.deb http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.16-debian6.0-x86_64.deb"
-  - "sudo dpkg -i mysql-5.6.16.deb"
-  - "sudo cp /opt/mysql/server-5.6/support-files/mysql.server /etc/init.d/mysql.server"
-  - "sudo ln -s /opt/mysql/server-5.6/bin/* /usr/bin/"
-  - "sudo sed -i'' 's/table_cache/table_open_cache/' /etc/mysql/my.cnf"
-  - "sudo sed -i'' 's/log_slow_queries/slow_query_log/' /etc/mysql/my.cnf"
-  - "sudo sed -i'' 's/basedir[^=]\\+=.*$/basedir = \\/opt\\/mysql\\/server-5.6/' /etc/mysql/my.cnf"
-  - "sudo sed -i'' 's/max_allowed_packet[^=]\\+=.*$/max_allowed_packet = 100M/' /etc/mysql/my.cnf"
-  - "sudo /etc/init.d/mysql.server start"

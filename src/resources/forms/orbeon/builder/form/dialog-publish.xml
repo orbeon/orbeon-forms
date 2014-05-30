@@ -143,26 +143,21 @@
                 </xf:group>
                 <xf:group ref=".[not(normalize-space($response) != '')]">
                     <xh:div class="fb-publish-message">
-                        <xh:ol>
-                            <xh:li>
-                                <xh:a href="/fr/{$app}/{$form}/summary" target="_blank">
-                                    <xf:output value="$form-resources/dialog-publish/open-summary"/>
-                                </xh:a>
-                            </xh:li>
-                            <xh:li>
-                                <xh:a href="/fr/{$app}/{$form}/new" target="_blank">
-                                    <xf:output value="$form-resources/dialog-publish/open-new"/>
-                                </xh:a>
-                            </xh:li>
-                        </xh:ol>
+                        <xh:ul>
+                            <xf:repeat ref="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]">
+                                <xh:li>
+                                    <xh:a href="/fr/{$app}/{$form}/{.}" target="_blank">
+                                        <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
+                                    </xh:a>
+                                </xh:li>
+                            </xf:repeat>
+                        </xh:ul>
                     </xh:div>
                 </xf:group>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
                 <xf:trigger appearance="xxf:primary">
-                    <xf:label>
-                        <xf:output value="$form-resources/close/label"/>
-                    </xf:label>
+                    <xf:label value="$form-resources/close/label"/>
                     <xxf:hide event="DOMActivate" dialog="fb-publish-dialog"/>
                 </xf:trigger>
             </xh:div>
@@ -176,9 +171,7 @@
             </xh:div>
             <xh:div class="fr-dialog-buttons">
                 <xf:trigger appearance="xxf:primary">
-                    <xf:label>
-                        <xf:output value="$form-resources/close/label"/>
-                    </xf:label>
+                    <xf:label value="$form-resources/close/label"/>
                     <xxf:hide event="DOMActivate" dialog="fb-publish-dialog"/>
                 </xf:trigger>
             </xh:div>

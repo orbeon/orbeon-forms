@@ -216,11 +216,8 @@
             </xh:div>
         </xh:div>
 
-        <!-- To facilitate marking buttons read-only -->
-        <xf:var name="trigger" value="instance('fb-metadata-instance')/toolbox/services-actions" as="element()"/>
-
         <!-- Services -->
-        <xh:div class="fb-tools">
+        <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/http">
             <xf:group class="fb-hide-alert">
                 <xh:legend><xf:output ref="$form-resources/http-services/label"/></xh:legend>
                 <!-- Repeat over existing services -->
@@ -237,7 +234,7 @@
                     </xh:div>
                 </xf:repeat>
                 <xh:div class="fb-tool">
-                    <xf:trigger ref="$trigger">
+                    <xf:trigger>
                         <xf:label>
                             <xh:i class="icon-plus-sign"/>
                             <xf:output value="$form-resources/add/label"/>
@@ -247,10 +244,10 @@
                     </xf:trigger>
                 </xh:div>
             </xf:group>
-        </xh:div>
+        </xf:group>
 
         <!-- Database services -->
-        <xh:div class="fb-tools">
+        <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/services/database">
             <xf:group class="fb-hide-alert">
                 <xh:legend><xf:output ref="$form-resources/database-services/label"/></xh:legend>
                 <!-- Repeat over existing services -->
@@ -267,7 +264,7 @@
                         </xh:div>
                 </xf:repeat>
                 <xh:div class="fb-tool">
-                    <xf:trigger ref="$trigger">
+                    <xf:trigger>
                         <xf:label>
                             <xh:i class="icon-plus-sign"/>
                             <xf:output value="$form-resources/add/label"/>
@@ -277,10 +274,10 @@
                     </xf:trigger>
                 </xh:div>
             </xf:group>
-        </xh:div>
+        </xf:group>
 
         <!-- Actions -->
-        <xh:div class="fb-tools">
+        <xf:group xxf:element="div" class="fb-tools" ref="instance('fb-metadata-instance')/toolbox/actions">
             <xf:group class="fb-hide-alert">
                 <xh:legend><xf:output ref="$form-resources/actions/label"/></xh:legend>
                 <!-- Repeat over existing bindings -->
@@ -297,7 +294,7 @@
                     </xh:div>
                 </xf:repeat>
                 <xh:div class="fb-tool">
-                    <xf:trigger ref="$trigger">
+                    <xf:trigger>
                         <xf:label>
                             <xh:i class="icon-plus-sign"/>
                             <xf:output value="$form-resources/add/label"/>
@@ -307,7 +304,7 @@
                     </xf:trigger>
                 </xh:div>
             </xf:group>
-        </xh:div>
+        </xf:group>
         <!-- Orbeon Forms version -->
         <fr:version/>
     </xh:div>

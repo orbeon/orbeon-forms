@@ -28,6 +28,7 @@ import scala.xml.Elem
 import org.dom4j.Document
 import java.io.ByteArrayInputStream
 import org.orbeon.oxf.xml.Dom4j
+import scala.util.control.NonFatal
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -56,7 +57,15 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                         case DB2       ⇒ "db2-4_6.sql"
                     }
                     val createDDL = SQL.read(sql)
-                    createDDL foreach statement.executeUpdate
+                    createDDL foreach { s ⇒
+                        try
+                            statement.executeUpdate(s)
+                        catch {
+                            case NonFatal(e) ⇒
+                                println(s)
+                                throw e
+                        }
+                    }
                     // Run the interesting code
                     block(connection, provider)
                 } finally {

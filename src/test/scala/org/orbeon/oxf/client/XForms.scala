@@ -16,8 +16,71 @@ package org.orbeon.oxf.client
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.scalatest.junit.{MustMatchersForJUnit, AssertionsForJUnit}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.openqa.selenium.{WebElement, By, Keys}
+import scala.util.Try
 
 trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunnerOps {
+
+    def isInvalid(el: WebElement): Boolean = split[Set](el.getAttribute("class")).contains("xforms-invalid")
+    def inErrorSummary(id: String): Boolean = Try(webDriver.findElement(By.linkText(id))).isSuccess
+
+    // Load the page, and clears the regular input. At that point, it won't yet be marked as invalid.
+    def issue619WithClearInput(block: (WebElement, WebElement) ⇒ Unit): Unit = {
+        for {
+            _ ← loadOrbeonPage("/unit-tests/issue-0619")
+            regularSpan  ← webDriver.findElement(By.cssSelector("#regular"))
+            regularInput ← regularSpan.findElement(By.cssSelector("input"))
+            // Clear input
+            _ ← regularInput.click()
+            _ ← regularInput.sendKeys(Keys.DELETE)
+            // Should not be invalid or shown in the error summary
+            _ ← assert(! isInvalid(regularSpan))
+            _ ← assert(! inErrorSummary("regular"))
+        }
+        block(regularSpan, regularInput)
+    }
+
+    @Test def issue619ErrorShownOnTabOut(): Unit =
+        issue619WithClearInput { (regularSpan, regularInput) ⇒
+            for {
+                _ ← regularInput.sendKeys(Keys.TAB)
+                _ ← assert(isInvalid(regularSpan))
+                _ ← assert(inErrorSummary("regular"))
+            }()
+        }
+
+    @Test def issue619ErrorShownOnClickBody(): Unit =
+        issue619WithClearInput { (regularSpan, regularInput) ⇒
+            for {
+                _ ← webDriver.findElement(By.cssSelector("body")).click()
+                _ ← assert(isInvalid(regularSpan))
+                //_ ← assert(inErrorSummary("regular")) // FIXME
+            }()
+        }
+
+    @Test def issue619ErrorShownOnActivate(): Unit =
+        issue619WithClearInput { (regularSpan, regularInput) ⇒
+            for {
+                _ ← regularInput.sendKeys(Keys.ENTER)
+                _ ← assert(isInvalid(regularSpan))
+                //_ ← assert(inErrorSummary("regular")) // FIXME
+            }()
+        }
+
+    @Test def issue619Incremental(): Unit = {
+        for {
+            _ ← loadOrbeonPage("/unit-tests/issue-0619")
+            incrementalSpan  ← webDriver.findElement(By.cssSelector("#incremental"))
+            incrementalInput ← incrementalSpan.findElement(By.cssSelector("input"))
+            _ ← incrementalInput.click()
+            _ ← assert(! isInvalid(incrementalSpan))
+            _ ← assert(! inErrorSummary("incremental"))
+            _ ← incrementalInput.sendKeys(Keys.DELETE)
+            _ ← assert(isInvalid(incrementalSpan))
+            //_ ← assert(inErrorSummary("incremental")) // FIXME
+        }()
+    }
 
     // https://github.com/orbeon/orbeon-forms/issues/889
     @Test def issue889(): Unit = {

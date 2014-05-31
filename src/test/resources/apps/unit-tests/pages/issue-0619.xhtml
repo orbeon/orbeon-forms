@@ -1,0 +1,30 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xf:model>
+            <xf:instance>
+                <form>
+                    <regular>a</regular>
+                    <incremental>a</incremental>
+                </form>
+            </xf:instance>
+            <xf:bind ref="*" required="true()"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:group id="container">
+            <xf:input id="regular" ref="regular">
+                <xf:label>regular</xf:label>
+                <xf:alert>required</xf:alert>
+            </xf:input>
+            <xf:input id="incremental" ref="incremental" incremental="true">
+                <xf:label>incremental</xf:label>
+                <xf:alert>required</xf:alert>
+            </xf:input>
+        </xf:group>
+        <fr:error-summary id="error-summary" observer="container"/>
+    </xh:body>
+</xh:html>

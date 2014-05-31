@@ -17,7 +17,6 @@ import org.junit.Test
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.junit.MustMatchersForJUnit
 import org.openqa.selenium.By
-import org.scalatest.selenium.WebBrowser.click
 
 trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // with AssertionsForJUnit
 

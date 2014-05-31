@@ -20,6 +20,56 @@
                 <short-date>[M01]/[D01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Review</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Delete</delete>
+            <import>&lt;i class="icon-upload"/&gt; Import</import>
+            <new>&lt;i class="icon-plus"/&gt; New</new>
+            <duplicate>&lt;i class="icon-file"/&gt; Duplicate</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Save</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Save</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; Validate</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Edit</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Summary</summary>
+            <close>&lt;i class="icon-remove"/&gt; Close</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Clear</clear>
+            <cancel>Cancel</cancel>
+            <save-locally>Save Locally</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Clear and close</submit-dialog-clear>
+            <submit-dialog-keep>Keep values and close</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Close window</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Review</validation-dialog-review>
+            <validation-dialog-continue>Continue</validation-dialog-continue>
+            
+            <test>&lt;i class="icon-cog"/&gt; Test</test>
+            <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Show Section</open-section>
@@ -60,16 +110,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Review</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Delete</delete>
-                <import>&lt;i class="icon-upload"/&gt; Import</import>
-                <new>&lt;i class="icon-plus"/&gt; New</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Edit</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; Duplicate</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Summary</summary-title>
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
@@ -122,47 +162,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Save</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Save</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-                <validate>&lt;i class="icon-ok"/&gt; Validate</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Edit</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <summary>&lt;i class="icon-list"/&gt; Summary</summary>
-                <close>&lt;i class="icon-remove"/&gt; Close</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Clear</clear>
-                <cancel>Cancel</cancel>
-                <save-locally>Save Locally</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Clear and close</submit-dialog-clear>
-                <submit-dialog-keep>Keep values and close</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Close window</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Review</validation-dialog-review>
-                <validation-dialog-continue>Continue</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Document saved successfully!</save-success>
                 <save-draft-success>Draft saved successfully!</save-draft-success>
@@ -303,6 +302,56 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Accueil</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Supprimer</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importer</import>
+            <new>&lt;i class="icon-plus"/&gt; Nouveau</new>
+            <duplicate>&lt;i class="icon-file"/&gt; Dupliquer</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Valider</review>
+            <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; Valider</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
+            <close>&lt;i class="icon-remove"/&gt; Fermer</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Effacer</clear>
+            <cancel>Annuler</cancel>
+            <save-locally>Enreg. Local</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Suivant</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Précédent</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
+            <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Revoir</validation-dialog-review>
+            <validation-dialog-continue>Continuer</validation-dialog-continue>
+            
+            <test>&lt;i class="icon-cog"/&gt; Tester</test>
+            <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Montrer section</open-section>
@@ -346,16 +395,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Accueil</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Supprimer</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importer</import>
-                <new>&lt;i class="icon-plus"/&gt; Nouveau</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Editer</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; Dupliquer</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Sommaire</summary-title>
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
@@ -408,47 +447,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Valider</review>
-                <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-                <validate>&lt;i class="icon-ok"/&gt; Valider</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Accueil</home>
-                <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
-                <close>&lt;i class="icon-remove"/&gt; Fermer</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Effacer</clear>
-                <cancel>Annuler</cancel>
-                <save-locally>Enreg. Local</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Suivant</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Précédent</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
-                <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Revoir</validation-dialog-review>
-                <validation-dialog-continue>Continuer</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Document enregistré avec succès!</save-success>
                 <save-draft-success>Document en cours enregistré avec succès!</save-draft-success>
@@ -590,6 +588,56 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Inicio</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Ver</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importar</import>
+            <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
+            <duplicate>&lt;i class="icon-file"/&gt; Duplicar</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Ver</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Ver</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editar</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Resumen</summary>
+            <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Limpiar</clear>
+            <cancel>Cancel</cancel>
+            <save-locally>Save Locally</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
+            <submit-dialog-keep>Mantener valores y cerrar</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Revisar</validation-dialog-review>
+            <validation-dialog-continue>Continuar</validation-dialog-continue>
+
+            <test>&lt;i class="icon-cog"/&gt; Testear</test>
+            <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Mostrar Sección</open-section>
@@ -624,16 +672,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Inicio</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Ver</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importar</import>
-                <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Editar</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; Duplicar</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Resumen</summary-title>
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
@@ -686,47 +724,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Ver</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-                <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Ver</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editar</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Inicio</home>
-                <summary>&lt;i class="icon-list"/&gt; Resumen</summary>
-                <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Limpiar</clear>
-                <cancel>Cancel</cancel>
-                <save-locally>Save Locally</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
-                <submit-dialog-keep>Mantener valores y cerrar</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Revisar</validation-dialog-review>
-                <validation-dialog-continue>Continuar</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
                 <save-draft-success>Borrador guardado correctamente!</save-draft-success>
@@ -862,6 +859,57 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Hjem</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Slett</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importer</import>
+            <new>&lt;i class="icon-plus"/&gt; Nytt skjema</new>
+            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
+            <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
+            <review>&lt;i class="icon-arrow-right"/&gt; Vis</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
+            <email>&lt;i class="icon-envelope"/&gt; Epost</email>
+            <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Vis</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+            <close>&lt;i class="icon-remove"/&gt; Lukk</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Tøm innhold</clear>
+            <cancel>Angre</cancel>
+            <save-locally>Lagre lokalt</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
+            <submit-dialog-keep>Behold innhold og lukk</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review todo="true">[Review]</validation-dialog-review>
+            <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
+            
+            <test>&lt;i class="icon-cog"/&gt; Test</test>
+            <publish>&lt;i class="icon-globe"/&gt; Publiser…</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Åpne seksjon</open-section>
@@ -896,16 +944,7 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Hjem</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Slett</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importer</import>
-                <new>&lt;i class="icon-plus"/&gt; Nytt skjema</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Rediger</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
-            </buttons>
+
             <titles>
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
@@ -958,48 +997,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
-                <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
-                <review>&lt;i class="icon-arrow-right"/&gt; Vis</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
-                <email>&lt;i class="icon-envelope"/&gt; Epost</email>
-                <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Vis</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Hjem</home>
-                <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
-                <close>&lt;i class="icon-remove"/&gt; Lukk</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Tøm innhold</clear>
-                <cancel>Angre</cancel>
-                <save-locally>Lagre lokalt</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
-                <submit-dialog-keep>Behold innhold og lukk</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review todo="true">[Review]</validation-dialog-review>
-                <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Skjemaet er lagret!</save-success>
                 <save-draft-success todo="true">[Draft saved successfully!]</save-draft-success>
@@ -1133,6 +1130,56 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; На главную</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Удалить</delete>
+            <import>&lt;i class="icon-upload"/&gt; Импорт</import>
+            <new>&lt;i class="icon-plus"/&gt; Новая</new>
+            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Сохранить</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Править</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Отправить</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+            <close>&lt;i class="icon-remove"/&gt; Закрыть</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Очистить</clear>
+            <cancel>Отменить</cancel>
+            <save-locally>Сохр.на диск</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
+            <submit-dialog-keep>Сохранить значения и закрыть</submit-dialog-keep>
+            <submit-dialog-go>Ок</submit-dialog-go>
+            <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review todo="true">[Review]</validation-dialog-review>
+            <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
+            
+            <test>&lt;i class="icon-cog"/&gt; Тестировать</test>
+            <publish>&lt;i class="icon-globe"/&gt; Публиковать</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Показать раздел</open-section>
@@ -1167,16 +1214,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; На главную</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Удалить</delete>
-                <import>&lt;i class="icon-upload"/&gt; Импорт</import>
-                <new>&lt;i class="icon-plus"/&gt; Новая</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Редактировать</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Общая информация</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
@@ -1229,47 +1266,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Сохранить</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-                <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Править</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Отправить</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; На главную</home>
-                <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
-                <close>&lt;i class="icon-remove"/&gt; Закрыть</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Очистить</clear>
-                <cancel>Отменить</cancel>
-                <save-locally>Сохр.на диск</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
-                <submit-dialog-keep>Сохранить значения и закрыть</submit-dialog-keep>
-                <submit-dialog-go>Ок</submit-dialog-go>
-                <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review todo="true">[Review]</validation-dialog-review>
-                <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Документ сохранен успешно!</save-success>
                 <save-draft-success todo="true">[Draft saved successfully!]</save-draft-success>
@@ -1402,6 +1398,56 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Recensione</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Cancella</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importa</import>
+            <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
+            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Salva</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Salva</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Salva</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Esamina</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; Validare</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Presentare</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Esamina</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Modifica</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Sommario</summary>
+            <close>&lt;i class="icon-remove"/&gt; Chiudi</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Cancella</clear>
+            <cancel>Cancella</cancel>
+            <save-locally>Salva localmente</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Cancella e chiudi</submit-dialog-clear>
+            <submit-dialog-keep>Memorizza valori e chiudi</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Chiudi finestra</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Recensione</validation-dialog-review>
+            <validation-dialog-continue>Continua</validation-dialog-continue>
+            
+            <test>&lt;i class="icon-cog"/&gt; Prova</test>
+            <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Mostra sezione</open-section>
@@ -1442,16 +1488,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Recensione</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Cancella</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importa</import>
-                <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Modifica</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Sommario</summary-title>
                 <delete-confirmation>Conferma cancella</delete-confirmation>
@@ -1504,47 +1540,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Salva</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Salva</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Salva</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Esamina</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-                <validate>&lt;i class="icon-ok"/&gt; Validare</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Presentare</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Esamina</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Modifica</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <summary>&lt;i class="icon-list"/&gt; Sommario</summary>
-                <close>&lt;i class="icon-remove"/&gt; Chiudi</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Cancella</clear>
-                <cancel>Cancella</cancel>
-                <save-locally>Salva localmente</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Cancella e chiudi</submit-dialog-clear>
-                <submit-dialog-keep>Memorizza valori e chiudi</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Chiudi finestra</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Recensione</validation-dialog-review>
-                <validation-dialog-continue>Continua</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Il documento è stato salvato!</save-success>
                 <save-draft-success>Bozza salvata correttamente!</save-draft-success>
@@ -1684,6 +1679,56 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Übersicht</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Löschen</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importieren</import>
+            <new>&lt;i class="icon-plus"/&gt; Neu</new>
+            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Speichern</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Einsenden</send>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; Validieren</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Abschicken</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Ändern</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Einsenden</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Übersicht</summary>
+            <close>&lt;i class="icon-remove"/&gt; Schließen</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Zurücksetzen</clear>
+            <cancel>Löschen</cancel>
+            <save-locally>Lokal speichern</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
+            <submit-dialog-keep>Werte beibehalten und schließen</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Fenster schließen</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Überprüfung</validation-dialog-review>
+            <validation-dialog-continue>Weiter</validation-dialog-continue>
+
+            <test>&lt;i class="icon-cog"/&gt; Test</test>
+            <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Abschnitt anzeigen</open-section>
@@ -1724,16 +1769,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Übersicht</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Löschen</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importieren</import>
-                <new>&lt;i class="icon-plus"/&gt; Neu</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Ändern</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Übersicht</summary-title>
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
@@ -1786,47 +1821,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Speichern</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Einsenden</send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-                <validate>&lt;i class="icon-ok"/&gt; Validieren</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Abschicken</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Ändern</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Einsenden</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <summary>&lt;i class="icon-list"/&gt; Übersicht</summary>
-                <close>&lt;i class="icon-remove"/&gt; Schließen</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Zurücksetzen</clear>
-                <cancel>Löschen</cancel>
-                <save-locally>Lokal speichern</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
-                <submit-dialog-keep>Werte beibehalten und schließen</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Fenster schließen</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Überprüfung</validation-dialog-review>
-                <validation-dialog-continue>Weiter</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Document erfolgreich gespeichert!</save-success>
                 <save-draft-success>Entwurf erfolgreich gespeichert!</save-draft-success>
@@ -1966,6 +1960,56 @@
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Koti</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Käy läpi</review>
+            <pdf>&lt;i class="icon-print"/&gt; Näytä PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Poista</delete>
+            <import>&lt;i class="icon-upload"/&gt; Tuo</import>
+            <new>&lt;i class="icon-plus"/&gt; Uusi</new>
+            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Tallenna</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Tallenna</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
+            <email>&lt;i class="icon-envelope"/&gt; Sähköposti</email>
+            <validate>&lt;i class="icon-ok"/&gt; Tarkista oikeellisuus</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Toimita</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Lähetä</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Yhteenveto</summary>
+            <close>&lt;i class="icon-remove"/&gt; Sulje</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Tyhjennä</clear>
+            <cancel>Peruuta</cancel>
+            <save-locally>Tallenna paikallisesti</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Seuraava</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Edellinen</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
+            <submit-dialog-keep>Pidä arvot ja sulje</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Sulje ikkuna</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Käy läpi</validation-dialog-review>
+            <validation-dialog-continue>Jatka</validation-dialog-continue>
+
+            <test>&lt;i class="icon-cog"/&gt; Testaa</test>
+            <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
+        </buttons>
         <components>
             <labels>
                 <open-section>Näytä lohko</open-section>
@@ -2006,16 +2050,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Koti</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Käy läpi</review>
-                <pdf>&lt;i class="icon-print"/&gt; Näytä PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Poista</delete>
-                <import>&lt;i class="icon-upload"/&gt; Tuo</import>
-                <new>&lt;i class="icon-plus"/&gt; Uusi</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Muokkaa</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Yhteenveto</summary-title>
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
@@ -2068,47 +2102,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Tallenna</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Tallenna</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
-                <email>&lt;i class="icon-envelope"/&gt; Sähköposti</email>
-                <validate>&lt;i class="icon-ok"/&gt; Tarkista oikeellisuus</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Toimita</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Lähetä</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Koti</home>
-                <summary>&lt;i class="icon-list"/&gt; Yhteenveto</summary>
-                <close>&lt;i class="icon-remove"/&gt; Sulje</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Tyhjennä</clear>
-                <cancel>Peruuta</cancel>
-                <save-locally>Tallenna paikallisesti</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Seuraava</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Edellinen</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
-                <submit-dialog-keep>Pidä arvot ja sulje</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Sulje ikkuna</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Käy läpi</validation-dialog-review>
-                <validation-dialog-continue>Jatka</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Asiakirja tallennettu onnistuneesti!</save-success>
                 <save-draft-success>Luonnos tallennettu onnistuneesti!</save-draft-success>
@@ -2248,6 +2241,53 @@
                 <short-date>[Y0001]-[M01]-[D01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Start</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Granska</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Ta bort</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importera</import>
+            <new>&lt;i class="icon-plus"/&gt; Skapa</new>
+            <duplicate>&lt;i class="icon-file"/&gt; Duplicera</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Spara</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Spara</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Spara</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Granska</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
+            <email>&lt;i class="icon-envelope"/&gt; Mejla</email>
+            <validate>&lt;i class="icon-ok"/&gt; Godkänn</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Skicka</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Granska</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Redigera</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Skicka</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Lista</summary>
+            <close>&lt;i class="icon-remove"/&gt; Stäng</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Rensa</clear>
+            <cancel>Avbryt</cancel>
+            <save-locally>Spara lokalt</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
+            <submit-dialog-keep>Behåll värden och stäng</submit-dialog-keep>
+            <submit-dialog-go>Ok</submit-dialog-go>
+            <submit-dialog-close-window>Stäng fönstret</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Granskning</validation-dialog-review>
+            <validation-dialog-continue>Fortsätt</validation-dialog-continue>
+        </buttons>
         <components>
             <labels>
                 <open-section>Visa sektion</open-section>
@@ -2288,16 +2328,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Start</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Granska</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Ta bort</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importera</import>
-                <new>&lt;i class="icon-plus"/&gt; Skapa</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Redigera</edit><!-- unused as of 2013-04-05 -->
-        <duplicate>&lt;i class="icon-file"/&gt; Duplicera</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Sammanställning</summary-title>
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
@@ -2350,47 +2380,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Spara</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Spara</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Spara</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Granska</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
-                <email>&lt;i class="icon-envelope"/&gt; Mejla</email>
-                <validate>&lt;i class="icon-ok"/&gt; Godkänn</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Skicka</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Granska</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Redigera</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Skicka</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Start</home>
-                <summary>&lt;i class="icon-list"/&gt; Lista</summary>
-                <close>&lt;i class="icon-remove"/&gt; Stäng</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Rensa</clear>
-                <cancel>Avbryt</cancel>
-                <save-locally>Spara lokalt</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
-                <submit-dialog-keep>Behåll värden och stäng</submit-dialog-keep>
-                <submit-dialog-go>Ok</submit-dialog-go>
-                <submit-dialog-close-window>Stäng fönstret</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Granskning</validation-dialog-review>
-                <validation-dialog-continue>Fortsätt</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Formuläret sparat</save-success>
                 <save-draft-success>Utkast sparat</save-draft-success>
@@ -2530,6 +2519,53 @@
                 <short-date>[D01]-[M01]-[Y01]</short-date>
             </formats>
         </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Home</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Review</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Verwijderen</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importeren</import>
+            <new>&lt;i class="icon-plus"/&gt; Nieuw</new>
+            <duplicate>&lt;i class="icon-file"/&gt; Dupliceren</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Opslaan</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Opslaan</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Opslaan</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
+            <email>&lt;i class="icon-envelope"/&gt; E-mail</email>
+            <validate>&lt;i class="icon-ok"/&gt; Valideren</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Indienen</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Sturen</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Samenvatting</summary>
+            <close>&lt;i class="icon-remove"/&gt; Sluiten</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Wissen</clear>
+            <cancel>Anulleren</cancel>
+            <save-locally>Lokaal bewaren</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
+            <submit-dialog-keep>Waarden behouden en sluiten</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Venster sluiten</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Review</validation-dialog-review>
+            <validation-dialog-continue>Doorgaan</validation-dialog-continue>
+        </buttons>
         <components>
             <labels>
                 <open-section>Sectie tonen</open-section>
@@ -2570,16 +2606,6 @@
             </formats>
         </print>
         <summary>
-            <buttons>
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <review>&lt;i class="icon-eye-open"/&gt; Review</review>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Verwijderen</delete>
-                <import>&lt;i class="icon-upload"/&gt; Importeren</import>
-                <new>&lt;i class="icon-plus"/&gt; Nieuw</new>
-                <edit>&lt;i class="icon-pencil"/&gt; Bewerken</edit><!-- unused as of 2013-04-05 -->
-                <duplicate>&lt;i class="icon-file"/&gt; Dupliceren</duplicate>
-            </buttons>
             <titles>
                 <summary-title>Samenvatting</summary-title>
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
@@ -2632,47 +2658,6 @@
             </formats>
         </summary>
         <detail>
-            <buttons>
-                <!-- Standard process buttons -->
-                <save>&lt;i class="icon-hdd"/&gt; Opslaan</save>
-                <save-final>&lt;i class="icon-hdd"/&gt; Opslaan</save-final>
-                <save-draft>&lt;i class="icon-inbox"/&gt; Opslaan</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
-                <email>&lt;i class="icon-envelope"/&gt; E-mail</email>
-                <validate>&lt;i class="icon-ok"/&gt; Valideren</validate>
-
-                <!-- Legacy buttons -->
-                <submit>&lt;i class="icon-arrow-right"/&gt; Indienen</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Sturen</workflow-send>
-
-                <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; Home</home>
-                <summary>&lt;i class="icon-list"/&gt; Samenvatting</summary>
-                <close>&lt;i class="icon-remove"/&gt; Sluiten</close>
-                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Wissen</clear>
-                <cancel>Anulleren</cancel>
-                <save-locally>Lokaal bewaren</save-locally>
-                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
-                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
-
-                <!-- Submit dialog -->
-                <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
-                <submit-dialog-keep>Waarden behouden en sluiten</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Venster sluiten</submit-dialog-close-window>
-
-                <!-- Warning dialog -->
-                <validation-dialog-review>Review</validation-dialog-review>
-                <validation-dialog-continue>Doorgaan</validation-dialog-continue>
-            </buttons>
             <messages>
                 <save-success>Document succesvol bewaard!</save-success>
                 <save-draft-success>Concept succesvol bewaard!</save-draft-success>

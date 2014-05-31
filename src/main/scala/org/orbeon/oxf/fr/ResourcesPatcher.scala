@@ -54,12 +54,18 @@ object ResourcesPatcher {
 
         val propertyNames = properties.propertiesStartsWith("oxf.fr.resource" :: app :: form :: Nil mkString ".")
 
+        // In 4.6 summary/detail buttons are at the top level
+        def filterPathForBackwardCompatibility(path: Seq[String]) = path take 2 match {
+            case Seq("detail" | "summary", "buttons") ⇒ path drop 1
+            case _                                    ⇒ path
+        }
+
         val langPathValue =
             for {
                 name   ← propertyNames
                 tokens = name split """\."""
                 lang   = tokens(5)
-                path   = tokens drop 6 mkString "/"
+                path   = filterPathForBackwardCompatibility(tokens drop 6) mkString "/"
             } yield
                 (lang, path, properties.getString(name))
 

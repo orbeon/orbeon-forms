@@ -76,9 +76,15 @@
 
     <property as="xs:string"  name="oxf.fb.publish.buttons"                          value="new summary"/>
 
+
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
     <property as="xs:integer" name="oxf.fb.grid.max-columns"                         value="4"/>
     <property as="xs:integer" name="oxf.fb.section.close"                            value="100"/>
+
+    <!-- Form Builder detail page buttons -->
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.builder">
+        summary new test publish save
+    </property>
 
     <!-- Form Builder summary page  -->
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder">
@@ -92,7 +98,28 @@
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"       value="true"/>
 
     <!-- Processes associated with Form Builder buttons -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save.orbeon.builder"       value='save-final'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.close.orbeon.builder"      value='summary'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.close.orbeon.builder">
+        summary
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.new.orbeon.builder">
+        navigate(uri = "/fr/orbeon/builder/new")
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
+        xf:dispatch(name = "fb-test-form")
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
+        xf:show(
+            dialog = "fb-publish-dialog",
+            app    = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name}",
+            form   = "{xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name}"
+        )
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.save.orbeon.builder">
+        save-final
+    </property>
 
 </properties>

@@ -31,13 +31,17 @@
 
             <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
             <!-- Q: Should modality be configured in properties? oxf.fr.detail.process.home.modal = false -->
-            <xf:var name="modal" value="not($button-name = ('collapse-all', 'expand-all', 'home', 'summary', 'close', 'clear', 'validate', 'wizard-prev', 'wizard-next'))"/>
+            <xf:var name="modal" value="not($button-name = ('collapse-all', 'expand-all', 'home', 'summary', 'new', 'close', 'clear', 'validate', 'wizard-prev', 'wizard-next', 'test', 'publish'))"/>
 
             <xf:trigger
                     ref="xxf:binding('fr-process-button')"
                     xbl:attr="appearance"
                     class="fr-{$button-name}-button {if ($modal) then 'xforms-trigger-appearance-modal' else ''}">
-                <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/*[name() = $button-name]"/>
+                <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
+                <!-- Run process action within context item of xxf:instance('fr-form-instance'). This is not the full
+                     context, meaning that we are not in the XForms context of that model/instance (which would
+                     determine the current model, for example), or even the full XPath context, which would expose
+                     variables. -->
                 <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                     xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
                 </xf:action>

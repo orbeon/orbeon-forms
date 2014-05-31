@@ -37,7 +37,7 @@
             <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')))">
                 <!-- Clear button -->
                 <xf:trigger ref="instance()[context() = 'clear']">
-                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-clear"/>
+                    <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-clear"/>
                     <xf:action ev:event="DOMActivate">
                         <!-- Restore instance -->
                         <xf:dispatch name="fr-clear" targetid="fr-persistence-model"/>
@@ -49,7 +49,7 @@
                 </xf:trigger>
                 <!-- Keep button -->
                 <xf:trigger ref="instance()[context() = 'keep']">
-                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-keep"/>
+                    <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-keep"/>
                     <xf:action ev:event="DOMActivate">
                         <xxf:hide dialog="fr-submission-result-dialog"/>
                         <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
@@ -57,7 +57,7 @@
                 </xf:trigger>
                 <!-- Go button -->
                 <xf:trigger ref="instance()[context() = 'go']">
-                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-go"/>
+                    <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-go"/>
                     <xf:action ev:event="DOMActivate">
                         <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
                         <xf:load context="xxf:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
@@ -65,7 +65,7 @@
                 </xf:trigger>
                 <!-- Close window button -->
                 <xf:trigger ref="instance()[context() = 'close-window']">
-                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-close-window"/>
+                    <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-close-window"/>
                     <xxf:script ev:event="DOMActivate">window.close();</xxf:script>
                 </xf:trigger>
             </xf:repeat>

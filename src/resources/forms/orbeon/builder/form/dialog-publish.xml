@@ -113,12 +113,15 @@
             </xh:div>
             <xh:div class="fr-dialog-buttons">
                 <xf:group>
-                    <!-- Submit button -->
+                    <!-- Publish button -->
                     <xf:trigger xxf:modal="true" appearance="xxf:primary">
                         <xf:label value="$form-resources/dialog-publish/publish"/>
                         <!-- Dispatch publish event -->
-                        <xf:dispatch event="DOMActivate" name="fb-publish-form" targetid="fb-publish-model">
+                        <xf:dispatch event="DOMActivate" name="fb-publish-form" targetid="fr-form-model">
+                            <xf:property name="app"      value="$app"/>
+                            <xf:property name="form"     value="$form"/>
                             <xf:property name="document" model="fr-persistence-model" value="$document"/>
+                            <xf:property name="version"  value="instance()/version/string()"/>
                         </xf:dispatch>
                     </xf:trigger>
                     <xf:output value="$form-resources/or/label"/>
@@ -205,30 +208,6 @@
 
         <xf:var name="versioning-supported"
                 value="if ($app != '') then frf:versioningSupported($app, $form) else false()"/>
-
-        <!-- Publish form operation -->
-        <xf:action event="fb-publish-form" type="xpath">
-            for $annotated in
-                xxf:call-xpl(
-                    'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                    (
-                        'data',
-                        'bindings'
-                    ),
-                    (
-                        xxf:call-xpl(
-                            'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                            'data',
-                            xxf:instance('fb-form-instance'),
-                            'data'
-                        ),
-                        xxf:instance('fb-components-instance')
-                    ),
-                    'data'
-                )
-            return
-                fbf:publish($annotated, $app, $form, event('document'), instance()/version)
-        </xf:action>
 
         <!--<xf:instance id="fb-existing-form-instance"><dummy/></xf:instance>-->
 

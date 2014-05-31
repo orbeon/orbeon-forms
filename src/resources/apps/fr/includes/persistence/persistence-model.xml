@@ -403,6 +403,16 @@
         </save>
     </xf:instance>
 
+    <!-- Watch data-status and dispatch fr-data-status-changed -->
+    <xf:action
+        event="xxforms-value-changed"
+        observer="fr-persistence-instance"
+        if="name(event('node')) = 'data-status' and event('old-value') != event('new-value')">
+        <xf:dispatch name="fr-data-status-changed" targetid="fr-persistence-model">
+            <xf:property name="data-status" value="event('new-value')"/>
+        </xf:dispatch>
+    </xf:action>
+
     <xf:bind ref="$persistence-instance">
         <xf:bind ref="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
         <xf:bind ref="captcha" constraint=". = 'true'"/>
@@ -426,8 +436,6 @@
             <pdf/>
             <noscript/>
             <other/>
-            <!-- TODO: Move out, this is Form Builder-specific -->
-            <publish/>
         </triggers>
     </xf:instance>
 
@@ -458,12 +466,6 @@
 
         <xf:bind ref="noscript"
                  relevant="property('xxf:noscript')"/>
-
-        <!-- TODO: Move out, this is Form Builder-specific -->
-        <xf:bind ref="publish"
-                 readonly="not($persistence-instance/data-status = 'clean')
-                           or xxf:instance('fr-error-summary-instance')/valid = false()
-                           or xxf:pending-uploads() > 0"/>
     </xf:bind>
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity

@@ -842,14 +842,14 @@
                             <!-- Home -->
                             <xf:group ref="if (. = 'home') then $enabled else ()">
                                 <xf:trigger ref=".">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/home"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/home"/>
                                     <xf:load ev:event="DOMActivate" resource="/fr/"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- Print/review button -->
                             <xf:group ref="if (. = ('print', 'review')) then if ($view-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref=".">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/review"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/review"/>
                                     <xf:action ev:event="DOMActivate">
                                         <!-- FIXME: assert(only one document selected) -->
                                         <xf:dispatch targetid="fr-form-model" name="fr-summary-view"/>
@@ -866,7 +866,7 @@
                                 <fr:href-button
                                         ref="."
                                         href="/fr/{$app}/{$form}/pdf/{$selection-document-id}?fr-language={xxf:instance('fr-language-instance')}">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/pdf"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/pdf"/>
                                 </fr:href-button>
                             </xf:group>
                             <!-- Test button -->
@@ -880,7 +880,7 @@
                             <!-- Delete button -->
                             <xf:group ref="if (. = 'delete') then if ($delete-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref=".">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/delete"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/delete"/>
                                     <!-- Open delete confirmation dialog -->
                                     <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
                                 </xf:trigger>
@@ -888,21 +888,21 @@
                             <!-- Import button -->
                             <xf:group ref="if (. = 'import' and $new-visible) then $enabled else ()">
                                 <xf:trigger ref=".">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/import"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/import"/>
                                     <xf:load ev:event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- New button -->
                             <xf:group ref="if (. = 'new' and $new-visible) then $enabled else ()">
                                 <xf:trigger ref="." appearance="xxf:primary">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/new"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/new"/>
                                     <xf:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- Duplicate button -->
                             <xf:group ref="if (. = 'duplicate') then if ($duplicate-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref=".">
-                                    <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/duplicate"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/duplicate"/>
                                     <xf:action ev:event="DOMActivate">
                                         <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
                                             <xf:send submission="read-form-data">

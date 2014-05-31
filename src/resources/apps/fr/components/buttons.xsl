@@ -59,7 +59,7 @@
                 ref="instance('fr-triggers-instance')/pdf"
                 href="/fr/service/{$app}/{$form}/pdf/{{xxf:instance('fr-parameters-instance')/document}}/{{xxf:document-id()}}.pdf">
             <xsl:copy-of select="@appearance | @ref | @class" />
-            <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/pdf"/>
+            <xf:label mediatype="text/html" value="$fr-resources/buttons/pdf"/>
         </fr:href-button>
     </xsl:template>
 

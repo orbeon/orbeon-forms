@@ -209,18 +209,6 @@
         <help-icon>
             <label>Edit Help</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; New</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Test</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Publish</label>
-        </publish-button>
-        <save-as-button>
-            <label>Save as…</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Add</label>
@@ -1099,18 +1087,6 @@
         <help-icon>
             <label>Editer l'aide</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; Nouveau</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Tester</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Publier</label>
-        </publish-button>
-        <save-as-button>
-            <label>Enregistrer sous…</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Ajouter</label>
@@ -1984,18 +1960,6 @@
         <help-icon>
             <label>Rediger hjelpetekst</label>
         </help-icon>
-        <new-button>
-            <label todo="true">[&lt;i class="icon-plus"/&gt; New]</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Test</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Publiser…</label>
-        </publish-button>
-        <save-as-button>
-            <label todo="true">[Save as…]</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Legg til</label>
@@ -2868,18 +2832,6 @@
         <help-icon>
             <label>Редактировать справку</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; Новая</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Тестировать</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Публиковать</label>
-        </publish-button>
-        <save-as-button>
-            <label>Сохр.копию</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Добавить</label>
@@ -3752,18 +3704,6 @@
         <help-icon>
             <label>Modifica aiuto</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; Nuovo</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Prova</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Pubblica</label>
-        </publish-button>
-        <save-as-button>
-            <label>Salva con nome...</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Aggiungi</label>
@@ -4641,18 +4581,6 @@
         <help-icon>
             <label>Hilfstext editieren</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; Neu</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Test</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Veröffentlichen</label>
-        </publish-button>
-        <save-as-button>
-            <label>Speichern als…</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Hinzufügen</label>
@@ -5532,18 +5460,6 @@
         <help-icon>
             <label>Muokkaa Ohje</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; Uusi</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Testaa</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Julkaise</label>
-        </publish-button>
-        <save-as-button>
-            <label>Tallenna nimellä…</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Lisää</label>
@@ -6420,18 +6336,6 @@
         <help-icon>
             <label>Editar Ayuda</label>
         </help-icon>
-        <new-button>
-            <label>&lt;i class="icon-plus"/&gt; Nuevo</label>
-        </new-button>
-        <test-button>
-            <label>&lt;i class="icon-cog"/&gt; Testear</label>
-        </test-button>
-        <publish-button>
-            <label>&lt;i class="icon-globe"/&gt; Publicar</label>
-        </publish-button>
-        <save-as-button>
-            <label>Guardar como…</label>
-        </save-as-button>
         <!-- Common -->
         <add>
             <label>Agregar</label>

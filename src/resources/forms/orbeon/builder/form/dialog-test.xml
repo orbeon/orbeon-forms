@@ -30,7 +30,7 @@
     <xh:div class="fr-dialog-buttons">
         <xh:span>
             <xf:trigger appearance="xxf:primary">
-                <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/close"/>
+                <xf:label mediatype="text/html" value="$fr-resources/buttons/close"/>
                 <xxf:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
             </xf:trigger>
         </xh:span>

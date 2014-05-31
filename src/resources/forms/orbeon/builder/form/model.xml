@@ -28,7 +28,7 @@
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
-      xxf:external-events="show-fb-test-dialog fb-update-control-lhha"
+      xxf:external-events="fb-show-test-dialog fb-update-control-lhha"
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
       xxf:expose-xpath-types="true"
@@ -277,7 +277,10 @@
     <!-- Similar to fr-triggers-instance, but for FB-specific buttons -->
     <xf:instance id="fb-triggers-instance">
         <triggers>
+            <data-status/>
+            <publish/>
             <save-as/>
+            <other/>
         </triggers>
     </xf:instance>
 
@@ -289,6 +292,11 @@
     </xf:instance>
 
     <xf:bind ref="instance('fb-triggers-instance')">
+        <xf:bind ref="publish"
+                 readonly="not(../data-status = 'clean')
+                           or xxf:instance('fr-error-summary-instance')/valid = false()
+                           or xxf:pending-uploads() > 0"/>
+
         <!-- Condition for disabling Save as… button -->
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
         <xf:bind ref="save-as" readonly="$mode != 'edit'" calculate="$mode"/>
@@ -296,6 +304,13 @@
 
     <!-- HACK: Bind has inter-model dependency -->
     <xf:recalculate ev:event="xxforms-value-changed" ev:observer="fr-parameters-instance"/>
+
+    <!-- Synchronize data status -->
+    <xf:setvalue
+        event="fr-data-status-changed"
+        observer="fr-persistence-model"
+        ref="instance('fb-triggers-instance')/data-status"
+        value="event('data-status')"/>
 
     <!-- All form resources -->
     <xf:instance
@@ -412,6 +427,42 @@
 
     <xf:action ev:event="fb-xxforms-xpath-error" context="$variables">
         <xf:setvalue ref="if (rr = 'calculate') then calculate-errors else validate-errors" value=". + 1"/>
+    </xf:action>
+
+    <!-- Reset the displayed page as the iframe might show the result from a previous test -->
+    <xxf:script ev:event="fb-test-form">
+        $('#fb-test-iframe')[0].contentWindow.location.href = "about:blank";
+        ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-dialog");
+    </xxf:script>
+
+    <!-- Dispatched from the client, see above action -->
+    <xf:action ev:event="fb-show-test-dialog">
+        <xxf:show dialog="fb-test-dialog"/>
+        <xf:send submission="fb-test-form-submission"/>
+    </xf:action>
+
+    <!-- Publish form operation -->
+    <xf:action ev:event="fb-publish-form" type="xpath">
+        for $annotated in
+            xxf:call-xpl(
+                'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                (
+                    'data',
+                    'bindings'
+                ),
+                (
+                    xxf:call-xpl(
+                        'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                        'data',
+                        xxf:instance('fb-form-instance'),
+                        'data'
+                    ),
+                    xxf:instance('fb-components-instance')
+                ),
+                'data'
+            )
+        return
+            fbf:publish($annotated, event('app'), event('form'), event('document'), event('version'))
     </xf:action>
 
     <!-- These actions track how many dialogs are open at a given time -->

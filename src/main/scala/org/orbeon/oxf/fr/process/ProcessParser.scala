@@ -68,7 +68,7 @@ object ProcessParser extends Parser {
     }
 
     def Action: Rule1[ActionNode] = rule {
-        Name ~ optional("(" ~ OptWhiteSpace ~ zeroOrMore(Param, ", ") ~ OptWhiteSpace ~ ")") ~~>
+        Name ~ optional("(" ~ OptWhiteSpace ~ zeroOrMore(Param, ParamSeparator) ~ OptWhiteSpace ~ ")") ~~>
             ((name, params) ⇒ ActionNode(name, params.getOrElse(Nil).toMap))
     }
 
@@ -88,6 +88,8 @@ object ProcessParser extends Parser {
     def Param: Rule1[(Option[String], String)] = rule {
         optional(OptWhiteSpace ~ Name ~ OptWhiteSpace ~ "=") ~ OptWhiteSpace ~ ValueString ~~> (_ → _)
     }
+
+    def ParamSeparator = OptWhiteSpace ~ "," ~ OptWhiteSpace
 
     def ValueString: Rule1[String] = rule {
         "\"" ~ zeroOrMore(Character) ~> identity ~ "\""

@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.fr.process
 
-import SimpleProcess._
 import org.orbeon.oxf.fr.FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import util.Try
 
 trait XFormsActions {
+
+    self: ProcessInterpreter ⇒
 
     def AllowedXFormsActions = Map[String, Action](
         "xf:send"     → tryXFormsSend,
@@ -32,16 +33,25 @@ trait XFormsActions {
             submission foreach (sendThrowOnError(_))
         }
 
+    private val StandardDispatchParams = Set("name", "targetid")
+    private val StandardShowParams     = Set("dialog")
+
+    private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]) = params.collect {
+        case (Some(name), value) if ! standardParamNames(name) ⇒ name → Option(evaluateValueTemplate(value))
+    }
+
     def tryXFormsDispatch(params: ActionParams): Try[Any] =
         Try {
-            val eventName = paramByNameOrDefault(params, "name")
+            val eventName     = paramByNameOrDefault(params, "name")
             val eventTargetId = paramByName(params, "targetid") getOrElse FormModel
-            eventName foreach (dispatch(_, eventTargetId))
+
+            eventName foreach (dispatch(_, eventTargetId, properties = collectCustomProperties(params, StandardDispatchParams)))
         }
 
     def tryShowDialog(params: ActionParams): Try[Any] =
         Try {
             val dialogName = paramByNameOrDefault(params, "dialog")
-            dialogName foreach (show(_))
+
+            dialogName foreach (show(_, properties = collectCustomProperties(params, StandardShowParams)))
         }
 }

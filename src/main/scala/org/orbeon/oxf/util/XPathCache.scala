@@ -268,7 +268,7 @@ object XPathCache {
                 functionLibrary, baseURI, isAVT = true, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
-            Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString) orNull
+            Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString) orNull // FIXME: can ever return null?
         }
     }
 

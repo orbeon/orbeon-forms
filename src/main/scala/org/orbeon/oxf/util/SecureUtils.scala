@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.security.{SecureRandom, MessageDigest}
+import java.security.{Security, SecureRandom, MessageDigest}
 import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.SecretKey
@@ -26,10 +26,11 @@ import org.orbeon.oxf.common.OXFException
 object SecureUtils {
 
     // Properties
-    private val XFormsPasswordProperty = "oxf.xforms.password" // for backward compatibility
-    private val PasswordProperty       = "oxf.crypto.password"
-    private val KeyLengthProperty      = "oxf.crypto.key-length"
-    private val HashAlgorithmProperty  = "oxf.crypto.hash-algorithm"
+    private val XFormsPasswordProperty    = "oxf.xforms.password" // for backward compatibility
+    private val PasswordProperty          = "oxf.crypto.password"
+    private val KeyLengthProperty         = "oxf.crypto.key-length"
+    private val HashAlgorithmProperty     = "oxf.crypto.hash-algorithm"
+    private val PreferredProviderProperty = "oxf.crypto.preferred-provider"
 
     private def getPassword: String = {
         val propertySet = Properties.instance.getPropertySet
@@ -43,6 +44,9 @@ object SecureUtils {
 
     private def getHashAlgorithm: String =
         Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA1")
+
+    private def getPreferredProvider: Option[String] =
+        Option(Properties.instance.getPropertySet.getString(PreferredProviderProperty))
 
     private val HexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
@@ -68,10 +72,19 @@ object SecureUtils {
         new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
     }
 
+    // See: https://github.com/orbeon/orbeon-forms/pull/1745
+    private lazy val preferredProviderOpt =
+        getPreferredProvider flatMap { preferredProvider ⇒
+            Security.getProviders find (_.getName == preferredProvider)
+        }
+
     // Cipher is not thread-safe, see:
     // http://stackoverflow.com/questions/6957406/is-cipher-thread-safe
     private val pool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
-        def makeObject() = Cipher.getInstance(EncryptionCipherTransformation)
+        def makeObject() = preferredProviderOpt match {
+            case Some(preferred) ⇒ Cipher.getInstance(EncryptionCipherTransformation, preferred)
+            case None            ⇒ Cipher.getInstance(EncryptionCipherTransformation)
+        }
     })
 
     private def withCipher[T](body: Cipher ⇒ T) = {

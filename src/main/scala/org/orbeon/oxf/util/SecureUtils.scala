@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.security.{SecureRandom, MessageDigest}
+import java.security.{SecureRandom, MessageDigest, Security, Provider}
 import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.SecretKey
@@ -67,11 +67,24 @@ object SecureUtils {
         val factory = SecretKeyFactory.getInstance(KeyCipherAlgorithm)
         new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
     }
+    
+    private lazy val defaultSecurityProvider: Provider = {
+        var sunJCEProvider: Provider = null
+        for (provider ← Security.getProviders())
+            if ("SunJCE".equals(provider.getName()))
+                sunJCEProvider = provider
+        sunJCEProvider
+    }
 
     // Cipher is not thread-safe, see:
     // http://stackoverflow.com/questions/6957406/is-cipher-thread-safe
     private val pool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
-        def makeObject() = Cipher.getInstance(EncryptionCipherTransformation)
+        def makeObject() = {
+            if (defaultSecurityProvider ne null)
+                Cipher.getInstance(EncryptionCipherTransformation, defaultSecurityProvider)
+            else
+                Cipher.getInstance(EncryptionCipherTransformation)
+        }
     })
 
     private def withCipher[T](body: Cipher ⇒ T) = {

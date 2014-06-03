@@ -55,7 +55,7 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             for {
                 _ ← webDriver.findElement(By.cssSelector("body")).click()
                 _ ← assert(isInvalid(regularSpan))
-                //_ ← assert(inErrorSummary("regular")) // FIXME
+                _ ← assert(inErrorSummary("regular"))
             }()
         }
 

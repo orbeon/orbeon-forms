@@ -70,7 +70,7 @@ object ClientEvents extends Logging {
     def processEvents(
             doc:                  XFormsContainingDocument,
             clientEvents:         List[LocalEvent],
-            serverEventsElements: List[Element]): (Boolean, ju.Set[String], String) = {
+            serverEventsElements: List[Element]): (Boolean, ju.Set[String], Option[String]) = {
 
         val allClientAndServerEvents = {
 
@@ -150,12 +150,13 @@ object ClientEvents extends Logging {
             val valueChangeControlIds = allClientAndServerEvents collect
                 { case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId } toSet
 
-            // Last client focus event received
-            val clientFocusControlId = allClientAndServerEvents.reverse find
-                (_.name == XFORMS_FOCUS) map
-                    (_.targetEffectiveId) orNull
+            // Last client focus/blur event received
+            val clientFocusControlId = allClientAndServerEvents.reverse collectFirst {
+                case e if e.name == XFORMS_FOCUS ⇒ Some(e.targetEffectiveId)
+                case e if e.name == XXFORMS_BLUR ⇒ None
+            }
 
-            (gotAllEvents, valueChangeControlIds.asJava, clientFocusControlId)
+            (gotAllEvents, valueChangeControlIds.asJava, clientFocusControlId.orNull)
 
         } else
             (false, ju.Collections.emptySet[String], null)
@@ -476,24 +477,28 @@ object ClientEvents extends Logging {
 
                 warn("ghost target")
 
-            } else eventTarget match {
+            } else (eventTarget, event) match {
                 // Controls accept event only if they are relevant
-                case control: XFormsControl if ! control.isRelevant ⇒
+                case (control: XFormsControl, _) if ! control.isRelevant ⇒
                     warn("non-relevant control")
 
                 // Output control not subject to readonly condition below
-                case control: XFormsOutputControl ⇒
+                case (control: XFormsOutputControl, _) ⇒
                     true
 
                 // Single node controls accept event only if they are not readonly
-                case control: XFormsSingleNodeControl if control.isReadonly ⇒
+                case (control: XFormsSingleNodeControl, _) if control.isReadonly ⇒
                     warn("read-only control")
 
-                // Disallow focus if the control is no focusable
+                // Disallow focus/blur if the control is no focusable
                 // Relevance and read-only above are already caught. This catches hidden controls, which must not be
                 // focusable from the client.
-                case control: XFormsControl if event.isInstanceOf[XFormsFocusEvent] && ! control.isFocusable ⇒
-                    warn("non-focusable control")
+                case (control: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! control.isFocusable ⇒
+                    warn(s"non-focusable control for ${e.name}")
+
+                // The client must dispatch xxforms-blur only to a control which had the focus
+                case (control: XFormsControl, e: XXFormsBlurEvent) if doc.getControls.getFocusedControl ne control ⇒
+                    warn(s"control doesn't have focus control for ${e.name}")
 
                 case _ ⇒
                     true

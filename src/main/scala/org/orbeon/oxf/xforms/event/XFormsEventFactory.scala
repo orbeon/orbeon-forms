@@ -29,6 +29,7 @@ object XFormsEventFactory {
         XFORMS_HELP                 → (new XFormsHelpEvent(_, _)),
         XFORMS_HINT                 → (new XFormsHintEvent(_, _)),
         XFORMS_FOCUS                → (new XFormsFocusEvent(_, _)),
+        XXFORMS_BLUR                → (new XXFormsBlurEvent(_, _)),
         DOM_FOCUS_IN                → (new DOMFocusInEvent(_, _)),
         DOM_FOCUS_OUT               → (new DOMFocusOutEvent(_, _)),
         XFORMS_ENABLED              → (new XFormsEnabledEvent(_, _)),

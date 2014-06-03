@@ -231,11 +231,11 @@ public class XFormsServer extends ProcessorImpl {
 
                             final boolean allEvents;
                             final Set<String> valueChangeControlIds;
-                            final String clientFocusControlId;
+                            final scala.Option<String> clientFocusControlId;
                             if (eventsFindings[0] != null) {
                                 allEvents = ((Boolean) eventsFindings[0]._1());
                                 valueChangeControlIds = ((Set<String>) eventsFindings[0]._2());
-                                clientFocusControlId = ((String) eventsFindings[0]._3());
+                                clientFocusControlId = ((scala.Option<String>) eventsFindings[0]._3());
                             } else {
                                 allEvents = false;
                                 valueChangeControlIds = Collections.emptySet();
@@ -454,7 +454,7 @@ public class XFormsServer extends ProcessorImpl {
             XFormsContainingDocument containingDocument,
             IndentedLogger indentedLogger,
             Set<String> valueChangeControlIds,
-            String clientFocusControlId,
+            scala.Option<String> clientFocusControlId,
             XFormsControl beforeFocusedControl,
             String repeatHierarchy,
             Document requestDocument,
@@ -650,7 +650,15 @@ public class XFormsServer extends ProcessorImpl {
 
                     // The focus as known by the client, as far as we know: either the focus sent by the client in the
                     // current request, or the focus information we kept since the previous request.
-                    final String beforeFocusEffectiveId = clientFocusControlId != null ? clientFocusControlId : beforeFocusedControl != null ? beforeFocusedControl.getEffectiveId() : null;
+                    final String beforeFocusEffectiveId =
+                        clientFocusControlId != null
+                        ? clientFocusControlId.isDefined()
+                            ? clientFocusControlId.get()
+                            : null
+                        : beforeFocusedControl != null
+                            ? beforeFocusedControl.getEffectiveId()
+                            : null;
+
                     final String afterFocusEffectiveId = afterFocusedControl != null ? afterFocusedControl.getEffectiveId() : null;
 
                     if (beforeFocusEffectiveId != null && afterFocusEffectiveId == null) {

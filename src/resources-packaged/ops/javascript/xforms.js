@@ -2797,12 +2797,12 @@ ORBEON.xforms.Events = {
                     ORBEON.xforms.Globals.currentFocusControlElement = control;
                 }
 
-                // Dispatch xforms-blur event if we're not going to another XForms control (see issue #619)
+                // Dispatch xxforms-blur event if we're not going to another XForms control (see issue #619)
                 var relatedTarget = event.relatedTarget || document.activeElement;
                 var relatedControl = ORBEON.xforms.Events._findParentXFormsControl(relatedTarget);
                 if (relatedControl == null) {
                     ORBEON.xforms.Globals.currentFocusControlId = null;
-                    var events = [new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xforms-blur")];
+                    var events = [new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xxforms-blur")];
                     ORBEON.xforms.server.AjaxServer.fireEvents(events, false);
                 }
             }

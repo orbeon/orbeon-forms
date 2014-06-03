@@ -144,7 +144,7 @@
                 && ORBEON.xforms.Globals.eventQueue.length > 0
                 && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
 
-            // Filter events (typically used for xforms-focus/xforms-blur events)
+            // Filter events (typically used for xforms-focus/xxforms-blur events)
             (function() {
                 var eventsToFilter = Properties.clientEventsFilter.get().split(" ");
                 Globals.eventQueue = _.filter(Globals.eventQueue, function(event) {

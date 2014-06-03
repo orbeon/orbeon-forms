@@ -66,6 +66,12 @@ trait VisitableTrait extends XFormsControl {
                 // visited property, it is up to date. This seems reasonable since DOMFocusOut indicates that the focus has
                 // already left the control.
                 visited = true
+            case _: XXFormsBlurEvent ⇒
+                // The client dispatches xxforms-blur when focus goes away from all XForms controls.
+                if (containingDocument.getControls.getFocusedControl eq this) {
+                    visited = true
+                    Focus.removeFocus(containingDocument)
+                }
             case _ ⇒
         }
         super.performTargetAction(event)

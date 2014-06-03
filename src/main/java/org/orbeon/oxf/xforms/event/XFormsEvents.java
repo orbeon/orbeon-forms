@@ -64,6 +64,8 @@ public class XFormsEvents {
     public static final String XXFORMS_XPATH_ERROR = "xxforms-xpath-error";
     public static final String XXFORMS_BINDING_ERROR = "xxforms-binding-error";
 
+    public static final String XXFORMS_BLUR = "xxforms-blur";
+
     // Standard XForms events
     public static final String XFORMS_MODEL_CONSTRUCT = "xforms-model-construct";
     public static final String XFORMS_MODEL_CONSTRUCT_DONE = "xforms-model-construct-done";

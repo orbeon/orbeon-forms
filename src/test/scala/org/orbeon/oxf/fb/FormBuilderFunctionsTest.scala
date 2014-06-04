@@ -168,7 +168,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 val explanationResourceHolder = FormBuilder.resourcesRoot.child("resource").child(*).last
                 val actual   = <holder> { explanationResourceHolder.child(*) map nodeInfoToElem } </holder>
                 val expected = <holder><text/></holder>
-                assertXMLDocuments(actual, expected)
+                assertXMLDocumentsIgnoreNamespacesInScope(actual, expected)
             }
 
             // Check that the <fr:text ref=""> points to the corresponding <text> resource

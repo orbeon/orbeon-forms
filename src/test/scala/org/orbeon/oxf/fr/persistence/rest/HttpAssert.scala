@@ -37,7 +37,7 @@ private object HttpAssert extends TestSupport {
                 body match {
                     case HttpRequest.XML(expectedDoc) ⇒
                         val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
-                        assertXMLDocuments(resultDoc, expectedDoc)
+                        assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
                     case HttpRequest.Binary(expectedFile) ⇒
                         assert(resultBody.get === expectedFile)
                 }

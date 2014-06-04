@@ -161,7 +161,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                         </resource>
                     </resources>
 
-                assertXMLDocuments(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
+                assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
             }
 
             locally {
@@ -203,7 +203,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                         </resource>
                     </resources>
 
-                assertXMLDocuments(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
+                assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
             }
         }
 
@@ -400,7 +400,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     private def assertAlertsXML(left: Array[Elem], right: Array[NodeInfo]): Unit = {
 
         left zip right foreach {
-            case (l, r) ⇒ assertXMLDocuments(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))
+            case (l, r) ⇒ assertXMLDocumentsIgnoreNamespacesInScope(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))
         }
 
         assert(left.size === right.size)

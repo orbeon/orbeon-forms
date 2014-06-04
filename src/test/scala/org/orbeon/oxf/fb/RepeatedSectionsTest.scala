@@ -47,7 +47,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                         </form>
                     )
     
-                assertXMLElementsCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
             }
 
             // Rename section
@@ -72,7 +72,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                         </form>
                     )
 
-                assertXMLElementsCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
             }
 
             // Custom iteration element name
@@ -96,7 +96,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                         </form>
                     )
                 
-                assertXMLElementsCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
             }
 
             // Change min/max
@@ -146,7 +146,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                         </form>
                     )
 
-                assertXMLElementsCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
             }
 
             // Disable repeat
@@ -168,7 +168,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                         </form>
                     )
     
-                assertXMLElementsCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
 
                 assert("0" === getNormalizedMin(doc, "foo"))
                 assert(None === getNormalizedMax(doc, "foo"))

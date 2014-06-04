@@ -99,7 +99,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
             setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
 
             // No annotation
-            assertXMLDocuments(copyFormInstance, copyAndAnnotate(""))
+            assertXMLDocumentsIgnoreNamespacesInScope(copyFormInstance, copyAndAnnotate(""))
 
             locally {
                 val expected: JDocument =
@@ -110,7 +110,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
                         </my-section>
                     </form>
 
-                assertXMLDocuments(expected, copyAndAnnotate("warning"))
+                assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning"))
             }
 
             locally {
@@ -122,7 +122,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
                         </my-section>
                     </form>
 
-                assertXMLDocuments(expected, copyAndAnnotate("info"))
+                assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("info"))
             }
 
             locally {
@@ -136,7 +136,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
                         </my-section>
                     </form>
 
-                assertXMLDocuments(expected, copyAndAnnotate("warning info"))
+                assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning info"))
             }
         }
 }

@@ -54,7 +54,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         val deserializedDoc = TransformerUtils.saxStoreToDom4jDocument(deserializedSAXStore)
 
         // Compare
-        assert(Dom4j.compareDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc))
+        assertXMLDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc)
     }
 
     @Test def saxStoreWithMarks() {
@@ -91,7 +91,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         // Compare all
         assert(actualDocs.size === expectedDocs.size)
         for ((expected, actual) ← expectedDocs zip actualDocs)
-            assert(Dom4j.compareDocumentsIgnoreNamespacesInScope(expected, actual))
+            assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
     }
 
     @Test def dynamicState() {
@@ -200,7 +200,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         val restoredXML = restored.staticStateDocument.xmlDocument
 
         // Compare expected/actual XML representation of the static state
-        assert(Dom4j.compareDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML))
+        assertXMLDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML)
 
         // Check other aspects of the restored state
         val part = restored.topLevelPart

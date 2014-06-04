@@ -350,6 +350,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                 doc
             }
 
-            assertXMLDocuments(filterResultBody(resultBodyTry.get), expectedBody)
+            assertXMLDocumentsIgnoreNamespacesInScope(filterResultBody(resultBodyTry.get), expectedBody)
         }
 }

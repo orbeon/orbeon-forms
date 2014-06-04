@@ -42,7 +42,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
                     FormBuilder.getControlItemsGroupedByValue(controlName).asScala map TransformerUtils.tinyTreeToDom4j
 
                 for ((expected, actual) ← expectedItems.zipAll(actualItems, null, null))
-                    assertXMLDocuments(expected, actual)
+                    assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
             }
 
             // Read itemsets
@@ -205,7 +205,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
                         }
                     }</resources>
                 val actualResources = resourceForNewControl()
-                assertXMLDocuments(actualResources, expectedResources)
+                assertXMLDocumentsIgnoreNamespacesInScope(actualResources, expectedResources)
             }
 
             // Editing a form in English; English placeholders are added

@@ -88,6 +88,6 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
         ResourcesPatcher.transform(initial, "*", "*")(propertySet)
 
-        assertXMLDocuments(initial, expected)
+        assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }
 }

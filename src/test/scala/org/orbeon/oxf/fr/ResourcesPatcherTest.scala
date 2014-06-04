@@ -18,7 +18,6 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.junit.Test
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xml.Dom4j
 import org.scalatest.junit.AssertionsForJUnit
 
 class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
@@ -44,31 +43,27 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
         def newDoc: Document =
             <resources>
                 <resource xml:lang="en">
-                    <detail>
-                        <buttons>
-                            <existing>OVERRIDE ME</existing>
-                            <acme>OVERRIDE ME</acme>
-                        </buttons>
-                    </detail>
+                    <buttons>
+                        <existing>OVERRIDE ME</existing>
+                        <acme>OVERRIDE ME</acme>
+                    </buttons>
                 </resource>
                 <resource xml:lang="fr">
-                    <detail>
-                        <buttons>
-                            <existing>OVERRIDE ME</existing>
-                            <acme>OVERRIDE ME</acme>
-                        </buttons>
-                    </detail>
+                    <buttons>
+                        <existing>OVERRIDE ME</existing>
+                        <acme>OVERRIDE ME</acme>
+                    </buttons>
                 </resource>
             </resources>
 
         val expected: Document =
             <resources>
                 <resource xml:lang="en">
+                    <buttons>
+                        <existing>Existing</existing>
+                        <acme>Acme Existing</acme>
+                    </buttons>
                     <detail>
-                        <buttons>
-                            <existing>Existing</existing>
-                            <acme>Acme Existing</acme>
-                        </buttons>
                         <labels>
                             <missing>Missing</missing>
                             <acme>Acme Missing</acme>
@@ -76,11 +71,11 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
                     </detail>
                 </resource>
                 <resource xml:lang="fr">
+                    <buttons>
+                        <existing>Existant</existing>
+                        <acme>Acme Existing</acme>
+                    </buttons>
                     <detail>
-                        <buttons>
-                            <existing>Existant</existing>
-                            <acme>Acme Existing</acme>
-                        </buttons>
                         <labels>
                             <missing>Manquant</missing>
                             <acme>Acme Missing</acme>
@@ -93,6 +88,6 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
         ResourcesPatcher.transform(initial, "*", "*")(propertySet)
 
-        assert(Dom4j.compareDocumentsIgnoreNamespacesInScope(initial, expected))
+        assertXMLDocuments(initial, expected)
     }
 }

@@ -718,9 +718,9 @@
                             <classpath><pathelement location="${oracle.jar}"/></classpath>
                             CREATE USER              orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat IDENTIFIED BY ${env.RDS_PASSWORD};
                             ALTER  USER              orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat QUOTA UNLIMITED ON users;
-                            GRANT  CREATE SESSION TO orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat",
-                            GRANT  CREATE TABLE   TO orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat",
-                            GRANT  CREATE TRIGGER TO orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat")
+                            GRANT  CREATE SESSION TO orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                            GRANT  CREATE TABLE   TO orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                            GRANT  CREATE TRIGGER TO orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
                         <sql driver="${mysql.driver}" url="${env.MYSQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
                             <classpath><pathelement location="${mysql.jar}"/></classpath>

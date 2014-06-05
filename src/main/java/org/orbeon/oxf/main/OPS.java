@@ -108,8 +108,7 @@ public class OPS {
         // 5. Build processor definition from command-line parameters
         if (otherArgs != null && otherArgs.length == 1) {
             // Assume the pipeline processor and a config input
-            processorDefinition = new ProcessorDefinition();
-            processorDefinition.setName(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
+            processorDefinition = new ProcessorDefinition(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
 
             final String configURL;
             if (!NetUtils.urlHasProtocol(otherArgs[0])) {
@@ -235,31 +234,30 @@ public class OPS {
             // 7. Run the pipeline from the processor definition created earlier. An ExternalContext
             // is supplied for those processors using external contexts, such as most serializers.
 
+            InitUtils.processorDefinitions();
             if (outputs == null) {
                 // No outputs to connect: just execute the pipeline
-                InitUtils.processorDefinitions();
-                InitUtils.runProcessor(InitUtils.createProcessor(processorDefinition), new CommandLineExternalContext(), pipelineContext, logger);
+                InitUtils.runProcessor(createProcessor(processorDefinition), new CommandLineExternalContext(), pipelineContext, logger);
             } else {
                 // At least one output to connect...
-                InitUtils.processorDefinitions();
-                Processor processor = createProcessor(processorDefinition);
+                final Processor processor = createProcessor(processorDefinition);
                 processor.reset(pipelineContext);
                 // Loop over outputs
-                for (int i=0;  i < outputs.length; i ++) {
-                    String outputArg = outputs[i];
-                    int iEqual = outputArg.indexOf("=");
+                for (int i = 0;  i < outputs.length; i ++) {
+                    final String outputArg = outputs[i];
+                    final int iEqual = outputArg.indexOf("=");
                     if (iEqual <= 0 || iEqual >= outputArg.length() - 1) {
                         throw new OXFException("Output \"" + outputArg + "\" doesn't follow the syntax <name>=<url>");
                     }
-                    String outputName = outputArg.substring(0, iEqual );
-                    URL url = URLFactory.createURL(outputArg.substring(iEqual + 1));
+                    final String outputName = outputArg.substring(0, iEqual );
+                    final URL url = URLFactory.createURL(outputArg.substring(iEqual + 1));
                     // Create the output
                     ProcessorOutput output = processor.createOutput(outputName);
                     // Connect to an URL serializer
-                    URLSerializer urlSerializer = new URLSerializer();
+                    final URLSerializer urlSerializer = new URLSerializer();
                     PipelineUtils.connect(processor, output.getName(), urlSerializer, "data");
                     // Serialize
-                    urlSerializer.serialize(pipelineContext, url);                    
+                    urlSerializer.serialize(pipelineContext, url);
                 }
 
             }

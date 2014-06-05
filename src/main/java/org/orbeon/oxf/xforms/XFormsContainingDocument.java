@@ -208,7 +208,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             final scala.Option<String> staticStateDigest = xformsState.staticStateDigest();
 
             if (staticStateDigest.isDefined()) {
-                final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateDigest.get());
+                final XFormsStaticState cachedState = XFormsStaticStateCache.getDocumentJava(staticStateDigest.get());
                 if (cachedState != null) {
                     // Found static state in cache
                     indentedLogger().logDebug("", "found static state by digest in cache");
@@ -221,7 +221,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
                     indentedLogger().endHandleOperation();
 
                     // Store in cache
-                    XFormsStaticStateCache.instance().storeDocument(this.staticState);
+                    XFormsStaticStateCache.storeDocument(this.staticState);
                 }
 
                 assert this.staticState.isServerStateHandling();

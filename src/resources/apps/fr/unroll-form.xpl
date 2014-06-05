@@ -75,12 +75,13 @@
 
     <!-- Apply UI components -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#themed-data"/>
-        <p:input name="instance" href="#instance"/>
-        <p:input name="config" href="components/components.xsl"/>
-        <p:input name="request" href="#request"/>
+        <p:input name="config"   href="components/components.xsl"/>
 
-        <p:output name="data" id="after-components"/>
+        <p:input name="data"     href="#themed-data"/>
+        <p:input name="instance" href="#instance"/>
+        <p:input name="request"  href="#request"/>
+
+        <p:output name="data"    id="after-components"/>
 
         <!-- This is here just so that we can reload the form when the properties or the resources change -->
         <p:input name="properties-xforms" href="oxf:/config/properties-xforms.xml"/>

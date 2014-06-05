@@ -103,9 +103,8 @@ public class XXFormsCallXPL extends XFormsFunction {
             // Create processor definition and processor
             Processor processor;
             {
-                ProcessorDefinition processorDefinition = new ProcessorDefinition();
+                ProcessorDefinition processorDefinition = new ProcessorDefinition(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
                 {
-                    processorDefinition.setName(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
                     processorDefinition.addInput("config", xplURL.toExternalForm());
 
                     Iterator inputNodesIterator = inputNodeInfos.iterator();

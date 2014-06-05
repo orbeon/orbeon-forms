@@ -58,14 +58,12 @@ public class SchedulerProcessor extends ProcessorImpl {
                         config.setName(XPathUtils.selectStringValueNormalize(startTaskElement, "name"));
 
                         // Create new processor definition
-                        ProcessorDefinition processorDefinition = new ProcessorDefinition();
-                        config.setProcessorDefinition(processorDefinition);
-
+                        final ProcessorDefinition processorDefinition;
                         {
                             // Use processor QName
                             final Element processorNameElement = startTaskElement.element(new QName("processor-name"));
                             final QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement, true);
-                            processorDefinition.setName(processorQName);
+                            processorDefinition = new ProcessorDefinition(processorQName);
 
                             for (final Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
                                 Element inputElement = (Element) j.next();
@@ -84,6 +82,8 @@ public class SchedulerProcessor extends ProcessorImpl {
                                 }
                             }
                         }
+
+                        config.setProcessorDefinition(processorDefinition);
 
                         String startTimeString = XPathUtils.selectStringValueNormalize(startTaskElement, "start-time");
                         long startTime = 0;

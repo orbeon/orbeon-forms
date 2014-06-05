@@ -26,18 +26,15 @@ import java.util.Map;
  * object can then be used to instantiate and run the given processor.
  */
 public class ProcessorDefinition {
-    private QName name;
+    private final QName name;
     private Map<String, Object> entries = new HashMap<String, Object>();
 
-    public ProcessorDefinition() {
-    }
-
     /**
-     * Set the qualified name of the processor, for example "oxf:xslt".
+     * Create a definition.
      *
-     * @param name the qualified name of the processor
+     * @param name the qualified name of the processor, for example "oxf:xslt".
      */
-    public void setName(QName name) {
+    public ProcessorDefinition(QName name) {
         this.name = name;
     }
 

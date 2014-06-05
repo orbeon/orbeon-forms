@@ -27,7 +27,7 @@ import org.orbeon.scaxon.XML._
 class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Test for issue #1689, where errors were not if the error summary was placed before what it was observing
-    @Test def onTop() {
+    @Test def onTop(): Unit = {
         val doc = this setupDocument
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
                   xmlns:xf="http://www.w3.org/2002/xforms"

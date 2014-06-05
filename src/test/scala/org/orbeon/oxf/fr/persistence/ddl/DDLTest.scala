@@ -28,7 +28,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
         val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"
         val createUserAndDatabase = provider match {
-            case Oracle    ⇒ Seq(s"CREATE USER $schema IDENTIFIED BY " ++ System.getenv("RDS_PASSWORD"),
+            case Oracle    ⇒ Seq(s"CREATE USER $schema IDENTIFIED BY ${System.getenv("RDS_PASSWORD")}",
                                  s"ALTER  USER $schema QUOTA UNLIMITED ON users",
                                  s"GRANT  CREATE SESSION TO $schema",
                                  s"GRANT  CREATE TABLE   TO $schema",

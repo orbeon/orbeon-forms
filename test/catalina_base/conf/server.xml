@@ -24,15 +24,15 @@
                   unpackWARs="true" autoDeploy="false"
                   xmlValidation="false" xmlNamespaceAware="false">
                 <Context path="/orbeon" docBase="../../../build/orbeon-war-tomcat" reloadable="false" override="true" allowLinking="true" crossContext="true">
-                    <!--<Resource name="jdbc/oracle_tomcat" auth="Container" type="javax.sql.DataSource"-->
-                        <!--initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"-->
-                        <!--driverClassName="oracle.jdbc.OracleDriver"-->
-                        <!--poolPreparedStatements="true"-->
-                        <!--validationQuery="select * from dual"-->
-                        <!--testOnBorrow="true"-->
-                        <!--username="orbeon_tomcat"-->
-                        <!--password="@RDS_PASSWORD@"-->
-                        <!--url="@ORACLE_URL@"/>-->
+                    <Resource name="jdbc/oracle_tomcat" auth="Container" type="javax.sql.DataSource"
+                        initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"
+                        driverClassName="oracle.jdbc.OracleDriver"
+                        poolPreparedStatements="true"
+                        validationQuery="select * from dual"
+                        testOnBorrow="true"
+                        username="orbeon_@TRAVIS_BUILD_NUMBER@_tomcat"
+                        password="@RDS_PASSWORD@"
+                        url="@ORACLE_URL@"/>
                     <Resource name="jdbc/mysql_tomcat" auth="Container" type="javax.sql.DataSource"
                         initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"
                         driverClassName="com.mysql.jdbc.Driver"

@@ -75,7 +75,7 @@ object InitUtils {
         try {
             // Set cache size
             val cacheMaxSize = Properties.instance.getPropertySet.getInteger(CacheSizeProperty)
-            if (cacheMaxSize != null) ObjectCache.instance.setMaxSize(cacheMaxSize)
+            if (cacheMaxSize ne null) ObjectCache.instance.setMaxSize(cacheMaxSize)
 
             // Start execution
             processor.reset(pipelineContext)
@@ -207,8 +207,7 @@ object InitUtils {
     // Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used
     def getDefinitionFromMap(map: Map[String, String], uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
         map.get(uriNamePropertyPrefix + "name") map { processorName ⇒
-            val processorDefinition = new ProcessorDefinition
-            processorDefinition.setName(Dom4jUtils.explodedQNameToQName(processorName))
+            val processorDefinition = new ProcessorDefinition(Dom4jUtils.explodedQNameToQName(processorName))
 
             for ((name, value) ← map)
                 if (name.startsWith(inputPropertyPrefix))

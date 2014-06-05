@@ -202,7 +202,7 @@ private object PEVersion {
                 val licence = new DOMGenerator(inputLicenseDocument, "license", DOMGenerator.ZeroValidity, LicenseURL)
                 val verifierProcessor = new SignatureVerifierProcessor
                 connect(licence, OUTPUT_DATA, verifierProcessor, INPUT_DATA)
-                connect(key, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
+                connect(key,     OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
                 val result = new DOMSerializer
                 connect(verifierProcessor, OUTPUT_DATA, result, INPUT_DATA)
                 result

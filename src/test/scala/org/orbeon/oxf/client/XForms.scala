@@ -59,7 +59,7 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             }()
         }
 
-    @Test def issue619ErrorShownOnActivate(): Unit =
+    @Test def issue1749ErrorShownOnActivate(): Unit =
         issue619WithClearInput { (regularSpan, regularInput) ⇒
             for {
                 _ ← regularInput.sendKeys(Keys.ENTER)
@@ -68,7 +68,7 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             }()
         }
 
-    @Test def issue619Incremental(): Unit = {
+    @Test def issue1750Incremental(): Unit = {
         for {
             _ ← loadOrbeonPage("/unit-tests/issue-0619")
             incrementalSpan  ← webDriver.findElement(By.cssSelector("#incremental"))

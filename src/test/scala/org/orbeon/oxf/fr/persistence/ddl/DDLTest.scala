@@ -26,20 +26,21 @@ import org.orbeon.oxf.util.ScalaUtils._
 class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
+        val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"
         val createUserAndDatabase = provider match {
-            case Oracle    ⇒ Seq("CREATE USER orbeon_ddl IDENTIFIED BY " ++ System.getenv("RDS_PASSWORD"),
-                                  "ALTER USER orbeon_ddl QUOTA UNLIMITED ON users",
-                                  "GRANT CREATE SESSION TO orbeon_ddl",
-                                  "GRANT CREATE TABLE   TO orbeon_ddl",
-                                  "GRANT CREATE TRIGGER TO orbeon_ddl")
-            case MySQL     ⇒ Seq("CREATE DATABASE orbeon_ddl")
-            case SQLServer ⇒ Seq("CREATE DATABASE orbeon_ddl")
+            case Oracle    ⇒ Seq(s"CREATE USER $schema IDENTIFIED BY " ++ System.getenv("RDS_PASSWORD"),
+                                 s"ALTER  USER $schema QUOTA UNLIMITED ON users",
+                                 s"GRANT  CREATE SESSION TO $schema",
+                                 s"GRANT  CREATE TABLE   TO $schema",
+                                 s"GRANT  CREATE TRIGGER TO $schema")
+            case MySQL     ⇒ Seq(s"CREATE DATABASE $schema")
+            case SQLServer ⇒ Seq(s"CREATE DATABASE $schema")
             case _         ⇒ ???
         }
         val dropUserAndDatabase = provider match {
-            case Oracle    ⇒ Seq("DROP USER orbeon_ddl CASCADE")
-            case MySQL     ⇒ Seq("DROP DATABASE orbeon_ddl")
-            case SQLServer ⇒ Seq("DROP DATABASE orbeon_ddl")
+            case Oracle    ⇒ Seq(s"DROP USER $schema CASCADE")
+            case MySQL     ⇒ Seq(s"DROP DATABASE $schema")
+            case SQLServer ⇒ Seq(s"DROP DATABASE $schema")
             case _         ⇒ ???
         }
         try {

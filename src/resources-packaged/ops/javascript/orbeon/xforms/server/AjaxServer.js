@@ -62,6 +62,8 @@
                 ORBEON.xforms.Globals.lastDialogZIndex += 2;
                 formErrorPanel.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex);
                 formErrorPanel.center();
+                // Focus within the dialog so that screen readers handle aria attributes
+                $('.xforms-error-panel .container-close').focus();
             }
         }
     };

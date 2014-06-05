@@ -1247,4 +1247,53 @@
         </output>
     </test>
 
+    <test description="#1683: fr:case: support AVT on selected attribute" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true">
+                        <xf:instance>
+                            <value>42</value>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:switch id="switch-1">
+                        <xf:case id="case-11" selected="false"/>
+                        <xf:case id="case-12" selected="{true()}"/>
+                        <xf:case id="case-13" selected="true"/>
+                    </xf:switch>
+                    <xf:switch id="switch-2">
+                        <xf:case id="case-21"/>
+                        <xf:case id="case-22"/>
+                        <xf:case id="case-23" selected="{instance() = '42'}"/>
+                    </xf:switch>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <controls>
+                            <control effective-id="switch-1" case-id="case-12"/>
+                            <control effective-id="switch-2" case-id="case-23"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="case-12" visibility="visible"/>
+                        <xxf:div id="case-11" visibility="hidden"/>
+                        <xxf:div id="case-13" visibility="hidden"/>
+                        <xxf:div id="case-23" visibility="visible"/>
+                        <xxf:div id="case-21" visibility="hidden"/>
+                        <xxf:div id="case-22" visibility="hidden"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

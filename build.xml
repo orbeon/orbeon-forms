@@ -700,27 +700,43 @@
         <property name="tomcat-version" value="6.0.36"/>
         <parallel failonany="true">
 
+            <property name="oracle.jar"    value="lib/oracle/ojdbc6_g.jar"/>
+            <property name="mysql.driver"  value="com.mysql.jdbc.Driver"/>
+            <property name="mysql.jar"     value="lib/mysql-connector-java-5.1.26-bin.jar"/>
+            <property name="sqlserver.jar" value="lib/sqljdbc4.jar"/>
+
             <!-- Run Tomcat -->
             <sequential>
                 <if>
                     <not><isset property="skip.selenium"/></not>
                     <then>
+
+                        <!-- Create schemas -->
+                        <sql driver="${mysql.driver}" url="${env.MYSQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                            <classpath><pathelement location="${mysql.jar}"/></classpath>
+                            CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                        </sql>
+
                         <!-- Uncompress Tomcat -->
                         <if>
                             <not><available file="build/apache-tomcat-${tomcat-version}"/></not>
                             <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
                         </if>
+
                         <!-- Put database driver in Tomcat's lib -->
-                        <copy file="lib/mysql-connector-java-5.1.26-bin.jar" todir="build/apache-tomcat-${tomcat-version}/lib"/>
-                        <copy file="lib/oracle/ojdbc6_g.jar"                 todir="build/apache-tomcat-${tomcat-version}/lib"/>
-                        <copy file="lib/sqljdbc4.jar"                        todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${mysql.jar}"     todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${oracle.jar}"    todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${sqlserver.jar}" todir="build/apache-tomcat-${tomcat-version}/lib"/>
+
                         <!-- Put URL and passwords in Tomcat's server.xml -->
                         <replace file="test/catalina_base/conf/server.xml">
-                            <replacefilter token="@RDS_PASSWORD@"  value="${env.RDS_PASSWORD}"/>
-                            <replacefilter token="@ORACLE_URL@"    value="${env.ORACLE_URL}"/>
-                            <replacefilter token="@MYSQL_URL@"     value="${env.MYSQL_URL}"/>
-                            <replacefilter token="@SQLSERVER_URL@" value="${env.SQLSERVER_URL}"/>
+                            <replacefilter token="@RDS_PASSWORD@"         value="${env.RDS_PASSWORD}"/>
+                            <replacefilter token="@TRAVIS_BUILD_NUMBER@"  value="${env.TRAVIS_BUILD_NUMBER}"/>
+                            <replacefilter token="@ORACLE_URL@"           value="${env.ORACLE_URL}"/>
+                            <replacefilter token="@MYSQL_URL@"            value="${env.MYSQL_URL}"/>
+                            <replacefilter token="@SQLSERVER_URL@"        value="${env.SQLSERVER_URL}"/>
                         </replace>
+
                         <!-- Run -->
                         <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true" taskname="tomcat">
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
@@ -807,6 +823,11 @@
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
                             <arg line="stop"/>
                         </java>
+                        <!-- Delete schemas -->
+                        <sql driver="${mysql.driver}" url="${env.MYSQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                            <classpath><pathelement location="${mysql.jar}"/></classpath>
+                            DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                        </sql>
                     </then>
                 </if>
             </sequential>

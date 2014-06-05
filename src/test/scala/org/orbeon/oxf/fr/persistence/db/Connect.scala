@@ -18,9 +18,10 @@ import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
 
-    def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                 , block)
-    def asDDL   [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some("orbeon_ddl")   , block)
-    def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some("orbeon_tomcat"), block)
+    val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
+    def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                                 , block)
+    def asDDL   [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(s"orbeon_${buildNumber}_ddl")   , block)
+    def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(s"orbeon_${buildNumber}_tomcat"), block)
 
     private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
         val url = provider match {

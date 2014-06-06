@@ -19,11 +19,15 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{Logging, LoggerFactory, IndentedLogger}
+import org.apache.log4j.Level
 
 /**
  * Test the DDL we provide to create and update databases.
  */
-class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Logging {
+
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true, "")
 
     private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
         val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"
@@ -62,7 +66,11 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     private def sqlToTableInfo(provider: Provider, sql: Seq[String]): Set[TableMeta] = {
         withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
-            sql foreach statement.executeUpdate
+            sql foreach { s ⇒
+                withDebug("running", List("statement" → s)) {
+                    statement.executeUpdate(s)
+                }
+            }
             val query = provider match {
                 // On Oracle, column order is "non-relevant", so we order by column name instead of position
                 case Oracle ⇒ """  SELECT *
@@ -97,9 +105,11 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     private def assertSameTable(provider: Provider, from: String, to: String): Unit = {
         val name = provider.name
-        val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
-        val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))
-        assert(upgrade === straight, s"$name from $from to $to")
+        withDebug("comparing upgrade to straight", List("provider" → name, "from" → from, "to" → to)) {
+            val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
+            val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))
+            assert(upgrade === straight, s"$name from $from to $to")
+        }
     }
 
     @Test def createAndUpgradeTest(): Unit = {

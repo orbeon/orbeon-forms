@@ -222,8 +222,15 @@ public class IndentedLogger {
             parametersString = "";
         }
 
-        logger.log(level, getLogIndentSpaces(indentLevel) + (StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString);
-//        logger.log(level, prefix + " - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
+        // If the text to log is on multiple lines, indent all the lines, and use indentLevel+2 for all but the first line
+        final String text = (StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString;
+        final String[] lines = text.split("\n");
+        boolean first = true;
+        for (String line: lines) {
+            String indentation = getLogIndentSpaces(indentLevel + (first ? 0 : 2));
+            logger.log(level, indentation + line);
+            if (first) first = false;
+        }
     }
 
     public static class Indentation {

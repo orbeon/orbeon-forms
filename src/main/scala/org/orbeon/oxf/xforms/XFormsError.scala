@@ -95,12 +95,14 @@ object XFormsError {
         fatalOrNot(target.container, throw new OXFException(reason.message), log())
     }
 
-    // The error is non fatal only upon XForms updates OR for nested parts
-    private def fatalOrNot(container: XBLContainer, fatal: ⇒ Any, nonFatal: ⇒ Any): Unit =
-        if (container.getPartAnalysis.isTopLevel && container.getContainingDocument.isInitializing)
+    // The error is non fatal only upon XForms updates OR for nested parts OR if disabled by property
+    private def fatalOrNot(container: XBLContainer, fatal: ⇒ Any, nonFatal: ⇒ Any): Unit = {
+        val doc = container.getContainingDocument
+        if (container.getPartAnalysis.isTopLevel && doc.isInitializing && doc.getFatalErrorsDuringInitialization)
             fatal
         else
             nonFatal
+    }
 
     // Output the Ajax error panel with a placeholder for errors
     def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: XMLReceiverHelper, htmlPrefix: String): Unit =

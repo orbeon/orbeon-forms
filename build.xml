@@ -686,6 +686,7 @@
         <!-- Uncompress WAR -->
         <unzip src="${build.distrib.dir}/${versioned-name}.war" dest="${build.dir}/${project.name}-war-tomcat"/>
         <!-- Copy test resources -->
+        <!-- TODO: We're mixing here the resources used by standalone tests and tests running in Tomcat -->
         <mkdir dir="${build.dir}/${project.name}-war-tomcat/WEB-INF/resources/apps/unit-tests"/>
         <copy todir="${build.dir}/${project.name}-war-tomcat/WEB-INF/resources">
             <fileset dir="${src.dir}/test/resources/">

@@ -22,6 +22,9 @@
     <category name="org.orbeon.oxf.fr.persistence.ddl.DDLTest">
         <priority value="debug"/>
     </category>
+    <category name="org.orbeon.oxf.fr.persistence.rest.RestApiTest">
+        <priority value="debug"/>
+    </category>
 
     <!-- This is the standard log appender to the console (System.out) -->
     <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">

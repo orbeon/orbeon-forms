@@ -29,6 +29,7 @@ import org.dom4j.Document
 import java.io.ByteArrayInputStream
 import org.orbeon.oxf.xml.Dom4j
 import scala.util.control.NonFatal
+import org.orbeon.oxf.util.{Logging, LoggerFactory, IndentedLogger}
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -37,45 +38,50 @@ import scala.util.control.NonFatal
  *      - Permissions
  *      - Large XML documents and binary attachments
  */
-class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with TestSupport {
+class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with TestSupport with Logging {
 
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true, "")
     val AllOperations = Set("create", "read", "update", "delete")
 
     private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"
     private def metadataURL(provider: Provider) = s"form/${provider.name}/my-form"
 
-    private def withOrbeonTables[T](block: (java.sql.Connection, Provider) ⇒ T) {
-        Provider.all.foreach { provider ⇒
-            Connect.asTomcat(provider) { connection ⇒
-                val statement = connection.createStatement
-                try {
-                    // Create tables
-                    val sql = provider match {
-                        case Oracle    ⇒ "oracle-4_6.sql"
-                        case MySQL     ⇒ "mysql-4_6.sql"
-                        case SQLServer ⇒ "sqlserver-4_6.sql"
-                        case DB2       ⇒ "db2-4_6.sql"
-                    }
-                    val createDDL = SQL.read(sql)
-                    createDDL foreach { s ⇒
-                        try
-                            statement.executeUpdate(s)
-                        catch {
-                            case NonFatal(e) ⇒
-                                println(s)
-                                throw e
+    private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T) {
+        withDebug(message) {
+            Provider.all.foreach { provider ⇒
+                withDebug("on database", List("provider" → provider.name)) {
+                    Connect.asTomcat(provider) { connection ⇒
+                        val statement = connection.createStatement
+                        try {
+                            // Create tables
+                            val sql = provider match {
+                                case Oracle ⇒ "oracle-4_6.sql"
+                                case MySQL ⇒ "mysql-4_6.sql"
+                                case SQLServer ⇒ "sqlserver-4_6.sql"
+                                case DB2 ⇒ "db2-4_6.sql"
+                            }
+                            val createDDL = SQL.read(sql)
+                            createDDL foreach { s ⇒
+                                try
+                                    statement.executeUpdate(s)
+                                catch {
+                                    case NonFatal(e) ⇒
+                                        println(s)
+                                        throw e
+                                }
+                            }
+                            // Run the interesting code
+                            block(connection, provider)
+                        } finally {
+                            // Clean-up database dropping tables
+                            (Connect.getTableNames(provider, connection)
+                                    map ("DROP TABLE " + _)
+                                    foreach statement.executeUpdate)
+                            // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
+                            if (provider == SQLServer)
+                                statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")
                         }
                     }
-                    // Run the interesting code
-                    block(connection, provider)
-                } finally {
-                    // Clean-up database dropping tables
-                    (Connect.getTableNames(provider, connection)
-                        map ("DROP TABLE " + _)
-                        foreach statement.executeUpdate)
-                    // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
-                    if (provider == SQLServer)
-                        statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")
                 }
             }
         }
@@ -85,7 +91,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Test new form versioning introduced in 4.5, for form definitions.
      */
     @Test def formDefinitionVersionTest(): Unit = {
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("form definition") { (connection, provider) ⇒
 
             val FormURL = crudURLPrefix(provider) + "form/form.xhtml"
 
@@ -139,7 +145,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Test new form versioning introduced in 4.5, for form data
      */
     @Test def formDataVersionTest(): Unit = {
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("form data version") { (connection, provider) ⇒
             val FirstDataURL = crudURLPrefix(provider) + "data/123/data.xml"
 
             // Storing for specific form version
@@ -171,7 +177,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      * Get form definition corresponding to a document
      */
     @Test def formForDataTest(): Unit = {
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("form data") { (connection, provider) ⇒
             val FormURL       = crudURLPrefix(provider) + "form/form.xhtml"
             val FirstDataURL  = crudURLPrefix(provider) + "data/123/data.xml"
             val SecondDataURL = crudURLPrefix(provider) + "data/456/data.xml"
@@ -209,7 +215,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
      */
     @Test def permissionsTest(): Unit = {
 
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("permissions") { (connection, provider) ⇒
 
             val FormURL = crudURLPrefix(provider) + "form/form.xhtml"
             val data    = <data/>
@@ -274,7 +280,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     // Try uploading files of 1 KB, 1 MB, and 10 MB
     @Test def attachmentsTest(): Unit = {
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("attachments") { (connection, provider) ⇒
             for ((size, position) ← Seq(1024, 1024*1024, 10*1024*1024).zipWithIndex) {
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
                 val url = crudURLPrefix(provider) + "data/123/file" + position.toString
@@ -286,7 +292,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     // Try uploading files of 1 KB, 1 MB, and 5 MB
     @Test def largeXMLDocumentsTest(): Unit = {
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("large XML documents") { (connection, provider) ⇒
             for ((size, position) ← Seq(1024, 1024*1024, 5*1024*1024).zipWithIndex) {
                 val string = new Array[Char](size)
                 for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
@@ -301,8 +307,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     }
 
     @Test def draftsTest(): Unit = {
-        withOrbeonTables { (connection, provider) ⇒
-
+        withOrbeonTables("drafts") { (connection, provider) ⇒
             // Draft and non-draft are different
             val first  = HttpRequest.XML(<gaga1/>)
             val second = HttpRequest.XML(<gaga2/>)
@@ -316,7 +321,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
     }
 
     @Test def extractMetadata(): Unit =
-        withOrbeonTables { (connection, provider) ⇒
+        withOrbeonTables("extract metadata") { (connection, provider) ⇒
 
             val FormURL     = crudURLPrefix(provider) + "form/form.xhtml"
             val MetadataURL = metadataURL(provider)

@@ -66,11 +66,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
     private def sqlToTableInfo(provider: Provider, sql: Seq[String]): Set[TableMeta] = {
         withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
-            sql foreach { s ⇒
-                withDebug("running", List("statement" → s)) {
-                    statement.executeUpdate(s)
-                }
-            }
+            SQL.executeStatements(provider, statement, sql)
             val query = provider match {
                 // On Oracle, column order is "non-relevant", so we order by column name instead of position
                 case Oracle ⇒ """  SELECT *

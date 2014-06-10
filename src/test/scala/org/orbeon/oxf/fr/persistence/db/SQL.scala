@@ -17,8 +17,10 @@ import org.orbeon.oxf.resources.URLFactory
 import java.io.{StringWriter, InputStreamReader}
 import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.mutable.ArrayBuffer
+import java.sql.Statement
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
-private[persistence] object SQL {
+private[persistence] object SQL extends Logging {
 
     private val Base = "oxf:/apps/fr/persistence/relational/ddl/"
 
@@ -67,4 +69,13 @@ private[persistence] object SQL {
         allStatements.toList
     }
 
+    def executeStatements(provider: Provider, statement: Statement, sql: Seq[String])(implicit logger: IndentedLogger): Unit = {
+        withDebug("running statements", List("provider" → provider.name)) {
+            sql foreach { s ⇒
+                withDebug("running", List("statement" → s)) {
+                    statement.executeUpdate(s)
+                }
+            }
+        }
+    }
 }

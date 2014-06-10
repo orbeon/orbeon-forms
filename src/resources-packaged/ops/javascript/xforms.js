@@ -2221,8 +2221,6 @@ ORBEON.xforms.Controls = {
         if (ORBEON.xforms.Globals.currentFocusControlId == null)
             return;
 
-
-
         var control = ORBEON.util.Dom.get(controlId);
 
         if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
@@ -2701,6 +2699,21 @@ ORBEON.xforms.Events = {
         }
     },
 
+    _findAncestorFocusableControl: function(eventTarget) {
+        var ancestorControl = ORBEON.xforms.Events._findParentXFormsControl(eventTarget);
+
+        var sendFocus =
+            ancestorControl != null
+            // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
+            // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
+            // prevents detection of value changes in focus() above.
+            && ! YAHOO.util.Dom.hasClass(ancestorControl, "xforms-dialog")
+            // Don't send focus for XBL component that are not focusable
+            && ! $(ancestorControl).is('.xbl-component:not(.xbl-focusable)');
+
+        return sendFocus ? ancestorControl : null;
+    },
+
     focus: function(event) {
         var eventTarget = YAHOO.util.Event.getTarget(event);
         // If the browser does not support capture, register listener for change on capture
@@ -2715,34 +2728,26 @@ ORBEON.xforms.Events = {
         }
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             // Control elements
-            var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(eventTarget);
+            var newFocusControlElement = ORBEON.xforms.Events._findAncestorFocusableControl(eventTarget);
             var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? ORBEON.util.Dom.get(ORBEON.xforms.Globals.currentFocusControlId) : null;
 
-            if (targetControlElement != null) {
+            if (newFocusControlElement != null) {
                 // Store initial value of control if we don't have a server value already, and if this is is not a list
                 // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
-                if (ORBEON.xforms.ServerValueStore.get(targetControlElement.id) == null
-                        && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-select-appearance-compact")
-                        && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-select1-appearance-compact")) {
-                    var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(targetControlElement);
-                    ORBEON.xforms.ServerValueStore.set(targetControlElement.id, controlCurrentValue);
+                if (ORBEON.xforms.ServerValueStore.get(newFocusControlElement.id) == null
+                        && ! YAHOO.util.Dom.hasClass(newFocusControlElement, "xforms-select-appearance-compact")
+                        && ! YAHOO.util.Dom.hasClass(newFocusControlElement, "xforms-select1-appearance-compact")) {
+                    var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(newFocusControlElement);
+                    ORBEON.xforms.ServerValueStore.set(newFocusControlElement.id, controlCurrentValue);
                 }
             }
 
-            // Send focus events
-            var events = [];
-            var sendFocus =
-                    // The idea here is that we only register focus changes when focus moves between XForms controls. If focus
-                    // goes out to nothing, we don't handle it at this point but wait until focus comes back to a control.
-                    targetControlElement != null && currentFocusControlElement != targetControlElement
-                    // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
-                    // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
-                    // prevents detection of value changes in focus() above.
-                    && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")
-                    // Don't send focus for XBL component that are not focusable
-                    && ! $(targetControlElement).is('.xbl-component:not(.xbl-focusable)');
+            // The idea here is that we only register focus changes when focus moves between XForms controls. If focus
+            // goes out to nothing, we don't handle it at this point but wait until focus comes back to a control.
+            if (newFocusControlElement != null && currentFocusControlElement != newFocusControlElement) {
 
-            if (sendFocus) {
+                // Send focus events
+                var events = [];
 
                 // Handle special value changes upon losing focus
 
@@ -2762,11 +2767,11 @@ ORBEON.xforms.Events = {
                 }
 
                 // Handle focus
-                events.push(new ORBEON.xforms.server.AjaxServer.Event(null, targetControlElement.id, null, "xforms-focus"));
+                events.push(new ORBEON.xforms.server.AjaxServer.Event(null, newFocusControlElement.id, null, "xforms-focus"));
 
                 // Keep track of the id of the last known control which has focus
-                ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
-                ORBEON.xforms.Globals.currentFocusControlElement = targetControlElement;
+                ORBEON.xforms.Globals.currentFocusControlId = newFocusControlElement.id;
+                ORBEON.xforms.Globals.currentFocusControlElement = newFocusControlElement;
 
                 // Fire events
                 ORBEON.xforms.server.AjaxServer.fireEvents(events, true);
@@ -2781,25 +2786,16 @@ ORBEON.xforms.Events = {
     blur: function(event) {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = YAHOO.util.Event.getTarget(event);
-            var control = ORBEON.xforms.Events._findParentXFormsControl(target);
+            var control = ORBEON.xforms.Events._findAncestorFocusableControl(target);
             if (control != null) {
                 ORBEON.xforms.Events.blurEvent.fire({control: control, target: target});
 
-                if (!YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
-                    // This is an event for an XForms control which is not a dialog
-
-                    // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
-                    // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the
-                    // dialog, which prevents detection of value changes in focus() above.
-
-                    // Keep track of the id of the last known control which has focus
-                    ORBEON.xforms.Globals.currentFocusControlId = control.id;
-                    ORBEON.xforms.Globals.currentFocusControlElement = control;
-                }
+                ORBEON.xforms.Globals.currentFocusControlId = control.id;
+                ORBEON.xforms.Globals.currentFocusControlElement = control;
 
                 // Dispatch xxforms-blur event if we're not going to another XForms control (see issue #619)
                 var relatedTarget = event.relatedTarget || document.activeElement;
-                var relatedControl = ORBEON.xforms.Events._findParentXFormsControl(relatedTarget);
+                var relatedControl = ORBEON.xforms.Events._findAncestorFocusableControl(relatedTarget);
                 if (relatedControl == null) {
                     ORBEON.xforms.Globals.currentFocusControlId = null;
                     var events = [new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xxforms-blur")];

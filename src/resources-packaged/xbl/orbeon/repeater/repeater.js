@@ -22,8 +22,22 @@ window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
     var currentRepeaterId = null;
     var currentRepeaterIteration = null;
 
-    // Move the menu after the button so that positioning it will work
     function moveAndShowMenu(e) {
+
+        moveMenu(e);
+
+        // NOTE: Don't use dropdown('toggle') as that registers a new handler further down the DOM!
+        $(globalMenu).find(".dropdown-toggle").trigger("click");
+
+        // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
+        // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
+        // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
+        // running.
+        return false;
+    }
+
+    // Move the menu just below the button
+    function moveMenu(e) {
         var dropdown = $(e.target).closest('.dropdown');
 
         var dropdownOffset = dropdown.offset();
@@ -38,9 +52,6 @@ window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
         currentRepeaterId = repeaterId(e);
         currentRepeaterIteration = repeaterIteration(e);
 
-        // NOTE: Don't use dropdown('toggle') as that registers a new handler further down the DOM!
-        $(globalMenu).find(".dropdown-toggle").trigger("click");
-
         // Prevent "propagation". In fact, with jQuery, "delegated" handlers are handled first, and if a delegated
         // event calls stopPropagation(), then "directly-bound" handlers are not called. Yeah. So here, we prevent
         // propagation as Dropdown.toggle() does, which will prevent the catch-all handler for clearMenus() from
@@ -50,6 +61,7 @@ window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
 
     // Handle keyboard events that arrive on our button and delegate the to the Bootstrap menu button
     function delegateKeyEventToBootstrapButton(e) {
+        moveMenu(e);
         $(globalMenu).find(".dropdown-toggle").trigger({ type: e.type, keyCode: e.keyCode });
     }
 

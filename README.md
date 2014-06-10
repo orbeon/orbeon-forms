@@ -67,7 +67,7 @@ Documentation
 
 All documentation is available online:
 
-- [Wiki on Google Docs](http://wiki.orbeon.com/forms/)
+- [Wiki on Google Sites](http://wiki.orbeon.com/forms/)
 - [Wiki on github](https://github.com/orbeon/orbeon-forms/wiki/)
 - [Frequently Asked Questions (FAQ)](https://github.com/orbeon/orbeon-forms/wiki/FAQ)
 
@@ -149,7 +149,7 @@ In addition, this product includes the following software:
 - antlr (<http://www.antlr.org/>)
 - Barcode4j (<http://barcode4j.sourceforge.net/>)
 - Castor (<http://www.castor.org/>)
-- CoffeeScript (<http://jashkenas.github.com/coffee-script/>)
+- CoffeeScript (<http://coffeescript.org/>)
 - dom4j (<http://dom4j.org/>)
 - Ehcache (<http://ehcache.org/>)
 - eXist (<http://exist.sourceforge.net/>)
@@ -182,7 +182,7 @@ locations:
 This product makes use of the Silk Icons, released under a Creative Commons
 Attribution 2.5 License: http://www.famfamfam.com/lab/icons/silk/
 
-This product makes use of the PixelMixer icons at http://pixel-mixer.com/
+This product makes use of the PixelMixer icons at http://www.iconarchive.com/artist/pixelmixer.html
 
 Please consult the third-party-licenses directory for more information
 about individual licenses.

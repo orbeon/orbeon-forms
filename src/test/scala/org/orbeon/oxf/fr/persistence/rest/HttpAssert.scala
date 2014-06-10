@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.rest
 import java.io.ByteArrayInputStream
 import org.orbeon.oxf.fr.relational.Version
 import org.orbeon.oxf.test.TestSupport
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.{IndentedLogger, ScalaUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 /**
@@ -28,7 +28,7 @@ private object HttpAssert extends TestSupport {
     case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
     case   class ExpectedCode(code: Int) extends Expected
 
-    def get(url: String, version: Version, expected: Expected, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+    def get(url: String, version: Version, expected: Expected, credentials: Option[HttpRequest.Credentials] = None)(implicit logger: IndentedLogger): Unit = {
         val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
         expected match {
             case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
@@ -53,12 +53,12 @@ private object HttpAssert extends TestSupport {
         }
     }
 
-    def put(url: String, version: Version, body: HttpRequest.Body, expectedCode: Int, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+    def put(url: String, version: Version, body: HttpRequest.Body, expectedCode: Int, credentials: Option[HttpRequest.Credentials] = None)(implicit logger: IndentedLogger): Unit = {
         val actualCode = HttpRequest.put(url, version, body, credentials)
         assert(actualCode === expectedCode)
     }
 
-    def del(url: String, version: Version, expectedCode: Int, credentials: Option[HttpRequest.Credentials] = None): Unit = {
+    def del(url: String, version: Version, expectedCode: Int, credentials: Option[HttpRequest.Credentials] = None)(implicit logger: IndentedLogger): Unit = {
         val actualCode = HttpRequest.del(url, version, credentials)
         assert(actualCode === expectedCode)
     }

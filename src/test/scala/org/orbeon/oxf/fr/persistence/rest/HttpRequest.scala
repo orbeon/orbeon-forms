@@ -27,7 +27,6 @@ import org.orbeon.oxf.fr.persistence.db.Config
 private object HttpRequest {
 
     private val PersistenceBase = "http://localhost:8080/orbeon/fr/service/persistence/"
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     case class Credentials(username: String, roles: Set[String], group: String)
 
@@ -35,7 +34,7 @@ private object HttpRequest {
     case class XML   (doc : Document   ) extends Body
     case class Binary(file: Array[Byte]) extends Body
 
-    private def request(url: String, method: String, version: Version, body: Option[Body], credentials: Option[Credentials]): ConnectionResult = {
+    private def request(url: String, method: String, version: Version, body: Option[Body], credentials: Option[Credentials])(implicit logger: IndentedLogger): ConnectionResult = {
         val documentUrl = URLFactory.createURL(PersistenceBase + url)
         val headers = {
             val contentTypeHeader = body.map {
@@ -64,13 +63,13 @@ private object HttpRequest {
             loadState = true, logBody = false).connect(saveState = true)
     }
 
-    def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None): Int =
+    def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
         useAndClose(request(url, "PUT", version, Some(body), credentials))(_.statusCode)
 
-    def del(url: String, version: Version, credentials: Option[Credentials] = None): Int =
+    def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
         useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
 
-    def get(url: String, version: Version, credentials: Option[Credentials] = None): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
+    def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
         useAndClose(request(url, "GET", version, None, credentials)) { connectionResult ⇒
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                 val statusCode = connectionResult.statusCode

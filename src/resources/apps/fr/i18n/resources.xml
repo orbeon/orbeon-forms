@@ -316,16 +316,16 @@
             <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
             <review>&lt;i class="icon-arrow-right"/&gt; Valider</review>
-            <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Valider</validate>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
-            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
             <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
@@ -760,6 +760,7 @@
                 <start-new>Empezar con un formulario en blanco</start-new>
             </drafts>
             <labels>
+                <language-choice todo="true">[Language]</language-choice>
                 <errors>Resumen de errores</errors>
                 <check-errors-in-form>Este formulario tiene errores</check-errors-in-form>
                 <error-details>Ver detalle de los errores</error-details>
@@ -872,7 +873,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
-            <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
             <review>&lt;i class="icon-arrow-right"/&gt; Vis</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
@@ -2287,6 +2287,9 @@
             <!-- Warning dialog -->
             <validation-dialog-review>Granskning</validation-dialog-review>
             <validation-dialog-continue>Fortsätt</validation-dialog-continue>
+
+            <test todo="true">&lt;i class="icon-cog"/&gt; [Test]</test>
+            <publish todo="true">&lt;i class="icon-globe"/&gt; [Publish]</publish>
         </buttons>
         <components>
             <labels>
@@ -2565,6 +2568,9 @@
             <!-- Warning dialog -->
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Doorgaan</validation-dialog-continue>
+
+            <test todo="true">&lt;i class="icon-cog"/&gt; [Test]</test>
+            <publish todo="true">&lt;i class="icon-globe"/&gt; [Publish]</publish>
         </buttons>
         <components>
             <labels>

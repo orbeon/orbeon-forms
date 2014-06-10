@@ -13,12 +13,16 @@
  */
 package org.orbeon.oxf.fr
 
-import org.dom4j.Document
+import org.dom4j._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.junit.Test
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.util.{ScalaUtils, XPath}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
 class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -89,5 +93,63 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
         ResourcesPatcher.transform(initial, "*", "*")(propertySet)
 
         assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
+    }
+
+    @Test def testResourcesConsistency(): Unit = {
+
+        import org.orbeon.scaxon.XML._
+
+        def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == "en"
+
+        val urls = Seq(
+            "oxf:/apps/fr/i18n/resources.xml",
+            "oxf:/forms/orbeon/builder/form/resources.xml",
+            "oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+        )
+
+        for (url ← urls) {
+
+            val doc =
+                ScalaUtils.useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+                    TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
+                }
+
+            // Baseline is "en"
+            val englishResource = doc / * / "resource" filter hasLang("en") head
+
+            // Recursively compare element presence and order. All other nodes, including text and attribute nodes, are
+            // ignored.
+            def compareElements(left: NodeInfo, right: NodeInfo, lang: String): Boolean = (left, right) match {
+                case (left: DocumentInfo, right: DocumentInfo) ⇒
+                    compareElements(left.rootElement, right.rootElement, lang)
+                case (left: NodeInfo, right: NodeInfo) if isElement(left) ⇒
+
+                    assert(left.name === right.name, s"different names for url=$url and lang=$lang")
+
+                    // Ignore children of "div" because it can contain XHTML which is different per language
+                    left.name == right.name && (left.name == "div" || {
+                        val leftChildren  = left  / *
+                        val rightChildren = right / *
+
+                        assert(leftChildren.size === rightChildren.size, s"different sizes for url=$url and lang=$lang")
+
+                        leftChildren.size == rightChildren.size && {
+                            (leftChildren zip rightChildren) forall {
+                                case (l, r) ⇒ compareElements(l, r, lang)
+                            }
+                        }
+                    })
+                case _ ⇒
+                    // Ignore all other nodes
+                    true
+            }
+
+            for {
+                resource ← doc / * / "resource" filterNot hasLang("en")
+                lang     = resource attValue "*:lang"
+            } locally {
+                assert(compareElements(englishResource, resource, lang))
+            }
+        }
     }
 }

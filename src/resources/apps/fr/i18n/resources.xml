@@ -3045,8 +3045,8 @@
                 <pull-from-remote>Tornar local</pull-from-remote>
                 <navigate-summary>Ir para o Sumário</navigate-summary>
                 <navigate-new>Ir para Novo</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <upgrade-local>Actualizar definições de formulário local</upgrade-local>
+                <upgrade-remote>Actualizar definições de formulário remoto</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar (Não)Publicação de Formulário</publish-confirmation>

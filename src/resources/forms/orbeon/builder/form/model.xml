@@ -269,6 +269,8 @@
             <description xml:lang="fr">Orbeon Form Builder vous permet d'éditer des formulaires directement depuis votre navigateur et sans programmation.</description>
             <title xml:lang="ru">Мастер форм</title>
             <description xml:lang="ru">Мастер форм позволяет легко создавать шаблоны форм запросов.</description>
+            <title xml:lang="pt">Form Builder</title>
+            <description xml:lang="pt">Orbeon Form Builder permite que criar facilmente formulários directamente do seu navegador e sem programação.</description>
             <author>Orbeon, Inc.</author>
             <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-30.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-30.png</logo>
         </metadata>

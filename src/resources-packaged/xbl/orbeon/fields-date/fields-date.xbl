@@ -38,6 +38,7 @@
             <display-name lang="it">Data in campi</display-name>
             <display-name lang="sv">Datumväljare med separata fält</display-name>
             <display-name lang="nl">Datumvelden</display-name>
+            <display-name lang="pt">Campos de Data</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>

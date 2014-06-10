@@ -39,6 +39,7 @@
             <display-name lang="it">Testo formattato in HTML</display-name>
             <display-name lang="sv">Formaterad HTML-text</display-name>
             <display-name lang="nl">Tekst met opmaak</display-name>
+            <display-name lang="pt">Texto Formatado</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/html5.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/html5.png</large-icon>

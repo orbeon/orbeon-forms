@@ -39,6 +39,7 @@
             <display-name lang="it">Valore numerico</display-name>
             <display-name lang="sv">Numeriskt värde</display-name>
             <display-name lang="nl">Getal</display-name>
+            <display-name lang="pt">Número</display-name>
             <icon lang="en">
                 <!-- TODO: icons -->
                 <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>

@@ -32,6 +32,7 @@
             <display-name lang="de">US-Staaten</display-name>
             <display-name lang="it">Stati membri USA</display-name>
             <display-name lang="nl">Amerikaanse staat</display-name>
+            <display-name lang="pt">Estados dos EUA</display-name>
             <icon lang="en">
                 <small-icon>/xbl/orbeon/us-state/us-flag.png</small-icon>
                 <large-icon>/xbl/orbeon/us-state/us-flag.png</large-icon>

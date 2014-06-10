@@ -7018,4 +7018,884 @@
             </items>
         </template>
     </resource>
+    <resource xml:lang="pt">
+        <!-- Form metadata -->
+        <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+        <application-name>
+            <label>Nome da Aplicação</label>
+            <hint>Identifica um grupo de formulários, agrupado por exemplo por funcionalidade ou departamento (exemplo: vendas). Tendo um grupo de formulários, pode-se usar o nome da organização (ex. "acme"). Este nome é visível no URL do formulário publicado pelo que recomendamos o uso de minúsculas.</hint>
+            <alert>Use letras ASCII, algarismos, "-" ou "_"</alert>
+        </application-name>
+        <form-name>
+            <label>Nome do Formulário</label>
+            <hint>Identifica este formulário específico (ex.: boletim de saúde). Este nome é visível no URL pelo que recomendamos o uso de minúsculas.</hint>
+            <alert>Use letras ASCII, algarismos, "-" ou "_"</alert>
+        </form-name>
+        <title>
+            <label>Título do Formulário</label>
+            <hint>Título do formulário na língua actual</hint>
+        </title>
+        <description>
+            <label>Descrição do Formulário</label>
+            <hint>Descrição do formulário na língua actual</hint>
+        </description>
+        <logo>
+            <label>Logotipo</label>
+            <hint>O logotipo que aparece to topo do formulário</hint>
+        </logo>
+        <!-- Toolbox -->
+        <cut>
+            <label>Cortar</label>
+        </cut>
+        <copy>
+            <label>Copiar</label>
+        </copy>
+        <paste>
+            <label>Colar</label>
+        </paste>
+        <form-structure>
+            <label>Estrutura do Formulário</label>
+        </form-structure>
+        <controls>
+            <label>Controlos</label>
+        </controls>
+        <i18n>
+            <label>Internacionalização</label>
+        </i18n>
+        <language>
+            <label>Língua Actual</label>
+        </language>
+        <advanced>
+            <label>Avançado</label>
+        </advanced>
+        <services-actions>
+            <label>Serviços &amp; Acções</label>
+        </services-actions>
+        <http-services>
+            <label>Serviços HTTP</label>
+        </http-services>
+        <database-services>
+            <label>Serviços de Base de Dados</label>
+        </database-services>
+        <actions>
+            <label>Acções</label>
+        </actions>
+        <new-section>
+            <label>Nova secção</label>
+        </new-section>
+        <new-grid>
+            <label>Nova Grelha</label>
+        </new-grid>
+        <new-repeated-grid>
+            <label>Nova Grelha Repetida</label>
+        </new-repeated-grid>
+        <change-schema>
+            <label>Alterar o Schema</label>
+        </change-schema>
+        <upload-schema>
+            <label>Anexar o Schema</label>
+        </upload-schema>
+        <change-pdf>
+            <label>Alterar o PDF</label>
+        </change-pdf>
+        <upload-pdf>
+            <label>Anexar o PDF</label>
+        </upload-pdf>
+        <change-css>
+            <label>Alterar o CSS</label>
+        </change-css>
+        <upload-css>
+            <label>Anexar o CSS</label>
+        </upload-css>
+        <show-source>
+            <label>Mostrar a fonte</label>
+        </show-source>
+        <edit-source>
+            <label>Alterar a fonte</label>
+        </edit-source>
+        <custom-xml>
+            <label>Customizar o XML</label>
+        </custom-xml>
+        <permissions>
+            <label>Dar permissões</label>
+        </permissions>
+        <reload-components>
+            <label>Recarregar as Ferramentas</label>
+        </reload-components>
+        <enter-section-title>
+            <label>Clique aqui para adicionar um título à secção</label>
+		</enter-section-title>
+        <type-section-title>
+            <label>Escreva aqui o título para a secção</label>
+        </type-section-title>
+        <enter-label>
+            <label>Clique aqui para introduzir uma label</label>
+        </enter-label>
+        <type-label>
+            <label>Escreva aqui o conteúdo da sua label</label>
+        </type-label>
+        <enter-hint>
+            <label>Clique para introduzir uma pista</label>
+        </enter-hint>
+        <enter-text>
+            <label>Escreva aqui o seu texto</label>
+        </enter-text>
+        <type-hint>
+            <label>Escreva aqui a sua pista</label>
+        </type-hint>
+        <enter-text>
+            <label>Clique para introduzir texto</label>
+        </enter-text>
+        <click-cell>
+            <label>Clique para seleccionar esta célula</label>
+        </click-cell>
+        <insert-control>
+            <label>Use as ferramentas para introduzir um controlo novo</label>
+        </insert-control>
+        <edit-items>
+            <label>Alterar escolhas</label>
+        </edit-items>
+        <expand-icon>
+            <label>Expandir</label>
+        </expand-icon>
+        <shrink-icon>
+            <label>Encolher</label>
+        </shrink-icon>
+        <delete-control-icon>
+            <label>Apagar Controlo</label>
+        </delete-control-icon>
+        <delete-grid-icon>
+            <label>Apagar Grelha</label>
+        </delete-grid-icon>
+        <delete-section-icon>
+            <label>Apagar Secção</label>
+        </delete-section-icon>
+        <delete-row-icon>
+            <label>Apagar Linha</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>Apagar Coluna</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>Adicionar coluna à esquerda</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>Adicionar coluna à direita</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>Adicionar Linha Acima</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>Adicionar Linha Abaixo</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>Configurações da secção</label>
+        </section-details-icon>
+        <grid-details-icon>
+            <label>Configurações da grelha</label>
+        </grid-details-icon>
+        <move-up-icon>
+            <label>Mover para Cima</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>Mover para Baixo</label>
+        </move-down-icon>
+        <move-right-icon>
+            <label>Mover para a Direita</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>Mover para a Esquerda</label>
+        </move-left-icon>
+        <control-details-icon>
+            <label>Configurações do Controlo</label>
+        </control-details-icon>
+        <switch-appearance-icon>
+            <label>Mudar a aparência</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>Alterar a Ajuda</label>
+        </help-icon>
+        <!-- Common -->
+        <add>
+            <label>Adicionar</label>
+        </add>
+        <remove>
+            <label>Remover</label>
+        </remove>
+        <edit>
+            <label>Alterar</label>
+        </edit>
+        <classes>
+            <label>Classes CSS Personalizadas</label>
+        </classes>
+        <!-- Dialogs -->
+        <continue>
+            <label>Continuar</label>
+        </continue>
+        <apply>
+            <label>Aplicar</label>
+        </apply>
+        <cancel>
+            <label>Cancelar</label>
+        </cancel>
+        <close>
+            <label>Fechar</label>
+        </close>
+        <delete>
+            <label>Apagar</label>
+        </delete>
+        <or>
+            <label>ou</label>
+        </or>
+        <dialog-form-settings>
+            <label>Configurações do Formulário</label>
+            <save-as>Guardar como…</save-as>
+            <open><label>Configurações do Formulário</label></open>
+            <stats>Estatística do Formulário</stats>
+            <sections>Secções</sections>
+            <repeats>Repetições</repeats>
+            <grids>Grelhas</grids>
+            <section-templates>Templates da Secção</section-templates>
+            <controls>Controlos</controls>
+            <all>Todos</all>
+        </dialog-form-settings>
+        <dialog-control-details>
+            <label>Configurações do Controlo</label>
+            <tab-base><label>Configurações Básicas</label></tab-base>
+            <tab-validations><label>Validações e Alertas</label></tab-validations>
+            <tab-formulas><label>Fórmulas</label></tab-formulas>
+            <tab-help><label>Mensagem de Ajuda</label></tab-help>
+            <control-name>
+                <label>Nome do Controlo</label>
+                <alert>O nome está incorrecto ou já existe um outro controlo com o mesmo nome</alert>
+                <hint>Ex.: "primeiro-nome"</hint>
+            </control-name>
+            <control-xpath>
+                <label>XPath</label>
+                <alert>Expressão de XPath inválida</alert>
+                <hint>Aponta para o nodo onde o valor deste controlo é guardado</hint>
+            </control-xpath>
+            <options>
+                <label>Opções</label>
+                <item>
+                    <label>Mostrar no Resumo</label>
+                    <value>fr-summary</value>
+                </item>
+                <item>
+                    <label>Mostrar na Pesquisa</label>
+                    <value>fr-search</value>
+                </item>
+                <item>
+                    <label>Receptor do Email</label>
+                    <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>Mostrar no assunto do email</label>
+                    <value>fr-email-subject</value>
+                </item>
+            </options>
+            <types>
+                <label>Tipo de Dados</label>
+            </types>
+            <builtin-type>
+                <label>Tipos Embutidos</label>
+                <hint>Tipos de dados embutidos</hint>
+
+                <use-schema-type>Use schema type</use-schema-type>
+
+                <choices>
+                    <choices>
+                        <label>Comuns</label>
+                        <type label="String">string</type>
+                        <type label="Boolean">boolean</type>
+                        <type label="Email address">email</type>
+                    </choices>
+                    <choices>
+                        <label>Numéricos</label>
+                        <type label="Decimal">decimal</type>
+
+                        <type label="Integer">integer</type>
+                        <type label="Positive integer">positiveInteger</type>
+                        <type label="Non-positive integer">nonPositiveInteger</type>
+                        <type label="Negative integer">negativeInteger</type>
+                        <type label="Non-negative integer">nonNegativeInteger</type>
+
+                        <type label="Simple-precision floating-point">float</type>
+                        <type label="Double-precision floating-point">double</type>
+
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Datas</label>
+                        <type label="Date">date</type>
+                        <type label="Time">time</type>
+                        <type label="Date and time">dateTime</type>
+                        <type label="Duration">duration</type>
+                        <type label="Year and month">gYearMonth</type>
+                        <type label="Month and day">gMonthDay</type>
+                        <type label="Year">gYear</type>
+                        <type label="Month">gMonth</type>
+                        <type label="Day">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>XML</label>
+                        <type label="">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                        <type label="XML qualified name">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                    <choices>
+                        <label>Outros</label>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="Base64-encoded binary">base64Binary</type>
+                        <type label="Hexadecimal-encoded binary">hexBinary</type>
+                        <type label="Any URI">anyURI</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>Schema</label>
+                <hint>Tipo de dados de um schema importado</hint>
+            </schema-type>
+            <required>
+                <label>Obrigatório</label>
+                <hint>Indica se é ou não obrigatório</hint>
+                <item id="0">Sim</item>
+                <item id="1">Não</item>
+                <item id="2">XPath</item>
+            </required>
+            <constraint>
+                <label>Restrição</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </constraint>
+            <visibility>
+                <label>Visibilidade</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </visibility>
+            <readonly>
+                <label>Apenas Leitura</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </readonly>
+            <default>
+                <label>Valor Inicial</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath</hint>
+            </default>
+            <calculate>
+				<label>Valor Calculado</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath</hint>
+            </calculate>
+            <help>
+                <label>Mensagem de Ajuda</label>
+                <hint>É mostrada quando a ajuda é activada</hint>
+            </help>
+            <alert>
+                <label>Mensagem de Alerta</label>
+                <hint>DÉ mostrada quando o alerta está activo</hint>
+            </alert>
+            <default-alert>
+                <label>Mensagem de alerta por defeito</label>
+                <hint>É activada quando não existe uma mensagem de alerta mais específica</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>Usar mensagens de alerta por defeito globais</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>Usar mensagens de alerta por defeito</label>
+            </use-default-alert>
+            <validation-type><label>Tipo de Validação</label></validation-type>
+            <validation-details><label>Detalhes de Validação</label></validation-details>
+            <level><label>Nível</label></level>
+            <use-html>Usar HTML</use-html>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Configurações da Secção</label>
+            <control-name>
+                <label>Nome da Secção</label>
+                <alert>O Nome é incorrecto ou já existe</alert>
+                <hint>Ex.: "morada"</hint>
+            </control-name>
+            <options>
+                <label>Opções</label>
+                <item>
+                    <label>Quebra de Página Antes</label>
+                    <value>fr-page-break-before</value>
+                </item>
+            </options>
+            <visibility>
+                <label>Visibilidade</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </visibility>
+            <readonly>
+                <label>Apenas Leitura</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </readonly>
+            <repeat>
+                <label>Repetir conteúdo da secção</label>
+            </repeat>
+            <custom-iteration-name>
+                <label> Nome da Iteração Personalizado</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>Nome da Iteração Personalizado</label>
+                <alert>O nome é incorrecto ou já está a ser utilizado</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>Configurações Básicas e Fórmulas</label></tab-base>
+            <tab-repeat><label>Conteúdo Repetido</label></tab-repeat>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Configurações de Grelha</label>
+            <control-name>
+                <label>Nome da Grelha</label>
+                <alert>O nome é incorrecto ou já está a ser utilizado</alert>
+                <hint>Ex.: "primeiro-nome"</hint>
+            </control-name>
+            <visibility>
+                <label>Visibilidade</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </visibility>
+            <readonly>
+                <label>Apenas Leitura</label>
+                <alert>Expressão de XPath incorrecta</alert>
+                <hint>Expressão XPath do tipo Boolean</hint>
+            </readonly>
+            <min>
+                <label>Valor mínimo de repetições</label>
+                <alert>Valor Incorrecto</alert>
+                <hint>Número não negativo</hint>
+            </min>
+            <max>
+                <label>Número máximo de repetições</label>
+                <alert>Valor incorrecto</alert>
+                <hint>Número positivo</hint>
+            </max>
+            <other>Outros</other>
+            <one>Uma repetição</one>
+            <unlimited>Ilimitado</unlimited>
+            <no-minimum>Sem mínimo</no-minimum>
+        </dialog-grid-details>
+        <dialog-confirmation>
+            <label>Confirmar</label>
+        </dialog-confirmation>
+        <dialog-help>
+            <label>Ajuda</label>
+            <help-message>
+                <label>Mensagem de Ajuda</label>
+            </help-message>
+        </dialog-help>
+        <dialog-publish>
+            <label>Publicar Formulário</label>
+            <publish>Publicar</publish>
+            <!--<publish-success>O formulário foi publicado com sucesso. {0,choice,0#Nenhum anexo foi|1#1 anexo foi|1&lt;{0,number,integer} anexos foram} publicado(s).</publish-success>-->
+            <publish-success todo="true">[The form definition was published successfully as version {1,number,integer}, with {0,choice,0#no attachments|1#1 attachment|1&lt;{0,number,integer} attachments}.]</publish-success>
+            <publish-error>Ocorreu um erro na publicação.</publish-error>
+            <latest-published-version todo="true">[Latest published version]</latest-published-version>
+            <create-new-version-item todo="true">[create a new form definition with version number {0,number,integer}]</create-new-version-item>
+            <overwrite-version-item todo="true">[write over the current form definition with version number {0,number,integer}]</overwrite-version-item>
+            <create-new-version-help todo="true">
+                [PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
+                database. Data which already exists in the database will still be viewed and edited with the previous
+                versions of this form definition which are associated with that data. The new form definition version
+                will be used to create new data.]
+            </create-new-version-help>
+            <overwrite-version-help todo="true">
+                [PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
+                definition are small, such as changing control labels, the form definition will be compatible with
+                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
+                moving controls, the form definition might be incompatible with existing data. We recommend being
+                careful when overwriting an existing form definition version.]
+            </overwrite-version-help>
+            <open-summary>Abrir a página de resumo do formulário submetido</open-summary>
+            <open-new>Abrir uma nova página de um formulário publicado</open-new>
+        </dialog-publish>
+        <dialog-add-language>
+            <label>Adicionar língua</label>
+            <new-language>
+                <label>Adicionar a língua seguinte</label>
+            </new-language>
+            <common>Línguas mais comuns</common>
+            <all>Outras línguas</all>
+            <add-language>
+                <label>Adicionar língua</label>
+            </add-language>
+            <remove-language>
+                <label>Remover língua</label>
+            </remove-language>
+        </dialog-add-language>
+        <dialog-upload-schema>
+            <label>Carregar o XML Schema</label>
+            <schema-type>
+                <label>Tipos de Schema Disponíveis</label>
+                <hint>Os tipos simples disponíveis no schema carregado</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>Schema Namespace URI</label>
+                <hint>Este é o namespace URI do schema carregado</hint>
+            </namespace-uri>
+            <operations>
+                <label>Operações</label>
+            </operations>
+            <delete-schema>
+                <label>Apagar o XML Schema existente</label>
+            </delete-schema>
+            <change-schema>
+                <label>Alterar o XML Schema</label>
+            </change-schema>
+            <replace-schema>
+                <label>Substituir o XML Schema</label>
+            </replace-schema>
+            <upload-schema>
+                <label>Anexar o XML Schema</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>O seu schema não tem tipos simples. Não conseguirá seleccionar tipos deste schema para validação.</no-simple-types>
+                <has-includes>O seu schema contém imports ou includes. Estes vão-se tornar inválidos.</has-includes>
+                <not-a-schema>O ficheiro carregado não é um schema válido.</not-a-schema>
+                <new-schema-information>Nova Informação de Schema</new-schema-information>
+                <existing-schema-information>Informação de Schema Existente</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
+        <dialog-edit-source>
+            <label>Fonte</label>
+            <source>
+                <alert>Por favor verifique que o conteúdo é um XML bem formado.</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <label>Ver Fonte</label>
+        </dialog-view-source>
+        <dialog-upload-pdf>
+            <label>Anexar um template PDF</label>
+            <upload-pdf>
+                <label>Ficheiro PDF</label>
+            </upload-pdf>
+        </dialog-upload-pdf>
+        <dialog-itemsets>
+            <label>Alterar Escolhas</label>
+            <resources-language>
+                <label>Línguas dos Recursos</label>
+            </resources-language>
+            <label>
+                <label>Label</label>
+            </label>
+            <value>
+                <label>Valor</label>
+            </value>
+            <hint>
+                <label>Pista</label>
+            </hint>
+        </dialog-itemsets>
+        <dialog-http-services>
+            <label>Editor do serviço HTTP</label>
+            <service-name>
+                <label>Nome do Serviço</label>
+                <hint>Escolha um nome único para este serviço</hint>
+            </service-name>
+            <resource>
+                <label>Recurso URL</label>
+                <hint>HTTP URL no qual o serviço reside</hint>
+            </resource>
+            <method>
+                <label>Método</label>
+            </method>
+            <serialization>
+                <label>Serialização</label>
+            </serialization>
+            <soap-submission>
+                <label>Serviço SOAP</label>
+                <hint>Indica se é um serviço SOAP</hint>
+            </soap-submission>
+            <soap-action>
+                <label>Acção SOAP</label>
+                <hint>Cabeçalho de acção SOAP opcional</hint>
+            </soap-action>
+            <http-authentication>
+                <label>Autenticação HTTP</label>
+                <hint>Autenticação HTTP</hint>
+            </http-authentication>
+            <username>
+                <label>Utilizador</label>
+            </username>
+            <password>
+                <label>Palavra-Passe</label>
+            </password>
+            <request-body>
+                <label>Corpo do Pedido</label>
+                <hint>dados XML (pode ser um envelope SOAP)</hint>
+            </request-body>
+            <response>
+                <label>Resposta</label>
+            </response>
+            <error-type>
+                <label>Tipo de Erro</label>
+                <item>
+                    <label>Submissão a decorrer</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>Sem dados</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>Erro de validação</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>Erro de recursos</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>Erro de Alvo</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>Erro interno</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>Recurso URL</label>
+            </resource-uri>
+            <status-code>
+                <label>Código do Estado</label>
+            </status-code>
+            <headers>
+                <label>Cabeçalhos</label>
+            </headers>
+            <header-name>
+                <label>Nome</label>
+            </header-name>
+            <header-value>
+                <label>Valor(es)</label>
+            </header-value>
+            <response-body>
+                <label>Corpo da Resposta</label>
+            </response-body>
+            <save>
+                <label>Guardar</label>
+            </save>
+            <test>
+                <label>Testar</label>
+            </test>
+        </dialog-http-services>
+        <dialog-database-services>
+            <label>Editor de Serviço de Base de Dados</label>
+            <service-name>
+                <label>Nome do Serviço</label>
+                <hint>Escolha um nome único para este serviço</hint>
+            </service-name>
+            <datasource>
+                <label>Fonte de Dados</label>
+                <hint> Fonte de dados JNDI para este serviço</hint>
+            </datasource>
+            <query>
+                <label>Query SQL </label>
+                <hint>Query SQL que pode conter espaços reservados a parâmetros</hint>
+            </query>
+            <save>
+                <label>Guardar</label>
+            </save>
+            <test>
+                <label>Testar</label>
+            </test>
+        </dialog-database-services>
+        <dialog-actions>
+            <label>Editor de Acções</label>
+            <service-name>
+                <label>Nome da Acção</label>
+                <hint>Escolha um nome único para esta acção</hint>
+            </service-name>
+            <event-type>
+                <label>Reagir a</label>
+                <hint>Evento (num controlo ou global) ao qual reagir</hint>
+                <!-- Just a value change -->
+                <item>
+                    <label>Mudança de valor</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <!-- Value change AND the first time the control shows -->
+                <item>
+                    <label>Mudança de valor ou carregamento de formulário</label>
+                    <value>xforms-value-changed xforms-enabled</value>
+                </item>
+                <!-- Control activation -->
+                <item>
+                    <label>Activação</label>
+                    <value>DOMActivate</value>
+                </item>
+                <!-- Form load -->
+                <item>
+                    <label>Carregamento de Formulário</label>
+                    <value>xforms-ready</value>
+                </item>
+            </event-type>
+            <event-condition>
+                <label>Condição</label>
+                <item>
+                    <label>Correr sempre</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>Correr apenas em criação</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
+            <event-control>
+                <label>Controlo</label>
+            </event-control>
+            <service-to-call>
+                <label>Serviço a chamar</label>
+                <hint>Serviço a chamar quando o evento ocorre</hint>
+            </service-to-call>
+            <request-parameters>
+                <label>Atribuir valores ao pedido do serviço</label>
+            </request-parameters>
+            <source-control>
+                <label>Controlo de fontes </label>
+            </source-control>
+            <destination-xpath>
+                <label>Expressão XPath de destino</label>
+            </destination-xpath>
+            <request-database-parameter>
+                <label>Atribuir parâmetros ao serviço de base de dados</label>
+            </request-database-parameter>
+            <parameter-number>
+                <label>Número do parâmetro</label>
+            </parameter-number>
+            <response-values>
+                <label>Atribuir valores de controlo à resposta</label>
+            </response-values>
+            <destination-control>
+                <label>Controlo de Destino</label>
+            </destination-control>
+            <source-xpath>
+                <label>Expressão fonte de XPath</label>
+            </source-xpath>
+            <response-itemset>
+                <label>Atribuir items aos controlos seleccionados da resposta</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>Controlo de selecção de resposta</label>
+            </destination-selection-control>
+            <itemset>
+                <label>Itemset</label>
+                <hint>Expressões XPath para construir um novo itemset</hint>
+            </itemset>
+            <items>
+                <label>Items</label>
+                <hint>Expressão XPath que retorna um nodo para cada item</hint>
+            </items>
+            <label>
+                <label>Label</label>
+                <hint>Expressão XPath relativa a um item de um nodo</hint>
+            </label>
+            <value>
+                <label>Valor</label>
+                <hint>Expressão XPath relativa a um item de um nodo</hint>
+            </value>
+            <save>
+                <label>Guardar</label>
+            </save>
+            <test>
+                <label>Testar</label>
+            </test>
+        </dialog-actions>
+        <dialog-test>
+            <label>Previsualização do formulário</label>
+        </dialog-test>
+        <dialog-pe>
+            <label>Característica do Orbeon Forms PE </label>
+            <message>
+                <div>
+                    <p>Esta característica está apenas disponível no Orbeon Forms PE.</p>
+                    <p>Para mais informações, por favor visite <a href="http://www.orbeon.com/download" target="_blank">Site do Orbeon</a>.</p>
+                </div>
+            </message>
+        </dialog-pe>
+        <dialog-custom-xml>
+            <label>XML Personalizado</label>
+            <mode-label>A informação introduzida pelos utilizadores neste formulário é guardada num documento XML.</mode-label>
+            <mode-automatic>Permitir que o Form Builder gere o XML por mim</mode-automatic>
+            <mode-custom>Vou providenciar um documento XML personalizado</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <label>Permissões</label>
+            <enable-permissions>Activar as permissões para este formulário</enable-permissions>
+            <role>Perfil</role>
+            <permissions>Permissões</permissions>
+            <operations>Operações</operations>
+            <anyone>Qualquer um</anyone>
+            <owner>Administrador</owner>
+            <group-members>Membros do Grupo</group-members>
+            <create>Criar</create>
+            <read>Ler</read>
+            <update>Actualizar</update>
+            <delete>Apagar</delete>
+        </dialog-permissions>
+        <!-- Messages -->
+        <messages>
+            <delete-section>Tem a certeza que deseja remover a secção actual?</delete-section>
+            <delete-grid>Tem a certeza que deseja remover a grelha actual?</delete-grid>
+            <delete-column>Tem a certeza que deseja remover a coluna actual?</delete-column>
+            <delete-row>Tem a certeza que deseja remover a linha actual?</delete-row>
+            <expand-cell>Tem a certeza que deseja expandir a célula existente? Vai ser removido um controlo.</expand-cell>
+            <delete-resources>Tem a certeza que deseja remover a todos os recursos para esta língua</delete-resources>
+            <delete-service>Tem a certeza que deseja remover o serviço</delete-service>
+            <delete-action>Tem a certeza que deseja remover a acção</delete-action>
+            <controls-will-be-deleted>{0,choice,0#Nenhum controlo será apagado|1#1 controlo será apagado|1&lt;{0,number,integer} controlos serão apagados} .</controls-will-be-deleted>
+            <metadata-edit-title>Meta-dados do formulário</metadata-edit-title>
+            <new-metadata-output>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário(ambos podem ser alterados posteriormente):</new-metadata-output>
+            <edit-metadata-output/>
+            <save-as-metadata-output>Introduza um novo nome de aplicação e um nome de formulário para ser usado para cópia deste formulário:</save-as-metadata-output>
+            <xpath-errors> {0,choice,1#Existe um erro de XPath |1&lt;Existem {0,number,integer} erros de XPath} no seu formulário.</xpath-errors>
+            <lhha-checkbox>Seleccione esta checkbox se gostaria introduzir tags de HTML</lhha-checkbox>
+        </messages>
+        <template>
+            <untitled-form>Formulário sem título</untitled-form>
+            <untitled-section>Secção sem título</untitled-section>
+            <items>
+                <item>
+                    <label>Primeira opção</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Segunda Opção</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Terceira Opção</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+            </items>
+        </template>
+    </resource>
 </resources>

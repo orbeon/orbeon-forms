@@ -61,15 +61,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                                 case DB2 ⇒ "db2-4_6.sql"
                             }
                             val createDDL = SQL.read(sql)
-                            createDDL foreach { s ⇒
-                                try
-                                    statement.executeUpdate(s)
-                                catch {
-                                    case NonFatal(e) ⇒
-                                        println(s)
-                                        throw e
-                                }
-                            }
+                            SQL.executeStatements(provider, statement, createDDL)
                             // Run the interesting code
                             block(connection, provider)
                         } finally {

@@ -264,11 +264,6 @@
                 <alert>Name is already in use or incorrect</alert>
                 <hint>E.g.: "first-name"</hint>
             </control-name>
-            <control-xpath>
-                <label>XPath</label>
-                <alert>Invalid XPath expression</alert>
-                <hint>Points to the node the value for this control is stored</hint>
-            </control-xpath>
             <options>
                 <label>Options</label>
                 <item>
@@ -905,7 +900,6 @@
         <title>
             <label>Titre du formulaire</label>
             <hint>cliquer pour entrer le titre du formulaire</hint>
-            <alert>Le titre de formulaire est requis dans toutes les langues</alert>
         </title>
         <description>
             <label>Description du formulaire</label>
@@ -1750,14 +1744,17 @@
                 <item>
                     <label>Premier choix</label>
                     <value>1</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Deuxième choix</label>
                     <value>2</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Troisième choix</label>
                     <value>3</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -1777,12 +1774,10 @@
         <title>
             <label>Skjematittel</label>
             <hint>Klikk for å skrive inn en skjematittel</hint>
-            <alert>Skjematittel er påkrevd for alle språk</alert>
         </title>
         <description>
             <label>Skjemainnstillinger</label>
             <hint>Klikk for å skrive inn skjemainnstillinger</hint>
-            <routing>Ruting</routing>
         </description>
         <logo>
             <label>Logo</label>
@@ -2623,14 +2618,17 @@
                 <item>
                     <label todo="true">[First choice]</label>
                     <value>1</value>
+                    <hint/>
                 </item>
                 <item>
                     <label todo="true">[Second choice]</label>
                     <value>2</value>
+                    <hint/>
                 </item>
                 <item>
                     <label todo="true">[Third choice]</label>
                     <value>3</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -2650,7 +2648,6 @@
         <title>
             <label>Заголовок формы</label>
             <hint>Нажмите чтобы ввести заголовок</hint>
-            <alert>Заголовок необходимо ввести на всех языках формы</alert>
         </title>
         <description>
             <label>Описание формы</label>
@@ -3494,14 +3491,17 @@
                 <item>
                     <label todo="true">[First choice]</label>
                     <value>1</value>
+                    <hint/>
                 </item>
                 <item>
                     <label todo="true">[Second choice]</label>
                     <value>2</value>
+                    <hint/>
                 </item>
                 <item>
                     <label todo="true">[Third choice]</label>
                     <value>3</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -3759,11 +3759,6 @@
                 <alert>Il nome richiesto esiste già</alert>
                 <hint>Ad esempio: "primo nome"</hint>
             </control-name>
-            <control-xpath>
-                <label>XPath</label>
-                <alert>Espressione XPath non valida</alert>
-                <hint>Punti di riferimento nei quali il valore per questo controllo è salvato.</hint>
-            </control-xpath>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -4371,14 +4366,17 @@
                 <item>
                     <label>Prima scelta</label>
                     <value>1</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Seconda scelta</label>
                     <value>2</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Terza scelta</label>
                     <value>3</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -4636,11 +4634,6 @@
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint>Z.B.: "vorname"</hint>
             </control-name>
-            <control-xpath>
-                <label>XPath</label>
-                <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Knotenpunkte, an denen der Wert dieses Bedienelementes gespeichert ist</hint>
-            </control-xpath>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -5250,14 +5243,17 @@
                 <item>
                     <label>Erster Auswahlpunkt</label>
                     <value>1</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Zweiter Auswahlpunkt</label>
                     <value>2</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Dritter Auswahlpunkt</label>
                     <value>3</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -5515,11 +5511,6 @@
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
                 <hint>Esim.: "etunimi"</hint>
             </control-name>
-            <control-xpath>
-                <label>XPath</label>
-                <alert>Virheellinen XPath-lauseke</alert>
-                <hint>Viittaa solmuun, johon tämän hallinnan arvo on varastoitu</hint>
-            </control-xpath>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -6090,7 +6081,7 @@
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Käyttöoikeudet</label>
-            <role-based-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</role-based-permissions>
+            <enable-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</enable-permissions>
             <role>Rooli</role>
             <permissions>Käyttöoikeudet</permissions>
             <operations>Operaatiot</operations>
@@ -6127,14 +6118,17 @@
                 <item>
                     <label>Ensimmäinen valinta</label>
                     <value>1</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Toinen valinta</label>
                     <value>2</value>
+                    <hint/>
                 </item>
                 <item>
                     <label>Kolmas valinta</label>
                     <value>3</value>
+                    <hint/>
                 </item>
             </items>
         </template>
@@ -6391,11 +6385,6 @@
                 <alert>Nombre en uso o incorrecto</alert>
                 <hint>Ej.: "primer-nombre"</hint>
             </control-name>
-            <control-xpath>
-                <label>XPath</label>
-                <alert>Expresión XPath Inválida</alert>
-                <hint>Apunta al nodo dónde el valor del control esta almacenado</hint>
-            </control-xpath>
             <options>
                 <label>Página de Resumen</label>
                 <item>
@@ -7270,11 +7259,6 @@
                 <alert>O nome está incorrecto ou já existe um outro controlo com o mesmo nome</alert>
                 <hint>Ex.: "primeiro-nome"</hint>
             </control-name>
-            <control-xpath>
-                <label>XPath</label>
-                <alert>Expressão de XPath inválida</alert>
-                <hint>Aponta para o nodo onde o valor deste controlo é guardado</hint>
-            </control-xpath>
             <options>
                 <label>Opções</label>
                 <item>

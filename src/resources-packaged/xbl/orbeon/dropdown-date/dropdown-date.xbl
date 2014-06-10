@@ -40,6 +40,7 @@
             <display-name lang="de">Dropdown-Datum</display-name>
             <display-name lang="sv">Datumväljare med rullgardinsmeny</display-name>
             <display-name lang="nl">Selectie datum</display-name>
+            <display-name lang="pt">Lista de Opções para Data</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
@@ -136,6 +137,11 @@
                             <year>Jaar</year>
                             <month>Maand</month>
                             <day>Dag</day>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <year>Ano</year>
+                            <month>Mês</month>
+                            <day>Dia</day>
                         </resource>
                     </resources>
                 </xf:instance>

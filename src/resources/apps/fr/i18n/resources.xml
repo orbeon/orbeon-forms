@@ -2789,4 +2789,285 @@
             </labels>
         </home>
     </resource>
+    <resource xml:lang="pt">
+        <common>
+            <formats>
+                <within-day>[H01]:[m01]</within-day>
+                <day-this-year>[D] [MNn,*-3]</day-this-year>
+                <short-date>[M01]/[Y01]</short-date>
+            </formats>
+        </common>
+        <buttons>
+            <home>&lt;i class="icon-home"/&gt; Início</home>
+            <review>&lt;i class="icon-eye-open"/&gt; Rever</review>
+            <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <delete>&lt;i class="icon-remove-sign"/&gt; Apagar</delete>
+            <import>&lt;i class="icon-upload"/&gt; Importar</import>
+            <new>&lt;i class="icon-plus"/&gt; Novo</new>
+            <duplicate>&lt;i class="icon-file"/&gt; Duplicar</duplicate>
+
+            <!-- Standard process buttons -->
+            <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
+            <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
+            <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
+            <review>&lt;i class="icon-arrow-right"/&gt; Rever</review>
+            <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
+            <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
+            <email>&lt;i class="icon-envelope"/&gt; Email</email>
+            <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
+
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="icon-arrow-right"/&gt; Submeter</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"/&gt; Rever</workflow-review>
+            <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editar</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
+
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="icon-list"/&gt; Sumário</summary>
+            <close>&lt;i class="icon-remove"/&gt; Fechar</close>
+            <clear>&lt;i class="icon-remove-sign"/&gt; Apagar</clear>
+            <cancel>Cancelar</cancel>
+            <save-locally>Guardar Localmente</save-locally>
+            <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+            <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
+            <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
+
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Apagar e fechar</submit-dialog-clear>
+            <submit-dialog-keep>Guardar e fechar</submit-dialog-keep>
+            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-close-window>Fechar a janela</submit-dialog-close-window>
+
+            <!-- Warning dialog -->
+            <validation-dialog-review>Rever</validation-dialog-review>
+            <validation-dialog-continue>Continuar</validation-dialog-continue>
+
+            <test>&lt;i class="icon-cog"/&gt; Testar</test>
+            <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+        </buttons>
+        <components>
+            <labels>
+                <open-section>Mostra Secção</open-section>
+                <close-section>Esconde Secção</close-section>
+                <section-name>Nome da Secção</section-name>
+            </labels>
+            <grid>
+                <insert-above>Insere em Cima</insert-above>
+                <insert-below>Insere em Baixo</insert-below>
+                <move-up>Move para Cima</move-up>
+                <move-down>Move para Baixo</move-down>
+                <remove>Remove</remove>
+            </grid>
+        </components>
+        <untitled-form>Formulário sem título</untitled-form>
+        <errors>
+            <summary-title>O seu formulário {1,choice,
+                0#não contém quaisquer mensagens|
+                1#contém o(a) seguinte '{0,choice,0#erro|1#aviso|2#mensagem informativa|3#mensagem}'|
+                1&lt;contém os(as) seguintes '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Erro|1#Aviso|2#Mensagem Informativa|3#Mensagem}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Erros|1#Avisos|2#Mensagens Informativas|3#Mensagens}' - }{2}</form-title>
+            <none>Formulário sem erros</none>
+            <unsaved>Alteração não guardadas</unsaved>
+        </errors>
+        <email>
+            <subject>Confirmação Orbeon Forms</subject>
+            <body>Segue em anexo o formulário em formato PDF e XML.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D] [MNn], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <titles>
+                <summary-title>Sumário</summary-title>
+                <delete-confirmation>Deseja apagar</delete-confirmation>
+                <created>Criado</created>
+                <last-modified>Modificado</last-modified>
+                <selected>Seleccionado</selected>
+                <refresh>Esta operação irá refrescar a página</refresh>
+                <toc>Tablea de Conteúdos</toc>
+                <description>Descrição</description>
+                <help>Ajuda</help>
+                <error-count>Erro no seu formulário</error-count>
+                <errors-count>Erros no seu formulário</errors-count>
+            </titles>
+            <search>
+                <search>Procurar</search>
+                <search-forms>&lt;i class="icon-search"/&gt; Procurar formulários</search-forms>
+                <show-options>Mostrar opções de procura</show-options>
+                <close-options>Fechar opções de procura</close-options>
+                <returned>A procura devolveu {0,number,integer} de {1,number,integer} documentos.</returned>
+            </search>
+            <paging>
+                <to>a</to>
+                <of>de</of>
+            </paging>
+            <messages>
+                <no-form-found>Não foram encontrados formulários.</no-form-found>
+                <delete-confirmation>Tem certeza de que deseja apagar um ou mais formulários? Note que ao apagar um documento guardado, os rascunhos correspondentes também serão apagados.</delete-confirmation>
+            </messages>
+            <labels>
+                <draft>Rascunho</draft>
+                <read-only>Somente leitura</read-only>
+                <language-choice>Escolha o idioma</language-choice>
+                <form-choice>Escolha um Formulário</form-choice>
+                <free-search>Pesquisa Livre</free-search>
+                <any>[Qualquer]</any>
+                <previous>Anterior</previous>
+                <next>Próximo</next>
+                <script>Versão Completa</script>
+                <noscript>Versão acessível</noscript>
+                <refresh>Refrescar</refresh>
+                <close-box>[fechar]</close-box>
+                <help-back>Voltar</help-back>
+                <goto-content>Ir para conteúdo</goto-content>
+            </labels>
+            <formats>
+                <date>[D] [MNn], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[D] [MNn], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Documento guardado com sucesso!</save-success>
+                <save-draft-success>Rascunho guardado com sucesso!</save-draft-success>
+                <email-success>Email enviado com sucesso!</email-success>
+                <form-validation-error>Existem erros de validação. Por favor, tente novamente quando todos os campos forem devidamente preenchidos.</form-validation-error>
+                <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador do aplicação.</database-error>
+                <process-error>Houve um erro na execução do processo. Entre em contacto com administrador da aplicação.</process-error>
+                <clear-confirm-message>Tem certeza de que deseja apagar todos os campos nesta página? Os seus dados serão perdidos caso não os tenha guardado.</clear-confirm-message>
+                <error-dialog-title>Não é possível concluir a acção</error-dialog-title>
+                <confirmation-dialog-title>Confirmação</confirmation-dialog-title>
+                <confirmation-dialog-message>Tem certeza de que deseja continuar?</confirmation-dialog-message>
+                <submit-dialog-title>Formulário Submetido</submit-dialog-title>
+                <submit-dialog-message>A sua informação foi submetida, obrigado.</submit-dialog-message>
+                <validation-dialog-title>Reveja as Mensagens de Validação do Formulário</validation-dialog-title>
+                <validation-dialog-message>O seu formulário {1,choice,
+                    0#não contém quaisquer mensagens|
+                    1#contém um(a) '{0,choice,0#erro|1#aviso|2#mensagem informativa|3#mensagem}'|
+                    1&lt;contém {1,number,integer} '{0,choice,0#erros|1#avisos|2#mensagens informativas|3#mensagens}'}. Pode optar por revê-{1,choice,1#lo(a)|1&lt;los(as)} primeiro ou ignorá-{1,choice,1#lo(a)|1&lt;los(as)} e continuar com a operação.</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Clique aqui para abrir o documento. A informação que introduziu será exibida na ferramenta como estava no momento em que guardou o seu trabalho.</saved-locally-open>
+                <upload-in-progress>Existem documentos a serem carregados. Por favor, tente novamente quando o carregamento dos documentos for concluído ou cancelado.</upload-in-progress>
+                <upload-start>Carregamento iniciado</upload-start>
+                <upload-cancel>Carregamento cancelado pelo utiliazdor</upload-cancel>
+                <upload-done>Carregamento concuído</upload-done>
+                <upload-error>Ocorreu um erro durante o carregamento. Por favor, tente novamente.</upload-error>
+                <upload-error-size>O documento carregado é muito grande. O tamanho máximo permitido são {0, number, integer} bytes e o tamanho recebido são {1, number, integer} bytes.</upload-error-size>
+            </messages>
+            <drafts>
+                <found-draft>Encontrado rascunho</found-draft>
+                <found-drafts>Encontrados rascunhos</found-drafts>
+                <found-draft-for-document>Após este documento ter sido guardado, um rascunho foi guardado automaticamente, e poderá conter trabalho adicional. Deseja abrir o documento guardado, ou o rascunho guardado automaticamente?</found-draft-for-document>
+                <found-draft-for-never-saved>Um rascunho para este formulário foi guardado automaticamente. Gostaria de começar do zero, ou abrir o rascunho guardado automaticamente?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Vários rascunhos para este formulário foram guardados automaticamente. Gostaria de começar do zero, ou ver os rascunhos guardados automaticamente (e, em seguida, possivelmente editar um deles)?</found-drafts-for-never-saved>
+                <open-saved>Abrir documento guardado</open-saved>
+                <open-draft>Abrir rascunho guardado automaticamente</open-draft>
+                <view-drafts>Ver rascunhos guardados automaticamente</view-drafts>
+                <start-new>Começar do zero</start-new>
+            </drafts>
+            <labels>
+                <language-choice>Idioma</language-choice>
+                <errors>Resumo de erros</errors>
+                <check-errors-in-form>Este formulário contém erros</check-errors-in-form>
+                <error-details>Ver detalhes de erros</error-details>
+                <confirm>Confirmar</confirm>
+                <alert>Valor em falta ou incorrecto</alert>
+
+                <captcha-label>Captcha</captcha-label>
+                <captcha-alert>O valor inserido não corresponde à imagem, por favor, tente novamente</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Esta é uma vista só de leitura dos seus dados.
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Guardar Localmente</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Clique no botão Guardar em baixo para guardar o formulário no seu computador como um ficheiro HTML.
+                    </p>
+                    <p>
+                        Para reabrir os seu formulário:
+                    </p>
+                    <ul>
+                        <li>Abra o ficheiro HTML no seu navegador (clicando sobre o ficheiro, ou arrastando para a janela do navegador).</li>
+                        <li>Clique no botão Abrir que será apresentado para confirmar.</li>
+                    </ul>
+                    <p>
+                        <b>AVISO:</b> Nenhuns dados são mantidos no servidor e se você remover o ficheiro que guardou, os seus dados serão perdidos.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Form Runner</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Não publicar</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+                <cancel>Cancelar</cancel>
+                <connect>Ligar</connect>
+                <select>Seleccionar</select>
+                <operation>Operação</operation>
+                <all>Todos</all>
+                <none>Nenhum</none>
+                <unpublished-local>Formulários locais não publicados</unpublished-local>
+                <published-local>Formulários locais publicados</published-local>
+                <unpublished-remote>Formulários remotos não publicados</unpublished-remote>
+                <published-remote>Formulários remotos publicados</published-remote>
+                <newer-local>Formulários que são mais novos localmente</newer-local>
+                <newer-remote>Formulários que são mais novos remotamente</newer-remote>
+                <publish-local>Publicar formulários locais</publish-local>
+                <unpublish-local>Não publicar formulários locais</unpublish-local>
+                <publish-remote>Publicar formulários remotos</publish-remote>
+                <unpublish-remote>Não publicar formulários remotos</unpublish-remote>
+                <push-to-remote>Tornar remoto</push-to-remote>
+                <pull-from-remote>Tornar local</pull-from-remote>
+                <navigate-summary>Ir para o Sumário</navigate-summary>
+                <navigate-new>Ir para Novo</navigate-new>
+                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
+                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+            </buttons>
+            <titles>
+                <publish-confirmation>Confirmar (Não)Publicação de Formulário</publish-confirmation>
+                <credentials>Credenciais do Servidor Remoto</credentials>
+                <status>Estado</status>
+                <app>Aplicação</app>
+                <form>Formulário</form>
+                <title>Título</title>
+                <view>Ver</view>
+                <new>Novo</new>
+                <local>Local</local>
+                <remote>Remoto</remote>
+                <form-identification>Identificação do Formulário</form-identification>
+                <last-modified>Modificado</last-modified>
+            </titles>
+            <messages>
+                <no-forms>Não tem acesso a quaisquer formulários.</no-forms>
+                <publish-confirmation>Tem a certeza que quer {0,choice,0#publicar|1#não publicar} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Disponível</available>
+                <unavailable>Indisponível</unavailable>
+                <library>Biblioteca</library>
+                <newer>Mais novo</newer>
+                <username>Utilizador</username>
+                <password>Senha</password>
+            </labels>
+        </home>
+    </resource>
 </resources>

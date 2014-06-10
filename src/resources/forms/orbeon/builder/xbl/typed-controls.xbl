@@ -34,6 +34,7 @@
         <display-name lang="de">Typisierte Bedienelemente</display-name>
         <display-name lang="it">Controlli tipizzati</display-name>
         <display-name lang="nl">Elementen met type</display-name>
+        <display-name lang="pt">Controlos de Tipos</display-name>
     </metadata>
 
     <xbl:binding id="fb-input-email" element="xf|input">
@@ -46,6 +47,7 @@
             <display-name lang="de">E-Mail Adresse</display-name>
             <display-name lang="it">Indirizzo email</display-name>
             <display-name lang="nl">E-mailadres</display-name>
+            <display-name lang="pt">Endereço de Email</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/email.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/email.png</large-icon>

@@ -40,6 +40,7 @@
             <display-name lang="it">Caselle scrollabili</display-name>
             <display-name lang="sv">Rullbara kryssrutor</display-name>
             <display-name lang="nl">Schuifbare keuzevakjes</display-name>
+            <display-name lang="pt">Lista de Caixas de Verificação</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>

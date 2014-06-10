@@ -34,6 +34,7 @@
         <display-name lang="de">Buttons</display-name>
         <display-name lang="it">Pulsanti</display-name>
         <display-name lang="nl">Knoppen</display-name>
+        <display-name lang="pt">Botões</display-name>
     </metadata>
 
     <xbl:binding id="fb-trigger" element="xf|trigger">
@@ -46,6 +47,7 @@
             <display-name lang="de">Button</display-name>
             <display-name lang="it">Pulsante</display-name>
             <display-name lang="nl">Knop</display-name>
+            <display-name lang="pt">Botão</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/button.png</large-icon>
@@ -71,6 +73,7 @@
             <display-name lang="de">Link Button</display-name>
             <display-name lang="it">Pulsante link</display-name>
             <display-name lang="nl">Knop met link</display-name>
+            <display-name lang="pt">Botão para endereço</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/link.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/link.png</large-icon>

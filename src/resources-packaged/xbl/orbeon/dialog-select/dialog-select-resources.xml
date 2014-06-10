@@ -82,4 +82,14 @@
         <add>Lägg till</add>
         <remove>Ta bort</remove>
     </resource>
+    <resource xml:lang="pt">
+        <select>...</select>
+        <title>Selecção</title>
+        <available>Disponível</available>
+        <selected>Seleccionado</selected>
+        <confirm>Confirmar</confirm>
+        <cancel>Cancelar</cancel>
+        <add>Adicionar</add>
+        <remove>Remover</remove>
+    </resource>
 </resources>

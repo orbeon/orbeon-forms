@@ -7496,24 +7496,22 @@
         <dialog-publish>
             <label>Publicar Formulário</label>
             <publish>Publicar</publish>
-            <!--<publish-success>O formulário foi publicado com sucesso. {0,choice,0#Nenhum anexo foi|1#1 anexo foi|1&lt;{0,number,integer} anexos foram} publicado(s).</publish-success>-->
-            <publish-success todo="true">[The form definition was published successfully as version {1,number,integer}, with {0,choice,0#no attachments|1#1 attachment|1&lt;{0,number,integer} attachments}.]</publish-success>
+            <publish-success>A definição de formulário foi publicada com sucesso com número de versão {1,number,integer}, {0,choice,0#sem anexos|1#com 1 anexo|1&lt;com {0,number,integer} anexos}.</publish-success>
             <publish-error>Ocorreu um erro na publicação.</publish-error>
-            <latest-published-version todo="true">[Latest published version]</latest-published-version>
-            <create-new-version-item todo="true">[create a new form definition with version number {0,number,integer}]</create-new-version-item>
-            <overwrite-version-item todo="true">[write over the current form definition with version number {0,number,integer}]</overwrite-version-item>
-            <create-new-version-help todo="true">
-                [PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
-                database. Data which already exists in the database will still be viewed and edited with the previous
-                versions of this form definition which are associated with that data. The new form definition version
-                will be used to create new data.]
+            <latest-published-version>Última versão publicada</latest-published-version>
+            <create-new-version-item>criar uma nova definição de formulário com número de versão {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>substituir a definição de formulário actual pela versão com número {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+                ATENÇÃO: A publicação desta definição do formulário irá criar uma nova versão da definição do formulário na
+                base de dados. Os dados já existentes na base de dados continuarão a ser visualizados e editados com as versões anteriores
+                desta definição de formulário a que os dados estão associados. A nova versão de definição de formulário
+                será utilizada para criar novos dados.
             </create-new-version-help>
-            <overwrite-version-help todo="true">
-                [PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
-                definition are small, such as changing control labels, the form definition will be compatible with
-                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
-                moving controls, the form definition might be incompatible with existing data. We recommend being
-                careful when overwriting an existing form definition version.]
+            <overwrite-version-help>
+                ATENÇÃO: Irá substituir a definição do formulário existente. Se as alterações feitas à definição do formulário forem pequenas,
+                como alterar rótulos de controlos, a nova definição do formulário será compatível com dados do formulário existentes.
+                Mas se você tiver efectuado alterações estruturais, como adicionar, remover, renomear ou mover controlos, a definição do formulário
+                poderá ser incompatível com os dados existentes. Recomendamos que tenha cuidado ao substituir uma versão de definição de formulário existente.
             </overwrite-version-help>
             <open-summary>Abrir a página de resumo do formulário submetido</open-summary>
             <open-new>Abrir uma nova página de um formulário publicado</open-new>

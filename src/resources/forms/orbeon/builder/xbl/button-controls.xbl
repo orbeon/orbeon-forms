@@ -31,7 +31,7 @@
         <display-name lang="fi">Painikkeet</display-name>
         <display-name lang="fr">Boutons</display-name>
         <display-name lang="ru">[Buttons]</display-name>
-        <display-name lang="de">Buttons</display-name>
+        <display-name lang="de" todo="true">[Buttons]</display-name>
         <display-name lang="it">Pulsanti</display-name>
         <display-name lang="nl">Knoppen</display-name>
         <display-name lang="pt">Botões</display-name>
@@ -44,7 +44,7 @@
             <display-name lang="fi">Painike</display-name>
             <display-name lang="fr">Bouton</display-name>
             <display-name lang="ru">Кнопка</display-name>
-            <display-name lang="de">Button</display-name>
+            <display-name lang="de" todo="true">[Button]</display-name>
             <display-name lang="it">Pulsante</display-name>
             <display-name lang="nl">Knop</display-name>
             <display-name lang="pt">Botão</display-name>
@@ -70,7 +70,7 @@
             <display-name lang="fi">Linkitä painike</display-name>
             <display-name lang="fr">Bouton lien</display-name>
             <display-name lang="ru">Кнопка-ссылка</display-name>
-            <display-name lang="de">Link Button</display-name>
+            <display-name lang="de" todo="true">[Link Button]</display-name>
             <display-name lang="it">Pulsante link</display-name>
             <display-name lang="nl">Knop met link</display-name>
             <display-name lang="pt">Botão para endereço</display-name>

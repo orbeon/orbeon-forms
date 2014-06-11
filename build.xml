@@ -838,6 +838,9 @@
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
                             <arg line="stop"/>
                         </java>
+                        <!-- If we don't wait for Tomcat to be really stopped, databases won't let us users/schemas we're connected to
+                             (todo: find a better way to know when Tomcat has properly shut down) -->
+                        <sleep seconds="20"/>
                         <!-- Delete schemas -->
                         <sql driver="${oracle.driver}" url="${env.ORACLE_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
                             <classpath><pathelement location="${oracle.jar}"/></classpath>

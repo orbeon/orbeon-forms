@@ -61,6 +61,11 @@
                 <xf:setvalue ref="$i/standard-classes"               value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"                 value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
+                <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
+                     allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
+                <xf:delete ref="$i/namespace::node()"/>
+                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
             <!-- Save data upon close unless the sub-form is not valid -->

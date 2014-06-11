@@ -270,10 +270,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
         }
     }
 
-    // Try uploading files of 1 KB, 1 MB, and 10 MB
+    // Try uploading files of 1 KB, 1 MB
     @Test def attachmentsTest(): Unit = {
         withOrbeonTables("attachments") { (connection, provider) ⇒
-            for ((size, position) ← Seq(1024, 1024*1024, 10*1024*1024).zipWithIndex) {
+            for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
                 val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpRequest.Binary
                 val url = crudURLPrefix(provider) + "data/123/file" + position.toString
                 HttpAssert.put(url, Specific(1), bytes, 201)
@@ -282,10 +282,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
         }
     }
 
-    // Try uploading files of 1 KB, 1 MB, and 5 MB
+    // Try uploading files of 1 KB, 1 MB
     @Test def largeXMLDocumentsTest(): Unit = {
         withOrbeonTables("large XML documents") { (connection, provider) ⇒
-            for ((size, position) ← Seq(1024, 1024*1024, 5*1024*1024).zipWithIndex) {
+            for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
                 val string = new Array[Char](size)
                 for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
                 val text = Dom4jUtils.createText(new String(string))

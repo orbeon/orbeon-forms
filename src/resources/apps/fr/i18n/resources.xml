@@ -2288,8 +2288,8 @@
             <validation-dialog-review>Granskning</validation-dialog-review>
             <validation-dialog-continue>Fortsätt</validation-dialog-continue>
 
-            <test todo="true">&lt;i class="icon-cog"/&gt; [Test]</test>
-            <publish todo="true">&lt;i class="icon-globe"/&gt; [Publish]</publish>
+            <test>&lt;i class="icon-cog"/&gt; Testa</test>
+            <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
         </buttons>
         <components>
             <labels>
@@ -2483,8 +2483,8 @@
                 <pull-from-remote>Hämta från servern</pull-from-remote>
                 <navigate-summary>Gå till sammanställning</navigate-summary>
                 <navigate-new>Gå till Skapa</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <upgrade-local>Uppgradera lokala formulärdefinitioner</upgrade-local>
+                <upgrade-remote>Uppgradera formulärdefinitioner på servern</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Bekräfta publicering/upphävande av publicering</publish-confirmation>
@@ -2502,7 +2502,7 @@
             </titles>
             <messages>
                 <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
-                <publish-confirmation todo="true">Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#upgrade} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
+                <publish-confirmation>Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
             </messages>
             <labels>
                 <available>Tillgänglig</available>

@@ -999,6 +999,9 @@ public class URLGenerator extends ProcessorImpl {
             tidy.setShowWarnings(tidyConfig.isShowWarnings());
             tidy.setQuiet(tidyConfig.isQuiet());
 
+            tidy.setTrimEmptyElements(false);
+            tidy.setDropEmptyParas(false);
+
             // Set encoding
             // If the encoding is null, we get a default
             tidy.setInputEncoding(TidyConfig.getTidyEncoding(encoding));

@@ -154,8 +154,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     override def serializeLocal =
         ju.Collections.singletonMap("case-id", XFormsUtils.getStaticIdFromId(getSelectedCaseEffectiveId))
 
-    override def setFocus(inputOnly: Boolean): Boolean =
-        isRelevant && (selectedCase exists (_.setFocus(inputOnly)))
+    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false): Boolean =
+        isRelevant && (selectedCase exists (_.setFocus(inputOnly, dryRun)))
 
     override def equalsExternal(other: XFormsControl): Boolean = {
         if (! other.isInstanceOf[XFormsSwitchControl])

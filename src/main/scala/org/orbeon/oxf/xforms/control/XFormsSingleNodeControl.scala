@@ -276,7 +276,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         containingDocument.staticReadonly ||
             XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
-    override def setFocus(inputOnly: Boolean): Boolean = Focus.focusWithEvents(this)
+    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false): Boolean = Focus.focusWithEvents(this, dryRun)
 
     override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {
         assert(attributesImpl.getLength == 0)

@@ -16,9 +16,8 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.oxf.xforms.control.FocusableTrait
 
 class XXFormsFocusable extends XFormsFunction with FunctionSupport {
     override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-        relevantControl(0)(xpathContext) map (_.isInstanceOf[FocusableTrait])
+        relevantControl(0)(xpathContext) map (_.setFocus(inputOnly = false, dryRun = true))
 }

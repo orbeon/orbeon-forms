@@ -217,8 +217,8 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     }
 
     // Don't accept focus if we have the internal appearance
-    override def setFocus(inputOnly: Boolean) =
-        ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.setFocus(inputOnly)
+    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) =
+        ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.setFocus(inputOnly, dryRun)
 
     override def supportAjaxUpdates =
         ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)

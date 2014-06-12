@@ -262,9 +262,9 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         ! handleLHHA || super.compareLHHA(other)
 
     // If component is directly focusable, attempt focus, otherwise delegate to container behavior
-    override def setFocus(inputOnly: Boolean) =
+    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) =
         if (isFocusable)
-            Focus.focusWithEvents(this)
+            Focus.focusWithEvents(this, dryRun)
         else
-            super.setFocus(inputOnly)
+            super.setFocus(inputOnly, dryRun)
 }

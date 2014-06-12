@@ -61,7 +61,7 @@ trait ControlEventSupport {
                     // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
                     Focus.hiddenCases(this) foreach (_.toggle())
                     
-                    setFocus(focusEvent.inputOnly)
+                    setFocus(focusEvent.inputOnly, dryRun = false)
                 case _ ⇒
             }
 

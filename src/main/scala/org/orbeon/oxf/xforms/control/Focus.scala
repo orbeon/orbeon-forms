@@ -24,42 +24,42 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
 object Focus {
 
     // Focus on the given control and dispatch appropriate focus events
-    def focusWithEvents(control: XFormsControl): Boolean = {
+    def focusWithEvents(control: XFormsControl, dryRun: Boolean = false): Boolean =
+        if (! control.isFocusable) {
+            false
+        } else {
+            if (! dryRun) {
 
-        // Continue only if control is focusable
-        if (! control.isFocusable)
-            return false
+                val doc = control.containingDocument
 
-        val doc = control.containingDocument
+                // Read previous control
+                val previousOption = Option(doc.getControls.getFocusedControl)
 
-        // Read previous control
-        val previousOption = Option(doc.getControls.getFocusedControl)
+                // Focus has not changed so don't do anything
+                if (previousOption exists (_ eq control))
+                    return true
 
-        // Focus has not changed so don't do anything
-        if (previousOption exists (_ eq control))
-            return true
+                // Remember first that the new control has focus
+                doc.getControls.setFocusedControl(control)
 
-        // Remember first that the new control has focus
-        doc.getControls.setFocusedControl(control)
+                // Ancestor-or-self chains from root to leaf
+                val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
+                val currentChain = containersAndSelf(control).reverse
 
-        // Ancestor-or-self chains from root to leaf
-        val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
-        val currentChain = containersAndSelf(control).reverse
+                // Number of common ancestor containers, if any
+                val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) ⇒ previous eq current}
 
-        // Number of common ancestor containers, if any
-        val commonPrefix = previousChain zip currentChain prefixLength
-            { case (previous, current) ⇒ previous eq current }
+                // Focus out of the previous control and grouping controls we are leaving
+                // Events are dispatched from leaf to root
+                (previousChain drop commonPrefix reverse) foreach focusOut
 
-        // Focus out of the previous control and grouping controls we are leaving
-        // Events are dispatched from leaf to root
-        (previousChain drop commonPrefix reverse) foreach focusOut
+                // Focus into the grouping controls we are entering and the current control
+                // Events are dispatched from root to leaf
+                currentChain drop commonPrefix foreach focusIn
+            }
 
-        // Focus into the grouping controls we are entering and the current control
-        // Events are dispatched from root to leaf
-        currentChain drop commonPrefix foreach focusIn
-
-        true
-    }
+            true
+        }
 
     // Update focus based on a previously focused control
     def updateFocusWithEvents(focusedBefore: XFormsControl, repeat: Option[XFormsRepeatControl] = None) = repeat match {
@@ -82,9 +82,9 @@ object Focus {
             def focus(control: XFormsControl) =
                 setFocusPartially(control, Some(repeat))
 
-            updateFocus(focusedBefore, removeFocus _, focus)
+            updateFocus(focusedBefore, removeFocus, focus)
         case None ⇒
-            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents)
+            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents(_, dryRun = false))
     }
 
     // Update focus based on a previously focused control

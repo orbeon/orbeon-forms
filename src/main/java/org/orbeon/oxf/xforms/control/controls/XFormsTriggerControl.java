@@ -52,7 +52,7 @@ public class XFormsTriggerControl extends XFormsSingleNodeFocusableControlBase {
     }
 
     @Override
-    public boolean setFocus(boolean inputOnly) {
-        return ! inputOnly && super.setFocus(inputOnly);
+    public boolean setFocus(boolean inputOnly, boolean dryRun) {
+        return ! inputOnly && super.setFocus(inputOnly, dryRun);
     }
 }

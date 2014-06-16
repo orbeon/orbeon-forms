@@ -1967,7 +1967,7 @@
             <delete>&lt;i class="icon-remove-sign"/&gt; Poista</delete>
             <import>&lt;i class="icon-upload"/&gt; Tuo</import>
             <new>&lt;i class="icon-plus"/&gt; Uusi</new>
-            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+            <duplicate>&lt;i class="icon-file"/&gt; Kopioi</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
@@ -2017,11 +2017,11 @@
                 <section-name>Lohkon nimi</section-name>
             </labels>
             <grid>
-                <insert-above todo="true">[Insert Above]</insert-above>
-                <insert-below todo="true">[Insert Below]</insert-below>
-                <move-up todo="true">[Move Up]</move-up>
-                <move-down todo="true">[Move Down]</move-down>
-                <remove todo="true">[Remove]</remove>
+                <insert-above>Liitä ylle</insert-above>
+                <insert-below>Liitä alle</insert-below>
+                <move-up>Siirrä ylös</move-up>
+                <move-down>Siirrä alas</move-down>
+                <remove>Poista</remove>
             </grid>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
@@ -2080,7 +2080,7 @@
             </messages>
             <labels>
                 <draft>Luonnos</draft>
-                <read-only todo="true">[Read-only]</read-only>
+                <read-only>Vain luku</read-only>
                 <language-choice>Valitse kieli</language-choice>
                 <form-choice>Valitse taulukko</form-choice>
                 <free-search>Vapaa haku</free-search>
@@ -2111,8 +2111,8 @@
                 <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
                 <clear-confirm-message>Oletko varma, että haluat tyhjentää kaikki kentät tällä sivulla? Tiedot häviävät jos et ole tallentanut niitä</clear-confirm-message>
                 <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
-                <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
-                <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <confirmation-dialog-title>Varmistus</confirmation-dialog-title>
+                <confirmation-dialog-message>Haluatko varmasti jatkaa?</confirmation-dialog-message>
                 <submit-dialog-title>Lomake toimitettu</submit-dialog-title>
                 <submit-dialog-message>Tietosi on toimitettu.</submit-dialog-message>
                 <validation-dialog-title>Käy läpi lomakevalidoinnin viestejä</validation-dialog-title>
@@ -2182,54 +2182,54 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Poista julkaisu</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
-                <cancel todo="true">[Cancel]</cancel>
-                <connect todo="true">[Connect]</connect>
-                <select todo="true">[Select]</select>
-                <operation todo="true">[Operation]</operation>
-                <all todo="true">[All]</all>
-                <none todo="true">[None]</none>
-                <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
-                <published-local todo="true">[Published local forms]</published-local>
-                <unpublished-remote todo="true">[Unpublished remote forms]</unpublished-remote>
-                <published-remote todo="true">[Published remote forms]</published-remote>
-                <newer-local todo="true">[Forms that are newer locally]</newer-local>
-                <newer-remote todo="true">[Forms that are newer remotely]</newer-remote>
-                <publish-local todo="true">[Publish local forms]</publish-local>
-                <unpublish-local todo="true">[Unpublish local forms]</unpublish-local>
-                <publish-remote todo="true">[Publish remote forms]</publish-remote>
-                <unpublish-remote todo="true">[Unpublish remote forms]</unpublish-remote>
-                <push-to-remote todo="true">[Push to remote]</push-to-remote>
-                <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
-                <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
-                <navigate-new todo="true">[Navigate to New]</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <cancel>Peruuta</cancel>
+                <connect>Yhdistä</connect>
+                <select>Valitse</select>
+                <operation>Toiminto</operation>
+                <all>Kaikki</all>
+                <none>Ei mitään</none>
+                <unpublished-local>Julkaisemattomat paikalliset lomakkeet</unpublished-local>
+                <published-local>Julkaistut paikalliset lomakkeet</published-local>
+                <unpublished-remote>Julkaisemattomat etälomakkeet</unpublished-remote>
+                <published-remote>Julkaistut etälomakkeet</published-remote>
+                <newer-local>Uudemmat paikalliset lomakkeet</newer-local>
+                <newer-remote>Uudemmat etälomakkeet</newer-remote>
+                <publish-local>Julkaise paikalliset lomakkeet</publish-local>
+                <unpublish-local>Palauta paikalliset lomakeet julkaisemattomiksi</unpublish-local>
+                <publish-remote>Julkaise etälomakkeet</publish-remote>
+                <unpublish-remote>Palauta etälomakeet julkaisemattomiksi</unpublish-remote>
+                <push-to-remote>Vie palvelimelle</push-to-remote>
+                <pull-from-remote>Hae palvelimelta</pull-from-remote>
+                <navigate-summary>Siirry yhteenvetoon</navigate-summary>
+                <navigate-new>Luo uusi</navigate-new>
+                <upgrade-local>Päivitä paikallisen lomakkeen määritykset</upgrade-local>
+                <upgrade-remote>Päivitä etälomakkeen määritykset</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Vahvista lomakkeen julkaisu/julkaisun poisto</publish-confirmation>
-                <credentials todo="true">[Remote Server Credentials]</credentials>
+                <credentials>Etäpalvelimen tunnistetiedot</credentials>
                 <status>Tila</status>
                 <app>Sovellus</app>
                 <form>Lomake</form>
                 <title>Otsikko</title>
                 <view>Näytä</view>
                 <new>Uusi</new>
-                <local todo="true">[Local]</local>
-                <remote todo="true">[Remote]</remote>
-                <form-identification todo="true">[Form Identification]</form-identification>
-                <last-modified todo="true">[Modified]</last-modified>
+                <local>Paikallinen</local>
+                <remote>Etä</remote>
+                <form-identification>Lomakkeen tunnistetiedot</form-identification>
+                <last-modified>Muokattu</last-modified>
             </titles>
             <messages>
                 <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
-                <publish-confirmation todo="true">Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
+                <publish-confirmation>Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Saatavilla</available>
                 <unavailable>Ei saatavilla</unavailable>
                 <library>Kirjasto</library>
-                <newer todo="true">[Newer]</newer>
-                <username todo="true">[Username]</username>
-                <password todo="true">[Password]</password>
+                <newer>Uudempi</newer>
+                <username>Käyttäjänimi</username>
+                <password>Salasana</password>
             </labels>
         </home>
     </resource>

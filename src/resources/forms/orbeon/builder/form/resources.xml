@@ -5327,7 +5327,7 @@
             <label>Uusi ruudukko</label>
         </new-grid>
         <new-repeated-grid>
-            <label todo="true">[New Repeated Grid]</label>
+            <label>Uusi toistettu ruudukko</label>
             <!--<label>Uusi toisto</label>-->
         </new-repeated-grid>
         <change-schema>
@@ -5379,7 +5379,7 @@
             <label>Klikkaa lisätäksesi vihje</label>
         </enter-hint>
         <enter-text>
-            <label todo="true">[Type your text here]</label>
+            <label>Kirjoita tekstisi tähän</label>
         </enter-text>
         <type-hint>
             <label>Kirjoita vihjeesi tähän</label>
@@ -5467,7 +5467,7 @@
             <label>Muokkaa</label>
         </edit>
         <classes>
-            <label todo="true">[Custom CSS classes]</label>
+            <label>Mukautetut CSS luokat</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -5512,7 +5512,7 @@
                 <hint>Esim.: "etunimi"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Asetukset</label>
                 <item>
                     <label>Näytä tiivistelmänä</label>
                     <value>fr-summary</value>
@@ -5663,7 +5663,7 @@
             <validation-type><label>Vahvistamisen tyyppi</label></validation-type>
             <validation-details><label>Vahvistamisen tiedot</label></validation-details>
             <level><label>Taso</label></level>
-            <use-html todo="true">[Use HTML]</use-html>
+            <use-html>Käytä HTML</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Lohkon yksityiskohdat</label>
@@ -5673,9 +5673,9 @@
                 <hint>Esim.: "osoite"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Asetukset</label>
                 <item>
-                    <label todo="true">[Page Break Before]</label>
+                    <label>Sivunvaihto ennen lohkoa</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -5690,19 +5690,19 @@
                 <hint>Boolean XPath-lauseke</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Section Content]</label>
+                <label>Toista osion sisältö</label>
             </repeat>
             <custom-iteration-name>
-                <label todo="true">[Enable Custom Iteration Name]</label>
+                <label>Aktivoi mukautetun silmukan nimi</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label todo="true">[Custom Iteration Name]</label>
-                <alert todo="true">[Name is already in use or incorrect]</alert>
+                <label>Mukautetun silmukan nimi</label>
+                <alert>Nimi on jo käytössä tai se on virheellinen</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
+            <tab-base><label>Perusasetukset ja lausekkeet</label></tab-base>
+            <tab-repeat><label>Toistettu sisältö</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
             <label>Ruudukon yksityiskohdat</label>
@@ -5724,12 +5724,12 @@
             <min>
                 <label>Toistojen vähimmäismäärä</label>
                 <alert>Virheellinen arvo</alert>
-                <hint todo="true">Positiivinen numero [or XPath expression]</hint>
+                <hint>Positiivinen numero tai XPath-lauseke</hint>
             </min>
             <max>
                 <label>Toistojen maksimimäärä</label>
                 <alert>Virheellinen arvo</alert>
-                <hint todo="true">Positiivinen numero [or XPath expression]</hint>
+                <hint>Positiivinen numero tai XPath-lauseke</hint>
             </max>
             <other>Muu</other>
             <one>Yksi toisto</one>
@@ -5748,23 +5748,16 @@
         <dialog-publish>
             <label>Julkaise lomake</label>
             <publish>Julkaise</publish>
-            <publish-success todo="true">Lomake julkaistiin onnistuneesti [as version {1,number,integer}]. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
+            <publish-success>Lomake julkaistiin onnistuneesti [as version {1,number,integer}]. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
             <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
-            <latest-published-version todo="true">Latest published version</latest-published-version>
-            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
-            <create-new-version-help todo="true">
-                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
-                database. Data which already exists in the database will still be viewed and edited with the previous
-                versions of this form definition which are associated with that data. The new form definition version
-                will be used to create new data.
+            <latest-published-version>Viimeisin julkaistu versio</latest-published-version>
+            <create-new-version-item>luo uusi lomakemäärittely versionumerolla {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+                HUOMAA: Tämän lomakemäärittelyn julkaiseminen luo uuden lomakemäärittelyversion tietokantaan. Tietoja, jotka jo ovat tietokannassa voidaan yhä tarkastella ja editoida niillä edellisillä lomakemäärittelyversioilla, jotka liittyvät tietoihin. Uutta lomakemäärittelyversiota käytetään uusien tietojen luomiseen.
             </create-new-version-help>
-            <overwrite-version-help todo="true">
-                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
-                definition are small, such as changing control labels, the form definition will be compatible with
-                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
-                moving controls, the form definition might be incompatible with existing data. We recommend being
-                careful when overwriting an existing form definition version.
+            <overwrite-version-help>
+                HUOMAA: Tämä korvaa nykyisen lomakemäärittelyn. Jos lomakemäärittelyyn tekemäsi muutokset ovat pieniä tekstimuutoksia, lomakemäärittely on yhteensopiva nykyisten lomakkeiden tietojen kanssa. Jos kuitenkin olet tehnyt muutoksia lomakkeen rakenteeseen, kuten lisännyt, poistanut, uudelleennimennyt tai siirtänyt elementtejä, lomakemäärittely voi olla yhteensopimaton nykyisen tiedon kanssa. Suosittelemme huolellisuutta korvattaessa olemassa olevaa lomakemäärittelyversiota.
             </overwrite-version-help>
             <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
             <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
@@ -5843,7 +5836,7 @@
                 <label>Arvo</label>
             </value>
             <hint>
-                <label todo="true">[Hint]</label>
+                <label>Vihje</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>

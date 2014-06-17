@@ -65,7 +65,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Create document
         final ExternalContext.Session session = NetUtils.getSession(true);
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml");
-        final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null);
+        final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null, true);
 
         stateManager.afterInitialResponse(document, null);
 
@@ -101,7 +101,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state1 = new State();
         {
             NetUtils.getSession(true); // make sure a session is in place as it is used by the state manager
-            state1.document = new XFormsContainingDocument(staticState, null, null);
+            state1.document = new XFormsContainingDocument(staticState, null, null, true);
 
             state1.uuid = state1.document.getUUID();
             state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
@@ -166,7 +166,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state1 = new State();
         {
             NetUtils.getSession(true);
-            state1.document = new XFormsContainingDocument(staticState, null, null);
+            state1.document = new XFormsContainingDocument(staticState, null, null, true);
 
             state1.uuid = state1.document.getUUID();
             state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);

@@ -41,19 +41,14 @@ class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsF
 
             // First time may or may not pass
             events.clear()
-            runFormRunner("cache-test", form, mode, document = Id1, noscript = noscript)
+            runFormRunner("cache-test", form, mode, document = Id1, noscript = noscript, initialize = false)
             assert(Some(expectedInitialHit) === (events collectFirst { case StaticState(found) ⇒ found }))
 
             // Second time with different document must always pass
             events.clear()
-            runFormRunner("cache-test", form, mode, document = Id2, noscript = noscript)
+            runFormRunner("cache-test", form, mode, document = Id2, noscript = noscript, initialize = false)
             assert(Some(true) === (events collectFirst { case StaticState(found) ⇒ found }))
         }
-
-        // In the tests below, we could entirely skip the XForms document's initialization, because we only want to test
-        // the static state cache here. We currently don't have a mechanism to skip document initialization in
-        // XFormsToXHTML, so initialization runs and causes dynamic errors. Those are ignored using
-        // xxf:fatal-errors-during-initialization="false".
 
         locally {
             val Form = "noscript-true-pdf-auto-wizard-false"

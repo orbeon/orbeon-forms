@@ -129,7 +129,9 @@ abstract public class XFormsToSomething extends ProcessorImpl {
         final IndentedLogger htmlLogger    = Loggers.getIndentedLogger("html");
         final IndentedLogger cachingLogger = Loggers.getIndentedLogger("cache");
 
-        final XFormsStaticStateCache.CacheTracer cacheTracer; {
+        final XFormsStaticStateCache.CacheTracer cacheTracer;
+        final boolean initializeXFormsDocument;
+        {
             final XFormsStaticStateCache.CacheTracer customTracer =
                 (XFormsStaticStateCache.CacheTracer) pipelineContext.getAttribute("orbeon.cache.test.tracer");
 
@@ -137,6 +139,11 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                 cacheTracer = customTracer;
             else
                 cacheTracer = new LoggingCacheTracer(cachingLogger);
+
+            final Boolean initializeXFormsDocumentOrNull =
+                (Boolean) pipelineContext.getAttribute("orbeon.cache.test.initialize-xforms-document");
+
+            initializeXFormsDocument = initializeXFormsDocumentOrNull != null ? initializeXFormsDocumentOrNull : true;
         }
 
         // ContainingDocument and XFormsState created below
@@ -172,7 +179,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                             new XFormsContainingDocument(
                                 staticState[0],
                                 uriResolver,
-                                PipelineResponse.getResponse(xmlReceiver, externalContext)
+                                PipelineResponse.getResponse(xmlReceiver, externalContext),
+                                initializeXFormsDocument
                             );
 
                         // Gather set caching dependencies
@@ -234,7 +242,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                     new XFormsContainingDocument(
                         staticState,
                         uriResolver,
-                        PipelineResponse.getResponse(xmlReceiver, externalContext)
+                        PipelineResponse.getResponse(xmlReceiver, externalContext),
+                        initializeXFormsDocument
                     );
             } else {
                 assert !cachedStatus[0];
@@ -242,7 +251,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             }
 
             // Output resulting document
-            produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState, containingDocument[0], xmlReceiver);
+            if (initializeXFormsDocument)
+                produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState, containingDocument[0], xmlReceiver);
 
             // Notify state manager
             XFormsStateManager.instance().afterInitialResponse(containingDocument[0], stage2CacheableState.template);

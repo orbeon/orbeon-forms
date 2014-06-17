@@ -73,7 +73,8 @@ trait FormRunnerSupport {
         formVersion: String = "",
         document: String    = "",
         uuid: String        = "",
-        noscript: Boolean   = false
+        noscript: Boolean   = false,
+        initialize: Boolean = true
     )(
         implicit tracer: CacheTracer
     ) = {
@@ -113,6 +114,7 @@ trait FormRunnerSupport {
             val externalContext = new TestExternalContext(pipelineContext, TransformerUtils.tinyTreeToDom4j(request))
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
             pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
+            pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", initialize)
 
             for (p ← Seq(xsltProcessor, includeProcessor, xformsProcessor, serializer))
                 p.reset(pipelineContext)

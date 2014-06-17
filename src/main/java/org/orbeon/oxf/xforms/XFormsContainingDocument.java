@@ -124,8 +124,9 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @param staticState static state object
      * @param uriResolver URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      * @param response    optional response for handling replace="all" during initialization
+     * @param initialize  initialize document (false for testing only)
      */
-    public XFormsContainingDocument(XFormsStaticState staticState, XFormsURIResolver uriResolver, ExternalContext.Response response) {
+    public XFormsContainingDocument(XFormsStaticState staticState, XFormsURIResolver uriResolver, ExternalContext.Response response, boolean initialize) {
         super();
 
         // Create UUID for this document instance
@@ -157,10 +158,12 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             this.initializing = true;
 
             // Initialize the containing document
-            try {
-                initialize();
-            } catch (Exception e) {
-                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "initializing XForms containing document"));
+            if (initialize) {
+                try {
+                    initialize();
+                } catch (Exception e) {
+                    throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "initializing XForms containing document"));
+                }
             }
         }
         indentedLogger().endHandleOperation();

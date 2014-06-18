@@ -112,6 +112,7 @@
                 <xh:div
                     class="xbl-fr-tinymce-div xbl-html-input"
                     id="tinymce-div"
+                    aria-label="{xxf:label('fr-tinymce')}"
                     xbl:attr="style tabindex tabindex=navindex"/>
             </xf:group>
             <xf:output mediatype="text/html" ref="$binding[not($script)]"/>

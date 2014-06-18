@@ -261,7 +261,7 @@
                                                        AND d.last_modified_time = m.last_modified_time
                                                        AND d.draft = m.draft
                                                        AND d.deleted = 'N'
-                                                       <xsl:copy-of select="f:owner-group-condition('data')"/>
+                                                       <xsl:copy-of select="f:owner-group-condition('d')"/>
                                             ) total,
                                             (
                                                 SELECT count(*)

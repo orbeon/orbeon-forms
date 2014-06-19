@@ -36,6 +36,14 @@
     <xh:body>
 
         <xh:div class="actions">
+            <xf:trigger id="short-request">
+                <xf:label>Short request normal</xf:label>
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Short request show-progress=false</xf:label>
+                <xf:dispatch ev:event="DOMActivate" name="my-event" targetid="model" delay="2000"
+                              xxf:show-progress="false"/>
+            </xf:trigger>
             <xf:trigger id="run-long-submission">
                 <xf:label>Run long submission</xf:label>
                 <xf:send ev:event="DOMActivate" submission="sleep"/>

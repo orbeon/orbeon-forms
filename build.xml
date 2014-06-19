@@ -858,12 +858,7 @@
                 </if>
 
                 <!-- If tests failed, stop after cleanup -->
-                <if>
-                    <isset property="test.failed"/>
-                    <then>
-                        <fail message="JUnit tests failed"/>
-                    </then>
-                </if>
+                <fail message="JUnit tests failed" if="test.failed"/>
 
             </sequential>
         </parallel>

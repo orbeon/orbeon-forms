@@ -782,7 +782,7 @@
                	<mkdir  dir="${test.exist-db.dir}"/>
 
                 <!-- Run tests -->
-                <junit fork="true" haltonerror="yes" haltonfailure="yes" printsummary="true" showoutput="yes">
+                <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed">
                     <!-- Enable assertions -->
                     <jvmarg value="-ea"/>
 
@@ -856,6 +856,15 @@
                         </sql>
                     </then>
                 </if>
+
+                <!-- If tests failed, stop after cleanup -->
+                <if>
+                    <isset property="test.failed"/>
+                    <then>
+                        <fail message="JUnit tests failed"/>
+                    </then>
+                </if>
+
             </sequential>
         </parallel>
 

@@ -54,11 +54,11 @@ trait Common extends RequestResponse with FormRunnerPersistence {
                     |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
                     |           GROUP BY app, form, form_version
                     |       ) m
-                        |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
+                    |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
                     |       AND t.deleted = 'N'
                     |""".stripMargin)
-                          ps.setString(1, app)
-                          ps.setString(2, form)
+            ps.setString(1, app)
+            ps.setString(2, form)
             docId.foreach(ps.setString(3, _))
             val rs = ps.executeQuery()
             rs.next(); rs

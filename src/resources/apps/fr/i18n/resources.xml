@@ -2569,8 +2569,8 @@
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Doorgaan</validation-dialog-continue>
 
-            <test todo="true">&lt;i class="icon-cog"/&gt; [Test]</test>
-            <publish todo="true">&lt;i class="icon-globe"/&gt; [Publish]</publish>
+            <test>&lt;i class="icon-cog"/&gt; [Testen]</test>
+            <publish>&lt;i class="icon-globe"/&gt; [Publiceren]</publish>
         </buttons>
         <components>
             <labels>
@@ -2764,8 +2764,8 @@
                 <pull-from-remote>Van extern ophalen</pull-from-remote>
                 <navigate-summary>Naar samenvatting</navigate-summary>
                 <navigate-new>Naar nieuw</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <upgrade-local>[Upgrade lokale formdefinities]</upgrade-local>
+                <upgrade-remote>[Upgrade externe formdefinities]</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>
@@ -2783,7 +2783,7 @@
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
-                <publish-confirmation todo="true">Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgrade}?</publish-confirmation>
+                <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>

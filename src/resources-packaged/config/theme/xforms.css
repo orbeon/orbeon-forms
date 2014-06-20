@@ -443,7 +443,7 @@
   background-color: transparent;
 }
 .orbeon .xforms-select-appearance-xxforms-tree table,
-.orbeon xforms-select1-appearance-xxforms-tree table {
+.orbeon .xforms-select1-appearance-xxforms-tree table {
   margin: 0;
 }
 .orbeon #xforms-form .xforms-width-2em input.xforms-input-input,

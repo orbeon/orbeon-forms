@@ -24,9 +24,9 @@ class LoggingCacheTracer(logger: IndentedLogger) extends CacheTracer {
             case None         ⇒ logger.logDebug("", "template and static state digest not obtained from cache.")
         }
 
-    def staticStateStatus(found: Boolean) =
+    def staticStateStatus(found: Boolean, digest: String) =
         if (found)
-            logger.logDebug("", "found up-to-date static state by digest in cache")
+            logger.logDebug("", "found up-to-date static state by digest in cache", "digest", digest)
         else
-            logger.logDebug("", "did not find static state by digest in cache")
+            logger.logDebug("", "did not find static state by digest in cache", "digest", digest)
 }

@@ -213,7 +213,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                     final XFormsStaticState cachedState = XFormsStaticStateCache.getDocumentJava(stage2CacheableState.staticStateDigest);
                     if (cachedState != null && cachedState.topLevelPart().metadata().bindingsIncludesAreUpToDate()) {
                         // Found static state in cache
-                        cacheTracer.staticStateStatus(true);
+                        cacheTracer.staticStateStatus(true, cachedState.digest());
 
                         staticState = cachedState;
                     } else {
@@ -224,11 +224,11 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                                 "out-of-date static state by digest in cache due to: "
                                     + cachedState.topLevelPart().metadata().debugOutOfDateBindingsIncludesJava());
 
-                        cacheTracer.staticStateStatus(false);
-
                         final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, cachingLogger, stage2CacheableState.staticStateDigest);
                         staticState = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits.staticStateDocument, stage2CacheableState.staticStateDigest,
                                 staticStateBits.metadata, staticStateBits.template);
+
+                        cacheTracer.staticStateStatus(false, staticState.digest());
 
                         // Store in cache
                         XFormsStaticStateCache.storeDocument(staticState);
@@ -284,7 +284,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             final XFormsStaticState cachedState = XFormsStaticStateCache.getDocumentJava(staticStateBits.staticStateDigest);
             if (cachedState != null && cachedState.topLevelPart().metadata().bindingsIncludesAreUpToDate()) {
                 // Found static state in cache
-                cacheTracer.staticStateStatus(true);
+                cacheTracer.staticStateStatus(true, cachedState.digest());
 
                 staticState[0] = cachedState;
             } else {
@@ -295,10 +295,10 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         "out-of-date static state by digest in cache due to: "
                             + cachedState.topLevelPart().metadata().debugOutOfDateBindingsIncludesJava());
 
-                cacheTracer.staticStateStatus(false);
-
                 staticState[0] = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits.staticStateDocument, staticStateBits.staticStateDigest,
                         staticStateBits.metadata, staticStateBits.template);
+
+                cacheTracer.staticStateStatus(false, staticState[0].digest());
 
                 // Store in cache
                 XFormsStaticStateCache.storeDocument(staticState[0]);

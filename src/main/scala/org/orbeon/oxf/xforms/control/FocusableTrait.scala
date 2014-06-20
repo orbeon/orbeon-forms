@@ -22,8 +22,8 @@ trait FocusableTrait extends VisitableTrait {
     self ⇒
 
     // Whether the control is actually focusable depending on relevance, visibility, readonliness
-    override def isFocusable = self match {
-        case single: XFormsSingleNodeControl ⇒ isRelevant && ! Focus.isHidden(self) && ! single.isReadonly
-        case _                               ⇒ isRelevant && ! Focus.isHidden(self)
+    override def isFocusable(withToggles: Boolean) = self match {
+        case single: XFormsSingleNodeControl ⇒ isRelevant && (withToggles || ! Focus.isHidden(self)) && ! single.isReadonly
+        case _                               ⇒ isRelevant && (withToggles || ! Focus.isHidden(self))
     }
 }

@@ -247,7 +247,7 @@ class XFormsControl(
     }
 
     // Whether focus can be set to this control
-    def isFocusable = false
+    def isFocusable(withToggles: Boolean) = false
 
     // Set the focus on this control and return true iif control accepted focus
     // By default, a control doesn't accept focus

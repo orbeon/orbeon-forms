@@ -263,8 +263,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     // If component is directly focusable, attempt focus, otherwise delegate to container behavior
     override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) =
-        if (isFocusable)
-            Focus.focusWithEvents(this, dryRun)
+        if (isFocusable(withToggles = false))
+            Focus.focusWithEvents(this)
         else
             super.setFocus(inputOnly, dryRun)
 }

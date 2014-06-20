@@ -24,39 +24,36 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
 object Focus {
 
     // Focus on the given control and dispatch appropriate focus events
-    def focusWithEvents(control: XFormsControl, dryRun: Boolean = false): Boolean =
-        if (! control.isFocusable) {
+    def focusWithEvents(control: XFormsControl): Boolean =
+        if (! control.isFocusable(withToggles = false)) {
             false
         } else {
-            if (! dryRun) {
+            val doc = control.containingDocument
 
-                val doc = control.containingDocument
+            // Read previous control
+            val previousOption = Option(doc.getControls.getFocusedControl)
 
-                // Read previous control
-                val previousOption = Option(doc.getControls.getFocusedControl)
+            // Focus has not changed so don't do anything
+            if (previousOption exists (_ eq control))
+                return true
 
-                // Focus has not changed so don't do anything
-                if (previousOption exists (_ eq control))
-                    return true
+            // Remember first that the new control has focus
+            doc.getControls.setFocusedControl(control)
 
-                // Remember first that the new control has focus
-                doc.getControls.setFocusedControl(control)
+            // Ancestor-or-self chains from root to leaf
+            val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
+            val currentChain = containersAndSelf(control).reverse
 
-                // Ancestor-or-self chains from root to leaf
-                val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
-                val currentChain = containersAndSelf(control).reverse
+            // Number of common ancestor containers, if any
+            val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) ⇒ previous eq current}
 
-                // Number of common ancestor containers, if any
-                val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) ⇒ previous eq current}
+            // Focus out of the previous control and grouping controls we are leaving
+            // Events are dispatched from leaf to root
+            (previousChain drop commonPrefix reverse) foreach focusOut
 
-                // Focus out of the previous control and grouping controls we are leaving
-                // Events are dispatched from leaf to root
-                (previousChain drop commonPrefix reverse) foreach focusOut
-
-                // Focus into the grouping controls we are entering and the current control
-                // Events are dispatched from root to leaf
-                currentChain drop commonPrefix foreach focusIn
-            }
+            // Focus into the grouping controls we are entering and the current control
+            // Events are dispatched from root to leaf
+            currentChain drop commonPrefix foreach focusIn
 
             true
         }
@@ -84,7 +81,7 @@ object Focus {
 
             updateFocus(focusedBefore, removeFocus, focus)
         case None ⇒
-            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents(_, dryRun = false))
+            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents)
     }
 
     // Update focus based on a previously focused control
@@ -117,7 +114,7 @@ object Focus {
                         // Control might be a ghost that has been removed from the tree (iteration removed)
                         onRemoveFocus()
 
-                    case Some(newReference) if ! newReference.isFocusable ⇒
+                    case Some(newReference) if ! newReference.isFocusable(withToggles = false) ⇒
                         // New reference exists, but is not focusable
                         onRemoveFocus()
 
@@ -192,8 +189,8 @@ object Focus {
     // Whether the control is hidden within a non-visible case or dialog
     def isHidden(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) exists {
         case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ true
-        case dialog: XXFormsDialogControl if ! dialog.isVisible ⇒ true
-        case _ ⇒ false
+        case dialog: XXFormsDialogControl  if ! dialog.isVisible     ⇒ true
+        case _                                                       ⇒ false
     }
 
     // Return all the ancestor-or-self hidden cases

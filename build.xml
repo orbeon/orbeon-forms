@@ -229,6 +229,7 @@
 
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
+        <echo message="Using Ant ${ant.version}"/>
 
         <!-- Provide custom version number to TeamCity -->
         <!-- http://confluence.jetbrains.com/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingBuildNumber-->
@@ -782,7 +783,7 @@
                	<mkdir  dir="${test.exist-db.dir}"/>
 
                 <!-- Run tests -->
-                <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed">
+                <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed" logfailedtests="true">
                     <!-- Enable assertions -->
                     <jvmarg value="-ea"/>
 

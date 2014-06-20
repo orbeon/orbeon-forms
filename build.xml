@@ -794,8 +794,6 @@
                         </fileset>
                     </batchtest>
 
-                    <formatter type="plain" usefile="false"/>
-
                     <!-- Configure resource manager -->
                     <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
                     <!-- 1: test/resources first, as we need to touch files and compile Java files there -->

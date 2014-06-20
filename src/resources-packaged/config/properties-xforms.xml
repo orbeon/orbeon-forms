@@ -119,6 +119,7 @@
     <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"           value=""/>
     <property as="xs:boolean" name="oxf.xforms.noscript"                                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.noscript-support"                            value="false"/>
+    <property as="xs:string"  name="oxf.xforms.noscript-template"                           value="static"/>
     <property as="xs:boolean" name="oxf.xforms.async-portlet-load"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>

@@ -17,21 +17,21 @@
   display: block;
   margin: 0;
 }
-.orbeon table {
+.orbeon .fr-forms-table {
   clear: both;
 }
-.orbeon table .fr-summary,
-.orbeon table .fr-new {
+.orbeon .fr-forms-table .fr-summary,
+.orbeon .fr-forms-table .fr-new {
   text-align: center;
 }
-.orbeon table th {
+.orbeon .fr-forms-table th {
   white-space: nowrap;
   min-width: 12px;
 }
-.orbeon table td {
+.orbeon .fr-forms-table td {
   position: relative;
 }
-.orbeon table td a {
+.orbeon .fr-forms-table td a {
   width: 100%;
   display: inline-block;
   height: 100%;
@@ -40,34 +40,34 @@
   color: black;
   outline: 0;
 }
-.orbeon table td a:hover {
+.orbeon .fr-forms-table td a:hover {
   text-decoration: none;
   color: black;
 }
-.orbeon table .fr-home-select {
+.orbeon .fr-forms-table .fr-home-select {
   width: 1px;
 }
-.orbeon table .fr-home-select label {
+.orbeon .fr-forms-table .fr-home-select label {
   display: inline-block;
   margin: 0;
   padding: 0;
   text-indent: 0;
 }
-.orbeon table .fr-home-select label input[type="checkbox"] {
+.orbeon .fr-forms-table .fr-home-select label input[type="checkbox"] {
   float: none;
   margin: 0;
 }
-.orbeon table .fr-home-select label .label {
+.orbeon .fr-forms-table .fr-home-select label .label {
   vertical-align: middle;
 }
-.orbeon table .fr-home-status {
+.orbeon .fr-forms-table .fr-home-status {
   width: 1px;
 }
-.orbeon table .fr-home-modified {
+.orbeon .fr-forms-table .fr-home-modified {
   width: 1px;
   white-space: nowrap;
 }
-.orbeon table .label {
+.orbeon .fr-forms-table .label {
   display: inline-block;
   text-align: left;
   -webkit-box-sizing: border-box;

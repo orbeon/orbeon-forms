@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunner.orbeonRoles
 
 trait PermissionsOps {
 
-    // Whether, given permissions in XML form, the user has Form Builder access to the given app/form 
+    // Whether, given permissions specified in XML, the user has Form Builder access to the given app/form
     def hasAdminPermissionsFor(fbPermissions: NodeInfo, app: String, form: String): Boolean = {
 
         def findAppElement(a: String) = fbPermissions \ "app" find (_ \@ "name" === a)

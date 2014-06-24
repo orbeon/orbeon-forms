@@ -41,7 +41,7 @@ trait PermissionsOps {
         else
             // Result document contains a tree structure of apps and forms
             <apps has-roles="true">{
-                appForms map { case (app, forms) ⇒
+                appForms.to[List].sortBy(_._1) map { case (app, forms) ⇒
                     <app name={app}>{ forms map { form ⇒ <form name={form}/> } }</app>
                 }
             }</apps>

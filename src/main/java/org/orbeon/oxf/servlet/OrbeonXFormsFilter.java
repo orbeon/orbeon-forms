@@ -221,7 +221,6 @@ public class OrbeonXFormsFilter implements Filter {
 
         public FilterRequestWrapper(HttpServletRequest httpServletRequest) {
             super(httpServletRequest);
-
         }
 
         @Override
@@ -236,6 +235,97 @@ public class OrbeonXFormsFilter implements Filter {
             // If the filtered resource attempts to read the request body, we will forward an empty body
             this.requestBodyRead = true;
             return super.getInputStream();
+        }
+
+        // See https://github.com/orbeon/orbeon-forms/issues/1796
+        private boolean isIfHeader(String name) {
+            return name.toLowerCase().startsWith("if-");
+        }
+
+        public abstract class FilterEnumeration implements Enumeration {
+
+            private final Enumeration that;
+            private Object next = null;
+
+            public FilterEnumeration(Enumeration that) {
+                this.that = that;
+            }
+
+            private void findNext() {
+                if (next != null)
+                    return;
+
+                while (that.hasMoreElements()) {
+                    final Object element = that.nextElement();
+                    if (predicate(element)) {
+                        next = element;
+                        break;
+                    }
+                }
+            }
+
+            public boolean hasMoreElements() {
+                findNext();
+                return next != null;
+            }
+
+            public Object nextElement() throws NoSuchElementException {
+                findNext();
+
+                if (next == null)
+                    throw new NoSuchElementException();
+
+                final Object result = next;
+                next = null;
+                return result;
+            }
+
+            public abstract boolean predicate(Object element);
+        }
+
+        @Override
+        public long getDateHeader(String name) {
+            if (isIfHeader(name))
+                return -1;
+            else
+                return super.getDateHeader(name);
+        }
+
+        @Override
+        public String getHeader(String name) {
+            if (isIfHeader(name))
+                return null;
+            else
+                return super.getHeader(name);
+        }
+
+        @Override
+        public Enumeration getHeaders(String name) {
+            if (isIfHeader(name))
+                return new Enumeration() {
+                    public boolean hasMoreElements() { return false; }
+                    public Object nextElement() { throw new NoSuchElementException();  }
+                };
+            else
+                return super.getHeaders(name);
+        }
+
+        @Override
+        public Enumeration getHeaderNames() {
+            return new FilterEnumeration(super.getHeaderNames()) {
+                @Override
+                public boolean predicate(Object element) {
+                    return ! isIfHeader((String) element);
+                }
+            };
+        }
+
+        @Override
+        public int getIntHeader(String name) {
+            if (isIfHeader(name))
+                return -1;
+            else
+                return super.getIntHeader(name);
         }
 
         public boolean isRequestBodyRead() {

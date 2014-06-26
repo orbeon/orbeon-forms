@@ -20,6 +20,7 @@
     <xi:include href="oxf:/config/properties-form-runner.xml"/>
     <xi:include href="oxf:/config/properties-form-builder.xml"/>
 
+    <property as="xs:boolean" name="oxf.show-version"                                        value="true"/>
     <property as="xs:boolean" name="oxf.http.exceptions"                                     value="true"/>
 
     <property as="xs:string"  processor-name="oxf:builtin-saxon"        name="location-mode" value="smart"/>
@@ -31,8 +32,6 @@
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                     value="false"/>
     <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                      value="10"/>
-
-    <property as="xs:boolean" name="oxf.fr.version.*.*"                                      value="true"/>
 
     <xi:include href="oxf:/config/properties-local.xml"/>
     <xi:include href="oxf:/config/properties-local-dev.xml"/>

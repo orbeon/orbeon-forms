@@ -51,7 +51,12 @@
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
     <!-- Properties -->
-    <xsl:variable name="has-version" select="p:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable
+        name="version"
+        as="xs:string?"
+        select="version:versionStringIfAllowedOrEmpty()"
+        xmlns:version="java:org.orbeon.oxf.common.Version"/>
+
     <xsl:variable name="has-noscript-link" select="p:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="is-noscript-table" select="not(not(p:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
     <xsl:variable name="is-noscript-section-collapse" select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>

@@ -18,7 +18,6 @@
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <xsl:variable name="has-version" select="p:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="p:split(normalize-space(p:property('oxf.fr.css.uri.*.*')))" as="xs:string*"/>
     <xsl:variable name="custom-css-uri" select="p:split(normalize-space(p:property('oxf.fr.css.custom.uri.*.*')))" as="xs:string*"/>
 
@@ -88,9 +87,13 @@
                     </div>
                 </div>
                 <div id="ft" class="fr-footer">
-                    <xsl:if test="not($has-version = false())">
-                        <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
-                        <div class="fr-orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></div>
+                    <xsl:variable
+                        name="version"
+                        as="xs:string?"
+                        select="version:versionStringIfAllowedOrEmpty()"
+                        xmlns:version="java:org.orbeon.oxf.common.Version"/>
+                    <xsl:if test="$version">
+                        <div class="fr-orbeon-version"><xsl:value-of select="$version"/></div>
                     </xsl:if>
                 </div>
             </div>

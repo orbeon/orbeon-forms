@@ -104,8 +104,9 @@ object XFormsResourceRewriter extends Logging {
         val outputWriter = new OutputStreamWriter(os, "utf-8")
 
         // Output Orbeon Forms version if allowed
-        if (! XFormsProperties.isEncodeVersion)
-            outputWriter.write("/* This file was produced by " + Version.VersionString + " */\n")
+        Version.versionStringIfAllowed foreach { version ⇒
+            outputWriter.write(s"/* This file was produced by $version */\n")
+        }
 
         // Write and rewrite all resources one after the other
         readCSSIterator foreach {
@@ -155,9 +156,9 @@ object XFormsResourceRewriter extends Logging {
 
     private def generateJS(resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
         // Output Orbeon Forms version if allowed
-        if (! XFormsProperties.isEncodeVersion) {
+        Version.versionStringIfAllowed foreach { version ⇒
             val outputWriter = new OutputStreamWriter(os, "utf-8")
-            outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
+            outputWriter.write(s"// This file was produced by $version\n")
             outputWriter.flush()
         }
 

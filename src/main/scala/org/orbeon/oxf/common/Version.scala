@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.common
 
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import scala.util.control.NonFatal
+import org.orbeon.oxf.util.ScalaUtils._
 
 // Product version information
+// NOTE: This could be a trait, but this causes difficulties to XPath callers to reach `object Version` functions.
 abstract class Version {
 
     import Version._
@@ -38,8 +41,16 @@ object Version {
     val Edition       = Option("@EDITION@") filter PossibleEditions getOrElse "CE"
     val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 
+    def versionStringIfAllowed =
+        Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
+    
+    // For XPath callers
+    def versionStringIfAllowedOrEmpty =
+        versionStringIfAllowed.orNull
+
     // For backward compatibility
-    def getVersionString = VersionString
+    def getVersionString =
+        versionStringIfAllowedOrEmpty
 
     val logger = LoggerFactory.createLogger(classOf[Version])
 

@@ -85,7 +85,6 @@
     <!-- E.g. "orbeon admin user" -->
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value=""/>
 
-    <property as="xs:boolean" name="oxf.fr.version.*.*"                                         value="false"/>
     <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                                   value="false"/>
 
     <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="10"/>

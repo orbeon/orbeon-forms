@@ -23,14 +23,17 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xh="http://www.w3.org/1999/xhtml"
                 xmlns:saxon="http://saxon.sf.net/"
-                xmlns:f="http://orbeon.org/oxf/xml/formatting"
-                xmlns:version="java:org.orbeon.oxf.common.Version"
                 xmlns="http://www.w3.org/1999/xhtml">
 
     <xsl:variable name="servlet-classes" as="xs:string+" select="('org.orbeon.oxf.servlet.OPSServlet', 'org.orbeon.oxf.servlet.OXFServlet')"/>
     <xsl:variable name="portlet-classes" as="xs:string+" select="('org.orbeon.oxf.portlet.OPSPortlet', 'org.orbeon.oxf.portlet.OPSPortlet')"/>
-    <xsl:variable name="orbeon-forms-version" as="xs:string" select="version:getVersionString()"/>
     <xsl:variable name="title" as="xs:string" select="'Orbeon Forms - An Error has Occurred'"/>
+
+    <xsl:variable
+        name="version"
+        as="xs:string?"
+        select="version:versionStringIfAllowedOrEmpty()"
+        xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
     <!-- Format the XForms error panel message body. This must return a single root element. -->
     <xsl:template name="format-xforms-error-panel-body" as="element()">
@@ -278,7 +281,9 @@
                             </div>
                         </div>
                     </xsl:if>
-                    <p class="orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></p>
+                    <xsl:if test="$version">
+                        <p class="orbeon-version"><xsl:value-of select="$version"/></p>
+                    </xsl:if>
                 </div>
             </body>
         </html>

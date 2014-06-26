@@ -26,6 +26,7 @@
     <property as="xs:integer" name="oxf.cache.size"                                  value="1000"/>
     <property as="xs:integer" name="oxf.cache.xpath.size"                            value="5000"/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
+    <property as="xs:boolean" name="oxf.show-version"                                value="false"/>
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 

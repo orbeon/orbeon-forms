@@ -22,8 +22,11 @@
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:version="java:org.orbeon.oxf.common.Version">
 
-    <!-- Orbeon Forms version -->
-    <xsl:variable name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
+    <xsl:variable
+        name="version"
+        as="xs:string?"
+        select="version:versionStringIfAllowedOrEmpty()"
+        xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
     <xsl:template match="xh:head">
         <xsl:copy>
@@ -47,8 +50,10 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xh:title>
-        <!-- Orbeon Forms version -->
-        <xh:meta name="generator" content="{$orbeon-forms-version}"/>
+        <xsl:if test="$version">
+            <!-- Orbeon Forms version -->
+            <xh:meta name="generator" content="{$version}"/>
+        </xsl:if>
         <!-- Handle head scripts if present -->
         <xsl:apply-templates select="xh:script"/>
     </xsl:template>

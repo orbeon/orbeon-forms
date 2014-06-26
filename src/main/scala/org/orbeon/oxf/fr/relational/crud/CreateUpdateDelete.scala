@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.relational.crud
 
 import java.io.{Writer, InputStream, ByteArrayOutputStream}
 import java.sql
-import java.sql.{Types, Timestamp, Connection}
+import java.sql._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
@@ -33,6 +33,12 @@ import org.orbeon.oxf.fr.relational.Specific
 import org.orbeon.oxf.fr.relational.ForDocument
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.JXQName
+import scala.collection.mutable.ListBuffer
+import scala.Some
+import org.orbeon.oxf.fr.relational.Specific
+import scala.Array
+import org.orbeon.oxf.fr.relational.ForDocument
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 object RequestReader {
 
@@ -171,75 +177,62 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         }
     }
 
+
     private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 
         val table = tableName(req)
-
         val versionToSet = existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req))
+
+        def param[T](setter: (PreparedStatement) ⇒ ((Int, T) ⇒ Unit), value: ⇒ T): (PreparedStatement, Int) ⇒ Unit = {
+            (ps: PreparedStatement, i: Int) ⇒ setter(ps)(i, value)
+        }
 
         // Do insert
         locally {
             val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
+            val isFormDefinition = req.forForm && ! req.forAttachment
+            val now = new Timestamp(System.currentTimeMillis())
+
+            val (xmlOpt, metadataOpt) =
+                if (! delete && ! req.forAttachment) {
+                    val (xml, metadataOpt) = RequestReader.dataAndMetadataAsString(metadata = !req.forData)
+                    (Some(xml), metadataOpt)
+                } else {
+                    (None, None)
+                }
+
+            val possibleCols = List(
+                true                  → "created"            → param(_.setTimestamp, existingRow.map(_.created).getOrElse(now)),
+                true                  → "last_modified_time" → param(_.setTimestamp, now),
+                true                  → "last_modified_by"   → param(_.setString   , requestUsername.getOrElse(null)),
+                true                  → "app"                → param(_.setString   , req.app),
+                true                  → "form"               → param(_.setString   , req.form),
+                true                  → "form_version"       → param(_.setInt      , versionToSet),
+                req.forData           → "document_id"        → param(_.setString   , req.dataPart.get.documentId),
+                true                  → "deleted"            → param(_.setString   , if (delete) "Y" else "N"),
+                req.forData           → "draft"              → param(_.setString   , if (req.dataPart.get.isDraft) "Y" else "N"),
+                req.forAttachment     → "file_name"          → param(_.setString   , req.filename.get),
+                req.forAttachment     → "file_content"       → param(_.setBytes    , RequestReader.bytes()),
+                isFormDefinition      → "form_metadata"      → param(_.setString   , metadataOpt.getOrElse(null)),
+                req.forData           → "username"           → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.getOrElse(null))),
+                req.forData           → "groupname"          → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup   .getOrElse(null))),
+                ! req.forAttachment   → xmlCol               → param(_.setString   , xmlOpt.getOrElse(null))
+            )
+
+            val includedCols =
+                for {
+                    ((included, col), param) ← possibleCols
+                    if included
+                } yield col → param
 
             val ps = connection.prepareStatement(
                 s"""|INSERT INTO $table
-                    |   (
-                    |                                                       created, last_modified_time, last_modified_by
-                    |                                                     , app, form, form_version
-                    |       ${if (req.forData)                           ", document_id"             else ""}
-                    |                                                     , deleted
-                    |       ${if (req.forData)                           ", draft"                   else ""}
-                    |       ${if (req.forAttachment)                     ", file_name, file_content" else ""}
-                    |       ${if (! req.forAttachment)                  s", $xmlCol"                 else ""}
-                    |       ${if (! req.forAttachment && ! req.forData)  ", form_metadata"           else ""}
-                    |       ${if (req.forData)                           ", username, groupname"     else ""}
-                    |   )
-                    |VALUES
-                    |   (
-                    |                                                   ?, ?, ?
-                    |                                                   , ?, ?, ?
-                    |       ${if (req.forData)                          ", ?"                 else ""}
-                    |                                                   , ${if (delete) "'Y'" else "'N'"}
-                    |       ${if (req.forData)                          ", ?"                 else ""}
-                    |       ${if (req.forAttachment)                    ", ?, ?"              else ""}
-                    |       ${if (! req.forAttachment)                  ", ?"                 else ""}
-                    |       ${if (! req.forAttachment && ! req.forData) ", ?"                 else ""}
-                    |       ${if (req.forData)                          ", ?, ?"              else ""}
-                    |   )
+                    |            ( ${includedCols.map(_._1   ).mkString(", ")} )
+                    |     VALUES ( ${includedCols.map(_ ⇒ "?").mkString(", ")} )
                     |""".stripMargin)
 
-            val position = Iterator.from(1)
-            val now = new Timestamp(System.currentTimeMillis())
-
-                                         ps.setTimestamp(position.next(), existingRow.map(_.created).getOrElse(now))
-                                         ps.setTimestamp(position.next(), now)
-                                         ps.setString(position.next(), requestUsername.getOrElse(null))
-                                         ps.setString(position.next(), req.app)
-                                         ps.setString(position.next(), req.form)
-                                         ps.setInt   (position.next(), versionToSet)
-            if (req.forData)             ps.setString(position.next(), req.dataPart.get.documentId)
-            if (req.forData)             ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
-            if (req.forAttachment)       ps.setString(position.next(), req.filename.get)
-            if (delete) {
-                                         ps.setNull(position.next(), if (req.forAttachment) Types.BLOB else Types.CLOB)
-
-                if (! req.forAttachment && ! req.forData)
-                                         ps.setNull(position.next(), Types.VARCHAR)
-            } else {
-                if (req.forAttachment) {
-                                         ps.setBytes(position.next(), RequestReader.bytes())
-                } else {
-                    val (form, metadataOpt) = RequestReader.dataAndMetadataAsString(metadata = ! req.forData)
-
-                                         ps.setString(position.next(), form)
-                    metadataOpt foreach (ps.setString(position.next(), _))
-                }
-            }
-            if (req.forData) {
-                                         ps.setString(position.next(), existingRow.map(_.username ).flatten.getOrElse(requestUsername .getOrElse(null)))
-                                         ps.setString(position.next(), existingRow.map(_.group).flatten.getOrElse(requestGroup.getOrElse(null)))
-            }
-
+            for (((_, param), i) ← includedCols.zipWithIndex)
+                param(ps, i + 1)
             ps.executeUpdate()
         }
 

@@ -22,9 +22,9 @@ import java.util.*;
 
 public class XFormsProperties {
 
-	public static final String[] EMPTY_STRING_ARRAY = new String[]{};
+    public static final String[] EMPTY_STRING_ARRAY = new String[]{};
 
-	public static final String XFORMS_PROPERTY_PREFIX = "oxf.xforms.";
+    public static final String XFORMS_PROPERTY_PREFIX = "oxf.xforms.";
 
     // Document properties
     public static final String STATE_HANDLING_PROPERTY = "state-handling";
@@ -346,16 +346,16 @@ public class XFormsProperties {
     }
 
     public static String[] getAdditionalAvtElementNamespaces() {
-    	final String additionalElementNamespacesStr = Properties.instance().getPropertySet().getString
-    			(ADDITIONAL_AVT_ELEMENT_NAMESPACES);
+        final String additionalElementNamespacesStr = Properties.instance().getPropertySet().getString
+                (ADDITIONAL_AVT_ELEMENT_NAMESPACES);
 
-		return additionalElementNamespacesStr != null?additionalElementNamespacesStr.split("\\s"):EMPTY_STRING_ARRAY;
+        return additionalElementNamespacesStr != null?additionalElementNamespacesStr.split("\\s"):EMPTY_STRING_ARRAY;
     }
 
     public static String[] getAdditionalRefIdAttributeNames() {
-    	String additionalRefIdAttributeNames = Properties.instance().getPropertySet().getString
-    			(ADDITIONAL_REF_ID_ATTRIBUTE_NAMES);
-		return additionalRefIdAttributeNames != null?additionalRefIdAttributeNames.split("\\s"):EMPTY_STRING_ARRAY;
+        String additionalRefIdAttributeNames = Properties.instance().getPropertySet().getString
+                (ADDITIONAL_REF_ID_ATTRIBUTE_NAMES);
+        return additionalRefIdAttributeNames != null?additionalRefIdAttributeNames.split("\\s"):EMPTY_STRING_ARRAY;
     }
 
     public static boolean isMinimalResources() {

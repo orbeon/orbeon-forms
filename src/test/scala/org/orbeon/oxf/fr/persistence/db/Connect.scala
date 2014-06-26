@@ -47,10 +47,16 @@ private[persistence] object Connect {
                   |  FROM all_tables
                   | WHERE table_name LIKE 'ORBEON%'
                   |       AND owner = sys_context('USERENV', 'CURRENT_USER')"""
-            case _ ⇒
+            case MySQL ⇒
+                """SELECT table_name
+                  |  FROM information_schema.tables
+                  | WHERE table_name LIKE 'orbeon%'
+                  |       AND table_schema = DATABASE()"""
+            case SQLServer ⇒
                 """SELECT table_name
                   |  FROM information_schema.tables
                   | WHERE table_name LIKE 'orbeon%'"""
+            case DB2 ⇒ ???
         }
         val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
         val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList

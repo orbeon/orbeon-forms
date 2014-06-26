@@ -136,7 +136,6 @@ trait FormRunnerActions {
             show("fr-confirmation-dialog", Map("message" → Some(message)))
         }
 
-    // TODO: Use xf:show("fr-submission-result-dialog")
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {
             show("fr-submission-result-dialog", Map(

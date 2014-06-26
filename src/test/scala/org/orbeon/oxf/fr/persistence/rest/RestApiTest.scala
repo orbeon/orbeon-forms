@@ -66,9 +66,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
                             block(connection, provider)
                         } finally {
                             // Clean-up database dropping tables
-                            (Connect.getTableNames(provider, connection)
-                                    map ("DROP TABLE " + _)
-                                    foreach statement.executeUpdate)
+                            for (tableName ← Connect.getTableNames(provider, connection))
+                                statement.executeUpdate(s"DROP TABLE $tableName")
                             // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
                             if (provider == SQLServer)
                                 statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")

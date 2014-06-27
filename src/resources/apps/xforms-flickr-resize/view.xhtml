@@ -38,7 +38,7 @@
                 </instanceData>
             </xf:instance>
             <xf:submission id="flickr-submission"
-                               method="get" action="http://www.flickr.com/services/rest/" separator="&amp;"
+                               method="get" action="https://www.flickr.com/services/rest/" separator="&amp;"
                                replace="instance" instance="response-instance">
                 <xf:toggle case="case-busy" ev:event="xforms-submit"/>
                 <xf:toggle case="case-done" ev:event="xforms-submit-done"/>
@@ -133,7 +133,7 @@
                             <xf:output
                                 value="concat(
                                         '&lt;img',
-                                          ' src=&#34;http://static.flickr.com/',
+                                          ' src=&#34;https://static.flickr.com/',
                                             @server, '/',
                                             @id, '_',
                                             @secret,

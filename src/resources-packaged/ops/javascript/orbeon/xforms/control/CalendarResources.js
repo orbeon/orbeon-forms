@@ -14,6 +14,20 @@
 (function() {
 
     ORBEON.xforms.control.CalendarResources = {
+        "pt": {
+            properties: {
+                "MONTHS_LONG": [ "Janeiro", "Fevereiro", "Mar\xe7o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
+                "WEEKDAYS_SHORT": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\xe1b"],
+                "START_WEEKDAY": 0
+            },
+            navigator: {
+                month: "M\xeas",
+                year: "Ano",
+                submit: "OK",
+                cancel: "Cancelar",
+                invalidYear: "O ano tem de ser um n\xfamero"
+            }
+        },
         "en": {
             properties: {
                 "MONTHS_LONG": [ "January", "February", "March", "April", "May", "June", "July", "August",  "September",  "October",  "November",  "December" ],

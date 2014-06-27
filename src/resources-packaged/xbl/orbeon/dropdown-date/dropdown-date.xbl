@@ -204,32 +204,33 @@
                 <xf:group ref=".[not($view)]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                    <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex" id="select1">
+                    <xf:var name="month-first" value="starts-with(xxf:property('oxf.xforms.format.input.date'), '[M]')"/>
+                    <xf:select1 ref="if ($month-first) then month else day" id="select1">
+                        <xf:item>
+                            <xf:label value="if ($month-first) then xxf:r('month') else xxf:r('day')"/>
+                            <xf:value/>
+                        </xf:item>
+                        <xf:itemset ref="if ($month-first) then instance('months-itemset')/month else instance('days-itemset')/day">
+                            <xf:label ref="."/>
+                            <xf:value ref="."/>
+                        </xf:itemset>
+                    </xf:select1>
+                    <xf:select1 ref="if ($month-first) then day else month">
+                        <xf:item>
+                            <xf:label value="if ($month-first) then xxf:r('day') else xxf:r('month')"/>
+                            <xf:value/>
+                        </xf:item>
+                        <xf:itemset ref="if ($month-first) then instance('days-itemset')/day else instance('months-itemset')/month">
+                            <xf:label ref="."/>
+                            <xf:value ref="."/>
+                        </xf:itemset>
+                    </xf:select1>
+                    <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
                         <xf:item>
                             <xf:label value="xxf:r('year')"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="instance('years-itemset')/year">
-                            <xf:label ref="."/>
-                            <xf:value ref="."/>
-                        </xf:itemset>
-                    </xf:select1>
-                    <xf:select1 ref="month">
-                        <xf:item>
-                            <xf:label value="xxf:r('month')"/>
-                            <xf:value/>
-                        </xf:item>
-                        <xf:itemset ref="instance('months-itemset')/month">
-                            <xf:label ref="."/>
-                            <xf:value ref="."/>
-                        </xf:itemset>
-                    </xf:select1>
-                    <xf:select1 ref="day">
-                        <xf:item>
-                            <xf:label value="xxf:r('day')"/>
-                            <xf:value/>
-                        </xf:item>
-                        <xf:itemset ref="instance('days-itemset')/day">
                             <xf:label ref="."/>
                             <xf:value ref="."/>
                         </xf:itemset>
@@ -246,9 +247,9 @@
                         <!-- Non-blank result -->
                         <xf:action if="$c != ''">
                             <!-- Compute date parts -->
-                            <xf:var name="y" value="if (year castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'" as="xs:string"/>
-                            <xf:var name="m" value="if (month castable as xs:integer) then format-number(xs:integer(month), '00') else '__'" as="xs:string"/>
-                            <xf:var name="d" value="if (day castable as xs:integer) then format-number(xs:integer(day), '00') else '__'" as="xs:string"/>
+                            <xf:var name="y" value="if (year  castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'" as="xs:string"/>
+                            <xf:var name="m" value="if (month castable as xs:integer) then format-number(xs:integer(month),  '00') else '__'"   as="xs:string"/>
+                            <xf:var name="d" value="if (day   castable as xs:integer) then format-number(xs:integer(day),    '00') else '__'"   as="xs:string"/>
 
                             <!-- Create date string -->
                             <xf:var name="date-string" value="string-join(($y, $m, $d), '-')" as="xs:string"/>

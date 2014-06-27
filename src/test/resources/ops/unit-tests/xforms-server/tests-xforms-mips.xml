@@ -289,6 +289,8 @@
                                                 <email>a@b</email>
                                                 <email>a@b.</email>
                                                 <email>a@b..</email>
+                                                <email>a@b.com</email>
+                                                <email>a@b.com/</email>
                                             </emails>
                                         </instance>
                                     </xf:instance>
@@ -328,8 +330,10 @@
                                     <email>false</email>
                                     <email>false</email>
                                     <email>false</email>
-                                    <email>true</email>
                                     <email>false</email>
+                                    <email>false</email>
+                                    <email>false</email>
+                                    <email>true</email>
                                     <email>false</email>
                                 </result>
                             </instance>

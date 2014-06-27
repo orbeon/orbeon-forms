@@ -14,8 +14,7 @@
 package org.orbeon.oxf.fr.relational.crud
 
 import java.io.{Writer, InputStream, ByteArrayOutputStream}
-import java.sql
-import java.sql._
+import java.sql.{Array ⇒ _, _}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
@@ -29,14 +28,8 @@ import org.xml.sax.InputSource
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.orbeon.oxf.fr.FormRunner.{XH, XF}
-import org.orbeon.oxf.fr.relational.Specific
-import org.orbeon.oxf.fr.relational.ForDocument
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.JXQName
-import scala.collection.mutable.ListBuffer
-import scala.Some
 import org.orbeon.oxf.fr.relational.Specific
-import scala.Array
 import org.orbeon.oxf.fr.relational.ForDocument
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 
@@ -129,7 +122,7 @@ object RequestReader {
 
 trait CreateUpdateDelete extends RequestResponse with Common {
 
-    private case class Row(created: sql.Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
+    private case class Row(created: Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
 
     private def existingRow(connection: Connection, req: Request): Option[Row] = {
 

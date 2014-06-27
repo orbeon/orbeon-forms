@@ -474,7 +474,10 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
             final boolean isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
 
-            if (isBuiltInXFormsType && "email".equals(typeLocalname)) {
+            if (isBuiltInXFormsType && nodeValue.length() == 0) {
+                // Don't consider the node invalid if the string is empty with xf:* types
+                typeValid = true;
+            } else if (isBuiltInXFormsType && "email".equals(typeLocalname)) {
                 typeValid = EmailValidator.getInstance(false).isValid(nodeValue);
             } else if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames().contains(typeLocalname)) {
                 // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
@@ -489,9 +492,6 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
                 typeValid = validationError == null;
 
-            } else if (isBuiltInXFormsType && nodeValue.length() == 0) {
-                // Don't consider the node invalid if the string is empty with xf:* types
-                typeValid = true;
             } else if (isBuiltInSchemaType || isBuiltInXFormsType) {
                 // Built-in schema or XForms type
 

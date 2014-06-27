@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -55,7 +56,7 @@ import java.util.Set;
  * Represent a given model's binds.
  */
 public class XFormsModelBinds extends XFormsModelBindsBase {
-    
+
     public final XFormsModel model;                            // model to which we belong
     private final Model staticModel;
 
@@ -290,7 +291,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
     }
 
     private void handleComputedExpressionBind(BindNode bindNode) {
-        
+
         final StaticBind staticBind = bindNode.staticBind();
 
         // Handle relevant, readonly, required, and custom MIPs
@@ -380,7 +381,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
     private void validateTypeAndRequired(BindNode bindNode, Set<String> invalidInstances) {
 
         final StaticBind staticBind = bindNode.staticBind();
-        
+
         assert staticBind.dataTypeOrNull() != null || staticBind.getRequired() != null;
 
         // Don't try to apply validity to a node if it has children nodes or if it's not a node
@@ -473,7 +474,9 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
             final boolean isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
 
-            if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames().contains(typeLocalname)) {
+            if (isBuiltInXFormsType && "email".equals(typeLocalname)) {
+                typeValid = EmailValidator.getInstance(false).isValid(nodeValue);
+            } else if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames().contains(typeLocalname)) {
                 // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
                 if (xformsValidator == null) {
                     xformsValidator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd");

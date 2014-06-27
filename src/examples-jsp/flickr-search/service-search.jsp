@@ -22,12 +22,12 @@
     SAXReader xmlReader = new SAXReader();
 
     // Build URL for query to Flickr
-    String flickrURL = "http://www.flickr.com/services/rest/?method=";
+    String flickrURL = "https://www.flickr.com/services/rest/?method=";
     if ("POST".equals(request.getMethod())) {
-        // We go a query string
+        // We got a query string
         Document queryDocument = xmlReader.read(request.getInputStream());
         String query = queryDocument.getRootElement().getStringValue();
-        flickrURL = "http://www.flickr.com/services/rest/?method=flickr.photos.search&text=" + URLEncoder.encode(query, "UTF-8");
+        flickrURL = "https://www.flickr.com/services/rest/?method=flickr.photos.search&text=" + URLEncoder.encode(query, "UTF-8");
     } else {
         // No query, return interesting photos
         flickrURL += "flickr.interestingness.getList";
@@ -40,9 +40,9 @@
 <photos>
 <%  for (Iterator photoIterator = photosElement.elementIterator(); photoIterator.hasNext();) {
         final Element photo = (Element) photoIterator.next();
-        final String photoURL = "http://static.flickr.com/" + photo.attributeValue("server") + "/" + photo.attributeValue("id")
+        final String photoURL = "https://static.flickr.com/" + photo.attributeValue("server") + "/" + photo.attributeValue("id")
             + "_" + photo.attributeValue("secret") + "_s.jpg";
-        final String pageURL = "http://flickr.com/photos/" + photo.attributeValue("owner") +"/" + photo.attributeValue("id") + "/";
+        final String pageURL = "https://flickr.com/photos/" + photo.attributeValue("owner") +"/" + photo.attributeValue("id") + "/";
 %>
     <photo url="<%=photoURL%>" page="<%=pageURL%>"/>
 <%  } %>

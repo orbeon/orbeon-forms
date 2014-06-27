@@ -762,20 +762,20 @@
                                             </xh:td>
                                         </xf:group>
                                         <xh:td>
-                                            <xh:a href="{$link}" target="_blank" class="{if ($link) then '' else 'xforms-hidden'}">
+                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="application-name"/>
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="application-name"/>
                                         </xh:td>
                                         <xh:td>
-                                            <xh:a href="{$link}" target="_blank" class="{if ($link) then '' else 'xforms-hidden'}">
+                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="form-name"/>
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="form-name"/>
                                         </xh:td>
                                         <xh:td>
                                             <xf:var name="title" value="(title[@xml:lang = $fr-lang], title)[1]"/>
-                                            <xh:a href="{$link}" target="_blank" class="{if ($link) then '' else 'xforms-hidden'}">
+                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="$title"/>
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="$title"/>

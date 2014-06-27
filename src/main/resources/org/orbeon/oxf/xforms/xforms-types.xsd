@@ -17,12 +17,6 @@
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
 
-    <xs:simpleType name="email">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="([A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*)?"/>
-        </xs:restriction>
-    </xs:simpleType>
-
     <xs:simpleType name="card-number">
         <xs:restriction base="xs:string">
             <xs:minLength value="12"/>

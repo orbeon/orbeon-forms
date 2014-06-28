@@ -531,7 +531,6 @@
     <!-- Instance for metadata editor -->
     <xf:instance id="fb-metadata-instance">
         <metadata valid="true">
-            <next-trigger/>
             <mode/> <!-- edit | save-as -->
             <toolbox>
                 <schema/>
@@ -549,13 +548,7 @@
         </metadata>
     </xf:instance>
 
-    <!-- Enable/disable trigger -->
-    <xf:setvalue ev:event="xxforms-invalid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/@valid">false</xf:setvalue>
-    <xf:setvalue ev:event="xxforms-valid"   ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/@valid">true</xf:setvalue>
-
     <xf:bind ref="instance('fb-metadata-instance')">
-        <!-- Triggers -->
-        <xf:bind ref="next-trigger"              readonly="../@valid = 'false'"/>
         <xf:bind ref="toolbox/schema"            relevant="xxf:property('oxf.fb.menu.schema')"/>
         <xf:bind ref="toolbox/css"               relevant="xxf:property('oxf.fb.menu.css')"/>
         <xf:bind ref="toolbox/pdf"               relevant="xxf:property('oxf.fb.menu.pdf')"/>

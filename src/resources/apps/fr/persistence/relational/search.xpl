@@ -429,7 +429,11 @@
                 <!-- Move created, last-modified, and name as attributes -->
                 <!-- Add wrapping details element -->
                 <xsl:template match="document">
-                    <document created="{created}" last-modified="{last-modified}" draft="{draft}" name="{document-id}" operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
+                    <document created="{created}"
+                              last-modified="{last-modified}"
+                              draft="{if (draft = 'Y') then 'true' else if (draft = 'N') then 'false' else ''}"
+                              name="{document-id}"
+                              operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

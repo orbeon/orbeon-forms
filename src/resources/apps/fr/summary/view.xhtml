@@ -557,7 +557,7 @@
                         <xf:var name="show-last-modified" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
-                            <xf:var name="have-drafts" value="exists(document[@draft = 'Y'])"/>
+                            <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
                             <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
@@ -607,7 +607,7 @@
                                             <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
                                             <xf:var name="req-parameters" value="(
                                                     if (property('xxf:noscript')) then 'fr-noscript=true' else (),
-                                                    if ($document/@draft = 'Y') then 'draft=true' else ()
+                                                    if ($document/@draft = 'true') then 'draft=true' else ()
                                                 )"/>
                                             <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/', $current-document-name,
                                                     if (exists($req-parameters)) then concat('?', string-join($req-parameters, '&amp;')) else '')"/>
@@ -616,12 +616,12 @@
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
                                                             <xf:label/>
-                                                            <xf:value value="concat(if ($document/@draft = 'Y') then 'draft' else 'data', '/', $current-document-name)"/>
+                                                            <xf:value value="concat(if ($document/@draft = 'true') then 'draft' else 'data', '/', $current-document-name)"/>
                                                         </xf:item>
                                                     </xf:select>
                                                 </xh:td>
                                                 <xh:td class="{$labels-class}">
-                                                    <xf:output ref="if ($document/@draft = 'Y') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
+                                                    <xf:output ref="if ($document/@draft = 'true') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
                                                     <xf:output ref="if (not(xxf:split($document/@operations) = ('*', 'update'))) then . else ()" value="$fr-resources/summary/labels/read-only" class="label"/>
                                                 </xh:td>
                                                 <!-- Why repeat and not group? -->
@@ -817,7 +817,7 @@
 
                     <xf:var
                         name="documents-selected"
-                        value="instance('fr-summary-instance')/document[concat(if (@draft = 'Y') then 'draft' else 'data', '/', @name) = xxf:split(instance('fr-selection-instance'))]"/>
+                        value="instance('fr-summary-instance')/document[concat(if (@draft = 'true') then 'draft' else 'data', '/', @name) = xxf:split(instance('fr-selection-instance'))]"/>
 
                     <!-- Take into account the global operations but also the operations returned by the persistence
                          layer for each selected form. This can only add to permissions, for example if the user is the

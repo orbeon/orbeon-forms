@@ -269,8 +269,16 @@
         <!-- NOTE: Place after fr-persistence-model, as it needs the list of available form languages, but before
              fr-form-model, as that model needs the language set. -->
         <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
-        <!-- This model handles navigation functionality -->
-        <xi:include href="oxf:/apps/fr/includes/pdf-model.xml" xxi:omit-xml-base="true"/>
+
+        <xf:model id="fr-pdf-model">
+            <!-- Open PDF for the current form data (dispatch of the event done from pdf-instant-view.xpl) -->
+            <xf:action event="fr-open-pdf" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                xxf:instance('fr-form-instance')/process:runProcess(
+                    'oxf.fr.detail.process',
+                    concat('open-pdf(lang = "', event('fr-language')[not(contains(., '"'))], '")')
+                )
+            </xf:action>
+        </xf:model>
 
         <!-- This model supports Form Runner rendered through the xforms-renderer -->
         <xf:model id="fr-xforms-renderer-model">

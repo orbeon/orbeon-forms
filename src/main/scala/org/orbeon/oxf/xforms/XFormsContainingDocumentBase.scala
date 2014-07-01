@@ -257,7 +257,7 @@ trait ContainingDocumentRequest {
     def getContainerNamespace    = _containerNamespace // always "" for servlets.
     def getVersionedPathMatchers = _versionedPathMatchers
     
-    protected def initializeRequestInformation(): Unit = {
+    protected def initializeRequestInformation(): Unit =
         Option(NetUtils.getExternalContext.getRequest) match {
             case Some(request) ⇒
                 // Remember if filter provided separate deployment information
@@ -301,8 +301,7 @@ trait ContainingDocumentRequest {
                 _containerType = "servlet"
                 _containerNamespace = ""
         }
-    }
-    
+
     protected def initializePathMatchers(): Unit =
         _versionedPathMatchers =
             Option(PipelineContext.get.getAttribute(PageFlowControllerProcessor.PathMatchers).asInstanceOf[ju.List[PathMatcher]]) getOrElse

@@ -39,6 +39,7 @@ trait FormRunnerActions {
         "navigate"         → tryNavigate,
         "review"           → tryNavigateToReview,
         "edit"             → tryNavigateToEdit,
+        "open-pdf"         → tryOpenPDF,
         "summary"          → tryNavigateToSummary,
         "toggle-noscript"  → tryToggleNoscript,
         "visit-all"        → tryVisitAll,
@@ -232,12 +233,12 @@ trait FormRunnerActions {
         EmbeddableParam → (() ⇒ isEmbeddable)
     )
 
-    private val CommonParamNames = TestCommonParams map (_._1) toSet
+    private val CommonParamNames = (TestCommonParams map (_._1) toSet) + "form-version"
 
-    // Automatically append fr-noscript and orbeon-embeddable when needed, unless they are already specified
+    // Automatically prepend fr-noscript and orbeon-embeddable when needed, unless they are already specified
     // NOTE: We don't need to pass fr-language to most submissions, as the current language is kept in the session.
     // Heuristic: We append only if the URL doesn't have a protocol. This might not always be a right guess.
-    private def appendCommonFormRunnerParameters(pathQuery: String) =
+    private def prependCommonFormRunnerParameters(pathQuery: String) =
         if (! NetUtils.urlHasProtocol(pathQuery)) {
 
             val (path, params) = splitQueryDecodeParams(pathQuery)
@@ -255,13 +256,28 @@ trait FormRunnerActions {
         } else
             pathQuery
 
+    private def prependUserParameters(pathQuery: String) = {
+
+        val (path, params) = splitQueryDecodeParams(pathQuery)
+
+        val newParams =
+            for {
+                (name, values) ← containingDocument.getRequestParameters.to[List]
+                if ! CommonParamNames(name) // built-in parameters win
+                value          ← values
+            } yield
+                name → value
+
+        recombineQuery(path, newParams ::: params)
+    }
+
     private def tryNavigateTo(path: String): Try[Any] =
-        Try(load(appendCommonFormRunnerParameters(path), progress = false))
+        Try(load(prependCommonFormRunnerParameters(path), progress = false))
 
     private def tryChangeMode(path: String): Try[Any] =
         Try {
             Map[Option[String], String](
-                Some("uri")        → appendCommonFormRunnerParameters(path),
+                Some("uri")        → prependUserParameters(prependCommonFormRunnerParameters(path)),
                 Some("method")     → "post",
                 Some("prune")      → "false",
                 Some("replace")    → "all",
@@ -304,6 +320,20 @@ trait FormRunnerActions {
         Try {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/edit/$document"
+        } flatMap
+            tryChangeMode
+
+    def tryOpenPDF(params: ActionParams): Try[Any] =
+        Try {
+            val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+
+            val requestedLangQuery = (
+                paramByName(params, "lang")
+                flatMap nonEmptyOrNone
+                map { lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang) }
+            )
+
+            recombineQuery(s"/fr/$app/$form/pdf/$document", requestedLangQuery getOrElse Nil)
         } flatMap
             tryChangeMode
 

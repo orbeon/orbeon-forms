@@ -362,11 +362,6 @@
   display: block;
   height: 0;
 }
-.orbeon div.xforms-modal-progress {
-  width: 40px;
-  height: 40px;
-  background-image: url(../../ops/images/xforms/processing.gif);
-}
 .orbeon .xforms-error-panel .bd {
   background-image: url(../../ops/images/xforms/warning_64.png);
   background-position: 20px 20px;
@@ -421,9 +416,6 @@
   display: list-item;
   margin-left: 2em;
 }
-.orbeon #wait .bd {
-  background-color: #ffffff;
-}
 .orbeon .xforms-select1-appearance-xxforms-tree,
 .orbeon .xforms-select-appearance-xxforms-tree {
   display: block;
@@ -469,6 +461,14 @@
 .orbeon #xforms-form .xforms-width-15em input.xforms-input-input,
 .orbeon #xforms-form .xforms-width-15em select {
   width: 15em;
+}
+#orbeon-spinner .bd {
+  background-color: white;
+}
+#orbeon-spinner .xforms-modal-progress {
+  width: 40px;
+  height: 40px;
+  background-image: url(../../ops/images/xforms/processing.gif);
 }
 @media print {
   html body.orbeon .xforms-loading-loading,

@@ -948,7 +948,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             displayModalProgressPanel: function(formID) {
                 if (!ORBEON.xforms.Globals.modalProgressPanel) {
                     ORBEON.xforms.Globals.modalProgressPanel =
-                    new YAHOO.widget.Panel("wait", {
+                    new YAHOO.widget.Panel(ORBEON.xforms.Globals.ns[formID] + "orbeon-spinner", {
                         width: "60px",
                         fixedcenter: true,
                         close: false,

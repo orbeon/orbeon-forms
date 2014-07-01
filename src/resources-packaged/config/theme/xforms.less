@@ -407,8 +407,6 @@
         height: 0;
     }
 
-    div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../../ops/images/xforms/processing.gif) }
-
     .xforms-error-panel .bd {
         background-image: url(../../ops/images/xforms/warning_64.png);
         background-position: 20px 20px;
@@ -468,8 +466,6 @@
         margin-left: 2em;
     }
 
-    #wait .bd { background-color: white }
-
     // ***** Tree ******************************************************************************************************
     // Fix for Firefox issue when clicking on the first "-" in span mode
     // http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207
@@ -499,6 +495,22 @@
         .xforms-width-7em input.xforms-input-input,  .xforms-width-7em select  { width: 7em }
         .xforms-width-10em input.xforms-input-input, .xforms-width-10em select { width: 10em }
         .xforms-width-15em input.xforms-input-input, .xforms-width-15em select { width: 15em }
+    }
+}
+
+// ***** Spinner *******************************************************************************************************
+
+// The spinner is placed by JS under <body> and not necessarily under .orbeon
+#orbeon-spinner {
+
+    .bd {
+        background-color: white;
+    }
+
+    .xforms-modal-progress {
+        width: 40px;
+        height: 40px;
+        background-image: url(../../ops/images/xforms/processing.gif)
     }
 }
 

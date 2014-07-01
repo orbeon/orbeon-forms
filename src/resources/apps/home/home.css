@@ -38,6 +38,16 @@ body.orbeon {
 .orbeon ul.thumbnails li.span8 {
   height: 412px;
 }
+.orbeon ul.thumbnails li.span4,
+.orbeon ul.thumbnails li.span8 {
+  box-sizing: border-box;
+}
+.orbeon ul.thumbnails li.span4 {
+  width: 302px;
+}
+.orbeon ul.thumbnails li.span8 {
+  width: 622px;
+}
 .orbeon ul.thumbnails li a {
   text-decoration: none;
 }

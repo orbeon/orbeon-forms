@@ -13,6 +13,11 @@ body.orbeon {
             font-family: "ff-meta-serif-web-pro",Georgia,Cambria,"Times New Roman",Times,serif;
             padding: 0;
             &.span4, &.span8 { height: 412px; }
+            // Avoid tiles wrapping with zooming out, see #1741
+            &.span4, &.span8 { box-sizing: border-box }
+            &.span4 { width: 302px }
+            &.span8 { width: 622px }
+
             a {
                 text-decoration: none;
                 img {

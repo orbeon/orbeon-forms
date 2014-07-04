@@ -161,6 +161,9 @@
             <xf:property name="data" value="$template"/>
         </xf:dispatch>
 
+        <!-- Free fr-form-instance -->
+        <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+
     </xf:action>
 
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
@@ -223,6 +226,10 @@
 
             <xf:setvalue ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[normalize-space() = $before]" value="$after"/>
         </xf:action>
+
+        <!-- Free fr-form-instance -->
+        <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+
     </xf:action>
 
     <!-- Form is ready -->
@@ -503,11 +510,16 @@
         xxf:readonly="true"
         xxf:cache="true">
 
-        <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
-             NOTE: The data in fr-form-instance must be up to date! -->
-        <xf:dispatch ev:event="xforms-submit-done" targetid="fr-form-model" name="fr-annotate-data">
-            <xf:property name="data" value="instance('fr-form-instance')"/>
-        </xf:dispatch>
+        <xf:action ev:event="xforms-submit-done">
+            <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
+                 NOTE: The data in fr-form-instance must be up to date! -->
+            <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
+                <xf:property name="data" value="instance('fr-form-instance')"/>
+            </xf:dispatch>
+
+            <!-- Free fr-form-instance -->
+            <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+        </xf:action>
 
     </xf:submission>
 

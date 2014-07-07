@@ -164,6 +164,11 @@
         <!-- Free fr-form-instance -->
         <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
 
+        <!-- Mark data as safe. Once user sets metadata from dialog, data will be marked dirty automatically.  -->
+        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+            process:runProcess('oxf.fr.detail.process', 'set-data-status(status = "safe")')
+        </xf:action>
+
     </xf:action>
 
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
@@ -227,8 +232,11 @@
             <xf:setvalue ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[normalize-space() = $before]" value="$after"/>
         </xf:action>
 
-        <!-- Free fr-form-instance -->
+        <!-- Free fr-form-instance and re-mark data as safe -->
         <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+            process:runProcess('oxf.fr.detail.process', 'set-data-status(status = "safe")')
+        </xf:action>
 
     </xf:action>
 
@@ -517,7 +525,7 @@
                 <xf:property name="data" value="instance('fr-form-instance')"/>
             </xf:dispatch>
 
-            <!-- Free fr-form-instance -->
+            <!-- Free fr-form-instance. Leave data as unsafe. -->
             <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
         </xf:action>
 

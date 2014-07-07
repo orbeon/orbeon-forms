@@ -148,6 +148,8 @@
     <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select"           value="full"/>
     <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select1"          value="full"/>
 
+    <property as="xs:string"  name="oxf.xforms.sanitize"                                    value=""/>
+
     <!-- Whitespace handling for XForms documents -->
     <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                     value="normalize"/>
     <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize">

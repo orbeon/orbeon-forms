@@ -27,10 +27,10 @@ class StringReplacerTest extends AssertionsForJUnit {
         val TestString = "abcdabcd"
 
         // Valid replacements
-        assert("AbCdAbCd" === StringReplacer("""{ "a": "A", "c": "C" }""")(logger)(TestString))
-        assert("BcdBcd" === StringReplacer("""{ "a": "aaa", "aaab": "B" }""")(logger)(TestString))
-        assert("dcbadcba" === StringReplacer("""{ "abcd": "dcba" }""")(logger)(TestString))
-        assert("""between "quotes"""" === StringReplacer("""{ "'": "\"" }""")(logger)("between 'quotes'"))
+        assert("AbCdAbCd"             === StringReplacer("""{ "a": "A", "c": "C" }""")     (logger)(TestString))
+        assert("BcdBcd"               === StringReplacer("""{ "a": "aaa", "aaab": "B" }""")(logger)(TestString))
+        assert("dcbadcba"             === StringReplacer("""{ "abcd": "dcba" }""")         (logger)(TestString))
+        assert("""between "quotes"""" === StringReplacer("""{ "'": "\"" }""")              (logger)("between 'quotes'"))
 
         // Empty map
         assert(TestString === StringReplacer("""{}""")(logger)(TestString))

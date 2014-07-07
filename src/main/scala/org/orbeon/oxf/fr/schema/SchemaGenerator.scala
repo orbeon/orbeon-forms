@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import org.orbeon.scaxon.XML._
-import scala.Some
 import scala.xml._
 import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 
@@ -61,9 +60,9 @@ object SchemaGenerator {
             required: Boolean,
             elemType: Option[QName],
             repeated: Boolean,
-            min: Option[String],
-            max: Option[String]
-            )
+            min:      Option[String],
+            max:      Option[String]
+        )
 
         // Returns control corresponding to a bind, with a given name (e.g. *:grid)
         def findControlNodeForBind(bind: NodeInfo, controlName: Test): Option[NodeInfo] = {
@@ -79,8 +78,6 @@ object SchemaGenerator {
             def unapply(bind: NodeInfo): Option[BindInfo] = {
                 val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter (_.attValue("repeat") == "true") toList
 
-                val x = bind.attValue("required") == "true()"
-
                 Some(BindInfo(
                     elemName = bind \@ ("ref" || "nodeset"),
                     required = bind.attValue("required") == "true()",
@@ -95,7 +92,7 @@ object SchemaGenerator {
         // Build xs:element for this bind
         val xsElem = bind match {
             case RootBind() ⇒ <xs:element name="form"/>
-            case Bind(BindInfo(elemName, required, elemType, repeated, min, max)) ⇒ {
+            case Bind(BindInfo(elemName, required, elemType, repeated, min, max)) ⇒
 
                 // Optional type attribute
                 def attr(name: String, value: String) = scala.xml.Attribute(None, name, scala.xml.Text(value), Null)
@@ -110,10 +107,10 @@ object SchemaGenerator {
                 // For controls with an itemset, generate a xs:simpleType
                 val simpleTypeRestrictionElemOpt =
                     for {
-                        control ← resolve(elemName + "-control")
-                        select ← collectByErasedType[XFormsSelect1Control](control)
+                        control       ← resolve(elemName + "-control")
+                        select        ← collectByErasedType[XFormsSelect1Control](control)
                         if select.isRelevant
-                        itemset = select.getItemset
+                        itemset       = select.getItemset
                         itemsetValues = itemset.children map (_.value)
                         if itemsetValues.nonEmpty
                     } yield {
@@ -143,13 +140,15 @@ object SchemaGenerator {
                             </xs:simpleType>
 
 
-                        if (select.isInstanceOf[XFormsSelectControl]) {
-                            if (required)
-                                listMinLengthOneSimpleType
-                            else
-                                listSimpleType
-                        } else
-                            oneValueSimpleType(allowEmpty = ! required)
+                        select match {
+                            case _: XFormsSelectControl ⇒
+                                if (required)
+                                    listMinLengthOneSimpleType
+                                else
+                                    listSimpleType
+                            case _ ⇒
+                                oneValueSimpleType(allowEmpty = ! required)
+                        }
                     }
 
                 // The xf:bind is for an attachment control if it has type="xs|xf:anyURI" and the corresponding control
@@ -179,7 +178,8 @@ object SchemaGenerator {
                             case (prefix, uri) ⇒ Some(NamespaceBinding(prefix, uri, _: NamespaceBinding))
                         })
 
-                val complexTypeForAttachment = isBindForAttachmentControl option
+                val complexTypeForAttachment =
+                    isBindForAttachmentControl option
                         <xs:complexType>
                             <xs:simpleContent>
                                 <xs:extension base="xs:anyURI">
@@ -199,7 +199,6 @@ object SchemaGenerator {
                 val attributes = typeAttr ++ minAttr ++ maxAttr
 
                 attributes.foldLeft(xsElemWithNS)(_ % _)
-            }
         }
 
         // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from
@@ -279,5 +278,4 @@ object SchemaGenerator {
             </xs:complexType>)
         }
     }
-
 }

@@ -57,6 +57,9 @@ trait ProcessInterpreter extends Logging {
     def paramByName(params: ActionParams, name: String) =
         params.get(Some(name))
 
+    def booleanParamByName(params: ActionParams, name: String, default: Boolean) =
+        params.get(Some(name)) map (_ == "true") getOrElse default
+
     def paramByNameOrDefault(params: ActionParams, name: String) =
         params.get(Some(name)) orElse params.get(None)
 

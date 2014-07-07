@@ -49,7 +49,8 @@ trait FormRunnerActions {
         "result-dialog"    → tryShowResultDialog,
         "captcha"          → tryCaptcha,
         "wizard-prev"      → tryWizardPrev,
-        "wizard-next"      → tryWizardNext
+        "wizard-next"      → tryWizardNext,
+        "set-data-status"  → trySetDataStatus
     )
 
     // Check whether there are pending uploads
@@ -71,13 +72,13 @@ trait FormRunnerActions {
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, formVersion, Some(document), _) = FormRunnerParams()
-            val isDraft = paramByName(params, "draft").exists(_ == "true")
+            val isDraft = booleanParamByName(params, "draft", default = false)
 
             // Notify that the data is about to be saved
             dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
             val modeElement = parametersInstance.rootElement \ "mode"
-            val isNew = modeElement.stringValue == "new"
+            val isNew       = modeElement.stringValue == "new"
 
             // Save
             val (beforeURLs, afterURLs, _) = putWithAttachments(
@@ -97,24 +98,42 @@ trait FormRunnerActions {
             // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
             // before calling the submission
             recalculate(PersistenceModel)
-            revalidate(PersistenceModel)
-            refresh(PersistenceModel)
+            revalidate (PersistenceModel)
+            refresh    (PersistenceModel)
 
-            // Mark data clean
-            val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
-            val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
-            (saveStatus ++ autoSaveStatus) foreach (setvalue(_, "clean"))
+            if (isNew) {
+                // Manual dependency HACK: RR fr-form-model as we have changed mode
+                recalculate(FormModel)
+                revalidate(FormModel)
+            }
 
-            // Manual dependency HACK: RR fr-form-model as we have changed mode
-            recalculate(FormModel)
-            revalidate(FormModel)
-
-            // Notify that the data is saved (2013-09-03: used by FB only)
-            dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
-                "before-urls" → Some(beforeURLs),
-                "after-urls"  → Some(afterURLs)
-            ))
+            (beforeURLs, afterURLs, isDraft)
+        } map {
+            case result @ (beforeURLs, afterURLs, isDraft) ⇒
+                // Mark data clean
+                trySetDataStatus(Map(Some("status") → "safe", Some("draft") → isDraft.toString))
+                result
+        } map {
+            case (beforeURLs, afterURLs, _) ⇒
+                // Notify that the data is saved (2014-07-07: used by FB only)
+                dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
+                    "before-urls" → Some(beforeURLs),
+                    "after-urls"  → Some(afterURLs)
+                ))
+        } recover {
+            case _ ⇒
+                dispatch(name = "fr-data-save-error", targetId = FormModel)
         }
+
+    def trySetDataStatus(params: ActionParams): Try[Any] = Try {
+        val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true
+        val isDraft = booleanParamByName(params, "draft", default = false)
+
+        val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
+        val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
+
+        (saveStatus ++ autoSaveStatus) foreach (setvalue(_, if (isSafe) "clean" else "dirty"))
+    }
 
     private def messageFromResourceOrParam(params: ActionParams) = {
         def fromResource = paramByNameOrDefault(params, "resource") map (k ⇒ currentFRResources \ "detail" \ "messages" \ k stringValue)

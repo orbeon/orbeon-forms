@@ -175,18 +175,6 @@
                         <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xf:trigger>
                 </xf:group>
-                <xf:group ref="instance('fb-metadata-instance')/toolbox/css">
-                    <!-- Upload CSS -->
-                    <xf:trigger>
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/images/silk/css.png" alt=""/>
-                            <xh:span>
-                                <xf:output value="if (bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
-                            </xh:span>
-                        </xf:label>
-                        <xxf:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-                    </xf:trigger>
-                </xf:group>
                 <xf:group ref="instance('fb-metadata-instance')/toolbox/pdf">
                     <!-- Upload PDF Template -->
                     <xf:trigger>

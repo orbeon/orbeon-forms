@@ -423,6 +423,13 @@
     </property>
 
     <property as="xs:integer" name="oxf.fr.home.page-size"                                      value="20"/>
-    <property as="xs:anyURI"  name="oxf.fr.production-server-uri"                               value=""/>
+
+    <!-- Example:
+        [
+            { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" },
+            { "label": "Prod 2", "url": "http://prod2.acme.org/orbeon" }
+        ]
+    -->
+    <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
 
 </properties>

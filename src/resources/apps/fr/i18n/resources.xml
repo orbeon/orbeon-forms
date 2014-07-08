@@ -289,6 +289,7 @@
                 <unavailable>Unavailable</unavailable>
                 <library>Library</library>
                 <newer>Newer</newer>
+                <remote-server>Remote server</remote-server>
                 <username>Username</username>
                 <password>Password</password>
             </labels>
@@ -575,6 +576,7 @@
                 <unavailable>Indisponible</unavailable>
                 <library>Bibliothèque</library>
                 <newer>Plus récent</newer>
+                <remote-server>Serveur distant</remote-server>
                 <username>Nom d'utilisateur</username>
                 <password>Mot de passe</password>
             </labels>
@@ -847,6 +849,7 @@
                 <unavailable>No Disponibile</unavailable>
                 <library>Librería</library>
                 <newer>Más Nuevos</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username>Usuario</username>
                 <password>Contraseña</password>
             </labels>
@@ -1117,6 +1120,7 @@
                 <unavailable todo="true">[Unavailable]</unavailable>
                 <library todo="true">[Library]</library>
                 <newer todo="true">[Newer]</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username todo="true">[Username]</username>
                 <password todo="true">[Password]</password>
             </labels>
@@ -1385,6 +1389,7 @@
                 <unavailable todo="true">[Unavailable]</unavailable>
                 <library todo="true">[Library]</library>
                 <newer todo="true">[Newer]</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username todo="true">[Username]</username>
                 <password todo="true">[Password]</password>
             </labels>
@@ -1666,6 +1671,7 @@
                 <unavailable>Non disponibile</unavailable>
                 <library>Biblioteca</library>
                 <newer todo="true">[Newer]</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username todo="true">[Username]</username>
                 <password todo="true">[Password]</password>
             </labels>
@@ -1947,6 +1953,7 @@
                 <unavailable>Nicht verfügbar</unavailable>
                 <library>Bibliothek</library>
                 <newer>Neuer</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username>Benutzername</username>
                 <password>Passwort</password>
             </labels>
@@ -2228,6 +2235,7 @@
                 <unavailable>Ei saatavilla</unavailable>
                 <library>Kirjasto</library>
                 <newer>Uudempi</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username>Käyttäjänimi</username>
                 <password>Salasana</password>
             </labels>
@@ -2509,6 +2517,7 @@
                 <unavailable>Ej tillgänglig</unavailable>
                 <library>Bibliotek</library>
                 <newer>Nyare</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username>Användarnamn</username>
                 <password>Lösenord</password>
             </labels>
@@ -2790,6 +2799,7 @@
                 <unavailable>Niet-beschikbaar</unavailable>
                 <library>Library</library>
                 <newer>Nieuwer</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username>Gebruiker</username>
                 <password>Wachtwoord</password>
             </labels>
@@ -3071,6 +3081,7 @@
                 <unavailable>Indisponível</unavailable>
                 <library>Biblioteca</library>
                 <newer>Mais novo</newer>
+                <remote-server todo="true">[Remote server]</remote-server>
                 <username>Utilizador</username>
                 <password>Senha</password>
             </labels>

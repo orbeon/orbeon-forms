@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.util.StringReplacer._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.fb.FormBuilder
+import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash ⇒ _, _}
+
+import scala.util.Try
 
 trait FormRunnerHome {
 
@@ -171,11 +175,11 @@ trait FormRunnerHome {
                 case node: NodeInfo ⇒ makeAppFormKey(node) → node
             } toMap
 
-            val localIndex  = createIndex(local)
+            val localIndex = createIndex(local)
             val remoteIndex = createIndex(remote)
 
             (localIndex.keySet ++ remoteIndex.keySet).iterator map { key ⇒
-                key → (localIndex.get(key), remoteIndex.get(key))
+                key →(localIndex.get(key), remoteIndex.get(key))
             }
         }
 
@@ -232,4 +236,72 @@ trait FormRunnerHome {
             newNode
         }
     }
+
+    // Return remote servers information:
+    //
+    // 1. If the backward compatibility property (oxf.fr.production-server-uri) is present and not empty, try to use it
+    //    and return a sequence of one string containing the server URL configured.
+    // 2. Else try the JSON property (oxf.fr.home.remote-servers). If the property exists and is well-formed, return
+    //    a flattened sequence of label/url pairs.
+    // 3. Otherwise the empty sequence is returned.
+    def remoteServersXPath: SequenceIterator = {
+
+        import FormRunnerHome._
+
+        def fromCompatibility =
+            remoteServerFromCompatibilityProperty map (List(_))
+
+        def fromJSON =
+            remoteServersFromJSONProperty map { values ⇒
+                values flatMap { case (label, uri) ⇒ label :: uri :: Nil }
+            }
+
+        def fromEither =
+            fromCompatibility orElse fromJSON getOrElse List.empty[String]
+
+        fromEither
+    }
+}
+
+object FormRunnerHome {
+
+    import spray.json._
+
+    def tryRemoteServersFromString(json: String) =
+        Try(json.asJson) flatMap tryRemoteServersFromJSON
+
+    def tryRemoteServersFromJSON(json: JsValue) = Try {
+        json match {
+            case JsArray(elements) ⇒
+                elements collect {
+                    case JsObject(fields) ⇒
+
+                        def stringValueOrThrow(v: JsValue) = (
+                            collectByErasedType[JsString](v)
+                            map       (_.value)
+                            flatMap   nonEmptyOrNone
+                            getOrElse (throw new IllegalArgumentException)
+                        )
+
+                        stringValueOrThrow(fields("label")) → dropTrailingSlash(stringValueOrThrow(fields("url")))
+                }
+            case other ⇒
+                throw new IllegalArgumentException
+        }
+    }
+
+    private def remoteServersFromJSONProperty: Option[List[(String, String)]] =
+        Option(properties.getProperty("oxf.fr.home.remote-servers")) map { property ⇒
+            Try(property.associatedValue(_.value.toString.asJson)) flatMap tryRemoteServersFromJSON getOrElse {
+                implicit val logger = containingDocument.getIndentedLogger("form-runner")
+                warn(s"incorrect JSON configuration for property `oxf.fr.home.remote-servers`", Seq("JSON" → property.value.toString))
+                Nil
+            }
+        }
+
+    private def remoteServerFromCompatibilityProperty: Option[String] = (
+        Option(properties.getStringOrURIAsString("oxf.fr.production-server-uri"))
+        flatMap nonEmptyOrNone
+        map     dropTrailingSlash
+    )
 }

@@ -119,7 +119,7 @@ object ToolboxOps {
 
                 // Adjust bindings on newly inserted control, done after the control is added as
                 // renameControlByElement() expects resources to be present
-                renameControlByElement(newControlElement, newControlName)
+                renameControlByElement(newControlElement, newControlName, resourceNamesInUseForControl(newControlName))
 
                 // Insert the bind element
                 val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName)
@@ -415,7 +415,38 @@ object ToolboxOps {
 
             val xvc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("xcv"))
 
+            /* Example layout:
+            <xcv>
+                <control>
+                    <xf:input id="control-1-control" bind="control-1-bind">
+                        <xf:label ref="$form-resources/control-1/label"/>
+                        <xf:hint ref="$form-resources/control-1/hint"/>
+                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xf:input>
+                </control>
+                <holder>
+                    <control-1/>
+                </holder>
+                <resources>
+                    <resource xml:lang="en">
+                        <control-1>
+                            <label>My label</label>
+                            <hint/>
+                            <alert/>
+                        </control-1>
+                    </resource>
+                </resources>
+                <bind>
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                </bind>
+            </xcv>
+            */
+
             (xvc \ "control" \ * headOption) foreach { control ⇒
+
+                def holders   = xvc \ "holder" \ *
+                def resources = xvc \ "resources" \ "resource" \ *
+
                 val name = {
                     val requestedName = getControlName(control)
 
@@ -425,10 +456,11 @@ object ToolboxOps {
                         val newName = controlNameFromId(nextId(td, "control"))
 
                         // Rename everything
-                        // TODO: don't rename in place
-                        renameControlByElement(control, newName)
+                        // LATER: Don't rename in place as it would be better to keep the original name when possible,
+                        // e.g. copy, paste remove first control, paste again.
+                        renameControlByElement(control, newName, resources \ * map (_.localname) toSet)
 
-                        (xvc \ "holder" \ *) ++ (xvc \ "resources" \ "resource" \ *) foreach
+                        holders ++ resources foreach
                             (rename(_, newName))
 
                         (xvc \ "bind" \ * headOption) foreach
@@ -443,8 +475,8 @@ object ToolboxOps {
                 val newControlElement = insert(into = gridTd, origin = control).head
                 insertHolders(
                     newControlElement,
-                    xvc \ "holder" \ * head,
-                    xvc \ "resources" \ "resource" map (r ⇒ (r \@ "*:lang" stringValue, r \ * head)),
+                    holders.head,
+                    xvc \ "resources" \ "resource" map (r ⇒ (r attValue "*:lang", r \ * head)),
                     precedingControlNameInSectionForControl(newControlElement)
                 )
 

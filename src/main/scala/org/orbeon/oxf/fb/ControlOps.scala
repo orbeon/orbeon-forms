@@ -32,7 +32,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.FormRunner
 
 /*
  * Form Builder: operations on controls.
@@ -202,10 +201,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         }
 
     def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
-        findControlByName(inDoc, oldName) foreach (renameControlByElement(_, newName))
+        findControlByName(inDoc, oldName) foreach (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
+
+    def resourceNamesInUseForControl(controlName: String) =
+        currentResources.child(controlName).child(*).map(_.localname).to[Set]
 
     // Rename the control (but NOT its holders, binds, etc.)
-    def renameControlByElement(controlElement: NodeInfo, newName: String): Unit = {
+    def renameControlByElement(controlElement: NodeInfo, newName: String, resourcesNames: Set[String]): Unit = {
 
         // Set @id in any case, @ref value if present, @bind value if present
         ensureAttribute(controlElement, "id", controlId(newName))
@@ -216,7 +218,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             setvalue(controlElement \@ attName, makeInstanceExpression(templateId(newName)))
 
         // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
-        val resourcesNames = currentResources.child(newName).child(*).map(_.localname).toSet
         for {
             resourcePointer ← controlElement.child(*)
             resourceName = resourcePointer.localname

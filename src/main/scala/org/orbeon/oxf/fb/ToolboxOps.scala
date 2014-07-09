@@ -390,12 +390,14 @@ object ToolboxOps {
             }
 
             // Clear and insert each clipboard element
-            Map[String, Seq[NodeInfo]](
+            val nameAndElementsToInsert = Map(
                 "control"   → List(controlElement),
                 "holder"    → findDataHolders(doc, name),
                 "resources" → resourcesWithLang,
-                "bind"      → findBindByName(doc, name).toList) foreach {
+                "bind"      → findBindByName(doc, name).toList
+            )
 
+            nameAndElementsToInsert foreach {
                 case (elementName, content) ⇒
                     delete(xvc \ elementName \ *)
                     insert(into = xvc \ elementName, origin = content)

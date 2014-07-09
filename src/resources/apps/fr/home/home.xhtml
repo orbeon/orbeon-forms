@@ -37,7 +37,15 @@
             <!-- Entry point -->
             <xf:action event="xforms-ready fr-initialize">
 
-                <xf:var name="remote-servers" value="frf:remoteServersXPath()"/>
+                <xf:var
+                    name="remote-servers"
+                    value="frf:remoteServersXPath()"/>
+
+                <xf:var
+                    name="has-remote"
+                    value="normalize-space(instance()/remote-server/url)
+                       and normalize-space(instance()/remote-server/username)
+                       and normalize-space(instance()/remote-server/password)"/>
 
                 <xf:dispatch name="fr-clear" targetid="fr-form-model"/>
 
@@ -57,6 +65,8 @@
                 <xf:action type="xpath" xmlns:version="java:org.orbeon.oxf.common.Version">
                     if (not(version:isPE()) or empty($remote-servers)) then
                         process:runProcessByName('oxf.fr.home.process', 'load-local')
+                    else if ($has-remote) then
+                        process:runProcess('oxf.fr.home.process', 'load-remote')
                     else
                         process:runProcessByName('oxf.fr.home.process', 'ask-credentials')
                 </xf:action>

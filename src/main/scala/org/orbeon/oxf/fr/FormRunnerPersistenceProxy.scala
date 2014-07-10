@@ -29,7 +29,6 @@ import org.orbeon.scaxon.XML._
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.externalcontext.URLRewriter
-import collection.JavaConverters._
 import org.orbeon.oxf.util.{XPath, URLRewriterUtils, NetUtils}
 
 /**
@@ -46,8 +45,6 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private val DataCollectionPath         = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
     private val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
     private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(/([^/]+))?)?""".r
-
-    private val ParametersToForward = Set("document", "valid")
 
     // Start the processor
     override def start(pipelineContext: PipelineContext) {
@@ -72,7 +69,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private def proxyRequest(request: Request, response: Response, app: String, form: String, formOrData: String, path: String): Unit = {
 
         def buildQueryString =
-            NetUtils.encodeQueryString(request.getParameterMap.asScala filter (entry ⇒ ParametersToForward(entry._1)) asJava)
+            NetUtils.encodeQueryString(request.getParameterMap)
 
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)

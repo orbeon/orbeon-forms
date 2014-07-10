@@ -71,7 +71,10 @@ trait FormRunnerActions {
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, formVersion, Some(document), _) = FormRunnerParams()
-            val isDraft = paramByName(params, "draft").exists(_ == "true")
+            
+            val isDraft     = paramByName(params, "draft").exists(_ == "true")
+            val queryXVT    = paramByName(params, "query")
+            val querySuffix = queryXVT map evaluateValueTemplate map ('&' +) getOrElse ""
 
             // Notify that the data is about to be saved
             dispatch(name = "fr-data-save-prepare", targetId = FormModel)
@@ -86,7 +89,7 @@ trait FormRunnerActions {
                 fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
                 toBasePath        = createFormDataBasePath(app, form, isDraft, document),
                 filename          = "data.xml",
-                commonQueryString = s"valid=$dataValid",
+                commonQueryString = s"valid=$dataValid" + querySuffix,
                 forceAttachments  = false,
                 formVersion       = Some(formVersion)
             )

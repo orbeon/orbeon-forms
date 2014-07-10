@@ -554,9 +554,8 @@ body.orbeon {
   .orbeon .fr-mode-view .xforms-field,
   .orbeon .fr-mode-pdf .xforms-field,
   .orbeon .fr-mode-email .xforms-field {
-    height: 24px;
+    min-height: 24px !important;
     line-height: 24px;
-    background-color: red;
   }
   .orbeon .fr-mode-view .fr-grid-1 .xforms-field,
   .orbeon .fr-mode-pdf .fr-grid-1 .xforms-field,

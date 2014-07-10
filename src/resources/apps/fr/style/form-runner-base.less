@@ -568,6 +568,17 @@
             }
         }
     }
+
+    // Allow wrapping of input fields content in view/pdf modes
+    // https://github.com/orbeon/orbeon-forms/issues/1822
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .xforms-field {
+            white-space: normal;
+            word-wrap: break-word;
+            min-height: @controlsHeight;
+            height: auto;
+        }
+    }
 }
 
 // This is also used for PDF generation

@@ -561,6 +561,14 @@
 .orbeon .xforms-form .fr-mode-email .fr-repeat-multiple-rows .fr-grid-master-row {
   display: none;
 }
+.orbeon .fr-mode-view .xforms-field,
+.orbeon .fr-mode-pdf .xforms-field,
+.orbeon .fr-mode-email .xforms-field {
+  white-space: normal;
+  word-wrap: break-word;
+  min-height: 28px;
+  height: auto;
+}
 @media print {
   .orbeon #xforms-form .fr-status-icons,
   .orbeon #xforms-form .xforms-loading-loading,

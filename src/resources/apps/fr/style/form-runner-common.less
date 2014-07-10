@@ -27,6 +27,11 @@
 @frSectionTitleIconWidth: 7px;
 @frIconHeight: 14px;
 
+@controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
+@textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
+@controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
+@multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
+
 // Similar to Bootstrap .well
 .fr-border {
     padding: 0;
@@ -65,6 +70,6 @@
             float: none;                                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
             margin: 0
         }
-        .label { vertical-align: middle }                       // Vertically center Draft label on the chekcbox
+        .label { vertical-align: middle }                   // Vertically center Draft label on the chekcbox
     }
 }

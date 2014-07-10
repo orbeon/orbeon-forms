@@ -12,11 +12,6 @@
 
 @import (reference) "form-runner-common";
 
-@controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
-@textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
-@controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
-@multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
-
 body.orbeon {
   margin: 0;
   font-family: @baseFontFamily;
@@ -419,9 +414,8 @@ body.orbeon {
 
             .xforms-field {
                 // Flying Saucer: missing box-sizing support :(
-                height: @controlsHeight - 2 * 2px;
+                min-height: @controlsHeight - 2 * 2px !important; // not sure why it doesn't kick in otherwise
                 line-height: @controlsHeight - 2 * 2px;
-                background-color: red;
             }
 
             // Values below are empirical

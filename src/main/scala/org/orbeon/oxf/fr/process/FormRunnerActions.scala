@@ -40,7 +40,6 @@ trait FormRunnerActions {
         "review"           → tryNavigateToReview,
         "edit"             → tryNavigateToEdit,
         "open-pdf"         → tryOpenPDF,
-        "summary"          → tryNavigateToSummary,
         "toggle-noscript"  → tryToggleNoscript,
         "visit-all"        → tryVisitAll,
         "unvisit-all"      → tryUnvisitAll,
@@ -364,13 +363,6 @@ trait FormRunnerActions {
             s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! isNoscript).toString}"
         } flatMap
             tryChangeMode
-
-    def tryNavigateToSummary(params: ActionParams): Try[Any]  =
-        Try {
-            val FormRunnerParams(app, form, _, _, _) = FormRunnerParams()
-            s"/fr/$app/$form/summary"
-        } flatMap
-            tryNavigateTo
 
     // Visit/unvisit controls
     def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = ErrorSummaryModel))

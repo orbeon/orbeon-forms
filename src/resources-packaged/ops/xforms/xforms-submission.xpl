@@ -76,16 +76,6 @@
     </p:processor>
 
     <p:choose href="#binary-document">
-        <!--&lt;!&ndash; HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way &ndash;&gt;-->
-        <!--<p:when test="if (for $c in /*/@status-code return $c castable as xs:integer and (not((xs:integer($c) ge 200 and xs:integer($c) lt 300) or xs:integer($c) = 304)))-->
-                      <!--then form-runner:sendError(/*/@status-code)-->
-                      <!--else false()">-->
-            <!--&lt;!&ndash; Null document to keep XPL happy. The error has already been sent in the XPath expression above. &ndash;&gt;-->
-            <!--<p:processor name="oxf:identity">-->
-                <!--<p:input name="data"><null xsi:nil="true"/></p:input>-->
-                <!--<p:output name="data" ref="response"/>-->
-            <!--</p:processor>-->
-        <!--</p:when>-->
         <p:when test="contains(/*/@content-type, 'xml')">
             <!-- Convert binary document to XML -->
             <p:processor name="oxf:to-xml-converter">

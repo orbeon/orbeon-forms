@@ -299,8 +299,6 @@ public class XFormsProperties {
 
     public static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
 
-    public static final String ASYNC_PORTLET_LOAD_PROPERTY = XFORMS_PROPERTY_PREFIX + "async-portlet-load";
-
     public static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     public static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
@@ -385,9 +383,6 @@ public class XFormsProperties {
 
     public static JPropertySet.Property getResourcesBaseline() {
         return Properties.instance().getPropertySet().getProperty(BASELINE_PROPERTY);
-    }
-    public static boolean isAsyncPortletLoad() {
-        return Properties.instance().getPropertySet().getBoolean(ASYNC_PORTLET_LOAD_PROPERTY, false);
     }
 
     public static boolean getDebugLogXPathAnalysis() {

@@ -13,15 +13,47 @@
  */
 package org.orbeon.oxf.portlet
 
-import org.orbeon.oxf.util.{ScalaUtils, NetUtils}
-import BufferedPortlet._
-import javax.portlet._
-import collection.JavaConverters._
-import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.processor.serializer.CachedSerializer
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
+import java.io.ByteArrayInputStream
 import java.{util ⇒ ju}
-import ScalaUtils._
+import javax.portlet._
+
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
+import org.orbeon.oxf.fr.embedding._
+import org.orbeon.oxf.portlet.BufferedPortlet._
+import org.orbeon.oxf.portlet.liferay.LiferayURL
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.ScalaUtils._
+
+import scala.collection.JavaConverters._
+
+class PortletEmbeddingContext(context: PortletContext, request: PortletRequest, response: PortletResponse)
+        extends EmbeddingContext {
+
+    private val session = request.getPortletSession(true) ensuring (_ ne null)
+
+    val namespace = BufferedPortlet.shortIdNamespace(response.getNamespace, context) ensuring (_ ne null)
+
+    def getSessionAttribute(name: String)                = session.getAttribute(name)
+    def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
+    def removeSessionAttribute(name: String)             = session.removeAttribute(name)
+    def log(message: String)                             = context.log(message)
+}
+
+class PortletEmbeddingContextWithResponse(context: PortletContext, request: PortletRequest, response: MimeResponse)
+        extends PortletEmbeddingContext(context, request, response)
+        with EmbeddingContextWithResponse {
+
+    def writer                     = response.getWriter
+    def outputStream               = response.getPortletOutputStream
+    def decodeURL(encoded: String) = LiferayURL.wsrpToPortletURL(encoded, response)
+    def setStatusCode(code: Int)   = () // Q: Can we do anything meaningful for resource caching?
+
+    def setHeader(name: String, value: String): Unit =
+        if (name.toLowerCase == "content-type")
+            response.setContentType(value)
+        else
+            response.setProperty(name, value)
+}
 
 // Abstract portlet logic including buffering of portlet actions
 // This doesn't deal direct with ProcessorService or HTTP proxying
@@ -30,18 +62,11 @@ trait BufferedPortlet {
     def title(request: RenderRequest): String
     def portletContext: PortletContext
 
-    // Immutable responses
-    sealed trait ContentOrRedirect
-    case class Content(body: String Either Array[Byte], contentType: Option[String], title: Option[String]) extends ContentOrRedirect
-    case class Redirect(location: String, exitPortal: Boolean = false) extends ContentOrRedirect {
-        require(location ne null, "Missing Location header in redirect response")
-    }
-
     // Immutable response with parameters
     case class ResponseWithParameters(response: ContentOrRedirect, parameters: Map[String, List[String]])
 
-    def bufferedRender(request: RenderRequest, response: RenderResponse, render: ⇒ ContentOrRedirect): Unit =
-        getResponseWithParameters(request) match {
+    def bufferedRender(request: RenderRequest, response: RenderResponse, render: ⇒ ContentOrRedirect)(implicit ctx: EmbeddingContextWithResponse): Unit =
+        getStoredResponseWithParameters match {
             case Some(ResponseWithParameters(content: Content, parameters)) if toScalaMap(request.getParameterMap) == parameters ⇒
                 // The result of an action with the current parameters is available
                 // NOTE: Until we can correctly handle multiple render requests for an XForms page, we should detect the
@@ -60,9 +85,9 @@ trait BufferedPortlet {
                 }
         }
 
-    def bufferedProcessAction(request: ActionRequest, response: ActionResponse, action: ⇒ ContentOrRedirect): Unit = {
+    def bufferedProcessAction(request: ActionRequest, response: ActionResponse, action: ⇒ ContentOrRedirect)(implicit ctx: EmbeddingContext): Unit = {
         // Make sure the previously cached output is cleared, if there is any. We keep the result of only one action.
-        clearResponseWithParameters(request)
+        clearResponseWithParameters()
 
         action match {
             case Redirect(location, true) ⇒
@@ -97,55 +122,33 @@ trait BufferedPortlet {
                 response.setRenderParameters(newRenderParameters)
 
                 // Store response
-                setResponseWithParameters(request, ResponseWithParameters(content, toScalaMap(newRenderParameters)))
+                storeResponseWithParameters(ResponseWithParameters(content, toScalaMap(newRenderParameters)))
         }
     }
 
-    private def writeResponseWithParameters(request: RenderRequest, response: RenderResponse, contentResponse: Content) {
+    private def writeResponseWithParameters(request: RenderRequest, response: RenderResponse, contentResponse: Content)(implicit ctx: EmbeddingContextWithResponse): Unit = {
         // Set title and content type
         contentResponse.title orElse Option(title(request)) foreach response.setTitle
         contentResponse.contentType foreach response.setContentType
 
         // Write response out directly
-        write(response, contentResponse.body, contentResponse.contentType)
+        APISupport.writeResponse(contentResponse.body.right map (new ByteArrayInputStream(_)), contentResponse.contentType)
     }
 
-    protected def write(response: MimeResponse, data: String Either Array[Byte], contentType: Option[String]): Unit =
-        contentType map NetUtils.getContentTypeMediaType match {
-            case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
-                // Text/JSON/XML content type: rewrite response content
-                data match {
-                    case Left(string) ⇒
-                        WSRP2Utils.write(response, string, shortIdNamespace(response.getNamespace, portletContext), XMLUtils.isXMLMediatype(mediatype))
-                    case Right(bytes) ⇒
-                        val encoding = contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeCharset(ct))) getOrElse CachedSerializer.DEFAULT_ENCODING
-                        WSRP2Utils.write(response, new String(bytes, 0, bytes.length, encoding), shortIdNamespace(response.getNamespace, portletContext), XMLUtils.isXMLMediatype(mediatype))
-                }
-            case _ ⇒
-                // All other types: just output
-                data match {
-                    case Left(string) ⇒
-                        response.getWriter.write(string)
-                    case Right(bytes) ⇒
-                        response.getPortletOutputStream.write(bytes)
-                }
-        }
+    protected def getStoredResponseWithParameters(implicit ctx: EmbeddingContext) =
+        Option(ctx.getSessionAttribute(ResponseSessionKey).asInstanceOf[ResponseWithParameters])
 
-    protected def getResponseWithParameters(request: PortletRequest) =
-        Option(request.getPortletSession.getAttribute(ResponseSessionKey).asInstanceOf[ResponseWithParameters])
+    private def storeResponseWithParameters(responseWithParameters: ResponseWithParameters)(implicit ctx: EmbeddingContext) =
+        ctx.setSessionAttribute(ResponseSessionKey, responseWithParameters)
 
-    private def setResponseWithParameters(request: PortletRequest, responseWithParameters: ResponseWithParameters) =
-        request.getPortletSession.setAttribute(ResponseSessionKey, responseWithParameters)
-
-    private def clearResponseWithParameters(request: PortletRequest) =
-        request.getPortletSession.removeAttribute(ResponseSessionKey)
+    private def clearResponseWithParameters()(implicit ctx: EmbeddingContext) =
+        ctx.removeSessionAttribute(ResponseSessionKey)
 }
 
 object BufferedPortlet {
 
-    val PathParameter = PathParameterName
-    val MethodParameter = "orbeon.method"
-
+    val PathParameter      = PathParameterName
+    val MethodParameter    = "orbeon.method"
     val ResponseSessionKey = "org.orbeon.oxf.response"
 
     // Convert to immutable String → List[String] so that map equality works as expected
@@ -186,10 +189,10 @@ object BufferedPortlet {
             }
 
             // Get or create specific mapping portletNamespace → idNamespace
-            mappings.map.get(portletNamespace) getOrElse {
+            mappings.map.getOrElse(portletNamespace, {
                 val newMappings = mappings.next(portletNamespace)
                 portletContext.setAttribute(IdNamespacesSessionKey, newMappings)
                 newMappings.map(portletNamespace)
-            }
+            })
         }
 }

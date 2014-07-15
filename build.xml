@@ -72,6 +72,9 @@
         </classpath>
     </taskdef>
 
+    <taskdef resource="proguard/ant/task.properties"
+         classpath="lib/proguard-5.0.beta2.jar"/>
+
     <fileset id="war.libs" dir="lib">
 
         <include name="orbeon-errorified-20130923.jar"/>
@@ -386,8 +389,107 @@
         </javac>
     </target>
 
+    <target name="embedding-jar" depends="classes">
+        <if>
+            <isset property="skip.compilation"/>
+            <then>
+                <property name="proguard.classes" value="build/orbeon-war/WEB-INF/classes"/>
+            </then>
+            <else>
+                <property name="proguard.classes" value="build/classes"/>
+            </else>
+        </if>
+        <local name="temp.jar"/>
+        <tempfile property="temp.jar" suffix=".jar"/>
+        <proguard>
+            -verbose
+            -dontobfuscate
+            -dontnote
+            -dontwarn
+            -ignorewarnings
+            -forceprocessing
+
+            -injars      ${proguard.classes}
+
+            -injars      lib/commons-io-2.0.1.jar
+            -injars      lib/commons-lang3-3.1.jar
+            -injars      lib/scala-library-2.10.3.jar
+            -injars      lib/orbeon-errorified-20130923.jar
+            -injars      lib/httpclient-4.2.3.jar
+            -injars      lib/httpclient-cache-4.2.3.jar
+            -injars      lib/httpcore-4.2.2.jar
+            -injars      lib/httpmime-4.2.3.jar
+
+            -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
+            <!-- -outjars     build/lib/check-resources.jar -->
+
+            -libraryjars ${java.home}/lib/rt.jar
+            -libraryjars lib/servlet-2_3-4_0_4.jar
+
+            <!-- Seeds: servlet filter and the public API -->
+            -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
+            -keep public class org.orbeon.oxf.fr.embedding.servlet.API {
+                public static *;
+            }
+        </proguard>
+        <jarjar jarfile="build/lib/orbeon-embedding.jar">
+            <zipfileset src="${temp.jar}"/>
+            <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
+            <rule pattern="scala.**" result="org.orbeon.scala.@1"/>
+        </jarjar>
+    </target>
+
+    <target name="proxy-portlet-jar" depends="classes">
+        <if>
+            <isset property="skip.compilation"/>
+            <then>
+                <property name="proguard.classes" value="build/orbeon-war/WEB-INF/classes"/>
+            </then>
+            <else>
+                <property name="proguard.classes" value="build/classes"/>
+            </else>
+        </if>
+        <local name="temp.jar"/>
+        <tempfile property="temp.jar" suffix=".jar"/>
+        <proguard>
+            -verbose
+            -dontobfuscate
+            -dontnote
+            -dontwarn
+            -ignorewarnings
+            -forceprocessing
+
+            -injars      ${proguard.classes}
+
+            -injars      lib/commons-io-2.0.1.jar
+            -injars      lib/commons-lang3-3.1.jar
+            -injars      lib/scala-library-2.10.3.jar
+            -injars      lib/orbeon-errorified-20130923.jar
+            -injars      lib/httpclient-4.2.3.jar
+            -injars      lib/httpclient-cache-4.2.3.jar
+            -injars      lib/httpcore-4.2.2.jar
+            -injars      lib/httpmime-4.2.3.jar
+
+            -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
+            <!-- -outjars     build/lib/check-resources.jar -->
+
+            -libraryjars ${java.home}/lib/rt.jar
+            -libraryjars lib/servlet-2_3-4_0_4.jar
+            -libraryjars lib/portlet-api_2.0.jar
+
+            <!-- Seeds: servlet filter and the public API -->
+            -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
+            <!---keep public class * extends org.apache.log4j.Appender-->
+        </proguard>
+        <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">
+            <zipfileset src="${temp.jar}"/>
+            <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
+            <rule pattern="scala.**" result="org.orbeon.scala.@1"/>
+        </jarjar>
+    </target>
+
     <!-- JARs -->
-    <target name="jars" depends="classes, orbeon-minify-js">
+    <target name="jars" depends="classes, orbeon-minify-js, embedding-jar">
         <jar destfile="${jar.file}" compress="false">
             <fileset dir="src/main/resources">
                 <include name="**/*.xml"/>
@@ -568,24 +670,12 @@
         </antcall>
     </target>
 
-    <target name="proxy-portlet-war" depends="jars" description="Create proxy portlet WAR">
+    <target name="proxy-portlet-war" depends="proxy-portlet-jar" description="Create proxy portlet WAR">
     	<mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
             <webinf dir="descriptors/proxy-portlet"/>
             <lib dir="${build.lib.dir}">
-                <include name="orbeon.jar"/>
-                <include name="orbeon-xforms-filter.jar"/>
-            </lib>
-            <lib dir="lib">
-                <include name="xerces-2.11-orbeon.jar"/>
-                <include name="orbeon-errorified-20130923.jar"/>
-                <include name="scala-library-*.jar"/>
-                <include name="commons-fileupload-*.jar"/>
-                <include name="commons-lang3-*.jar"/>
-                <include name="log4j-*.jar"/>
-                <include name="httpclient-4.2.3.jar"/>
-                <include name="httpcore-4.2.2.jar"/>
-                <include name="httpmime-4.2.3.jar"/>
+                <include name="orbeon-proxy-portlet.jar"/>
             </lib>
         </war>
     </target>
@@ -908,6 +998,9 @@
             </zipfileset>
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-auth.war">
                 <include name="orbeon-auth.war"/>
+            </zipfileset>
+            <zipfileset dir="build/lib" fullpath="${versioned-name}/orbeon-embedding.jar">
+                <include name="orbeon-embedding.jar"/>
             </zipfileset>
             <zipfileset file="README.md" prefix="${versioned-name}"/>
             <zipfileset file="README.md" fullpath="${versioned-name}/README.txt"/>

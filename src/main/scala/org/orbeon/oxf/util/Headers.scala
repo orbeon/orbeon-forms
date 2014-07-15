@@ -41,6 +41,7 @@ object Headers {
     def filterHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
         for {
             (name, values) ← headers
+            if name ne null // HttpURLConnection.getHeaderFields returns null names. Great.
             if ! HeadersToFilterOut(name.toLowerCase)
             if ! out || name.toLowerCase != "content-length"
             if (values ne null) && values.nonEmpty

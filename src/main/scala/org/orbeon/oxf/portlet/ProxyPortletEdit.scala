@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.portlet
 
-import org.orbeon.oxf.util.ScalaUtils._
 import javax.portlet._
-import org.apache.log4j.Logger
+
 import scala.xml.Elem
 
 // Preference editor for the proxy portlet
 trait ProxyPortletEdit extends GenericPortlet {
 
-    implicit def logger: Logger
+    import OrbeonProxyPortlet._
+    implicit def portletContext = getPortletContext
     
     case class NameLabel(name: String, label: String)
 

@@ -13,6 +13,10 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
+import java.{util ⇒ ju}
+import javax.portlet._
+
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
 
@@ -27,7 +31,7 @@ object LiferayURL {
 
     // Liferay-specific code: attempt to move p_p_resource_id with magic number to the end so that client can attempt to
     // find a base URL. This is specifically written to handle https://github.com/orbeon/orbeon-forms/issues/258
-    def moveMagicResourceId(encodedURL: String) =
+    def moveMagicResourceId(encodedURL: String): String =
         if (encodedURL.contains(URLBaseMagic) && encodedURL.contains(ResourceIdParameter)) {
             splitQuery(encodedURL) match {
                 case (path, Some(query)) ⇒
@@ -43,4 +47,30 @@ object LiferayURL {
             }
         } else
             encodedURL
+
+
+    // Rewrite a WSRP-encoded URL to a portlet URL
+    def wsrpToPortletURL(encodedURL: String, response: MimeResponse): String = {
+
+        def createResourceURL(resourceId: String) = {
+            val url = response.createResourceURL
+            url.setResourceID(resourceId)
+            url.setCacheability(ResourceURL.PAGE)
+            moveMagicResourceId(url.toString)
+        }
+
+        def createPortletURL(url: PortletURL, portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) = {
+            portletMode foreach (v ⇒ url.setPortletMode(new PortletMode(v)))
+            windowState foreach (v ⇒ url.setWindowState(new WindowState(v)))
+            url.setParameters(navigationParameters)
+            url.toString
+        }
+
+        WSRPURLRewriter.decodeURL(
+            encodedURL,
+            createResourceURL,
+            createPortletURL(response.createActionURL, _, _, _),
+            createPortletURL(response.createRenderURL, _, _, _)
+        )
+    }
 }

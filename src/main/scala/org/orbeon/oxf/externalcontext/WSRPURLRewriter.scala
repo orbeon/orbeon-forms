@@ -14,30 +14,29 @@
 package org.orbeon.oxf.externalcontext
 
 import URLRewriter._
-import WSRPURLRewriter._
-import java.net.URL
-import java.net.URLEncoder
+import java.net.{URLDecoder, URL, URLEncoder}
 import java.util.concurrent.Callable
-import java.util.{List ⇒ JList}
+import java.{util ⇒ ju}
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.URLRewriterUtils
+import org.orbeon.oxf.util.{StringConversions, NetUtils, URLRewriterUtils}
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DynamicResourcesPath
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
-        retrievePathMatchers: ⇒ JList[URLRewriterUtils.PathMatcher],
+        retrievePathMatchers: ⇒ ju.List[URLRewriterUtils.PathMatcher],
         request: ExternalContext.Request,
         wsrpEncodeResources: Boolean)
     extends URLRewriter {
+    
+    import WSRPURLRewriter._
 
     // We don't initialize the matchers right away, because when the rewriter is created, they may not be available.
     // Specifically. the rewriter is typically created along the ExternalContext and PipelineContext, before the PFC has
     // been able to place the matchers in the PipelineContext.
-    private var pathMatchers: JList[URLRewriterUtils.PathMatcher] = null
+    private var pathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
 
     // For Java callers, use Callable
-    def this(getPathMatchers: Callable[JList[URLRewriterUtils.PathMatcher]], request: ExternalContext.Request, wsrpEncodeResources: Boolean) =
+    def this(getPathMatchers: Callable[ju.List[URLRewriterUtils.PathMatcher]], request: ExternalContext.Request, wsrpEncodeResources: Boolean) =
         this(getPathMatchers.call, request, wsrpEncodeResources)
 
     private def getPathMatchers = {
@@ -75,6 +74,7 @@ class WSRPURLRewriter(
             return urlString
 
         // Parse URL
+        // TODO: Use URI instead?
         val baseURL = new URL("http", "example.org", request.getRequestPath)
         val u = new URL(baseURL, urlString)
         // Decode query string
@@ -95,7 +95,7 @@ class WSRPURLRewriter(
         val navigationalState = NetUtils.encodeQueryString2(parameters)
 
         // Encode the URL a la WSRP
-        encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)
+        encodeURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)
     }
 
     def rewriteResourceURL(urlString: String, wsrpEncodeResources: Boolean): String = {
@@ -117,17 +117,17 @@ object WSRPURLRewriter {
     val PathParameterName = "orbeon.path"
 
     private val URLTypeBlockingAction = 1
-    private val URLTypeRender = 2
-    private val URLTypeResource = 3
+    private val URLTypeRender         = 2
+    private val URLTypeResource       = 3
 
     val URLTypeBlockingActionString = "blockingAction"
-    val URLTypeRenderString = "render"
-    val URLTypeResourceString = "resource"
+    val URLTypeRenderString         = "render"
+    val URLTypeResourceString       = "resource"
 
     private val URLTypes = Map(
-        URLTypeBlockingAction   → URLTypeBlockingActionString,
-        URLTypeRender           → URLTypeRenderString,
-        URLTypeResource         → URLTypeResourceString
+        URLTypeBlockingAction → URLTypeBlockingActionString,
+        URLTypeRender         → URLTypeRenderString,
+        URLTypeResource       → URLTypeResourceString
     )
 
     val BaseTag     = "wsrp_rewrite"
@@ -150,7 +150,7 @@ object WSRPURLRewriter {
      *
      * This does not call the portlet API. Used by Portlet2URLRewriter.
      */
-    def encodePortletURL(urlType: Int, navigationalState: String, mode: String, windowState: String, fragmentId: String, secure: Boolean): String = {
+    def encodeURL(urlType: Int, navigationalState: String, mode: String, windowState: String, fragmentId: String, secure: Boolean): String = {
 
         val sb = new StringBuilder(StartTag)
 
@@ -187,5 +187,58 @@ object WSRPURLRewriter {
         sb.append(EndTag)
 
         sb.toString
+    }
+
+    type CreateResourceURL = String ⇒ String
+    type CreatePortletURL  = (Option[String], Option[String], ju.Map[String, Array[String]]) ⇒ String
+
+    def decodeURL(encodedURL: String, createResourceURL: CreateResourceURL, createActionURL: CreatePortletURL, createRenderURL: CreatePortletURL): String = {
+
+        import StringConversions.getFirstValueFromStringArray
+
+        def removeAmpIfNeeded(s: String) =
+            if (s.startsWith("amp;")) s.substring("amp;".length) else s
+
+        val wsrpParameters = NetUtils.decodeQueryStringPortlet(encodedURL)
+        
+        val urlType = {
+            val urlType = getFirstValueFromStringArray(wsrpParameters.get(URLTypeParam))
+
+            if (urlType eq null)
+                throw new IllegalArgumentException(s"Missing URL type for WSRP encoded URL $encodedURL")
+
+            if (! URLTypes.values.toSet(urlType))
+                throw new IllegalArgumentException(s"Invalid URL type $urlType for WSRP encoded URL $encodedURL")
+
+            urlType
+        }
+
+        val navigationParameters = {
+            val navigationalStateValue = getFirstValueFromStringArray(wsrpParameters.get(NavigationalStateParam))
+            if (navigationalStateValue ne null)
+                NetUtils.decodeQueryStringPortlet(URLDecoder.decode(removeAmpIfNeeded(navigationalStateValue), "utf-8"))
+            else
+                ju.Collections.emptyMap[String, Array[String]]
+        }
+
+        if (urlType == URLTypeResourceString) {
+            val resourcePath = navigationParameters.get(PathParameterName)(0)
+            navigationParameters.remove(PathParameterName)
+            val resourceQuery = NetUtils.encodeQueryString2(navigationParameters)
+            val resourceId = NetUtils.appendQueryString(resourcePath, resourceQuery)
+            
+            createResourceURL(resourceId)
+        } else {
+            val portletMode =
+                Option(getFirstValueFromStringArray(wsrpParameters.get(ModeParam))) map removeAmpIfNeeded
+
+            val windowState =
+                Option(getFirstValueFromStringArray(wsrpParameters.get(WindowStateParam))) map removeAmpIfNeeded
+
+            if (urlType == URLTypeBlockingActionString)
+                createActionURL(portletMode, windowState, navigationParameters)
+            else
+                createRenderURL(portletMode, windowState, navigationParameters)
+        }
     }
 }

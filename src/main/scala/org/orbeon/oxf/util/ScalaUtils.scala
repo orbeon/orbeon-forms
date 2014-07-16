@@ -28,35 +28,6 @@ object ScalaUtils extends PathOps {
 
     private val CopyBufferSize = 8192
 
-    type Readable[T] = {
-        def close()
-        def read(b: Array[T]): Int
-    }
-
-    type Writable[T] = {
-        def close()
-        def write(cbuf: Array[T], off: Int, len: Int)
-        def flush()
-    }
-
-    // Copy a stream, with optional progress callback
-    // This fails at runtime due to: https://lampsvn.epfl.ch/trac/scala/ticket/2672
-    def genericCopyStream[T : ClassTag](in: Readable[T], out: Writable[T], progress: Long ⇒ Unit = _ ⇒ ()) = {
-
-        require(in ne null)
-        require(out ne null)
-
-        useAndClose(in) { in ⇒
-            useAndClose(out) { out ⇒
-                val buffer = new Array[T](CopyBufferSize)
-                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read ⇒
-                    progress(read)
-                    out.write(buffer, 0, read)
-                }
-            }
-        }
-    }
-
     def copyStream(in: InputStream, out: OutputStream, progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)

@@ -129,7 +129,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 // returned. The only exception is schema type validation, which can cause the node to be invalid, yet
                 // doesn't have an associated validation because it doesn't have a MIP. Conceivably, something could be
                 // associated with a type validation error.
-                val failedValidations = BindNode.failedValidationsForHighestLevel(nodeInfo)
+                val failedValidations = BindNode.failedValidationsForHighestLevelPrioritizeRequired(nodeInfo)
 
                 this._alertLevel        = failedValidations map (_._1) orElse (! _valid option ErrorLevel)
                 this._failedValidations = failedValidations map (_._2) getOrElse Nil

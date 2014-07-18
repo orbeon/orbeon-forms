@@ -41,7 +41,7 @@ object XFormsModelSubmissionBase {
             // Iterate data to gather elements with failed constraints
             doc.accept(new VisitorSupport() {
                 override def visit(element: Element): Unit = {
-                    val failedValidations = BindNode.failedValidationsForAllLevels(element)
+                    val failedValidations = BindNode.failedValidationsForAllLevelsPrioritizeRequired(element)
                     for (level ← levelsToAnnotate) {
                         // NOTE: Annotate all levels specified. If we decide to store only one level of validation
                         // in bind nodes, then we would have to change this to take the highest level only and ignore

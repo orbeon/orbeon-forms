@@ -2239,7 +2239,7 @@
         </input>
         <output name="response">
            <data>
-                <my-number-1 xxf:error="&lt;ul&gt;&lt;li&gt;A valid value is required.&lt;/li&gt;&lt;li&gt;Must be a decimal number.&lt;/li&gt;&lt;/ul&gt;"/>
+                <my-number-1 xxf:error="A valid value is required."/>
                 <my-number-2 xxf:error="Must be a decimal number.">abc</my-number-2>
                 <my-number-3 xxf:error="Must be greater or equal to 1.">-1</my-number-3>
                 <my-number-4 xxf:error="Must be less than or equal to 100.">101</my-number-4>

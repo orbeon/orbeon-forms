@@ -173,7 +173,11 @@ object LHHASupport {
             // Alerts are returned in document order
             control.alertLevel flatMap { level ⇒
 
-                val alerts = alertsMatchingValidations orElse alertsMatchingLevel(level) orElse alertsMatchingAny getOrElse Nil
+                val alerts =
+                    alertsMatchingValidations  orElse
+                    alertsMatchingLevel(level) orElse
+                    alertsMatchingAny          getOrElse
+                    Nil
 
                 val matchingAlertIds = alerts map (_.staticId) toSet
                 val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))

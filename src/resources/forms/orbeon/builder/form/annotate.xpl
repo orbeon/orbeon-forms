@@ -43,6 +43,17 @@
                               name="unneeded-elements"
                               select="fbf:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
 
+                <!-- Migrate constraints, see https://github.com/orbeon/orbeon-forms/issues/1829 -->
+                <xsl:variable name="ids-of-alert-validations"
+                              select="//xf:alert/@validation/string()"/>
+                
+                <xsl:variable name="ids-of-binds-with-constraint-attribute-and-custom-alert"
+                              select="$model//xf:bind[@constraint and @id = $ids-of-alert-validations]/@id/string()"/>
+
+                <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                              name="new-validation-ids"
+                              select="fbf:nextIdsJava(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
+
                 <xsl:template match="xf:help[generate-id() = $unneeded-elements]"/>
 
                 <!-- Temporarily mark read-only instances as read-write -->
@@ -231,6 +242,23 @@
                     <fr:dropdown-select1>
                         <xsl:apply-templates select="@* except @appearance | node() except xf:item[xf:value = '']"/>
                     </fr:dropdown-select1>
+                </xsl:template>
+
+                <!-- Convert constraint attributes to nested elements, see https://github.com/orbeon/orbeon-forms/issues/1829  -->
+                <xsl:template match="xf:bind[@constraint and @id = $ids-of-binds-with-constraint-attribute-and-custom-alert]">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* except @constraint"/>
+                        <xsl:variable name="bind-id" select="@id/string()"/>
+                        <xsl:variable name="validation-id" select="$new-validation-ids[index-of($ids-of-binds-with-constraint-attribute-and-custom-alert, $bind-id)]"/>
+                        <fb:constraint id="{$validation-id}" value="{@constraint}" level="error"/>
+                    </xsl:copy>
+                </xsl:template>
+                <xsl:template match="xf:alert[@validation and @validation = $ids-of-binds-with-constraint-attribute-and-custom-alert]">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* except @validation"/>
+                        <xsl:variable name="bind-id" select="@validation"/>
+                        <xsl:attribute name="validation" select="$new-validation-ids[index-of($ids-of-binds-with-constraint-attribute-and-custom-alert, $bind-id)]"/>
+                    </xsl:copy>
                 </xsl:template>
 
             </xsl:stylesheet>

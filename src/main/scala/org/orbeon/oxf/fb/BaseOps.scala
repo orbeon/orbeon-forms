@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import scala.collection.JavaConverters._
 
 trait BaseOps extends Logging {
 
@@ -94,6 +95,9 @@ trait BaseOps extends Logging {
         for (_ ← 1 to count)
             yield nextId
     }
+
+    def nextIdsJava(inDoc: NodeInfo, token: String, count: Int) =
+        nextIds(inDoc, token, count).asJava
 
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 

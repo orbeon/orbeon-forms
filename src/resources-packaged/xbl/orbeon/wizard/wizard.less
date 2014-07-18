@@ -14,18 +14,10 @@
 
 .orbeon .xbl-fr-wizard {
 
-    width: 940px; // Avoid having TOC wrap below the body, see #1741
-
-    .fr-wizard-toc, .fr-wizard-body {
-        display: inline-block;
-        vertical-align: top;
-        position: relative;
-    }
-
     .fr-wizard-toc {
         width: 199px;
+        float: left;
         margin-bottom: 0;
-        left: -738px;
         overflow: hidden;   // so that content is contained
 
         .nav {
@@ -59,7 +51,7 @@
 
     .fr-wizard-body {
         width: 738px;
-        left: 199px;
+        float: right;
         border-left: 1px solid darken(@wellBackground, 7%);
         border-bottom: 1px solid darken(@wellBackground, 7%);
     }

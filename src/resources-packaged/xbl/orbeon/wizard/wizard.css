@@ -1,16 +1,7 @@
-.orbeon .xbl-fr-wizard {
-  width: 940px;
-}
-.orbeon .xbl-fr-wizard .fr-wizard-toc,
-.orbeon .xbl-fr-wizard .fr-wizard-body {
-  display: inline-block;
-  vertical-align: top;
-  position: relative;
-}
 .orbeon .xbl-fr-wizard .fr-wizard-toc {
   width: 199px;
+  float: left;
   margin-bottom: 0;
-  left: -738px;
   overflow: hidden;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav {
@@ -37,7 +28,7 @@
 }
 .orbeon .xbl-fr-wizard .fr-wizard-body {
   width: 738px;
-  left: 199px;
+  float: right;
   border-left: 1px solid #e3e3e3;
   border-bottom: 1px solid #e3e3e3;
 }

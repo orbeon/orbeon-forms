@@ -54,7 +54,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:template match="/*">
-                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                    <xh:div class="fr-clear-container" xxbl:scope="outer">
                         <xh:div class="fr-wizard-body">
                             <xf:switch id="switch">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
@@ -166,7 +166,7 @@
                         </xh:div>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
                         <xsl:apply-templates select="* except fr:section"/>
-                    </xf:group>
+                    </xh:div>
                 </xsl:template>
 
                 <!-- TOC: Swallow non-relevant nodes -->

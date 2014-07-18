@@ -91,16 +91,17 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // Write constraints
         val hasSingleErrorConstraint =
             validations match {
-                case List() ⇒
+                case Nil ⇒
                     delete(existingAttributeConstraints ++ existingElementConstraints)
                     false
-                case List(ConstraintValidation(_, ErrorLevel, expression, _)) ⇒
-                    // Single error constraint, set @fb:constraint and remove all nested elements
+                case List(ConstraintValidation(_, ErrorLevel, expression, None)) ⇒
+                    // Single error constraint without custom alert: set @fb:constraint and remove all nested elements
+                    // See also: https://github.com/orbeon/orbeon-forms/issues/1829
+                    // NOTE: We could optimize further by taking this branch if there is no type or required validation.
                     updateMip(inDoc, controlName, Constraint.name, expression)
                     delete(existingElementConstraints)
                     true
                 case _ ⇒
-                    // More than one constraint or not an error constraint, create nested fb:constraint and remove attribute
                     val nestedConstraints =
                         validations map { constraint ⇒
                             <fb:constraint id={constraint.id.get} value={constraint.expression} level={constraint.level.name} xmlns:fb={FB}/>: NodeInfo

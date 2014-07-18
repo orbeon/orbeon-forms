@@ -225,7 +225,31 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             }
         }
 
-    @Test def singleConstraintHasBindId() =
+    @Test def singleConstraintWithoutCustomAlert() =
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
+
+            val newValidation =
+                <validation type="constraint" id="length5-constraint" level="error" default-alert="true">
+                    <constraint expression="string-length() gt 5"/>
+                    <alert message="" global="false"/>
+                </validation>
+
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
+
+            val expected =
+                <validation type="constraint" id="" level="error" default-alert="true">
+                    <constraint expression="string-length() gt 5"/>
+                    <alert message="" global="false"/>
+                </validation>
+
+            assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
+
+            // No elements inserted under the bind
+            val bind = findBindByName(doc, Control1).toList
+            assert(bind child * isEmpty)
+        }
+
+    @Test def singleConstraintWithCustomAlert() =
         withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val newValidation =
@@ -239,7 +263,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
 
             val expected =
-                <validation type="constraint" id="" level="error" default-alert="false">
+                <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
                     <constraint expression="string-length() gt 5"/>
                     <alert message="Length must be greater than 5" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 5"/>
@@ -248,9 +272,9 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
             assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
 
-            // No elements inserted under the bind
+            // One element inserted under the bind
             val bind = findBindByName(doc, Control1).toList
-            assert(bind child * isEmpty)
+            assert(1 ===(bind child * size))
         }
 
     @Test def requiredAndDatatypeValidations() =

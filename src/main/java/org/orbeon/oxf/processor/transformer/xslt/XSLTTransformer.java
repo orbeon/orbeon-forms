@@ -35,7 +35,7 @@ import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -285,7 +285,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     }
 
                     final Transformer transformer = transformerHandler.getTransformer();
-                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
+                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
                     transformer.setURIResolver(transformerURIResolver);
                     transformer.setErrorListener(errorListener);
                     if (smartOutputLocation)
@@ -651,7 +651,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         });
                         final TransformerURIResolver uriResolver
-                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
+                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
                         templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, createXSLTConfiguration(), errorListener, uriResolver);
                         uriResolver.destroy();
                         templatesInfo.transformerClass = transformerClass;

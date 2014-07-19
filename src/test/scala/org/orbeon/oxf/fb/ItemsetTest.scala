@@ -17,7 +17,7 @@ import collection.JavaConverters._
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
+import org.orbeon.oxf.xml.{XMLParsing, TransformerUtils}
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 import scala.xml.Elem

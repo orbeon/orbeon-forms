@@ -15,10 +15,10 @@ package org.orbeon.oxf.processor.generator;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.xml.XMLUtils;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -52,15 +52,15 @@ public class KeyPairGenerator extends ProcessorImpl {
 
                     xmlReceiver.startDocument();
 
-                    xmlReceiver.startElement("", "key-pair", "key-pair", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "key-pair", "key-pair", SAXUtils.EMPTY_ATTRIBUTES);
 
-                    xmlReceiver.startElement("", "private-key", "private-key", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "private-key", "private-key", SAXUtils.EMPTY_ATTRIBUTES);
                     final char[] privKeyChar = new char[privKey.length()];
                     privKey.getChars(0, privKey.length(), privKeyChar, 0);
                     xmlReceiver.characters(privKeyChar, 0, privKeyChar.length);
                     xmlReceiver.endElement("", "private-key", "private-key");
 
-                    xmlReceiver.startElement("", "public-key", "public-key", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "public-key", "public-key", SAXUtils.EMPTY_ATTRIBUTES);
                     final char[] pubKeyChar = new char[pubKey.length()];
                     pubKey.getChars(0, pubKey.length(), pubKeyChar, 0);
                     xmlReceiver.characters(pubKeyChar, 0, pubKeyChar.length);

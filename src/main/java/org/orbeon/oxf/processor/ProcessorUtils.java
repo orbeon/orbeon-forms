@@ -24,9 +24,7 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -162,7 +160,7 @@ public class ProcessorUtils {
             if (encoding == null)
                 encoding = DEFAULT_TEXT_READING_ENCODING;
             outputStartDocument(output, contentType, lastModified, statusCode, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
-            XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
+            SAXUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
             outputEndDocument(output, DEFAULT_TEXT_DOCUMENT_ELEMENT);
         } catch (Exception e) {
             throw new OXFException(e);
@@ -200,7 +198,7 @@ public class ProcessorUtils {
     public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified, int statusCode, String fileName) {
         try {
             outputStartDocument(output, contentType, lastModified, statusCode, fileName, XMLConstants.XS_BASE64BINARY_QNAME, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-            XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
+            SAXUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
             outputEndDocument(output, DEFAULT_BINARY_DOCUMENT_ELEMENT);
         } catch (Exception e) {
             throw new OXFException(e);

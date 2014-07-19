@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
 import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import java.io.{FileInputStream, File}
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.XMLParsing
 import util.Try
 import java.security.SignatureException
 import scala.util.control.NonFatal
@@ -183,7 +183,7 @@ private object PEVersion {
                 val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
 
                 useAndClose(new FileInputStream(new File(path))) { is ⇒
-                    Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN)
+                    Dom4jUtils.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
                 }
             }
 

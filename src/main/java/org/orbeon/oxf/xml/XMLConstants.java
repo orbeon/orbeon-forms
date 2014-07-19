@@ -85,10 +85,6 @@ public class XMLConstants {
     public static final QName XS_FLOAT_QNAME = new QName("float", XSD_NAMESPACE);
     public static final QName XS_DOUBLE_QNAME = new QName("double", XSD_NAMESPACE);
 
-    public static final String XS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XS_STRING_QNAME);
-    public static final String XS_ANYURI_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XS_ANYURI_QNAME);
-    public static final String XS_BASE64BINARY_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XS_BASE64BINARY_QNAME);
-
     public static final String OPS_TYPES_URI = "http://orbeon.org/oxf/xml/datatypes";
     public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", new Namespace("ops", OPS_TYPES_URI));
 

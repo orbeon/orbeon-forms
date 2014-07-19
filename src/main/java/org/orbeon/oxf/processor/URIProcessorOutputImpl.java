@@ -25,7 +25,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 
 import java.net.URL;
 import java.util.*;
@@ -397,7 +397,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                 // Read connection into SAXStore
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), documentSAXStore, XMLUtils.ParserConfiguration.PLAIN, true);
+                XMLParsing.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), documentSAXStore, XMLParsing.ParserConfiguration.PLAIN, true);
 
                 // Obtain last modified
                 lastModifiedLong = connectionResult.getLastModifiedJava();

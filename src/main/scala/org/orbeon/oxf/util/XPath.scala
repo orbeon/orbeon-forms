@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.xml.{XMLUtils, ShareableXPathStaticContext, NamespaceMapping}
+import org.orbeon.oxf.xml.{XMLParsing, ShareableXPathStaticContext, NamespaceMapping}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathStaticContext, XPathExpression}
 import org.orbeon.saxon.style.AttributeValueTemplate
@@ -192,7 +192,7 @@ object XPath {
                 // Saxon Document.makeDoc() changes the base to "" if it is null
                 // NOTE: We might use TransformerURIResolver/ExternalContext in the future (ThreadLocal)
                 val url = URLFactory.createURL(if (base == "") null else base, href)
-                new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(url.openStream))
+                new SAXSource(XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN), new InputSource(url.openStream))
             } catch {
                 case NonFatal(t) ⇒ throw new TransformerException(t)
             }

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
+import org.orbeon.oxf.resources.URLFactory
+
 import collection.JavaConverters._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util._
@@ -135,7 +137,7 @@ private object SubmitResponseEvent {
                         // Read stream into String
                         try {
                             val charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType)
-                            val is = new URL(tempURI).openStream()
+                            val is = URLFactory.createURL(tempURI).openStream()
                             useAndClose(new InputStreamReader(is, charset)) { reader ⇒
                                 val string = NetUtils.readStreamAsString(reader)
                                 if (XFormsProperties.getErrorLogging.contains("submission-error-body"))

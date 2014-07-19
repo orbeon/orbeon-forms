@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
@@ -26,8 +25,8 @@ import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReaderToReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -52,7 +51,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
     private URIProcessorOutputImpl processorOutput;
 
     public XFormsURIResolver(ProcessorImpl processor, URIProcessorOutputImpl processorOutput, PipelineContext pipelineContext,
-                             String prohibitedInput, XMLUtils.ParserConfiguration parserConfiguration) {
+                             String prohibitedInput, XMLParsing.ParserConfiguration parserConfiguration) {
         super(processor, pipelineContext, prohibitedInput, parserConfiguration);
         this.processorOutput = processorOutput;
     }

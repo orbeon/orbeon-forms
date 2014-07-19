@@ -29,10 +29,7 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -269,7 +266,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 if (value == null) {
                                     assert item.hasChildren();
                                     final String itemClasses = getItemClasses(item, null);
-                                    final AttributesImpl optGroupAttributes = getIdClassXHTMLAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+                                    final AttributesImpl optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null);
                                     if (label != null)
                                         optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label);
 
@@ -457,7 +454,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         // xhtml:span enclosing input and label
         final String itemClasses = getItemClasses(item, isSelected ? "xforms-selected" : "xforms-deselected");
-        final AttributesImpl spanAttributes = getIdClassXHTMLAttributes(containingDocument, reusableAttributes, XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+        final AttributesImpl spanAttributes = getIdClassXHTMLAttributes(containingDocument, reusableAttributes, SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to span
         addItemAttributes(item, spanAttributes);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
@@ -571,7 +568,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                    boolean isMultiple, Item item, boolean encode) throws SAXException {
 
         final String itemClasses = getItemClasses(item, null);
-        final AttributesImpl optionAttributes = getIdClassXHTMLAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+        final AttributesImpl optionAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to option
         addItemAttributes(item, optionAttributes);
         optionAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode));

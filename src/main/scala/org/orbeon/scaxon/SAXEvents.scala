@@ -13,9 +13,10 @@
  */
 package org.orbeon.scaxon
 
+
 import collection.mutable.ListBuffer
 import javax.xml.namespace.QName
-import org.orbeon.oxf.xml.{XMLReceiverAdapter, XMLUtils}
+import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverAdapter}
 import org.xml.sax.{Attributes, Locator}
 
 // Representation of all SAX events that are useful

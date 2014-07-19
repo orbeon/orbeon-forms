@@ -18,7 +18,7 @@ import oracle.sql.*;
 import oracle.xdb.XMLType;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -159,7 +159,7 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
         } else {
             // FIXME: Xerces throws when walking the tree if we return the DOM directly!!!
 //                doc = xmlType.getDOM();
-            doc = XMLUtils.stringToDOM(xmlType.getStringVal());
+            doc = XMLParsing.stringToDOM(xmlType.getStringVal());
         }
 
         return doc;

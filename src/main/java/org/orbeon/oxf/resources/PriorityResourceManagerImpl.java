@@ -15,8 +15,8 @@ package org.orbeon.oxf.resources;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
 
@@ -100,7 +100,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
     
-    public Document getContentAsDOM4J(final String key, final XMLUtils.ParserConfiguration parserConfiguration, final boolean handleLexical) {
+    public Document getContentAsDOM4J(final String key, final XMLParsing.ParserConfiguration parserConfiguration, final boolean handleLexical) {
         return (Document) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
                 return resourceManager.getContentAsDOM4J(key, parserConfiguration, handleLexical);
@@ -117,7 +117,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    public void getContentAsSAX(final String key, final XMLReceiver xmlReceiver, final XMLUtils.ParserConfiguration parserConfiguration, final boolean handleLexical) {
+    public void getContentAsSAX(final String key, final XMLReceiver xmlReceiver, final XMLParsing.ParserConfiguration parserConfiguration, final boolean handleLexical) {
         delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
                 resourceManager.getContentAsSAX(key, xmlReceiver, parserConfiguration, handleLexical);

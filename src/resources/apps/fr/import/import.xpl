@@ -22,7 +22,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:saxon="http://saxon.sf.net/"
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          xmlns:utils="java:org.orbeon.oxf.xml.XMLUtils">
+          xmlns:utils="java:org.orbeon.oxf.xml.SaxonUtils">
 
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>

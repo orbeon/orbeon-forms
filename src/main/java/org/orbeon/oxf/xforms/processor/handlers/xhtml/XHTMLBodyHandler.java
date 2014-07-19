@@ -56,7 +56,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Add class for YUI skin
         // TODO: should be configurable somehow
-        attributes = XMLUtils.appendToClassAttribute(attributes, "yui-skin-sam");
+        attributes = SAXUtils.appendToClassAttribute(attributes, "yui-skin-sam");
 
         // Start xhtml:body
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();

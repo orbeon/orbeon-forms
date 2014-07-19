@@ -43,7 +43,7 @@ public class TransformerURIResolver implements URIResolver {
     private ProcessorImpl processor;
     private PipelineContext pipelineContext;
     private String prohibitedInput;
-    private XMLUtils.ParserConfiguration parserConfiguration;
+    private XMLParsing.ParserConfiguration parserConfiguration;
     private String mode;
     private boolean destroyPipelineContext;
 
@@ -55,7 +55,7 @@ public class TransformerURIResolver implements URIResolver {
      * @param prohibitedInput       name of an input which triggers and exception if read (usually "data" or "config")
      * @param parserConfiguration   parser configuration
      */
-    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, XMLUtils.ParserConfiguration parserConfiguration) {
+    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, XMLParsing.ParserConfiguration parserConfiguration) {
         this(processor, pipelineContext, prohibitedInput, parserConfiguration, null);
     }
 
@@ -68,7 +68,7 @@ public class TransformerURIResolver implements URIResolver {
      * @param parserConfiguration   parser configuration
      * @param mode                  "xml", "html", "text" or "binary"
      */
-    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, XMLUtils.ParserConfiguration parserConfiguration, String mode) {
+    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, XMLParsing.ParserConfiguration parserConfiguration, String mode) {
         this.processor = processor;
         this.pipelineContext = pipelineContext;
         this.prohibitedInput = prohibitedInput;
@@ -81,7 +81,7 @@ public class TransformerURIResolver implements URIResolver {
      *
      * @param parserConfiguration   parser configuration
      */
-    public TransformerURIResolver(XMLUtils.ParserConfiguration parserConfiguration) {
+    public TransformerURIResolver(XMLParsing.ParserConfiguration parserConfiguration) {
         this(null, new PipelineContext(), null, parserConfiguration);
         destroyPipelineContext = true;
     }

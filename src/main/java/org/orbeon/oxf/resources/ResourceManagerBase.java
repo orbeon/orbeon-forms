@@ -16,12 +16,9 @@ package org.orbeon.oxf.resources;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.resources.handler.OXFHandler;
-import org.orbeon.oxf.xml.ForwardingXMLReceiver;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLReaderToReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Node;
@@ -64,7 +61,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
     public Node getContentAsDOM(String key) {
         try {
             final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-            final DOMResult domResult = new DOMResult(XMLUtils.createDocument());
+            final DOMResult domResult = new DOMResult(XMLParsing.createDocument());
             identity.setResult(domResult);
             getContentAsSAX(key, identity);
             return domResult.getNode();
@@ -79,22 +76,22 @@ public abstract class ResourceManagerBase implements ResourceManager {
         return lch.getDocument();
     }
     
-    public org.dom4j.Document getContentAsDOM4J(String key, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public org.dom4j.Document getContentAsDOM4J(String key, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical) {
         final LocationSAXContentHandler lch = new LocationSAXContentHandler();
         getContentAsSAX(key, lch, parserConfiguration, handleLexical);
         return lch.getDocument();
     }
 
     public void getContentAsSAX(final String key, XMLReceiver handler) {
-        getContentAsSAX(key, handler, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, true);
+        getContentAsSAX(key, handler, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, true);
     }
 
-    public void getContentAsSAX(String key, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public void getContentAsSAX(String key, XMLReceiver xmlReceiver, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical) {
         InputStream inputStream = null;
         final Locator[] locator = new Locator[1];
         try {
             inputStream = getContentAsStream(key);
-            XMLUtils.inputStreamToSAX(inputStream, OXFHandler.PROTOCOL + ":" + key, new ForwardingXMLReceiver(xmlReceiver) {
+            XMLParsing.inputStreamToSAX(inputStream, OXFHandler.PROTOCOL + ":" + key, new ForwardingXMLReceiver(xmlReceiver) {
                 public void setDocumentLocator(Locator loc) {
                     locator[0] = loc;
                     super.setDocumentLocator(loc);

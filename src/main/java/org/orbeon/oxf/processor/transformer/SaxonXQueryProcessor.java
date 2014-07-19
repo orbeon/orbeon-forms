@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
@@ -25,7 +26,6 @@ import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.query.DynamicQueryContext;
@@ -70,7 +70,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
                     // Create XQuery configuration (depends on attributes input)
-                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
+                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
                     // NOTE: Don't use global configuration, which is immutable
                     final Configuration configuration = new Configuration();

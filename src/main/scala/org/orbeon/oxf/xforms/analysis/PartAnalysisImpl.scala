@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
+
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.util.XPathCache
@@ -23,14 +26,13 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}
 import collection.mutable.Buffer
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
-import org.orbeon.oxf.xml.XMLUtils.DebugXML
 
 /**
  * Static analysis of a whole part, including:
@@ -264,7 +266,7 @@ class PartAnalysisImpl(
         controlAnalysisMap(startScope.prefixedIdForStaticId("#document")).toXML(helper)
 
     def dumpAnalysis() =
-        println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(this)))
+        println(Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this)))
 }
 
 object PartAnalysisImpl {

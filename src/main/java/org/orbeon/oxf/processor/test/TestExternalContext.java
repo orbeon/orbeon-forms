@@ -26,8 +26,8 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.TestWebAppContext;
 import org.orbeon.oxf.webapp.WebAppContext;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.sax.SAXSource;

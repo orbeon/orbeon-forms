@@ -18,11 +18,11 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXException;
 
@@ -79,7 +79,7 @@ public class AggregatorProcessor extends ProcessorImpl {
                     xmlReceiver.startDocument();
                     if (!rootNamespaceURI.equals(""))
                         xmlReceiver.startPrefixMapping(rootPrefix, rootNamespaceURI);
-                    xmlReceiver.startElement(rootNamespaceURI, rootLocalName, rootQName, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement(rootNamespaceURI, rootLocalName, rootQName, SAXUtils.EMPTY_ATTRIBUTES);
 
                     // Processor input processors
                     for (Iterator i = getInputsByName(INPUT_DATA).iterator(); i.hasNext();) {

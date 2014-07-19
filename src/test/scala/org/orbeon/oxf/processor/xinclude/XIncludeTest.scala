@@ -15,8 +15,8 @@ package org.orbeon.oxf.processor.xinclude
 
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xml.XMLUtils.ParserConfiguration.XINCLUDE_ONLY
-import org.orbeon.oxf.xml.{JXQName, XMLUtils}
+import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration.XINCLUDE_ONLY
+import org.orbeon.oxf.xml.{JXQName, XMLParsing}
 import org.orbeon.scaxon.SAXEvents._
 import org.scalatest.junit.AssertionsForJUnit
 import JXQName._
@@ -36,7 +36,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
         val collector = new DocumentAndElementsCollector
         
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include11.xml", collector, XINCLUDE_ONLY, true)
+        XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include11.xml", collector, XINCLUDE_ONLY, true)
         
         val expected = Seq(
             StartDocument,
@@ -68,7 +68,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
         val collector = new DocumentAndElementsCollector
 
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include21.xml", collector, XINCLUDE_ONLY, true)
+        XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include21.xml", collector, XINCLUDE_ONLY, true)
         
         val expected = Seq(
             StartDocument,
@@ -98,7 +98,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
         val collector = new DocumentAndElementsCollector
 
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include31.xml", collector, XINCLUDE_ONLY, true)
+        XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include31.xml", collector, XINCLUDE_ONLY, true)
 
         val expected = Seq(
             StartDocument,
@@ -120,7 +120,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
         val collector = new DocumentAndElementsCollector
 
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include41.xml", collector, XINCLUDE_ONLY, true)
+        XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include41.xml", collector, XINCLUDE_ONLY, true)
 
         val expected = Seq(
             StartDocument,

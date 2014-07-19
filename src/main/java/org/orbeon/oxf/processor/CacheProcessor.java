@@ -20,11 +20,8 @@ import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.DateUtils;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XMLReceiverAdapter;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.value.DurationValue;
 import org.xml.sax.Locator;
@@ -96,7 +93,7 @@ public class CacheProcessor extends ProcessorImpl {
             // Get a digest of the key input, if possible from cache
             state.keyDigest = readCacheInputAsObject(context, getInputByName(INPUT_KEY), new CacheableInputReader<String>() {
                 public String read(PipelineContext context, ProcessorInput input) {
-                    XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler();
+                    DigestContentHandler digestContentHandler = new DigestContentHandler();
                     readInputAsSAX(context, input, digestContentHandler);
                     return new String(digestContentHandler.getResult());
                 }

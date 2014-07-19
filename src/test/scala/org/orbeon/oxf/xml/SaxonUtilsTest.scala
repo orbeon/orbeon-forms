@@ -16,21 +16,21 @@ package org.orbeon.oxf.xml
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 
-class XMLUtilsTest extends AssertionsForJUnit {
+class SaxonUtilsTest extends AssertionsForJUnit {
 
     @Test def makeNCName() {
 
         intercept[IllegalArgumentException] {
-            XMLUtils.makeNCName("")
+            SaxonUtils.makeNCName("")
         }
 
         intercept[IllegalArgumentException] {
-            XMLUtils.makeNCName("  ")
+            SaxonUtils.makeNCName("  ")
         }
 
-        assert("foo"      === XMLUtils.makeNCName("foo"))
-        assert("_foo_"    === XMLUtils.makeNCName(" foo "))
-        assert("_2foos"   === XMLUtils.makeNCName("42foos"))
-        assert("foo_bar_" === XMLUtils.makeNCName("foo(bar)"))
+        assert("foo"      === SaxonUtils.makeNCName("foo"))
+        assert("_foo_"    === SaxonUtils.makeNCName(" foo "))
+        assert("_2foos"   === SaxonUtils.makeNCName("42foos"))
+        assert("foo_bar_" === SaxonUtils.makeNCName("foo(bar)"))
     }
 }

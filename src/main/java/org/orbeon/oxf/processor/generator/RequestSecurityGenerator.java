@@ -17,10 +17,8 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
 import java.security.Principal;
@@ -46,7 +44,7 @@ public class RequestSecurityGenerator extends ProcessorImpl {
                 try {
                     xmlReceiver.startDocument();
                     String rootElementName = "request-security";
-                    xmlReceiver.startElement("", rootElementName, rootElementName, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", rootElementName, rootElementName, SAXUtils.EMPTY_ATTRIBUTES);
 
                     ExternalContext.Request request = externalContext.getRequest();
                     addElement(xmlReceiver, "auth-type", request.getAuthType());
@@ -90,7 +88,7 @@ public class RequestSecurityGenerator extends ProcessorImpl {
     protected void addElement(ContentHandler contentHandler, String name, String value)
             throws Exception {
         if (value != null) {
-            contentHandler.startElement("", name, name, XMLUtils.EMPTY_ATTRIBUTES);
+            contentHandler.startElement("", name, name, SAXUtils.EMPTY_ATTRIBUTES);
             addString(contentHandler, value);
             contentHandler.endElement("", name, name);
         }

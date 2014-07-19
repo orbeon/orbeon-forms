@@ -19,15 +19,14 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.xml.NamespaceCleanupXMLReceiver;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,8 +57,8 @@ public class Dom4jUtils {
         NULL_DOCUMENT.setRootElement(nullElement);
     }
 
-    private static SAXReader createSAXReader(XMLUtils.ParserConfiguration parserConfiguration) throws SAXException {
-        final XMLReader xmlReader = XMLUtils.newXMLReader(parserConfiguration);
+    private static SAXReader createSAXReader(XMLParsing.ParserConfiguration parserConfiguration) throws SAXException {
+        final XMLReader xmlReader = XMLParsing.newXMLReader(parserConfiguration);
 
         final SAXReader saxReader = new SAXReader(xmlReader);
         final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
@@ -68,7 +67,7 @@ public class Dom4jUtils {
     }
 
     private static SAXReader createSAXReader() throws SAXException {
-        return createSAXReader(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
+        return createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY);
     }
 
     /**
@@ -230,7 +229,7 @@ public class Dom4jUtils {
      * @param parserConfiguration   parser configuration
      * @return                      document
      */
-    public static Document readFromURL(String urlString, XMLUtils.ParserConfiguration parserConfiguration) {
+    public static Document readFromURL(String urlString, XMLParsing.ParserConfiguration parserConfiguration) {
         InputStream is = null;
         try {
             final URL url = URLFactory.createURL(urlString);
@@ -263,23 +262,23 @@ public class Dom4jUtils {
      * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it creates work for GC
      * (because it relies on JAXP).
      */
-    public static Document readDom4j(String xmlString, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
+    public static Document readDom4j(String xmlString, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader(parserConfiguration);
         final StringReader stringReader = new StringReader(xmlString);
         return saxReader.read(stringReader);
     }
 
     public static Document readDom4j(String xmlString) throws SAXException, DocumentException {
-        return readDom4j(xmlString, XMLUtils.ParserConfiguration.PLAIN);
+        return readDom4j(xmlString, XMLParsing.ParserConfiguration.PLAIN);
     }
 
-    public static Document readDom4j(InputStream inputStream, String uri, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
+    public static Document readDom4j(InputStream inputStream, String uri, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader(parserConfiguration);
         return saxReader.read(inputStream, uri);
     }
 
     public static Document readDom4j(InputStream inputStream) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(XMLUtils.ParserConfiguration.PLAIN);
+        final SAXReader saxReader = createSAXReader(XMLParsing.ParserConfiguration.PLAIN);
         return saxReader.read(inputStream);
     }
 
@@ -430,13 +429,13 @@ public class Dom4jUtils {
          */
         final LocationDocumentSource lds = new LocationDocumentSource(d);
         final XMLReader rdr = lds.getXMLReader();
-        rdr.setErrorHandler(XMLUtils.ERROR_HANDLER);
+        rdr.setErrorHandler(XMLParsing.ERROR_HANDLER);
         return lds;
     }
 
     public static byte[] getDigest(Document document) {
         final DocumentSource ds = getDocumentSource(document);
-        return XMLUtils.getDigest(ds);
+        return DigestContentHandler.getDigest(ds);
     }
 
     /**
@@ -845,11 +844,51 @@ public class Dom4jUtils {
     }
 
     public static String attributeToDebugString(Attribute attribute) {
-        final StringBuilder sb = new StringBuilder(attribute.getQualifiedName());
-        sb.append("=\"");
-        sb.append(attribute.getValue());
-        sb.append('\"');
-        return sb.toString();
+        return attribute.getQualifiedName() + "=\"" + attribute.getValue() + '\"';
+    }
+
+    /**
+     * Convert dom4j attributes to SAX attributes.
+     *
+     * @param element   dom4j Element
+     * @return          SAX Attributes
+     */
+    public static AttributesImpl getSAXAttributes(Element element) {
+        final AttributesImpl result = new AttributesImpl();
+        for (Iterator i = element.attributeIterator(); i.hasNext();) {
+            final Attribute attribute = (Attribute) i.next();
+
+            result.addAttribute(attribute.getNamespaceURI(), attribute.getName(), attribute.getQualifiedName(),
+                    XMLReceiverHelper.CDATA, attribute.getValue());
+        }
+        return result;
+    }
+
+    public static Document createDocument(DebugXML debugXML) {
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
+        final LocationDocumentResult result = new LocationDocumentResult();
+        identity.setResult(result);
+
+        final XMLReceiverHelper helper = new XMLReceiverHelper(new ForwardingXMLReceiver(identity) {
+            @Override
+            public void startDocument() {}
+            @Override
+            public void endDocument() {}
+        });
+
+        try {
+            identity.startDocument();
+            debugXML.toXML(helper);
+            identity.endDocument();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+
+        return result.getDocument();
+    }
+
+    public static String buildExplodedQName(QName qName) {
+        return XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
     }
 
     public static interface VisitorListener {
@@ -858,33 +897,7 @@ public class Dom4jUtils {
         void text(Text text);
     }
 
-    private static void findPrecedingElements(List<Element> finalResult, Element startElement, Element ancestorElement) {
-        final Element parentElement = startElement.getParent();
-        if (parentElement == null)
-            return;
-
-        final List siblingElements = parentElement.elements();
-        if (siblingElements.size() > 1) {
-            final List<Element> result = new ArrayList<Element>();
-            for (Iterator i = siblingElements.iterator(); i.hasNext();) {
-                final Element currentElement = (Element) i.next();
-
-                if (currentElement == startElement)
-                    break;
-
-                result.add(currentElement);
-            }
-
-            Collections.reverse(result);
-            finalResult.addAll(result);
-        }
-
-        // Add parent
-        finalResult.add(ancestorElement);
-
-        // Find parent's preceding elements
-        if (parentElement != ancestorElement) {
-            findPrecedingElements(finalResult, parentElement, ancestorElement);
-        }
+    public interface DebugXML {
+        void toXML(XMLReceiverHelper helper);
     }
 }

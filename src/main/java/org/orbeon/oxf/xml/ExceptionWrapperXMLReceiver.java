@@ -212,7 +212,7 @@ public class ExceptionWrapperXMLReceiver extends SimpleForwardingXMLReceiver {
 
     private void wrapException(Exception e, String uri, String qName, Attributes attributes) throws SAXException {
         if (locator != null)
-            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(new LocationData(locator), message, new String[]{"element", XMLUtils.saxElementToDebugString(uri, qName, attributes)}));
+            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(new LocationData(locator), message, new String[]{"element", SAXUtils.saxElementToDebugString(uri, qName, attributes)}));
         else if (e instanceof SAXException)
             throw (SAXException) e;
         else if (e instanceof RuntimeException)

@@ -20,13 +20,10 @@ import org.exolab.castor.xml.Marshaller;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
@@ -122,13 +119,13 @@ public class ScopeGenerator extends ScopeProcessorBase {
                             // Store empty document
                             if (nullDocumentSAXStore == null) {
                                 nullDocumentSAXStore = new SAXStore();
-                                XMLUtils.streamNullDocument(nullDocumentSAXStore);
+                                SAXUtils.streamNullDocument(nullDocumentSAXStore);
                             }
                             state.saxStore = nullDocumentSAXStore;
                         }
 
                         // Compute digest of the SAX Store
-                        XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler();
+                        DigestContentHandler digester = new DigestContentHandler();
                         state.saxStore.replay(digester);
                         state.digest = digester.getResult();
                     }
@@ -151,7 +148,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                 ProcessorUtils.readText((String) value, result, contentType, System.currentTimeMillis());
             } else {
                 logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + key);
-                XMLUtils.streamNullDocument(result);
+                SAXUtils.streamNullDocument(result);
             }
             return result;
         } else {
@@ -181,7 +178,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) value), resultStore);
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse
-                    XMLUtils.stringToSAX((String) value, "", resultStore, XMLUtils.ParserConfiguration.PLAIN, true);
+                    XMLParsing.stringToSAX((String) value, "", resultStore, XMLParsing.ParserConfiguration.PLAIN, true);
                 } else {
                     // Consider the object a JavaBean
                     readBean(value, mapping, resultStore);
@@ -197,7 +194,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
             contentHandler.startDocument();
 
             // Initialize Castor
-            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getParser());
+            ParserAdapter adapter = new ParserAdapter(XMLParsing.newSAXParser(XMLParsing.ParserConfiguration.PLAIN).getParser());
             adapter.setContentHandler(contentHandler);
             Marshaller marshaller = new Marshaller(adapter);
             marshaller.setMarshalAsDocument(false);

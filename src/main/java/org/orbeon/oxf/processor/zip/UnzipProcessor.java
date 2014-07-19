@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -24,7 +25,6 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.DateUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -60,7 +60,7 @@ public class UnzipProcessor extends ProcessorImpl {
 
                     xmlReceiver.startDocument();
                     // <files>
-                    xmlReceiver.startElement("", "files", "files", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "files", "files", SAXUtils.EMPTY_ATTRIBUTES);
                     ZipFile zipFile = new ZipFile(temporaryZipFile);
                     for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
                         // Go through each entry in the zip file

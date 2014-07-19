@@ -115,7 +115,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Perform transformation
                     final Transformer transformer = templates.newTransformer();
-                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN));
+                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN));
 
                     final SAXResult saxResult = new SAXResult(xmlReceiver);
                     saxResult.setLexicalHandler(xmlReceiver);

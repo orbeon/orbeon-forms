@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{XMLUtils, SAXUtils, XMLReceiverHelper}
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
@@ -153,7 +153,7 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
                 if (StringUtils.isBlank(hrefValue)) {
                     // No URL so make sure a click doesn't cause navigation, and add class
                     containerAttributes.addAttribute("", "href", "href", CDATA, "#")
-                    XMLUtils.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")
+                    SAXUtils.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")
                 } else {
                     // URL value
                     containerAttributes.addAttribute("", "href", "href", CDATA, hrefValue)

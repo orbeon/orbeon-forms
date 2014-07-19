@@ -29,7 +29,7 @@ import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.HttpStatusCodeException;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
@@ -110,7 +110,7 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical,
+                      boolean ignoreConnectionEncoding, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical,
                       String mode, Map<String, String[]> headerNameValues, String forwardHeaders, List<String> readHeaders,
                       boolean cacheUseLocalCache, boolean enableConditionalGET) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
@@ -130,7 +130,7 @@ public class URLGenerator extends ProcessorImpl {
         private Map<String, String[]> headerNameValues;
         private String forwardHeaders;
         private List<String> readHeaders;
-        private XMLUtils.ParserConfiguration parserConfiguration = null;
+        private XMLParsing.ParserConfiguration parserConfiguration = null;
         private boolean handleLexical = DEFAULT_HANDLE_LEXICAL;
 
         private String mode;
@@ -147,13 +147,13 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url) {
             this.url = url;
-            this.parserConfiguration = XMLUtils.ParserConfiguration.PLAIN;
+            this.parserConfiguration = XMLParsing.ParserConfiguration.PLAIN;
             this.tidyConfig = new TidyConfig(null);
         }
 
         public Config(URL url, boolean handleXInclude) {
             this.url = url;
-            this.parserConfiguration = new XMLUtils.ParserConfiguration(DEFAULT_VALIDATING, handleXInclude, DEFAULT_EXTERNAL_ENTITIES);
+            this.parserConfiguration = new XMLParsing.ParserConfiguration(DEFAULT_VALIDATING, handleXInclude, DEFAULT_EXTERNAL_ENTITIES);
             this.tidyConfig = new TidyConfig(null);
         }
 
@@ -166,7 +166,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration,
+                      boolean ignoreConnectionEncoding, XMLParsing.ParserConfiguration parserConfiguration,
                       boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
                       List<String> readHeaders, boolean cacheUseLocalCache, boolean enableConditionalGET, String username,
                       String password, boolean preemptiveAuthentication, String domain, TidyConfig tidyConfig) {
@@ -231,7 +231,7 @@ public class URLGenerator extends ProcessorImpl {
             return tidyConfig;
         }
 
-        public XMLUtils.ParserConfiguration getParserConfiguration() {
+        public XMLParsing.ParserConfiguration getParserConfiguration() {
             return parserConfiguration;
         }
 
@@ -409,7 +409,7 @@ public class URLGenerator extends ProcessorImpl {
 
                             // Create configuration
                             final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                    ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
+                                    ignoreConnectionEncoding, new XMLParsing.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
                                     headerNameValues, forwardHeaders, readHeaders,
                                     cacheUseLocalCache, enableConditionalGET,
                                     username, password, preemptiveAuthentication, domain,
@@ -796,11 +796,11 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
-            final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+            final XMLParsing.ParserConfiguration parserConfiguration = new XMLParsing.ParserConfiguration(config.getParserConfiguration(), uriReferences);
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-                XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(),
+                XMLParsing.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(),
                         xmlReceiver, parserConfiguration, config.isHandleLexical());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
@@ -963,9 +963,9 @@ public class URLGenerator extends ProcessorImpl {
             openConnection();
             checkStatusCode();
 
-            final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+            final XMLParsing.ParserConfiguration parserConfiguration = new XMLParsing.ParserConfiguration(config.getParserConfiguration(), uriReferences);
             try {
-                final XMLReader reader = XMLUtils.newXMLReader(parserConfiguration);
+                final XMLReader reader = XMLParsing.newXMLReader(parserConfiguration);
                 reader.setContentHandler(xmlReceiver);
                 // TODO: lexical handler?
                 final InputSource inputSource;
@@ -1077,10 +1077,10 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
-            final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+            final XMLParsing.ParserConfiguration parserConfiguration = new XMLParsing.ParserConfiguration(config.getParserConfiguration(), uriReferences);
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
-                XMLUtils.readerToSAX(new InputStreamReader(System.in, getExternalEncoding()), config.getURL().toExternalForm(),
+                XMLParsing.readerToSAX(new InputStreamReader(System.in, getExternalEncoding()), config.getURL().toExternalForm(),
                         xmlReceiver, parserConfiguration, config.isHandleLexical());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding

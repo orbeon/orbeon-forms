@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.xml.XMLUtils._
+import org.orbeon.oxf.xml.XMLParsing._
+import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import scala.util.matching.Regex
 
 object URLFinder {

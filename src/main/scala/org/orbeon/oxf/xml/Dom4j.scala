@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import dom4j.Dom4jUtils._
 import org.dom4j._
 import java.util.{List ⇒ JList, Map ⇒ JMap}
@@ -76,7 +76,7 @@ object Dom4j {
     // An ordering for attributes, which takes into account the namespace URI and the local name
     private implicit object AttributeOrdering extends Ordering[Attribute] {
         def compare(x: Attribute, y: Attribute) =
-            XMLUtils.buildExplodedQName(x.getQName) compare XMLUtils.buildExplodedQName(y.getQName)
+            Dom4jUtils.buildExplodedQName(x.getQName) compare Dom4jUtils.buildExplodedQName(y.getQName)
     }
 
     private def compareTwoNodes(left: Node, right: Node)(normalizeText: String ⇒ String): Boolean =

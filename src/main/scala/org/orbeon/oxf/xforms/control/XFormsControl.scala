@@ -23,8 +23,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventObserver
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.ForwardingXMLReceiver
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{XMLUtils, ForwardingXMLReceiver}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.xml.dom4j.LocationData

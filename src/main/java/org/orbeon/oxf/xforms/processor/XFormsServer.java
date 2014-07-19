@@ -256,7 +256,7 @@ public class XFormsServer extends ProcessorImpl {
                                         // Redirect already sent
                                         // Output null document so that rest of pipeline doesn't fail and no further processing takes place
                                         indentedLogger.logDebug("response", "handling submission with replace=\"all\" with redirect");
-                                        XMLUtils.streamNullDocument(xmlReceiver);
+                                        SAXUtils.streamNullDocument(xmlReceiver);
                                     } else if (!isNoscript) {
                                         // This is an Ajax response
                                         indentedLogger.startHandleOperation("response", "handling regular Ajax response");
@@ -422,7 +422,7 @@ public class XFormsServer extends ProcessorImpl {
             externalContext.getResponse().sendRedirect(location, false, false);
 
             // Output null document so that rest of pipeline doesn't fail and no further processing takes place
-            XMLUtils.streamNullDocument(xmlReceiver);
+            SAXUtils.streamNullDocument(xmlReceiver);
         } else {
             // The template is stored either in the static state or in the dynamic state
             final AnnotatedTemplate template; {

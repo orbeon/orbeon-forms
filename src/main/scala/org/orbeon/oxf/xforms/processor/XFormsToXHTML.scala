@@ -80,7 +80,7 @@ object XFormsToXHTML {
             externalContext.getResponse.sendRedirect(location, false, false)
             
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-            XMLUtils.streamNullDocument(xmlReceiver)
+            SAXUtils.streamNullDocument(xmlReceiver)
         } else {
             // 3. Regular case: produce an XHTML document out
             implicit val controller = new ElementHandlerController

@@ -17,8 +17,9 @@ import org.dom4j.{Document, Element}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.htmlStringToDom4jTagSoup
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.controls.XMLCleaner.cleanXML
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.domToString
 
 /**
@@ -52,7 +53,7 @@ class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, elem
                     }
 
                     def cleanWithXSLT(document: Document) = {
-                        val cleanedDocument = XMLUtils.cleanXML(document, "oxf:/ops/xforms/clean-html.xsl")
+                        val cleanedDocument = XMLCleaner.cleanXML(document, "oxf:/ops/xforms/clean-html.xsl")
 
                         // Remove dummy tag are added by the XSLT
                         domToString(cleanedDocument) match {

@@ -60,7 +60,7 @@ package org.orbeon.oxf.xml.xerces;
 import orbeon.apache.xerces.impl.Constants;
 import orbeon.apache.xerces.jaxp.JAXPConstants;
 import orbeon.apache.xerces.util.SAXMessageFormatter;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -133,7 +133,7 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser {
      *
      * @param features Map of SAX features
      */
-    XercesJAXPSAXParser(SAXParserFactory spf, Map<String, Boolean> features, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException {
+    XercesJAXPSAXParser(SAXParserFactory spf, Map<String, Boolean> features, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException {
 
         // Instantiate a SAXParser directly and not through SAX so that we
         // use the right ClassLoader

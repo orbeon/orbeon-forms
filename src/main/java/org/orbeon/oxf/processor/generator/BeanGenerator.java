@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -117,10 +117,10 @@ public class BeanGenerator extends ProcessorImpl {
         try {
             xmlReceiver.startDocument();
             String rootElementName = "beans";
-            xmlReceiver.startElement("", rootElementName, rootElementName, XMLUtils.EMPTY_ATTRIBUTES);
+            xmlReceiver.startElement("", rootElementName, rootElementName, SAXUtils.EMPTY_ATTRIBUTES);
 
             // Initialize Castor
-            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getParser());
+            ParserAdapter adapter = new ParserAdapter(XMLParsing.newSAXParser(XMLParsing.ParserConfiguration.PLAIN).getParser());
             adapter.setContentHandler(xmlReceiver);
             Marshaller marshaller = new Marshaller(adapter);
             marshaller.setMarshalAsDocument(false);
@@ -133,7 +133,7 @@ public class BeanGenerator extends ProcessorImpl {
                     // Create empty element
                     if (logger.isInfoEnabled())
                         logger.info("Bean " + attName + " is null");
-                    xmlReceiver.startElement("", attName, attName, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", attName, attName, SAXUtils.EMPTY_ATTRIBUTES);
                     xmlReceiver.endElement("", attName, attName);
                 } else if (bean instanceof org.w3c.dom.Document) {
                     // W3C Document: send as-is
@@ -176,7 +176,7 @@ public class BeanGenerator extends ProcessorImpl {
                 State state = (State) digestState;
                 if (state.beanStore == null) {
                     state.beanStore = new SAXStore();
-                    final XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler();
+                    final DigestContentHandler digester = new DigestContentHandler();
                     final TeeXMLReceiver tee = new TeeXMLReceiver(Arrays.asList(state.beanStore, digester));
                     readBean(pipelineContext, getConfig(pipelineContext), getMapping(pipelineContext), tee);
                     state.digest = digester.getResult();

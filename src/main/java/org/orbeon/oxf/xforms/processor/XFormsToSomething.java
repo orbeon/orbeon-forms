@@ -173,7 +173,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         // Create containing document and initialize XForms engine
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToSomething.this, processorOutput,
-                                pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
+                                pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLParsing.ParserConfiguration.PLAIN);
 
                         containingDocument[0] =
                             new XFormsContainingDocument(
@@ -236,7 +236,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                 }
 
                 final XFormsURIResolver uriResolver =
-                    new XFormsURIResolver(XFormsToSomething.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
+                    new XFormsURIResolver(XFormsToSomething.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLParsing.ParserConfiguration.PLAIN);
 
                 containingDocument[0] =
                     new XFormsContainingDocument(
@@ -328,7 +328,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             final LocationDocumentResult documentResult = new LocationDocumentResult();
             documentReceiver.setResult(documentResult);
 
-            final XMLUtils.DigestContentHandler digestReceiver = computeDigest ? new XMLUtils.DigestContentHandler() : null;
+            final DigestContentHandler digestReceiver = computeDigest ? new DigestContentHandler() : null;
             final XMLReceiver extractorOutput;
             if (isLogStaticStateInput) {
                 extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver, getDebugReceiver(logger)) : new TeeXMLReceiver(documentReceiver, getDebugReceiver(logger));

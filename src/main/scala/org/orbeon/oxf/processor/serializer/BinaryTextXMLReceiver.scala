@@ -20,14 +20,14 @@ import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
-import org.orbeon.oxf.pipeline.api.{ExternalContext}
+import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.Base64XMLReceiver
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.NetUtils.{getContentTypeMediaType, getContentTypeCharset}
 import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 import org.orbeon.oxf.util.TextXMLReceiver
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter, XMLUtils}
+import org.orbeon.oxf.xml.{XMLUtils, XMLReceiver, XMLReceiverAdapter}
 import org.orbeon.scaxon.XML
 import org.xml.sax.Attributes
 import collection.mutable

@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Collections;
@@ -157,12 +158,6 @@ public class XFormsConstants {
     public static final QName XBL_HANDLER_QNAME = new QName("handler", XBL_NAMESPACE);
     public static final QName XBL_IMPLEMENTATION_QNAME = new QName("implementation", XBL_NAMESPACE);
 
-    public static final QName XBL_HANDLER_EVENT_ATTRIBUTE_QNAME = new QName("event");
-    public static final QName XBL_HANDLER_PHASE_ATTRIBUTE_QNAME = new QName("phase");
-    public static final QName XBL_HANDLER_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate");
-    // NOTE: XBL 2 working draft has "default-action" instead
-    public static final QName XBL_HANDLER_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction");
-
     public static final QName ELEMENT_QNAME = new QName("element");
     public static final QName INCLUDES_QNAME = new QName("includes");
 
@@ -200,7 +195,6 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME = new QName("observer");
     public static final QName XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME = new QName("target", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_TARGET_ATTRIBUTE_QNAME = new QName("target");
-    public static final QName XML_EVENTS_EV_HANDLER_ATTRIBUTE_QNAME = new QName("handler", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME = new QName("phase", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_PHASE_ATTRIBUTE_QNAME = new QName("phase");
     public static final QName XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
@@ -258,12 +252,8 @@ public class XFormsConstants {
     public static final QName XFORMS_SUBMISSION_QNAME = new QName("submission", XFORMS_NAMESPACE);
     public static final QName XFORMS_HEADER_QNAME = new QName("header", XFORMS_NAMESPACE);
 
-    public static final QName XXFORMS_CONTROLS_QNAME = new QName("controls", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_MODELS_QNAME = new QName("models", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_INSTANCES_QNAME = new QName("instances", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENT_QNAME = new QName("event", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENTS_QNAME = new QName("events", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_DIVS_QNAME = new QName("divs", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PROPERTY_QNAME = new QName("property", XXFORMS_NAMESPACE);
 
     public static final QName LABEL_QNAME = new QName("label", XFORMS_NAMESPACE);
@@ -276,14 +266,12 @@ public class XFormsConstants {
     public static final QName XFORMS_ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);
     public static final QName XFORMS_ITEM_QNAME = new QName("item", XFORMS_NAMESPACE);
     public static final QName XFORMS_CHOICES_QNAME = new QName("choices", XFORMS_NAMESPACE);
-    public static final QName LOAD_QNAME = new QName("load", XFORMS_NAMESPACE);
 
     public static final String XFORMS_SUBMIT_REPLACE_ALL = "all";
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
     public static final String XFORMS_SUBMIT_REPLACE_TEXT = "text";
     public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
 
-    public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance";
     public static final QName XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
 
@@ -363,17 +351,16 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_UPDATE_QNAME = new QName("update", XXFORMS_NAMESPACE);
     public static final String XFORMS_FULL_UPDATE = "full";
-    public static final String XFORMS_INCREMENTAL_UPDATE = "incremental";
 
     public static final QName XXFORMS_XFORMS11_SWITCH_QNAME = new QName("xforms11-switch", XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_INTEGER_QNAME = new QName("integer", XFORMS_NAMESPACE);
 
     public static final QName XFORMS_STRING_QNAME = new QName("string", XFORMS_NAMESPACE);
-    public static final QName XFORMS_ANYURI_QNAME = new QName("anyURI", XFORMS_NAMESPACE);
     public static final QName XFORMS_BASE64BINARY_QNAME = new QName("base64Binary", XFORMS_NAMESPACE);
 
-    public static final String XFORMS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_STRING_QNAME);
+    public static final String XS_STRING_EXPLODED_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XS_STRING_QNAME);
+    public static final String XFORMS_STRING_EXPLODED_QNAME = Dom4jUtils.buildExplodedQName(XFORMS_STRING_QNAME);
 
     public static final QName XXFORMS_EVENT_MODE_QNAME = new QName("events-mode", XXFORMS_NAMESPACE);
 
@@ -391,7 +378,6 @@ public class XFormsConstants {
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png";
 
-    public static final QName STATIC_STATE_SCRIPTS_QNAME = new QName("scripts");
     public static final QName STATIC_STATE_PROPERTIES_QNAME = new QName("properties");
 
     private XFormsConstants() {

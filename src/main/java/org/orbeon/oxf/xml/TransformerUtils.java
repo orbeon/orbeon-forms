@@ -362,14 +362,14 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
                 xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = dom4jResult;
             }
             try {
-                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, handleLexical);
             } finally {
                 if (resolver != null)
                     resolver.destroy();
@@ -389,7 +389,7 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
                 xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
@@ -418,14 +418,14 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
                 xmlReceiver = new XIncludeReceiver(null, identityHandler, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = identityHandler;
             }
             try {
-                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, handleLexical);
             } finally {
                 if (resolver != null)
                     resolver.destroy();
@@ -442,7 +442,7 @@ public class TransformerUtils {
         try {
             final TransformerURIResolver resolver;
             if (handleXInclude) {
-                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
             } else {
                 resolver = null;
             }
@@ -609,6 +609,19 @@ public class TransformerUtils {
         final SAXStore saxStore = new SAXStore();
         sourceToSAX(location ? new LocationDocumentSource(document) : new DocumentSource(document), saxStore);
         return saxStore;
+    }
+
+    public static String domToString(Node node) {
+        try {
+            Transformer transformer = getXMLIdentityTransformer();
+            DOMSource source = new DOMSource(node);
+
+            StringBuilderWriter writer = new StringBuilderWriter();
+            transformer.transform(source, new StreamResult(writer));
+            return writer.toString();
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
     }
 }
 

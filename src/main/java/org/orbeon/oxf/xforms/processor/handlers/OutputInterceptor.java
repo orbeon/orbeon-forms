@@ -114,7 +114,7 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
         generateFirstDelimitersIfNeeded();
 
         // Wrap any other text within an xhtml:span
-        super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
+        super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(SAXUtils.EMPTY_ATTRIBUTES));
         final char[] chars = characters.toCharArray();
         super.characters(chars, 0, chars.length);
         super.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -140,7 +140,7 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
         }
 
         if (newClassAttribute != null)
-            return XMLUtils.addOrReplaceAttribute(originalAttributes, "", "", "class", newClassAttribute);
+            return SAXUtils.addOrReplaceAttribute(originalAttributes, "", "", "class", newClassAttribute);
         else
             return originalAttributes;
     }

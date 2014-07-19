@@ -21,7 +21,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -154,7 +154,7 @@ public class ResourceServer extends ProcessorImpl {
 
     public static MimeTypeConfig readMimeTypeConfig() {
         final MimeTypesContentHandler ch = new MimeTypesContentHandler();
-        XMLUtils.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLUtils.ParserConfiguration.PLAIN, false);
+        XMLParsing.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLParsing.ParserConfiguration.PLAIN, false);
         return ch.getMimeTypes();
     }
 

@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.DelegatingProcessorInput;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
@@ -30,7 +31,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.saxon.Configuration;
@@ -268,7 +268,7 @@ public abstract class ProcessorImpl implements Processor {
 
     public Document readInputAsDOM(PipelineContext context, ProcessorInput input) {
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-        final DOMResult domResult = new DOMResult(XMLUtils.createDocument());
+        final DOMResult domResult = new DOMResult(XMLParsing.createDocument());
         identity.setResult(domResult);
         readInputAsSAX(context, input, identity);
         return (Document) domResult.getNode();

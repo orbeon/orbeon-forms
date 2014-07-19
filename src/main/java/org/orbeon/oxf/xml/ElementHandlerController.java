@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OrbeonLocationException;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -516,7 +517,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         final HandlerInfo handlerInfo = 
         getHandler(element.getNamespaceURI(),
                 XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
-                XMLUtils.getSAXAttributes(element));
+                Dom4jUtils.getSAXAttributes(element));
         
         return (handlerInfo != null) ? handlerInfo.elementHandler : null;
     }

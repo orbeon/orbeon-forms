@@ -21,7 +21,6 @@ import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.processor.transformer.XPathProcessor
 import org.orbeon.oxf.util.{XPath, LoggerFactory, XPathCache}
-import org.orbeon.oxf.xml.XMLUtils.addOrReplaceAttribute
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.xml.sax._
@@ -110,7 +109,7 @@ class XIncludeReceiver(
 
         val newAttributes =
             if (! topLevel && level == 0 && generateXMLBase)
-                addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
+                SAXUtils.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
             else
                 attributes
 

@@ -18,9 +18,9 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
@@ -256,11 +256,11 @@ public class LDAPProcessor extends ProcessorImpl {
     private void serialize(List results, Config config, ContentHandler ch) {
         try {
             ch.startDocument();
-            ch.startElement("", "results", "results", XMLUtils.EMPTY_ATTRIBUTES);
+            ch.startElement("", "results", "results", SAXUtils.EMPTY_ATTRIBUTES);
             for (Iterator i = results.iterator(); i.hasNext();) {
                 SearchResult sr = (SearchResult) i.next();
 
-                ch.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
+                ch.startElement("", "result", "result", SAXUtils.EMPTY_ATTRIBUTES);
                 addElement(ch, "name", sr.getName());
                 try {
                   addElement(ch, "fullname", sr.getNameInNamespace());
@@ -273,7 +273,7 @@ public class LDAPProcessor extends ProcessorImpl {
                     Attribute a = (Attribute) attrEn.next();
                     if (config.getAttributes().isEmpty() ||
                             config.getAttributes().contains(a.getID())) {
-                        ch.startElement("", "attribute", "attribute", XMLUtils.EMPTY_ATTRIBUTES);
+                        ch.startElement("", "attribute", "attribute", SAXUtils.EMPTY_ATTRIBUTES);
                         addElement(ch, "name", a.getID());
                         NamingEnumeration aEn = a.getAll();
                         while (aEn.hasMoreElements()) {
@@ -337,7 +337,7 @@ public class LDAPProcessor extends ProcessorImpl {
     private void addElement(ContentHandler contentHandler, String name, String value)
             throws Exception {
         if (value != null) {
-            contentHandler.startElement("", name, name, XMLUtils.EMPTY_ATTRIBUTES);
+            contentHandler.startElement("", name, name, SAXUtils.EMPTY_ATTRIBUTES);
             addString(contentHandler, value);
             contentHandler.endElement("", name, name);
         }

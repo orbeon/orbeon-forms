@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
@@ -26,7 +27,6 @@ import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.SAXException;
 
@@ -325,7 +325,7 @@ public class FileSerializer extends ProcessorImpl {
                     }
 
                     xmlReceiver.startDocument();
-                    xmlReceiver.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "url", "url", SAXUtils.EMPTY_ATTRIBUTES);
                     xmlReceiver.characters(resultURL.toCharArray(), 0, resultURL.length());
                     xmlReceiver.endElement("", "url", "url");
                     xmlReceiver.endDocument();

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.XQuery;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -23,7 +24,6 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.xqj.SaxonXQDataSource;
 import org.xml.sax.SAXException;
 
@@ -172,7 +172,7 @@ public class XQueryProcessor extends ProcessorImpl {
                                 // type java.sql.Types of SQLXML." For 1.5 compatibility we use getString() instead.
                                 String sqlxml = rs.getString(i);
                                 if (sqlxml != null) {
-                                    XMLUtils.parseDocumentFragment(sqlxml, xmlReceiver);
+                                    XMLParsing.parseDocumentFragment(sqlxml, xmlReceiver);
                                 }
                             }
                             helper.endElement();
@@ -219,7 +219,7 @@ public class XQueryProcessor extends ProcessorImpl {
                             }
                             if (SaxonXQDataSource.class.isInstance(xqs)) {
                                 // For Saxon: setup a URI resolver to support the "input:" scheme
-                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, XMLUtils.ParserConfiguration.PLAIN);
+                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, XMLParsing.ParserConfiguration.PLAIN);
                                 ((SaxonXQDataSource) xqs).getConfiguration().setURIResolver(resolver);
                             }
                             XQConnection conn;

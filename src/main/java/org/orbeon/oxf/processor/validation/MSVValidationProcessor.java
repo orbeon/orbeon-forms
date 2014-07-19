@@ -20,16 +20,13 @@ import org.dom4j.Document;
 import org.orbeon.msv.iso_relax.verifier.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.ExceptionWrapperXMLReceiver;
-import org.orbeon.oxf.xml.TeeXMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -89,7 +86,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
         //                from here into ExceptionInInitializerError without setting the cause.
         //                This of course makes diagnosing reports from the field a major pain.
         try {
-            factory = XMLUtils.createSAXParserFactory(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
+            factory = XMLParsing.createSAXParserFactory(XMLParsing.ParserConfiguration.XINCLUDE_ONLY);
         } catch (final Error e) {
             throw new ExceptionInInitializerError(e);
         } catch (final RuntimeException e) {

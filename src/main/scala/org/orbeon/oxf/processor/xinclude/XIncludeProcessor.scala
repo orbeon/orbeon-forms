@@ -19,7 +19,7 @@ import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer
 import org.orbeon.oxf.properties.PropertyStore
-import org.orbeon.oxf.xml.XMLUtils.ParserConfiguration
+import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration
 import org.orbeon.oxf.xml._
 import ProcessorImpl._
 import URIProcessorOutputImpl.URIReferences

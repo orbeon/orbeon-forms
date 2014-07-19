@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
@@ -534,7 +534,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 final boolean isOptionalAndEmpty = !required && "".equals(nodeValue);
                 if (typeLocalname.equals("xml")) {
                     // xxf:xml type
-                    typeValid = isOptionalAndEmpty || XMLUtils.isWellFormedXML(nodeValue);
+                    typeValid = isOptionalAndEmpty || XMLParsing.isWellFormedXML(nodeValue);
                 } else if (typeLocalname.equals("xpath2")) {
                     // xxf:xpath2 type
 

@@ -526,7 +526,7 @@ object XBLBindings {
         val lastModified = ResourceManagerWrapper.instance.lastModified(path, false)
 
         // Read content
-        val sourceXBL = ResourceManagerWrapper.instance.getContentAsDOM4J(path, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false)
+        val sourceXBL = ResourceManagerWrapper.instance.getContentAsDOM4J(path, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, false)
 
         (Transform.transformXBLDocumentIfNeeded(path, sourceXBL, lastModified).getRootElement, lastModified)
     }

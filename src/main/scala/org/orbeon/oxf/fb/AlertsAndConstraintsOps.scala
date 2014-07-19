@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.xml.XMLUtils.buildQName
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner._
@@ -24,7 +25,7 @@ import org.dom4j.{Namespace, QName}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import scala.xml.Elem
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{XMLUtils, XMLParsing}
 
 trait AlertsAndConstraintsOps extends ControlOps {
 

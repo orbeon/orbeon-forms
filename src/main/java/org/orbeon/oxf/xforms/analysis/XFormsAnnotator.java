@@ -165,14 +165,14 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Remember this subtree has a full update
                     putMark(xformsElementId);
                     // Add a class to help the client
-                    attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
+                    attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
                 }
             }
 
             // Rewrite elements / add appearances
             if (inTitle && "output".equals(localname)) {
                 // Special case of xf:output within title, which produces an xxf:text control
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
+                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                 startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 stackElement.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
             } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
@@ -181,14 +181,14 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Append the new xxf:separator appearance
                 final String existingAppearance = attributes.getValue("appearance");
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
+                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
                         (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 stackElement.startElement(uri, localname, qName, attributes);
             } else if (stackElement.isXForms() && "repeat".equals(localname)) {
                 // Add separator appearance
                 if (doesClosestXHTMLRequireSeparatorAppearance()) {
                     final String existingAppearance = attributes.getValue("appearance");
-                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
                             (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 }
 
@@ -219,7 +219,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Remember this subtree has a full update
                     putMark(xformsElementId);
                     // Add a class to help the client
-                    attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
+                    attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
                 }
             }
 
@@ -530,7 +530,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 if (metadata.idGenerator().isDuplicate(rawId))
                     throw new ValidationException("Duplicate id for XForms element: " + rawId,
                         new ExtendedLocationData(LocationData.createIfPresent(documentLocator()), "analyzing control element",
-                                new String[] { "element", XMLUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));
+                                new String[] { "element", SAXUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));
             }
 
         } else {

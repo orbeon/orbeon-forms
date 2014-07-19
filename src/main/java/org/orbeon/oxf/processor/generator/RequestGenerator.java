@@ -34,7 +34,6 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -228,7 +227,7 @@ public class RequestGenerator extends ProcessorImpl {
 
             protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
                 final State state = (State) digestState;
-                return XMLUtils.getDigest(new DocumentSource(state.requestDocument));
+                return DigestContentHandler.getDigest(new DocumentSource(state.requestDocument));
             }
         };
         addOutput(name, output);
@@ -261,7 +260,7 @@ public class RequestGenerator extends ProcessorImpl {
         InputStream fileItemInputStream = null;
         try {
             fileItemInputStream = fileItem.getInputStream();
-            XMLUtils.inputStreamToBase64Characters(fileItemInputStream, contentHandler);
+            SAXUtils.inputStreamToBase64Characters(fileItemInputStream, contentHandler);
         } catch (IOException e) {
             throw new OXFException(e);
         } finally {

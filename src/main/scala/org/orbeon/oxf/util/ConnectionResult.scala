@@ -15,8 +15,9 @@ package org.orbeon.oxf.util
 
 import org.apache.log4j.Level
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{XMLUtils, XMLParsing}
 import java.io._
+
 import scala.collection.JavaConverters._
 import ScalaUtils._
 import java.lang.{Long ⇒ JLong}
@@ -117,7 +118,7 @@ class ConnectionResult(val resourceURI: String) extends Logging {
             }
         } else if (XMLUtils.isXMLMediatype(getResponseMediaType)) {
             // XML mediatype other than text/xml
-            useAndClose(XMLUtils.getReaderFromXMLInputStream(getResponseInputStream)) { reader ⇒
+            useAndClose(XMLParsing.getReaderFromXMLInputStream(getResponseInputStream)) { reader ⇒
                 NetUtils.readStreamAsString(reader)
             }
         } else

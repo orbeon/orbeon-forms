@@ -184,7 +184,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                 if (resource instanceof XMLResource) {
                     ((XMLResource) resource).getContentAsSAX(new DatabaseReadXMLReceiver(xmlReceiver));
                 } else if (resource instanceof BinaryResource) {
-                    XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), xmlReceiver);
+                    SAXUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), xmlReceiver);
                 } else {
                     throw new OXFException("Unsupported resource type: " + resource.getClass());
                 }

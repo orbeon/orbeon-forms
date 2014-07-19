@@ -17,13 +17,13 @@ import org.apache.commons.fileupload.FileItem;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -43,12 +43,12 @@ public class ToXMLConverter extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 // Read config input
-                final XMLUtils.ParserConfiguration config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<XMLUtils.ParserConfiguration>() {
-                    public XMLUtils.ParserConfiguration read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                final XMLParsing.ParserConfiguration config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<XMLParsing.ParserConfiguration>() {
+                    public XMLParsing.ParserConfiguration read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
 
                         final Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
-                        return new XMLUtils.ParserConfiguration(
+                        return new XMLParsing.ParserConfiguration(
                                 ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING),
                                 ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", URLGenerator.DEFAULT_HANDLE_XINCLUDE),
                                 ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", URLGenerator.DEFAULT_EXTERNAL_ENTITIES));
@@ -65,7 +65,7 @@ public class ToXMLConverter extends ProcessorImpl {
                     readInputAsSAX(pipelineContext, INPUT_DATA, new BinaryTextXMLReceiver(fileItem.getOutputStream()));
 
                     // Create parser
-                    final XMLReader reader = XMLUtils.newXMLReader(config);
+                    final XMLReader reader = XMLParsing.newXMLReader(config);
 
                     // Run parser on InputStream
                     //inputSource.setSystemId();

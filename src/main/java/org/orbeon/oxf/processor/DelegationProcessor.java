@@ -29,7 +29,6 @@ import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -143,7 +142,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                         super.startPrefixMapping("", defaultNS);
                                 }
 
-                                parameters.startElement("", "parameters", "parameters", XMLUtils.EMPTY_ATTRIBUTES);
+                                parameters.startElement("", "parameters", "parameters", SAXUtils.EMPTY_ATTRIBUTES);
                             }
 
                         } else {
@@ -285,9 +284,9 @@ public class DelegationProcessor extends ProcessorImpl {
                                             // Throw exception if a fault is returned and the user does not want the fault to be returned
                                             if (resultEnvelope.getBody().getFault() != null && !service.returnFault) {
                                                 throw new OXFException("SOAP Fault. Request:\n"
-                                                        + XMLUtils.domToString(requestEnvelope.getAsDocument())
+                                                        + TransformerUtils.domToString(requestEnvelope.getAsDocument())
                                                         + "\n\nResponse:\n"
-                                                        + XMLUtils.domToString(resultEnvelope.getAsDocument()));
+                                                        + TransformerUtils.domToString(resultEnvelope.getAsDocument()));
                                             }
 
                                             // Send body from result envelope

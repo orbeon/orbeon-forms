@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -154,7 +154,7 @@ public class XFormsUtils {
 
 
     public static org.w3c.dom.Document htmlStringToDocumentTagSoup(String value, LocationData locationData) {
-        final org.w3c.dom.Document document = XMLUtils.createDocument();
+        final org.w3c.dom.Document document = XMLParsing.createDocument();
         final DOMResult domResult = new DOMResult(document);
         htmlStringToResult(value, locationData, domResult);
         return document;

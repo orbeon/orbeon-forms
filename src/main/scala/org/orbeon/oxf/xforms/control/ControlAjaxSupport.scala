@@ -19,7 +19,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.LinkedHashSet
 import AjaxSupport._
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
 import XMLReceiverHelper.CDATA
 import org.orbeon.oxf.util.ScalaUtils
 
@@ -53,7 +53,7 @@ trait ControlAjaxSupport {
 
         // Visited
         if ((Option(other) exists (_.visited)) != visited) {
-            XMLUtils.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
+            SAXUtils.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
             added |= true
         }
 
@@ -172,7 +172,7 @@ object AjaxSupport {
         if (isNewRepeatIteration && isDefaultValue)
             false
         else {
-            XMLUtils.addOrAppendToAttribute(attributesImpl, name, value)
+            SAXUtils.addOrAppendToAttribute(attributesImpl, name, value)
             true
         }
 

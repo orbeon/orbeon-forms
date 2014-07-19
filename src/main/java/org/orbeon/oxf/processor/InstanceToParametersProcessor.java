@@ -16,12 +16,12 @@ package org.orbeon.oxf.processor;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.NamespaceMapping;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -99,7 +99,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
 
                     // Output as SAX
                     xmlReceiver.startDocument();
-                    xmlReceiver.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
                         // If all the nodes of the instance map to parameters, we don't output the instance parameter
                         outputParameter("$instance", XFormsUtils.encodeXML(instance, false), xmlReceiver);
@@ -117,14 +117,14 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
     }
 
     private static void outputParameter(String name, String value, ContentHandler contentHandler) throws SAXException {
-        contentHandler.startElement("", PARAMETER_ELEMENT, PARAMETER_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+        contentHandler.startElement("", PARAMETER_ELEMENT, PARAMETER_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
         outputElement(NAME_ELEMENT, name, contentHandler);
         outputElement(VALUE_ELEMENT, value, contentHandler);
         contentHandler.endElement("", PARAMETER_ELEMENT, PARAMETER_ELEMENT);
     }
 
     private static void outputElement(String name, String content, ContentHandler contentHandler) throws SAXException {
-        contentHandler.startElement("", name, name, XMLUtils.EMPTY_ATTRIBUTES);
+        contentHandler.startElement("", name, name, SAXUtils.EMPTY_ATTRIBUTES);
         contentHandler.characters(content.toCharArray(), 0, content.length());
         contentHandler.endElement("", name, name);
     }

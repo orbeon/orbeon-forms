@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xml.xerces;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 
@@ -28,13 +28,13 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
 
     private final Map<String, Boolean> features;
     private final Set<String> recognizedFeatures;
-    private final XMLUtils.ParserConfiguration parserConfiguration;
+    private final XMLParsing.ParserConfiguration parserConfiguration;
 
     public XercesSAXParserFactoryImpl() {
-        this(XMLUtils.ParserConfiguration.PLAIN);
+        this(XMLParsing.ParserConfiguration.PLAIN);
     }
 
-    public XercesSAXParserFactoryImpl(XMLUtils.ParserConfiguration parserConfiguration) {
+    public XercesSAXParserFactoryImpl(XMLParsing.ParserConfiguration parserConfiguration) {
         this.parserConfiguration = parserConfiguration;
 
         // NOTE: Creating a configuration can be expensive, so callers should create factories sparingly

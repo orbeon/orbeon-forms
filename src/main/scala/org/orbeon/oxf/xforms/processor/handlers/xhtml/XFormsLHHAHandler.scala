@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
@@ -110,7 +111,7 @@ object XFormsLHHAHandler {
                     controlElement.getNamespaceURI,
                     controlElement.getName,
                     XMLUtils.buildQName(controlElement.getNamespacePrefix, controlElement.getName),
-                    XMLUtils.getSAXAttributes(controlElement),
+                    Dom4jUtils.getSAXAttributes(controlElement),
                     targetControl)
 
                 Some(handler.getForEffectiveId(targetControlEffectiveId))

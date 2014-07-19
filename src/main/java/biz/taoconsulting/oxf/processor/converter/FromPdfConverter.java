@@ -17,11 +17,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.util.Base64XMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.pdfbox.exceptions.OutlineNotLocalException;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentCatalog;
@@ -415,7 +415,7 @@ public class FromPdfConverter extends SimpleProcessor {
             //read the XML metadata into an inputstream
             InputStream xmlInputStream = metadata.createInputStream();
             logger.info("Before creating sax stream for meta data");
-            XMLUtils.inputStreamToSAX(xmlInputStream, "PDF", pdfMetaContent, XMLUtils.ParserConfiguration.PLAIN, false);
+            XMLParsing.inputStreamToSAX(xmlInputStream, "PDF", pdfMetaContent, XMLParsing.ParserConfiguration.PLAIN, false);
             //Now pull it in and write it out 1:1
             logger.info("Meta data stream created in SAX");
         } catch (IOException e) {

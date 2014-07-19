@@ -18,7 +18,7 @@ import RegexpMatcher._
 import java.util.regex.Pattern
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
-import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
+import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver}
 import org.orbeon.oxf.util.URLRewriterUtils.globToRegexp
 
 class RegexpProcessor extends ProcessorImpl {
@@ -53,17 +53,17 @@ object RegexpMatcher {
     def writeXML(xmlReceiver: XMLReceiver, result: MatchResult): Unit = {
 
         xmlReceiver.startDocument()
-        xmlReceiver.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES)
+        xmlReceiver.startElement("", "result", "result", SAXUtils.EMPTY_ATTRIBUTES)
 
         // <matches>
-        xmlReceiver.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES)
+        xmlReceiver.startElement("", "matches", "matches", SAXUtils.EMPTY_ATTRIBUTES)
         val matchesString = result.matches.toString
         xmlReceiver.characters(matchesString.toCharArray, 0, matchesString.length)
         xmlReceiver.endElement("", "matches", "matches")
 
         // <group>
         for (group ← result.groupsWithNulls) {
-            xmlReceiver.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES)
+            xmlReceiver.startElement("", "group", "group", SAXUtils.EMPTY_ATTRIBUTES)
             if (group ne null)
                 xmlReceiver.characters(group.toCharArray, 0, group.length)
             xmlReceiver.endElement("", "group", "group")

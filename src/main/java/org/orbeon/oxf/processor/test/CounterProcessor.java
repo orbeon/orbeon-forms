@@ -15,10 +15,10 @@ package org.orbeon.oxf.processor.test;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -40,7 +40,7 @@ public class CounterProcessor extends ProcessorImpl {
                 try {
                     counter++;
                     xmlReceiver.startDocument();
-                    xmlReceiver.startElement("", "counter", "counter", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "counter", "counter", SAXUtils.EMPTY_ATTRIBUTES);
                     final String counterString = Integer.toString(counter);
                     xmlReceiver.characters(counterString.toCharArray(), 0, counterString.length());
                     xmlReceiver.endElement("", "counter", "counter");

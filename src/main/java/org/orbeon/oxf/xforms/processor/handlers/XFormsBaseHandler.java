@@ -20,10 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.ElementHandler;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -210,14 +207,14 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValueHandleSrc(attributeControl, controlAnalysis);
 
                         // Set the value of the attribute
-                        attributes = XMLUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),
+                        attributes = SAXUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),
                                 XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue);
                     }
                 }
 
                 if (found) {
                     // Update the value of the id attribute
-                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
                 }
             }
 
@@ -225,7 +222,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 // Id was not replaced as part of AVT processing
 
                 // Update the value of the id attribute
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
+                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
         }
 
@@ -234,7 +231,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         {
             final String forAttribute = attributes.getValue(refIdAttributeName);
             if (forAttribute != null) {
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, handlerContext.getIdPrefix() + forAttribute + handlerContext.getIdPostfix());
+                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, handlerContext.getIdPrefix() + forAttribute + handlerContext.getIdPostfix());
             }
         }
 		return attributes;

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.itemset.Itemset
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.xml.sax.Attributes
 import org.orbeon.oxf.util.ScalaUtils._

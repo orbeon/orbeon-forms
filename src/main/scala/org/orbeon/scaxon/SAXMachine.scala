@@ -16,7 +16,9 @@ package org.orbeon.scaxon
 import org.xml.sax.{ContentHandler, Locator, Attributes}
 import org.xml.sax.ext.LexicalHandler
 import javax.xml.namespace.QName
-import org.orbeon.oxf.xml.{NamespaceContext, XMLUtils} // TODO: remove dependency on this or move dependency to Scaxon
+import org.orbeon.oxf.xml.{XMLUtils, NamespaceContext}
+
+// TODO: remove dependency on this or move dependency to Scaxon
 
 // FSM specifically handling SAX events
 trait SAXMachine[S, D] extends FSM[S, SAXEvents.SAXEvent, D] with ContentHandler with LexicalHandler {

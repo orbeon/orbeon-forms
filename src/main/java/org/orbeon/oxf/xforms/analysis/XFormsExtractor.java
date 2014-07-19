@@ -312,7 +312,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
                 outputFirstElementIfNeeded();
 
                 // Add xml:base on element
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
+                attributes = SAXUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
 
                 // Add xml:lang on element if found
                 final String xmlLang = elementStack.peek().xmlLang;
@@ -328,7 +328,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
                         newXMLLang = xmlLang;
                     }
 
-                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "lang", newXMLLang);
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "lang", newXMLLang);
                 }
 
                 sendStartPrefixMappings();

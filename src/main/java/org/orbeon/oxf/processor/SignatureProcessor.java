@@ -16,10 +16,8 @@ package org.orbeon.oxf.processor;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 
@@ -57,8 +55,8 @@ public class SignatureProcessor extends ProcessorImpl {
                     dsa.initSign(privKey);
 
                     xmlReceiver.startDocument();
-                    xmlReceiver.startElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
-                    xmlReceiver.startElement("", DATA_ELEMENT, DATA_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", DATA_ELEMENT, DATA_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
 
                     final Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
                     final String dataStr = Dom4jUtils.domToString(data);
@@ -71,7 +69,7 @@ public class SignatureProcessor extends ProcessorImpl {
 
                     xmlReceiver.endElement("", DATA_ELEMENT, DATA_ELEMENT);
 
-                    xmlReceiver.startElement("", SIGNATURE_ELEMENT, SIGNATURE_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", SIGNATURE_ELEMENT, SIGNATURE_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
                     char[] sigChars = new char[sig.length()];
                     sig.getChars(0, sig.length(), sigChars, 0);
                     xmlReceiver.characters(sigChars, 0, sigChars.length);

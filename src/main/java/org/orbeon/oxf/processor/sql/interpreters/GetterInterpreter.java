@@ -20,9 +20,7 @@ import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.DateUtils;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -106,7 +104,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                         if (clob != null) {
                             Reader reader = clob.getCharacterStream();
                             try {
-                                XMLUtils.parseDocumentFragment(reader, interpreterContext.getOutput());
+                                XMLParsing.parseDocumentFragment(reader, interpreterContext.getOutput());
                             } finally {
                                 reader.close();
                             }
@@ -133,7 +131,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                         // The fragment is stored as a String
                         String value = resultSet.getString(columnName);
                         if (value != null)
-                            XMLUtils.parseDocumentFragment(value, interpreterContext.getOutput());
+                            XMLParsing.parseDocumentFragment(value, interpreterContext.getOutput());
                     }
                 } else {
                     // xs:*
@@ -142,26 +140,26 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                         if (o instanceof Clob) {
                             Reader reader = ((Clob) o).getCharacterStream();
                             try {
-                                XMLUtils.readerToCharacters(reader, interpreterContext.getOutput());
+                                SAXUtils.readerToCharacters(reader, interpreterContext.getOutput());
                             } finally {
                                 reader.close();
                             }
                         } else if (o instanceof Blob) {
                             InputStream is = ((Blob) o).getBinaryStream();
                             try {
-                                XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
+                                SAXUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
                             } finally {
                                 is.close();
                             }
                         } else if (o instanceof InputStream) {
                             InputStream is = (InputStream) o;
                             try {
-                                XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
+                                SAXUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
                             } finally {
                                 is.close();
                             }
                         } else {
-                            XMLUtils.objectToCharacters(o, interpreterContext.getOutput());
+                            SAXUtils.objectToCharacters(o, interpreterContext.getOutput());
                         }
                     }
                 }
@@ -230,26 +228,26 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                     if (o instanceof Clob) {
                         final Reader reader = ((Clob) o).getCharacterStream();
                         try {
-                            XMLUtils.readerToCharacters(reader, interpreterContext.getOutput());
+                            SAXUtils.readerToCharacters(reader, interpreterContext.getOutput());
                         } finally {
                             reader.close();
                         }
                     } else if (o instanceof Blob) {
                         final InputStream is = ((Blob) o).getBinaryStream();
                         try {
-                            XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
+                            SAXUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
                         } finally {
                             is.close();
                         }
                     } else if (o instanceof InputStream) {
                         final InputStream is = (InputStream) o;
                         try {
-                            XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
+                            SAXUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
                         } finally {
                             is.close();
                         }
                     } else {
-                        XMLUtils.objectToCharacters(o, interpreterContext.getOutput());
+                        SAXUtils.objectToCharacters(o, interpreterContext.getOutput());
                     }
                 }
             }
@@ -331,7 +329,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                             throw new ValidationException("Invalid get-columns format: " + getColumnsFormat, new LocationData(getDocumentLocator()));
                         String elementQName = (outputElementURI.equals("")) ? elementName : getColumnsPrefix + ":" + elementName;
                         ContentHandler output = interpreterContext.getOutput();
-                        output.startElement(outputElementURI, elementName, elementQName, XMLUtils.EMPTY_ATTRIBUTES);
+                        output.startElement(outputElementURI, elementName, elementQName, SAXUtils.EMPTY_ATTRIBUTES);
                         // Output value if non-null
                         if (nonNullValue) {
                             if (clobValue == null && blobValue == null) {
@@ -342,7 +340,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                                 // Clob: convert the Reader into characters
                                 Reader reader = clobValue.getCharacterStream();
                                 try {
-                                    XMLUtils.readerToCharacters(reader, output);
+                                    SAXUtils.readerToCharacters(reader, output);
                                 } finally {
                                     reader.close();
                                 }
@@ -350,7 +348,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                                 // Blob: convert the InputStream into characters in Base64
                                 InputStream is = blobValue.getBinaryStream();
                                 try {
-                                    XMLUtils.inputStreamToBase64Characters(is, output);
+                                    SAXUtils.inputStreamToBase64Characters(is, output);
                                 } finally {
                                     is.close();
                                 }

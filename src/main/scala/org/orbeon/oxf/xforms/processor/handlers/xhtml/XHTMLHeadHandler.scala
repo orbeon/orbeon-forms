@@ -14,6 +14,7 @@
 
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+
 import collection.mutable
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.URLRewriterUtils

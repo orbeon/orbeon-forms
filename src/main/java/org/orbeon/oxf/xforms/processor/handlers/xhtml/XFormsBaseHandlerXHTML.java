@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
@@ -24,9 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -241,7 +239,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
     protected void handleLabelHintHelpAlert(LHHAAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
 
-        final AttributesImpl staticLHHAAttributes = XMLUtils.getSAXAttributes(lhhaAnalysis.element());
+        final AttributesImpl staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element());
 
         final boolean isLabel = lhhaType == LHHAC.LABEL;
         final boolean isHelp = lhhaType == LHHAC.HELP;
@@ -400,10 +398,10 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         if (addIds && targetControlEffectiveId != null) {
             // Add or replace existing id attribute
             // NOTE: addIds == true for external LHHA
-            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), targetControlEffectiveId, LHHAC_CODES.get(lhha)));
+            newAttribute = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), targetControlEffectiveId, LHHAC_CODES.get(lhha)));
         } else {
             // Remove existing id attribute if any
-            newAttribute = XMLUtils.removeAttribute(attributes, "", "id");
+            newAttribute = SAXUtils.removeAttribute(attributes, "", "id");
         }
 
         // Add @for attribute if specified and element is a label

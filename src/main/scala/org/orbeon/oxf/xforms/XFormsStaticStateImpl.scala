@@ -206,7 +206,7 @@ object XFormsStaticStateImpl {
         identity.setResult(documentResult)
 
         val metadata = new Metadata
-        val digestContentHandler = new XMLUtils.DigestContentHandler
+        val digestContentHandler = new DigestContentHandler
         val template = new SAXStore
 
         val prefix = startScope.fullPrefix
@@ -323,7 +323,7 @@ object XFormsStaticStateImpl {
         
         def getOrComputeDigest(digest: Option[String]) =
             digest getOrElse {
-                val digestContentHandler = new XMLUtils.DigestContentHandler
+                val digestContentHandler = new DigestContentHandler
                 TransformerUtils.writeDom4j(xmlDocument, digestContentHandler)
                 NumberUtils.toHexString(digestContentHandler.getResult)
             }

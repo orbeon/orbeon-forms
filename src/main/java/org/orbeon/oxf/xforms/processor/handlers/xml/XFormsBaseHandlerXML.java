@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xml;
 
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -20,7 +21,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -111,7 +112,7 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
         final Attributes labelHintHelpAlertAttributes;
         {
             final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
-            final AttributesImpl tempAttributes = XMLUtils.getSAXAttributes(getStaticLHHA(forPrefixedId, lhhaType).element());
+            final AttributesImpl tempAttributes = Dom4jUtils.getSAXAttributes(getStaticLHHA(forPrefixedId, lhhaType).element());
             
             if (tempAttributes != null)
             	updateID(tempAttributes, controlEffectiveId, lhhaType);
@@ -124,7 +125,7 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
         
         if (labelHintHelpAlertValue != null && !labelHintHelpAlertValue.equals("")) {
             if (mustOutputHTMLFragment) {
-            	XMLUtils.parseDocumentFragment(labelHintHelpAlertValue, xmlReceiver);
+            	XMLParsing.parseDocumentFragment(labelHintHelpAlertValue, xmlReceiver);
             }
             else
                 xmlReceiver.characters(labelHintHelpAlertValue.toCharArray(), 0, labelHintHelpAlertValue.length());

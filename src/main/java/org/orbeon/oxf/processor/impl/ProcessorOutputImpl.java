@@ -19,7 +19,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
-import org.orbeon.oxf.pipeline.api.TracingPipelineContext;
 import org.orbeon.oxf.xml.InspectingXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -391,15 +390,6 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
     public final void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
         TraceEntry traceEntry = null;
         try {
-            // Update trace if needed
-            if (pipelineContext instanceof TracingPipelineContext) {
-                final TracingPipelineContext tracingPipelineContext = (TracingPipelineContext) pipelineContext;
-                if (tracingPipelineContext.getTraceForUpdate() != null) {
-                    traceEntry = tracingPipelineContext.getTraceForUpdate().getTraceEntry(this);
-                    traceEntry.outputReadCalled();
-                }
-            }
-
             // Delegate
             getRuntimeFilter().read(pipelineContext, xmlReceiver);
             // NOTE: Not sure why we used to catch and log AbstractMethodError here, but we should not!

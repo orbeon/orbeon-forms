@@ -17,10 +17,8 @@ import org.dom4j.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.orbeon.oxf.externalcontext.TemplateURLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.properties.Properties;
@@ -420,24 +418,5 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResolveURI() {
         assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("a b", "http://localhost:8080/myapp/"));
         assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("http://localhost:8080/myapp/a b", null));
-    }
-
-    @Test
-    public void testTemplateURLRewriter() {
-
-        directRequest.getAttributesMap().put(OrbeonPortletXFormsFilter.PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE, "http://localhost:8080/portal/?type=render&amp;path=" + OrbeonPortletXFormsFilter.PATH_TEMPLATE + "&amp;p=42");
-        directRequest.getAttributesMap().put(OrbeonPortletXFormsFilter.PORTLET_ACTION_URL_TEMPLATE_ATTRIBUTE, "http://localhost:8080/portal/?type=action&amp;path=" + OrbeonPortletXFormsFilter.PATH_TEMPLATE + "&amp;p=42");
-        directRequest.getAttributesMap().put(OrbeonPortletXFormsFilter.PORTLET_RESOURCE_URL_TEMPLATE_ATTRIBUTE, "http://localhost:8080/portal/?type=resource&amp;path=" + OrbeonPortletXFormsFilter.PATH_TEMPLATE + "&amp;p=42");
-
-        final TemplateURLRewriter rewriter = new TemplateURLRewriter(directRequest);
-
-        assertEquals("http://localhost:8080/portal/?type=render&amp;path=%2Fbar%3Fa%3D1%26amp%3Bb%3D2%23there&amp;p=42", rewriter.rewriteRenderURL("/bar?a=1&amp;b=2#there"));
-        assertEquals("http://localhost:8080/portal/?type=action&amp;path=%2Fbar%3Fa%3D1%26amp%3Bb%3D2%23there&amp;p=42", rewriter.rewriteActionURL("/bar?a=1&amp;b=2#there"));
-        assertEquals("http://localhost:8080/portal/?type=resource&amp;path=%2Fbar%3Fa%3D1%26amp%3Bb%3D2%23there&amp;p=42", rewriter.rewriteResourceURL("/bar?a=1&amp;b=2#there", ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH));
-
-        assertEquals("https://foo.com/bar?a=1&amp;b=2#there", rewriter.rewriteRenderURL("https://foo.com/bar?a=1&amp;b=2#there"));
-        assertEquals("https://foo.com/bar?a=1&amp;b=2#there", rewriter.rewriteActionURL("https://foo.com/bar?a=1&amp;b=2#there"));
-        assertEquals("https://foo.com/bar?a=1&amp;b=2#there", rewriter.rewriteResourceURL("https://foo.com/bar?a=1&amp;b=2#there", ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH));
-
     }
 }

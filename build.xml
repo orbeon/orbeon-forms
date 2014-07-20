@@ -402,9 +402,6 @@
                 <include name="**/*.xsd"/>
                 <!-- This goes into a separate JAR -->
                 <exclude name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
-                <exclude name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
-                <exclude name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
-                <exclude name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
                 <exclude name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
             </fileset>
             <fileset dir="${resources-packaged.dir}">
@@ -416,9 +413,6 @@
         <jar destfile="${xforms-filter.jar.file}" compress="false">
           <fileset dir="${build.classes.dir}">
               <include name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
-              <include name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
-              <include name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
-              <include name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
               <include name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
           </fileset>
         </jar>

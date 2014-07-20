@@ -3,23 +3,4 @@
     <description>
         Proxy portlet allowing the use of a separately-deployed Form Runner instance.
     </description>
-
-    <servlet>
-        <servlet-name>orbeon-trampoline-servlet</servlet-name>
-        <servlet-class>org.orbeon.oxf.portlet.OrbeonTrampolineServlet</servlet-class>
-        <init-param>
-            <param-name>oxf.xforms.renderer.context</param-name>
-            <param-value>/orbeon</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <!-- Uncomment and configure this to map the Orbeon portlet XForms filter -->
-    <!--
-    <servlet-mapping>
-        <servlet-name>orbeon-trampoline-servlet</servlet-name>
-        <url-pattern>/xforms-trampoline</url-pattern>
-    </servlet-mapping>
-    -->
-
 </web-app>

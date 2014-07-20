@@ -40,22 +40,6 @@ class ForwardServletRequestWrapper(
     override def getMethod = "GET"
 }
 
-// Request wrapper for forwarding a request from the trampoline servlet.
-class TrampolineServletRequestWrapper(
-        request: HttpServletRequest,
-        pathQuery: String,
-        method: String)
-    extends BaseServletRequestWrapper(request)
-    with RequestPathQuery
-    with RequestPrependHeaders {
-
-    // "Constructors" for traits
-    def overriddenPathQuery = pathQuery
-    val headersToPrepend    = Map.empty[String, Array[String]] // Map("orbeon-client" → Array("portlet")) // if/when OrbeonPortletXFormsFilter is modified to do rewriting
-
-    override def getMethod = method
-}
-
 // See also: LocalRequest, which does much of this based on ExternalContext
 abstract class BaseServletRequestWrapper(val request: HttpServletRequest)
     extends HttpServletRequestWrapper(request) {

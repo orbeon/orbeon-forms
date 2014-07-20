@@ -20,7 +20,6 @@ import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.WebAppContext;
@@ -727,10 +726,7 @@ public class ServletExternalContext implements ExternalContext  {
                 response.setURLRewriter(new ServletURLRewriter(getRequest()));
             } else {
                 // No known override
-                if (nativeRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE) != null) {
-                    // If we are passed template URLs, then we use the template URL rewriter automatically
-                    response.setURLRewriter(new TemplateURLRewriter(request));
-                } else if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
+                if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
                             "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
                     // Configuration asks to use portlet2/wsrp
                     response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), URLRewriterUtils.isWSRPEncodeResources()));

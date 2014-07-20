@@ -127,7 +127,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         this.submissions = new Submission[] {
             new EchoSubmission(this),
             new ClientGetAllSubmission(this),
-            new FilterPortletSubmission(this),
             new CacheableSubmission(this),
             new LocalPortletSubmission(this),
             new RequestDispatcherSubmission(this),

@@ -40,8 +40,6 @@ import java.util.regex.Pattern;
 
 public class NetUtils {
 
-    private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
-
     private static final Pattern PATTERN_NO_AMP;
 
     public static final int COPY_BUFFER_SIZE = 8192;
@@ -80,7 +78,7 @@ public class NetUtils {
      * header. If the request method was not "GET", or if no valid lastModified value was provided,
      * consider the document modified.
      */
-    public static boolean checkIfModifiedSince(ExternalContext.Request request, long lastModified) {
+    public static boolean checkIfModifiedSince(ExternalContext.Request request, long lastModified, Logger logger) {
         // Do the check only for the GET method
         if (!"GET".equals(request.getMethod()) || lastModified <= 0)
             return true;
@@ -548,11 +546,11 @@ public class NetUtils {
      * NOTE: The implementation creates a temporary file. The Pipeline Context is required so
      * that the file can be deleted when no longer used.
      */
-    public static String base64BinaryToAnyURI(String value, int scope) {
+    public static String base64BinaryToAnyURI(String value, int scope, Logger logger) {
         // Convert Base64 to binary first
         final byte[] bytes = base64StringToByteArray(value);
 
-        return inputStreamToAnyURI(new ByteArrayInputStream(bytes), scope);
+        return inputStreamToAnyURI(new ByteArrayInputStream(bytes), scope, logger);
     }
 
     /**
@@ -583,7 +581,7 @@ public class NetUtils {
             public int read() {
                 return -1;
             }
-        }, scope);
+        }, scope, null);
     }
 
     /**
@@ -592,9 +590,9 @@ public class NetUtils {
      * The implementation creates a temporary file. The PipelineContext is required so that the file can be deleted
      * when no longer used.
      */
-    public static String inputStreamToAnyURI(InputStream inputStream, int scope) {
+    public static String inputStreamToAnyURI(InputStream inputStream, int scope, Logger logger) {
         // Get FileItem
-        final FileItem fileItem = prepareFileItemFromInputStream(inputStream, scope);
+        final FileItem fileItem = prepareFileItemFromInputStream(inputStream, scope, logger);
 
         // Return a file URL
         final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
@@ -602,9 +600,9 @@ public class NetUtils {
         return storeLocation.toURI().toString().replace("+", "%2B");
     }
 
-    private static FileItem prepareFileItemFromInputStream(InputStream inputStream, int scope) {
+    private static FileItem prepareFileItemFromInputStream(InputStream inputStream, int scope, Logger logger) {
         // Get FileItem
-        final FileItem fileItem = prepareFileItem(scope);
+        final FileItem fileItem = prepareFileItem(scope, logger);
         // Write to file
         OutputStream os = null;
         try {
@@ -636,18 +634,18 @@ public class NetUtils {
      * Return a FileItem which is going to be automatically destroyed upon destruction of the request, session or
      * application.
      */
-    public static FileItem prepareFileItem(int scope) {
+    public static FileItem prepareFileItem(int scope, Logger logger) {
         // We use the commons file upload utilities to save a file
         if (fileItemFactory == null)
             fileItemFactory = new DiskFileItemFactory(0, SystemUtils.getTemporaryDirectory());
         final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
         // Make sure the file is deleted appropriately
         if (scope == REQUEST_SCOPE) {
-            deleteFileOnRequestEnd(fileItem);
+            deleteFileOnRequestEnd(fileItem, logger);
         } else if (scope == SESSION_SCOPE) {
-            deleteFileOnSessionTermination(fileItem);
+            deleteFileOnSessionTermination(fileItem, logger);
         } else if (scope == APPLICATION_SCOPE) {
-            deleteFileOnApplicationDestroyed(fileItem);
+            deleteFileOnApplicationDestroyed(fileItem, logger);
         } else {
             throw new OXFException("Invalid context requested: " + scope);
         }
@@ -660,11 +658,11 @@ public class NetUtils {
      *
      * @param fileItem        FileItem
      */
-    public static void deleteFileOnRequestEnd(final FileItem fileItem) {
+    public static void deleteFileOnRequestEnd(final FileItem fileItem, final Logger logger) {
         // Make sure the file is deleted at the end of request
         PipelineContext.get().addContextListener(new PipelineContext.ContextListenerAdapter() {
             public void contextDestroyed(boolean success) {
-                deleteFileItem(fileItem, REQUEST_SCOPE);
+                deleteFileItem(fileItem, REQUEST_SCOPE, logger);
             }
         });
     }
@@ -674,17 +672,17 @@ public class NetUtils {
      *
      * @param fileItem        FileItem
      */
-    public static void deleteFileOnSessionTermination(final FileItem fileItem) {
+    public static void deleteFileOnSessionTermination(final FileItem fileItem, final Logger logger) {
         // Try to delete the file on exit and on session termination
         final ExternalContext externalContext = getExternalContext();
         final ExternalContext.Session session = externalContext.getSession(false);
         if (session != null) {
             session.addListener(new ExternalContext.Session.SessionListener() {
                 public void sessionDestroyed() {
-                    deleteFileItem(fileItem, SESSION_SCOPE);
+                    deleteFileItem(fileItem, SESSION_SCOPE, logger);
                 }
             });
-        } else {
+        } else if (logger != null) {
             logger.debug("No existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
         }
     }
@@ -694,18 +692,18 @@ public class NetUtils {
      *
      * @param fileItem        FileItem
      */
-    public static void deleteFileOnApplicationDestroyed(final FileItem fileItem) {
+    public static void deleteFileOnApplicationDestroyed(final FileItem fileItem, final Logger logger) {
         // Try to delete the file on exit and on session termination
         final ExternalContext externalContext = getExternalContext();
         externalContext.getWebAppContext().addListener(new WebAppListener() {
             public void webAppDestroyed() {
-                deleteFileItem(fileItem, APPLICATION_SCOPE);
+                deleteFileItem(fileItem, APPLICATION_SCOPE, logger);
             }
         });
     }
 
-    private static void deleteFileItem(FileItem fileItem, int scope) {
-        if (logger.isDebugEnabled() && fileItem instanceof DiskFileItem) {
+    private static void deleteFileItem(FileItem fileItem, int scope, Logger logger) {
+        if (logger != null && logger.isDebugEnabled() && fileItem instanceof DiskFileItem) {
             final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
             if (storeLocation != null) {
                 final String temporaryFileName = storeLocation.getAbsolutePath();

@@ -542,7 +542,7 @@ public class ServletExternalContext implements ExternalContext  {
             if (responseCachingDisabled) {
                 return true;
             } else {
-                return NetUtils.checkIfModifiedSince(request, lastModified);
+                return NetUtils.checkIfModifiedSince(request, lastModified, logger);
             }
         }
 

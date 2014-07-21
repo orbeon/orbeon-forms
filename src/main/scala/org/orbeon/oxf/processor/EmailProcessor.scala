@@ -373,7 +373,7 @@ object EmailProcessor {
 
     // Read a text or binary document and return it as a FileItem
     def handleStreamedPartContent(pipelineContext: PipelineContext, source: SAXSource): FileItem = {
-        val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE)
+        val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, ProcessorImpl.logger)
         TransformerUtils.sourceToSAX(source, new BinaryTextXMLReceiver(fileItem.getOutputStream))
         fileItem
     }

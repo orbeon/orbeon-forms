@@ -142,7 +142,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
                 public ImageResource getImageResource(String uri) {
                     final InputStream is = resolveAndOpenStream(uri);
-                    final String localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE);
+                    final String localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger);
                     return super.getImageResource(localURI);
                 }
             };

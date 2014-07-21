@@ -49,7 +49,7 @@ public class ZipProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Create temporary zip file
-                    final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
+                    final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, logger);
                     fileItem.getOutputStream().close();
                     final File temporaryZipFile = ((DiskFileItem) fileItem).getStoreLocation();
                     temporaryZipFile.createNewFile();

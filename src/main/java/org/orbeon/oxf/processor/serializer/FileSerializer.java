@@ -306,7 +306,7 @@ public class FileSerializer extends ProcessorImpl {
                     }
 
                     // We use the commons fileupload utilities to write to file
-                    final FileItem fileItem = NetUtils.prepareFileItem(scope);
+                    final FileItem fileItem = NetUtils.prepareFileItem(scope, logger);
                     fileOutputStream = fileItem.getOutputStream();
                     writeToFile(pipelineContext, config, dataInput, fileOutputStream);
 

@@ -110,7 +110,7 @@ private object SubmitResponseEvent {
             // Read the whole stream to a temp URI so we can read it more than once if needed
             val tempURIOpt =
                 try useAndClose(connectionResult.getResponseInputStream) { is ⇒
-                    Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE))
+                    Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
                 } catch
                     warn("error while reading response body.")
 

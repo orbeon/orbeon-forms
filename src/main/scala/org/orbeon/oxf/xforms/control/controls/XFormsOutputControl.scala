@@ -153,7 +153,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 } else if (typeName == "base64Binary") {
                     // xs:base64Binary type
                     // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
-                    doProxyURI(NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE), -1)
+                    doProxyURI(NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
                 } else
                     // Dummy image
                     defaultValue

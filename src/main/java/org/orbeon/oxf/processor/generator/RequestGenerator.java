@@ -286,7 +286,7 @@ public class RequestGenerator extends ProcessorImpl {
             // File does not exist on disk, must convert
             // NOTE: Conversion occurs every time this method is called. Not optimal.
             try {
-                uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
+                uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), NetUtils.REQUEST_SCOPE, logger);
             } catch (IOException e) {
                 throw new OXFException(e);
             }

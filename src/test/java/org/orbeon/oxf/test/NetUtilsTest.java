@@ -73,9 +73,9 @@ public class NetUtilsTest extends ResourceManagerTestBase {
             }
         };
 
-        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong -1), false);
-        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong), false);
+        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong -1, logger), false);
+        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong, logger), false);
         // For some reason the code checks that there is more than one second of difference
-        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong + 1001), true);
+        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong + 1001, logger), true);
     }
 }

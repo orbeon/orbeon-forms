@@ -309,7 +309,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                             connectionResult.close()
                         }
                     })
-                    val tempURLString = NetUtils.inputStreamToAnyURI(connectionResult.getResponseInputStream, NetUtils.REQUEST_SCOPE)
+                    val tempURLString = NetUtils.inputStreamToAnyURI(connectionResult.getResponseInputStream, NetUtils.REQUEST_SCOPE, Logger)
                     Image.getInstance(URLFactory.createURL(tempURLString))
             }
         }

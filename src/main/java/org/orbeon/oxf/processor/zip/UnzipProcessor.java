@@ -52,7 +52,7 @@ public class UnzipProcessor extends ProcessorImpl {
                     // Read input in a temporary file
                     final File temporaryZipFile;
                     {
-                        final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
+                        final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, logger);
                         final OutputStream fileOutputStream = fileItem.getOutputStream();
                         readInputAsSAX(context, getInputByName(INPUT_DATA), new BinaryTextXMLReceiver(fileOutputStream));
                         temporaryZipFile = ((DiskFileItem) fileItem).getStoreLocation();
@@ -71,7 +71,7 @@ public class UnzipProcessor extends ProcessorImpl {
                         String fileTime = DateUtils.DateTime().print(zipEntry.getTime());
 
                         InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-                        String uri = NetUtils.inputStreamToAnyURI(entryInputStream, NetUtils.REQUEST_SCOPE);
+                        String uri = NetUtils.inputStreamToAnyURI(entryInputStream, NetUtils.REQUEST_SCOPE, logger);
                         // <file name="filename.ext">uri</file>
                         AttributesImpl fileAttributes = new AttributesImpl();
                         fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);

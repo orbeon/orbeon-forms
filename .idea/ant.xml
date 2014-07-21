@@ -5,6 +5,8 @@
       <additionalClassPath>
         <entry path="file://$PROJECT_DIR$/lib/junit.jar" />
       </additionalClassPath>
+      <customJdkName value="1.7" />
+      <maximumHeapSize value="512" />
       <maximumStackSize value="32" />
       <properties>
         <property name="skip.compilation" value="true" />

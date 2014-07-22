@@ -62,7 +62,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
         // The scope is interpreted as a property prefix
         formRunnerProperty(scope + '.' + name) flatMap
-        nonEmptyOrNone orElse // don't accept an existing but blank property [why?]
+        nonEmptyOrNone                         orElse // don't accept an existing but blank property [why?]
         buildProcessFromLegacyProperties(name)
     }
 

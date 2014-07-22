@@ -123,8 +123,11 @@ trait ProcessInterpreter extends Logging {
             def runAction(action: ActionNode) =
                 withDebug("process: running action", Seq("action" → action.toString)) {
                     // Push and pop the stack frame (for suspend/resume)
-                    val result =
-                        AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
+                    val result = (
+                        AllAllowedActions
+                        getOrElse (action.name, (_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name)))
+                        apply     action.params
+                    )
 
                     debugResults(Seq("result" → (if (result.isSuccess) "success" else "failure")))
 

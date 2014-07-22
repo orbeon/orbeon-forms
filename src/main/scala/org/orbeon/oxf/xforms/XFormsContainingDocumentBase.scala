@@ -265,7 +265,7 @@ trait ContainingDocumentRequest {
                 import OrbeonXFormsFilter._
 
                 val rendererDeploymentType =
-                    request.getAttributesMap.get(RENDERER_DEPLOYMENT_ATTRIBUTE_NAME).asInstanceOf[String]
+                    request.getAttributesMap.get(RendererDeploymentAttributeName).asInstanceOf[String]
 
                 _deploymentType =
                     rendererDeploymentType match {
@@ -280,7 +280,7 @@ trait ContainingDocumentRequest {
                 // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
                 // NOTE: We used to have response.rewriteRenderURL() on this, but why?
                 _requestPath =
-                    Option(request.getAttributesMap.get(RENDERER_BASE_URI_ATTRIBUTE_NAME).asInstanceOf[String]) getOrElse
+                    Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse
                     request.getRequestPath
 
                 _requestHeaders =

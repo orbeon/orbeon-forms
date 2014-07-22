@@ -71,7 +71,7 @@ class ServletEmbeddingContextWithResponse(
 
 class ServletFilter extends Filter {
 
-    import org.orbeon.oxf.fr.embedding.servlet.ServletFilter._
+    import ServletFilter._
 
     private var settingsOpt: Option[FilterSettings] = None
 

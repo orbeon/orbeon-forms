@@ -183,7 +183,7 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             // Set deployment mode into request (useful for epilogue)
-                            request.getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getDeploymentType().name());
+                            request.getAttributesMap().put(OrbeonXFormsFilter.RendererDeploymentAttributeName(), containingDocument.getDeploymentType().name());
 
                             final boolean hasEvents = remainingClientEvents.nonEmpty() || serverEventsElements.nonEmpty();
                             // Whether there are uploaded files to handle

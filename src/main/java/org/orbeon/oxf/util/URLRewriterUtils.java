@@ -151,7 +151,7 @@ public class URLRewriterUtils {
 
     public static boolean isSeparateDeployment(ExternalContext.Request request) {
         final Map<String, Object> attributes = request.getAttributesMap();
-        return "separate".equals(attributes.get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
+        return "separate".equals(attributes.get(OrbeonXFormsFilter.RendererDeploymentAttributeName()));
     }
 
     public static boolean isForwarded(ExternalContext.Request request) {

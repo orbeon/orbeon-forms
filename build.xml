@@ -328,7 +328,6 @@
     <target name="test-classpath" depends="classpath">
         <path id="test.class.path">
             <pathelement location="${build.classes.dir}"/>
-            <pathelement location="${xforms-filter.jar.file}"/>
             <fileset dir="lib">
                 <include name="**/*.jar"/>
             </fileset>
@@ -434,8 +433,11 @@
         </proguard>
         <jarjar jarfile="build/lib/orbeon-embedding.jar">
             <zipfileset src="${temp.jar}"/>
-            <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
-            <rule pattern="scala.**" result="org.orbeon.scala.@1"/>
+            <rule pattern="org.orbeon.oxf.fr.embedding.servlet.ServletFilter*" result="org.orbeon.oxf.fr.embedding.servlet.ServletFilter@1"/>
+            <rule pattern="org.orbeon.oxf.fr.embedding.servlet.API*"           result="org.orbeon.oxf.fr.embedding.servlet.API@1"/>
+            <rule pattern="org.orbeon.**" result="org.orbeon.private.orbeon.@1"/>
+            <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
+            <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
     </target>
 
@@ -472,8 +474,10 @@
         </proguard>
         <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">
             <zipfileset src="${temp.jar}"/>
-            <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
-            <rule pattern="scala.**" result="org.orbeon.scala.@1"/>
+            <rule pattern="org.orbeon.oxf.portlet.OrbeonProxyPortlet*" result="org.orbeon.oxf.portlet.OrbeonProxyPortlet@1"/>
+            <rule pattern="org.orbeon.**" result="org.orbeon.private.orbeon.@1"/>
+            <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
+            <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
     </target>
 
@@ -505,8 +509,10 @@
         </proguard>
         <jarjar jarfile="${xforms-filter.jar.file}">
             <zipfileset src="${temp.jar}"/>
-            <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
-            <rule pattern="scala.**" result="org.orbeon.scala.@1"/>
+            <rule pattern="org.orbeon.oxf.servlet.OrbeonXFormsFilter*" result="org.orbeon.oxf.servlet.OrbeonXFormsFilter@1"/>
+            <rule pattern="org.orbeon.**" result="org.orbeon.private.orbeon.@1"/>
+            <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
+            <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
     </target>
 
@@ -524,9 +530,11 @@
             <fileset dir="${build.classes.dir}">
                 <include name="**/*.class"/>
                 <include name="**/*.xsd"/>
-                <!-- This goes into a separate JAR -->
+                <!-- These all go into separate JARs -->
                 <exclude name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
                 <exclude name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
+                <exclude name="org/orbeon/oxf/fr/embedding/servlet/ServletFilter*.class"/>
+                <exclude name="org/orbeon/oxf/fr/embedding/servlet/API*.class"/>
             </fileset>
             <fileset dir="${resources-packaged.dir}">
                 <include name="config/*-processors.xml"/>

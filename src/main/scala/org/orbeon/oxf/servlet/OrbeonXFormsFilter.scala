@@ -78,11 +78,6 @@ class OrbeonXFormsFilter extends Filter {
                     if (orbeonContext eq servletContext) "integrated" else "separate"
                 )
                 
-                httpRequest.setAttribute(
-                    RendererDeploymentSourceAttributeName,
-                    "servlet"
-                )
-
                 requestPath match {
                     case settings.OrbeonResourceRegex(subRequestPath) ⇒
                         // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
@@ -160,20 +155,18 @@ class OrbeonXFormsFilter extends Filter {
 
 object OrbeonXFormsFilter {
     
-    val RendererDeploymentAttributeName       = "oxf.xforms.renderer.deployment"
-    val RendererDeploymentSourceAttributeName = "oxf.xforms.renderer.source"
-    val RendererBaseUriAttributeName          = "oxf.xforms.renderer.base-uri"
-    val RendererDocumentAttributeName         = "oxf.xforms.renderer.document"
-    val RendererContentTypeAttributeName      = "oxf.xforms.renderer.content-type"
-    val RendererHasSessionAttributeName       = "oxf.xforms.renderer.has-session"
-    val RendererContextParameterName          = "oxf.xforms.renderer.context"
-    val DefaultEncodingParameterName          = "oxf.xforms.renderer.default-encoding"
+    val RendererDeploymentAttributeName      = "oxf.xforms.renderer.deployment"
+    val RendererBaseUriAttributeName         = "oxf.xforms.renderer.base-uri"
+    val RendererDocumentAttributeName        = "oxf.xforms.renderer.document"
+    val RendererContentTypeAttributeName     = "oxf.xforms.renderer.content-type"
+    val RendererHasSessionAttributeName      = "oxf.xforms.renderer.has-session"
 
-    val RendererPath                          = "/xforms-renderer"
+    private val RendererContextParameterName = "oxf.xforms.renderer.context"
+    private val DefaultEncodingParameterName = "oxf.xforms.renderer.default-encoding"
+    private val RendererPath                 = "/xforms-renderer"
+    private val DefaultEncoding              = "ISO-8859-1" // antique and for backward compatibility, could change
 
-    val DefaultEncoding                       = "ISO-8859-1" // antique and for backward compatibility, could change
-
-    def normalizeContextPath(s: String) =
+    private def normalizeContextPath(s: String) =
         "/" + dropStartingSlash(dropTrailingSlash(s))
 }
 

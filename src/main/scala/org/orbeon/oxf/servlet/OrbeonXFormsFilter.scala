@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
-private case class FilterSettings(servletContext: ServletContext, orbeonContextPath: Option[String], defaultEncoding: String) {
+private case class FilterSettings(context: ServletContext, orbeonContextPath: Option[String], defaultEncoding: String) {
     // NOTE: Never match anything if there is no context path
     val OrbeonResourceRegex = orbeonContextPath map (path ⇒ s"$path(/.*)".r) getOrElse "$.".r
 }
@@ -52,33 +52,48 @@ class OrbeonXFormsFilter extends Filter {
 
                 val orbeonContext = (
                     orbeonContextPath
-                    map { servletContext.getContext(_) ensuring (_ ne null, s"Can't find Orbeon Forms context called '$orbeonContextPath'. Check the '$RendererContextParameterName' filter initialization parameter and the <Context crossContext='true'/> attribute.") }
+                    map {
+                        servletContext.getContext(_) ensuring (
+                            _ ne null,
+                            s"Can't find Orbeon Forms context called '$orbeonContextPath'. Check the " +
+                            s"'$RendererContextParameterName' filter initialization parameter and the " +
+                            s"<Context crossContext='true'/> attribute."
+                        )
+                    }
                     getOrElse servletContext
                 )
 
                 def getOrbeonDispatcher(path: String) =
-                    orbeonContext.getRequestDispatcher(path) ensuring (_ ne null, "Can't find Orbeon Forms request dispatcher.")
+                    orbeonContext.getRequestDispatcher(path) ensuring
+                    (_ ne null, "Can't find Orbeon Forms request dispatcher.")
 
                 val httpRequest  = servletRequest.asInstanceOf[HttpServletRequest]
                 val httpResponse = servletResponse.asInstanceOf[HttpServletResponse]
                 val requestPath  = NetUtils.getRequestPathInfo(httpRequest)
 
                 // Set whether deployment is integrated or separate
-                // NOTE: DO this also for resources, so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly
-
-                httpRequest.setAttribute(RendererDeploymentAttributeName, if (orbeonContext eq servletContext) "integrated" else "separate")
-                httpRequest.setAttribute(RendererDeploymentSourceAttributeName, "servlet")
+                // NOTE: Also for resources so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly.
+                httpRequest.setAttribute(
+                    RendererDeploymentAttributeName,
+                    if (orbeonContext eq servletContext) "integrated" else "separate"
+                )
+                
+                httpRequest.setAttribute(
+                    RendererDeploymentSourceAttributeName,
+                    "servlet"
+                )
 
                 requestPath match {
                     case settings.OrbeonResourceRegex(subRequestPath) ⇒
                         // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
 
                         // Check that the session exists for any request to /xforms-server
-                        // The purpose of this check is that if the application has invalidated the session, we don't want to allow
-                        // further interactions with a page.
-                        // NOTE: With Tomcat, this doesn't seem necessary. Other application servers might work differently.
+                        // The purpose of this check is that if the application has invalidated the session, we don't
+                        // want to allow further interactions with a page.
+                        // NOTE: With Tomcat this doesn't seem necessary. Other containers might work differently.
                         if (subRequestPath.startsWith("/xforms-server"))
-                            httpRequest.getSession(false) ensuring (_ ne null, "Session has expired. Unable to process incoming request.")
+                            httpRequest.getSession(false) ensuring
+                            (_ ne null, "Session has expired. Unable to process incoming request.")
                         
                         getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse)
                     case _ ⇒
@@ -92,7 +107,8 @@ class OrbeonXFormsFilter extends Filter {
                         // Content can be a String or other content set as a request attribute which can be read by the
                         // scope generator
                         val content =
-                            Option(httpRequest.getAttribute(RendererDocumentAttributeName)) orElse responseWrapper.content
+                            Option(httpRequest.getAttribute(RendererDocumentAttributeName)) orElse
+                            responseWrapper.content
 
                         val nonEmptyContent = content match {
                             case Some(s: String) ⇒ StringUtils.isNotBlank(s)
@@ -100,26 +116,39 @@ class OrbeonXFormsFilter extends Filter {
                             case None            ⇒ false
                         }
 
-                        // Make sure document is set
-                        content foreach
-                            (httpRequest.setAttribute(RendererDocumentAttributeName, _))
+                        // Make sure document is set when available
+                        content foreach {
+                            httpRequest.setAttribute(
+                                RendererDocumentAttributeName,
+                                _
+                            )
+                        }
 
-                        // Tell whether there is a session
-                        httpRequest.setAttribute(RendererHasSessionAttributeName, (httpRequest.getSession(false) ne null).toString)
+                        // Whether there is a session
+                        httpRequest.setAttribute(
+                            RendererHasSessionAttributeName,
+                            (httpRequest.getSession(false) ne null).toString
+                        )
 
-                        // Provide media type if available
-                        responseWrapper.mediaType foreach
-                            (httpRequest.setAttribute(RendererContentTypeAttributeName, _))
+                        // Mediatype if available
+                        responseWrapper.mediaType foreach {
+                            httpRequest.setAttribute(
+                                RendererContentTypeAttributeName,
+                                _
+                            )
+                        }
 
-                        // Set base URI
-                        httpRequest.setAttribute(RendererBaseUriAttributeName, requestPath)
+                        httpRequest.setAttribute(
+                            RendererBaseUriAttributeName,
+                            requestPath
+                        )
 
-                        // Forward to Orbeon Forms for rendering only if there is content to be rendered, otherwise just return and
-                        // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
-                        // available in the response object
+                        // Forward to Orbeon Forms for rendering only if there is content to be rendered, otherwise just
+                        // return and let the filterChain finish its life naturally, assuming that when sendRedirect is
+                        // used, no content is available in the response object.
                         if (nonEmptyContent) {
-                            // The request wrapper provides an empty request body if the filtered resource already attempted to
-                            // read the body.
+                            // The request wrapper provides an empty request body if the filtered resource already
+                            // attempted to read the body.
                             val orbeonRequestWrapper =
                                 new OptionalBodyFilterRequestWrapper(httpRequest, requestWrapper.isRequestBodyRead)
 
@@ -142,7 +171,7 @@ object OrbeonXFormsFilter {
 
     val RendererPath                          = "/xforms-renderer"
 
-    val DefaultEncoding                       = "ISO-8859-1" // per antiquated Servlet spec, for backward compatibility, maybe we could change this
+    val DefaultEncoding                       = "ISO-8859-1" // antique and for backward compatibility, could change
 
     def normalizeContextPath(s: String) =
         "/" + dropStartingSlash(dropTrailingSlash(s))

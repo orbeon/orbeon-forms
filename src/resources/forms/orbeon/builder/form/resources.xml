@@ -3510,14 +3510,14 @@
         <!-- Form metadata -->
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
-            <label>Nome dell' applicazione</label>
-            <hint>Identifica un gruppo di moduli, per esempio rappresenta una funzionalità o un dipartimento (esempio: "sales"). Se ce solo un gruppo di moduli, il nome dell’organizzazione può essere utilizzato. Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
-            <alert>Deve essere composto e non può contenere vuoti</alert>
+            <label>Nome dell'applicazione</label>
+            <hint>Identifica un gruppo di moduli, per esempio rappresenta una funzionalità o un dipartimento (esempio: "sales"). Se c'é solo un gruppo di moduli, il nome dell’organizzazione può essere utilizzato. Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
+            <alert>Utilizza lettere ASCII, cifre, "-" o "_"</alert>
         </application-name>
         <form-name>
             <label>Nome del modulo</label>
             <hint>Identifica il modulo specifico (esempio: "health-record" o "claim"). Il nome verrà esposto nelle URL del modulo pubblicato, per questo raccomandiamo di usare solo lettere minuscole. Non è permesso usare accenti e apostrofi o interpunzioni.</hint>
-            <alert>Deve essere composto e non può contenere vuoti</alert>
+            <alert>Utilizza lettere ASCII, cifre, "-" o "_"</alert>
         </form-name>
         <title>
             <label>Titolo del modulo</label>
@@ -3575,8 +3575,7 @@
             <label>Nuova griglia</label>
         </new-grid>
         <new-repeated-grid>
-            <label todo="true">[New Repeated Grid]</label>
-            <!--<label>Nuovo repeat</label>-->
+            <label>Nuova griglia ripetuta</label>
         </new-repeated-grid>
         <change-schema>
             <label>Cambia schema</label>
@@ -3597,46 +3596,46 @@
             <label>Allega CSS</label>
         </upload-css>
         <show-source>
-            <label>Mostra Source</label>
+            <label>Visualizza fonte</label>
         </show-source>
         <edit-source>
-            <label>Modifica Source</label>
+            <label>Modifica fonte</label>
         </edit-source>
         <custom-xml>
             <label>Personalizza XML</label>
         </custom-xml>
         <permissions>
-            <label>Fissa permessi</label>
+            <label>Imposta autorizzazioni</label>
         </permissions>
         <reload-components>
             <label>Ricarica Toolbox</label>
         </reload-components>
         <enter-section-title>
-            <label>Fai click per inserire un titolo</label>
+            <label>Clicca per inserire un titolo</label>
         </enter-section-title>
         <type-section-title>
-            <label>Scrivi qui il titolo della sezione</label>
+            <label>Scrivi il titolo della sezione qui </label>
         </type-section-title>
         <enter-label>
-            <label>Fai click per inserire un' etichetta</label>
+            <label>Clicca per inserire un'etichetta</label>
         </enter-label>
         <type-label>
-            <label>Scrivi qui il nome dell' etichetta</label>
+            <label>Scrivi il nome dell'etichetta qui</label>
         </type-label>
         <enter-hint>
-            <label>Fai click per inserire un suggerimento</label>
+            <label>Clicca per inserire un suggerimento</label>
         </enter-hint>
         <enter-text>
-            <label todo="true">[Type your text here]</label>
+            <label>Scrivi il tuo test qui</label>
         </enter-text>
         <type-hint>
-            <label>Scrivi qui il tuo suggerimento</label>
+            <label>Scrivi il tuo suggerimento qui</label>
         </type-hint>
         <enter-text>
-            <label>Fai click per inserire un testo</label>
+            <label>Clicca per inserire un testo</label>
         </enter-text>
         <click-cell>
-            <label>Fai click per selezionare questa cella</label>
+            <label>Clicca per selezionare questa cella</label>
         </click-cell>
         <insert-control>
             <label>Usa la toolbar per inserire un controllo</label>
@@ -3645,7 +3644,7 @@
             <label>Modifica scelte</label>
         </edit-items>
         <expand-icon>
-            <label>Ingrandisci</label>
+            <label>Espandi</label>
         </expand-icon>
         <shrink-icon>
             <label>Restringi</label>
@@ -3678,25 +3677,25 @@
             <label>Inserisci riga sotto</label>
         </insert-row-below-icon>
         <section-details-icon>
-            <label>Dettagli della sezione</label>
+            <label>Impostazioni sezione</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>Dettagli della griglia</label>
+            <label>Impostazioni griglia</label>
         </grid-details-icon>
         <move-up-icon>
-            <label>Sali</label>
+            <label>Sposta in sù</label>
         </move-up-icon>
         <move-down-icon>
-            <label>Scendi</label>
+            <label>Sposta in giù</label>
         </move-down-icon>
         <move-right-icon>
-            <label>Vai a destra</label>
+            <label>Sposta a destra</label>
         </move-right-icon>
         <move-left-icon>
-            <label>Vai a sinistra</label>
+            <label>Sposta a sinistra</label>
         </move-left-icon>
         <control-details-icon>
-            <label>Impostazioni del controllo</label>
+            <label>Impostazioni di controllo</label>
         </control-details-icon>
         <switch-appearance-icon>
             <label>Cambia aspetto</label>
@@ -3715,7 +3714,7 @@
             <label>Modifica</label>
         </edit>
         <classes>
-            <label todo="true">[Custom CSS classes]</label>
+            <label>Classi CSS personalizzati</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -3749,18 +3748,18 @@
             <all>Tutti</all>
         </dialog-form-settings>
         <dialog-control-details>
-            <label>Impostazioni del controllo</label>
+            <label>Impostazioni di controllo</label>
             <tab-base><label>Impostazioni di base</label></tab-base>
-            <tab-validations><label>Validazioni e avvisi</label></tab-validations>
+            <tab-validations><label>Convalide e avvisi</label></tab-validations>
             <tab-formulas><label>Formule</label></tab-formulas>
             <tab-help><label>Messaggio d'aiuto</label></tab-help>
             <control-name>
                 <label>Nome del controllo</label>
-                <alert>Il nome richiesto esiste già</alert>
+                <alert>Il nome é già in uso o non é valido</alert>
                 <hint>Ad esempio: "primo nome"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Opzioni</label>
                 <item>
                     <label>Mostra nel sommario</label>
                     <value>fr-summary</value>
@@ -3791,7 +3790,7 @@
                     <choices>
                         <label>Tipi comuni</label>
                         <type label="Stringa">string</type>
-                        <type label="Boolean">boolean</type>
+                        <type label="Booleana">boolean</type>
                         <type label="Indirizzo email">email</type>
                     </choices>
                     <choices>
@@ -3805,7 +3804,7 @@
                         <type label="Numero intero non-negativo">nonNegativeInteger</type>
 
                         <type label="Numero di virgola mobile (precisione semplice)">float</type>
-                        <type label="Numero di virgola mobile (doppia precisione)">double</type>
+                        <type label="Numero di virgola mobile (precisione doppia)">double</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -3866,19 +3865,19 @@
                 <item id="2">XPath</item>
             </required>
             <constraint>
-                <label>Condizione</label>
+                <label>Costrizione</label>
                 <alert>Espressione XPath non corretta</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </constraint>
             <visibility>
                 <label>Visibiltà</label>
                 <alert>Espressione XPath non corretta</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </visibility>
             <readonly>
                 <label>Solo lettura</label>
                 <alert>Espressione XPath non corretta</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </readonly>
             <default>
                 <label>Valore iniziale</label>
@@ -3892,15 +3891,15 @@
             </calculate>
             <help>
                 <label>Messaggio d'aiuto</label>
-                <hint>Questo messaggio viene mostrato quando l'utente attiva l'aiuto</hint>
+                <hint>Visualizzato quando l'aiuto viene attivato</hint>
             </help>
             <alert>
                 <label>Messaggio di avviso</label>
-                <hint>Questo messaggio viene mostrato quando l'utente attiva l'avviso</hint>
+                <hint>Visualizzato quando l'avviso é attivo</hint>
             </alert>
             <default-alert>
                 <label>Messaggio di avviso predefinito</label>
-                <hint>Attivo se non esiste un messaggio di avviso più specifico</hint>
+                <hint>Attivo quando non c'é un messaggio di avviso più specifico</hint>
             </default-alert>
             <use-global-alert>
                 <label>Usa messaggio di avviso predefinito globale</label>
@@ -3911,72 +3910,72 @@
             <validation-type><label>Tipo di convalida</label></validation-type>
             <validation-details><label>Dettagli di convalida</label></validation-details>
             <level><label>Livello</label></level>
-            <use-html todo="true">[Use HTML]</use-html>
+            <use-html>Usa HTML</use-html>
         </dialog-control-details>
         <dialog-section-details>
-            <label>Dettagli della sezione</label>
+            <label>Impostazioni sezione</label>
             <control-name>
                 <label>Nome della sezione</label>
-                <alert>Il nome esiste già o non è valido</alert>
+                <alert>Il nome é già in uso o non è valido</alert>
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Opzioni</label>
                 <item>
-                    <label todo="true">[Page Break Before]</label>
+                    <label>Interruzione di pagina prima</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
                 <label>Visibilità</label>
                 <alert>Espressione XPath non valida</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </visibility>
             <readonly>
                 <label>Solo lettura</label>
                 <alert>Espressione XPath non valida</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Section Content]</label>
+                <label>Ripeti contenuto sezione</label>
             </repeat>
             <custom-iteration-name>
-                <label todo="true">[Enable Custom Iteration Name]</label>
+                <label>Attiva nome iterazione personalizzato</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label todo="true">[Custom Iteration Name]</label>
-                <alert todo="true">[Name is already in use or incorrect]</alert>
+                <label>Nome iterazione personalizzato</label>
+                <alert>Il nome é già in uso o non è valido</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
+            <tab-base><label>Impostazioni di base e formule</label></tab-base>
+            <tab-repeat><label>Contenuto ripetuto</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>Dettagli griglia</label>
+            <label>Impostazioni griglia</label>
             <control-name>
                 <label>Nome della griglia</label>
-                <alert>Nome e gia esistente o non valido</alert>
+                <alert>Il nome é già in uso o non è valido</alert>
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
             <visibility>
-                <label>Visibilita</label>
+                <label>Visibilità</label>
                 <alert>Espressione XPath non valida</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </visibility>
             <readonly>
                 <label>Solo lettura</label>
                 <alert>Espressione XPath non valida</alert>
-                <hint>Espressione XPath boolean</hint>
+                <hint>Espressione XPath booleana</hint>
             </readonly>
             <min>
                 <label>Numero minimo di ripetizioni</label>
-                <alert>Valore non corretto</alert>
+                <alert>Valore invalido</alert>
                 <hint>Numero non-negativo o espressione XPath</hint>
             </min>
             <max>
                 <label>Numero massimo di ripetizioni</label>
-                <alert>Valore non corretto</alert>
+                <alert>Valore invalido</alert>
                 <hint>Numero positivo o espressione XPath</hint>
             </max>
             <other>Altro</other>
@@ -3996,25 +3995,17 @@
         <dialog-publish>
             <label>Pubblica modulo</label>
             <publish>Pubblica</publish>
-            <publish-success todo="true">Il modulo è stato pubblicato con successo [as version {1,number,integer}]. {0,choice,0#No allegati sono|1#1 allegato è|1&lt;{0,number,integer}} stati pubblicati.</publish-success>
-            <publish-error>Si è riscontrato un errore durante la pubblicazione del modulo.</publish-error>
-            <latest-published-version todo="true">Latest published version</latest-published-version>
-            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
-            <create-new-version-help todo="true">
-                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
-                database. Data which already exists in the database will still be viewed and edited with the previous
-                versions of this form definition which are associated with that data. The new form definition version
-                will be used to create new data.
+            <publish-success>La definizione di modulo è stata pubblicata con successo come versione {1,number,integer}, {0,choice,0#senza allegati|1#con 1 allegato|con 1&lt;{0,number,integer}allegati}.</publish-success>
+            <publish-error>Si è verificato un errore durante la pubblicazione del modulo.</publish-error>
+            <latest-published-version>Ultima versione pubblicata</latest-published-version>
+            <create-new-version-item>Crea una nuova definizione di modulo con il numero di versione {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>Sovrascrivi la definizione del modulo attuale con il numero di versione {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+                NOTA: La pubblicazione di questa definizione di modulo creerà una nuova versione della definizione del modulo nel database. I dati che esistono già nel database potranno ancora essere visualizzati e modificati con le versioni precedenti di questa definizione del modulo che sono associati con tali dati. La nuova versione della definizione del modulo verrà utilizzata per creare nuovi dati.
             </create-new-version-help>
-            <overwrite-version-help todo="true">
-                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
-                definition are small, such as changing control labels, the form definition will be compatible with
-                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
-                moving controls, the form definition might be incompatible with existing data. We recommend being
-                careful when overwriting an existing form definition version.
-            </overwrite-version-help>
-            <open-summary>Elenca moduli già compilati</open-summary>
+            <overwrite-version-help>
+                NOTA: Questo sovrascriverà la definizione di modulo esistente. Se le modifiche apportate alla definizione di modulo sono piccole, come cambiare le etichette di controllo, la definizione del modulo sarà compatibile con i dati del modulo esistente. Ma se sono state apportate modifiche strutturali, come l'aggiunta, la rimozione, la ridenominazione, o il movimento dei controlli, la definizione di modulo potrebbe essere incompatibile con i dati esistenti. Si consiglia di essere attentiti quando sovrascrive una versione della definizione di modulo esistente. </overwrite-version-help>
+            <open-summary>Elenca moduli già pubblicati</open-summary>
             <open-new>Compila nuovo modulo</open-new>
         </dialog-publish>
         <dialog-add-language>
@@ -4035,11 +4026,11 @@
             <label>Carica schema XML</label>
             <schema-type>
                 <label>Tipi di schema disponibili</label>
-                <hint>Tipi semplici disponibili nel schema per caricare</hint>
+                <hint>Tipi semplici disponibili nel schema caricato</hint>
             </schema-type>
             <namespace-uri>
-                <label>Schema con spazio dei nomi URI</label>
-                <hint>Questo è lo spazio dei nomi per l'URI del schema caricato</hint>
+                <label>URI dello spazio dei nomi dello schema</label>
+                <hint>Questo è l'URI dello spazio dei nomi dello schema caricato</hint>
             </namespace-uri>
             <operations>
                 <label>Operazioni</label>
@@ -4057,11 +4048,11 @@
                 <label>Allega schema XML</label>
             </upload-schema>
             <messages>
-                <no-simple-types>Sembra che il tuo schema contenga solo tipi di dati semplici. Non è possibile fare una convalida.</no-simple-types>
-                <has-includes>Il tuo schema contiene importazioni o note. Queste saranno ignorate.</has-includes>
+                <no-simple-types>Il tuo schema non sembra contenere tipi semplici. Non sarai in grado di selezionare i tipi da questo schema per la convalida.</no-simple-types>
+                <has-includes>Il tuo schema contiene importazioni o note. Questi verranno disattivate.</has-includes>
                 <not-a-schema>Il file caricato non è uno schema valido.</not-a-schema>
                 <new-schema-information>Informazioni sul nuovo schema</new-schema-information>
-                <existing-schema-information>Informazioni sollo schema già esistente</existing-schema-information>
+                <existing-schema-information>Informazioni sui schemi già esistenti</existing-schema-information>
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
@@ -4074,7 +4065,7 @@
             <label>Visualizza fonte</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <label>Allega un file template PDF</label>
+            <label>Allega un file di modello PDF</label>
             <upload-pdf>
                 <label>File PDF</label>
             </upload-pdf>
@@ -4091,18 +4082,18 @@
                 <label>Valore</label>
             </value>
             <hint>
-                <label todo="true">[Hint]</label>
+                <label>Suggerimento</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>
-            <label>Editore HTTP-servizi</label>
+            <label>Editore servizi HTTP</label>
             <service-name>
                 <label>Nome del servizio</label>
-                <hint>Scegli un nome unico per questo servizio</hint>
+                <hint>Scegli un nome univoco per questo servizio</hint>
             </service-name>
             <resource>
                 <label>URL della fonte</label>
-                <hint>HTTP URL su cui risiede il servizio</hint>
+                <hint>URL HTTP in cui il servizio risiede</hint>
             </resource>
             <method>
                 <label>Metodo</label>
@@ -4123,14 +4114,14 @@
                 <hint>Autenticazione HTTP</hint>
             </http-authentication>
             <username>
-                <label>Nome dell'utente</label>
+                <label>Utente</label>
             </username>
             <password>
                 <label>Password</label>
             </password>
             <request-body>
-                <label>Richiesta corpo</label>
-                <hint>dati XML (puo essere un involucro SOAP)</hint>
+                <label>Corpo della richiesta</label>
+                <hint>Dati XML (puo essere un involucro SOAP)</hint>
             </request-body>
             <response>
                 <label>Risposta</label>
@@ -4146,15 +4137,15 @@
                     <value>no-data</value>
                 </item>
                 <item>
-                    <label>Errore di validazione</label>
+                    <label>Errore di convalida</label>
                     <value>validation-error</value>
                 </item>
                 <item>
-                    <label>Errore nelle risorse</label>
+                    <label>Errore di risorse</label>
                     <value>resource-error</value>
                 </item>
                 <item>
-                    <label>Errore nell'obiettivo</label>
+                    <label>Errore di destinazione</label>
                     <value>target-error</value>
                 </item>
                 <item>
@@ -4178,7 +4169,7 @@
                 <label>Valori</label>
             </header-value>
             <response-body>
-                <label>Response Body</label>
+                <label>Corpo della risposta</label>
             </response-body>
             <save>
                 <label>Salva</label>
@@ -4188,18 +4179,18 @@
             </test>
         </dialog-http-services>
         <dialog-database-services>
-            <label>Editore del servizio banca dati</label>
+            <label>Editore del servizio database</label>
             <service-name>
                 <label>Nome del servizio</label>
-                <hint>Scegli un nome unico per questo servizio</hint>
+                <hint>Scegli un nome univoco per questo servizio</hint>
             </service-name>
             <datasource>
                 <label>Fonte dei dati</label>
                 <hint>Fonte dei dati JNDI per questo servizio</hint>
             </datasource>
             <query>
-                <label>Interrogazione SQL</label>
-                <hint>Interrogazione SQL che può contenere segnaposti per parametri</hint>
+                <label>Richiesta SQL</label>
+                <hint>Richiesta SQL che può contenere segnaposti per i parametri</hint>
             </query>
             <save>
                 <label>Salva</label>
@@ -4211,12 +4202,12 @@
         <dialog-actions>
             <label>Editore delle azioni</label>
             <service-name>
-                <label>Nome dell' azione</label>
-                <hint>Scegli un nome unico per questa azione</hint>
+                <label>Nome dell'azione</label>
+                <hint>Scegli un nome univoco per questa azione</hint>
             </service-name>
             <event-type>
                 <label>Reagisce a</label>
-                <hint>Evento (su un controllo globale) sul quale reagire</hint>
+                <hint>Evento (su un controllo o globale) sul quale reagire</hint>
                 <!-- Just a value change -->
                 <item>
                     <label>Cambia valore</label>
@@ -4224,7 +4215,7 @@
                 </item>
                 <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Cambia valore o cambia modulo</label>
+                    <label>Cambia valore o carica modulo</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
                 <!-- Control activation -->
@@ -4234,30 +4225,30 @@
                 </item>
                 <!-- Form load -->
                 <item>
-                    <label>Caricare modulo</label>
+                    <label>Carica modulo</label>
                     <value>xforms-ready</value>
                 </item>
             </event-type>
             <event-condition>
-                <label>Condizioni</label>
+                <label>Condizione</label>
                 <item>
-                    <label>Eseguire sempre</label>
+                    <label>Esegui sempre</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>Eseguire solo su certi moduli</label>
+                    <label>Esegui sulla creazione solo</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
             <event-control>
-                <label>Controlli</label>
+                <label>Controllo</label>
             </event-control>
             <service-to-call>
-                <label>Servizio da eseguire quando richiamato</label>
-                <hint>Servizio da eseguire quando avviene l'evento</hint>
+                <label>Servizio da eseguire quando chiamato</label>
+                <hint>Servizio da eseguire quando l'evento si verifica</hint>
             </service-to-call>
             <request-parameters>
-                <label>Inserisci valore di domanda del servizio</label>
+                <label>Imposti i parametri per la richiesta del servizio</label>
             </request-parameters>
             <source-control>
                 <label>Controllo della fonte</label>
@@ -4266,33 +4257,33 @@
                 <label>Espressione XPath destinazione</label>
             </destination-xpath>
             <request-database-parameter>
-                <label>Inserisci parametri del servizio banca dati</label>
+                <label>Imposti parametri per il servizio database</label>
             </request-database-parameter>
             <parameter-number>
-                <label>Numero di parametri</label>
+                <label>Numero del parametro</label>
             </parameter-number>
             <response-values>
-                <label>Inserisci controllo valore risposta</label>
+                <label>Imposti valori controllo dalla risposta</label>
             </response-values>
             <destination-control>
-                <label>Controllo destinazioni</label>
+                <label>Controllo destinazione</label>
             </destination-control>
             <source-xpath>
                 <label>Espressione XPath della fonte</label>
             </source-xpath>
             <response-itemset>
-                <label>Inserisci articoli di controllo selezione risposta</label>
+                <label>Imposti elementi di controllo di selezione dalla risposta</label>
             </response-itemset>
             <destination-selection-control>
-                <label>Destinazione controllo selezione</label>
+                <label>Controllo selezione destinazione</label>
             </destination-selection-control>
             <itemset>
-                <label>Set di elementi</label>
-                <hint>Espressione XPath per creare un nuovo set di elementi</hint>
+                <label>Scelta</label>
+                <hint>Espressione XPath per creare una nuova scelta</hint>
             </itemset>
             <items>
                 <label>Elementi</label>
-                <hint>Espressione XPath expression che dà un nodo per ogni elemento</hint>
+                <hint>Espressione XPath che ritorna un nodo per ogni elemento</hint>
             </items>
             <label>
                 <label>Etichetta</label>
@@ -4313,25 +4304,25 @@
             <label>Anteprima del modulo</label>
         </dialog-test>
         <dialog-pe>
-            <label>Caratteristica del modulo dell' edizione professionale di Orbeon</label>
+            <label>Funzioni di Orbeon Forms PE</label>
             <message>
                 <div>
-                    <p>Questa caratteristica è disponibile solo nell' edizione professionale di Orbeon.</p>
-                    <p>Per maggiori informazioni prego consultare il sito web:<a href="http://www.orbeon.com/download" target="_blank">Sito web Orbeon</a>.</p>
+                    <p>Questa funzione è disponibile solo in Orbeon Forms PE.</p>
+                    <p>Per ulteriori informazioni, si prega di visitare il <a href="http://www.orbeon.com/download" target="_blank">sito web Orbeon</a>.</p>
                 </div>
             </message>
         </dialog-pe>
         <dialog-custom-xml>
             <label>XML personalizzato</label>
-            <mode-label>L'informazione inserita dall'utente viene salvata in un documento XML:</mode-label>
-            <mode-automatic>Permette di creare il XML automaticamente da Form Builder</mode-automatic>
-            <mode-custom>Offrirò un documento XML personalizzato</mode-custom>
+            <mode-label>Le informazioni inserite dagli utenti nel modulo viene salvata in un documento XML:</mode-label>
+            <mode-automatic>Lascia From Builder generare il codice XML per me.</mode-automatic>
+            <mode-custom>Fornirò un documento XML personalizzato</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
-            <label>Permessi</label>
-            <enable-permissions>Attiva permessi per questo modulo</enable-permissions>
+            <label>Autorizzazioni</label>
+            <enable-permissions>Abilita autorizzazioni per questo modulo</enable-permissions>
             <role>Ruolo</role>
-            <permissions>Permessi</permissions>
+            <permissions>Autorizzazioni</permissions>
             <operations>Operazioni</operations>
             <anyone>Tutti</anyone>
             <owner>Proprietario</owner>
@@ -4346,18 +4337,18 @@
             <delete-section>Sei sicuro di voler cancellare la sezione attuale?</delete-section>
             <delete-grid>Sei sicuro di voler cancellare la griglia attuale?</delete-grid>
             <delete-column>Sei sicuro di voler cancellare la colonna attuale?</delete-column>
-            <delete-row>Sei sicuro di voler cancellare la riga?</delete-row>
+            <delete-row>Sei sicuro di voler cancellare la riga attuale?</delete-row>
             <expand-cell>Sei sicuro di voler espandere la cella attuale? Un controllo sarà cancellato.</expand-cell>
-            <delete-resources>Sei sicuro di voler cancellare tutte le fonti per le lingue?</delete-resources>
+            <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua?</delete-resources>
             <delete-service>Sei sicuro di voler cancellare questo servizio?</delete-service>
             <delete-action>Sei sicuro di voler cancellare questa azione?</delete-action>
-            <controls-will-be-deleted>{0,choice,0#No controlli|1#1 controllo|1&lt;{0,number,integer} controls} sarà cancellato.</controls-will-be-deleted>
+            <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
             <metadata-edit-title>metadati del modulo</metadata-edit-title>
-            <new-metadata-output>Prego fornire un nome dell'applicazione e del modulo, che sarà usato per identificare il tuo modulo (è possibile cambiarlo più tardi):</new-metadata-output>
+            <new-metadata-output>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo (è possibile cambiarli più tardi):</new-metadata-output>
             <edit-metadata-output/>
-            <save-as-metadata-output>Inserisci un nuovo nome per l'applicazione e per il modulo che sarà usato per copiare il modulo:</save-as-metadata-output>
-            <xpath-errors>{0,choice,1# errore XPath è stato trovato |1&lt; {0,number,integer} errori sono stati trovati} nel tuo modulo.</xpath-errors>
-            <lhha-checkbox>Contrassegna questa casella di controllo se vuoi usare HTML tags</lhha-checkbox>
+            <save-as-metadata-output>Inserisci un nuovo nome per l'applicazione e per il modulo che saranno usati per la copia di questo modulo:</save-as-metadata-output>
+            <xpath-errors>{0,choice,1# Un errore XPath è stato trovato |1&lt; {0,number,integer} errori sono stati trovati} nel tuo modulo.</xpath-errors>
+            <lhha-checkbox>Contrassegna questa casella se vuoi usare tag HTML</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Modulo senza nome</untitled-form>
@@ -4385,14 +4376,14 @@
         <!-- Form metadata -->
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
-            <label>Name der Applikation</label>
-            <hint>Fasst eine Menge an Formularen nach Abteilung, Funktion oder ähnlichem zusammen (z.B.: "sales"). Sie können auch den Namen ihres Unternehmens verwenden. Da dieser Name in der URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
-            <alert>Muss gesetzt werden und darf keine Leerstellen beinhalten</alert>
+            <label>Name der Anwendung</label>
+            <hint>Kennzeichnet eine Gruppe von Formularen, z.B. unterteilt nach Funktion oder Abteilung. Wenn Sie eine Gruppe von Formularen haben, können Sie auch den Namen Ihres Unternehmens verwenden. Da dieser Name im URL des Formulars angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
+            <alert>Verwenden Sie ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
         </application-name>
         <form-name>
             <label>Name des Formulars</label>
-            <hint>Gibt den spezifischen Namen des Formulars an. (z.B.: "health-record" oder "claim")Identifies this specific form (e.g. "health-record" or "claim"). Da dieser Name in der URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
-            <alert>Muss gesetzt werden und darf keine Leerstellen beinhalten</alert>
+            <hint>Wird zu Identifikation des Formulars verwendet(z.B.: "Krankenakte"). Da dieser Name im URL angezeigt wird, empfehlen wir nur Kleinbuchstaben zu verwenden.</hint>
+            <alert>Verwenden Sie ASCII-Buchstaben, Ziffern,"-" oder "_"</alert>
         </form-name>
         <title>
             <label>Formulartitel</label>
@@ -4404,7 +4395,7 @@
         </description>
         <logo>
             <label>Logo</label>
-            <hint>Das Logo erscheint überhalb des Formulars</hint>
+            <hint>Das Logo erscheint oberhalb des Formulars</hint>
         </logo>
         <!-- Toolbox -->
         <cut>
@@ -4420,7 +4411,7 @@
             <label>Struktur des Formulars</label>
         </form-structure>
         <controls>
-            <label>Bedienelemente</label>
+            <label>Steuerelemente</label>
         </controls>
         <i18n>
             <label>Internationalisierung</label>
@@ -4447,11 +4438,10 @@
             <label>Neuer Abschnitt</label>
         </new-section>
         <new-grid>
-            <label>Neue Tabelle</label>
+            <label>Neues Raster</label>
         </new-grid>
         <new-repeated-grid>
-            <label todo="true">[New Repeated Grid]</label>
-            <!--<label>Neue Schleife</label>-->
+            <label>Neues wiederholtes Raster</label>
         </new-repeated-grid>
         <change-schema>
             <label>Schema ändern</label>
@@ -4472,10 +4462,10 @@
             <label>CSS anhängen</label>
         </upload-css>
         <show-source>
-            <label>Source-Code anzeigen</label>
+            <label>Quelltext anzeigen</label>
         </show-source>
         <edit-source>
-            <label>Source-Code ändern</label>
+            <label>Quelltext ändern</label>
         </edit-source>
         <custom-xml>
             <label>XML anpassen</label>
@@ -4484,28 +4474,28 @@
             <label>Berechtigungen setzen</label>
         </permissions>
         <reload-components>
-            <label>Bedienelemente neu laden</label>
+            <label>Toolbox neu laden</label>
         </reload-components>
         <enter-section-title>
-            <label>Klicken, um dem Abschnitt einen Namen zu geben</label>
+            <label>Klicken, um einen Abschnittstitel einzugeben</label>
         </enter-section-title>
         <type-section-title>
-            <label>Schreibe den Titel des Abschnittes hier hinein</label>
+            <label>Geben Sie den Abschnittstitel hier ein</label>
         </type-section-title>
         <enter-label>
-            <label>Klicken, um das Etikett zu ändern</label>
+            <label>Klicken, um die Beschriftung einzugeben</label>
         </enter-label>
         <type-label>
-            <label>Den Inhalt des Etiketts hier hineinschreiben</label>
+            <label>Beschriftung hier eingeben</label>
         </type-label>
         <enter-hint>
-            <label>Klicken, um einen Hinweis hinzuzufgügen</label>
+            <label>Klicken, um einen Hinweis hinzuzufügen</label>
         </enter-hint>
         <enter-text>
-            <label todo="true">[Type your text here]</label>
+            <label>Text hier eingeben</label>
         </enter-text>
         <type-hint>
-            <label>Schreibe hier den Hinweis hinein</label>
+            <label>Geben Sie den Text des Hinweises hier ein</label>
         </type-hint>
         <enter-text>
             <label>Klicken, um einen Text einzugeben</label>
@@ -4514,16 +4504,16 @@
             <label>Klicken, um diese Zelle auszuwählen</label>
         </click-cell>
         <insert-control>
-            <label>Verwende die Bedienelemente um ein Element hinzuzufügen</label>
+            <label>Verwenden Sie die Toolbox um ein Element hinzuzufügen</label>
         </insert-control>
         <edit-items>
             <label>Auswahlmöglichkeiten bearbeiten</label>
         </edit-items>
         <expand-icon>
-            <label>Ausweiten</label>
+            <label>Erweitern</label>
         </expand-icon>
         <shrink-icon>
-            <label>Verkleienern</label>
+            <label>Verkleinern</label>
         </shrink-icon>
         <delete-control-icon>
             <label>Bedienelement löschen</label>
@@ -4553,10 +4543,10 @@
             <label>Zeile unterhalb einfügen</label>
         </insert-row-below-icon>
         <section-details-icon>
-            <label>Abschnittdetails</label>
+            <label>Abschnittseigenschaften</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>Tabellendetails</label>
+            <label>Tabelleneigenschaften</label>
         </grid-details-icon>
         <move-up-icon>
             <label>Nach oben verschieben</label>
@@ -4571,13 +4561,13 @@
             <label>Nach links verschieben</label>
         </move-left-icon>
         <control-details-icon>
-            <label>Einstellungen Bedienelement</label>
+            <label>Steuerungseinstellungen</label>
         </control-details-icon>
         <switch-appearance-icon>
-            <label>Aussehen wechseln</label>
+            <label>Ansicht wechseln</label>
         </switch-appearance-icon>
         <help-icon>
-            <label>Hilfstext editieren</label>
+            <label>Hilfstext bearbeiten</label>
         </help-icon>
         <!-- Common -->
         <add>
@@ -4590,7 +4580,7 @@
             <label>Ändern</label>
         </edit>
         <classes>
-            <label todo="true">[Custom CSS classes]</label>
+            <label>Benutzerdefinierte CSS-Klassen</label>
         </classes>
         <!-- Dialogs -->
         <continue>
@@ -4612,36 +4602,36 @@
             <label>oder</label>
         </or>
         <dialog-form-settings>
-            <label>Form Settings</label>
-            <save-as>Save as…</save-as>
+            <label>Formulareinstellungen</label>
+            <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
             <stats>Formularstatistiken</stats>
             <sections>Abschnitte</sections>
-            <repeats>Schleifen</repeats>
+            <repeats>Wiederholungen</repeats>
             <grids>Tabellen</grids>
             <section-templates>Abschnittsvorlagen</section-templates>
-            <controls>Bedienelemente</controls>
+            <controls>Steuerelemente</controls>
             <all>Alle</all>
         </dialog-form-settings>
         <dialog-control-details>
-            <label>Einstellungen Bedienelement</label>
+            <label>Einstellungen Steuerelemente</label>
             <tab-base><label>Grundeinstellungen</label></tab-base>
         <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
         <tab-formulas><label>Formeln</label></tab-formulas>
-            <tab-help><label>Hilfnachricht</label></tab-help>
+            <tab-help><label>Hilfsnachricht</label></tab-help>
             <control-name>
-                <label>Bedienelementname</label>
+                <label>Steuerelementname</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
-                <hint>Z.B.: "vorname"</hint>
+                <hint>z.B.: "Vorname"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Optionen</label>
                 <item>
-                    <label>Übersicht anzeigen</label>
+                    <label>In Übersicht anzeigen</label>
                     <value>fr-summary</value>
                 </item>
                 <item>
-                    <label>In Suchen anzeigen</label>
+                    <label>In Suche anzeigen</label>
                     <value>fr-search</value>
                 </item>
                 <item>
@@ -4657,10 +4647,10 @@
                 <label>Datentyp</label>
             </types>
             <builtin-type>
-                <label>Eingebauter Datentyp</label>
+                <label>Eingebauter Typ</label>
                 <hint>Eingebauter Datentyp</hint>
 
-                <use-schema-type>Verwendeter Schematyp</use-schema-type>
+                <use-schema-type>Schematyp verwenden</use-schema-type>
 
                 <choices>
                     <choices>
@@ -4673,14 +4663,14 @@
                         <label>Numerische Typen</label>
                         <type label="Dezimalzahl">decimal</type>
 
-                        <type label="Integer">integer</type>
-                        <type label="Positive integer">positiveInteger</type>
-                        <type label="Non-positive integer">nonPositiveInteger</type>
-                        <type label="Negative integer">negativeInteger</type>
-                        <type label="Non-negative integer">nonNegativeInteger</type>
+                        <type label="Ganze Zahl">integer</type>
+                        <type label="Positive ganze Zahl">positiveInteger</type>
+                        <type label="Nicht positive ganze Zahl">nonPositiveInteger</type>
+                        <type label="Negative ganze Zahl">negativeInteger</type>
+                        <type label="Nicht negative ganze Zahl">nonNegativeInteger</type>
 
-                        <type label="Simple-precision floating-point">float</type>
-                        <type label="Double-precision floating-point">double</type>
+                        <type label="Gleitkommazahl(Einfache Genauigkeit)">float</type>
+                        <type label="Gleitkommazahl(Doppelte Genauigkeit)">double</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -4717,21 +4707,21 @@
                         <type label="">ENTITIES</type>
                         <type label="">NMTOKEN</type>
                         <type label="">NMTOKENS</type>
-                        <type label="XML qualified name">QName</type>
+                        <type label="Qualifizierter XML-Name">QName</type>
                         <type label="">NOTATION</type>
                     </choices>
                     <choices>
                         <label>Andere Typen</label>
                         <!-- Not 100% sure if these two types allow empty content -->
-                        <type label="Base64-encoded binary">base64Binary</type>
-                        <type label="Hexadecimal-encoded binary">hexBinary</type>
+                        <type label="Base64-codierte Binärdaten">base64Binary</type>
+                        <type label="Hexadecimal-codierte Binärdaten">hexBinary</type>
                         <type label="Jede URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
             <schema-type>
                 <label>Schematyp</label>
-                <hint>Typ des importierten Schema</hint>
+                <hint>Typ des importierten Schemas</hint>
             </schema-type>
             <required>
                 <label>Erforderlich</label>
@@ -4741,7 +4731,7 @@
                 <item id="2">XPath</item>
             </required>
             <constraint>
-                <label>Bedingung</label>
+                <label>Einschränkung</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck</hint>
             </constraint>
@@ -4761,12 +4751,12 @@
                 <hint>XPath-Ausdruck</hint>
             </default>
             <calculate>
-                <label>Berechneter Wert Value</label>
+                <label>Berechneter Wert</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>XPath-Ausdruck</hint>
             </calculate>
             <help>
-                <label>Hilfnachricht</label>
+                <label>Hilfsnachricht</label>
                 <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
             </help>
             <alert>
@@ -4774,8 +4764,8 @@
                 <hint>Wird angezeigt, falls die Warnungen aktiviert wurden</hint>
             </alert>
             <default-alert>
-                <label>Standard-Hilfnachricht</label>
-                <hint>Aktiv, falls es keine speziellere Hilfnachricht gibt</hint>
+                <label>Standardwarnung</label>
+                <hint>Aktiv, falls es keine speziellere Warnung gibt</hint>
             </default-alert>
             <use-global-alert>
                 <label>Verwende globale Hilfnachricht</label>
@@ -4783,80 +4773,80 @@
             <use-default-alert>
                 <label>Verwende Standard-Hilfnachricht</label>
             </use-default-alert>
-            <validation-type><label>Validationstypen</label></validation-type>
+            <validation-type><label>Validierungstypen</label></validation-type>
             <validation-details><label>Validierungsdetails</label></validation-details>
             <level><label>Level</label></level>
-            <use-html todo="true">[Use HTML]</use-html>
+            <use-html>HTML verwenden</use-html>
         </dialog-control-details>
         <dialog-section-details>
             <label>Abschnittdetails</label>
             <control-name>
-                <label>Name des Abschnittes</label>
+                <label>Abschnittsname</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
-                <hint>Z.B.: "kontaktdaten"</hint>
+                <hint>z.B.: "Kontaktdaten"</hint>
             </control-name>
             <options>
-                <label todo="true">[Options]</label>
+                <label>Optionen</label>
                 <item>
-                    <label todo="true">[Page Break Before]</label>
+                    <label>Seitenumbruch vor</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
             <visibility>
                 <label>Sichtbarkeit</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+                <hint>Boolescher XPath-Ausdruck</hint>
             </visibility>
             <readonly>
                 <label>Schreibgeschützt</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+                <hint>Boolescher XPath-Ausdruck</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Section Content]</label>
+                <label>Abschnittsinhalt wiederholen</label>
             </repeat>
             <custom-iteration-name>
-                <label todo="true">[Enable Custom Iteration Name]</label>
+                <label>Benutzerdefinierte Namen der Wiederholung aktivieren</label>
                 <hint/>
             </custom-iteration-name>
             <iteration-name>
-                <label todo="true">[Custom Iteration Name]</label>
-                <alert todo="true">[Name is already in use or incorrect]</alert>
+                <label>Name der Wiederholung</label>
+                <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
+            <tab-base><label>Grundeinstellungen und Formeln</label></tab-base>
+            <tab-repeat><label>Wiederholter Inhalt</label></tab-repeat>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>Tabellendetails</label>
+            <label>Tabelleneigenschaften</label>
             <control-name>
                 <label>Name der Tabelle</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
-                <hint>Z.B.: "vorname"</hint>
+                <hint>z.B.: "Vorname"</hint>
             </control-name>
             <visibility>
                 <label>Sichtbarkeit</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+                <hint>Boolescher XPath-Ausdruck</hint>
             </visibility>
             <readonly>
                 <label>Schreibgeschützt</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+                <hint>Boolescher XPath-Ausdruck</hint>
             </readonly>
             <min>
                 <label>Mindestanzahl an Wiederholungen</label>
                 <alert>Ungültiger Wert</alert>
-                <hint>Nicht negativer Zahlenwert oder XPath-Ausdruck</hint>
+                <hint>Nicht negative Zahl oder XPath-Ausdruck</hint>
             </min>
             <max>
-                <label>Maximalanzahl an Wiederholungen</label>
+                <label>Maximale Anzahl an Wiederholungen</label>
                 <alert>Ungültiger Wert</alert>
                 <hint>Positive Zahl oder XPath-Ausdruck</hint>
             </max>
             <other>Anderes</other>
             <one>Eine Wiederholung</one>
-            <unlimited>Unlimitiert</unlimited>
+            <unlimited>Unbeschränkt</unlimited>
             <no-minimum>Kein Minimum</no-minimum>
         </dialog-grid-details>
         <dialog-confirmation>
@@ -4865,32 +4855,25 @@
         <dialog-help>
             <label>Hilfe</label>
             <help-message>
-                <label>Hilfnachricht</label>
+                <label>Hilfsnachricht</label>
             </help-message>
         </dialog-help>
         <dialog-publish>
             <label>Formular veröffentlichen</label>
             <publish>Veröffentlichen</publish>
-            <publish-success todo="true">Das Formular wurde erfolgreich veröffentlicht [as version {1,number,integer}]. {0,choice,0#Kein Anhang wurde|1#1 Anhang wurde|1&lt;{0,number,integer} Anhänge wurden} veröffentlicht.</publish-success>
-            <publish-error>Beim Aktivieren des Formulartyps sind Fehler aufgetreten.</publish-error>
-            <latest-published-version todo="true">Latest published version</latest-published-version>
-            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
-            <create-new-version-help todo="true">
-                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
-                database. Data which already exists in the database will still be viewed and edited with the previous
-                versions of this form definition which are associated with that data. The new form definition version
-                will be used to create new data.
+            <publish-success>Das Formular wurde erfolgreich als Version {1,number,integer} mit {0,choice,0#keinem Anhang|1#1 Anhang|1&lt;{0,number,integer} Anhängen} veröffentlicht.</publish-success>
+            <publish-error>Beim Veröffentlichen des Formulars ist ein Fehler aufgetreten.</publish-error>
+            <latest-published-version>Letzte veröffentlichte Version</latest-published-version>
+            <create-new-version-item>Erstelle eine neue Formulardefinition mit der Versionsnummer {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>Überschreibe die aktuelle Formulardefinition mit Versionsnummer {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+                BITTE BEACHTEN SIE: Die Veröffentlichung dieser Formulardefinition erstellt eine neue Version der Formulardefiniton in der Datenbank. Daten, die sich bereits in der Datenbank befinden 		können noch in den vorherigen Versionen der Formulardefintion angezeigt und bearbeitet werden, welche mit ihnen verknüpft ist. Die neue Version der Formulardefinition wird verwendet, um 			neue Daten zu erstellen.
             </create-new-version-help>
-            <overwrite-version-help todo="true">
-                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
-                definition are small, such as changing control labels, the form definition will be compatible with
-                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
-                moving controls, the form definition might be incompatible with existing data. We recommend being
-                careful when overwriting an existing form definition version.
+            <overwrite-version-help>
+                BITTE BEACHTEN SIE: Das wird die bestehende Formulardefinition überschreiben. Wenn die Änderungen, die Sie vorgenommen haben klein sind, wie z.B. Änderung der Beschriftungen der 			Steuerelemente, wird die Formulardefinition mit den existierenden Formulardaten kompatible sein. Aber wenn Sie strukturelle Änderungen, wie Hinzufügen, Entfernen, Umbenennen oder 			Verschieben von Steuerelementen, vorgenommen haben, kann die Formulardefinition mit den vorhandenen Daten nicht vereinbar sein. Wir empfehlen beim Überschreiben von einer bestehenden 			Version der Formulardefinition vorsichtig zu sein.
             </overwrite-version-help>
             <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
-            <open-new>Öffne leeres Formular </open-new>
+            <open-new>Öffne neue Seite des veröffentlichten Formulars </open-new>
         </dialog-publish>
         <dialog-add-language>
             <label>Sprache hinzufügen</label>
@@ -4910,11 +4893,11 @@
             <label>XML-Schema hochladen</label>
             <schema-type>
                 <label>Verfügbare Schema-Typen</label>
-                <hint>Die einfachen Typen, die im Schema zum Hochladen vorhanden sind</hint>
+                <hint>Die einfachen Typen, die im hochgeladenen Schema vorhanden sind</hint>
             </schema-type>
             <namespace-uri>
-                <label>Schema Lücken-URI</label>
-                <hint>Das ist die URI der Lücke vom hochgeladenen Schema</hint>
+                <label>URI des Namesraumes des Schemas</label>
+                <hint>Das ist die URI des Namensraumes des hochgeladenen Schemas</hint>
             </namespace-uri>
             <operations>
                 <label>Operationen</label>
@@ -4932,11 +4915,11 @@
                 <label>XML-Schema anhängen</label>
             </upload-schema>
             <messages>
-                <no-simple-types>Ihr Schema scheint keine einfachen Typen zu beinhalten. Die Validation wird nicht möglich sein.</no-simple-types>
-                <has-includes>Ihr Schema beinhält Anhänge. Diese werden ignoriert.</has-includes>
+                <no-simple-types>Ihr Schema scheint keine einfachen Typen zu beinhalten. Sie werden nicht in der Lage sein, Typen aus diesem Schema für die Validierung auszuwählen.</no-simple-types>
+                <has-includes>Ihr Schema enthält Imports und Anhänge. Diese werden deaktiviert.</has-includes>
                 <not-a-schema>Die hochgeladene Datei ist kein zulässiges Schema.</not-a-schema>
-                <new-schema-information>Neue Schema-Information</new-schema-information>
-                <existing-schema-information>Bereits existierende Schema-Information</existing-schema-information>
+                <new-schema-information>Neue Schema-Informationen</new-schema-information>
+                <existing-schema-information>Bereits existierende Schema-Informationen</existing-schema-information>
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
@@ -4945,8 +4928,8 @@
                 <alert>Bitte stellen Sie sicher, dass der Inhalt richtig formatiertes XML ist</alert>
             </source>
         </dialog-edit-source>
-        <dialog-view-source>
-            <label>Quelltext Anzeigen</label>
+            <dialog-view-source>
+            <label>Quelltext anzeigen</label>
         </dialog-view-source>
         <dialog-upload-pdf>
             <label>Eine PDF-Vorlage anhängen</label>
@@ -4960,24 +4943,24 @@
                 <label>Sprache der Ressourcen</label>
             </resources-language>
             <label>
-                <label>Etikett</label>
+                <label>Beschriftung</label>
             </label>
             <value>
                 <label>Wert</label>
             </value>
             <hint>
-                <label todo="true">[Hint]</label>
+                <label>Hinweis</label>
             </hint>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
             <service-name>
                 <label>Name des Dienstes</label>
-                <hint>Wählen sie einen einzigartigen Namen für diesen Dienst</hint>
+                <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
             </service-name>
             <resource>
                 <label>URL der Ressourcen</label>
-                <hint>HTTP URL an der der Dienst bereitgestellt wird</hint>
+                <hint>HTTP URL an dem der Dienst bereitgestellt wird</hint>
             </resource>
             <method>
                 <label>Methode</label>
@@ -4998,17 +4981,17 @@
                 <hint>HTTP Authentifizierung</hint>
             </http-authentication>
             <username>
-                <label>Nutzername</label>
+                <label>Benutzername</label>
             </username>
             <password>
                 <label>Passwort</label>
             </password>
             <request-body>
-                <label>Request Body</label>
-                <hint>XML-Daten (kann ein SOAP-Archiv sein)</hint>
+                <label>Hauptteil der Anfrage</label>
+                <hint>XML-Daten (kann ein SOAP-Umschlag sein)</hint>
             </request-body>
             <response>
-                <label>Response</label>
+                <label>Antwort</label>
             </response>
             <error-type>
                 <label>Fehlertyp</label>
@@ -5029,7 +5012,7 @@
                     <value>resource-error</value>
                 </item>
                 <item>
-                    <label>Fehler im Ziel</label>
+                    <label>Zielfehler</label>
                     <value>target-error</value>
                 </item>
                 <item>
@@ -5041,7 +5024,7 @@
                 <label>URL der Ressourcen</label>
             </resource-uri>
             <status-code>
-                <label>Status-Code</label>
+                <label>Statuscode</label>
             </status-code>
             <headers>
                 <label>Köpfe</label>
@@ -5053,7 +5036,7 @@
                 <label>Wert/e</label>
             </header-value>
             <response-body>
-                <label>Response-Body</label>
+                <label>Haupteil der Antwort</label>
             </response-body>
             <save>
                 <label>Speichern</label>
@@ -5066,7 +5049,7 @@
             <label>Datenbank-Dienst Editor</label>
             <service-name>
                 <label>Name des Dienstes</label>
-                <hint>Wähle einene eizigartigen Namen für diesen Dienst</hint>
+                <hint>Wähle einen einzigartigen Namen für diesen Dienst</hint>
             </service-name>
             <datasource>
                 <label>Datenquelle</label>
@@ -5074,7 +5057,7 @@
             </datasource>
             <query>
                 <label>SQL-Abfrage</label>
-                <hint>SQL-Abfrage, die Leerstellen für Parameter beinhalten kann</hint>
+                <hint>SQL-Abfrage, die Platzhalter für Parameter beinhalten kann</hint>
             </query>
             <save>
                 <label>Speichern</label>
@@ -5084,14 +5067,14 @@
             </test>
         </dialog-database-services>
         <dialog-actions>
-            <label>Applikations-Editor</label>
+            <label>Aktionen-Editor</label>
             <service-name>
-                <label>Name der Applikation</label>
-                <hint>Wähle einen einzigartigen Namen für diese Applikation</hint>
+                <label>Name der Aktion</label>
+                <hint>Wähle einen einzigartigen Namen für diese Aktion</hint>
             </service-name>
             <event-type>
                 <label>Reagiert auf</label>
-                <hint>Ereignis auf das reagiert wird (nur ein Element oder Global)</hint>
+                <hint>Ereignis (auf ein Steuerelement oder global) auf das reagiert wird.</hint>
                 <!-- Just a value change -->
                 <item>
                     <label>Wertänderung</label>
@@ -5114,28 +5097,28 @@
                 </item>
             </event-type>
             <event-condition>
-                <label>Zustand</label>
+                <label>Bedingung</label>
                 <item>
                     <label>Läuft immer</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>Läuft nur auf bestimmten</label>
+                    <label>Läuft nur beim Erstellen</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
             <event-control>
-                <label>Bedienelement</label>
+                <label>Steuerelement</label>
             </event-control>
             <service-to-call>
                 <label>Aufzurufender Dienst</label>
-                <hint>Dienst welcher beim beim Auslösen der Aktion ausgerufen werden soll</hint>
+                <hint>Dienst welcher beim Auslösen der Aktion aufgerufen werden soll</hint>
             </service-to-call>
             <request-parameters>
-                <label>Folgende Werte von Bedienelemente sollen in die Anfrage des Dienstes gesetzt werden</label>
+                <label>Werte für die Serviceanfrage setzen</label>
             </request-parameters>
             <source-control>
-                <label>Bedienelement (Quelle)</label>
+                <label>Steuerelement (Quelle)</label>
             </source-control>
             <destination-xpath>
                 <label>XPath-Ausdruck (Ziel)</label>
@@ -5144,38 +5127,38 @@
                 <label>Setze die Parameter des Datenbank-Dienstes</label>
             </request-database-parameter>
             <parameter-number>
-                <label>Nummer der Parameter</label>
+                <label>Parameternummer</label>
             </parameter-number>
             <response-values>
-                <label>Folgende Werte aus der Antwort des Dienstes soll in Bedienelemente gesetzt werden</label>
+                <label>Werte der Steuerelemente aus Serviceantwort setzen</label>
             </response-values>
             <destination-control>
-                <label>Bedienelement (Ziel)</label>
+                <label>Steuerelement (Ziel)</label>
             </destination-control>
             <source-xpath>
                 <label>XPath Ausdruck (Quelle)</label>
             </source-xpath>
             <response-itemset>
-                <label>Folgende Einträge aus der Antwort des Dienstes soll in Auswahllisten (z.B. Aufklappmenü) geladen werden</label>
+                <label>Einträge aus der Antwort des Dienstes in Auswahllisten laden</label>
             </response-itemset>
             <destination-selection-control>
                 <label>Auswahlliste (Ziel)</label>
             </destination-selection-control>
             <itemset>
-                <label>Definition von Einträgen</label>
-                <hint>XPath-Ausdruck um neue Einträge zu generieren</hint>
+                <label>Auswahl</label>
+                <hint>XPath-Ausdruck um eine neue Auswahl zu erstellen</hint>
             </itemset>
             <items>
-                <label>Einträge</label>
-                <hint>XPath-Ausdruck, der die relevanten Knoten an Einträgen selektiert (z.B. '/versicherungen/versicherung')</hint>
+                <label>Element</label>
+                <hint>XPath-Ausdruck, der eine Knoten für des Element zurückgibt</hint>
             </items>
             <label>
                 <label>Beschriftung</label>
-                <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags (z.B. 'name')</hint>
+                <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </label>
             <value>
                 <label>Wert</label>
-                <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags (z.B. 'id')</hint>
+                <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </value>
             <save>
                 <label>Speichern</label>
@@ -5192,15 +5175,15 @@
             <message>
                 <div>
                     <p>Diese Eigenschaft ist nur in Orbeon Forms PE vorhanden.</p>
-                    <p>Für weitere Informationen: <a href="http://www.orbeon.com/download" target="_blank">Orbeon web site</a>.</p>
+                    <p>Für weitere Informationen besuchen Sie die <a href="http://www.orbeon.com/download" target="_blank">Orbeon web site</a>.</p>
                 </div>
             </message>
         </dialog-pe>
         <dialog-custom-xml>
-            <label>Custom XML</label>
-            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
-            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
-            <mode-custom>I will provide a custom XML document</mode-custom>
+            <label>Benutzerdefiniertes XML</label>
+            <mode-label>Die Informationen, die von den Benutzern in das Formular eingegeben werden, werden in einer XML-Datei gespeichert.</mode-label>
+            <mode-automatic>Form Builder XML für mich erstellen lassen</mode-automatic>
+            <mode-custom>Ich werde ein benutzerdefiniertes XML-Dokument zur Verfügung stellen</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Berechtigungen</label>
@@ -5210,28 +5193,27 @@
             <operations>Operationen</operations>
             <anyone>Alle</anyone>
          <owner>Inhaber</owner>
-            <group-members>Mitglieder der Gruppe</group-members>
-            <create>Create</create>
+            <group-members>Gruppenmitglieder</group-members>
+            <create>Erstellen</create>
             <read>Lesen</read>
             <update>Update</update>
             <delete>Löschen</delete>
         </dialog-permissions>
         <!-- Messages -->
         <messages>
-            <delete-section>Wollen Sie wirklich den aktuellen Abschnitt löschen?</delete-section>
-            <delete-grid>Wollen Sie wirklich die aktuelle Tabelle löschen?</delete-grid>
-            <delete-column>Wollen Sie wirklich die aktuelle Spalte löschen?</delete-column>
-            <delete-row>Wollen Sie wirklich den aktuellen Zeile löschen?</delete-row>
-            <expand-cell>Wollen Sie wirklich die aktuelle Zelle erweitern? Ein Bedienelement wird dazu gelöscht werden.
-            </expand-cell>
-            <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
-            <delete-service>Are you sure you want to delete service</delete-service>
-            <delete-action>Are you sure you want to delete action</delete-action>
-            <controls-will-be-deleted>Bedienelemente werden gelöscht werden.</controls-will-be-deleted>
+            <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
+            <delete-grid>Sind Sie sicher, dass Sie die aktuelle Tabelle löschen wollen?</delete-grid>
+            <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
+            <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
+            <expand-cell>Sind Sie sicher, dass Sie die aktuelle Zelle erweitern wollen? Ein Steuerelement wird gelöscht werden.</expand-cell>
+            <delete-resources>Sind Sie sicher, dass Sie alle Sprachresourcen löschen wollen?</delete-resources>
+            <delete-service>Sind Sie sicher, dass Sie diesen Dienst löschen wollen?</delete-service>
+            <delete-action>Sind Sie sicher, dass Sie diese Aktion löschen wollen?</delete-action>
+            <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>
             <metadata-edit-title>Formularmetadaten</metadata-edit-title>
-            <new-metadata-output>Geben Sie bitte ihre Applikations-ID und eine Formulartyp-ID an.</new-metadata-output>
+            <new-metadata-output>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden (Sie können sie auch später ändern):</new-metadata-output>
             <edit-metadata-output/>
-            <save-as-metadata-output>Geben Sie einen neuen Applikationsnamen und Formularnamen für die Kopie dieses Formulars verwendet werden:
+            <save-as-metadata-output>Geben Sie einen neuen Anwendungstitel und Formulartitel ein, welche für die Kopie dieses Formulars verwendet werden:
             </save-as-metadata-output>
             <xpath-errors>{0,choice,1#Ein XPath Fehler|1&lt;{0,number,integer} XPath Fehler} im Formular.</xpath-errors>
             <lhha-checkbox>Hier ein Häkchen setzen, falls Sie HTML-Tags verwenden wollen</lhha-checkbox>

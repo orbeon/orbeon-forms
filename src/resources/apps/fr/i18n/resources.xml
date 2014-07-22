@@ -1410,7 +1410,7 @@
             <delete>&lt;i class="icon-remove-sign"/&gt; Cancella</delete>
             <import>&lt;i class="icon-upload"/&gt; Importa</import>
             <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
-            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+            <duplicate>&lt;i class="icon-file"/&gt; Copia</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Salva</save>
@@ -1420,10 +1420,10 @@
             <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
-            <validate>&lt;i class="icon-ok"/&gt; Validare</validate>
+            <validate>&lt;i class="icon-ok"/&gt; Valida</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="icon-arrow-right"/&gt; Presentare</submit>
+            <submit>&lt;i class="icon-arrow-right"/&gt; Presenta</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Esamina</workflow-review>
             <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Modifica</workflow-edit>
             <workflow-send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</workflow-send>
@@ -1460,11 +1460,11 @@
                 <section-name>Nome della sezione</section-name>
             </labels>
             <grid>
-                <insert-above todo="true">[Insert Above]</insert-above>
-                <insert-below todo="true">[Insert Below]</insert-below>
-                <move-up todo="true">[Move Up]</move-up>
-                <move-down todo="true">[Move Down]</move-down>
-                <remove todo="true">[Remove]</remove>
+                <insert-above>Inserisci sopra</insert-above>
+                <insert-below>Inserisci sotto</insert-below>
+                <move-up>Sposta in sù</move-up>
+                <move-down>Sposta in giù</move-down>
+                <remove>Rimuovi</remove>
             </grid>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
@@ -1481,8 +1481,8 @@
             <unsaved>Modifiche non salvate</unsaved>
         </errors>
         <email>
-            <subject>Orbeon Forms confirmazione</subject>
-            <body>Prego allegare un file in formato PDF o XML.</body>
+            <subject>Orbeon Forms confermazione</subject>
+            <body>Si allega il modulo in formato PDF e XML.</body>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -1511,7 +1511,7 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Cerca moduli</search-forms>
                 <show-options>Mostra opzioni di ricerca</show-options>
                 <close-options>Chiudi opzioni di ricerca</close-options>
-                <returned>Risultato della ricerca {0,number,integer} di {1,number,integer} documenti.</returned>
+                <returned>Risultato della ricerca: {0,number,integer} di {1,number,integer} documenti.</returned>
             </search>
             <paging>
                 <to>a</to>
@@ -1519,11 +1519,11 @@
             </paging>
             <messages>
                 <no-form-found>I dati del modulo non sono stati trovati.</no-form-found>
-                <delete-confirmation>Sei sicuro di volere cancellare uno o più moduli? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
+                <delete-confirmation> Sei sicuro di voler cancellare uno o più moduli? Nota: Quando elimini un documento salvato, le bozze corrispondenti vengono eliminate pure.</delete-confirmation>
             </messages>
             <labels>
                 <draft>Bozza</draft>
-                <read-only todo="true">[Read-only]</read-only>
+                <read-only>Sola lettura</read-only>
                 <language-choice>Seleziona lingua</language-choice>
                 <form-choice>Seleziona un modulo</form-choice>
                 <free-search>Ricerca libera</free-search>
@@ -1535,7 +1535,7 @@
                 <refresh>Aggiorna</refresh>
                 <close-box>[chiudi]</close-box>
                 <help-back>Indietro</help-back>
-                <goto-content>Vai a contenuto</goto-content>
+                <goto-content>Vai al contenuto</goto-content>
             </labels>
             <formats>
                 <date>[D] [MNn] [Y]</date>
@@ -1550,53 +1550,53 @@
                 <save-draft-success>Bozza salvata correttamente!</save-draft-success>
                 <email-success>Email inviata correttamente!</email-success>
                 <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
-                <database-error>Nella communicazione con la banca dati è apparso un errore. Si prega di contattare l'amministratore.</database-error>
-                <process-error>È apparso un errore mentre in questo processo. Si prega di contattare l'amministratore.</process-error>
-                <clear-confirm-message>Sei sicuro di volere pulitre tutti i spazi in questa pagina? Tutti i dati che non sono salvati saranno perduti.</clear-confirm-message>
-                <error-dialog-title>Non è stato possibile completare questa Azione</error-dialog-title>
-                <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
-                <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
+                <process-error>È apparso un errore durante l'esecuzione del processo. Si prega di contattare l'amministratore.</process-error>
+                <clear-confirm-message>Sei sicuro di voler cancellare tutti i campi di questa pagina? Tutti i dati che non sono stati salvati saranno perduti.</clear-confirm-message>
+                <error-dialog-title>Non è stato possibile completare questa azione</error-dialog-title>
+                <confirmation-dialog-title>Confermazione</confirmation-dialog-title>
+                <confirmation-dialog-message>Sei sicuro di voler continuare?</confirmation-dialog-message>
                 <submit-dialog-title>Il modulo è stato inviato</submit-dialog-title>
                 <submit-dialog-message>L'informazione è stata inviata. Grazie.</submit-dialog-message>
                 <validation-dialog-title>Elenco dei messaggi di convalida del modulo</validation-dialog-title>
-                <validation-dialog-message>Il suo modulo {1,choice,
+                <validation-dialog-message>Il tuo modulo {1,choice,
                     0#non contiene avvisi|
                     1#'{0,choice,0#contiene un errore|1#contiene un avvertimento|2#contiene un avviso|3#contiene un avviso}'|
                     1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}. È possibile ricontrollare il modulo oppure procedere.</validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Clickare per aprire il documento. Le informazioni saranno mostrati nel modo in cui erano quando hai salvato il documento.</saved-locally-open>
-                <upload-in-progress>Ci sono operazioni di caricamento in corso. Si prega di provare quando il file è caricato o cancellato completamente.</upload-in-progress>
+                <saved-locally-open>Clicca qui per aprire il documento. Le informazioni immesse veranno visualizzate sullo strumento, come era nel momento in cui é stato salvato il tuo lavoro.</saved-locally-open>
+                <upload-in-progress>Ci sono operazioni di caricamento in corso. Si prega di riprovalo una volta che il caricamento del file è stato completato o annullato.</upload-in-progress>
                 <upload-start>Il caricamento ha iniziato</upload-start>
-                <upload-cancel>L'operazione di caricamento è stata cancellata da un utente.</upload-cancel>
+                <upload-cancel>L'operazione di caricamento è stata annullata dall'utente.</upload-cancel>
                 <upload-done>Caricamento completato</upload-done>
                 <upload-error>È apparso un errore durante il caricamento. Si prega di riprovare.</upload-error>
-                <upload-error-size>Il file caricato è troppo grande. La grandezza massima è di {0,number,integer} bytes. La grandezza del file inviato è di {1,number,integer} bytes.</upload-error-size>
+                <upload-error-size>Il file caricato è troppo grande. La dimensione massima consentita è di {0,number,integer} byte e la dimensione reale ricevuta è di {1,number,integer} byte.</upload-error-size>
             </messages>
             <drafts>
-                <found-draft todo="true">[Found draft]</found-draft>
-                <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
-                <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
-                <start-new todo="true">[Start from scratch]</start-new>
+                <found-draft>Bozza trovata</found-draft>
+                <found-drafts>Bozze trovate</found-drafts>
+                <found-draft-for-document>Dopo questo documento é stato salvato, una bozza é stata salvata automaticamente e potrebbe contenere lavoro supplementare. Vuole aprire il documento salvato, o la bozza di auto-salvato?</found-draft-for-document>
+                <found-draft-for-never-saved>Una bozza di questo modulo é stata salvata automaticamente. Vuoi iniziare da zero o aprire la bozza salvata in automatico?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Diverse bozze di questo modulo sono state salvate automaticamente. Vuoi iniziare da zero o vedere le bozze di auto-salvaggio (e poi eventualmente modificare uno di loro)?</found-drafts-for-never-saved>
+                <open-saved>Apri documento salvato</open-saved>
+                <open-draft>Apri bozza auto-salvata</open-draft>
+                <view-drafts>Visualizza le bozze auto-salvate</view-drafts>
+                <start-new>Riparti da zero</start-new>
             </drafts>
             <labels>
                 <language-choice>Lingua</language-choice>
                 <errors>Elenco di errori</errors>
                 <check-errors-in-form>Questo modulo contiene errori</check-errors-in-form>
-                <error-details>Visualizza dettagli del errore</error-details>
-                <confirm>Confirma</confirm>
-                <alert>Campo obbligatorio o errato</alert>
+                <error-details>Visualizza i dettagli di errore</error-details>
+                <confirm>Conferma</confirm>
+                <alert>Campo obbligatorio o valore errato</alert>
 
                 <captcha-label>Codice di sicurezza</captcha-label>
                 <captcha-alert>Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
             </labels>
             <view>
                 <explanation>
-                    Questa è una visualizzazione che non può essere cambiata.
+                    Questa è una vista di sola lettura dei dati.
                 </explanation>
             </view>
         </detail>
@@ -1608,14 +1608,14 @@
                         Clicca qui per salvare i dati del tuo modulo come file HTML sul tuo computer.
                     </p>
                     <p>
-                        Per riaprire i dati del tuo modulo:
+                        Per riaprire i dati modulo:
                     </p>
                     <ul>
-                        <li>Apri il file HTML nel tuo browser (Fai click sul file o trascinalo nella finestra del tuo browser).</li>
-                        <li>Fai click sul pulsante per aprire che apparirà per confirmare.</li>
+                        <li>Apri il file HTML nel tuo browser (Clicca sul file o trascinalo nella finestra del tuo browser).</li>
+                        <li>Clicca su Apri per confermare.</li>
                     </ul>
                     <p>
-                        <b>AVVISO:</b> Le dati ancora non sono salvate sul server. Se lo cancelli sarà perso.
+                        <b>AVVISO:</b> I dati non sono salvati sul server e se elimini il file salvato i vostri dati andranno persi.
                     </p>
                 </div>
             </dialog-body>
@@ -1625,55 +1625,55 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Nascondi</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
-                <cancel todo="true">[Cancel]</cancel>
-                <connect todo="true">[Connect]</connect>
-                <select todo="true">[Select]</select>
-                <operation todo="true">[Operation]</operation>
-                <all todo="true">[All]</all>
-                <none todo="true">[None]</none>
-                <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
-                <published-local todo="true">[Published local forms]</published-local>
-                <unpublished-remote todo="true">[Unpublished remote forms]</unpublished-remote>
-                <published-remote todo="true">[Published remote forms]</published-remote>
-                <newer-local todo="true">[Forms that are newer locally]</newer-local>
-                <newer-remote todo="true">[Forms that are newer remotely]</newer-remote>
-                <publish-local todo="true">[Publish local forms]</publish-local>
-                <unpublish-local todo="true">[Unpublish local forms]</unpublish-local>
-                <publish-remote todo="true">[Publish remote forms]</publish-remote>
-                <unpublish-remote todo="true">[Unpublish remote forms]</unpublish-remote>
-                <push-to-remote todo="true">[Push to remote]</push-to-remote>
-                <pull-from-remote todo="true">[Pull from remote]</pull-from-remote>
-                <navigate-summary todo="true">[Navigate to Summary]</navigate-summary>
-                <navigate-new todo="true">[Navigate to New]</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <cancel>Cancella</cancel>
+                <connect>Connetti</connect>
+                <select>Seleziona</select>
+                <operation>Operazione</operation>
+                <all>Tutti</all>
+                <none>Nessuno</none>
+                <unpublished-local>Moduli locali non pubblicati</unpublished-local>
+                <published-local>Moduli locali pubblicati</published-local>
+                <unpublished-remote>Moduli remoti non pubblicati</unpublished-remote>
+                <published-remote>Moduli remoti pubblicati</published-remote>
+                <newer-local>Moduli locali che sono più recenti</newer-local>
+                <newer-remote>Moduli remoti che sono più recenti</newer-remote>
+                <publish-local>Pubblica moduli locali</publish-local>
+                <unpublish-local>Annulla la pubblicazione dei moduli locali</unpublish-local>
+                <publish-remote>Pubblica moduli remoti</publish-remote>
+                <unpublish-remote>Annulla la pubblicazione dei moduli remoti</unpublish-remote>
+                <push-to-remote>Invia a remoto </push-to-remote>
+                <pull-from-remote>Prendi da remoto</pull-from-remote>
+                <navigate-summary>Passa al sommario</navigate-summary>
+                <navigate-new>Passa a Nuovo</navigate-new>
+                <upgrade-local>Aggiorna le definizioni dei moduli locali</upgrade-local>
+                <upgrade-remote>Aggiorna le definizioni dei moduli remoti</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
-                <credentials todo="true">[Remote Server Credentials]</credentials>
-                <status todo="true">[Status]</status>
+                <credentials>Credenziali server remoto</credentials>
+                <status>Stato</status>
                 <app>Applicazione</app>
                 <form>Modulo</form>
                 <title>Titolo</title>
                 <view>Vizualizza</view>
                 <new>Nuovo</new>
-                <local todo="true">[Local]</local>
-                <remote todo="true">[Remote]</remote>
-                <form-identification todo="true">[Form Identification]</form-identification>
-                <last-modified todo="true">[Modified]</last-modified>
+                <local>">Locale</local>
+                <remote>Remoto</remote>
+                <form-identification>Identificazione del modulo</form-identification>
+                <last-modified>Modificato</last-modified>
             </titles>
             <messages>
-                <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation todo="true">È sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#upgrade} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+                <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
+                <publish-confirmation> Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
                 <unavailable>Non disponibile</unavailable>
                 <library>Biblioteca</library>
-                <newer todo="true">[Newer]</newer>
-                <remote-server todo="true">[Remote server]</remote-server>
-                <username todo="true">[Username]</username>
-                <password todo="true">[Password]</password>
+                <newer>Più recente</newer>
+                <remote-server>Server remoto</remote-server>
+                <username>Utente</username>
+                <password>Password</password>
             </labels>
         </home>
     </resource>
@@ -1692,7 +1692,7 @@
             <delete>&lt;i class="icon-remove-sign"/&gt; Löschen</delete>
             <import>&lt;i class="icon-upload"/&gt; Importieren</import>
             <new>&lt;i class="icon-plus"/&gt; Neu</new>
-            <duplicate>&lt;i class="icon-file"/&gt; [Duplicate]</duplicate>
+            <duplicate>&lt;i class="icon-file"/&gt; Kopieren</duplicate>
 
             <!-- Standard process buttons -->
             <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
@@ -1700,7 +1700,7 @@
             <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
             <review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
-            <send>&lt;i class="icon-arrow-right"/&gt; Einsenden</send>
+            <send>&lt;i class="icon-arrow-right"/&gt; Senden</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
             <validate>&lt;i class="icon-ok"/&gt; Validieren</validate>
 
@@ -1708,13 +1708,13 @@
             <submit>&lt;i class="icon-arrow-right"/&gt; Abschicken</submit>
             <workflow-review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</workflow-review>
             <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Ändern</workflow-edit>
-            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Einsenden</workflow-send>
+            <workflow-send>&lt;i class="icon-arrow-right"/&gt; Senden</workflow-send>
 
             <!-- Other standard buttons -->
             <summary>&lt;i class="icon-list"/&gt; Übersicht</summary>
             <close>&lt;i class="icon-remove"/&gt; Schließen</close>
             <clear>&lt;i class="icon-remove-sign"/&gt; Zurücksetzen</clear>
-            <cancel>Löschen</cancel>
+            <cancel>Abbrechen</cancel>
             <save-locally>Lokal speichern</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
@@ -1737,34 +1737,34 @@
         </buttons>
         <components>
             <labels>
-                <open-section>Abschnitt anzeigen</open-section>
-                <close-section>Abschnitt verstecken</close-section>
+                <open-section>Abschnitt einblenden</open-section>
+                <close-section>Abschnitt ausblenden</close-section>
                 <section-name>Abschnittsname</section-name>
             </labels>
             <grid>
-                <insert-above todo="true">[Insert Above]</insert-above>
-                <insert-below todo="true">[Insert Below]</insert-below>
-                <move-up todo="true">[Move Up]</move-up>
-                <move-down todo="true">[Move Down]</move-down>
-                <remove todo="true">[Remove]</remove>
+                <insert-above>Darüber einfügen</insert-above>
+                <insert-below>Darunter einfügen</insert-below>
+                <move-up>Nach oben verschieben</move-up>
+                <move-down>Nach unten verschieben</move-down>
+                <remove>Löschen</remove>
             </grid>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
             <summary-title>Ihr Formular {1,choice,
-                0#enthält keine Hinweise|
-                1#enthält '{0,choice,0#den folgenden Fehler|1#die folgende Warnung|2#den folgenden Hinweis|3#den folgenden Hinweis}'|
-                1&lt;enthält '{0,choice,0#die folgenden Fehler|1#die folgenden Warnungen|2#die folgenden Hinweise|3#die folgenden Hinweise}'}</summary-title>
+                0#enthält keine Meldungen|
+                1#enthält '{0,choice,0#den folgenden Fehler|1#die folgende Warnung|2#die folgende Informationsmeldung|3#den folgenden Hinweis}'|
+                1&lt;enthält '{0,choice,0#die folgenden Fehler|1#die folgenden Warnungen|2#die folgenden Informationensmeldungen|3#die folgenden Hinweise}'}</summary-title>
             <form-title>{1,choice,
                 0#|
-                1#{1,number,integer} '{0,choice,0#Fehler|1#Warnung|2#Hinweis|3#Hinweis}' - |
-                1&lt;{1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Hinweise|3#Hinweise}' - }{2}</form-title>
+                1#{1,number,integer} '{0,choice,0#Fehler|1#Warnung|2#Informationsmeldung|3#Hinweis}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}' - }{2}</form-title>
             <none>Keine Fehler im Formular</none>
             <unsaved>Ungespeicherte Änderungen</unsaved>
         </errors>
         <email>
-            <subject>Orbeon Forms: Confirmation</subject>
-            <body>Bitte eine Datei im PDF oder XML-Format anhängen.</body>
+            <subject>Orbeon Forms: Bestätigung</subject>
+            <body>Im Anhang finden Sie das Formular im PDF- und XML-Format</body>
         </email>
         <!-- Formats used for PDF template -->
         <print>
@@ -1791,9 +1791,9 @@
             <search>
                 <search>Suchen</search>
                 <search-forms>&lt;i class="icon-search"/&gt; Suche Formular</search-forms>
-                <show-options>Zeige Suchoptionen an</show-options>
-                <close-options>Schließe Suchoptionen</close-options>
-                <returned>Suchergebnisse {0,number,integer} von {1,number,integer} Dokumente.</returned>
+                <show-options>Suchoptionen anzeigen</show-options>
+                <close-options>Suchoptionen schließen</close-options>
+                <returned>Suchergebnisse: {0,number,integer} von {1,number,integer} Dokumenten.</returned>
             </search>
             <paging>
                 <to>bis</to>
@@ -1801,11 +1801,11 @@
             </paging>
             <messages>
                 <no-form-found>Es wurde kein Formular gefunden.</no-form-found>
-                <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
+                <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen? Hinweis: Wenn Sie ein bereits gespeichertes Dokument löschen, werden auch die entsprechenden Entwürfe gelöscht.</delete-confirmation>
             </messages>
             <labels>
                 <draft>Entwurf</draft>
-                <read-only todo="true">[Read-only]</read-only>
+                <read-only>Schreibgeschützt</read-only>
                 <language-choice>Sprachauswahl</language-choice>
                 <form-choice>Wählen Sie ein Formular</form-choice>
                 <free-search>Freie Suche</free-search>
@@ -1813,7 +1813,7 @@
                 <previous>Zurück</previous>
                 <next>Weiter</next>
                 <script>Vollversion</script>
-                <noscript>verfügbare Version</noscript>
+                <noscript>Verfügbare Version</noscript>
                 <refresh>Aktualisieren</refresh>
                 <close-box>[Schließen]</close-box>
                 <help-back>Zurück</help-back>
@@ -1828,57 +1828,57 @@
         </summary>
         <detail>
             <messages>
-                <save-success>Document erfolgreich gespeichert!</save-success>
+                <save-success>Dokument erfolgreich gespeichert!</save-success>
                 <save-draft-success>Entwurf erfolgreich gespeichert!</save-draft-success>
                 <email-success>Email erfolgreich gesendet!</email-success>
                 <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
                 <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
                 <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
                 <clear-confirm-message>Sind Sie sich sicher, dass Sie alle Felder auf dieser Seite zurücksetzen wollen? Ungespeicherte Änderungen gehen verloren.</clear-confirm-message>
-                <error-dialog-title>Aktion konnte nicht ausgeführt werden</error-dialog-title>
-                <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
-                <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <error-dialog-title>Aktion konnte nicht beendet werden</error-dialog-title>
+                <confirmation-dialog-title>Bestätigung</confirmation-dialog-title>
+                <confirmation-dialog-message>Sind Sie sicher, dass Sie fortfahren wollen?</confirmation-dialog-message>
                 <submit-dialog-title>Formular abgeschickt</submit-dialog-title>
                 <submit-dialog-message>Ihre Daten wurden abgeschickt. Danke.</submit-dialog-message>
                 <validation-dialog-title>Überblick über Meldungen zur Formularvalidierung</validation-dialog-title>
                 <validation-dialog-message>Ihr Formular enthält {1,choice,
-                    0#keine Hinweise|
-                    1#'{0,choice,0#einen Fehler|1#eine Warnung|2#einen Hinweis|3#einen Hinweis}'|
-                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Hinweise|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
+                    0#keine Meldungen|
+                    1#'{0,choice,0#einen Fehler|1#eine Warnung|2#eine Informationsmeldung|3#einen Hinweis}'|
+                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Informationsmeldungen|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Klicken Sie hier, um das Dokument zu öffnen. Die Inhalte werden so angezeigt, wie abgespeichert.</saved-locally-open>
-                <upload-in-progress>Es werden im Moment schon Dateien hochgeladen. Bitte versuchen Sie es sobald die Dateien erfolgreich hochgeladen wurden.</upload-in-progress>
+                <saved-locally-open>Klicken Sie hier, um das Dokument zu öffnen. Die Inhalte werden so angezeigt, wie sie im Moment der Speicherung Ihrer Arbeit waren.</saved-locally-open>
+                <upload-in-progress>Es werden im Moment schon Dateien hochgeladen. Bitte versuchen Sie es erneut, sobald die Dateien erfolgreich hochgeladen oder das Hochladen abgebrochen wurde.</upload-in-progress>
                 <upload-start>Hochladen gestartet</upload-start>
-                <upload-cancel>Das Hochladen der Datei wurde von einem Benutzer abgebrochen.</upload-cancel>
+                <upload-cancel>Das Hochladen der Datei wurde vom Benutzer abgebrochen.</upload-cancel>
                 <upload-done>Datei fertig hochgeladen</upload-done>
-                <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.</upload-error>
-                <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximale Dateigröße liegt bei {0,number,integer} Bytes. Die hochgeladene Datei hat eine Größe von {1,number,integer} Byte.</upload-error-size>
+                <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</upload-error>
+                <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximal zulässige Größe ist {0,number,integer} Bytes und die tatsächlich empfangene Größe ist {1,number,integer} Bytes.</upload-error-size>
             </messages>
             <drafts>
-                <found-draft todo="true">[Found draft]</found-draft>
-                <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
-                <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
-                <start-new todo="true">[Start from scratch]</start-new>
+                <found-draft>Gefundener Entwurf</found-draft>
+                <found-drafts>Gefundene Entwürfe</found-drafts>
+                <found-draft-for-document>Nachdem das Dokumnet gespeichert wurde, wurde ein Entwurf automatisch gespeichert und könnte zusätzliche Informationen enthalten. Möchten Sie das gespeicherte Dokument oder den automatisch gespeicherten Entwurf öffen?</found-draft-for-document>
+                <found-draft-for-never-saved>Es wurde automatisch ein Entwurf für dieses Formular gespeichert. Möchten Sie von vorne beginnen oder den automatisch gespeicherten Entwurf öffen?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Es wurden mehrere Entwürfe für dieses Formular automatisch gespeichert. Möchten Sie von vorne beginnen oder die automatisch gespeicherten Entwürfe sehen (und dann möglicherweise einen von ihnen ändern)?</found-drafts-for-never-saved>
+                <open-saved>Gespeichertes Dokument öffen</open-saved>
+                <open-draft>Automatisch gespeicherten Entwurf öffnen</open-draft>
+                <view-drafts>Automatisch gespeicherte Entwürfe ansehen</view-drafts>
+                <start-new>Von vorne beginnen</start-new>
             </drafts>
             <labels>
                 <language-choice>Sprache</language-choice>
-                <errors>Liste der Fehler</errors>
-                <check-errors-in-form>Formular beinhaltet Fehler</check-errors-in-form>
+                <errors>Übersicht der Fehler</errors>
+                <check-errors-in-form>Dieses Formular enthält Fehler</check-errors-in-form>
                 <error-details>Fehlerdetails anzeigen</error-details>
                 <confirm>Bestätigen</confirm>
                 <alert>Pflichtfeld oder fehlerhafter Wert</alert>
 
                 <captcha-label>Sicherheitscode</captcha-label>
-                <captcha-alert>Der eingegebene Wert entspricht nicht dem auf dem Bild</captcha-alert>
+                <captcha-alert>Der eingegebene Wert entspricht nicht dem auf dem Bild. Bitte versuchen Sie es erneut!</captcha-alert>
             </labels>
             <view>
                 <explanation>
-                    Die angezeigten Daten können nicht geändert werden.
+                    Dies ist eine schreibgeschützte Ansicht Ihrer Daten.
                 </explanation>
             </view>
         </detail>
@@ -1887,14 +1887,14 @@
             <dialog-body>
                 <div>
                     <p>
-                        Den "Speichern" Knopf drücken um das Formular auf ihrem Rechner als HTML-Dokument zu speichern.
+                        Klicken Sie auf "Speichern" um das Formular auf ihrem Computer als HTML-Datei zu speichern.
                     </p>
                     <p>
                         Um das Formular wieder zu öffenen:
                     </p>
                     <ul>
-                        <li>Öffnen Sie die HTML-Datei in ihrem Browser (Entweder indem Sie auf die Datei klicken oder indem Sie die Datei in ein neues Browserfenster Ziehen).</li>
-                        <li>Klicken Sie den Knopf zum Öffnen, der die Bestätigung anzeigen wird.</li>
+                        <li>Öffnen Sie die HTML-Datei in ihrem Browser (Entweder indem Sie auf die Datei klicken oder indem Sie die Datei in ein neues Browserfenster ziehen).</li>
+                        <li>Klicken Sie auf "Öffnen" um zu bestätigen.</li>
                     </ul>
                     <p>
                         <b>WARNUNG:</b> Die Daten sind nicht auf dem Server gespeichert. Löschen Sie diese Datei, so ist Sie unwiderruflich gelöscht.
@@ -1907,53 +1907,53 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Verbergen</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
-                <cancel>abbrechen</cancel>
+                <cancel>Abbrechen</cancel>
                 <connect>Verbinden</connect>
                 <select>Auswählen</select>
                 <operation>Operation</operation>
                 <all>Alle</all>
                 <none>Keine</none>
-                <unpublished-local>Formulare wurden lokal verborgen</unpublished-local>
-                <published-local>Formulare wurden lokal veröffentlicht</published-local>
-                <unpublished-remote>Formulare wurden am Produktivsystem verborgen</unpublished-remote>
-                <published-remote>Formulare wurden am Produktivsystem veröffentlicht</published-remote>
-                <newer-local>Formulare die lokal aktueller sind</newer-local>
-                <newer-remote>Formulare die am Produktivsystem neuer sind</newer-remote>
-                <publish-local>Veröffentliche die Formulare lokal</publish-local>
-                <unpublish-local>Verberge die Formulare lokal</unpublish-local>
-                <publish-remote>Veröffentliche die Formulare am Produktivsystem</publish-remote>
-                <unpublish-remote>Verberge die Formulare am Produktivsystem</unpublish-remote>
-                <push-to-remote>Sende ans Produktivsystem</push-to-remote>
-                <pull-from-remote>Hole vom Produktivsystem</pull-from-remote>
+                <unpublished-local>Unveröffentlichte lokale Formulare</unpublished-local>
+                <published-local>Veröffentlichte lokale Formulare</published-local>
+                <unpublished-remote>Unveröffentlichte Formulare auf Remote-System</unpublished-remote>
+                <published-remote>Veröffentlichte Formulare auf Remote-System</published-remote>
+                <newer-local>Aktuellste lokale Formulare</newer-local>
+                <newer-remote>Aktuellste Formulare auf Remote-System</newer-remote>
+                <publish-local>Lokale Formulare veröffentlichen</publish-local>
+                <unpublish-local>Lokale Formulare verbergen</unpublish-local>
+                <publish-remote>Formulare auf Remote-System veröffentlichen</publish-remote>
+                <unpublish-remote>Formulare auf Remote-System verbergen</unpublish-remote>
+                <push-to-remote>An Remote-System senden</push-to-remote>
+                <pull-from-remote>Aus dem Remote-System holen</pull-from-remote>
                 <navigate-summary>Gehe zu Liste</navigate-summary>
                 <navigate-new>Gehe zu Neu</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <upgrade-local>Lokale Formulardefinition aktualisieren</upgrade-local>
+                <upgrade-remote>Formulardefinition auf Remote-System aktualisieren</upgrade-remote>
             </buttons>
             <titles>
-                <publish-confirmation>Bestätige veröffentlichen/ veröffentlichen rückgängig machen</publish-confirmation>
-                <credentials>Produktivsystem Credentials</credentials>
+                <publish-confirmation>Veröffentlichen/Verbergen bestätigen</publish-confirmation>
+                <credentials>Remote-Server Anmeldeinformationen</credentials>
                 <status>Status</status>
-                <app>Applikation</app>
+                <app>Anwendung</app>
                 <form>Formular</form>
                 <title>Titel</title>
-                <view>Ansehen</view>
+                <view>Ansicht</view>
                 <new>Neu</new>
                 <local>Lokal</local>
-                <remote>Produktivsystem</remote>
+                <remote>Remote-System</remote>
                 <form-identification>Formular Identifikation</form-identification>
-                <last-modified>Verändert am</last-modified>
+                <last-modified>Geändert am</last-modified>
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
-                <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} die Formulare} {0,choice,0#veröffentlichen |1#nicht mehr öffentlich zugänglich haben|2#upgrade} wollen?</publish-confirmation>
+                <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern} wollen?</publish-confirmation>
             </messages>
             <labels>
                 <available>Verfügbar</available>
                 <unavailable>Nicht verfügbar</unavailable>
                 <library>Bibliothek</library>
                 <newer>Neuer</newer>
-                <remote-server todo="true">[Remote server]</remote-server>
+                <remote-server>Remote-Server</remote-server>
                 <username>Benutzername</username>
                 <password>Passwort</password>
             </labels>

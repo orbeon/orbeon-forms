@@ -3995,7 +3995,7 @@
         <dialog-publish>
             <label>Pubblica modulo</label>
             <publish>Pubblica</publish>
-            <publish-success>La definizione di modulo è stata pubblicata con successo come versione {1,number,integer}, {0,choice,0#senza allegati|1#con 1 allegato|con 1&lt;{0,number,integer}allegati}.</publish-success>
+            <publish-success>La definizione di modulo è stata pubblicata con successo come versione {1,number,integer}, {0,choice,0#senza allegati|1#con 1 allegato|1&lt;con {0,number,integer}allegati}.</publish-success>
             <publish-error>Si è verificato un errore durante la pubblicazione del modulo.</publish-error>
             <latest-published-version>Ultima versione pubblicata</latest-published-version>
             <create-new-version-item>Crea una nuova definizione di modulo con il numero di versione {0,number,integer}</create-new-version-item>

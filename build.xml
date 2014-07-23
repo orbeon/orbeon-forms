@@ -1110,51 +1110,6 @@
     </target>
     <target name="teamcity-release" depends="skip-selenium-database, clean, test, orbeon-dist"/>
 
-    <target name="teamcity-rsync" depends="teamcity-release">
-
-        <echo message="Rsync using artifact name: ${unversioned-name}"/>
-
-        <!-- Create directory for rsync -->
-        <mkdir dir="${rsync.dir}"/>
-        <!-- Copy files to rsync -->
-        <copy todir="${rsync.dir}">
-            <fileset dir="${build.distrib.dir}">
-                <include name="*"/>
-            </fileset>
-        </copy>
-
-        <!-- Move to generic file name so that rsync overwrites -->
-        <move file="${rsync.dir}/${versioned-name}.zip" tofile="${rsync.dir}/${unversioned-name}.zip"/>
-        <move file="${rsync.dir}/${versioned-name}.tgz" tofile="${rsync.dir}/${unversioned-name}.tgz"/>
-        <move file="${rsync.dir}/${versioned-name}.war" tofile="${rsync.dir}/${unversioned-name}.war"/>
-        <move file="${rsync.dir}/${versioned-name}-src.zip" tofile="${rsync.dir}/${unversioned-name}-src.zip"/>
-
-        <move file="${rsync.dir}/${versioned-name}.zip.MD5" tofile="${rsync.dir}/${unversioned-name}.zip.MD5"/>
-        <move file="${rsync.dir}/${versioned-name}.tgz.MD5" tofile="${rsync.dir}/${unversioned-name}.tgz.MD5"/>
-        <move file="${rsync.dir}/${versioned-name}.war.MD5" tofile="${rsync.dir}/${unversioned-name}.war.MD5"/>
-        <move file="${rsync.dir}/${versioned-name}-src.zip.MD5" tofile="${rsync.dir}/${unversioned-name}-src.zip.MD5"/>
-
-        <!-- Post the unstable build -->
-        <exec executable="rsync" failonerror="true" dir="${rsync.dir}">
-            <arg value="-vv"/>
-            <arg value="--stats"/>
-            <arg value="-z"/>
-            <arg value="-c"/>
-            <arg value="--rsh=/usr/bin/ssh"/>
-            <arg value="--bwlimit=50"/>
-            <arg value="${unversioned-name}.zip"/>
-            <arg value="${unversioned-name}.zip.MD5"/>
-            <arg value="${unversioned-name}.tgz"/>
-            <arg value="${unversioned-name}.tgz.MD5"/>
-            <arg value="${unversioned-name}.war"/>
-            <arg value="${unversioned-name}.war.MD5"/>
-            <arg value="${unversioned-name}-src.zip"/>
-            <arg value="${unversioned-name}-src.zip.MD5"/>
-            <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
-        </exec>
-
-    </target>
-
     <target name="exist-task" depends="classpath">
         <!-- eXist tasks -->
         <!-- http://exist-db.org/ant-tasks.html -->

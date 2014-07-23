@@ -130,7 +130,7 @@
             <!-- NOTE: We guess whether the control is a select or select1 based on the element name. One exception is
                  autocomplete, which is also a single selection control. -->
             <xf:var name="element-name" value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
-            <xf:action if="$element-name = 'select' or ends-with($element-name, '-select')">
+            <xf:action if="frf:isMultipleSelectionControl($element-name)">
                 <xf:action iterate="{fr:resolve-targets()}">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
@@ -138,7 +138,7 @@
                         value="string-join(xxf:split($bind)[. = $resource-holders[1]/item/value/string()], ' ')"/>
                 </xf:action>
             </xf:action>
-            <xf:action if="$element-name = ('select1', 'autocomplete') or ends-with($element-name, '-select1')">
+            <xf:action if="frf:isSingleSelectionControl($element-name) or $element-name = 'autocomplete'">
                 <xf:action iterate="{fr:resolve-targets()}">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue

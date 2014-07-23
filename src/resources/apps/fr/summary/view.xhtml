@@ -690,9 +690,9 @@
                                                                         for $control in $query/@control return
                                                                             if ($control = 'textarea') then
                                                                                 if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
-                                                                            else if ($control = 'select' or ends-with($control, '-select')) then
+                                                                            else if (frf:isMultipleSelectionControl($control)) then
                                                                                 string-join(for $v in xxf:split() return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
-                                                                            else if ($control = 'select1' or ends-with($control, '-select1')) then
+                                                                            else if (frf:isSingleSelectionControl($control)) then
                                                                                 for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
                                                                             else
                                                                                 for $type in substring-after($query/@type, ':') return

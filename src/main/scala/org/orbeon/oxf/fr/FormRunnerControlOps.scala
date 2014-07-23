@@ -102,6 +102,12 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
         nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
 
+    def isSingleSelectionControl(localName: String) =
+        localName == "select1" || localName.endsWith("-select1")
+
+    def isMultipleSelectionControl(localName: String) =
+        localName == "select" || localName.endsWith("-select")
+
     // Resolve target bind nodes from an action source and a target control.
     //
     // Must be called from an XPath expression.

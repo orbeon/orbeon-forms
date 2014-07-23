@@ -174,7 +174,7 @@ private class FilterRequestWrapper(httpServletRequest: HttpServletRequest)
         extends BaseServletRequestWrapper(httpServletRequest)
         with RequestRemoveHeaders {
 
-    private var _requestBodyRead: Boolean = false
+    private var _requestBodyRead = false
     def isRequestBodyRead = _requestBodyRead
 
     override def getReader = {

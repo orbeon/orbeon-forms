@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest
 import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.Headers._
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
 
@@ -47,11 +47,11 @@ object APISupport {
             params      : immutable.Seq[(String, String)] = Nil)(
             implicit ctx: EmbeddingContextWithResponse): Unit = {
 
-        val url  = buildFormRunnerURL(baseURL, path, embeddable = true)
+        val url  = formRunnerURL(baseURL, path, embeddable = true)
 
         callService(RequestDetails(None, url, headers, params)) match {
             case Content(content, contentType, _) ⇒
-                writeResponse(content.right map (new ByteArrayInputStream(_)), contentType)
+                writeResponseBody(content.right map (new ByteArrayInputStream(_)), contentType)
             case Redirect(_, _) ⇒
                 throw new UnsupportedOperationException
         }
@@ -59,27 +59,23 @@ object APISupport {
 
     def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
 
-        val connection = connectURL(requestDetails)
+        val cx = connectURL(requestDetails)
+        
+        propagateStatusCodeAndHeaders(cx)
 
-        useAndClose(connection.getInputStream) { is ⇒
-
-            ctx.setStatusCode(connection.getResponseCode)
-
-            filterCapitalizeAndCombineHeaders(connection.getHeaderFields.asScala mapValues (_.asScala), out = false) foreach
-                (ctx.setHeader _).tupled
-
-            writeResponse(Right(is), Option(connection.getContentType))
+        useAndClose(cx.getInputStream) { is ⇒
+            writeResponseBody(Right(is), Option(cx.getContentType))
         }
     }
 
-    def buildFormRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
-        NetUtils.appendQueryString("/fr/" + app + "/" + form + "/" + action + (documentId map ("/" +) getOrElse ""), query getOrElse "")
+    def formRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
+        appendQueryString(s"/fr/$app/$form/$action${documentId map ("/" +) getOrElse ""}", query getOrElse "")
 
-    def buildFormRunnerHomePath(query: Option[String]) =
-        NetUtils.appendQueryString("/fr/", query getOrElse "")
+    def formRunnerHomePath(query: Option[String]) =
+        appendQueryString("/fr/", query getOrElse "")
 
-    def buildFormRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
-        NetUtils.appendQueryString(dropTrailingSlash(baseURL) + path, if(embeddable) "orbeon-embeddable=true" else "")
+    def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
+        appendQueryString(dropTrailingSlash(baseURL) + path, if(embeddable) "orbeon-embeddable=true" else "")
 
     def requestHeaders(req: HttpServletRequest) =
         for {
@@ -99,12 +95,12 @@ object APISupport {
 
     // Call the Orbeon service at the other end
     def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): ContentOrRedirect = {
-        val connection = connectURL(requestDetails)
-        useAndClose(connection.getInputStream) { is ⇒
-            if (NetUtils.isRedirectCode(connection.getResponseCode))
-                Redirect(connection.getHeaderField("Location"), exitPortal = true) // we could consider an option for intra-portlet redirection
+        val cx = connectURL(requestDetails)
+        useAndClose(cx.getInputStream) { is ⇒
+            if (isRedirectCode(cx.getResponseCode))
+                Redirect(cx.getHeaderField("Location"), exitPortal = true)
             else
-                Content(Right(IOUtils.toByteArray(is)), Option(connection.getHeaderField("Content-Type")), None)
+                Content(Right(IOUtils.toByteArray(is)), Option(cx.getHeaderField("Content-Type")), None)
         }
     }
 
@@ -122,34 +118,27 @@ object APISupport {
 
         val newURL = recombineQuery(requestDetails.url, requestDetails.params)
 
-        // TODO: Ability to use other HTTP client
-        val connection = new URL(newURL).openConnection.asInstanceOf[HttpURLConnection]
+        val cx = new URL(newURL).openConnection.asInstanceOf[HttpURLConnection]
 
-        connection.setInstanceFollowRedirects(false)
-        connection.setDoInput(true)
+        cx.setInstanceFollowRedirects(false)
+        cx.setDoInput(true)
 
         requestDetails.content foreach { content ⇒
-            connection.setDoOutput(true)
-            connection.setRequestMethod("POST")
-            content.contentType foreach (connection.setRequestProperty("Content-Type", _))
+            cx.setDoOutput(true)
+            cx.setRequestMethod("POST")
+            content.contentType foreach (cx.setRequestProperty("Content-Type", _))
         }
 
-        def setRequestHeaders(headers: Seq[(String, String)], connection: HttpURLConnection): Unit =
+        def setRequestHeaders(headers: Seq[(String, String)]): Unit =
             for ((name, value) ← headers if name.toLowerCase != "content-type") // handled via requestDetails.content
-                connection.addRequestProperty(name, value)
+                cx.addRequestProperty(name, value)
 
-        def setRequestRemoteSessionIdAndHeaders(connection: HttpURLConnection, url: String)(implicit ctx: EmbeddingContext): Unit = {
-            // Tell Orbeon Forms explicitly that we are in fact in a portlet or portlet-like environment. This causes
-            // the server to use WSRP URL rewriting for the resulting HTML and CSS.
-            connection.addRequestProperty("Orbeon-Client", "portlet")
-            // Set Cookie header
-            CookieManager.processRequestCookieHeaders(connection, url)
-        }
+        // Tell Orbeon Forms explicitly that we are an embedded client. This causes it to use WSRP URL rewriting for the
+        // resulting HTML and CSS.
+        setRequestHeaders(("Orbeon-Client" → "embedded") +: requestDetails.headers)
+        CookieManager.processRequestCookieHeaders(cx, newURL)
 
-        setRequestHeaders(requestDetails.headers, connection)
-        setRequestRemoteSessionIdAndHeaders(connection, newURL)
-
-        connection.connect()
+        cx.connect()
         try {
             // Write content
             // NOTE: At this time we don't support application/x-www-form-urlencoded. When that type of encoding is
@@ -158,17 +147,17 @@ object APISupport {
             // multipart/form-data encoding on the main form to help us here.
             requestDetails.content foreach { content ⇒
                 content.body match {
-                    case Left(string) ⇒ connection.getOutputStream.write(string.getBytes("utf-8"))
-                    case Right(bytes) ⇒ connection.getOutputStream.write(bytes)
+                    case Left(string) ⇒ cx.getOutputStream.write(string.getBytes("utf-8"))
+                    case Right(bytes) ⇒ cx.getOutputStream.write(bytes)
                 }
             }
 
-            CookieManager.processResponseSetCookieHeaders(connection, newURL)
+            CookieManager.processResponseSetCookieHeaders(cx, newURL)
 
-            connection
+            cx
         } catch {
             case NonFatal(t) ⇒
-                val is = connection.getInputStream
+                val is = cx.getInputStream
                 if (is ne null)
                     runQuietly(is.close())
 
@@ -176,8 +165,17 @@ object APISupport {
         }
     }
     
-    def writeResponse(data: String Either InputStream, contentType: Option[String])(implicit ctx: EmbeddingContextWithResponse): Unit =
-        contentType map NetUtils.getContentTypeMediaType match {
+    def propagateStatusCodeAndHeaders(cx: HttpURLConnection)(implicit ctx: EmbeddingContextWithResponse): Unit = {
+        ctx.setStatusCode(cx.getResponseCode)
+        val responseHeaderFields = cx.getHeaderFields.asScala mapValues (_.asScala)
+        filterCapitalizeAndCombineHeaders(responseHeaderFields, out = false) foreach (ctx.setHeader _).tupled
+    }
+    
+    def writeResponseBody(
+            data        : String Either InputStream,
+            contentType : Option[String])(
+            implicit ctx: EmbeddingContextWithResponse): Unit =
+        contentType map getContentTypeMediaType match {
             case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
                 // Text/JSON/XML content type: rewrite response content
                 val contentAsString =
@@ -185,15 +183,21 @@ object APISupport {
                         case Left(string) ⇒
                             string
                         case Right(is) ⇒
-                            val encoding = contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeCharset(ct))) getOrElse "utf-8"
+                            val encoding = contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
                             IOUtils.toString(is, encoding)
                     }
+
+                val encodeForXML = XMLUtils.isXMLMediatype(mediatype)
+
+                def decodeURL(encoded: String) = {
+                    val decodedURL = ctx.decodeURL(encoded)
+                    if (encodeForXML) XMLUtils.escapeXMLMinimal(decodedURL) else decodedURL
+                }
 
                 decodeWSRPContent(
                     contentAsString,
                     ctx.namespace,
-                    XMLUtils.isXMLMediatype(mediatype),
-                    ctx.decodeURL,
+                    decodeURL,
                     ctx.writer
                 )
             case _ ⇒
@@ -207,7 +211,7 @@ object APISupport {
         }
 
     // Parse a string containing WSRP encodings and encode the URLs and namespaces
-    def decodeWSRPContent(content: String, namespace: String, encodeForXML: Boolean, decodeURL: String ⇒ String, writer: Writer): Unit = {
+    def decodeWSRPContent(content: String, ns: String, decodeURL: String ⇒ String, writer: Writer): Unit = {
 
         val stringLength = content.length
         var currentIndex = 0
@@ -221,7 +225,8 @@ object APISupport {
             writer.write(content, currentIndex, index - currentIndex)
 
             // Check if escaping is requested
-            if (index + BaseTagLength * 2 <= stringLength && content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
+            if (index + BaseTagLength * 2 <= stringLength &&
+                    content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
                 // Write escaped tag, update index and keep looking
                 writer.write(BaseTag)
                 currentIndex = index + BaseTagLength * 2
@@ -233,12 +238,11 @@ object APISupport {
                     throw new OXFException("Missing end tag for WSRP encoded URL.")
                 val encodedURL = content.substring(index + StartTagLength, endIndex)
                 currentIndex = endIndex + EndTagLength
-                val decodedURL = decodeURL(encodedURL)
 
-                writer.write(if (encodeForXML) XMLUtils.escapeXMLMinimal(decodedURL) else decodedURL)
+                writer.write(decodeURL(encodedURL))
             } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '_') {
                 // Namespace encoding
-                writer.write(namespace)
+                writer.write(ns)
                 currentIndex = index + PrefixTagLength
             } else
                 throw new OXFException("Invalid WSRP rewrite tagging.")
@@ -252,7 +256,10 @@ object APISupport {
 
 // Immutable responses
 sealed trait ContentOrRedirect
-case class Content(body: String Either Array[Byte], contentType: Option[String], title: Option[String]) extends ContentOrRedirect
+
+case class Content(body: String Either Array[Byte], contentType: Option[String], title: Option[String])
+    extends ContentOrRedirect
+
 case class Redirect(location: String, exitPortal: Boolean = false) extends ContentOrRedirect {
     require(location ne null, "Missing Location header in redirect response")
 }

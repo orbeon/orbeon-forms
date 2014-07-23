@@ -92,7 +92,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response)
 
             val resourceId     = request.getResourceID
-            val url            = APISupport.buildFormRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
+            val url            = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
             val requestDetails = newRequestDetails(request, contentFromRequest(request, response.getNamespace), url)
 
             APISupport.proxyResource(requestDetails)
@@ -107,9 +107,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
             def defaultPath =
                 if (getPreference(request, Page) == "home")
-                    APISupport.buildFormRunnerHomePath(None)
+                    APISupport.formRunnerHomePath(None)
                 else
-                    APISupport.buildFormRunnerPath(getPreference(request, AppName), getPreference(request, FormName), getPreference(request, Page), None, None)
+                    APISupport.formRunnerPath(getPreference(request, AppName), getPreference(request, FormName), getPreference(request, Page), None, None)
 
             def filterAction(action: String) =
                 if (getPreference(request, ReadOnly) == "true" && action == "edit") "view" else action
@@ -119,13 +119,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                     path
                 // Incoming path is Form Runner path without document id
                 case FormRunnerPath(appName, formName, action, _, query) ⇒
-                    APISupport.buildFormRunnerPath(appName, formName, filterAction(action), None, Option(query))
+                    APISupport.formRunnerPath(appName, formName, filterAction(action), None, Option(query))
                 // Incoming path is Form Runner path with document id
                 case FormRunnerDocumentPath(appName, formName, action, documentId, _, query) ⇒
-                    APISupport.buildFormRunnerPath(appName, formName, filterAction(action), Some(documentId), Option(query))
+                    APISupport.formRunnerPath(appName, formName, filterAction(action), Some(documentId), Option(query))
                 // Incoming path is Form Runner Home page
                 case FormRunnerHome(_, query) ⇒
-                    APISupport.buildFormRunnerHomePath(Option(query))
+                    APISupport.formRunnerHomePath(Option(query))
                 // Unsupported path
                 case otherPath ⇒
                     throw new PortletException("Unsupported path: " + otherPath)
@@ -135,7 +135,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         newRequestDetails(
             request,
             contentFromRequest(request, namespace),
-            APISupport.buildFormRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true)
+            APISupport.formRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true)
         )
     }
 

@@ -60,7 +60,7 @@ object API {
             servletCtx,
             req,
             writer,
-            APISupport.buildFormRunnerPath(app, form, action, Option(documentId), Option(query))
+            APISupport.formRunnerPath(app, form, action, Option(documentId), Option(query))
         )
 
     def embedPage(
@@ -95,7 +95,7 @@ object API {
             servletCtx,
             req,
             out,
-            APISupport.buildFormRunnerPath(app, form, action.name, documentId, query)
+            APISupport.formRunnerPath(app, form, action.name, documentId, query)
         )
 
     def proxyServletResources(
@@ -133,7 +133,7 @@ object API {
         APISupport.proxyResource(
             RequestDetails(
                 content  = contentFromRequest,
-                url      = APISupport.buildFormRunnerURL(settings.formRunnerURL, resourcePath, embeddable = true),
+                url      = APISupport.formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = true),
                 headers  = requestHeaders,
                 params   = Nil
             )

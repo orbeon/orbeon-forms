@@ -69,15 +69,17 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
-        final boolean isPortletClient; {
+        final boolean isEmbeddedClient; {
             final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
-            isPortletClient = "portlet".equals(NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client"));
+            final String client = NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client");
+            isEmbeddedClient = "embedded".equals(client) || "portlet".equals(client);
         }
 
         final String requestPath = containingDocument.getRequestPath();
         final String xformsSubmissionPath;
         {
-            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.standalone || containingDocument.getContainerType().equals("portlet") || isPortletClient) {
+            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.standalone
+                    || containingDocument.getContainerType().equals("portlet") || isEmbeddedClient) {
                 // Integrated or separate deployment mode or portlet
                 xformsSubmissionPath =  "/xforms-server-submit";
             } else {
@@ -103,7 +105,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
-        final boolean doMultipartPOST = containingDocument.getStaticOps().hasControlByName("upload") || isPortletClient;
+        final boolean doMultipartPOST = containingDocument.getStaticOps().hasControlByName("upload") || isEmbeddedClient;
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getFormId(containingDocument),

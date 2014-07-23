@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004-2009 Orbeon, Inc.
+    Copyright (C) 2004-2014 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -703,6 +703,19 @@
         </war>
     </target>
 
+    <target name="embedding-war" depends="embedding-jar" description="Create embedding WAR">
+    	<mkdir dir="${build.distrib.dir}"/>
+        <war destfile="${build.distrib.dir}/${project.name}-${release.number}-embedding.war"
+             webxml="descriptors/embedding/web.xml">
+            <lib dir="${build.lib.dir}">
+                <include name="orbeon-embedding.jar"/>
+            </lib>
+            <zipfileset dir="descriptors/embedding" prefix="">
+                <include name="*.jsp"/>
+            </zipfileset>
+        </war>
+    </target>
+
     <target name="orbeon-auth-war" depends="classes" description="Creates Orbeon Forms orbeon-auth.war">
         <mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/orbeon-auth.war" webxml="descriptors/orbeon-auth-war/web.xml">
@@ -1012,12 +1025,15 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, orbeon-auth-war, orbeon-src">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, embedding-war, orbeon-auth-war, orbeon-src">
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/${versioned-name}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/${project.name}.war">
                 <include name="${versioned-name}.war"/>
+            </zipfileset>
+            <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/proxy-portlet.war">
+                <include name="${project.name}-${release.number}-embedding.war"/>
             </zipfileset>
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-auth.war">
                 <include name="orbeon-auth.war"/>

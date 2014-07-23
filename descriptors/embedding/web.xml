@@ -1,0 +1,29 @@
+<web-app version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/j2ee">
+    <!-- Declare and configure the embedding filter -->
+    <filter>
+        <filter-name>orbeon-form-runner-filter</filter-name>
+        <filter-class>org.orbeon.oxf.fr.embedding.servlet.ServletFilter</filter-class>
+        <init-param>
+            <param-name>form-runner-url</param-name>
+            <param-value>http://localhost:8080/orbeon</param-value>
+        </init-param>
+        <init-param>
+            <param-name>orbeon-prefix</param-name>
+            <param-value>/orbeon</param-value>
+        </init-param>
+    </filter>
+    <!-- Any JSP resource is processed by the filter -->
+    <filter-mapping>
+        <filter-name>orbeon-form-runner-filter</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <!-- This ensures that Orbeon resources are proxied appropriately -->
+    <filter-mapping>
+        <filter-name>orbeon-form-runner-filter</filter-name>
+        <url-pattern>/orbeon/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+</web-app>

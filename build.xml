@@ -506,6 +506,9 @@
             -libraryjars lib/servlet-2_3-4_0_4.jar
 
             -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter
+            -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter$ {
+                public *;
+            }
         </proguard>
         <jarjar jarfile="${xforms-filter.jar.file}">
             <zipfileset src="${temp.jar}"/>

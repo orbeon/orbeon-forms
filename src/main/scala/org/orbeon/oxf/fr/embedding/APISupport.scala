@@ -135,7 +135,7 @@ object APISupport {
 
         // Tell Orbeon Forms explicitly that we are an embedded client. This causes it to use WSRP URL rewriting for the
         // resulting HTML and CSS.
-        setRequestHeaders(("Orbeon-Client" → "embedded") +: requestDetails.headers)
+        setRequestHeaders(("Orbeon-Client" → "portlet") +: requestDetails.headers)
         CookieManager.processRequestCookieHeaders(cx, newURL)
 
         cx.connect()

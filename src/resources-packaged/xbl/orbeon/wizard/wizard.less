@@ -12,9 +12,13 @@
 
 @import (reference) "../../../../resources/apps/fr/style/form-runner-common";
 
+@frWizardWidth: 940px;
+@frWizardTocWidth: 199px;
+@frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
+
 .orbeon .xbl-fr-wizard {
 
-    width: 940px; // Avoid having TOC wrap below the body, see #1741
+    width: @frWizardWidth; // Avoid having TOC wrap below the body, see #1741
 
     .fr-wizard-toc, .fr-wizard-body {
         display: inline-block;
@@ -23,9 +27,9 @@
     }
 
     .fr-wizard-toc {
-        width: 199px;
+        width: @frWizardTocWidth;
+        left: -@frWizardBodyWidth;
         margin-bottom: 0;
-        left: -738px;
         overflow: hidden;   // so that content is contained
 
         .nav {
@@ -58,8 +62,8 @@
     }
 
     .fr-wizard-body {
-        width: 738px;
-        left: 199px;
+        width: @frWizardBodyWidth;
+        left: @frWizardTocWidth;
         border-left: 1px solid darken(@wellBackground, 7%);
         border-bottom: 1px solid darken(@wellBackground, 7%);
     }
@@ -78,7 +82,7 @@
         display: block;
         float: right;
         box-sizing: border-box;
-        width: 738px;
+        width: @frWizardBodyWidth;
         padding-top: 10px;
         padding-bottom: 10-5px; // adjust for the 5px bottom margin of buttons (see below)
         padding-right: 10-1px;  // align with bottom buttons

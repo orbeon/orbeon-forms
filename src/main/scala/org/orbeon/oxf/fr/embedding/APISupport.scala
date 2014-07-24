@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.{ByteArrayInputStream, InputStream, OutputStream, Writer}
-import java.net.{HttpURLConnection, URL}
 import java.{util ⇒ ju}
 import javax.servlet.http.HttpServletRequest
 
@@ -25,10 +24,8 @@ import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
 
-import scala.collection.immutable
-import scala.util.control.NonFatal
-
 import scala.collection.JavaConverters._
+import scala.collection.immutable
 
 sealed trait Action { val name: String }
 case object New  extends Action { val name = "new" }
@@ -59,12 +56,13 @@ object APISupport {
 
     def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
 
-        val cx = connectURL(requestDetails)
+        val res = connectURL(requestDetails)
         
-        propagateStatusCodeAndHeaders(cx)
+        ctx.setStatusCode(res.statusCode)
+        filterCapitalizeAndCombineHeaders(res.headers mapValues (List(_)), out = false) foreach (ctx.setHeader _).tupled
 
-        useAndClose(cx.getInputStream) { is ⇒
-            writeResponseBody(Right(is), Option(cx.getContentType))
+        useAndClose(res.inputStream) { is ⇒
+            writeResponseBody(Right(is), Option(res.contentType))
         }
     }
 
@@ -79,8 +77,8 @@ object APISupport {
 
     def requestHeaders(req: HttpServletRequest) =
         for {
-            name           ← req.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala
-            values         = req.getHeaders(name).asInstanceOf[ju.Enumeration[String]].asScala.toList
+            name   ← req.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala
+            values = req.getHeaders(name).asInstanceOf[ju.Enumeration[String]].asScala.toList
         } yield
             name → values
 
@@ -96,81 +94,39 @@ object APISupport {
     // Call the Orbeon service at the other end
     def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): ContentOrRedirect = {
         val cx = connectURL(requestDetails)
-        useAndClose(cx.getInputStream) { is ⇒
-            if (isRedirectCode(cx.getResponseCode))
-                Redirect(cx.getHeaderField("Location"), exitPortal = true)
+        useAndClose(cx.inputStream) { is ⇒
+            if (isRedirectCode(cx.statusCode))
+                Redirect(cx.headers("Location"), exitPortal = true)
             else
-                Content(Right(IOUtils.toByteArray(is)), Option(cx.getHeaderField("Content-Type")), None)
+                Content(Right(IOUtils.toByteArray(is)), Option(cx.contentType), None)
         }
     }
 
-    def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): HttpURLConnection = {
+    // POST when we get ClientDataRequest for:
+    //
+    // - actions requests
+    // - resources requests: Ajax requests, form posts, and uploads
+    //
+    // GET otherwise for:
+    //
+    // - render requests
+    // - resources: typically image, CSS, JavaScript, etc.
+    def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
+        PlainHttpClient.openConnection(
+            recombineQuery(requestDetails.url, requestDetails.params),
+            requestDetails.content map { content ⇒
 
-        // POST when we get ClientDataRequest for:
-        //
-        // - actions requests
-        // - resources requests: Ajax requests, form posts, and uploads
-        //
-        // GET otherwise for:
-        //
-        // - render requests
-        // - resources: typically image, CSS, JavaScript, etc.
+                def write(os: OutputStream): Unit =
+                    content.body match {
+                        case Left(string) ⇒ os.write(string.getBytes("utf-8"))
+                        case Right(bytes) ⇒ os.write(bytes)
+                    }
 
-        val newURL = recombineQuery(requestDetails.url, requestDetails.params)
+                (content.contentType, write _)
+            },
+            ("Orbeon-Client" → "portlet") +: requestDetails.headers
+        )
 
-        val cx = new URL(newURL).openConnection.asInstanceOf[HttpURLConnection]
-
-        cx.setInstanceFollowRedirects(false)
-        cx.setDoInput(true)
-
-        requestDetails.content foreach { content ⇒
-            cx.setDoOutput(true)
-            cx.setRequestMethod("POST")
-            content.contentType foreach (cx.setRequestProperty("Content-Type", _))
-        }
-
-        def setRequestHeaders(headers: Seq[(String, String)]): Unit =
-            for ((name, value) ← headers if name.toLowerCase != "content-type") // handled via requestDetails.content
-                cx.addRequestProperty(name, value)
-
-        // Tell Orbeon Forms explicitly that we are an embedded client. This causes it to use WSRP URL rewriting for the
-        // resulting HTML and CSS.
-        setRequestHeaders(("Orbeon-Client" → "portlet") +: requestDetails.headers)
-        CookieManager.processRequestCookieHeaders(cx, newURL)
-
-        cx.connect()
-        try {
-            // Write content
-            // NOTE: At this time we don't support application/x-www-form-urlencoded. When that type of encoding is
-            // taking place, the portal doesn't provide a body and instead makes the content available via parameters.
-            // So we would need to re-encode the POST. As of 2012-05-10, the XForms engine instead uses the
-            // multipart/form-data encoding on the main form to help us here.
-            requestDetails.content foreach { content ⇒
-                content.body match {
-                    case Left(string) ⇒ cx.getOutputStream.write(string.getBytes("utf-8"))
-                    case Right(bytes) ⇒ cx.getOutputStream.write(bytes)
-                }
-            }
-
-            CookieManager.processResponseSetCookieHeaders(cx, newURL)
-
-            cx
-        } catch {
-            case NonFatal(t) ⇒
-                val is = cx.getInputStream
-                if (is ne null)
-                    runQuietly(is.close())
-
-                throw t
-        }
-    }
-    
-    def propagateStatusCodeAndHeaders(cx: HttpURLConnection)(implicit ctx: EmbeddingContextWithResponse): Unit = {
-        ctx.setStatusCode(cx.getResponseCode)
-        val responseHeaderFields = cx.getHeaderFields.asScala mapValues (_.asScala)
-        filterCapitalizeAndCombineHeaders(responseHeaderFields, out = false) foreach (ctx.setHeader _).tupled
-    }
-    
     def writeResponseBody(
             data        : String Either InputStream,
             contentType : Option[String])(

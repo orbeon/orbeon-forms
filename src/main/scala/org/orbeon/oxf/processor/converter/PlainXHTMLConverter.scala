@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.converter
 
-import org.orbeon.oxf.pipeline.api.{PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorInputOutputInfo, ProcessorImpl}
 import org.orbeon.oxf.xml.{XMLReceiver, ForwardingXMLReceiver}

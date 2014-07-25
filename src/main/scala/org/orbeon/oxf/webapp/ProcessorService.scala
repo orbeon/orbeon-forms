@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.ProcessorDefinition
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.LoggerFactory
 import java.io.PrintWriter
-import org.orbeon.oxf.util.task.TaskScheduler
 import scala.util.control.NonFatal
 
 class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProcessorDefinition: Option[ProcessorDefinition]) {

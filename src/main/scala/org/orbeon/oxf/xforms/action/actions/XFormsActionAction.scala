@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis._
-import java.lang.IllegalStateException
 
 /**
  * 10.1.1 The action Element

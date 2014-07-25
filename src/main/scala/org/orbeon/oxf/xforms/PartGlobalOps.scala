@@ -18,7 +18,7 @@ import analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.{Model, Instance}
 import event.EventHandler
 import org.dom4j.QName
-import java.util.{List ⇒ JList, Collection ⇒ JCollection}
+import java.util.{Collection ⇒ JCollection}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings, ConcreteBinding}
 import org.apache.commons.lang3.StringUtils

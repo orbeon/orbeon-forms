@@ -25,7 +25,8 @@ import org.xml.sax.Attributes
 //
 // RFE: Support xml:space
 //
-class WhitespaceXMLReceiver(xmlReceiver: XMLReceiver, startPolicy: Policy, policyMatcher: PolicyMatcher) extends ForwardingXMLReceiver(xmlReceiver) {
+class WhitespaceXMLReceiver(xmlReceiver: XMLReceiver, startPolicy: Policy, policyMatcher: PolicyMatcher)
+        extends ForwardingXMLReceiver(xmlReceiver) {
 
     private case class StackElement(policy: Policy, parent: Option[(String, String)])
     

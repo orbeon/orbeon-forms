@@ -31,7 +31,6 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.saxon.value.TimeValue
 import util.matching.Regex
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xml.XMLConstants._
 
 /**
  * xf:input control

@@ -207,9 +207,8 @@ class XFormsControl(
     final def evaluate(): Unit =
         try evaluateImpl(relevant = true, parentRelevant = true)
         catch {
-            case e: ValidationException ⇒ {
+            case e: ValidationException ⇒
                 throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element))
-            }
         }
 
     // Called to clear the control's values when the control becomes non-relevant

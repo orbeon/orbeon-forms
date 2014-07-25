@@ -29,7 +29,7 @@ trait FormRunnerErrorSummary {
 
         val ancestorRepeats = containingDocument.getStaticOps.getAncestorRepeatIds(prefixedId)
 
-        if (ancestorRepeats exists (_ == repeatPrefixedId)) {
+        if (ancestorRepeats contains repeatPrefixedId) {
             // Control is a descendant of the repeat so might be impacted
 
             val idIterationPairs = getEffectiveIdSuffixParts(effectiveId) zip ancestorRepeats

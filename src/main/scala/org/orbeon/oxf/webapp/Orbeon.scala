@@ -56,8 +56,13 @@ object Orbeon {
         val propertiesURL = {
 
             // Try to replace the run mode variable so we can write "oxf:/config/properties-${oxf.run-mode}.xml"
-            val rawPropertiesURL = StringUtils.trimToNull(context.initParameters.get(PropertiesProperty) getOrElse
-                (throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")))
+            val rawPropertiesURL =
+                StringUtils.trimToNull(
+                    context.initParameters.getOrElse(
+                        PropertiesProperty,
+                        throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")
+                    )
+                )
 
             val runMode = RunMode.getRunMode(context.initParameters)
             logger.info("Using run mode: " + runMode)

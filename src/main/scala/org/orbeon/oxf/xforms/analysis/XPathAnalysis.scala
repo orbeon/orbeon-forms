@@ -37,7 +37,7 @@ abstract class XPathAnalysis extends DebugXML  {
     // NOTE: For now just check exact paths. Later must be smarter?
 
     def intersectsBinding(touchedPaths:  MapSet[String, String]) = valueDependentPaths intersects touchedPaths
-    def intersectsModels (touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _)
+    def intersectsModels (touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains)
     def intersectsValue  (touchedPaths:  MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
 
     // Combine this analysis with another one and return a new analysis

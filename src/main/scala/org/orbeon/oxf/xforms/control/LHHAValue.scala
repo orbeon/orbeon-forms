@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl._
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.XMLParsing._
 import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import org.orbeon.oxf.xml.dom4j.LocationData
 

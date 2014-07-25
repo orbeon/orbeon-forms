@@ -101,8 +101,8 @@ class BinaryTextXMLReceiver(
 
             val (typePrefix, typeLocalName) = XML.parseQName(xsiType)
 
-            val typeNamespaceURI = prefixMappings.get(typePrefix) getOrElse
-                (throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix))
+            val typeNamespaceURI =
+                prefixMappings.getOrElse(typePrefix, throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix))
 
             val isBinaryInput = QName.get(typeLocalName, Namespace.get(typePrefix, typeNamespaceURI)) match {
                 case XS_BASE64BINARY_QNAME ⇒ true

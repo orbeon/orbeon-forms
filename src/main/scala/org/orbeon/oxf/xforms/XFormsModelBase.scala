@@ -148,7 +148,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     private def doRecalculate(applyDefaults: Boolean): Unit =
         withDebug("performing recalculate", List("model" → effectiveId)) {
 
-            val hasVariables = ! staticModel.variablesSeq.isEmpty
+            val hasVariables = staticModel.variablesSeq.nonEmpty
 
             // Re-evaluate top-level variables if needed
             if (hasInstancesAndBinds || hasVariables)

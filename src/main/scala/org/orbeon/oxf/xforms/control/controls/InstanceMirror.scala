@@ -24,7 +24,6 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.value.StringValue
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.IndentedLogger
-import java.lang.IllegalStateException
 import org.dom4j._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.common.OXFException

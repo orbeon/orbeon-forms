@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.event.{XFormsEvents, EventHandlerImpl, EventHandler}
 import org.orbeon.oxf.xforms.script.ServerScript
 import org.orbeon.oxf.xforms.{Script, XFormsConstants}
@@ -52,7 +51,7 @@ trait PartEventHandlerAnalysis {
         // Accumulate new handlers into existing map by combining values for a given observer
         _handlersForObserver = newHandlers.foldLeft(_handlersForObserver) {
             case (existingMap, (observerId, newHandlers)) ⇒
-                val existingHandlers = existingMap.get(observerId) getOrElse Nil
+                val existingHandlers = existingMap.getOrElse(observerId, Nil)
                 existingMap + (observerId → (existingHandlers ::: newHandlers))
         }
 
@@ -104,7 +103,7 @@ trait PartEventHandlerAnalysis {
     }
 
     def getEventHandlers(observerPrefixedId: String) =
-        _handlersForObserver.get(observerPrefixedId) getOrElse Nil
+        _handlersForObserver.getOrElse(observerPrefixedId, Nil)
 
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String) =
         _handlersForObserver.get(observerPrefixedId) exists

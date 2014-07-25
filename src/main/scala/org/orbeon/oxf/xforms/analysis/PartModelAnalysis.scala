@@ -48,7 +48,7 @@ trait PartModelAnalysis extends TransientState {
             (_ find (_.bindsById.contains(bindStaticId))) orNull
 
     def getModelsForScope(scope: Scope) =
-        modelsByScope.get(scope) getOrElse Seq()
+        modelsByScope.getOrElse(scope, Seq())
 
     def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String = {
         var currentScope = startScope

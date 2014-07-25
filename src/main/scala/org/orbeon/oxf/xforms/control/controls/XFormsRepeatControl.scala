@@ -31,7 +31,6 @@ import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.{NodeInfo, Item}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.util.Logging
 
 import control.controls.XFormsRepeatControl._
 import java.lang.{Integer ⇒ JInteger}
@@ -180,7 +179,14 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
         val deletedNodeInfo = {
             // This deletes exactly one node
-            val deleteInfos = XFormsDeleteAction.doDelete(containingDocument, containingDocument.getControls.getIndentedLogger, sourceNodeset, requestedSourceIndex, false)
+            val deleteInfos =
+                XFormsDeleteAction.doDelete(
+                    containingDocument,
+                    containingDocument.getControls.getIndentedLogger,
+                    sourceNodeset,
+                    requestedSourceIndex,
+                    false
+                )
             deleteInfos.get(0).nodeInfo
         }
 
@@ -330,7 +336,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         var updated = false
 
         val (newIterations, movedIterationsOldPositions, movedIterationsNewPositions, partialFocusRepeatOption) =
-            if (! newRepeatNodeset.isEmpty) {
+            if (newRepeatNodeset.nonEmpty) {
 
                 // This may be set to this repeat or to a nested repeat if focus was within a removed iteration
                 var partialFocusRepeatOption: Option[XFormsRepeatControl] = None
@@ -385,15 +391,14 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         // We want to point to a new node (case of insert)
 
                         // First, try to point to the last inserted node if found
-                        findNodeIndexes(insertedItems, newRepeatNodeset).reverse find (_ != -1) map { index ⇒
+                        findNodeIndexes(insertedItems, newRepeatNodeset).reverse find (_ != -1) exists { index ⇒
                             val newRepeatIndex = index + 1
-                            
+
                             debug("setting index to new node", Seq("id" → getEffectiveId, "new index" → newRepeatIndex.toString))
-                            
+
                             setIndexInternal(newRepeatIndex)
                             true
-                        } getOrElse
-                            false
+                        }
                     } else
                         false
 

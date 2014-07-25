@@ -21,7 +21,6 @@ import analysis._
 import event.EventHandlerImpl
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import java.lang.String
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 import Model._

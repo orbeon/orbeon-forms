@@ -173,6 +173,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
                 value
         }
 
-        fromControl orElse fromBind getOrElse null
+        fromControl orElse fromBind orNull
     }
 }

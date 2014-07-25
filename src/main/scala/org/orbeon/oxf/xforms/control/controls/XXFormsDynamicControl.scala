@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.control.Controls._
 import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml._
-import java.lang.IllegalArgumentException
 import org.dom4j.{XPath ⇒ _, _}
 import org.orbeon.scaxon.XML._
 import collection.mutable.Buffer

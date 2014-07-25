@@ -14,12 +14,11 @@
 package org.orbeon.oxf.xforms.analysis
 
 import collection.JavaConverters._
-import collection.immutable.Stream._
 import collection.immutable.TreeMap
 import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import java.util.{Map ⇒ JMap}
 import org.dom4j.io.DocumentSource
-import org.orbeon.oxf.resources.{ResourceManager, ResourceNotFoundException, ResourceManagerWrapper}
+import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate

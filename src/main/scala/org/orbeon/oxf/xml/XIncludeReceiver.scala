@@ -32,13 +32,13 @@ import scala.util.control.NonFatal
 // NOTE: Does not support: <xi:fallback>, encoding, accept, or accept-language attributes.
 class XIncludeReceiver(
         pipelineContext: PipelineContext,
-        val parent: Option[XIncludeReceiver],
-        xmlReceiver: XMLReceiver,
-        uriReferences: URIReferences,
-        uriResolver: TransformerURIResolver,
-        xmlBase: String,
+        val parent     : Option[XIncludeReceiver],
+        xmlReceiver    : XMLReceiver,
+        uriReferences  : URIReferences,
+        uriResolver    : TransformerURIResolver,
+        xmlBase        : String,
         generateXMLBase: Boolean,
-        outputLocator: OutputLocator)
+        outputLocator  : OutputLocator)
     extends ForwardingXMLReceiver(xmlReceiver) {
 
     self ⇒

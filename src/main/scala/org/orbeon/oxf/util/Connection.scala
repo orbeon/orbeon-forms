@@ -24,7 +24,7 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.resources.handler.HTTPURLConnection
+import org.orbeon.oxf.http.HTTPURLConnection
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils

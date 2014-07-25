@@ -21,7 +21,7 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.Headers._
 import collection.JavaConversions._
-import org.orbeon.oxf.resources.handler.HTTPURLConnection
+import org.orbeon.oxf.http.HTTPURLConnection
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xml.TransformerUtils

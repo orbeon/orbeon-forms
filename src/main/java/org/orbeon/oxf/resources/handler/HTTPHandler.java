@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.resources.handler;
 
+import org.orbeon.oxf.http.HTTPURLConnection;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;

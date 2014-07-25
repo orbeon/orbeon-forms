@@ -43,6 +43,14 @@ object PlainHttpClient extends HttpClient {
         cx.setInstanceFollowRedirects(false)
         cx.setDoInput(true)
 
+        // "There is no default implementation of URLConnection caching in the Java 2 Standard Edition":
+        // http://docs.oracle.com/javase/8/docs/technotes/guides/net/http-cache.html
+        // But HttpURLConnection does set `Pragma: no-cache` if `useCaches == false`. It probably doesn't matter much
+        // as it concerns the request AFAICT, but there is no need for it.
+        // See also:
+        // http://stackoverflow.com/questions/1330882/how-does-urlconnection-setusecaches-work-in-practice
+        cx.setUseCaches(true)
+
         content foreach { case (contentType, _) ⇒
             cx.setDoOutput(true)
             cx.setRequestMethod("POST")

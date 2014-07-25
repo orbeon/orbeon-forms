@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
+import java.net.HttpURLConnection
+
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Response, Request}
 import org.orbeon.oxf.common.OXFException
@@ -21,7 +23,6 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.Headers._
 import collection.JavaConversions._
-import org.orbeon.oxf.http.HTTPURLConnection
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xml.TransformerUtils
@@ -88,12 +89,12 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             URLFactory.createURL(persistenceBaseAbsoluteURL)
         }
 
-        def setPersistenceHeaders(connection: HTTPURLConnection) {
+        def setPersistenceHeaders(connection: HttpURLConnection) {
             for ((name, value) ← headers)
                 connection.setRequestProperty(capitalizeCommonOrSplitHeader(name), value)
         }
 
-        def proxyOutgoingHeaders(connection: HTTPURLConnection) =
+        def proxyOutgoingHeaders(connection: HttpURLConnection) =
             filterCapitalizeAndCombineHeaders(request.getHeaderValuesMap, out = true) foreach (connection.setRequestProperty _).tupled
 
         if (! Set("GET", "DELETE", "PUT", "POST")(request.getMethod))
@@ -101,7 +102,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         // Prepare connection
         val doOutput = Set("PUT", "POST")(request.getMethod)
-        val connection = outgoingURL.openConnection.asInstanceOf[HTTPURLConnection]
+        val connection = outgoingURL.openConnection.asInstanceOf[HttpURLConnection]
 
         connection.setDoInput(true)
         connection.setDoOutput(doOutput)

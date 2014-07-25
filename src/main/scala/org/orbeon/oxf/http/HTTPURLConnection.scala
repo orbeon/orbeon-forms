@@ -14,12 +14,12 @@
 package org.orbeon.oxf.http
 
 import java.io.{ByteArrayOutputStream, InputStream}
-import java.net.{ProtocolException, URL, URLConnection, URLDecoder}
+import java.net._
 import java.security.KeyStore
 import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
-import org.apache.http._
+import org.apache.http.{ProtocolException ⇒ _, _}
 import org.apache.http.auth._
 import org.apache.http.client.CookieStore
 import org.apache.http.client.methods._
@@ -40,13 +40,13 @@ import org.orbeon.oxf.util.{Connection, LoggerFactory, StringConversions}
 
 
 
-class HTTPURLConnection(url: URL) extends URLConnection(url) {
+class HTTPURLConnection(url: URL) extends HttpURLConnection(url) {
     
     import org.orbeon.oxf.http.HTTPURLConnection._
 
     private var cookieStore: CookieStore = null
     private var _connected: Boolean = false
-    private var method: HttpUriRequest = null
+    private var _method: HttpUriRequest = null
     private var httpResponse: HttpResponse = null
     private var requestBody: Array[Byte] = null
     private val requestProperties: ju.Map[String, Array[String]] = new ju.LinkedHashMap[String, Array[String]]
@@ -57,11 +57,11 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
     private var domain: String = null
     private var os: ByteArrayOutputStream = null
 
-    def setRequestMethod(methodName: String): Unit = {
+    override def setRequestMethod(methodName: String): Unit = {
         if (_connected)
             throw new ProtocolException("Can't reset method: already connected")
 
-        method =
+        _method =
             methodName match {
                 case "GET"     ⇒ new HttpGet(url.toString)
                 case "POST"    ⇒ new HttpPost(url.toString)
@@ -99,6 +99,7 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
             // Set proxy and host authentication
             if (proxyAuthState != null)
                 httpContext.setAttribute(ClientContext.PROXY_AUTH_STATE, proxyAuthState)
+
             if (userInfo != null || isAuthenticationRequestedWithUsername) {
 
                 // Make authentication preemptive; interceptor is added first, as the Authentication header is added
@@ -137,7 +138,7 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
 
             // If method has not been set, use GET
             // This can happen e.g. when this connection handler is used from URLFactory
-            if (method == null)
+            if (_method == null)
                 setRequestMethod("GET")
 
             val skipAuthorizationHeader = userInfo != null || username != null
@@ -150,17 +151,17 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
                 // Skip over Authorization header if user authentication specified
                 if ! (skipAuthorizationHeader && name.toLowerCase == Connection.AuthorizationHeader.toLowerCase)
             } locally {
-                method.addHeader(name, value)
+                _method.addHeader(name, value)
             }
 
             // Create request entity with body
-            method match {
+            _method match {
                 case enclosingRequest: HttpEntityEnclosingRequest ⇒
 
                     // Use the body that was set directly, or the result of writing to the OutputStream
                     val body = if (requestBody != null) requestBody else if (os != null) os.toByteArray else null
                     if (body != null) {
-                        val contentTypeHeader = method.getFirstHeader("Content-Type") // header names are case-insensitive for comparison
+                        val contentTypeHeader = _method.getFirstHeader("Content-Type") // header names are case-insensitive for comparison
                         if (contentTypeHeader == null)
                             throw new ProtocolException("Can't set request entity: Content-Type header is missing")
                         val byteArrayEntity = new ByteArrayEntity(body)
@@ -171,7 +172,7 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
             }
 
             // Make request
-            httpResponse = httpClient.execute(method, httpContext)
+            httpResponse = httpClient.execute(_method, httpContext)
             _connected = true
         }
     }
@@ -243,7 +244,7 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
         super.getRequestProperties
     }
 
-    def getResponseCode = httpResponse.getStatusLine.getStatusCode
+    override def getResponseCode = httpResponse.getStatusLine.getStatusCode
 
     // "As of version 4.1 one should be using EntityUtils#consume() instead."
     // http://mail-archives.apache.org/mod_mbox/hc-httpclient-users/201012.mbox/%3C1291222613.3781.68.camel@ubuntu%3E
@@ -277,10 +278,14 @@ class HTTPURLConnection(url: URL) extends URLConnection(url) {
                 new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName))
             }
     }
+
+    override def usingProxy() = httpProxy != null
 }
 
 object HTTPURLConnection {
+
     private val logger = LoggerFactory.createLogger(classOf[HTTPURLConnection])
+
     val STALE_CHECKING_ENABLED_PROPERTY = "oxf.http.stale-checking-enabled"
     val SO_TIMEOUT_PROPERTY = "oxf.http.so-timeout"
     val PROXY_HOST_PROPERTY = "oxf.http.proxy.host"

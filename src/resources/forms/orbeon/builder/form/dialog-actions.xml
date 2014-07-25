@@ -24,8 +24,42 @@
 
     <xf:label ref="$form-resources/dialog-actions/label"/>
 
-    <xf:var name="instance" value="instance('fb-bindings-editor-instance')"/>
+    <xf:var name="instance" value="instance('fb-actions-editor-instance')"/>
     <xf:var name="body"     value="$body" model="fr-form-model"/>
+
+    <xf:var
+        name="all-services"
+        value="$model/fb:submission[
+                    ends-with(@id, '-submission')
+                    and not(@id = ../fb:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xf:action[1]/xf:send/@submission)]"/>
+
+    <!-- Initialize dialog -->
+    <xf:action ev:event="xxforms-dialog-open">
+        <xf:var name="instance"     value="instance('fb-actions-editor-instance')"/>
+        <xf:var name="binding-name" value="event('binding-name')"/>
+
+        <!-- Clear working values -->
+        <xf:setvalue ref="$instance/name"/>
+        <xf:setvalue ref="$instance/initial-name"/>
+        <xf:delete   ref="$instance/fb:action"/>
+
+        <!-- Empty binding if no binding id passed -->
+        <xf:action if="not($binding-name)">
+            <xf:insert ref="$instance/*" origin="instance('fb-binding-template')"/>
+        </xf:action>
+        <!-- Otherwise copy binding -->
+        <xf:action if="$binding-name">
+            <xf:var name="binding-id"                 value="concat($binding-name, '-binding')"/>
+            <xf:setvalue ref="$instance/name"         value="$binding-name"/>
+            <xf:setvalue ref="$instance/initial-name" value="$binding-name"/>
+
+            <xf:insert ref="$instance/*" origin="$model/fb:action[@id = $binding-id]"/>
+
+            <!-- Insert condition on action if missing -->
+            <xf:var name="action1" value="$instance/fb:action/xf:action[1]"/>
+            <xf:insert if="not(exists($action1/@if))" context="$action1" origin="xxf:attribute('if', 'true()')"/>
+        </xf:action>
+    </xf:action>
 
     <fr:grid columns="2">
         <xh:tr>
@@ -93,7 +127,7 @@
 
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
                 <!-- Set Service Request Values -->
-                <xf:group ref="xf:action[@fb:event = 'xforms-submit']/xf:action">
+                <xf:group ref=".[exists($all-services[xxf:has-class('fr-service')])]/xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
                         <xh:tr>
@@ -116,7 +150,7 @@
                     </fr:grid>
                 </xf:group>
                 <!-- Set Database Service Parameters -->
-                <xf:group ref="xf:action[@fb:event = 'xforms-submit']/xf:action">
+                <xf:group ref=".[exists($all-services[xxf:has-class('fr-database-service')])]/xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
                         <xh:tr>
@@ -165,7 +199,7 @@
                 <!-- Only show this section if there are selection controls -->
                 <!-- Q: Should be consistent with actions.xsl to identify selection controls based on name? -->
                 <xf:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]" as="element()*"/>
-                <xf:group ref="xf:action[@fb:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
+                <xf:group ref=".[exists($controls-with-itemset)]/xf:action[@fb:event = 'xforms-submit-done']">
                     <xf:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-itemset-action']">
                         <xh:tr>
@@ -273,34 +307,6 @@
         </xf:group>
     </xh:div>
 
-    <!-- Initialize dialog -->
-    <xf:action ev:event="xxforms-dialog-open">
-        <xf:var name="instance" value="instance('fb-bindings-editor-instance')"/>
-        <xf:var name="binding-name" value="event('binding-name')"/>
-
-        <!-- Clear working values -->
-        <xf:setvalue ref="$instance/name"/>
-        <xf:setvalue ref="$instance/initial-name"/>
-        <xf:delete ref="$instance/fb:action"/>
-
-        <!-- Empty binding if no binding id passed -->
-        <xf:action if="not($binding-name)">
-            <xf:insert ref="$instance/*" origin="instance('fb-binding-template')"/>
-        </xf:action>
-        <!-- Otherwise copy binding -->
-        <xf:action if="$binding-name">
-            <xf:var name="binding-id" value="concat($binding-name, '-binding')"/>
-            <xf:setvalue ref="$instance/name" value="$binding-name"/>
-            <xf:setvalue ref="$instance/initial-name" value="$binding-name"/>
-
-            <xf:insert ref="$instance/*" origin="$model/fb:action[@id = $binding-id]"/>
-
-            <!-- Insert condition on action if missing -->
-            <xf:var name="action1" value="$instance/fb:action/xf:action[1]"/>
-            <xf:insert if="not(exists($action1/@if))" context="$action1" origin="xxf:attribute('if', 'true()')"/>
-        </xf:action>
-    </xf:action>
-
     <!-- Model for the bindings editor -->
     <xf:model id="fb-actions-editor-model">
 
@@ -309,7 +315,7 @@
         <xf:var name="resources" value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
         <xf:var name="current-resources" value="$resources/resource[@xml:lang = $fb-lang]"/>
 
-        <xf:instance id="fb-bindings-editor-instance">
+        <xf:instance id="fb-actions-editor-instance">
             <bindings-editor valid="true">
                 <name/>
                 <initial-name/>
@@ -321,10 +327,10 @@
         </xf:instance>
 
         <!-- Enable/disable trigger -->
-        <xf:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="@valid">false</xf:setvalue>
-        <xf:setvalue ev:event="xxforms-valid"   ev:observer="fb-bindings-editor-instance" ref="@valid">true</xf:setvalue>
+        <xf:setvalue ev:event="xxforms-invalid" ev:observer="fb-actions-editor-instance" ref="@valid">false</xf:setvalue>
+        <xf:setvalue ev:event="xxforms-valid"   ev:observer="fb-actions-editor-instance" ref="@valid">true</xf:setvalue>
 
-        <xf:bind ref="instance('fb-bindings-editor-instance')">
+        <xf:bind ref="instance('fb-actions-editor-instance')">
             <xf:bind ref="name"
                      type="xs:NCName"
                      required="true()"

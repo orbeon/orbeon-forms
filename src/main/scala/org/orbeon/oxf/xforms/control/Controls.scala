@@ -17,7 +17,7 @@ import controls._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis
-import xbl.XBLContainer
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
@@ -154,6 +154,32 @@ object Controls {
         }
     }
 
+    def findRepeatedControlsForTarget(containingDocument: XFormsContainingDocument, sourceControlEffectiveId: String, targetStaticId: String) =
+        resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId).toIterator flatMap
+            XFormsRepeatControl.findAllRepeatedControls
+
+    def resolveObjectById(containingDocument: XFormsContainingDocument, sourceControlEffectiveId: String, targetStaticId: String): Option[XFormsControl] = {
+
+        val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId)
+        val scope            = containingDocument.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
+        val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
+
+        val effectiveControlId =
+            Option(
+                findEffectiveControlId(
+                    containingDocument.getStaticOps,
+                    containingDocument.getControls.getCurrentControlTree,
+                    sourceControlEffectiveId,
+                    targetPrefixedId
+                )
+            )
+
+        effectiveControlId map containingDocument.getControls.getObjectByEffectiveId
+    }
+
+    def resolveObjectByIdJava(containingDocument: XFormsContainingDocument, sourceControlEffectiveId: String, targetStaticId: String) =
+        resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId).orNull
+
     /**
      * Find an effective control id based on a source and a control static id, following XBL scoping and the repeat
      * structure.
@@ -162,10 +188,8 @@ object Controls {
      * @param targetPrefixedId   reference to target control, e.g. "list$xf-10"
      * @return effective control id, or null if not found
      */
-    def findEffectiveControlId(ops: StaticStateGlobalOps, controls: XFormsControls, sourceEffectiveId: String, targetPrefixedId: String): String = {
+    def findEffectiveControlId(ops: StaticStateGlobalOps, tree: ControlTree, sourceEffectiveId: String, targetPrefixedId: String): String = {
         
-        val tree = controls.getCurrentControlTree 
-
         // Don't do anything if there are no controls
         if (tree.getChildren.isEmpty)
             return null

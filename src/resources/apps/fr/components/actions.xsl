@@ -50,8 +50,21 @@
                             xf:action[p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>
-            <xsl:apply-templates select="node()"/>
+            <xsl:variable name="action" select="."/>
+            <xsl:variable name="var"    select="$action/xf:var[@name = 'iterate-control-name']"/>
+            <xsl:choose>
+                <xsl:when test="exists($var)">
+                    <xsl:apply-templates select="$var"/>
+                    <xf:action iterate="frf:findRepeatedControlsForTarget(event('xxf:absolute-targetid'), $iterate-control-name)">
+                        <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', string(.))</xf:action>
+                        <xsl:apply-templates select="$action/node() except $var"/>
+                    </xf:action>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>
+                    <xsl:apply-templates select="$action/node()"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:copy>
     </xsl:template>
 

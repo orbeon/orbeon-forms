@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 import java.util.ArrayList;
@@ -250,12 +249,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @return                          object, or null if not found
      */
     public XFormsObject resolveObjectById(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
-        final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
-        final Scope scope = containingDocument.getStaticOps().scopeForPrefixedId(sourcePrefixedId);
-        final String targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId);
-        
-        final String effectiveControlId = Controls.findEffectiveControlId(containingDocument.getStaticOps(), this, sourceControlEffectiveId, targetPrefixedId);
-        return (effectiveControlId != null) ? getObjectByEffectiveId(effectiveControlId) : null;
+        return Controls.resolveObjectByIdJava(containingDocument, sourceControlEffectiveId, targetStaticId);
     }
 
     /**

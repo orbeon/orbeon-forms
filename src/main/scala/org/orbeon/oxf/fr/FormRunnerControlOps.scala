@@ -17,10 +17,10 @@ import org.orbeon.saxon.om.{ValueRepresentation, NodeInfo}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.RuntimeBind
-import org.orbeon.oxf.xforms.BindVariableResolver
+import org.orbeon.oxf.xforms.{XFormsUtils, BindVariableResolver}
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
@@ -168,5 +168,19 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         }
 
         fromControl orElse fromBind getOrElse null
+    }
+
+    def findRepeatedControlsForTarget(actionSourceAbsoluteId: String, targetControlName: String) = {
+
+        import scala.collection.JavaConverters._
+
+        val controls =
+            Controls.findRepeatedControlsForTarget(
+                XFormsFunction.context.containingDocument,
+                XFormsUtils.absoluteIdToEffectiveId(actionSourceAbsoluteId),
+                controlId(targetControlName)
+            )
+
+        (controls map (_.getEffectiveId) map XFormsUtils.effectiveIdToAbsoluteId toList).asJava
     }
 }

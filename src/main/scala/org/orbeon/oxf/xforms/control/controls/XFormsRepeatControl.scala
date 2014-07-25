@@ -651,19 +651,44 @@ object XFormsRepeatControl {
     // For the given control, return the matching control that follows repeat indexes
     // This might be the same as the given control if it is within the repeat indexes chain, or another control if not
     def findControlFollowIndexes(control: XFormsControl) = {
-        val doc = control.containingDocument
+        val doc  = control.containingDocument
         val tree = doc.getControls.getCurrentControlTree
         
-        // All ancestor repeats from root to leaf
-        val ancestorRepeats = control.staticControl.ancestorRepeatsAcrossParts.reverse
+        val ancestorRepeatsFromRoot = control.staticControl.ancestorRepeatsAcrossParts.reverse
         
         // Find just the indexes we need
-        val indexes = findIndexes(tree, ancestorRepeats, _.getIndex)
+        val indexes = findIndexes(tree, ancestorRepeatsFromRoot, _.getIndex)
 
         // Build a suffix based on the ancestor repeats' current indexes
-        val suffix = suffixForRepeats(indexes, ancestorRepeats)
+        val suffix = suffixForRepeats(indexes, ancestorRepeatsFromRoot)
 
         Option(tree.getControl(addSuffix(control.prefixedId, suffix)))
+    }
+
+    // Return all the controls with the same prefixed id as the control specified
+    def findAllRepeatedControls(control: XFormsControl): Iterator[XFormsControl] = {
+        val doc  = control.containingDocument
+        val tree = doc.getControls.getCurrentControlTree
+
+        val controlPrefixedId = control.prefixedId
+
+        def search(ancestorRepeats: List[RepeatControl], suffix: String): Iterator[String] =
+            ancestorRepeats match {
+                case Nil          ⇒
+                    Iterator(addSuffix(controlPrefixedId, suffix))
+                case head :: tail ⇒
+
+                    val repeatEffectiveId = addSuffix(head.prefixedId, suffix)
+                    val repeatControl     = tree.getControl(repeatEffectiveId).asInstanceOf[XFormsRepeatControl]
+
+                    for {
+                        index ← Iterator.from(1).take(repeatControl.getSize)
+                        i     ← search(tail, suffix + (if (suffix.isEmpty) "" else REPEAT_INDEX_SEPARATOR) + index)
+                    } yield
+                        i
+            }
+
+        search(control.staticControl.ancestorRepeatsAcrossParts.reverse, "") map tree.getControl
     }
 
     // Find indexes for the given repeats in the current document

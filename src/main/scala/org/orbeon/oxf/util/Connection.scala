@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import ScalaUtils._
 import Headers._
+import org.apache.http.impl.client.BasicCookieStore
 import collection.JavaConverters._
 import java.net.{URI, URLConnection, URL}
 import java.util.{Map ⇒ JMap}
@@ -24,11 +25,10 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.http.HTTPURLConnection
+import org.orbeon.oxf.http.{Credentials, HTTPURLConnection}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils
-import Connection._
 import scala.util.control.NonFatal
 
 /**
@@ -51,6 +51,8 @@ class Connection(
         headers: collection.Map[String, Array[String]],
         logBody: Boolean)(implicit logger: IndentedLogger)
     extends ConnectionState with Logging {
+
+    import Connection._
 
     require(StringUtils.isAllUpperCase(httpMethod))
 
@@ -93,19 +95,13 @@ class Connection(
 
                 // Configure HTTPURLConnection
                 httpURLConnection.setDoOutput(requestBody.isDefined)
-                httpURLConnection.setCookieStore(cookieStoreOption.orNull)
-                httpURLConnection.setRequestMethod(httpMethod)
 
-                // Set credentials if any
-                credentials foreach { credentials ⇒
-                    httpURLConnection.setUsername(credentials.username)
-                    if (credentials.password ne null)
-                        httpURLConnection.setPassword(credentials.password)
-                    if (credentials.preemptiveAuthentication ne null)
-                        httpURLConnection.setPreemptiveAuthentication(credentials.preemptiveAuthentication)
-                    if (credentials.domain ne null)
-                        httpURLConnection.setDomain(credentials.domain)
-                }
+                cookieStoreOpt = cookieStoreOpt orElse Some(new BasicCookieStore)
+                cookieStoreOpt foreach
+                        httpURLConnection.setCookieStore
+
+                httpURLConnection.setRequestMethod(httpMethod)
+                httpURLConnection.setCredentials(credentials)
 
                 // Set headers on connection
                 val capitalizedHeaders = setHeaders(headers, httpURLConnection)
@@ -147,10 +143,6 @@ class Connection(
 
                 // Connect
                 httpURLConnection.connect()
-
-                // Get state if possible
-                // This is either the state we set above before calling connect(), or a new state if we didn't provide any
-                cookieStoreOption = Option(httpURLConnection.getCookieStore)
 
                 // Create result
                 val connectionResult = new ConnectionResult(connectionURL.toExternalForm) {
@@ -199,15 +191,15 @@ trait ConnectionState {
     import ConnectionState._
 
     private val stateScope = stateScopeFromProperty
-    var cookieStoreOption: Option[CookieStore] = None
+    var cookieStoreOpt: Option[CookieStore] = None
 
     def loadHttpState()(implicit logger: IndentedLogger): Unit = {
-        cookieStoreOption = stateAttributes(createSession = false) flatMap (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+        cookieStoreOpt = stateAttributes(createSession = false) flatMap (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
         debugStore("loaded HTTP state", "did not load HTTP state")
     }
 
     def saveHttpState()(implicit logger: IndentedLogger): Unit = {
-        cookieStoreOption foreach { cookieStore ⇒
+        cookieStoreOpt foreach { cookieStore ⇒
             stateAttributes(createSession = true) foreach (_.put(HttpCookieStoreAttribute, cookieStore))
         }
         debugStore("saved HTTP state", "did not save HTTP state")
@@ -215,7 +207,7 @@ trait ConnectionState {
 
     private def debugStore(positive: String, negative: String)(implicit logger: IndentedLogger) =
         ifDebug {
-            cookieStoreOption match {
+            cookieStoreOpt match {
                 case Some(cookieStore) ⇒
                     val cookies = cookieStore.getCookies.asScala map (_.getName) mkString " | "
                     debug(positive, Seq(
@@ -266,11 +258,6 @@ object Connection extends Logging {
 
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
-
-    case class Credentials(username: String, password: String, preemptiveAuthentication: String, domain: String) {
-        assert(username ne null)
-        def getPrefix = Option(password) map (username + ":" + _ + "@") getOrElse username + "@"
-    }
 
     // Whether the given method requires a request body
     def requiresRequestBody(method: String) = Set("POST", "PUT")(method)

@@ -14,11 +14,13 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.{ByteArrayInputStream, InputStream, OutputStream, Writer}
+import java.net.HttpURLConnection
 import java.{util ⇒ ju}
 import javax.servlet.http.HttpServletRequest
 
 import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.http.HTTPClient
 import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -59,7 +61,8 @@ object APISupport {
         val res = connectURL(requestDetails)
         
         ctx.setStatusCode(res.statusCode)
-        filterCapitalizeAndCombineHeaders(res.headers mapValues (List(_)), out = false) foreach (ctx.setHeader _).tupled
+
+        proxyCapitalizeAndCombineHeaders(res.headers mapValues (List(_)), request = false) foreach (ctx.setHeader _).tupled
 
         useAndClose(res.inputStream) { is ⇒
             writeResponseBody(Right(is), Option(res.contentType))
@@ -86,7 +89,7 @@ object APISupport {
     // header specified in the init parameter.
     def headersToForward(clientHeaders: List[(String, List[String])], configuredHeaders: Map[String, String]) =
         for {
-            (name, value) ← filterAndCombineHeaders(clientHeaders, out = true)
+            (name, value) ← proxyAndCombineRequestHeaders(clientHeaders)
             originalName  ← configuredHeaders.get(name.toLowerCase)
         } yield
             originalName → value
@@ -112,7 +115,7 @@ object APISupport {
     // - render requests
     // - resources: typically image, CSS, JavaScript, etc.
     def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
-        PlainHttpClient.openConnection(
+        ApacheHttpClient.openConnection(
             recombineQuery(requestDetails.url, requestDetails.params),
             requestDetails.content map { content ⇒
 
@@ -234,6 +237,7 @@ trait EmbeddingContext {
     def setSessionAttribute(name: String, value: AnyRef): Unit
     def removeSessionAttribute(name: String): Unit
     def log(message: String): Unit                              // consider removing
+    def httpClient: HTTPClient
 }
 
 trait EmbeddingContextWithResponse extends EmbeddingContext{
@@ -242,4 +246,11 @@ trait EmbeddingContextWithResponse extends EmbeddingContext{
     def setHeader(name: String, value: String): Unit
     def setStatusCode(code: Int): Unit
     def decodeURL(encoded: String): String
+}
+
+case class HttpURLConnectionResponse(cx: HttpURLConnection) extends HttpResponse {
+    def statusCode  = cx.getResponseCode
+    def headers     = cx.getHeaderFields.asScala.toMap map { case (name, values) ⇒ name → (values.asScala mkString ",") }
+    def inputStream = cx.getInputStream
+    def contentType = cx.getContentType
 }

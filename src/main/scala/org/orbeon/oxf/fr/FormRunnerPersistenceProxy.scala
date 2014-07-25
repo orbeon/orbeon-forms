@@ -75,11 +75,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
         val connection = proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
-        // Proxy status code
-        response.setStatus(connection.getResponseCode)
-        // Proxy incoming headers
-        filterCapitalizeAndCombineHeaders(connection.getHeaderFields, out = false) foreach (response.setHeader _).tupled
-        copyStream(connection.getInputStream, response.getOutputStream)
+        useAndClose(connection.getInputStream) { is ⇒
+            // Proxy status code
+            response.setStatus(connection.getResponseCode)
+            // Proxy incoming headers
+            proxyCapitalizeAndCombineHeaders(connection.getHeaderFields, request = false) foreach (response.setHeader _).tupled
+            copyStream(is, response.getOutputStream)
+        }
     }
 
     private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]) = {
@@ -95,7 +97,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         }
 
         def proxyOutgoingHeaders(connection: HttpURLConnection) =
-            filterCapitalizeAndCombineHeaders(request.getHeaderValuesMap, out = true) foreach (connection.setRequestProperty _).tupled
+            proxyCapitalizeAndCombineHeaders(request.getHeaderValuesMap, request = true) foreach (connection.setRequestProperty _).tupled
 
         if (! Set("GET", "DELETE", "PUT", "POST")(request.getMethod))
             throw new OXFException("Unsupported method: " + request.getMethod)
@@ -118,9 +120,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             // Q: Could this be handled automatically in ExternalContext?
             val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
                 case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-                case _ ⇒ request.getInputStream
+                case _               ⇒ request.getInputStream
             }
 
+            // NOTE: This goes through our HttpURLConnection which requires writing to the OutputStream *before* calling
+            // .connect()! Should be changed so we can properly stream!
             copyStream(is, connection.getOutputStream)
         }
 
@@ -129,8 +133,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     }
 
     /**
-     * Proxies the request to every configured persistence layer to get the list of the forms,
-     * and aggregates the results.
+     * Proxies the request to every configured persistence layer to get the list of the forms, and aggregates the
+     * results. So the response is not simply proxied, unlike for other persistence layer calls.
      */
     private def proxyPublishedFormsMetadata(request: Request, response: Response, app: Option[String], form: Option[String], path: String): Unit = {
         val propertySet = Properties.instance.getPropertySet
@@ -160,6 +164,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
 
             // TODO: Handle connection.getResponseCode.
+            // CHECK: What if response has Content-Encoding: gzip? Does the HTTP client handle that for us?
             useAndClose(proxyEstablishConnection(request, serviceURI, headers).getInputStream) { is ⇒
                 val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
                 forms \\ "forms" \\ "form"

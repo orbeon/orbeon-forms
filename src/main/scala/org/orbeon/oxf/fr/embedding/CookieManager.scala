@@ -71,7 +71,7 @@ object CookieManager {
         new CookieOrigin(uri.getHost, effectivePort, uri.getPath, uri.getScheme == "https")
     }
 
-    private def getOrCreateCookieStore(implicit ctx: EmbeddingContext) =
+    def getOrCreateCookieStore(implicit ctx: EmbeddingContext) =
         Option(ctx.getSessionAttribute(RemoteSessionIdKey).asInstanceOf[CookieStore]) getOrElse {
             val newCookieStore = new BasicCookieStore
             ctx.setSessionAttribute(RemoteSessionIdKey, newCookieStore)

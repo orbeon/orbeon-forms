@@ -22,9 +22,9 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
-private case class FilterSettings(context: ServletContext, orbeonContextPath: Option[String], defaultEncoding: String) {
+private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {
     // NOTE: Never match anything if there is no context path
-    val OrbeonResourceRegex = orbeonContextPath map (path ⇒ s"$path(/.*)".r) getOrElse "$.".r
+    val OrbeonResourceRegex = orbeonContextPathOpt map (path ⇒ s"$path(/.*)".r) getOrElse "$.".r
 }
 
 // This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
@@ -48,12 +48,12 @@ class OrbeonXFormsFilter extends Filter {
 
     def doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, filterChain: FilterChain) =
         settingsOpt foreach {
-            case settings @ FilterSettings(servletContext, orbeonContextPath, defaultEncoding) ⇒
+            case settings @ FilterSettings(servletContext, orbeonContextPathOpt, defaultEncoding) ⇒
 
                 val orbeonContext = (
-                    orbeonContextPath
-                    map {
-                        servletContext.getContext(_) ensuring (
+                    orbeonContextPathOpt
+                    map { orbeonContextPath ⇒
+                        servletContext.getContext(orbeonContextPath) ensuring (
                             _ ne null,
                             s"Can't find Orbeon Forms context called '$orbeonContextPath'. Check the " +
                             s"'$RendererContextParameterName' filter initialization parameter and the " +

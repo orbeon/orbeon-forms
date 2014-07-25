@@ -19,6 +19,7 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -141,7 +142,7 @@ public class URLGenerator extends ProcessorImpl {
         private String username;
         private String password;
         private String domain;
-        private boolean preemptiveAuthentication = DEFAULT_PREEMPTIVE_AUTHENTICATION;
+        private boolean preemptiveAuth = DEFAULT_PREEMPTIVE_AUTHENTICATION;
 
         private TidyConfig tidyConfig;
 
@@ -169,7 +170,7 @@ public class URLGenerator extends ProcessorImpl {
                       boolean ignoreConnectionEncoding, XMLParsing.ParserConfiguration parserConfiguration,
                       boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
                       List<String> readHeaders, boolean cacheUseLocalCache, boolean enableConditionalGET, String username,
-                      String password, boolean preemptiveAuthentication, String domain, TidyConfig tidyConfig) {
+                      String password, boolean preemptiveAuth, String domain, TidyConfig tidyConfig) {
 
             this.url = url;
             this.contentType = contentType;
@@ -198,7 +199,7 @@ public class URLGenerator extends ProcessorImpl {
             this.username = username;
             this.password = password;
             this.domain = domain;
-            this.preemptiveAuthentication = preemptiveAuthentication;
+            this.preemptiveAuth = preemptiveAuth;
 
             this.tidyConfig = tidyConfig;
         }
@@ -275,14 +276,14 @@ public class URLGenerator extends ProcessorImpl {
             return domain;
         }
 
-        public boolean isPreemptiveAuthentication() {
-            return preemptiveAuthentication;
+        public boolean isPreemptiveAuth() {
+            return preemptiveAuth;
         }
 
         @Override
         public String toString() {
             return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + parserConfiguration.getKey() + "|" + isHandleLexical() + "|" + isForceContentType()
-                    + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + getUsername() + "|" + getPassword() + "|" + isPreemptiveAuthentication() + "|" + getDomain()
+                    + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + getUsername() + "|" + getPassword() + "|" + isPreemptiveAuth() + "|" + getDomain()
                     + "|" + tidyConfig + "]";
         }
     }
@@ -392,7 +393,7 @@ public class URLGenerator extends ProcessorImpl {
                             final org.dom4j.Node configAuthentication = XPathUtils.selectSingleNode(configElement, "/config/authentication");
                             final String username = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "username");
                             final String password = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "password");
-                            final boolean preemptiveAuthentication = ProcessorUtils.selectBooleanValue(configElement, "/config/authentication/preemptive", DEFAULT_PREEMPTIVE_AUTHENTICATION);
+                            final boolean preemptiveAuth = ProcessorUtils.selectBooleanValue(configElement, "/config/authentication/preemptive", DEFAULT_PREEMPTIVE_AUTHENTICATION);
                             final String domain = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "domain");
 
                             // Get Tidy config (will only apply if content-type is text/html)
@@ -412,7 +413,7 @@ public class URLGenerator extends ProcessorImpl {
                                     ignoreConnectionEncoding, new XMLParsing.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
                                     headerNameValues, forwardHeaders, readHeaders,
                                     cacheUseLocalCache, enableConditionalGET,
-                                    username, password, preemptiveAuthentication, domain,
+                                    username, password, preemptiveAuth, domain,
                                     tidyConfig);
                             if (logger.isDebugEnabled())
                                 logger.debug("Read configuration: " + config.toString());
@@ -897,9 +898,9 @@ public class URLGenerator extends ProcessorImpl {
                     newHeaders = config.getHeaderNameValues();
                 }
 
-                final Connection.Credentials credentials = config.getUsername() == null ?
+                final Credentials credentials = config.getUsername() == null ?
                     null :
-                    new Connection.Credentials(config.getUsername(), config.getPassword(), config.isPreemptiveAuthentication() ? "true" : "false", config.getDomain());
+                    Credentials.apply(config.getUsername(), config.getPassword(), config.isPreemptiveAuth() ? "true" : "false", config.getDomain());
 
                 final URL url = config.getURL();
                 final scala.collection.immutable.Map<String, String[]> headers =

@@ -19,6 +19,7 @@ import javax.portlet._
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding._
+import org.orbeon.oxf.http.HTTPClient
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.NetUtils
@@ -26,8 +27,12 @@ import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.JavaConverters._
 
-class PortletEmbeddingContext(context: PortletContext, request: PortletRequest, response: PortletResponse)
-        extends EmbeddingContext {
+class PortletEmbeddingContext(
+        context       : PortletContext,
+        request       : PortletRequest,
+        response      : PortletResponse,
+        val httpClient: HTTPClient)
+    extends EmbeddingContext {
 
     private val session = request.getPortletSession(true) ensuring (_ ne null)
 
@@ -39,9 +44,17 @@ class PortletEmbeddingContext(context: PortletContext, request: PortletRequest, 
     def log(message: String)                             = context.log(message)
 }
 
-class PortletEmbeddingContextWithResponse(context: PortletContext, request: PortletRequest, response: MimeResponse)
-        extends PortletEmbeddingContext(context, request, response)
-        with EmbeddingContextWithResponse {
+class PortletEmbeddingContextWithResponse(
+        context   : PortletContext,
+        request   : PortletRequest,
+        response  : MimeResponse,
+        httpClient: HTTPClient)
+    extends PortletEmbeddingContext(
+        context,
+        request,
+        response,
+        httpClient)
+    with EmbeddingContextWithResponse {
 
     def writer                     = response.getWriter
     def outputStream               = response.getPortletOutputStream

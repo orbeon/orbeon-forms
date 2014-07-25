@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import org.orbeon.oxf.http.Credentials
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.{XPath, Logging, NetUtils}
 import org.orbeon.oxf.xforms._
 import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import xbl.Scope
-import org.orbeon.oxf.util.Connection.Credentials
 import XFormsConstants._
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
@@ -122,10 +122,10 @@ trait InstanceMetadata {
         // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
         def username = element.attributeValue(XXFORMS_USERNAME_QNAME)
         def password = element.attributeValue(XXFORMS_PASSWORD_QNAME)
-        def preemptiveAuthentication = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
+        def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
         def domain = element.attributeValue(XXFORMS_DOMAIN_QNAME)
 
-        Option(username) map (Credentials(_, password, preemptiveAuthentication, domain)) orNull
+        Option(username) map (Credentials(_, password, preemptiveAuth, domain)) orNull
     }
 
     val excludeResultPrefixes = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))

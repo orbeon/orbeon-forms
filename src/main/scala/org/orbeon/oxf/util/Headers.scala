@@ -18,7 +18,12 @@ import collection.breakOut
 object Headers {
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
-    private val HeadersToFilterOut = Set("transfer-encoding", "connection", "host", "set-cookie")
+    // Q: Why request content-length? In case we modify request content?
+    // 2014-07-28: We are not able to properly proxy directly a content-encoded response, so we don't proxy the relevant
+    // headers.
+    private val HeadersToRemove         = Set("connection")
+    private val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "content-length", "cookie", "cookie2", "accept-encoding")
+    private val ResponseHeadersToRemove = HeadersToRemove ++ List("transfer-encoding", "set-cookie", "content-encoding")
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
     // Q: Doesn't Scala already have such a type?
@@ -27,23 +32,22 @@ object Headers {
 
     // Filter headers that that should never be propagated in our proxies
     // Also combine headers with the same name into a single header
-    def filterCapitalizeAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, String)] =
-        filterAndCapitalizeHeaders(headers, out) map { case (name, values) ⇒ name → (values mkString ",") }
+    def proxyCapitalizeAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], request: Boolean): Iterable[(String, String)] =
+        proxyAndCapitalizeHeaders(headers, request) map { case (name, values) ⇒ name → (values mkString ",") }
 
-    def filterAndCapitalizeHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
-        filterHeaders(headers, out) map { case (n, v) ⇒ capitalizeCommonOrSplitHeader(n) → v }
-
-    // NOTE: Filtering is case-insensitive, but original case is unchanged
-    def filterAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, String)] =
-        filterHeaders(headers, out) map { case (name, values) ⇒ name → (values mkString ",") }
+    def proxyAndCapitalizeHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], request: Boolean): Iterable[(String, T[String])] =
+        proxyHeaders(headers, request) map { case (n, v) ⇒ capitalizeCommonOrSplitHeader(n) → v }
 
     // NOTE: Filtering is case-insensitive, but original case is unchanged
-    def filterHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
+    def proxyAndCombineRequestHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])]): Iterable[(String, String)] =
+        proxyHeaders(headers, request = true) map { case (name, values) ⇒ name → (values mkString ",") }
+
+    // NOTE: Filtering is case-insensitive, but original case is unchanged
+    def proxyHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], request: Boolean): Iterable[(String, T[String])] =
         for {
             (name, values) ← headers
             if name ne null // HttpURLConnection.getHeaderFields returns null names. Great.
-            if ! HeadersToFilterOut(name.toLowerCase)
-            if ! out || name.toLowerCase != "content-length"
+            if (request && ! RequestHeadersToRemove(name.toLowerCase)) || (! request && ! ResponseHeadersToRemove(name.toLowerCase))
             if (values ne null) && values.nonEmpty
         } yield
             name → values

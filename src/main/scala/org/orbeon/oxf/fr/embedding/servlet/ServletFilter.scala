@@ -20,18 +20,24 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
+import org.orbeon.oxf.http.{ConnectionSettings, HTTPClient}
 import org.orbeon.oxf.util.NetUtils
 
 import scala.collection.JavaConverters._
 
-private case class FilterSettings(servletContext: ServletContext, formRunnerURL: String, orbeonPrefix: String) {
+private case class FilterSettings(
+        servletContext: ServletContext,
+        formRunnerURL : String,
+        orbeonPrefix  : String,
+        httpClient    : HTTPClient) {
     val OrbeonResourceRegex = s"$orbeonPrefix/([^/]+)(/.+)".r
 }
 
 class ServletEmbeddingContext(
-        val namespace: String,
-        req          : HttpServletRequest,
-        logFunction  : String ⇒ Unit)
+        val namespace : String,
+        req           : HttpServletRequest,
+        logFunction   : String ⇒ Unit,
+        val httpClient: HTTPClient)
     extends EmbeddingContext {
 
     private val session = req.getSession(true)
@@ -47,9 +53,10 @@ class ServletEmbeddingContextWithResponse(
         logFunction : String ⇒ Unit,
         out         : Writer Either HttpServletResponse,
         namespace   : String,
-        orbeonPrefix: String)
+        orbeonPrefix: String,
+        httpClient  : HTTPClient)
     extends ServletEmbeddingContext(
-        namespace, req, logFunction)
+        namespace, req, logFunction, httpClient)
     with EmbeddingContextWithResponse {
 
     def writer                                 = out.fold(identity, _.getWriter)
@@ -81,14 +88,18 @@ class ServletFilter extends Filter {
                 FilterSettings(
                     servletContext = config.getServletContext,
                     formRunnerURL  = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
-                    orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon"
+                    orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon",
+                    httpClient     = new HTTPClient(ConnectionSettings(config.getInitParameter))
                 )
             )
 
-    def destroy(): Unit = settingsOpt = None
+    def destroy(): Unit = {
+        settingsOpt foreach (_.httpClient.shutdown())
+        settingsOpt = None
+    }
 
     def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
-        settingsOpt foreach { case settings @ FilterSettings(servletCtx, frURL, orbeonPrefix) ⇒
+        settingsOpt foreach { case settings @ FilterSettings(servletCtx, frURL, orbeonPrefix, httpClient) ⇒
 
             val httpReq = req.asInstanceOf[HttpServletRequest]
             val httpRes = res.asInstanceOf[HttpServletResponse]

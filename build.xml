@@ -418,6 +418,7 @@
             -injars      lib/httpclient-cache-4.2.3.jar
             -injars      lib/httpcore-4.2.2.jar
             -injars      lib/httpmime-4.2.3.jar
+            -injars      lib/commons-logging-1.1.1.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
             <!-- -outjars     build/lib/check-resources.jar -->
@@ -429,6 +430,13 @@
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
             -keep public class org.orbeon.oxf.fr.embedding.servlet.API {
                 public static *;
+            }
+            <!-- For HttpClient -->
+            -keep public class org.apache.commons.logging.impl.LogFactoryImpl {
+                public *;
+            }
+            -keep public class org.apache.commons.logging.impl.Jdk14Logger {
+                public *;
             }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-embedding.jar">
@@ -462,6 +470,7 @@
             -injars      lib/httpclient-cache-4.2.3.jar
             -injars      lib/httpcore-4.2.2.jar
             -injars      lib/httpmime-4.2.3.jar
+            -injars      lib/commons-logging-1.1.1.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
 
@@ -471,6 +480,13 @@
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
+            <!-- For HttpClient -->
+            -keep public class org.apache.commons.logging.impl.LogFactoryImpl {
+                public *;
+            }
+            -keep public class org.apache.commons.logging.impl.Jdk14Logger {
+                public *;
+            }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">
             <zipfileset src="${temp.jar}"/>

@@ -13,15 +13,18 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.OutputStream
-import java.net.{HttpURLConnection, URL}
+import java.io.{ByteArrayOutputStream, OutputStream}
+import java.net.URL
 
+import org.orbeon.oxf.http.HTTPURLConnection
 import org.orbeon.oxf.util.ScalaUtils._
 
-import collection.immutable.Iterable
+import scala.collection.immutable.Iterable
 import scala.util.control.NonFatal
 
-object PlainHttpClient extends HttpClient {
+
+
+object ApacheHttpClient extends HttpClient {
 
     def openConnection(
         url         : String,
@@ -30,18 +33,10 @@ object PlainHttpClient extends HttpClient {
         implicit ctx: EmbeddingContext
     ): HttpResponse = {
 
-        val cx = new URL(url).openConnection.asInstanceOf[HttpURLConnection]
+        val cx = new HTTPURLConnection(new URL(url))(ctx.httpClient)
 
-        cx.setInstanceFollowRedirects(false)
+        cx.setInstanceFollowRedirects(false) // TODO
         cx.setDoInput(true)
-
-        // "There is no default implementation of URLConnection caching in the Java 2 Standard Edition":
-        // http://docs.oracle.com/javase/8/docs/technotes/guides/net/http-cache.html
-        // But HttpURLConnection does set `Pragma: no-cache` if `useCaches == false`. It probably doesn't matter much
-        // as it concerns the request AFAICT, but there is no need for it.
-        // See also:
-        // http://stackoverflow.com/questions/1330882/how-does-urlconnection-setusecaches-work-in-practice
-        cx.setUseCaches(true)
 
         content foreach { case (contentType, _) ⇒
             cx.setDoOutput(true)
@@ -52,21 +47,17 @@ object PlainHttpClient extends HttpClient {
         for ((name, value) ← headers if name.toLowerCase != "content-type") // handled above via Content
             cx.addRequestProperty(name, value)
 
-        CookieManager.processRequestCookieHeaders(cx, url)
+        // FIXME: Stream content as memory usage is large for uploads.
+        content foreach { case (_, write) ⇒
+            val os = new ByteArrayOutputStream()
+            write(os)
+            cx.setRequestBody(os.toByteArray)
+        }
+
+        cx.setCookieStore(CookieManager.getOrCreateCookieStore)
 
         cx.connect()
         try {
-            // Write content
-            // NOTE: At this time we don't support application/x-www-form-urlencoded. When that type of encoding is
-            // taking place, the portal doesn't provide a body and instead makes the content available via parameters.
-            // So we would need to re-encode the POST. As of 2012-05-10, the XForms engine instead uses the
-            // multipart/form-data encoding on the main form to help us here.
-            content foreach { case (_, write) ⇒
-                write(cx.getOutputStream)
-            }
-
-            CookieManager.processResponseSetCookieHeaders(cx, url)
-
             HttpURLConnectionResponse(cx)
         } catch {
             case NonFatal(t) ⇒

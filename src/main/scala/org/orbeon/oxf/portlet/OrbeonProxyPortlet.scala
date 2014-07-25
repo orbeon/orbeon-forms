@@ -21,6 +21,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
+import org.orbeon.oxf.http.{HTTPClient, ConnectionSettings}
 import org.orbeon.oxf.portlet.liferay.LiferaySupport
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils.{withRootException ⇒ _, _}
@@ -38,19 +39,32 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     import org.orbeon.oxf.portlet.OrbeonProxyPortlet._
 
+    private case class PortletSettings(
+        forwardHeaders: Map[String, String], // lowercase name → original name
+        forwardParams : Set[String],
+        httpClient    : HTTPClient
+     )
+
     // For BufferedPortlet
     def title(request: RenderRequest) = getTitle(request)
 
-    // Init parameters to configure headers and parameters forwarding
-    private var forwardHeaders = Map.empty[String, String] // lowercase name → original name
-    private var forwardParams  = Set.empty[String]
+    private var settingsOpt: Option[PortletSettings] = None
 
     override def init(config: PortletConfig) {
         super.init(config)
+        settingsOpt = Some(
+            PortletSettings(
+                forwardHeaders = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut),
+                forwardParams  = stringToSet(config.getInitParameter("forward-parameters")),
+                httpClient     = new HTTPClient(ConnectionSettings(config.getInitParameter))
+            )
+        )
+    }
 
-        // Read portlet init parameters
-        forwardHeaders = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut)
-        forwardParams  = stringToSet(config.getInitParameter("forward-parameters"))
+    override def destroy() = {
+        settingsOpt foreach (_.httpClient.shutdown())
+        settingsOpt = None
+        super.destroy()
     }
 
     // Try to find getHttpServletRequest only the first time this is accessed
@@ -67,38 +81,62 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     // Portlet render
     override def doView(request: RenderRequest, response: RenderResponse): Unit =
-        withRootException("view render", new PortletException(_)) {
-            implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response)
-            bufferedRender(request, response, APISupport.callService(createRequestDetails(request, response.getNamespace)))
+        settingsOpt foreach { settings ⇒
+            withRootException("view render", new PortletException(_)) {
+
+                implicit val ctx = new PortletEmbeddingContextWithResponse(
+                    getPortletContext,
+                    request,
+                    response,
+                    settings.httpClient
+                )
+
+                bufferedRender(request, response, APISupport.callService(createRequestDetails(settings, request, response.getNamespace)))
+            }
         }
 
     // Portlet action
     override def processAction(request: ActionRequest, response: ActionResponse): Unit =
-        request.getPortletMode match {
-            case PortletMode.VIEW ⇒ doViewAction(request, response)
-            case PortletMode.EDIT ⇒ doEditAction(request, response)
-            case _ ⇒ // NOP
+        settingsOpt foreach { settings ⇒
+            request.getPortletMode match {
+                case PortletMode.VIEW ⇒ doViewAction(request, response)
+                case PortletMode.EDIT ⇒ doEditAction(request, response)
+                case _ ⇒ // NOP
+            }
         }
 
     private def doViewAction(request: ActionRequest, response: ActionResponse): Unit =
-        withRootException("view action", new PortletException(_)) {
-            implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response)
-            bufferedProcessAction(request, response, APISupport.callService(createRequestDetails(request, response.getNamespace)))
+        settingsOpt foreach { settings ⇒
+            withRootException("view action", new PortletException(_)) {
+                implicit val ctx = new PortletEmbeddingContext(
+                    getPortletContext,
+                    request,
+                    response,
+                    settings.httpClient
+                )
+                bufferedProcessAction(request, response, APISupport.callService(createRequestDetails(settings, request, response.getNamespace)))
+            }
         }
 
     // Portlet resource
     override def serveResource(request: ResourceRequest, response: ResourceResponse): Unit =
-        withRootException("resource", new PortletException(_)) {
-            implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response)
+        settingsOpt foreach { settings ⇒
+            withRootException("resource", new PortletException(_)) {
+                implicit val ctx = new PortletEmbeddingContextWithResponse(
+                    getPortletContext,
+                    request,
+                    response,
+                    settings.httpClient
+                )
+                val resourceId = request.getResourceID
+                val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
+                val requestDetails = newRequestDetails(settings, request, contentFromRequest(request, response.getNamespace), url)
 
-            val resourceId     = request.getResourceID
-            val url            = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
-            val requestDetails = newRequestDetails(request, contentFromRequest(request, response.getNamespace), url)
-
-            APISupport.proxyResource(requestDetails)
+                APISupport.proxyResource(requestDetails)
+            }
         }
 
-    private def createRequestDetails(request: PortletRequest, namespace: String): RequestDetails = {
+    private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
         // Determine URL based on preferences and request
         val path = {
 
@@ -133,13 +171,14 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         }
 
         newRequestDetails(
+            settings,
             request,
             contentFromRequest(request, namespace),
             APISupport.formRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true)
         )
     }
 
-    private def newRequestDetails(request: PortletRequest, content: Option[Content], url: String): RequestDetails = {
+    private def newRequestDetails(settings: PortletSettings, request: PortletRequest, content: Option[Content], url: String): RequestDetails = {
 
         def clientHeaders =
             findServletRequest(request).toList flatMap APISupport.requestHeaders
@@ -147,7 +186,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         def paramsToSet =
             for {
                 pair @ (name, _) ← collectByErasedType[String](request.getAttribute("javax.servlet.forward.query_string")) map decodeSimpleQuery getOrElse Nil
-                if forwardParams(name)
+                if settings.forwardParams(name)
             } yield
                 pair
 
@@ -175,7 +214,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 Nil
 
         def headersToSet =
-            APISupport.headersToForward(clientHeaders, forwardHeaders).toList ++ languageHeader.toList ++ userHeaders
+            APISupport.headersToForward(clientHeaders, settings.forwardHeaders).toList ++ languageHeader.toList ++ userHeaders
 
         RequestDetails(
             content,

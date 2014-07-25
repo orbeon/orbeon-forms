@@ -78,7 +78,7 @@ public class AllReplacer extends BaseReplacer {
         response.setContentType(connectionResult.getResponseContentType());
 
         // Forward headers to response
-        connectionResult.forwardHeaders(response);
+        connectionResult.forwardResponseHeaders(response);
 
         // Forward content to response
         final OutputStream outputStream = response.getOutputStream();

@@ -92,9 +92,9 @@ class ConnectionResult(val resourceURI: String) extends Logging {
         this._lastModified = if (connectionLastModified <= 0) None else Some(connectionLastModified)
     }
 
-    def forwardHeaders(response: ExternalContext.Response): Unit =
+    def forwardResponseHeaders(response: ExternalContext.Response): Unit =
         for {
-            (headerName, headerValues) ← Headers.filterHeaders(responseHeaders, out = false)
+            (headerName, headerValues) ← Headers.proxyHeaders(responseHeaders, request = false)
             headerValue ← headerValues
         } locally {
             response.addHeader(headerName, headerValue)

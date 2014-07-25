@@ -85,7 +85,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     override def render(request: RenderRequest, response: RenderResponse): Unit =
         currentPortlet.withValue(this) {
             withRootException("render", new PortletException(_)) {
-                implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response)
+                implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
                 bufferedRender(request, response, callService(directContext(request)))
             }
         }
@@ -94,7 +94,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     override def processAction(request: ActionRequest, response: ActionResponse): Unit =
         currentPortlet.withValue(this) {
             withRootException("action", new PortletException(_)) {
-                implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response)
+                implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null)
                 bufferedProcessAction(request, response, callService(directContext(request)))
             }
         }
@@ -103,7 +103,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     override def serveResource(request: ResourceRequest, response: ResourceResponse) =
         currentPortlet.withValue(this) {
             withRootException("resource", new PortletException(_)) {
-                implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response)
+                implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
                 directServeResource(request, response)
             }
         }

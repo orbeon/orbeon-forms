@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -96,7 +97,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
     private String avtXXFormsUsername;
     private String avtXXFormsPassword;
-    private String avtXXFormsPreemptiveAuthentication;
+    private String avtXXFormsPreemptiveAuth;
     private String avtXXFormsDomain;
     private String avtXXFormsReadonly;
     private String avtXXFormsShared;
@@ -227,7 +228,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             // Extension attributes
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
             avtXXFormsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
-            avtXXFormsPreemptiveAuthentication = submissionElement.attributeValue(XFormsConstants.XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME);
+            avtXXFormsPreemptiveAuth = submissionElement.attributeValue(XFormsConstants.XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME);
             avtXXFormsDomain = submissionElement.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME);
 
             avtXXFormsReadonly = submissionElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
@@ -885,7 +886,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         final boolean indent;
         final boolean omitxmldeclaration;
         final Boolean standalone;
-        final Connection.Credentials credentials;
+        final Credentials credentials;
         final boolean isReadonly;
         final boolean isCache;
         final long timeToLive;
@@ -929,13 +930,13 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
             final String username = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
             final String password = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
-            final String preemptiveAuthentication = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuthentication);
+            final String preemptiveAuth = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuth);
             final String domain = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
 
             if (StringUtils.isEmpty(username))
                 credentials = null;
             else
-                credentials = new Connection.Credentials(username, password, preemptiveAuthentication, domain);
+                credentials = Credentials.apply(username, password, preemptiveAuth, domain);
 
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);

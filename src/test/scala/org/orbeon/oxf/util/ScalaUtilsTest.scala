@@ -18,7 +18,6 @@ import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.ScalaUtils._
 import collection.mutable
-import org.orbeon.oxf.util.Headers._
 
 class ScalaUtilsTest extends AssertionsForJUnit {
 
@@ -59,14 +58,6 @@ class ScalaUtilsTest extends AssertionsForJUnit {
         assert("/a/" === appendStartingSlash("a/"))
         assert("/"   === appendStartingSlash("/"))
         assert("//"  === appendStartingSlash("//"))
-    }
-
-    @Test def testCapitalizeHeader(): Unit = {
-        assert("Accept"       === capitalizeCommonOrSplitHeader("aCcEpT"))
-        assert("Content-Type" === capitalizeCommonOrSplitHeader("cOnTeNt-tYpE"))
-        assert("SOAPAction"   === capitalizeCommonOrSplitHeader("sOaPaCtIoN"))
-        assert("TE"           === capitalizeCommonOrSplitHeader("tE"))
-        assert("Content-MD5"  === capitalizeCommonOrSplitHeader("cOnTeNt-Md5"))
     }
 
     @Test def testPipeOps(): Unit = {
@@ -163,18 +154,6 @@ class ScalaUtilsTest extends AssertionsForJUnit {
 
         assert(collectByErasedType[Seq[String]](Seq("a")).isDefined)
         assert(collectByErasedType[Seq[String]](Seq(42)).isDefined) // erasure!
-    }
-
-    @Test def testFilterAndCapitalizeHeaders(): Unit = {
-
-        val arrays = Seq("Foo" → Array("foo1", "foo2"), "Bar" → Array("bar1", "bar2"))
-        val lists  = Seq("Foo" → List("foo1", "foo2"),  "Bar" → List("bar1", "bar2"))
-
-        val toFilter = Seq("Transfer-Encoding", "Connection", "Host", "Content-Length") map (name ⇒ name → List("NOT!"))
-
-        assert(lists === (filterAndCapitalizeHeaders(arrays, out = true) map { case (k, v) ⇒ k → v.to[List]}))
-        assert(lists === filterAndCapitalizeHeaders(lists, out = true))
-        assert(lists === filterAndCapitalizeHeaders(lists ++ toFilter, out = true))
     }
 
     @Test def testSplit(): Unit = {

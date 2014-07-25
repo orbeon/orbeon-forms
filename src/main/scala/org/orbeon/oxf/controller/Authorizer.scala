@@ -101,7 +101,11 @@ object Authorizer extends Logging {
             case Some(baseDelegateURI) ⇒
                 // Forward method and headers but not the body
                 val method  = request.getMethod
-                val headers = filterAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, out = true)
+
+                // NOTE: There is a question of whether we need to forward cookies for authorization purposes. If we
+                // do, there is the issue of the first incoming request which doesn't have incoming cookies. So at this
+                // point, we just follow the header proxying method we use in other places and remove Cookie/Set-Cookie.
+                val headers = proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true)
                 val body    = if (Connection.requiresRequestBody(method)) Some(Array[Byte]()) else None
 
                 val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString)).toString

@@ -113,7 +113,7 @@ public class ResourceServer extends ProcessorImpl {
                 // Set Last-Modified, required for caching and conditional get
                 if (isVersioned) {
                     // Use expiration far in the future
-                    response.setResourceCaching(lastModified, lastModified + ONE_YEAR_IN_MILLISECONDS);
+                    response.setResourceCaching(lastModified, System.currentTimeMillis() + ONE_YEAR_IN_MILLISECONDS);
                 } else {
                     // Use standard expiration policy
                     response.setResourceCaching(lastModified, 0);

@@ -145,7 +145,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         // Set Last-Modified, required for caching and conditional get
         if (URLRewriterUtils.isResourcesVersioned)
             // Use expiration far in the future
-            response.setResourceCaching(combinedLastModified, combinedLastModified + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+            response.setResourceCaching(combinedLastModified, System.currentTimeMillis + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
         else
             // Use standard expiration policy
             response.setResourceCaching(combinedLastModified, 0)

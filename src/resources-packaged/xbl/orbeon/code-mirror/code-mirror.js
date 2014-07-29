@@ -58,7 +58,9 @@
             }
         },
 
-        xformsReadonly: function() { this.editor.setOption("readOnly", 'nocursor'); },
+        // Use 'true' instead of 'nocursor' so that copy/paste works:
+        // https://github.com/orbeon/orbeon-forms/issues/1841
+        xformsReadonly: function() { this.editor.setOption("readOnly", 'true'); },
         xformsReadwrite: function() { this.editor.setOption("readOnly", false); },
         xformsValueChanged: function() {
             var doUpdate =

@@ -145,7 +145,8 @@ public class ServletExternalContext implements ExternalContext  {
                 // included servlet via the getAttribute method on the request object and their values must be equal to
                 // the request URI, context path, servlet path, path info, and query string of the included servlet,
                 // respectively."
-                // NOTE: This is very different from the similarly-named forward attributes!
+                // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
+                // first servlet in the chain!
                 final String dispatcherContext = (String) nativeRequest.getAttribute("javax.servlet.include.context_path");
                 if (dispatcherContext != null) {
                     // This ensures we return the included / forwarded servlet's value
@@ -293,7 +294,8 @@ public class ServletExternalContext implements ExternalContext  {
             // included servlet via the getAttribute method on the request object and their values must be equal to the
             // request URI, context path, servlet path, path info, and query string of the included servlet,
             // respectively."
-            // NOTE: This is very different from the similarly-named forward attributes!
+            // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
+            // first servlet in the chain!
             final String dispatcherQueryString = (String) nativeRequest.getAttribute("javax.servlet.include.query_string");
             return (dispatcherQueryString != null) ? dispatcherQueryString : nativeRequest.getQueryString();
         }
@@ -312,7 +314,8 @@ public class ServletExternalContext implements ExternalContext  {
             // included servlet via the getAttribute method on the request object and their values must be equal to the
             // request URI, context path, servlet path, path info, and query string of the included servlet,
             // respectively."
-            // NOTE: This is very different from the similarly-named forward attributes!
+            // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
+            // first servlet in the chain!
             final String dispatcherRequestURI = (String) nativeRequest.getAttribute("javax.servlet.include.request_uri");
             return (dispatcherRequestURI != null) ? dispatcherRequestURI : nativeRequest.getRequestURI();
         }

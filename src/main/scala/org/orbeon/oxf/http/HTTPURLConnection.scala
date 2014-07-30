@@ -28,7 +28,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-class HTTPURLConnection(url: URL)(implicit client: HTTPClient) extends HttpURLConnection(url) {
+class HTTPURLConnection(url: URL)(implicit client: HttpClientImpl) extends HttpURLConnection(url) {
     
     private var _connected = false
 

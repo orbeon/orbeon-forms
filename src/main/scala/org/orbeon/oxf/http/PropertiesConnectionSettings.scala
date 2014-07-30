@@ -15,33 +15,33 @@ package org.orbeon.oxf.http
 
 import org.orbeon.oxf.properties.Properties
 
-object PropertiesHTTPClient extends HTTPClient(PropertiesConnectionSettings.apply)
+object PropertiesHttpClientImpl extends HttpClientImpl(PropertiesConnectionSettings.apply)
 
 object PropertiesConnectionSettings {
 
-    def apply: ConnectionSettings = {
+    def apply: HttpClientSettings = {
 
-        val propertySet = Properties.instance.getPropertySet
+        val props = Properties.instance.getPropertySet
 
-        import ConnectionSettings._
+        import HttpClientSettings._
 
-        ConnectionSettings(
-            staleCheckingEnabled = propertySet.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
-            soTimeout            = propertySet.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
+        HttpClientSettings(
+            staleCheckingEnabled = props.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
+            soTimeout            = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
 
-            proxyHost            = Option(propertySet.getString(ProxyHostProperty)),
-            proxyPort            = Option(propertySet.getInteger(ProxyPortProperty)) map (_.toInt),
-            proxyExclude         = Option(propertySet.getString(ProxyExcludeProperty)),
+            proxyHost            = Option(props.getString(ProxyHostProperty)),
+            proxyPort            = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
+            proxyExclude         = Option(props.getString(ProxyExcludeProperty)),
 
-            sslHostnameVerifier  = propertySet.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
-            sslKeystoreURI       = Option(propertySet.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
-            sslKeystorePassword  = Option(propertySet.getString(SSLKeystorePasswordProperty)),
+            sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
+            sslKeystoreURI       = Option(props.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
+            sslKeystorePassword  = Option(props.getString(SSLKeystorePasswordProperty)),
 
-            proxySSL             = propertySet.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
-            proxyUsername        = Option(propertySet.getString(ProxyUsernameProperty)),
-            proxyPassword        = Option(propertySet.getString(ProxyPasswordProperty)),
-            proxyNTLMHost        = Option(propertySet.getString(ProxyNTLMHostProperty)),
-            proxyNTLMDomain      = Option(propertySet.getString(ProxyNTLMDomainProperty))
+            proxySSL             = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
+            proxyUsername        = Option(props.getString(ProxyUsernameProperty)),
+            proxyPassword        = Option(props.getString(ProxyPasswordProperty)),
+            proxyNTLMHost        = Option(props.getString(ProxyNTLMHostProperty)),
+            proxyNTLMDomain      = Option(props.getString(ProxyNTLMDomainProperty))
         )
     }
 }

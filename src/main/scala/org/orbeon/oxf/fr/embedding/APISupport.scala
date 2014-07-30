@@ -14,13 +14,11 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.{ByteArrayInputStream, InputStream, OutputStream, Writer}
-import java.net.HttpURLConnection
 import java.{util ⇒ ju}
 import javax.servlet.http.HttpServletRequest
 
 import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.http.HTTPClient
 import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -28,11 +26,6 @@ import org.orbeon.oxf.xml.XMLUtils
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
-
-sealed trait Action { val name: String }
-case object New  extends Action { val name = "new" }
-case object Edit extends Action { val name = "edit" }
-case object View extends Action { val name = "view" }
 
 object APISupport {
 
@@ -176,7 +169,7 @@ object APISupport {
         var currentIndex = 0
         var index        = 0
 
-        import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
+        import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL => _, _}
 
         while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
 
@@ -211,46 +204,4 @@ object APISupport {
         if (currentIndex < stringLength)
             writer.write(content, currentIndex, content.length - currentIndex)
     }
-}
-
-// Immutable responses
-sealed trait ContentOrRedirect
-
-case class Content(body: String Either Array[Byte], contentType: Option[String], title: Option[String])
-    extends ContentOrRedirect
-
-case class Redirect(location: String, exitPortal: Boolean = false) extends ContentOrRedirect {
-    require(location ne null, "Missing Location header in redirect response")
-}
-
-// Immutable information about an outgoing request
-case class RequestDetails(
-    content  : Option[Content],
-    url      : String,
-    headers  : immutable.Seq[(String, String)],
-    params   : immutable.Seq[(String, String)]
-)
-
-trait EmbeddingContext {
-    def namespace: String
-    def getSessionAttribute(name: String): AnyRef
-    def setSessionAttribute(name: String, value: AnyRef): Unit
-    def removeSessionAttribute(name: String): Unit
-    def log(message: String): Unit                              // consider removing
-    def httpClient: HTTPClient
-}
-
-trait EmbeddingContextWithResponse extends EmbeddingContext{
-    def writer: Writer
-    def outputStream: OutputStream                              // for binary resources only
-    def setHeader(name: String, value: String): Unit
-    def setStatusCode(code: Int): Unit
-    def decodeURL(encoded: String): String
-}
-
-case class HttpURLConnectionResponse(cx: HttpURLConnection) extends HttpResponse {
-    def statusCode  = cx.getResponseCode
-    def headers     = cx.getHeaderFields.asScala.toMap map { case (name, values) ⇒ name → (values.asScala mkString ",") }
-    def inputStream = cx.getInputStream
-    def contentType = cx.getContentType
 }

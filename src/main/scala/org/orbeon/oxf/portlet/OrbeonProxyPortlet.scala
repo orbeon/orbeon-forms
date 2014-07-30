@@ -21,7 +21,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{HTTPClient, ConnectionSettings}
+import org.orbeon.oxf.http.{HttpClientImpl, HttpClientSettings}
 import org.orbeon.oxf.portlet.liferay.LiferaySupport
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils.{withRootException ⇒ _, _}
@@ -42,7 +42,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     private case class PortletSettings(
         forwardHeaders: Map[String, String], // lowercase name → original name
         forwardParams : Set[String],
-        httpClient    : HTTPClient
+        httpClient    : HttpClientImpl
      )
 
     // For BufferedPortlet
@@ -56,7 +56,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             PortletSettings(
                 forwardHeaders = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut),
                 forwardParams  = stringToSet(config.getInitParameter("forward-parameters")),
-                httpClient     = new HTTPClient(ConnectionSettings(config.getInitParameter))
+                httpClient     = new HttpClientImpl(HttpClientSettings(config.getInitParameter))
             )
         )
     }

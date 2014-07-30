@@ -20,7 +20,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{ConnectionSettings, HTTPClient}
+import org.orbeon.oxf.http.{HttpClientSettings, HttpClientImpl}
 import org.orbeon.oxf.util.NetUtils
 
 import scala.collection.JavaConverters._
@@ -29,7 +29,7 @@ private case class FilterSettings(
         servletContext: ServletContext,
         formRunnerURL : String,
         orbeonPrefix  : String,
-        httpClient    : HTTPClient) {
+        httpClient    : HttpClientImpl) {
     val OrbeonResourceRegex = s"$orbeonPrefix/([^/]+)(/.+)".r
 }
 
@@ -37,7 +37,7 @@ class ServletEmbeddingContext(
         val namespace : String,
         req           : HttpServletRequest,
         logFunction   : String ⇒ Unit,
-        val httpClient: HTTPClient)
+        val httpClient: HttpClientImpl)
     extends EmbeddingContext {
 
     private val session = req.getSession(true)
@@ -54,7 +54,7 @@ class ServletEmbeddingContextWithResponse(
         out         : Writer Either HttpServletResponse,
         namespace   : String,
         orbeonPrefix: String,
-        httpClient  : HTTPClient)
+        httpClient  : HttpClientImpl)
     extends ServletEmbeddingContext(
         namespace, req, logFunction, httpClient)
     with EmbeddingContextWithResponse {
@@ -89,7 +89,7 @@ class ServletFilter extends Filter {
                     servletContext = config.getServletContext,
                     formRunnerURL  = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
                     orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon",
-                    httpClient     = new HTTPClient(ConnectionSettings(config.getInitParameter))
+                    httpClient     = new HttpClientImpl(HttpClientSettings(config.getInitParameter))
                 )
             )
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.http
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
-case class ConnectionSettings(
+case class HttpClientSettings(
     staleCheckingEnabled: Boolean,
     soTimeout           : Int,
 
@@ -35,9 +35,9 @@ case class ConnectionSettings(
     proxyNTLMDomain     : Option[String]
 )
 
-object ConnectionSettings {
+object HttpClientSettings {
     
-    def apply(param: String ⇒ String): ConnectionSettings = {
+    def apply(param: String ⇒ String): HttpClientSettings = {
 
         def booleanParamWithDefault(name: String, default: Boolean) =
             nonEmptyOrNone(param(name)) map (_ == "true") getOrElse default
@@ -54,7 +54,7 @@ object ConnectionSettings {
         def stringParamWithDefault(name: String, default: String) =
             stringParam(name) getOrElse default
 
-        ConnectionSettings(
+        HttpClientSettings(
             staleCheckingEnabled = booleanParamWithDefault(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
             soTimeout            = intParamWithDefault(SOTimeoutProperty, SOTimeoutPropertyDefault),
 

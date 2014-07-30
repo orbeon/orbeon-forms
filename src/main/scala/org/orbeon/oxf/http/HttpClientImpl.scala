@@ -33,11 +33,11 @@ import org.apache.http.protocol.{ExecutionContext, BasicHttpContext, HttpContext
 import org.apache.http.{ProtocolException ⇒ _, _}
 import org.orbeon.oxf.util.ScalaUtils._
 
-class HTTPClient(settings: ConnectionSettings) {
+class HttpClientImpl(settings: HttpClientSettings) {
 
     import Private._
 
-    final def newHttpClient(credentials: Option[Credentials], host: String, port: Int) = {
+    def newHttpClient(credentials: Option[Credentials], host: String, port: Int) = {
 
         val httpClient  = new DefaultHttpClient(connectionManager, newHttpParams)
         val httpContext = new BasicHttpContext
@@ -80,8 +80,8 @@ class HTTPClient(settings: ConnectionSettings) {
         (httpClient, httpContext)
     }
 
-    final def shutdown() = connectionManager.shutdown()
-    final def usingProxy = proxyHost.isDefined
+    def shutdown() = connectionManager.shutdown()
+    def usingProxy = proxyHost.isDefined
 
     private object Private {
 

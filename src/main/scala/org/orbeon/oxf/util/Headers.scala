@@ -21,9 +21,9 @@ object Headers {
     // Q: Why request content-length? In case we modify request content?
     // 2014-07-28: We are not able to properly proxy directly a content-encoded response, so we don't proxy the relevant
     // headers.
-    private val HeadersToRemove         = Set("connection")
-    private val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "content-length", "cookie", "cookie2", "accept-encoding")
-    private val ResponseHeadersToRemove = HeadersToRemove ++ List("transfer-encoding", "set-cookie", "content-encoding")
+    private val HeadersToRemove = Set("connection")
+    val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "content-length", "cookie", "cookie2", "accept-encoding")
+    val ResponseHeadersToRemove = HeadersToRemove ++ List("transfer-encoding", "set-cookie", "content-encoding")
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
     // Q: Doesn't Scala already have such a type?

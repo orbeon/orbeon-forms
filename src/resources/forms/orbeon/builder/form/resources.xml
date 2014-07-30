@@ -5206,7 +5206,7 @@
             <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
             <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
             <expand-cell>Sind Sie sicher, dass Sie die aktuelle Zelle erweitern wollen? Ein Steuerelement wird gelöscht werden.</expand-cell>
-            <delete-resources>Sind Sie sicher, dass Sie alle Sprachresourcen löschen wollen?</delete-resources>
+            <delete-resources>Sind Sie sicher, dass Sie alle Sprachressourcen löschen wollen?</delete-resources>
             <delete-service>Sind Sie sicher, dass Sie diesen Dienst löschen wollen?</delete-service>
             <delete-action>Sind Sie sicher, dass Sie diese Aktion löschen wollen?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>

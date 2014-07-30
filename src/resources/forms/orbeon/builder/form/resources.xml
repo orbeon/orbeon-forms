@@ -4435,7 +4435,7 @@
             <label>Dienste &amp; Aktionen</label>
         </services-actions>
         <http-services>
-            <label>HTTP Dienste</label>
+            <label>HTTP-Dienste</label>
         </http-services>
         <database-services>
             <label>Datenbankdienste</label>
@@ -4525,10 +4525,10 @@
             <label>Verkleinern</label>
         </shrink-icon>
         <delete-control-icon>
-            <label>Bedienelement löschen</label>
+            <label>Steuerelement löschen</label>
         </delete-control-icon>
         <delete-grid-icon>
-            <label>Tabelle löschen</label>
+            <label>Raster löschen</label>
         </delete-grid-icon>
         <delete-section-icon>
             <label>Abschnitt löschen</label>
@@ -4546,16 +4546,16 @@
             <label>Spalte rechts einfügen</label>
         </insert-column-right-icon>
         <insert-row-above-icon>
-            <label>Zeile oberhalb einfügen</label>
+            <label>Zeile darüber einfügen</label>
         </insert-row-above-icon>
         <insert-row-below-icon>
-            <label>Zeile unterhalb einfügen</label>
+            <label>Zeile darunter einfügen</label>
         </insert-row-below-icon>
         <section-details-icon>
             <label>Abschnittseigenschaften</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>Tabelleneigenschaften</label>
+            <label>Rastereigenschaften</label>
         </grid-details-icon>
         <move-up-icon>
             <label>Nach oben verschieben</label>
@@ -4570,7 +4570,7 @@
             <label>Nach links verschieben</label>
         </move-left-icon>
         <control-details-icon>
-            <label>Steuerungseinstellungen</label>
+            <label>Einstellungen Steuerelemente</label>
         </control-details-icon>
         <switch-appearance-icon>
             <label>Ansicht wechseln</label>
@@ -4617,7 +4617,7 @@
             <stats>Formularstatistiken</stats>
             <sections>Abschnitte</sections>
             <repeats>Wiederholungen</repeats>
-            <grids>Tabellen</grids>
+            <grids>Raster</grids>
             <section-templates>Abschnittsvorlagen</section-templates>
             <controls>Steuerelemente</controls>
             <all>Alle</all>
@@ -4789,10 +4789,10 @@
                 <hint>Aktiv, falls es keine speziellere Warnung gibt</hint>
             </default-alert>
             <use-global-alert>
-                <label>Verwende globale Hilfnachricht</label>
+                <label>Verwende globale Standardwarnung</label>
             </use-global-alert>
             <use-default-alert>
-                <label>Verwende Standard-Hilfnachricht</label>
+                <label>Verwende Standardwarnung</label>
             </use-default-alert>
             <validation-type><label>Validierungstypen</label></validation-type>
             <validation-details><label>Validierungsdetails</label></validation-details>
@@ -4809,7 +4809,7 @@
             <options>
                 <label>Optionen</label>
                 <item>
-                    <label>Seitenumbruch vor</label>
+                    <label>Seitenumbruch vor diesem Abschnitt</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
@@ -4980,7 +4980,7 @@
             </soap-submission>
             <soap-action>
                 <label>SOAP-Aktion</label>
-                <hint>Optionaler SOAP-Action Kopf</hint>
+                <hint>Optionaler SOAP-Aktionskopf</hint>
             </soap-action>
             <http-authentication>
                 <label>HTTP Authentifizierung</label>
@@ -5130,7 +5130,7 @@
                 <label>XPath-Ausdruck (Ziel)</label>
             </destination-xpath>
             <request-database-parameter>
-                <label>Setze die Parameter des Datenbank-Dienstes</label>
+                <label>Parameter des Datenbankdienstes setzen</label>
             </request-database-parameter>
             <parameter-number>
                 <label>Parameternummer</label>
@@ -5148,14 +5148,14 @@
                 <label>Einträge aus der Antwort des Dienstes in Auswahllisten laden</label>
             </response-itemset>
             <destination-selection-control>
-                <label>Auswahlliste (Ziel)</label>
+                <label>Auswahlsteuerelement (Ziel)</label>
             </destination-selection-control>
             <itemset>
                 <label>Auswahl</label>
                 <hint>XPath-Ausdruck um eine neue Auswahl zu erstellen</hint>
             </itemset>
             <items>
-                <label>Element</label>
+                <label>Elemente</label>
                 <hint>XPath-Ausdruck, der eine Knoten für des Element zurückgibt</hint>
             </items>
             <item-label>
@@ -5208,11 +5208,11 @@
         <!-- Messages -->
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
-            <delete-grid>Sind Sie sicher, dass Sie die aktuelle Tabelle löschen wollen?</delete-grid>
+            <delete-grid>Sind Sie sicher, dass Sie das aktuelle Raster löschen wollen?</delete-grid>
             <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
             <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
             <expand-cell>Sind Sie sicher, dass Sie die aktuelle Zelle erweitern wollen? Ein Steuerelement wird gelöscht werden.</expand-cell>
-            <delete-resources>Sind Sie sicher, dass Sie alle Sprachresourcen löschen wollen?</delete-resources>
+            <delete-resources>Sind Sie sicher, dass Sie alle Ressourcen löschen wollen für die Sprache</delete-resources>
             <delete-service>Sind Sie sicher, dass Sie diesen Dienst löschen wollen?</delete-service>
             <delete-action>Sind Sie sicher, dass Sie diese Aktion löschen wollen?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>

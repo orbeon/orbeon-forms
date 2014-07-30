@@ -1214,6 +1214,7 @@
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+
         </buttons>
         <components>
             <labels>
@@ -1699,7 +1700,7 @@
                 <title>Titolo</title>
                 <view>Vizualizza</view>
                 <new>Nuovo</new>
-                <local>">Locale</local>
+                <local>Locale</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificazione del modulo</form-identification>
                 <last-modified>Modificato</last-modified>
@@ -1836,7 +1837,7 @@
             </titles>
             <search>
                 <search>Suchen</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Suche Formular</search-forms>
+                <search-forms>&lt;i class="icon-search"/&gt; Formular suchen</search-forms>
                 <show-options>Suchoptionen anzeigen</show-options>
                 <close-options>Suchoptionen schließen</close-options>
                 <returned>Suchergebnisse: {0,number,integer} von {1,number,integer} Dokumenten.</returned>

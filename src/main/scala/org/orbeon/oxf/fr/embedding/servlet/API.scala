@@ -148,7 +148,7 @@ object API {
             APISupport.proxyResource(
                 RequestDetails(
                     content  = contentFromRequest,
-                    url      = APISupport.formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = true),
+                    url      = APISupport.formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false),
                     headers  = requestHeaders.to[List],
                     params   = Nil
                 )

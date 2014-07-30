@@ -15,9 +15,9 @@ package org.orbeon.oxf.resources.handler
 
 import java.net.{URL, URLStreamHandler}
 
-import org.orbeon.oxf.http.{HTTPURLConnection, PropertiesHttpClientImpl}
+import org.orbeon.oxf.http.{ApacheHttpUrlConnection, PropertiesApacheHttpClient}
 
 class HTTPHandler extends URLStreamHandler {
     protected def openConnection(url: URL) =
-        new HTTPURLConnection(url)(PropertiesHttpClientImpl)
+        new ApacheHttpUrlConnection(url)(PropertiesApacheHttpClient)
 }

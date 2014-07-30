@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.{ByteArrayInputStream, InputStream, OutputStream, Writer}
+import java.io.{ByteArrayInputStream, InputStream, Writer}
 import java.{util ⇒ ju}
 import javax.servlet.http.HttpServletRequest
 
@@ -55,10 +55,10 @@ object APISupport {
         
         ctx.setStatusCode(res.statusCode)
 
-        proxyCapitalizeAndCombineHeaders(res.headers mapValues (List(_)), request = false) foreach (ctx.setHeader _).tupled
+        proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
 
         useAndClose(res.inputStream) { is ⇒
-            writeResponseBody(Right(is), Option(res.contentType))
+            writeResponseBody(Right(is), res.contentType)
         }
     }
 
@@ -92,9 +92,9 @@ object APISupport {
         val cx = connectURL(requestDetails)
         useAndClose(cx.inputStream) { is ⇒
             if (isRedirectCode(cx.statusCode))
-                Redirect(cx.headers("Location"), exitPortal = true)
+                Redirect(cx.headers("Location").head, exitPortal = true)
             else
-                Content(Right(IOUtils.toByteArray(is)), Option(cx.contentType), None)
+                Content(Right(IOUtils.toByteArray(is)), cx.contentType, None)
         }
     }
 
@@ -108,19 +108,13 @@ object APISupport {
     // - render requests
     // - resources: typically image, CSS, JavaScript, etc.
     def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
-        ApacheHttpClient.openConnection(
-            recombineQuery(requestDetails.url, requestDetails.params),
-            requestDetails.content map { content ⇒
-
-                def write(os: OutputStream): Unit =
-                    content.body match {
-                        case Left(string) ⇒ os.write(string.getBytes("utf-8"))
-                        case Right(bytes) ⇒ os.write(bytes)
-                    }
-
-                (content.contentType, write _)
-            },
-            ("Orbeon-Client" → "portlet") +: requestDetails.headers
+        ctx.httpClient.connect(
+            url         = recombineQuery(requestDetails.url, requestDetails.params),
+            credentials = None,
+            cookieStore = CookieManager.getOrCreateCookieStore,
+            method      = if (requestDetails.content.isEmpty) "GET" else "POST",
+            headers     = requestDetails.headersMapWithContentType + ("Orbeon-Client" → List("portlet")),
+            content     = requestDetails.contentAsBytes.get
         )
 
     def writeResponseBody(
@@ -169,7 +163,7 @@ object APISupport {
         var currentIndex = 0
         var index        = 0
 
-        import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL => _, _}
+        import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
 
         while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
 

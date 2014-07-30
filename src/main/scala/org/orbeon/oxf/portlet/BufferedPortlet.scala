@@ -19,7 +19,7 @@ import javax.portlet._
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.HttpClientImpl
+import org.orbeon.oxf.http.HttpClient
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.NetUtils
@@ -31,7 +31,7 @@ class PortletEmbeddingContext(
         context       : PortletContext,
         request       : PortletRequest,
         response      : PortletResponse,
-        val httpClient: HttpClientImpl)
+        val httpClient: HttpClient)
     extends EmbeddingContext {
 
     private val session = request.getPortletSession(true) ensuring (_ ne null)
@@ -48,7 +48,7 @@ class PortletEmbeddingContextWithResponse(
         context   : PortletContext,
         request   : PortletRequest,
         response  : MimeResponse,
-        httpClient: HttpClientImpl)
+        httpClient: HttpClient)
     extends PortletEmbeddingContext(
         context,
         request,

@@ -13,8 +13,12 @@
  */
 package org.orbeon.oxf.http
 
+import java.io.InputStream
+
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.ScalaUtils._
+
+import scala.collection.immutable.Seq
 
 case class HttpClientSettings(
     staleCheckingEnabled: Boolean,
@@ -107,4 +111,25 @@ object Credentials {
             ! (nonEmptyOrNone(preemptiveAuth) exists (_ == "false")),
             nonEmptyOrNone(domain)
         )
+}
+
+trait HttpResponse {
+    def statusCode  : Int
+    def inputStream : InputStream
+    def headers     : Map[String, Seq[String]]
+    def contentType : Option[String]
+    def disconnect(): Unit
+}
+
+trait HttpClient {
+    def connect(
+        url        : String,
+        credentials: Option[Credentials],
+        cookieStore: org.apache.http.client.CookieStore,
+        method     : String,
+        headers    : Map[String, Seq[String]],
+        content    : ⇒ Array[Byte]
+    ): HttpResponse
+
+    def shutdown(): Unit
 }

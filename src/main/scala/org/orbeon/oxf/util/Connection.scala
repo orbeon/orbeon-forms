@@ -25,7 +25,7 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.http.{Credentials, HTTPURLConnection}
+import org.orbeon.oxf.http.{Credentials, ApacheHttpUrlConnection}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils
@@ -91,20 +91,20 @@ class Connection(
                 // Any method with http: or https:
 
                 // Create URL connection object
-                val httpURLConnection = connectionURL.openConnection.asInstanceOf[HTTPURLConnection]
+                val httpUrlConnection = connectionURL.openConnection.asInstanceOf[ApacheHttpUrlConnection]
 
                 // Configure HTTPURLConnection
-                httpURLConnection.setDoOutput(requestBody.isDefined)
+                httpUrlConnection.setDoOutput(requestBody.isDefined)
 
                 cookieStoreOpt = cookieStoreOpt orElse Some(new BasicCookieStore)
                 cookieStoreOpt foreach
-                        httpURLConnection.setCookieStore
+                    httpUrlConnection.setCookieStore
 
-                httpURLConnection.setRequestMethod(httpMethod)
-                httpURLConnection.setCredentials(credentials)
+                httpUrlConnection.setRequestMethod(httpMethod)
+                httpUrlConnection.setCredentials(credentials)
 
                 // Set headers on connection
-                val capitalizedHeaders = setHeaders(headers, httpURLConnection)
+                val capitalizedHeaders = setHeaders(headers, httpUrlConnection)
 
                 // Set request body if any
                 requestBody foreach { messageBody ⇒
@@ -114,7 +114,7 @@ class Connection(
                         logRequestBody(logger, contentType, messageBody)
                     }
 
-                    httpURLConnection.setRequestBody(messageBody)
+                    httpUrlConnection.setRequestBody(messageBody)
                 }
 
                 ifDebug {
@@ -142,22 +142,22 @@ class Connection(
                 }
 
                 // Connect
-                httpURLConnection.connect()
+                httpUrlConnection.connect()
 
                 // Create result
                 val connectionResult = new ConnectionResult(connectionURL.toExternalForm) {
                     override def close(): Unit = {
                         super.close()
-                        httpURLConnection.disconnect()
+                        httpUrlConnection.disconnect()
                     }
                 }
 
                 // Get response information
-                connectionResult.statusCode = httpURLConnection.getResponseCode
-                connectionResult.responseHeaders = httpURLConnection.getHeaderFields
-                connectionResult.setLastModified(httpURLConnection)
-                connectionResult.setResponseContentType(httpURLConnection.getContentType, "application/xml")
-                connectionResult.setResponseInputStream(httpURLConnection.getInputStream)
+                connectionResult.statusCode = httpUrlConnection.getResponseCode
+                connectionResult.responseHeaders = httpUrlConnection.getHeaderFields
+                connectionResult.setLastModified(httpUrlConnection)
+                connectionResult.setResponseContentType(httpUrlConnection.getContentType, "application/xml")
+                connectionResult.setResponseInputStream(httpUrlConnection.getInputStream)
 
                 ifDebug {
                     connectionResult.logResponseDetailsIfNeeded(logger, Level.DEBUG, "")

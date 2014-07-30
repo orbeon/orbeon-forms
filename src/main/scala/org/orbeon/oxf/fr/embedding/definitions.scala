@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.{InputStream, OutputStream, Writer}
-import java.net.HttpURLConnection
+import java.io.{OutputStream, Writer}
 
-import org.orbeon.oxf.http.HttpClientImpl
+import org.orbeon.oxf.http.HttpClient
+import org.orbeon.oxf.util.ScalaUtils.combineValues
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable
 
 sealed trait  Action              { val name: String }
@@ -46,44 +45,38 @@ case class RequestDetails(
     url    : String,
     headers: immutable.Seq[(String, String)],
     params : immutable.Seq[(String, String)]
-)
+) {
+    def contentAsBytes =
+        content map { content ⇒
+            content.body match {
+                case Left(string) ⇒ string.getBytes("utf-8")
+                case Right(bytes) ⇒ bytes
+            }
+        }
+    
+    def contentType =
+        content flatMap (_.contentType)
+    
+    def contentTypeHeader =
+        contentType map ("Content-Type" →)
+
+    def headersMapWithContentType =
+        combineValues[String, String, List](headers).toMap ++ (contentType map ("Content-Type" → List(_)))
+}
 
 trait EmbeddingContext {
     def namespace                                       : String
     def getSessionAttribute(name: String)               : AnyRef
     def setSessionAttribute(name: String, value: AnyRef): Unit
     def removeSessionAttribute(name: String)            : Unit
-    def log(message: String)                            : Unit  // consider removing
-    def httpClient                                      : HttpClientImpl
+    def log(message: String)                            : Unit  // consider removing and log via SLF4J
+    def httpClient                                      : HttpClient
 }
 
 trait EmbeddingContextWithResponse extends EmbeddingContext{
     def writer                                : Writer
-    def outputStream                          : OutputStream    // for binary resources only
+    def outputStream                          : OutputStream
     def setHeader(name: String, value: String): Unit
     def setStatusCode(code: Int)              : Unit
     def decodeURL(encoded: String)            : String
-}
-
-case class HttpURLConnectionResponse(cx: HttpURLConnection) extends HttpResponse {
-    def statusCode  = cx.getResponseCode
-    def headers     = cx.getHeaderFields.asScala.toMap map { case (name, values) ⇒ name → (values.asScala mkString ",") }
-    def inputStream = cx.getInputStream
-    def contentType = cx.getContentType
-}
-
-trait HttpResponse {
-    def statusCode : Int
-    def headers    : immutable.Map[String, String]
-    def inputStream: InputStream
-    def contentType: String
-}
-
-trait HttpClient {
-    def openConnection(
-        url         : String,
-        content     : Option[(Option[String], OutputStream ⇒ Unit)],
-        headers     : immutable.Iterable[(String, String)])(
-        implicit ctx: EmbeddingContext
-    ): HttpResponse
 }

@@ -13,31 +13,46 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.IOException
-import java.net._
+import java.io.{InputStream, IOException}
+import java.net.{CookieStore ⇒ _, _}
 import java.security.KeyStore
 
-import jcifs.ntlmssp.{Type3Message, Type2Message, Type1Message}
+import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
 import jcifs.util.Base64
 import org.apache.http.auth._
-import org.apache.http.client.CredentialsProvider
+import org.apache.http.client.{CookieStore, CredentialsProvider}
+import org.apache.http.client.methods._
 import org.apache.http.client.protocol.{ClientContext, RequestAcceptEncoding, ResponseContentEncoding}
 import org.apache.http.conn.routing.{HttpRoute, HttpRoutePlanner}
 import org.apache.http.conn.scheme.{PlainSocketFactory, Scheme, SchemeRegistry}
 import org.apache.http.conn.ssl.SSLSocketFactory
-import org.apache.http.impl.auth.{NTLMEngineException, NTLMEngine, BasicScheme, NTLMScheme}
+import org.apache.http.entity.ByteArrayEntity
+import org.apache.http.impl.auth.{BasicScheme, NTLMEngine, NTLMEngineException, NTLMScheme}
 import org.apache.http.impl.client.{BasicCredentialsProvider, DefaultHttpClient}
 import org.apache.http.impl.conn.PoolingClientConnectionManager
 import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
-import org.apache.http.protocol.{ExecutionContext, BasicHttpContext, HttpContext}
+import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
+import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
+import org.orbeon.oxf.util.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 
-class HttpClientImpl(settings: HttpClientSettings) {
+import scala.collection.immutable.Seq
+
+class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
     import Private._
 
-    def newHttpClient(credentials: Option[Credentials], host: String, port: Int) = {
+    def connect(
+        url        : String,
+        credentials: Option[Credentials],
+        cookieStore: CookieStore,
+        method     : String,
+        headers    : Map[String, Seq[String]],
+        content    : ⇒ Array[Byte]
+    ): HttpResponse = {
+
+        val uri = URI.create(url)
 
         val httpClient  = new DefaultHttpClient(connectionManager, newHttpParams)
         val httpContext = new BasicHttpContext
@@ -67,23 +82,95 @@ class HttpClientImpl(settings: HttpClientSettings) {
             httpContext.setAttribute(ClientContext.CREDS_PROVIDER, credentialsProvider)
 
             credentialsProvider.setCredentials(
-                new AuthScope(host, port),
+                new AuthScope(uri.getHost, uri.getPort),
                 actualCredentials match {
                     case Credentials(username, passwordOpt, _, None) ⇒
                         new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
                     case Credentials(username, passwordOpt, _, Some(domain)) ⇒
-                        new NTCredentials(username, passwordOpt getOrElse "", host, domain)
+                        new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
                 }
             )
         }
 
-        (httpClient, httpContext)
+        httpClient.setCookieStore(cookieStore)
+
+        val requestMethod =
+            method.toLowerCase match {
+                case "get"     ⇒ new HttpGet(uri)
+                case "post"    ⇒ new HttpPost(uri)
+                case "head"    ⇒ new HttpHead(uri)
+                case "options" ⇒ new HttpOptions(uri)
+                case "put"     ⇒ new HttpPut(uri)
+                case "delete"  ⇒ new HttpDelete(uri)
+                case "trace"   ⇒ new HttpTrace(uri)
+                case _         ⇒ throw new ProtocolException(s"Method $method is not supported")
+            }
+
+        val skipAuthorizationHeader = credentials.isDefined
+
+        // Set all headers
+        for {
+            (name, values) ← headers
+            value          ← values
+            // Skip over Authorization header if user authentication specified
+            if ! (skipAuthorizationHeader && name.toLowerCase == "authorization")
+        } locally {
+            requestMethod.addHeader(name, value)
+        }
+
+        requestMethod match {
+            case enclosingRequest: HttpEntityEnclosingRequest ⇒
+
+                val contentTypeHeader = requestMethod.getFirstHeader("Content-Type") // getFirstHeader is case-insensitive
+                if (contentTypeHeader == null)
+                    throw new ProtocolException("Can't set request entity: Content-Type header is missing")
+
+                val byteArrayEntity = new ByteArrayEntity(content)
+                byteArrayEntity.setContentType(contentTypeHeader)
+                enclosingRequest.setEntity(byteArrayEntity)
+
+            case _ ⇒
+        }
+
+        val response = httpClient.execute(requestMethod, httpContext)
+
+        new HttpResponse {
+
+            lazy val statusCode =
+                response.getStatusLine.getStatusCode
+
+            lazy val inputStream =
+                Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream
+
+            // NOTE: We capitalize common headers properly as we know how to do this. It's up to the caller to handle
+            // querying the map properly with regard to case.
+            lazy val headers =
+                combineValues[String, String, List](
+                    for (header ← response.getAllHeaders)
+                    yield Headers.capitalizeCommonOrSplitHeader(header.getName) → header.getValue
+                ) toMap
+
+            lazy val contentType =
+                for {
+                    entity ← Option(response.getEntity)
+                    header ← Option(entity.getContentType)
+                    value  ← Option(header.getValue)
+                } yield
+                    value
+
+            def disconnect() =
+                EntityUtils.consume(response.getEntity)
+        }
     }
 
     def shutdown() = connectionManager.shutdown()
     def usingProxy = proxyHost.isDefined
 
     private object Private {
+
+        object EmptyInputStream extends InputStream {
+            def read = -1
+        }
 
         // BasicHttpParams is not thread-safe per the doc
         def newHttpParams =
@@ -237,6 +324,5 @@ class HttpClientImpl(settings: HttpClientSettings) {
                 Base64.encode(t3m.toByteArray)
             }
         }
-
     }
 }

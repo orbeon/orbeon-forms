@@ -15,7 +15,7 @@ package org.orbeon.oxf.http
 
 import org.orbeon.oxf.properties.Properties
 
-object PropertiesHttpClientImpl extends HttpClientImpl(PropertiesConnectionSettings.apply)
+object PropertiesApacheHttpClient extends ApacheHttpClient(PropertiesConnectionSettings.apply)
 
 object PropertiesConnectionSettings {
 

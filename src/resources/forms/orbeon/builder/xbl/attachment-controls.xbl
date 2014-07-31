@@ -33,7 +33,7 @@
         <display-name lang="ru" todo="true">Attachments</display-name>
         <display-name lang="it">Allegati</display-name>
         <display-name lang="de">Anhänge</display-name>
-        <display-name lang="sv" todo="true">Attachments</display-name>
+        <display-name lang="sv">Bilagor</display-name>
         <display-name lang="nl">Bijlagen</display-name>
         <display-name lang="pt">Anexos</display-name>
     </metadata>
@@ -49,6 +49,7 @@
             <display-name lang="it">Immagine</display-name>
             <display-name lang="nl">Afbeelding</display-name>
             <display-name lang="pt">Imagem</display-name>
+            <display-name lang="sv">Bild</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/photo.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>

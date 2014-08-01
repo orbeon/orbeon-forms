@@ -22,7 +22,6 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.util.Try
 import org.orbeon.oxf.fr.FormRunnerPermissions._
-import org.orbeon.oxf.fr.persistence.db.Config
 
 private object HttpRequest {
 
@@ -50,7 +49,7 @@ private object HttpRequest {
             val credentialHeaders = credentials.map(c ⇒ Seq(
                 OrbeonUsernameHeaderName → Array(c.username),
                 OrbeonGroupHeaderName    → Array(c.group),
-                OrbeonRolesHeaderName    → Array(c.roles.mkString(" "))
+                OrbeonRolesHeaderName    → Array(c.roles.mkString(","))// split on commas as for other HTTP headers
             )).toSeq.flatten
             val myHeaders = Seq(contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
             Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))

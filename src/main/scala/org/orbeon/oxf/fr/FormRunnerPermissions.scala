@@ -210,7 +210,10 @@ trait FormRunnerPermissions {
 
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest
-        request.getHeaderValuesMap.asScala.getOrElse(OrbeonRolesHeaderName, Array.empty[String]) toSet
+        // Split header values on commas, in case the incoming header was not processed, see:
+        // https://github.com/orbeon/orbeon-forms/issues/1690
+        request.getHeaderValuesMap.asScala.getOrElse(OrbeonRolesHeaderName, Array.empty[String]) flatMap
+            (ScalaUtils.split[Array](_, ",")) toSet
     }
 
     def orbeonRolesSequence: SequenceIterator =

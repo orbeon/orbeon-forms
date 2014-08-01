@@ -145,10 +145,10 @@ trait FormRunnerActions {
     }
 
     def trySuccessMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.successMessage(messageFromResourceOrParam(params).get))
+        Try(FormRunner.successMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.errorMessage(messageFromResourceOrParam(params).get))
+        Try(FormRunner.errorMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
 
     def tryConfirm(params: ActionParams): Try[Any] =
         Try {

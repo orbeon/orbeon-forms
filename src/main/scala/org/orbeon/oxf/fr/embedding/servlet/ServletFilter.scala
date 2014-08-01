@@ -25,20 +25,12 @@ import org.orbeon.oxf.util.NetUtils
 
 import scala.collection.JavaConverters._
 
-private case class FilterSettings(
-        servletContext: ServletContext,
-        formRunnerURL : String,
-        orbeonPrefix  : String,
-        httpClient    : HttpClient) {
-    val OrbeonResourceRegex = s"$orbeonPrefix/([^/]+)(/.+)".r
-}
-
 class ServletEmbeddingContext(
-        val namespace : String,
-        req           : HttpServletRequest,
-        logFunction   : String ⇒ Unit,
-        val httpClient: HttpClient)
-    extends EmbeddingContext {
+    val namespace : String,
+    req           : HttpServletRequest,
+    logFunction   : String ⇒ Unit,
+    val httpClient: HttpClient
+) extends EmbeddingContext {
 
     private val session = req.getSession(true)
 
@@ -49,15 +41,18 @@ class ServletEmbeddingContext(
 }
 
 class ServletEmbeddingContextWithResponse(
-        req         : HttpServletRequest,
-        logFunction : String ⇒ Unit,
-        out         : Writer Either HttpServletResponse,
-        namespace   : String,
-        orbeonPrefix: String,
-        httpClient  : HttpClient)
-    extends ServletEmbeddingContext(
-        namespace, req, logFunction, httpClient)
-    with EmbeddingContextWithResponse {
+    req         : HttpServletRequest,
+    logFunction : String ⇒ Unit,
+    out         : Writer Either HttpServletResponse,
+    namespace   : String,
+    orbeonPrefix: String,
+    httpClient  : HttpClient
+) extends ServletEmbeddingContext(
+    namespace,
+    req,
+    logFunction,
+    httpClient
+) with EmbeddingContextWithResponse {
 
     def writer                                 = out.fold(identity, _.getWriter)
     def outputStream                           = out.fold(_ ⇒ throw new IllegalStateException, _.getOutputStream)
@@ -78,14 +73,12 @@ class ServletEmbeddingContextWithResponse(
 
 class ServletFilter extends Filter {
 
-    import ServletFilter._
-
-    private var settingsOpt: Option[FilterSettings] = None
+    private var settingsOpt: Option[EmbeddingSettings] = None
 
     def init(config: FilterConfig): Unit =
         settingsOpt =
             Some(
-                FilterSettings(
+                EmbeddingSettings(
                     servletContext = config.getServletContext,
                     formRunnerURL  = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
                     orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon",
@@ -99,24 +92,20 @@ class ServletFilter extends Filter {
     }
 
     def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
-        settingsOpt foreach { case settings @ FilterSettings(servletCtx, frURL, orbeonPrefix, httpClient) ⇒
+        settingsOpt foreach { case settings @ EmbeddingSettings(servletCtx, frURL, orbeonPrefix, httpClient) ⇒
 
             val httpReq = req.asInstanceOf[HttpServletRequest]
             val httpRes = res.asInstanceOf[HttpServletResponse]
 
-            httpReq.setAttribute(SettingsKey, settings)
-                
-            NetUtils.getRequestPathInfo(httpReq) match {
-                case settings.OrbeonResourceRegex(namespace, resourcePath) ⇒
-                    // Request is for an Orbeon resource or Ajax call that we need to proxy
-                    servlet.API.proxyServletResources(servletCtx, httpReq, httpRes, namespace, resourcePath)
-                case _ ⇒
-                    // Not an Orbeon resource
-                    chain.doFilter(httpReq, httpRes)
+            APISupport.scopeSettings(httpReq, settings) {
+                NetUtils.getRequestPathInfo(httpReq) match {
+                    case settings.OrbeonResourceRegex(namespace, resourcePath) ⇒
+                        // Request is for an Orbeon resource or Ajax call that we need to proxy
+                        APISupport.proxyServletResources(servletCtx, httpReq, httpRes, namespace, resourcePath)
+                    case _ ⇒
+                        // Not an Orbeon resource
+                        chain.doFilter(httpReq, httpRes)
+                }
             }
         }
-}
-
-private object ServletFilter {
-    val SettingsKey = "orbeon-form-runner-filter-settings"
 }

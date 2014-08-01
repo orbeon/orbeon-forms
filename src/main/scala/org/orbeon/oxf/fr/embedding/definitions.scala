@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.{OutputStream, Writer}
+import javax.servlet.ServletContext
 
 import org.orbeon.oxf.http.HttpClient
 import org.orbeon.oxf.util.ScalaUtils.combineValues
@@ -79,4 +80,13 @@ trait EmbeddingContextWithResponse extends EmbeddingContext{
     def setHeader(name: String, value: String): Unit
     def setStatusCode(code: Int)              : Unit
     def decodeURL(encoded: String)            : String
+}
+
+private case class EmbeddingSettings(
+    servletContext: ServletContext,
+    formRunnerURL : String,
+    orbeonPrefix  : String,
+    httpClient    : HttpClient
+) {
+    val OrbeonResourceRegex = s"$orbeonPrefix/([^/]+)(/.+)".r
 }

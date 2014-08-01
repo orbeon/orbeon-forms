@@ -15,11 +15,16 @@ package org.orbeon.oxf.fr.embedding
 
 import java.io.{ByteArrayInputStream, InputStream, Writer}
 import java.{util ⇒ ju}
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.ServletContext
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import org.apache.commons.io.IOUtils
+import org.apache.http.client.CookieStore
+import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.util.Headers._
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
@@ -29,15 +34,18 @@ import scala.collection.immutable
 
 object APISupport {
 
+    import Private._
+
     val AllActions       = List(New, Edit, View)
     val AllActionsByName = AllActions map (a ⇒ a.name → a) toMap
-
+    
     def proxyPage(
-            baseURL     : String,
-            path        : String,
-            headers     : immutable.Seq[(String, String)] = Nil,
-            params      : immutable.Seq[(String, String)] = Nil)(
-            implicit ctx: EmbeddingContextWithResponse): Unit = {
+        baseURL     : String,
+        path        : String,
+        headers     : immutable.Seq[(String, String)] = Nil,
+        params      : immutable.Seq[(String, String)] = Nil)(
+        implicit ctx: EmbeddingContextWithResponse
+    ): Unit = {
 
         val url  = formRunnerURL(baseURL, path, embeddable = true)
 
@@ -48,6 +56,55 @@ object APISupport {
                 throw new UnsupportedOperationException
         }
     }
+    
+    def proxyServletResources(
+        servletCtx  : ServletContext,
+        req         : HttpServletRequest,
+        res         : HttpServletResponse,
+        namespace   : String,
+        resourcePath: String
+    ): Unit =
+        withSettings(servletCtx, req, res.getWriter) { settings ⇒
+
+            implicit val ctx = new ServletEmbeddingContextWithResponse(
+                req,
+                servletCtx.log,
+                Right(res),
+                namespace,
+                settings.orbeonPrefix,
+                settings.httpClient
+            )
+
+            def contentFromRequest =
+                req.getMethod == "POST" option {
+
+                    val body =
+                        if (XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(req.getContentType)))
+                            Left(IOUtils.toString(req.getInputStream, Option(req.getCharacterEncoding) getOrElse "utf-8"))
+                        else
+                            Right(IOUtils.toByteArray(req.getInputStream))
+
+                    Content(body, Option(req.getContentType), None)
+                }
+
+            // Filter out client cookie headers. We clearly don't want JSESSIONID. If cookie forwarding is needed, this
+            // should be seen as a separate configurable feature.
+            val RequestHeadersToRemove = Set("cookie", "cookie2")
+
+            val requestHeaders =
+                proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true) filterNot {
+                    case (name, _) ⇒ RequestHeadersToRemove(name.toLowerCase)
+                }
+
+            APISupport.proxyResource(
+                RequestDetails(
+                    content  = contentFromRequest,
+                    url      = APISupport.formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false),
+                    headers  = requestHeaders.to[List],
+                    params   = Nil
+                )
+            )
+        }
 
     def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
 
@@ -98,29 +155,11 @@ object APISupport {
         }
     }
 
-    // POST when we get ClientDataRequest for:
-    //
-    // - actions requests
-    // - resources requests: Ajax requests, form posts, and uploads
-    //
-    // GET otherwise for:
-    //
-    // - render requests
-    // - resources: typically image, CSS, JavaScript, etc.
-    def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
-        ctx.httpClient.connect(
-            url         = recombineQuery(requestDetails.url, requestDetails.params),
-            credentials = None,
-            cookieStore = CookieManager.getOrCreateCookieStore,
-            method      = if (requestDetails.content.isEmpty) "GET" else "POST",
-            headers     = requestDetails.headersMapWithContentType + ("Orbeon-Client" → List("portlet")),
-            content     = requestDetails.contentAsBytes.get
-        )
-
     def writeResponseBody(
-            data        : String Either InputStream,
-            contentType : Option[String])(
-            implicit ctx: EmbeddingContextWithResponse): Unit =
+        data        : String Either InputStream,
+        contentType : Option[String])(
+        implicit ctx: EmbeddingContextWithResponse
+    ): Unit =
         contentType map getContentTypeMediaType match {
             case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
                 // Text/JSON/XML content type: rewrite response content
@@ -156,46 +195,109 @@ object APISupport {
                 }
         }
 
-    // Parse a string containing WSRP encodings and encode the URLs and namespaces
-    def decodeWSRPContent(content: String, ns: String, decodeURL: String ⇒ String, writer: Writer): Unit = {
-
-        val stringLength = content.length
-        var currentIndex = 0
-        var index        = 0
-
-        import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
-
-        while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
-
-            // Write up to the current mark
-            writer.write(content, currentIndex, index - currentIndex)
-
-            // Check if escaping is requested
-            if (index + BaseTagLength * 2 <= stringLength &&
-                    content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
-                // Write escaped tag, update index and keep looking
-                writer.write(BaseTag)
-                currentIndex = index + BaseTagLength * 2
-            } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '?') {
-                // URL encoding
-                // Find the matching end mark
-                val endIndex = content.indexOf(EndTag, index)
-                if (endIndex == -1)
-                    throw new OXFException("Missing end tag for WSRP encoded URL.")
-                val encodedURL = content.substring(index + StartTagLength, endIndex)
-                currentIndex = endIndex + EndTagLength
-
-                writer.write(decodeURL(encodedURL))
-            } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '_') {
-                // Namespace encoding
-                writer.write(ns)
-                currentIndex = index + PrefixTagLength
-            } else
-                throw new OXFException("Invalid WSRP rewrite tagging.")
+    def scopeSettings[T](req: HttpServletRequest, settings: EmbeddingSettings)(body: ⇒ T): T = {
+        req.setAttribute(SettingsKey, settings)
+        try body
+        finally req.removeAttribute(SettingsKey)
+    }
+    
+    def withSettings[T](servletCtx: ServletContext, req: HttpServletRequest, writer: ⇒ Writer)(body: EmbeddingSettings ⇒ T): Unit =
+        Option(req.getAttribute(SettingsKey).asInstanceOf[EmbeddingSettings]) match {
+            case Some(settings) ⇒
+                body(settings)
+            case None ⇒
+                val msg = "ERROR: Orbeon Forms embedding filter is not configured."
+                servletCtx.log(msg)
+                writer.write(msg)
         }
 
-        // Write remainder of string
-        if (currentIndex < stringLength)
-            writer.write(content, currentIndex, content.length - currentIndex)
+    def nextNamespace(req: HttpServletRequest) = {
+
+        val newValue =
+            Option(req.getAttribute(LastNamespaceIndexKey).asInstanceOf[Integer]) match {
+                case Some(value) ⇒ value + 1
+                case None        ⇒ 0
+            }
+
+        req.setAttribute(LastNamespaceIndexKey, newValue)
+
+        NamespacePrefix + newValue
+    }
+
+    private object Private {
+
+        val SettingsKey           = "orbeon.form-runner.filter-settings"
+        val RemoteSessionIdKey    = "orbeon.form-runner.remote-session-id"
+        val LastNamespaceIndexKey = "orbeon.form-runner.last-namespace-index"
+        val NamespacePrefix       = "o"
+
+        // POST when we get RequestDetails for:
+        //
+        // - actions requests
+        // - resources requests: Ajax requests, form posts, and uploads
+        //
+        // GET otherwise for:
+        //
+        // - render requests
+        // - resources: typically image, CSS, JavaScript, etc.
+        def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
+            ctx.httpClient.connect(
+                url         = recombineQuery(requestDetails.url, requestDetails.params),
+                credentials = None,
+                cookieStore = getOrCreateCookieStore,
+                method      = if (requestDetails.content.isEmpty) "GET" else "POST",
+                headers     = requestDetails.headersMapWithContentType + ("Orbeon-Client" → List("portlet")),
+                content     = requestDetails.contentAsBytes.get
+            )
+
+        // Parse a string containing WSRP encodings and encode the URLs and namespaces
+        def decodeWSRPContent(content: String, ns: String, decodeURL: String ⇒ String, writer: Writer): Unit = {
+
+            val stringLength = content.length
+            var currentIndex = 0
+            var index        = 0
+
+            import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
+
+            while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
+
+                // Write up to the current mark
+                writer.write(content, currentIndex, index - currentIndex)
+
+                // Check if escaping is requested
+                if (index + BaseTagLength * 2 <= stringLength &&
+                        content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
+                    // Write escaped tag, update index and keep looking
+                    writer.write(BaseTag)
+                    currentIndex = index + BaseTagLength * 2
+                } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '?') {
+                    // URL encoding
+                    // Find the matching end mark
+                    val endIndex = content.indexOf(EndTag, index)
+                    if (endIndex == -1)
+                        throw new OXFException("Missing end tag for WSRP encoded URL.")
+                    val encodedURL = content.substring(index + StartTagLength, endIndex)
+                    currentIndex = endIndex + EndTagLength
+
+                    writer.write(decodeURL(encodedURL))
+                } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '_') {
+                    // Namespace encoding
+                    writer.write(ns)
+                    currentIndex = index + PrefixTagLength
+                } else
+                    throw new OXFException("Invalid WSRP rewrite tagging.")
+            }
+
+            // Write remainder of string
+            if (currentIndex < stringLength)
+                writer.write(content, currentIndex, content.length - currentIndex)
+        }
+
+        def getOrCreateCookieStore(implicit ctx: EmbeddingContext) =
+            Option(ctx.getSessionAttribute(RemoteSessionIdKey).asInstanceOf[CookieStore]) getOrElse {
+                val newCookieStore = new BasicCookieStore
+                ctx.setSessionAttribute(RemoteSessionIdKey, newCookieStore)
+                newCookieStore
+            }
     }
 }

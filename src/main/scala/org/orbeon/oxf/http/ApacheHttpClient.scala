@@ -219,11 +219,14 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             val trustStore =
                 (settings.sslKeystoreURI, settings.sslKeystorePassword) match {
                     case (Some(keyStoreURI), Some(keyStorePassword)) ⇒
-                        val url = new URL(null, keyStoreURI)
-                        val is = url.openStream
-                        val result = KeyStore.getInstance(KeyStore.getDefaultType)
-                        result.load(is, keyStorePassword.toCharArray)
-                        Some(result → keyStorePassword)
+
+                        val keyStore =
+                            useAndClose(new URL(keyStoreURI).openStream) { is ⇒ // URL is typically local (file:, etc.)
+                                KeyStore.getInstance(KeyStore.getDefaultType) |!>
+                                    (_.load(is, keyStorePassword.toCharArray))
+                            }
+
+                        Some(keyStore → keyStorePassword)
                     case _ ⇒
                         None
                 }
@@ -292,7 +295,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             new HttpRoutePlanner {
                 def determineRoute(target: HttpHost, request: HttpRequest, context: HttpContext) =
                     proxyExclude match {
-                        case Some(proxyExclude) if target != null && target.getHostName.matches(proxyExclude) ⇒
+                        case Some(proxyExclude) if (target ne null) && target.getHostName.matches(proxyExclude) ⇒
                             new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName))
                         case _ ⇒
                             new HttpRoute(target, null, proxyHost, "https".equalsIgnoreCase(target.getSchemeName))
@@ -309,17 +312,17 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         object PreemptiveAuthHttpRequestInterceptor extends HttpRequestInterceptor {
             def process(request: HttpRequest, context: HttpContext) {
 
-                val authState = context.getAttribute(ClientContext.TARGET_AUTH_STATE).asInstanceOf[AuthState]
+                val authState           = context.getAttribute(ClientContext.TARGET_AUTH_STATE).asInstanceOf[AuthState]
                 val credentialsProvider = context.getAttribute(ClientContext.CREDS_PROVIDER).asInstanceOf[CredentialsProvider]
-                val targetHost = context.getAttribute(ExecutionContext.HTTP_TARGET_HOST).asInstanceOf[HttpHost]
+                val targetHost          = context.getAttribute(ExecutionContext.HTTP_TARGET_HOST).asInstanceOf[HttpHost]
 
                 // If not auth scheme has been initialized yet
-                if (authState.getAuthScheme == null) {
+                if (authState.getAuthScheme eq null) {
                     val authScope = new AuthScope(targetHost.getHostName, targetHost.getPort)
                     // Obtain credentials matching the target host
                     val credentials = credentialsProvider.getCredentials(authScope)
                     // If found, generate preemptively
-                    if (credentials != null) {
+                    if (credentials ne null) {
                         authState.update(
                             if (credentials.isInstanceOf[NTCredentials]) new NTLMScheme(JCIFSEngine) else new BasicScheme,
                             credentials

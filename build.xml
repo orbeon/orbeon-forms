@@ -84,6 +84,9 @@
         <include name="msv-20081113-orbeon.jar"/>
 
         <include name="dom4j-1_6_1.jar"/>
+        <include name="slf4j-api-1.7.7.jar"/>
+        <include name="slf4j-log4j12-1.7.7.jar"/>
+        <include name="jcl-over-slf4j-1.7.7.jar"/>
         <include name="log4j-1_2_15.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
         <include name="saxpath-dev_orbeon.jar"/>
@@ -150,8 +153,6 @@
         <include name="exist-dependency-resolver-1.2.jar"/>
 
         <include name="ehcache-core-2.6.3.jar"/>
-        <include name="ehcache-dependency-slf4j-api-1.6.1.jar"/>
-        <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
 
         <include name="scala-library-2.10.3.jar"/>
         <include name="sbinary_2.10-0.4.1.jar"/>

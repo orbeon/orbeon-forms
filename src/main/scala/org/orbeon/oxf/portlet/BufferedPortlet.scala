@@ -40,7 +40,6 @@ class PortletEmbeddingContext(
     def getSessionAttribute(name: String)                = session.getAttribute(name)
     def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
     def removeSessionAttribute(name: String)             = session.removeAttribute(name)
-    def log(message: String)                             = context.log(message)
 }
 
 class PortletEmbeddingContextWithResponse(

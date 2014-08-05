@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr.embedding
 
 import java.io.{InputStream, Writer}
 import java.{util ⇒ ju}
-import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import org.apache.commons.io.IOUtils
@@ -28,6 +27,7 @@ import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
@@ -35,6 +35,8 @@ import scala.collection.immutable
 object APISupport {
 
     import Private._
+
+    private val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
 
     val AllActions       = List(New, Edit, View)
     val AllActionsByName = AllActions map (a ⇒ a.name → a) toMap
@@ -58,24 +60,24 @@ object APISupport {
     }
     
     def proxyServletResources(
-        servletCtx  : ServletContext,
         req         : HttpServletRequest,
         res         : HttpServletResponse,
         namespace   : String,
         resourcePath: String
     ): Unit =
-        withSettings(servletCtx, req, res.getWriter) { settings ⇒
+        withSettings(req, res.getWriter) { settings ⇒
 
             implicit val ctx = new ServletEmbeddingContextWithResponse(
                 req,
-                servletCtx.log,
                 Right(res),
                 namespace,
                 settings.orbeonPrefix,
                 settings.httpClient
             )
 
-            def contentFromRequest =
+            val url = formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false)
+
+            val contentFromRequest =
                 req.getMethod == "POST" option
                     StreamedContent(
                         req.getInputStream,
@@ -87,7 +89,7 @@ object APISupport {
             proxyResource(
                 RequestDetails(
                     content  = contentFromRequest,
-                    url      = formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false),
+                    url      = url,
                     headers  = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
                     params   = Nil
                 )
@@ -95,6 +97,8 @@ object APISupport {
         }
 
     def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
+
+        Logger.debug("proxying resource {}", requestDetails.url)
 
         val res = connectURL(requestDetails)
         
@@ -134,6 +138,9 @@ object APISupport {
 
     // Call the Orbeon service at the other end
     def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): StreamedContentOrRedirect = {
+
+        Logger.debug("proxying page {}", requestDetails.url)
+
         val cx = connectURL(requestDetails)
         if (isRedirectCode(cx.statusCode))
             Redirect(cx.headers("Location").head, exitPortal = true)
@@ -187,13 +194,13 @@ object APISupport {
         finally req.removeAttribute(SettingsKey)
     }
     
-    def withSettings[T](servletCtx: ServletContext, req: HttpServletRequest, writer: ⇒ Writer)(body: EmbeddingSettings ⇒ T): Unit =
+    def withSettings[T](req: HttpServletRequest, writer: ⇒ Writer)(body: EmbeddingSettings ⇒ T): Unit =
         Option(req.getAttribute(SettingsKey).asInstanceOf[EmbeddingSettings]) match {
             case Some(settings) ⇒
                 body(settings)
             case None ⇒
                 val msg = "ERROR: Orbeon Forms embedding filter is not configured."
-                servletCtx.log(msg)
+                Logger.error(msg)
                 writer.write(msg)
         }
 

@@ -36,20 +36,17 @@
         </div>
 
         <div class="container">
-
             <%
                 API.embedFormJava(
-                        getServletConfig().getServletContext(),
-                        request,
-                        out,
-                        "orbeon",
-                        request.getParameter("form") != null ? request.getParameter("form") : "bookshelf",
-                        "new",
-                        null,
-                        null
+                    request,
+                    out,
+                    "orbeon",
+                    request.getParameter("form") != null ? request.getParameter("form") : "bookshelf",
+                    "new",
+                    null,
+                    null
                 );
             %>
-
         </div>
     </body>
 </html>

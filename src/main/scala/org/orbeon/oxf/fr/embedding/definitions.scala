@@ -47,7 +47,6 @@ trait EmbeddingContext {
     def getSessionAttribute(name: String)               : AnyRef
     def setSessionAttribute(name: String, value: AnyRef): Unit
     def removeSessionAttribute(name: String)            : Unit
-    def log(message: String)                            : Unit  // consider removing and log via SLF4J
     def httpClient                                      : HttpClient
 }
 
@@ -60,7 +59,6 @@ trait EmbeddingContextWithResponse extends EmbeddingContext{
 }
 
 private case class EmbeddingSettings(
-    servletContext: ServletContext,
     formRunnerURL : String,
     orbeonPrefix  : String,
     httpClient    : HttpClient

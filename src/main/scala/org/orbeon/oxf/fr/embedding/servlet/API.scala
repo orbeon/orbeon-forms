@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
-import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.fr.embedding.APISupport._
@@ -24,16 +23,14 @@ object API {
 
     // Embed an Orbeon Forms page by path
     def embedPageJava(
-        servletCtx: ServletContext,
         req       : HttpServletRequest,
         writer    : Writer,
         path      : String
      ): Unit =
-        withSettings(servletCtx, req, writer) { settings ⇒
+        withSettings(req, writer) { settings ⇒
 
             implicit val ctx = new ServletEmbeddingContextWithResponse(
                 req,
-                servletCtx.log,
                 Left(writer),
                 nextNamespace(req),
                 settings.orbeonPrefix,
@@ -45,7 +42,6 @@ object API {
 
     // Embed a Form Runner form
     def embedFormJava(
-        servletCtx: ServletContext,
         req       : HttpServletRequest,
         writer    : Writer,
         app       : String,
@@ -55,7 +51,6 @@ object API {
         query     : String
      ): Unit =
         embedPageJava(
-            servletCtx,
             req,
             writer,
             formRunnerPath(app, form, action, Option(documentId), Option(query))
@@ -63,16 +58,14 @@ object API {
 
     // Embed an Orbeon Forms page by path
     def embedPage(
-        servletCtx: ServletContext,
         req       : HttpServletRequest,
         out       : Writer Either HttpServletResponse,
         path      : String
      ): Unit =
-        withSettings(servletCtx, req, out.fold(identity, _.getWriter)) { settings ⇒
+        withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
 
             implicit val ctx = new ServletEmbeddingContextWithResponse(
                 req,
-                servletCtx.log,
                 out,
                 nextNamespace(req),
                 settings.orbeonPrefix,
@@ -84,7 +77,6 @@ object API {
 
     // Embed a Form Runner form
     def embedForm(
-        servletCtx: ServletContext,
         req       : HttpServletRequest,
         out       : Writer Either HttpServletResponse,
         app       : String,
@@ -94,7 +86,6 @@ object API {
         query     : Option[String]
     ): Unit =
         embedPage(
-            servletCtx,
             req,
             out,
             formRunnerPath(app, form, action.name, documentId, query)

@@ -100,7 +100,6 @@
         <include name="commons-fileupload-1.2.2.jar"/>
         <include name="commons-io-2.0.1.jar"/>
         <include name="commons-lang3-3.1.jar"/>
-        <include name="commons-logging-1.1.1.jar"/>
         <include name="commons-pool-1.6.jar"/>
         <include name="commons-validator-1.4.0.jar"/>
         <include name="joda-time-2.1.jar"/> <!--We don't include joda-convert-1.2.jar; it is only a compile-time dependency for Scala -->
@@ -419,13 +418,14 @@
             -injars      lib/httpclient-cache-4.2.3.jar
             -injars      lib/httpcore-4.2.2.jar
             -injars      lib/httpmime-4.2.3.jar
-            -injars      lib/commons-logging-1.1.1.jar
+            -injars      lib/jcl-over-slf4j-1.7.7.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
             <!-- -outjars     build/lib/check-resources.jar -->
 
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
+            -libraryjars lib/slf4j-api-1.7.7.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
@@ -471,13 +471,14 @@
             -injars      lib/httpclient-cache-4.2.3.jar
             -injars      lib/httpcore-4.2.2.jar
             -injars      lib/httpmime-4.2.3.jar
-            -injars      lib/commons-logging-1.1.1.jar
+            -injars      lib/jcl-over-slf4j-1.7.7.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
 
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
             -libraryjars lib/portlet-api_2.0.jar
+            -libraryjars lib/slf4j-api-1.7.7.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
@@ -715,19 +716,25 @@
     <target name="proxy-portlet-war" depends="proxy-portlet-jar" description="Create proxy portlet WAR">
     	<mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
-            <webinf dir="descriptors/proxy-portlet"/>
+            <webinf dir="descriptors/proxy-portlet/WEB-INF"/>
             <lib dir="${build.lib.dir}">
                 <include name="orbeon-proxy-portlet.jar"/>
+            </lib>
+            <lib dir="lib">
+                <include name="slf4j-api-1.7.7.jar"/>
             </lib>
         </war>
     </target>
 
     <target name="embedding-war" depends="embedding-jar" description="Create embedding WAR">
     	<mkdir dir="${build.distrib.dir}"/>
-        <war destfile="${build.distrib.dir}/${project.name}-${release.number}-embedding.war"
-             webxml="descriptors/embedding/web.xml">
+        <war destfile="${build.distrib.dir}/${project.name}-${release.number}-embedding.war">
+            <webinf dir="descriptors/embedding/WEB-INF"/>
             <lib dir="${build.lib.dir}">
                 <include name="orbeon-embedding.jar"/>
+            </lib>
+            <lib dir="lib">
+                <include name="slf4j-api-1.7.7.jar"/>
             </lib>
             <zipfileset dir="descriptors/embedding" prefix="">
                 <include name="*.jsp"/>

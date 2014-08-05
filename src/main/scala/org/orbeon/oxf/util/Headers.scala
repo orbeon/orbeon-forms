@@ -18,12 +18,13 @@ import collection.breakOut
 object Headers {
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
-    // Q: Why request content-length? In case we modify request content?
-    // 2014-07-28: We are not able to properly proxy directly a content-encoded response, so we don't proxy the relevant
-    // headers.
-    private val HeadersToRemove = Set("connection")
-    val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "content-length", "cookie", "cookie2", "accept-encoding")
-    val ResponseHeadersToRemove = HeadersToRemove ++ List("transfer-encoding", "set-cookie", "content-encoding")
+    //
+    // - Don't proxy Content-Length. Proxies must associate Content-Length with the content and propagate via other
+    //   means.
+    // - We are not able to properly proxy directly a content-encoded response, so we don't proxy the relevant headers.
+    private val HeadersToRemove = Set("connection", "transfer-encoding", "content-length")
+    val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "cookie", "cookie2", "accept-encoding")
+    val ResponseHeadersToRemove = HeadersToRemove ++ List("set-cookie", "set-cookie2", "content-encoding")
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
     // Q: Doesn't Scala already have such a type?
@@ -87,6 +88,7 @@ object Headers {
         "Content-Security-Policy",
         "Content-Type",
         "Cookie",
+        "Cookie2",
         "DNT",
         "Date",
         "ETag",
@@ -118,6 +120,7 @@ object Headers {
         "Retry-After",
         "Server",
         "Set-Cookie",
+        "Set-Cookie2",
         "SOAPAction",
         "Status",
         "Strict-Transport-Security",

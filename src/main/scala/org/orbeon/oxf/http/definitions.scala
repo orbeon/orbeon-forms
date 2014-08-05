@@ -13,16 +13,58 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 
+import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.immutable.Seq
 
+trait Content {
+    def inputStream  : InputStream
+    def contentType  : Option[String]
+    def contentLength: Option[Long]
+    def title        : Option[String]
+}
+
+sealed trait StreamedContentOrRedirect
+sealed trait BufferedContentOrRedirect
+
+case class StreamedContent(
+    inputStream  : InputStream,
+    contentType  : Option[String],
+    contentLength: Option[Long],
+    title        : Option[String]
+) extends StreamedContentOrRedirect with Content {
+    def close() = runQuietly(inputStream.close())
+}
+
+case class BufferedContent(
+    body         : Array[Byte],
+    contentType  : Option[String],
+    title        : Option[String]
+) extends BufferedContentOrRedirect with Content {
+    def inputStream   = new ByteArrayInputStream(body)
+    def contentLength = Some(body.size)
+}
+
+object BufferedContent {
+    def apply(content: StreamedContent): BufferedContent
+        = BufferedContent(useAndClose(content.inputStream)(IOUtils.toByteArray), content.contentType, content.title)
+}
+
+case class Redirect(
+    location   : String,
+    exitPortal : Boolean = false
+) extends StreamedContentOrRedirect with BufferedContentOrRedirect {
+    require(location ne null, "Missing redirect location")
+}
+
 case class HttpClientSettings(
     staleCheckingEnabled: Boolean,
     soTimeout           : Int,
+    chunkRequests       : Boolean,
 
     proxyHost           : Option[String],
     proxyPort           : Option[Int],
@@ -61,15 +103,16 @@ object HttpClientSettings {
         HttpClientSettings(
             staleCheckingEnabled = booleanParamWithDefault(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
             soTimeout            = intParamWithDefault(SOTimeoutProperty, SOTimeoutPropertyDefault),
+            chunkRequests        = booleanParamWithDefault(ChunkRequestsProperty, ChunkRequestsDefault),
 
             proxyHost            = stringParam(ProxyHostProperty),
             proxyPort            = intParam(ProxyPortProperty),
             proxyExclude         = stringParam(ProxyExcludeProperty),
-
+  
             sslHostnameVerifier  = stringParamWithDefault(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
             sslKeystoreURI       = stringParam(SSLKeystoreURIProperty),
             sslKeystorePassword  = stringParam(SSLKeystorePasswordProperty),
-
+  
             proxySSL             = booleanParamWithDefault(ProxySSLProperty, ProxySSLPropertyDefault),
             proxyUsername        = stringParam(ProxyUsernameProperty),
             proxyPassword        = stringParam(ProxyPasswordProperty),
@@ -80,6 +123,7 @@ object HttpClientSettings {
     
     val StaleCheckingEnabledProperty = "oxf.http.stale-checking-enabled"
     val SOTimeoutProperty            = "oxf.http.so-timeout"
+    val ChunkRequestsProperty        = "oxf.http.chunk-requests"
     val ProxyHostProperty            = "oxf.http.proxy.host"
     val ProxyPortProperty            = "oxf.http.proxy.port"
     val ProxyExcludeProperty         = "oxf.http.proxy.exclude"
@@ -94,6 +138,7 @@ object HttpClientSettings {
     
     val StaleCheckingEnabledDefault  = true
     val SOTimeoutPropertyDefault     = 0
+    val ChunkRequestsDefault         = false
     val ProxySSLPropertyDefault      = false
     val SSLHostnameVerifierDefault   = "strict"
 }
@@ -114,11 +159,13 @@ object Credentials {
 }
 
 trait HttpResponse {
-    def statusCode  : Int
-    def inputStream : InputStream
-    def headers     : Map[String, Seq[String]]
-    def contentType : Option[String]
-    def disconnect(): Unit
+    def statusCode   : Int
+    def inputStream  : InputStream
+    def headers      : Map[String, Seq[String]]
+    def contentType  : Option[String]
+    def contentLength: Option[Long]
+    def lastModified : Option[Long]
+    def disconnect() : Unit
 }
 
 trait HttpClient {
@@ -128,8 +175,12 @@ trait HttpClient {
         cookieStore: org.apache.http.client.CookieStore,
         method     : String,
         headers    : Map[String, Seq[String]],
-        content    : ⇒ Array[Byte]
+        content    : Option[StreamedContent]
     ): HttpResponse
 
     def shutdown(): Unit
+}
+
+object EmptyInputStream extends InputStream {
+    def read = -1
 }

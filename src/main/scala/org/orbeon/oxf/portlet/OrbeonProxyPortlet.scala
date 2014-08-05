@@ -16,16 +16,13 @@ package org.orbeon.oxf.portlet
 import javax.portlet._
 
 import com.liferay.portal.util.PortalUtil
-import org.apache.commons.io.IOUtils
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{HttpClient, ApacheHttpClient, HttpClientSettings}
+import org.orbeon.oxf.http.{StreamedContent, HttpClient, ApacheHttpClient, HttpClientSettings}
 import org.orbeon.oxf.portlet.liferay.LiferaySupport
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils.{withRootException ⇒ _, _}
-import org.orbeon.oxf.xml.XMLUtils
 
 import scala.collection.breakOut
 import scala.util.control.NonFatal
@@ -185,7 +182,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         )
     }
 
-    private def newRequestDetails(settings: PortletSettings, request: PortletRequest, content: Option[Content], url: String): RequestDetails = {
+    private def newRequestDetails(settings: PortletSettings, request: PortletRequest, content: Option[StreamedContent], url: String): RequestDetails = {
 
         def clientHeaders =
             findServletRequest(request).toList flatMap APISupport.requestHeaders
@@ -231,17 +228,17 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         )
     }
 
-    private def contentFromRequest(request: PortletRequest, namespace: String): Option[Content] =
+    private def contentFromRequest(request: PortletRequest, namespace: String): Option[StreamedContent] =
         request match {
             case clientDataRequest: ClientDataRequest if clientDataRequest.getMethod == "POST" ⇒
-                val body =
-                    if (XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(clientDataRequest.getContentType)))
-                        Left(IOUtils.toString(clientDataRequest.getPortletInputStream, Option(clientDataRequest.getCharacterEncoding) getOrElse "utf-8"))
-                    else
-                        // Just read without rewriting
-                        Right(IOUtils.toByteArray(clientDataRequest.getPortletInputStream))
-
-                Some(Content(body, Option(clientDataRequest.getContentType), None))
+                Some(
+                    StreamedContent(
+                        clientDataRequest.getPortletInputStream,
+                        Option(clientDataRequest.getContentType),
+                        Some(clientDataRequest.getContentLength.toLong) filter (_ >= 0),
+                        None
+                    )
+                )
             case _ ⇒
                 None
         }

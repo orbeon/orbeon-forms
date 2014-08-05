@@ -52,6 +52,7 @@
     <property as="xs:string"  name="oxf.http.forward-cookies"                        value="JSESSIONID JSESSIONIDSSO"/> <!-- forward JSESSIONIDSSO for JBoss -->
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>
     <property as="xs:integer" name="oxf.http.so-timeout"                             value="0"/>
+    <property as="xs:boolean" name="oxf.http.chunk-requests"                         value="false"/>
 
     <property as="xs:string"  name="oxf.http.ssl.hostname-verifier"                  value="strict"/>
     <property as="xs:anyURI"  name="oxf.http.ssl.keystore.uri"                       value=""/>

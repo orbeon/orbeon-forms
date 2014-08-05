@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.util
 
+import java.io.ByteArrayInputStream
+
 import ScalaUtils._
 import Headers._
 import org.apache.http.impl.client.BasicCookieStore
 import collection.JavaConverters._
-import java.net.{URI, URLConnection, URL}
+import java.net.{URI, URL}
 import java.util.{Map ⇒ JMap}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
@@ -25,7 +27,7 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.http.{Credentials, ApacheHttpUrlConnection}
+import org.orbeon.oxf.http.{StreamedContent, PropertiesApacheHttpClient, Credentials}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils
@@ -47,7 +49,7 @@ class Connection(
         httpMethod: String,
         connectionURL: URL,
         credentials: Option[Credentials],
-        requestBody: Option[Array[Byte]],
+        requestBody: Option[Array[Byte]],// TODO: Option[InputStream]
         headers: collection.Map[String, Array[String]],
         logBody: Boolean)(implicit logger: IndentedLogger)
     extends ConnectionState with Logging {
@@ -72,7 +74,8 @@ class Connection(
                 val connectionResult = new ConnectionResult(connectionURL.toExternalForm)
 
                 connectionResult.statusCode = 200
-                connectionResult.responseHeaders = urlConnection.getHeaderFields
+                connectionResult.responseHeaders = urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+
                 connectionResult.setLastModified(urlConnection)
                 connectionResult.setResponseContentType(urlConnection.getContentType, "application/xml")
                 connectionResult.setResponseInputStream(urlConnection.getInputStream)
@@ -90,32 +93,45 @@ class Connection(
             } else if (isHTTPOrHTTPS(scheme)) {
                 // Any method with http: or https:
 
-                // Create URL connection object
-                val httpUrlConnection = connectionURL.openConnection.asInstanceOf[ApacheHttpUrlConnection]
+                val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
 
-                // Configure HTTPURLConnection
-                httpUrlConnection.setDoOutput(requestBody.isDefined)
+                cookieStoreOpt = Some(cookieStore)
 
-                cookieStoreOpt = cookieStoreOpt orElse Some(new BasicCookieStore)
-                cookieStoreOpt foreach
-                    httpUrlConnection.setCookieStore
+                val cleanHeaders = {
 
-                httpUrlConnection.setRequestMethod(httpMethod)
-                httpUrlConnection.setCredentials(credentials)
+                    // Gather all headers nicely capitalized
+                    val capitalizedHeaders =
+                        for {
+                            (name, values) ← headers.toList
+                            if values ne null
+                            value ← values
+                            if value ne null
+                        } yield
+                            capitalizeCommonOrSplitHeader(name) → value
 
-                // Set headers on connection
-                val capitalizedHeaders = setHeaders(headers, httpUrlConnection)
-
-                // Set request body if any
-                requestBody foreach { messageBody ⇒
-
-                    if (logBody) {
-                        val contentType = headers.get("content-type") flatMap (_.lift(0)) getOrElse "application/octet-stream"
-                        logRequestBody(logger, contentType, messageBody)
-                    }
-
-                    httpUrlConnection.setRequestBody(messageBody)
+                    combineValues[String, String, List](capitalizedHeaders).toMap
                 }
+
+                val content = requestBody map { bytes ⇒
+
+                    val contentType = cleanHeaders.get("Content-Type") flatMap (_.lastOption) getOrElse "application/octet-stream"
+
+                    if (logBody)
+                        logRequestBody(logger, contentType, bytes)
+
+                    StreamedContent(new ByteArrayInputStream(bytes), Some(contentType), Some(bytes.size.toLong), None)
+                }
+
+                // Create URL connection object
+                val response =
+                    PropertiesApacheHttpClient.connect(
+                        connectionURL.toExternalForm,
+                        credentials,
+                        cookieStore,
+                        httpMethod,
+                        cleanHeaders,
+                        content
+                    )
 
                 ifDebug {
 
@@ -135,29 +151,30 @@ class Connection(
                             connectionURL.getPort,
                             connectionURL.getPath,
                             connectionURL.getQuery,
-                            connectionURL.getRef)
+                            connectionURL.getRef
+                        )
 
                     debug("opening URL connection",
-                        Seq("method" → httpMethod, "URL" → connectionURI.toString) ++ capitalizedHeaders)
+                        Seq(
+                            "method" → httpMethod,
+                            "URL"    → connectionURI.toString
+                        ) ++ (cleanHeaders mapValues (_ mkString ",")))
                 }
-
-                // Connect
-                httpUrlConnection.connect()
 
                 // Create result
                 val connectionResult = new ConnectionResult(connectionURL.toExternalForm) {
                     override def close(): Unit = {
                         super.close()
-                        httpUrlConnection.disconnect()
+                        response.disconnect()
                     }
                 }
 
                 // Get response information
-                connectionResult.statusCode = httpUrlConnection.getResponseCode
-                connectionResult.responseHeaders = httpUrlConnection.getHeaderFields
-                connectionResult.setLastModified(httpUrlConnection)
-                connectionResult.setResponseContentType(httpUrlConnection.getContentType, "application/xml")
-                connectionResult.setResponseInputStream(httpUrlConnection.getInputStream)
+                connectionResult.statusCode = response.statusCode
+                connectionResult.responseHeaders = response.headers
+                connectionResult.setLastModified(response)
+                connectionResult.setResponseContentType(response.contentType.orNull, "application/xml")
+                connectionResult.setResponseInputStream(response.inputStream)
 
                 ifDebug {
                     connectionResult.logResponseDetailsIfNeeded(logger, Level.DEBUG, "")
@@ -614,26 +631,6 @@ object Connection extends Logging {
         newHeaders
     }
 
-    private def setHeaders(headers: collection.Map[String, Array[String]], urlConnection: URLConnection) = {
-
-        // Gather all headers nicely capitalized
-        val capitalizedHeaders =
-            for {
-                (name, values) ← headers.toList
-                if values ne null
-                value ← values
-                if value ne null
-            } yield
-                capitalizeCommonOrSplitHeader(name) → value
-
-        // Set headers on connection
-        capitalizedHeaders foreach {
-            case (name, value) ⇒ urlConnection.addRequestProperty(name, value)
-        }
-
-        capitalizedHeaders
-    }
-    
     def logRequestBody(logger: IndentedLogger, mediatype: String, messageBody: Array[Byte]): Unit =
         if (XMLUtils.isXMLMediatype(mediatype) ||
             XMLUtils.isTextOrJSONContentType(mediatype) ||

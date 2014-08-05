@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.{InputStream, IOException}
+import java.io.IOException
 import java.net.{CookieStore ⇒ _, _}
 import java.security.KeyStore
 
 import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
 import jcifs.util.Base64
 import org.apache.http.auth._
-import org.apache.http.client.{CookieStore, CredentialsProvider}
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.{ClientContext, RequestAcceptEncoding, ResponseContentEncoding}
+import org.apache.http.client.{CookieStore, CredentialsProvider}
 import org.apache.http.conn.routing.{HttpRoute, HttpRoutePlanner}
 import org.apache.http.conn.scheme.{PlainSocketFactory, Scheme, SchemeRegistry}
 import org.apache.http.conn.ssl.SSLSocketFactory
-import org.apache.http.entity.ByteArrayEntity
+import org.apache.http.entity.{ContentType, InputStreamEntity}
 import org.apache.http.impl.auth.{BasicScheme, NTLMEngine, NTLMEngineException, NTLMScheme}
 import org.apache.http.impl.client.{BasicCredentialsProvider, DefaultHttpClient}
 import org.apache.http.impl.conn.PoolingClientConnectionManager
@@ -34,7 +34,7 @@ import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
-import org.orbeon.oxf.util.Headers
+import org.orbeon.oxf.util.{DateUtils, Headers}
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.immutable.Seq
@@ -49,7 +49,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         cookieStore: CookieStore,
         method     : String,
         headers    : Map[String, Seq[String]],
-        content    : ⇒ Array[Byte]
+        content    : Option[StreamedContent]
     ): HttpResponse = {
 
         val uri = URI.create(url)
@@ -119,15 +119,40 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         }
 
         requestMethod match {
-            case enclosingRequest: HttpEntityEnclosingRequest ⇒
+            case request: HttpEntityEnclosingRequest ⇒
 
-                val contentTypeHeader = requestMethod.getFirstHeader("Content-Type") // getFirstHeader is case-insensitive
-                if (contentTypeHeader == null)
-                    throw new ProtocolException("Can't set request entity: Content-Type header is missing")
+                def contentTypeFromContent =
+                    content flatMap (_.contentType)
 
-                val byteArrayEntity = new ByteArrayEntity(content)
-                byteArrayEntity.setContentType(contentTypeHeader)
-                enclosingRequest.setEntity(byteArrayEntity)
+                def contentTypeFromRequest = (
+                    headers
+                    collectFirst { case (key, values) if key.toLowerCase == "content-type" ⇒ values }
+                    flatMap (_.lastOption)
+                )
+
+                val contentTypeHeader = (
+                    contentTypeFromContent
+                    orElse contentTypeFromRequest
+                    getOrElse (throw new ProtocolException("Can't set request entity: Content-Type header is missing"))
+                )
+
+                val is =
+                    content map (_.inputStream) getOrElse
+                    (throw new IllegalArgumentException(s"No request content provided for method$method"))
+
+                val contentLength =
+                    content flatMap (_.contentLength) filter (_ >= 0L)
+
+                val inputStreamEntity =
+                    new InputStreamEntity(is, contentLength getOrElse -1L, ContentType.parse(contentTypeHeader))
+
+                // With HTTP 1.1, chunking is required if there is no Content-Length. But if the header is present, then
+                // chunking is optional. We support disabling this to work around a limitation with eXist when we
+                // write data from an XForms submission. In that case, we do pass a Content-Length, so we can disable
+                // chunking.
+                inputStreamEntity.setChunked(contentLength.isEmpty || settings.chunkRequests)
+
+                request.setEntity(inputStreamEntity)
 
             case _ ⇒
         }
@@ -158,6 +183,12 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
                 } yield
                     value
 
+            def contentLength =
+                headers.get("Content-Length") flatMap (_.lastOption) map (_.toLong) filter (_ >= 0L)
+
+            lazy val lastModified =
+                headers.get("Last-Modified") flatMap (_.lastOption) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
+
             def disconnect() =
                 EntityUtils.consume(response.getEntity)
         }
@@ -167,10 +198,6 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     def usingProxy = proxyHost.isDefined
 
     private object Private {
-
-        object EmptyInputStream extends InputStream {
-            def read = -1
-        }
 
         // BasicHttpParams is not thread-safe per the doc
         def newHttpParams =

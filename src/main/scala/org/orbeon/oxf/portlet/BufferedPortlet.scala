@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.portlet
 
-import java.io.ByteArrayInputStream
 import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.HttpClient
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.NetUtils
@@ -76,11 +75,11 @@ trait BufferedPortlet {
     def portletContext: PortletContext
 
     // Immutable response with parameters
-    case class ResponseWithParameters(response: ContentOrRedirect, parameters: Map[String, List[String]])
+    case class ResponseWithParameters(response: BufferedContentOrRedirect, parameters: Map[String, List[String]])
 
-    def bufferedRender(request: RenderRequest, response: RenderResponse, render: ⇒ ContentOrRedirect)(implicit ctx: EmbeddingContextWithResponse): Unit =
+    def bufferedRender(request: RenderRequest, response: RenderResponse, render: ⇒ StreamedContentOrRedirect)(implicit ctx: EmbeddingContextWithResponse): Unit =
         getStoredResponseWithParameters match {
-            case Some(ResponseWithParameters(content: Content, parameters)) if toScalaMap(request.getParameterMap) == parameters ⇒
+            case Some(ResponseWithParameters(content: BufferedContent, parameters)) if toScalaMap(request.getParameterMap) == parameters ⇒
                 // The result of an action with the current parameters is available
                 // NOTE: Until we can correctly handle multiple render requests for an XForms page, we should detect the
                 // situation where a second render request tries to load a deferred action response, and display an
@@ -93,12 +92,12 @@ trait BufferedPortlet {
                 // implement the redirect loop here. The issue would be what happens upon subsequent renders, as they
                 // would again request the first path, not the redirected path. For now we throw.
                 render match {
-                    case content: Content   ⇒ writeResponseWithParameters(request, response, content)
-                    case redirect: Redirect ⇒ throw new IllegalStateException("Processor execution did not return content.")
+                    case content: StreamedContent ⇒ useAndClose(content)(writeResponseWithParameters(request, response, _))
+                    case redirect: Redirect       ⇒ throw new IllegalStateException("Processor execution did not return content.")
                 }
         }
 
-    def bufferedProcessAction(request: ActionRequest, response: ActionResponse, action: ⇒ ContentOrRedirect)(implicit ctx: EmbeddingContext): Unit = {
+    def bufferedProcessAction(request: ActionRequest, response: ActionResponse, action: ⇒ StreamedContentOrRedirect)(implicit ctx: EmbeddingContext): Unit = {
         // Make sure the previously cached output is cleared, if there is any. We keep the result of only one action.
         clearResponseWithParameters()
 
@@ -120,32 +119,40 @@ trait BufferedPortlet {
                 // Set the new parameters for the subsequent render requests
                 response.setRenderParameters(parameters)
 
-            case content: Content ⇒
+            case content: StreamedContent ⇒
                 // Content was written, keep it in the session for subsequent render requests with the current action parameters
 
-                // NOTE: Don't use the action parameters, as in the case of a form POST there can be dozens of those
-                // or more, and anyway those don't make sense as subsequent render parameters. Instead, we just use
-                // the path and a method indicator. Later we should either indicate an error, or handle XForms Ajax
-                // updates properly.
-                val newRenderParameters = Map(
-                    PathParameter   → Array(request.getParameter(PathParameter)),
-                    MethodParameter → Array("post")
-                ).asJava
+                useAndClose(content) { _ ⇒
 
-                response.setRenderParameters(newRenderParameters)
+                    // NOTE: Don't use the action parameters, as in the case of a form POST there can be dozens of those
+                    // or more, and anyway those don't make sense as subsequent render parameters. Instead, we just use
+                    // the path and a method indicator. Later we should either indicate an error, or handle XForms Ajax
+                    // updates properly.
+                    val newRenderParameters = Map(
+                        PathParameter   → Array(request.getParameter(PathParameter)),
+                        MethodParameter → Array("post")
+                    ).asJava
 
-                // Store response
-                storeResponseWithParameters(ResponseWithParameters(content, toScalaMap(newRenderParameters)))
+                    response.setRenderParameters(newRenderParameters)
+
+                    // Store response
+                    storeResponseWithParameters(ResponseWithParameters(BufferedContent(content), toScalaMap(newRenderParameters)))
+                }
         }
     }
 
-    private def writeResponseWithParameters(request: RenderRequest, response: RenderResponse, contentResponse: Content)(implicit ctx: EmbeddingContextWithResponse): Unit = {
+    private def writeResponseWithParameters(
+        request        : RenderRequest,
+        response       : RenderResponse,
+        responseContent: Content)(
+        implicit ctx   : EmbeddingContextWithResponse
+    ): Unit = {
         // Set title and content type
-        contentResponse.title orElse Option(title(request)) foreach response.setTitle
-        contentResponse.contentType foreach response.setContentType
+        responseContent.title orElse Option(title(request)) foreach response.setTitle
+        responseContent.contentType foreach response.setContentType
 
         // Write response out directly
-        APISupport.writeResponseBody(contentResponse.body.right map (new ByteArrayInputStream(_)), contentResponse.contentType)
+        APISupport.writeResponseBody(Right(responseContent.inputStream), responseContent.contentType)
     }
 
     protected def getStoredResponseWithParameters(implicit ctx: EmbeddingContext) =

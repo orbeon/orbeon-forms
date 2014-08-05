@@ -13,24 +13,26 @@
  */
 package org.orbeon.oxf.fr
 
-import java.net.HttpURLConnection
 
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.pipeline.api.ExternalContext.{Response, Request}
+import javax.xml.transform.stream.StreamResult
+
+import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.http.{PropertiesApacheHttpClient, StreamedContent}
+import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.Headers._
-import collection.JavaConversions._
+import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.Headers._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.XML._
-import javax.xml.transform.stream.StreamResult
-import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.util.{XPath, URLRewriterUtils, NetUtils}
+
+import scala.collection.JavaConverters._
 
 /**
  * The persistence proxy processor:
@@ -62,7 +64,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             case DataCollectionPath(path, app, form)            ⇒ proxyRequest(request, response, app, form, "data", path)
             case SearchPath(path, app, form)                    ⇒ proxyRequest(request, response, app, form, "data", path)
             case PublishedFormsMetadataPath(path, app, _, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
-            case _ ⇒ throw new OXFException("Unsupported path: " + incomingPath)
+            case _ ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
         }
     }
 
@@ -74,62 +76,61 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
-        val connection = proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
-        useAndClose(connection.getInputStream) { is ⇒
+
+        val downstreamResponse =
+            proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
+
+        useAndClose(downstreamResponse.inputStream) { is ⇒
             // Proxy status code
-            response.setStatus(connection.getResponseCode)
+            response.setStatus(downstreamResponse.statusCode)
             // Proxy incoming headers
-            proxyCapitalizeAndCombineHeaders(connection.getHeaderFields, request = false) foreach (response.setHeader _).tupled
+            proxyCapitalizeAndCombineHeaders(downstreamResponse.headers, request = false) foreach (response.setHeader _).tupled
             copyStream(is, response.getOutputStream)
         }
     }
 
     private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]) = {
         // Create the absolute outgoing URL
-        val outgoingURL = {
-            val persistenceBaseAbsoluteURL = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
-            URLFactory.createURL(persistenceBaseAbsoluteURL)
-        }
+        val outgoingURL =
+            URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
 
-        def setPersistenceHeaders(connection: HttpURLConnection) {
+        val persistenceHeaders =
             for ((name, value) ← headers)
-                connection.setRequestProperty(capitalizeCommonOrSplitHeader(name), value)
-        }
+            yield capitalizeCommonOrSplitHeader(name) → List(value)
 
-        def proxyOutgoingHeaders(connection: HttpURLConnection) =
-            proxyCapitalizeAndCombineHeaders(request.getHeaderValuesMap, request = true) foreach (connection.setRequestProperty _).tupled
+        val proxiedHeaders =
+            proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala mapValues (_.toList), request = true)
 
-        if (! Set("GET", "DELETE", "PUT", "POST")(request.getMethod))
-            throw new OXFException("Unsupported method: " + request.getMethod)
+        val method = request.getMethod
 
-        // Prepare connection
-        val doOutput = Set("PUT", "POST")(request.getMethod)
-        val connection = outgoingURL.openConnection.asInstanceOf[HttpURLConnection]
+        if (! Set("GET", "DELETE", "PUT", "POST")(method))
+            throw new OXFException(s"Unsupported method: $method")
 
-        connection.setDoInput(true)
-        connection.setDoOutput(doOutput)
-        connection.setRequestMethod(request.getMethod)
+        val content =
+            Set("PUT", "POST")(method) option {
+                // Ask the request generator first, as the body might have been read already
+                // Q: Could this be handled automatically in ExternalContext?
+                val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
+                    case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
+                    case _               ⇒ request.getInputStream
+                }
 
-        setPersistenceHeaders(connection)
-        proxyOutgoingHeaders(connection)
-
-        // Write body if needed
-        // NOTE: HTTPURLConnection requires setting the body before calling connect()
-        if (doOutput) {
-            // Ask the request generator first, as the body might have been read already
-            // Q: Could this be handled automatically in ExternalContext?
-            val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
-                case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
-                case _               ⇒ request.getInputStream
+                StreamedContent(
+                    is,
+                    Option(request.getContentType),
+                    Some(request.getContentLength.toLong) filter (_ >= 0L),
+                    None
+                )
             }
 
-            // NOTE: This goes through our HttpURLConnection which requires writing to the OutputStream *before* calling
-            // .connect()! Should be changed so we can properly stream!
-            copyStream(is, connection.getOutputStream)
-        }
-
-        connection.connect()
-        connection
+        PropertiesApacheHttpClient.connect(
+            url         = outgoingURL,
+            credentials = None,
+            cookieStore = new BasicCookieStore,
+            method      = method,
+            headers     = persistenceHeaders ++ proxiedHeaders, // proxied headers win over persistence headers
+            content     = content
+        )
     }
 
     /**
@@ -164,8 +165,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
 
             // TODO: Handle connection.getResponseCode.
-            // CHECK: What if response has Content-Encoding: gzip? Does the HTTP client handle that for us?
-            useAndClose(proxyEstablishConnection(request, serviceURI, headers).getInputStream) { is ⇒
+            useAndClose(proxyEstablishConnection(request, serviceURI, headers).inputStream) { is ⇒
                 val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
                 forms \\ "forms" \\ "form"
             }

@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.ByteArrayOutputStream
+import java.io.{OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
 import java.net._
 
-import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.util.Headers
 import org.orbeon.oxf.util.ScalaUtils._
@@ -25,12 +24,12 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends HttpURLConnection(url) {
-    
-    private var _cookieStore: Option[CookieStore] = None
-    def setCookieStore(cookieStore: CookieStore) =
-        this._cookieStore = Option(cookieStore)
 
-    private var _method: Option[String] = None
+    private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
+
+    private var _method      : Option[String]                = None
+    private var _os          : Option[ByteArrayOutputStream] = None
+    private var _httpResponse: Option[HttpResponse]          = None
 
     override def setRequestMethod(methodName: String): Unit = {
 
@@ -40,18 +39,8 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
         _method = Some(methodName)
     }
 
-    private var _requestBody: Option[Array[Byte]] = None
-    def setRequestBody(requestBody: Array[Byte]): Unit =
-        this._requestBody = Option(requestBody)
-
-    private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
-
-    private var _credentials: Option[Credentials] = None
-    def setCredentials(credentials: Option[Credentials]) =
-        _credentials = credentials
-
-    private var _httpResponse   : Option[HttpResponse] = None
-    private var _os             : ByteArrayOutputStream = null
+    override def getOutputStream: OutputStream =
+        _os getOrElse { val os = new ByteArrayOutputStream; _os = Some(os); os }
 
     def connect(): Unit = {
         if (_httpResponse.isEmpty)
@@ -68,8 +57,8 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
                             else
                                 userInfo.substring(0, separatorPosition) → userInfo.substring(separatorPosition + 1)
 
-                        // If the username/password contain special character, those character will be encoded, since we
-                        // are getting this from a URL. Now do the decoding.
+                        // If the username/password contain special character, those characters will be encoded, since
+                        // we are getting this from a URL. Now do the decoding.
 
                         val usernameOpt = nonEmptyOrNone(username) map (URLDecoder.decode(_, "utf-8"))
                         val passwordOpt = nonEmptyOrNone(password) map (URLDecoder.decode(_, "utf-8"))
@@ -81,45 +70,35 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
                 }
 
                 val methodName = _method getOrElse "GET" toUpperCase
-
-                def produceContent = (
-                    _requestBody
-                    orElse    (Option(_os) map (_.toByteArray))
-                    getOrElse (throw new IllegalArgumentException(s"No request body set for method $methodName"))
-                )
+                val body       = _os map (_.toByteArray) map (new ByteArrayInputStream(_))
+                val bodyLength = _os map (_.size.toLong)
 
                 Some(
                     client.connect(
                         url         = url.toExternalForm,
-                        credentials = credentialsFromURL(url) orElse _credentials,
-                        cookieStore = _cookieStore getOrElse new BasicCookieStore,
+                        credentials = credentialsFromURL(url),
+                        cookieStore = new BasicCookieStore,
                         method      = methodName,
                         headers     = _requestHeaders mapValues (_.toList) toMap,
-                        content     = produceContent
+                        content     = body map (StreamedContent(_, Option(getRequestProperty("Content-Type")), bodyLength, None))
                     )
                 )
             }
     }
 
     override def setRequestProperty(key: String, value: String): Unit =
-        _requestHeaders.put(key, mutable.ListBuffer(value))
+        _requestHeaders.put(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer(value))
 
     override def addRequestProperty(key: String, value: String): Unit =
-        _requestHeaders.getOrElseUpdate(key, mutable.ListBuffer()) += value
+        _requestHeaders.getOrElseUpdate(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer()) += value
 
     // NOTE: No caller in our code
     override def getRequestProperty(key: String) =
-        _requestHeaders.get(key) flatMap (_.lastOption) orNull
+        _requestHeaders.get(Headers.capitalizeCommonOrSplitHeader(key)) flatMap (_.lastOption) orNull
 
     // NOTE: No caller in our code
     override def getRequestProperties =
         (_requestHeaders mapValues (_.asJava) toMap) asJava
-
-    override def getOutputStream = {
-        if (_os == null)
-            _os = new ByteArrayOutputStream
-        _os
-    }
 
     override def getInputStream =
         withConnection(_.inputStream)
@@ -129,11 +108,6 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
 
     override def getHeaderFields =
         withConnection(_.headers mapValues (_.asJava) asJava)
-
-    // Rarely used methods which we don't use and haven't implemented
-    override def usingProxy                = ???
-    override def getHeaderFieldKey(n: Int) = ???
-    override def getHeaderField(n: Int)    = ???
 
     override def getResponseCode =
         withConnection(_.statusCode)
@@ -153,4 +127,9 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
 
         body(_httpResponse.get)
     }
+
+    // Rarely used methods which we don't use and haven't implemented
+    override def usingProxy                = ???
+    override def getHeaderFieldKey(n: Int) = ???
+    override def getHeaderField(n: Int)    = ???
 }

@@ -28,6 +28,7 @@ object PropertiesConnectionSettings {
         HttpClientSettings(
             staleCheckingEnabled = props.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
             soTimeout            = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
+            chunkRequests        = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
 
             proxyHost            = Option(props.getString(ProxyHostProperty)),
             proxyPort            = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),

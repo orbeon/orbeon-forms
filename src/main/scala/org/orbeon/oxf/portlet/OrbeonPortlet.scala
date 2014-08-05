@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.portlet
 
-import java.io.ByteArrayInputStream
+import java.io.{InputStream, ByteArrayInputStream}
 
+import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.fr.embedding._
+import org.orbeon.oxf.http.{EmptyInputStream, StreamedContent, Redirect, StreamedContentOrRedirect}
 
 import collection.JavaConverters._
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
@@ -116,7 +118,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     }
 
     // Call the Orbeon Forms pipeline processor service
-    private def callService(context: AsyncContext): ContentOrRedirect = {
+    private def callService(context: AsyncContext): StreamedContentOrRedirect = {
         processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
         bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponse])
     }
@@ -130,22 +132,21 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
         // Write out the response
         val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]
         Option(directResponse.getContentType) foreach response.setContentType
-        APISupport.writeResponseBody(getResponseData(directResponse).right map (new ByteArrayInputStream(_)), Option(directResponse.getContentType))
+        APISupport.writeResponseBody(Right(new ByteArrayInputStream(directResponse.getBytes)), Option(directResponse.getContentType))
     }
 
-    private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): ContentOrRedirect =
+    private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): StreamedContentOrRedirect =
         if (bufferedResponse.isRedirect)
             Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
-        else
-            Content(getResponseData(bufferedResponse), Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
-
-    private def getResponseData(response: BufferedResponse) =
-        if (response.getStringBuilderWriter ne null)
-            Left(response.getStringBuilderWriter.toString)
-        else if (response.getByteStream ne null)
-            Right(response.getByteStream.toByteArray)
-        else
-            throw new IllegalStateException("Processor execution did not return content.")
+        else {
+            val bytes = bufferedResponse.getBytes
+            StreamedContent(
+                new ByteArrayInputStream(bytes),
+                Option(bufferedResponse.getContentType),
+                Some(bytes.size.toLong),
+                Option(bufferedResponse.getTitle)
+            )
+        }
 }
 
 object OrbeonPortlet {

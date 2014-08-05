@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.embedding
 import java.io.{OutputStream, Writer}
 import javax.servlet.ServletContext
 
-import org.orbeon.oxf.http.HttpClient
+import org.orbeon.oxf.http.{StreamedContent, HttpClient}
 import org.orbeon.oxf.util.ScalaUtils.combineValues
 
 import scala.collection.immutable
@@ -26,35 +26,12 @@ case   object New  extends Action { val name = "new" }
 case   object Edit extends Action { val name = "edit" }
 case   object View extends Action { val name = "view" }
 
-sealed trait ContentOrRedirect
-
-case class Content(
-    body       : String Either Array[Byte],
-    contentType: Option[String],
-    title      : Option[String]
-) extends ContentOrRedirect
-
-case class Redirect(
-    location   : String,
-    exitPortal : Boolean = false
-) extends ContentOrRedirect {
-    require(location ne null, "Missing Location header in redirect response")
-}
-
 case class RequestDetails(
-    content: Option[Content],
+    content: Option[StreamedContent],
     url    : String,
     headers: immutable.Seq[(String, String)],
     params : immutable.Seq[(String, String)]
 ) {
-    def contentAsBytes =
-        content map { content ⇒
-            content.body match {
-                case Left(string) ⇒ string.getBytes("utf-8")
-                case Right(bytes) ⇒ bytes
-            }
-        }
-    
     def contentType =
         content flatMap (_.contentType)
     

@@ -28,6 +28,7 @@ import java.net.URL
 import org.orbeon.oxf.xforms.XFormsProperties
 import java.io.InputStreamReader
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.collection.immutable
 import scala.util.control.NonFatal
 
 // Helper trait for xforms-submit-done/xforms-submit-error
@@ -51,7 +52,7 @@ private object SubmitResponseEvent {
     // response or if there were no headers. Each element has a local name of header with no namespace URI and
     // two child elements, name and value, whose string contents are the name and value of the header,
     // respectively."
-    def headersDocument(headersOpt: Option[Iterable[(String, List[String])]]): Option[DocumentInfo] =
+    def headersDocument(headersOpt: Option[Iterable[(String, immutable.Seq[String])]]): Option[DocumentInfo] =
         headersOpt filter (_.nonEmpty) map { headers ⇒
             val sb = new StringBuilder
             sb.append("<headers>")

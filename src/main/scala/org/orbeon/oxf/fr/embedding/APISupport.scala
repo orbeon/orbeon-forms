@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.{ByteArrayInputStream, InputStream, Writer}
+import java.io.{InputStream, Writer}
 import java.{util ⇒ ju}
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
@@ -23,8 +23,8 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
+import org.orbeon.oxf.http.{StreamedContent, Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.util.Headers._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
@@ -50,8 +50,8 @@ object APISupport {
         val url  = formRunnerURL(baseURL, path, embeddable = true)
 
         callService(RequestDetails(None, url, headers, params)) match {
-            case Content(content, contentType, _) ⇒
-                writeResponseBody(content.right map (new ByteArrayInputStream(_)), contentType)
+            case StreamedContent(is, contentType, _, _) ⇒
+                writeResponseBody(Right(is), contentType)
             case Redirect(_, _) ⇒
                 throw new UnsupportedOperationException
         }
@@ -76,31 +76,19 @@ object APISupport {
             )
 
             def contentFromRequest =
-                req.getMethod == "POST" option {
+                req.getMethod == "POST" option
+                    StreamedContent(
+                        req.getInputStream,
+                        Option(req.getContentType),
+                        Some(req.getContentLength.toLong) filter (_ >= 0L),
+                        None
+                    )
 
-                    val body =
-                        if (XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(req.getContentType)))
-                            Left(IOUtils.toString(req.getInputStream, Option(req.getCharacterEncoding) getOrElse "utf-8"))
-                        else
-                            Right(IOUtils.toByteArray(req.getInputStream))
-
-                    Content(body, Option(req.getContentType), None)
-                }
-
-            // Filter out client cookie headers. We clearly don't want JSESSIONID. If cookie forwarding is needed, this
-            // should be seen as a separate configurable feature.
-            val RequestHeadersToRemove = Set("cookie", "cookie2")
-
-            val requestHeaders =
-                proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true) filterNot {
-                    case (name, _) ⇒ RequestHeadersToRemove(name.toLowerCase)
-                }
-
-            APISupport.proxyResource(
+            proxyResource(
                 RequestDetails(
                     content  = contentFromRequest,
-                    url      = APISupport.formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false),
-                    headers  = requestHeaders.to[List],
+                    url      = formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false),
+                    headers  = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
                     params   = Nil
                 )
             )
@@ -145,14 +133,12 @@ object APISupport {
             originalName → value
 
     // Call the Orbeon service at the other end
-    def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): ContentOrRedirect = {
+    def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): StreamedContentOrRedirect = {
         val cx = connectURL(requestDetails)
-        useAndClose(cx.inputStream) { is ⇒
-            if (isRedirectCode(cx.statusCode))
-                Redirect(cx.headers("Location").head, exitPortal = true)
-            else
-                Content(Right(IOUtils.toByteArray(is)), cx.contentType, None)
-        }
+        if (isRedirectCode(cx.statusCode))
+            Redirect(cx.headers("Location").head, exitPortal = true)
+        else
+            StreamedContent(cx.inputStream, cx.contentType, cx.contentLength, None)
     }
 
     def writeResponseBody(
@@ -169,7 +155,7 @@ object APISupport {
                             string
                         case Right(is) ⇒
                             val encoding = contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
-                            IOUtils.toString(is, encoding)
+                            useAndClose(is)(IOUtils.toString(_, encoding))
                     }
 
                 val encodeForXML = XMLUtils.isXMLMediatype(mediatype)
@@ -191,7 +177,7 @@ object APISupport {
                     case Left(string) ⇒
                         ctx.writer.write(string)
                     case Right(is) ⇒
-                        IOUtils.copy(is, ctx.outputStream)
+                        useAndClose(is)(IOUtils.copy(_, ctx.outputStream))
                 }
         }
 
@@ -247,7 +233,7 @@ object APISupport {
                 cookieStore = getOrCreateCookieStore,
                 method      = if (requestDetails.content.isEmpty) "GET" else "POST",
                 headers     = requestDetails.headersMapWithContentType + ("Orbeon-Client" → List("portlet")),
-                content     = requestDetails.contentAsBytes.get
+                content     = requestDetails.content
             )
 
         // Parse a string containing WSRP encodings and encode the URLs and namespaces

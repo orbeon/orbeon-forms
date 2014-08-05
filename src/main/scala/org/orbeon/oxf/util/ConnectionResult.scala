@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.util
 
+import java.net.URLConnection
+
 import org.apache.log4j.Level
+import org.orbeon.oxf.http.HttpResponse
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.xml.{XMLUtils, XMLParsing}
 import java.io._
@@ -22,7 +25,8 @@ import scala.collection.JavaConverters._
 import ScalaUtils._
 import java.lang.{Long ⇒ JLong}
 import java.util.{Map ⇒ JMap, List ⇒ JList}
-import java.net.URLConnection
+
+import scala.collection.immutable
 
 class ConnectionResult(val resourceURI: String) extends Logging {
 
@@ -32,21 +36,18 @@ class ConnectionResult(val resourceURI: String) extends Logging {
     var statusCode: Int = 0
     def setStatusCodeJava(statusCode: Int) = this.statusCode = statusCode
 
-    private var _responseMediaType: Option[String] = None
-    private var _responseContentType: Option[String] = None
-    private var _originalResponseContentType: Option[String] = None
-    private var _lastModified: Option[Long] = None
+    private var _responseMediaType          : Option[String]      = None
+    private var _responseContentType        : Option[String]      = None
+    private var _originalResponseContentType: Option[String]      = None
+    private var _lastModified               : Option[Long]        = None
+    private var _responseInputStream        : Option[InputStream] = None
 
-    private var _responseHeaders: Iterable[(String, List[String])] = Iterable.empty
-
-    private var _didLogResponseDetails = false
-
-    private var _responseInputStream: Option[InputStream] = None
-    private var _hasContent = false
+    private var _responseHeaders            = Map.empty[String, immutable.Seq[String]]
+    private var _didLogResponseDetails      = false
+    private var _hasContent                 = false
 
     def getResponseInputStream = _responseInputStream.orNull
-
-    def hasContent = _hasContent
+    def hasContent             = _hasContent
 
     def setResponseInputStream(responseInputStream: InputStream): Unit = {
 
@@ -67,8 +68,8 @@ class ConnectionResult(val resourceURI: String) extends Logging {
     def jResponseHeaders: JMap[String, JList[String]] =
         responseHeaders.toMap.map{ case (k, v) ⇒ k → v.asJava }.asJava
 
-    def responseHeaders_= (headers: JMap[String, JList[String]]): Unit =
-        _responseHeaders = headers.asScala.toMap map { case (k, v) ⇒ k → v.asScala.to[List] }
+    def responseHeaders_= (headers: Map[String, immutable.Seq[String]]): Unit =
+        _responseHeaders = headers
 
     def setResponseContentType(responseContentType: String): Unit =
         setResponseContentType(responseContentType, null)
@@ -91,6 +92,9 @@ class ConnectionResult(val resourceURI: String) extends Logging {
         // Zero and negative values often have a special meaning, make sure to normalize here
         this._lastModified = if (connectionLastModified <= 0) None else Some(connectionLastModified)
     }
+
+    def setLastModified(response: HttpResponse) =
+        this._lastModified = response.lastModified
 
     def forwardResponseHeaders(response: ExternalContext.Response): Unit =
         for {

@@ -87,7 +87,7 @@
         <include name="slf4j-api-1.7.7.jar"/>
         <include name="slf4j-log4j12-1.7.7.jar"/>
         <include name="jcl-over-slf4j-1.7.7.jar"/>
-        <include name="log4j-1_2_15.jar"/>
+        <include name="log4j-1.2.17.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
         <include name="saxpath-dev_orbeon.jar"/>
 
@@ -723,7 +723,7 @@
             <lib dir="lib">
                 <include name="slf4j-api-1.7.7.jar"/>
                 <include name="slf4j-log4j12-1.7.7.jar"/>
-                <include name="log4j-1_2_15.jar"/>
+                <include name="log4j-1.2.17.jar"/>
             </lib>
         </war>
     </target>
@@ -786,7 +786,7 @@
                 <pathelement location="src/main/resources"/>
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
-                <pathelement location="lib/log4j-1_2_15.jar"/>
+                <pathelement location="lib/log4j-1.2.17.jar"/>
                 <pathelement location="lib/scala-library-2.10.3.jar"/>
                 <pathelement location="lib/orbeon-errorified-20130923.jar"/>
             </classpath>

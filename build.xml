@@ -931,6 +931,7 @@
                	<mkdir  dir="${test.exist-db.dir}"/>
 
                 <!-- Run tests -->
+                <junit fork="true" haltonerror="yes" haltonfailure="yes" printsummary="true" showoutput="yes" logfailedtests="yes">
                 <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed" logfailedtests="true">
                     <!-- Enable assertions -->
                     <jvmarg value="-ea"/>

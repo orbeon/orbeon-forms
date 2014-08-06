@@ -5,7 +5,8 @@
     <portlet>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
         <portlet-class>org.orbeon.oxf.portlet.OrbeonProxyPortlet</portlet-class>
-        <!-- Initialization parameters -->
+
+        <!-- Basic configuration -->
         <init-param>
             <name>form-runner-url</name>
             <value>http://localhost:8080/orbeon/</value>
@@ -33,6 +34,64 @@
         <init-param>
             <name>send-liferay-user</name>
             <value>false</value>
+        </init-param>
+
+        <!-- HTTP client configuration -->
+        <init-param>
+            <param-name>oxf.http.stale-checking-enabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.so-timeout</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.chunk-requests</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.host</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.port</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.exclude</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.hostname-verifier</param-name>
+            <param-value>strict</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.uri</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.password</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.use-ssl</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.username</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.password</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.ntlm.host</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.ntlm.domain</param-name>
+            <param-value/>
         </init-param>
         
         <supports>

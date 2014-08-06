@@ -3,6 +3,8 @@
     <filter>
         <filter-name>orbeon-form-runner-filter</filter-name>
         <filter-class>org.orbeon.oxf.fr.embedding.servlet.ServletFilter</filter-class>
+
+        <!-- Basic configuration -->
         <init-param>
             <param-name>form-runner-url</param-name>
             <param-value>http://localhost:8080/orbeon</param-value>
@@ -10,6 +12,64 @@
         <init-param>
             <param-name>orbeon-prefix</param-name>
             <param-value>/orbeon</param-value>
+        </init-param>
+
+        <!-- HTTP client configuration -->
+        <init-param>
+            <param-name>oxf.http.stale-checking-enabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.so-timeout</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.chunk-requests</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.host</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.port</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.exclude</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.hostname-verifier</param-name>
+            <param-value>strict</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.uri</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.password</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.use-ssl</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.username</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.password</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.ntlm.host</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.ntlm.domain</param-name>
+            <param-value/>
         </init-param>
     </filter>
     <!-- Any JSP resource is processed by the filter -->

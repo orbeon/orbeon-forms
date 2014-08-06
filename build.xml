@@ -722,6 +722,8 @@
             </lib>
             <lib dir="lib">
                 <include name="slf4j-api-1.7.7.jar"/>
+                <include name="slf4j-log4j12-1.7.7.jar"/>
+                <include name="log4j-1_2_15.jar"/>
             </lib>
         </war>
     </target>

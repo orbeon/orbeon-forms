@@ -160,11 +160,9 @@ object Credentials {
 
 trait HttpResponse {
     def statusCode   : Int
-    def inputStream  : InputStream
     def headers      : Map[String, Seq[String]]
-    def contentType  : Option[String]
-    def contentLength: Option[Long]
     def lastModified : Option[Long]
+    def content      : StreamedContent
     def disconnect() : Unit
 }
 

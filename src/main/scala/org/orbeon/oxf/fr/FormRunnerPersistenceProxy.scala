@@ -80,7 +80,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         val downstreamResponse =
             proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
 
-        useAndClose(downstreamResponse.inputStream) { is ⇒
+        useAndClose(downstreamResponse.content.inputStream) { is ⇒
             // Proxy status code
             response.setStatus(downstreamResponse.statusCode)
             // Proxy incoming headers
@@ -165,7 +165,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
 
             // TODO: Handle connection.getResponseCode.
-            useAndClose(proxyEstablishConnection(request, serviceURI, headers).inputStream) { is ⇒
+            useAndClose(proxyEstablishConnection(request, serviceURI, headers).content.inputStream) { is ⇒
                 val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
                 forms \\ "forms" \\ "form"
             }

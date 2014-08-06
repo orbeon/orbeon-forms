@@ -151,7 +151,7 @@ trait BufferedPortlet {
         responseContent.contentType foreach response.setContentType
 
         // Write response out directly
-        APISupport.writeResponseBody(Right(responseContent.inputStream), responseContent.contentType)
+        APISupport.writeResponseBody(responseContent)
     }
 
     protected def getStoredResponseWithParameters(implicit ctx: EmbeddingContext) =

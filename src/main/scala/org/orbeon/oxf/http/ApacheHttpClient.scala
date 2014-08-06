@@ -164,9 +164,6 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             lazy val statusCode =
                 response.getStatusLine.getStatusCode
 
-            lazy val inputStream =
-                Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream
-
             // NOTE: We capitalize common headers properly as we know how to do this. It's up to the caller to handle
             // querying the map properly with regard to case.
             lazy val headers =
@@ -175,19 +172,16 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
                     yield Headers.capitalizeCommonOrSplitHeader(header.getName) → header.getValue
                 ) toMap
 
-            lazy val contentType =
-                for {
-                    entity ← Option(response.getEntity)
-                    header ← Option(entity.getContentType)
-                    value  ← Option(header.getValue)
-                } yield
-                    value
-
-            def contentLength =
-                headers.get("Content-Length") flatMap (_.lastOption) map (_.toLong) filter (_ >= 0L)
-
             lazy val lastModified =
                 headers.get("Last-Modified") flatMap (_.lastOption) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
+
+            lazy val content =
+                StreamedContent(
+                    inputStream   = Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream,
+                    contentType   = headers.get("Content-Type") flatMap (_.lastOption),
+                    contentLength = headers.get("Content-Length") flatMap (_.lastOption) map (_.toLong) filter (_ >= 0L),
+                    title         = None
+                )
 
             def disconnect() =
                 EntityUtils.consume(response.getEntity)

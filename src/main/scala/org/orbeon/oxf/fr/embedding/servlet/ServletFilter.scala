@@ -57,13 +57,22 @@ class ServletEmbeddingContextWithResponse(
 
     def decodeURL(encoded: String) = {
 
-        def createResourceURL(resourceId: String) =
-            req.getContextPath + orbeonPrefix + '/' + namespace + resourceId
+        def namespaceResource(path: String) =
+            path == "/xforms-server" || path.endsWith(".css")
 
-        def createPortletURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
+        def createResourceURL(resourceId: String) =
+            req.getContextPath + orbeonPrefix + '/' + (if (namespaceResource(resourceId)) namespace else APISupport.NamespacePrefix) + resourceId
+
+        def path(navigationParameters: ju.Map[String, Array[String]]) =
             navigationParameters.asScala.getOrElse(WSRPURLRewriter.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
 
-        WSRPURLRewriter.decodeURL(encoded, createResourceURL, createPortletURL, createPortletURL)
+        def createActionURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
+            req.getContextPath + orbeonPrefix + '/' + path(navigationParameters)
+
+        def createRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
+            path(navigationParameters)
+
+        WSRPURLRewriter.decodeURL(encoded, createResourceURL, createActionURL, createRenderURL)
     }
 }
 

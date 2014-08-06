@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.portlet
 
-import java.io.{InputStream, ByteArrayInputStream}
+import java.io.ByteArrayInputStream
 
-import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{EmptyInputStream, StreamedContent, Redirect, StreamedContentOrRedirect}
+import org.orbeon.oxf.http._
 
 import collection.JavaConverters._
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
@@ -132,7 +131,13 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
         // Write out the response
         val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]
         Option(directResponse.getContentType) foreach response.setContentType
-        APISupport.writeResponseBody(Right(new ByteArrayInputStream(directResponse.getBytes)), Option(directResponse.getContentType))
+        APISupport.writeResponseBody(
+            BufferedContent(
+                directResponse.getBytes,
+                Option(directResponse.getContentType),
+                None
+            )
+        )
     }
 
     private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): StreamedContentOrRedirect =

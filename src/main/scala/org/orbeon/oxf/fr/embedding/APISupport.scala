@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.{InputStream, Writer}
+import java.io.Writer
 import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
@@ -22,7 +22,7 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
-import org.orbeon.oxf.http.{StreamedContent, Redirect, StreamedContentOrRedirect}
+import org.orbeon.oxf.http.{Content, StreamedContent, Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -52,8 +52,8 @@ object APISupport {
         val url  = formRunnerURL(baseURL, path, embeddable = true)
 
         callService(RequestDetails(None, url, headers, params)) match {
-            case StreamedContent(is, contentType, _, _) ⇒
-                writeResponseBody(Right(is), contentType)
+            case content: StreamedContent ⇒
+                useAndClose(content)(writeResponseBody)
             case Redirect(_, _) ⇒
                 throw new UnsupportedOperationException
         }
@@ -103,12 +103,11 @@ object APISupport {
         val res = connectURL(requestDetails)
         
         ctx.setStatusCode(res.statusCode)
+        res.content.contentType foreach (ctx.setHeader("Content-Type", _))
 
         proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
 
-        useAndClose(res.inputStream) { is ⇒
-            writeResponseBody(Right(is), res.contentType)
-        }
+        useAndClose(res.content)(writeResponseBody)
     }
 
     def formRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
@@ -145,27 +144,16 @@ object APISupport {
         if (isRedirectCode(cx.statusCode))
             Redirect(cx.headers("Location").head, exitPortal = true)
         else
-            StreamedContent(cx.inputStream, cx.contentType, cx.contentLength, None)
+            cx.content
     }
 
-    def writeResponseBody(
-        data        : String Either InputStream,
-        contentType : Option[String])(
-        implicit ctx: EmbeddingContextWithResponse
-    ): Unit =
-        contentType map getContentTypeMediaType match {
+    def writeResponseBody(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
+        content.contentType map getContentTypeMediaType match {
             case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
                 // Text/JSON/XML content type: rewrite response content
-                val contentAsString =
-                    data match {
-                        case Left(string) ⇒
-                            string
-                        case Right(is) ⇒
-                            val encoding = contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
-                            useAndClose(is)(IOUtils.toString(_, encoding))
-                    }
-
-                val encodeForXML = XMLUtils.isXMLMediatype(mediatype)
+                val encoding        = content.contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
+                val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
+                val encodeForXML    = XMLUtils.isXMLMediatype(mediatype)
 
                 def decodeURL(encoded: String) = {
                     val decodedURL = ctx.decodeURL(encoded)
@@ -180,12 +168,7 @@ object APISupport {
                 )
             case _ ⇒
                 // All other types: just output
-                data match {
-                    case Left(string) ⇒
-                        ctx.writer.write(string)
-                    case Right(is) ⇒
-                        useAndClose(is)(IOUtils.copy(_, ctx.outputStream))
-                }
+                useAndClose(content.inputStream)(IOUtils.copy(_, ctx.outputStream))
         }
 
     def scopeSettings[T](req: HttpServletRequest, settings: EmbeddingSettings)(body: ⇒ T): T = {
@@ -217,12 +200,13 @@ object APISupport {
         NamespacePrefix + newValue
     }
 
+    val NamespacePrefix = "o"
+
     private object Private {
 
         val SettingsKey           = "orbeon.form-runner.filter-settings"
         val RemoteSessionIdKey    = "orbeon.form-runner.remote-session-id"
         val LastNamespaceIndexKey = "orbeon.form-runner.last-namespace-index"
-        val NamespacePrefix       = "o"
 
         // POST when we get RequestDetails for:
         //

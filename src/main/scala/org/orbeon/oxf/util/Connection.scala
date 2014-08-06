@@ -173,8 +173,8 @@ class Connection(
                 connectionResult.statusCode = response.statusCode
                 connectionResult.responseHeaders = response.headers
                 connectionResult.setLastModified(response)
-                connectionResult.setResponseContentType(response.contentType.orNull, "application/xml")
-                connectionResult.setResponseInputStream(response.inputStream)
+                connectionResult.setResponseContentType(response.content.contentType.orNull, "application/xml")
+                connectionResult.setResponseInputStream(response.content.inputStream)
 
                 ifDebug {
                     connectionResult.logResponseDetailsIfNeeded(logger, Level.DEBUG, "")

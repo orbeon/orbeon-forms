@@ -14,10 +14,14 @@
 package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
+import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.fr.embedding.APISupport._
 import org.orbeon.oxf.fr.embedding.Action
+
+import scala.collection.JavaConverters._
+import scala.collection.immutable.Seq
 
 object API {
 
@@ -25,7 +29,8 @@ object API {
     def embedPageJava(
         req       : HttpServletRequest,
         writer    : Writer,
-        path      : String
+        path      : String,
+        headers   : ju.Map[String, String]
      ): Unit =
         withSettings(req, writer) { settings ⇒
 
@@ -37,7 +42,11 @@ object API {
                 settings.httpClient
             )
 
-            proxyPage(settings.formRunnerURL, path)
+            proxyPage(
+                settings.formRunnerURL,
+                path,
+                Option(headers) map (_.asScala.to[List]) getOrElse Nil
+            )
         }
 
     // Embed a Form Runner form
@@ -48,19 +57,22 @@ object API {
         form      : String,
         action    : String,
         documentId: String,
-        query     : String
+        query     : String,
+        headers   : ju.Map[String, String]
      ): Unit =
         embedPageJava(
             req,
             writer,
-            formRunnerPath(app, form, action, Option(documentId), Option(query))
+            formRunnerPath(app, form, action, Option(documentId), Option(query)),
+            headers
         )
 
     // Embed an Orbeon Forms page by path
     def embedPage(
         req       : HttpServletRequest,
         out       : Writer Either HttpServletResponse,
-        path      : String
+        path      : String,
+        headers   : Seq[(String, String)] = Nil
      ): Unit =
         withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
 
@@ -72,7 +84,7 @@ object API {
                 settings.httpClient
             )
 
-            proxyPage(settings.formRunnerURL, path)
+            proxyPage(settings.formRunnerURL, path, headers)
         }
 
     // Embed a Form Runner form
@@ -82,12 +94,14 @@ object API {
         app       : String,
         form      : String,
         action    : Action,
-        documentId: Option[String],
-        query     : Option[String]
+        documentId: Option[String] = None,
+        query     : Option[String] = None,
+        headers   : Seq[(String, String)] = Nil
     ): Unit =
         embedPage(
             req,
             out,
-            formRunnerPath(app, form, action.name, documentId, query)
+            formRunnerPath(app, form, action.name, documentId, query),
+            headers
         )
 }

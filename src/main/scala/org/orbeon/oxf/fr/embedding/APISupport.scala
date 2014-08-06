@@ -88,10 +88,10 @@ object APISupport {
 
             proxyResource(
                 RequestDetails(
-                    content  = contentFromRequest,
-                    url      = url,
-                    headers  = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
-                    params   = Nil
+                    content = contentFromRequest,
+                    url     = url,
+                    headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
+                    params  = Nil
                 )
             )
         }

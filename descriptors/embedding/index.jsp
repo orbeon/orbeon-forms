@@ -44,6 +44,7 @@
                     request.getParameter("form") != null ? request.getParameter("form") : "bookshelf",
                     "new",
                     null,
+                    null,
                     null
                 );
             %>

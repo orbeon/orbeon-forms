@@ -544,9 +544,6 @@ object Connection extends Logging {
             cookiesToForward: Seq[String],
             sessionCookieName: String)(implicit logger: IndentedLogger): Option[(String, Array[String])] = {
 
-        // Figure out if we need to forward session cookies. We only forward if there is the requested
-        // session id is the same as the current session. Otherwise, it means that the current session is no
-        // longer valid, or that the incoming cookie is out of date.
         def requestedSessionIdMatches =
             Option(externalContext.getSession(false)) exists { session ⇒
                 val requestedSessionId = externalContext.getRequest.getRequestedSessionId
@@ -554,12 +551,16 @@ object Connection extends Logging {
             }
 
         val cookies = Option(nativeRequest.getCookies) getOrElse Array.empty[Cookie]
-        if (requestedSessionIdMatches && cookies.nonEmpty) {
+        if (cookies.nonEmpty) {
 
             val pairsToForward =
                 for {
                     cookie ← cookies
+                    // Only forward cookie listed as cookies to forward
                     if cookiesToForward.contains(cookie.getName)
+                    // Only forward if there is the requested session id is the same as the current session. Otherwise,
+                    // it means that the current session is no longer valid, or that the incoming cookie is out of date.
+                    if sessionCookieName != cookie.getName || requestedSessionIdMatches
                 } yield
                     cookie.getName + '=' + cookie.getValue
 

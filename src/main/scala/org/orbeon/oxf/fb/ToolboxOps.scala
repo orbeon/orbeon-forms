@@ -18,9 +18,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{Names, FormRunner}
 
 /*
  * Form Builder: toolbox operations.
@@ -471,6 +469,8 @@ object ToolboxOps {
                         requestedName
                 }
 
+                import Names._
+
                 // Insert control and holders
                 val newControlElement = insert(into = gridTd, origin = control).head
                 insertHolders(
@@ -483,12 +483,19 @@ object ToolboxOps {
                 // Create the bind and copy all attributes and content
                 val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ name)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
-
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
+                }
 
-                    // If we copied a bind with @nodeset, keep things that way and remove the @ref created by ensureBinds
-                    if (bind \@ "nodeset" nonEmpty)
-                        delete(bind \@ "ref")
+                val alertsWithValidation = newControlElement / (XF → "alert") filter (_ att Validation nonEmpty)
+                val ids = nextIds(td, Constraint, alertsWithValidation.size).toIterator
+
+                // Update xf:alert/@validation and xf:constraint/@id
+                alertsWithValidation foreach { alertWithValidation ⇒
+                    val oldValidationId = alertWithValidation attValue Validation
+                    val newValidationId = ids.next()
+
+                    setvalue(alertWithValidation att Validation,                                 newValidationId)
+                    setvalue(bind / (FB → Constraint) filter (_.id == oldValidationId) att "id", newValidationId)
                 }
 
                 // This can impact templates

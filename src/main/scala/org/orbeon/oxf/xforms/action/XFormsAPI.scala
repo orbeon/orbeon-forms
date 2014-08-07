@@ -70,8 +70,8 @@ object XFormsAPI {
 
     // xf:setvalue
     // @return the node whose value was set, if any
-    def setvalue(ref: Seq[NodeInfo], value: String) = {
-        if (ref nonEmpty) {
+    def setvalue(ref: Seq[NodeInfo], value: String) =
+        ref.nonEmpty option {
             val nodeInfo = ref.head
 
             def onSuccess(oldValue: String): Unit =
@@ -84,10 +84,8 @@ object XFormsAPI {
 
             DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
 
-            Some(nodeInfo)
-        } else
-            None
-    }
+            nodeInfo
+        }
 
     // xf:setindex
     // @return:

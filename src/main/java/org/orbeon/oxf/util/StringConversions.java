@@ -86,16 +86,6 @@ public class StringConversions {
         return result;
     }
 
-    /**
-     * Return the value of the first object in the array as a String.
-     */
-    public static String getStringFromObjectArray(Object[] values) {
-        if (values == null || values.length == 0 || !(values[0] instanceof String))
-            return null;
-        else
-            return (String) values[0];
-    }
-
     public static String getFirstValueFromStringArray(String[] values) {
         return (values != null && values.length > 0) ? values[0] : null;
     }

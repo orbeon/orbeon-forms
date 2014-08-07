@@ -36,7 +36,7 @@ object APISupport {
 
     import Private._
 
-    private val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
+    val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
 
     val AllActions       = List(New, Edit, View)
     val AllActionsByName = AllActions map (a ⇒ a.name → a) toMap

@@ -80,17 +80,20 @@ class ServletFilter extends Filter {
 
     private var settingsOpt: Option[EmbeddingSettings] = None
 
-    def init(config: FilterConfig): Unit =
+    def init(config: FilterConfig): Unit = {
+        APISupport.Logger.info("initializing embedding servlet filter")
         settingsOpt =
             Some(
                 EmbeddingSettings(
-                    formRunnerURL  = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
-                    orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon",
-                    httpClient     = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
+                    formRunnerURL = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
+                    orbeonPrefix  = Option(config.getInitParameter("orbeon-prefix")) getOrElse "/orbeon",
+                    httpClient    = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
                 )
             )
+    }
 
     def destroy(): Unit = {
+        APISupport.Logger.info("destroying embedding servlet filter")
         settingsOpt foreach (_.httpClient.shutdown())
         settingsOpt = None
     }

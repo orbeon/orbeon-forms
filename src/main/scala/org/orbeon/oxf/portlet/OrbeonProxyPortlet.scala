@@ -90,7 +90,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                     settings.httpClient
                 )
 
-                bufferedRender(request, response, APISupport.callService(createRequestDetails(settings, request, response.getNamespace)))
+                bufferedRender(
+                    request,
+                    response,
+                    APISupport.callService(createRequestDetails(settings, request, response.getNamespace))
+                )
             }
         }
 
@@ -113,7 +117,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                     response,
                     settings.httpClient
                 )
-                bufferedProcessAction(request, response, APISupport.callService(createRequestDetails(settings, request, response.getNamespace)))
+                bufferedProcessAction(
+                    request,
+                    response,
+                    APISupport.callService(createRequestDetails(settings, request, response.getNamespace))
+                )
             }
         }
 
@@ -142,6 +150,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             }
         }
 
+    private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref) =
+        portalQuery(request) collectFirst { case (pref.nameLabel.name, value) ⇒ value}
+
+    private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
+        preferenceFromPortalQuery(request, pref) getOrElse getPreference(request, pref)
+
     private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
         // Determine URL based on preferences and request
         val path = {
@@ -153,7 +167,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 if (getPreference(request, Page) == "home")
                     APISupport.formRunnerHomePath(None)
                 else
-                    APISupport.formRunnerPath(getPreference(request, AppName), getPreference(request, FormName), getPreference(request, Page), None, None)
+                    APISupport.formRunnerPath(
+                        getPreferenceOrRequested(request, AppName),
+                        getPreferenceOrRequested(request, FormName),
+                        getPreferenceOrRequested(request, Page),
+                        Option(getPreferenceOrRequested(request, DocumentId)),
+                        None
+                    )
 
             def filterAction(action: String) =
                 if (getPreference(request, ReadOnly) == "true" && action == "edit") "view" else action
@@ -184,14 +204,22 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         )
     }
 
-    private def newRequestDetails(settings: PortletSettings, request: PortletRequest, content: Option[StreamedContent], url: String): RequestDetails = {
+    private def portalQuery(request: PortletRequest) =
+        collectByErasedType[String](request.getAttribute("javax.servlet.forward.query_string")) map decodeSimpleQuery getOrElse Nil
+
+    private def newRequestDetails(
+        settings: PortletSettings,
+        request : PortletRequest,
+        content : Option[StreamedContent],
+        url     : String
+    ): RequestDetails = {
 
         def clientHeaders =
             findServletRequest(request).toList flatMap APISupport.requestHeaders
 
         def paramsToSet =
             for {
-                pair @ (name, _) ← collectByErasedType[String](request.getAttribute("javax.servlet.forward.query_string")) map decodeSimpleQuery getOrElse Nil
+                pair @ (name, _) ← portalQuery(request)
                 if settings.forwardParams(name)
             } yield
                 pair

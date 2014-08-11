@@ -48,6 +48,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     private var settingsOpt: Option[PortletSettings] = None
 
     override def init(config: PortletConfig) {
+        APISupport.Logger.info("initializing Form Runner proxy portlet")
         super.init(config)
         settingsOpt = Some(
             PortletSettings(
@@ -59,6 +60,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     }
 
     override def destroy() = {
+        APISupport.Logger.info("destroying Form Runner proxy portlet")
         settingsOpt foreach (_.httpClient.shutdown())
         settingsOpt = None
         super.destroy()

@@ -188,7 +188,7 @@ trait FormRunnerActions {
         "annotate"   → "",
         "replace"    → "none",
         "content"    → "xml",
-        "parameters" → "app form document valid language"
+        "parameters" → "app form form-version document valid language"
     )
 
     private val SendParameterKeys = List("uri") ++ DefaultSendParameters.keys

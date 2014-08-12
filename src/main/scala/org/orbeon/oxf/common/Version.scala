@@ -35,10 +35,31 @@ abstract class Version {
 
 object Version {
 
-    private val PossibleEditions = Set("CE", "PE")
+    private object Private {
 
-    val VersionNumber = "@RELEASE@"
-    val Edition       = Option("@EDITION@") filter PossibleEditions getOrElse "CE"
+        sealed trait Edition { def name: String }
+        case object CE extends Edition { val name = "CE" }
+        case object PE extends Edition { val name = "PE" }
+
+        val EditionNames = Set(CE, PE) map (_.name)
+
+        val (versionNumber, edition) = {
+
+            val props = new java.util.Properties
+            useAndClose(getClass.getResourceAsStream("/orbeon.properties"))(props.load)
+
+            (
+                props.getProperty("build.number") ensuring (_ ne null),
+                Option(props.getProperty("build.edition")) filter EditionNames getOrElse CE.name
+            )
+        }
+    }
+
+    import Private._
+
+    val VersionNumber = versionNumber
+    val Edition       = edition
+
     val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 
     def versionStringIfAllowed =
@@ -81,5 +102,5 @@ object Version {
         fromContextClassLoaderOpt getOrElse fromName newInstance
     }
 
-    def isPE = Edition == "PE"
+    def isPE = Edition == PE.name
 }

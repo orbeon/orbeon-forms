@@ -13,6 +13,8 @@
 -->
 <project name="orbeon" default="orbeon-war" basedir="." xmlns:xdb="http://exist-db.org/ant">
 
+    <import file="ant-taskdefs.xml"/>
+
     <property file="build-local.properties"/>
     <property name="project.name" value="orbeon"/>
 
@@ -31,49 +33,34 @@
     <!-- Expose environment variables -->
     <property environment="env"/>
 
-    <!-- Scala tasks -->
-    <!-- http://www.scala-lang.org/node/98 -->
-    <taskdef resource="scala/tools/ant/antlib.xml">
-        <classpath>
-            <pathelement location="lib/scala-compiler-2.10.3.jar"/>
-            <pathelement location="lib/scala-library-2.10.3.jar"/>
-            <pathelement location="lib/scala-reflect-2.10.3.jar"/>
-        </classpath>
-    </taskdef>
+    <!-- Set build edition from property passed or environment variable -->
+    <if>
+        <isset property="build.edition"/>
+        <then>
+            <if>
+                <equals arg1="${build.edition}" arg2="PE"/>
+                <then>
+                    <property name="build-edition" value="PE"/>
+                </then>
+                <else>
+                    <property name="build-edition" value="CE"/>
+                </else>
+            </if>
+        </then>
+        <else>
+            <if>
+                <equals arg1="${env.ORBEON_BUILD_EDITION}" arg2="PE"/>
+                <then>
+                    <property name="build-edition" value="PE"/>
+                </then>
+                <else>
+                    <property name="build-edition" value="CE"/>
+                </else>
+            </if>
+        </else>
+    </if>
 
-    <!-- JUnit tasks -->
-    <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-        <classpath>
-            <pathelement location="lib/junit-4.11-SNAPSHOT.jar"/>
-            <pathelement location="lib/ant-junit-1.7.1.jar"/>
-        </classpath>
-    </taskdef>
-
-    <!-- Ant task for the YUI Compressor -->
-    <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
-    <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
-        <classpath>
-            <pathelement location="lib/yui-compressor-ant-task-0.5.jar"/>
-            <pathelement location="lib/jargs-1.0.jar"/>
-            <pathelement location="lib/yuicompressor-2.4.7.jar"/>
-        </classpath>
-    </taskdef>
-
-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
-        <classpath>
-            <pathelement location="lib/jarjar-1.3.jar"/>
-        </classpath>
-    </taskdef>
-
-    <!-- ant-contrib, for tasks like <if> -->
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-        <classpath>
-            <pathelement location="lib/ant-contrib-1.0b3.jar"/>
-        </classpath>
-    </taskdef>
-
-    <taskdef resource="proguard/ant/task.properties"
-         classpath="lib/proguard-5.0.beta2.jar"/>
+    <echo message="Building Orbeon Forms ${build-edition} edition"/>
 
     <fileset id="war.libs" dir="lib">
 
@@ -219,16 +206,13 @@
             Suffix CE or PE is separate from the version number.
          -->
         <property name="version.number" value="4.7.0.pre"/>
-        <property name="edition" value="CE"/>
         <property name="version.suffix" value=""/>
         <tstamp>
             <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>
         <property name="release.number" value="${version.number}.${time}${version.suffix}"/>
-        <property name="versioned-name" value="${project.name}-${release.number}-${edition}"/>
-        <property name="unversioned-name" value="${project.name}-${edition}"/>
+        <property name="versioned-name" value="${project.name}-${release.number}-${build-edition}"/>
         <property name="versioned-proxy-portlet-name" value="${project.name}-${release.number}-proxy-portlet"/>
-        <property name="unversioned-proxy-portlet-name" value="${project.name}-proxy-portlet"/>
 
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
@@ -335,12 +319,11 @@
     </target>
 
     <!-- Perform string replacement in Version.scala to set version and edition  -->
-    <target name="set-version" depends="init">
-        <mkdir dir="${build.dir}/src"/>
-        <copy todir="${build.dir}/src" file="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true" encoding="UTF-8">
+    <target name="set-version" depends="classpath">
+        <copy todir="${compiled.classes}" file="src/main/resources/orbeon.properties" overwrite="true" encoding="UTF-8">
             <filterset>
                 <filter token="RELEASE" value="${release.number}"/>
-                <filter token="EDITION" value="${edition}"/>
+                <filter token="EDITION" value="${build-edition}"/>
             </filterset>
         </copy>
     </target>
@@ -349,7 +332,6 @@
          The task is executed automatically by IntelliJ, which saves us from having to edit that file by hand. -->
     <target name="intellij-before-make" depends="set-version">
         <mkdir dir="test/src/config"/>
-        <copy file="build/src/Version.scala" tofile="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
     </target>
 
     <!-- Compile source -->
@@ -358,24 +340,20 @@
         <scalac destdir="${build.classes.dir}"
                 classpathref="class.path"
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="no">
-            <src path="${build.dir}/src"/> <!-- Location of the copy of Version.scala with the release/edition set -->
+                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials"
+                deprecation="no">
             <src path="src/main/java"/>
             <src path="src/main/scala"/>
             <!-- Scala code bundled with XBL components -->
             <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns, and scalac doesn't support fileset child elements, only include/exclude -->
             <src path="src/resources-packaged/xbl/orbeon/simple-captcha/src/scala"/>
-            <exclude name="org/orbeon/oxf/common/Version.scala"/>
         </scalac>
 
         <javac destdir="${build.classes.dir}"
                 classpathref="class.path"
                 debug="${build.debug}" optimize="off" target="1.5" source="1.5"
                 fork="true" memoryInitialSize="128m" memoryMaximumSize="400m" encoding="utf-8">
-            <src path="${build.dir}/src"/>
             <src path="src/main/java"/>
-            <exclude name="org/orbeon/oxf/common/Version.java"/>
-            <exclude name="org/orbeon/oxf/xforms/analysis/PathMapUIDependencies.java"/>
         </javac>
     </target>
 
@@ -386,7 +364,8 @@
         <scalac destdir="${build.test-classes.dir}"
                 classpathref="test.class.path"
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="no">
+                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials"
+                deprecation="no">
             <src path="src/test/scala"/>
             <src path="src/test/java"/>
         </scalac>
@@ -639,10 +618,6 @@
         <jar destfile="${form-runner.jar.file}" compress="false">
             <fileset dir="${resources.dir}">
                 <include name="apps/fr/**/*.*"/>
-                <exclude name="apps/fr/persistence/oracle/**/*.*"/>
-                <exclude name="apps/fr/persistence/db2/**/*.*"/>
-                <exclude name="apps/fr/alfresco/**/*.*"/>
-                <exclude name="apps/fr/print/print-pdf-template.xpl"/>
                 <exclude name="apps/fr/style/bootstrap-src/**/*.*"/>
             </fileset>
         </jar>
@@ -699,8 +674,8 @@
             <param name="target" expression="${target}"/>
             <param name="build-root" expression="${build.root}"/>
             <param name="build-root" expression="${build.root}"/>
-            <param name="version" expression="${release.number} ${edition}"/>
-            <param name="edition" expression="${edition}"/>
+            <param name="version" expression="${release.number} ${build-edition}"/>
+            <param name="edition" expression="${build-edition}"/>
         </xslt>
     </target>
 
@@ -717,22 +692,27 @@
     </target>
 
     <target name="proxy-portlet-war" depends="proxy-portlet-jar" description="Create proxy portlet WAR">
-    	<mkdir dir="${build.distrib.dir}"/>
-        <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
-            <webinf dir="descriptors/proxy-portlet/WEB-INF"/>
-            <lib dir="${build.lib.dir}">
-                <include name="orbeon-proxy-portlet.jar"/>
-            </lib>
-            <lib dir="lib">
-                <include name="slf4j-api-1.7.7.jar"/>
-                <include name="slf4j-log4j12-1.7.7.jar"/>
-                <include name="log4j-1.2.17.jar"/>
-            </lib>
-        </war>
+        <if>
+            <equals arg1="${build-edition}" arg2="PE"/>
+            <then>
+                <mkdir dir="${build.distrib.dir}"/>
+                <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
+                    <webinf dir="descriptors/proxy-portlet/WEB-INF"/>
+                    <lib dir="${build.lib.dir}">
+                        <include name="orbeon-proxy-portlet.jar"/>
+                    </lib>
+                    <lib dir="lib">
+                        <include name="slf4j-api-1.7.7.jar"/>
+                        <include name="slf4j-log4j12-1.7.7.jar"/>
+                        <include name="log4j-1.2.17.jar"/>
+                    </lib>
+                </war>
+            </then>
+        </if>
     </target>
 
     <target name="embedding-war" depends="embedding-jar" description="Create embedding WAR">
-    	<mkdir dir="${build.distrib.dir}"/>
+        <mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/${project.name}-${release.number}-embedding.war">
             <webinf dir="descriptors/embedding/WEB-INF"/>
             <lib dir="${build.lib.dir}">
@@ -786,8 +766,7 @@
         <!-- Defined here (instead of the beginning of this file) as CoffeeScriptTask needs to be compiled first -->
         <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask" >
             <classpath>
-                <pathelement location="build/classes"/>
-                <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->
+                <pathelement location="${compiled.classes}"/>
                 <pathelement location="src/main/resources"/>
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
@@ -931,9 +910,9 @@
                 </if>
 
                 <delete dir="build/temp/test"/>
-               	<mkdir  dir="build/temp/test"/>
-           	    <delete dir="${test.exist-db.dir}"/>
-               	<mkdir  dir="${test.exist-db.dir}"/>
+                <mkdir  dir="build/temp/test"/>
+                <delete dir="${test.exist-db.dir}"/>
+                <mkdir  dir="${test.exist-db.dir}"/>
 
                 <!-- Run tests -->
                 <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed" logfailedtests="true">
@@ -967,12 +946,12 @@
                     <!-- Other properties -->
                     <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
                     <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
-                	<sysproperty key="java.io.tmpdir" value="build/temp/test"/>
+                    <sysproperty key="java.io.tmpdir" value="build/temp/test"/>
 
                     <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitly -->
-                	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
+                    <sysproperty key="user.timezone" value="America/Los_Angeles"/>
                     <!-- Getting a JDK error, per http://stackoverflow.com/a/13575810/5295 -->
-                	<sysproperty key="java.util.Arrays.useLegacyMergeSort" value="true"/>
+                    <sysproperty key="java.util.Arrays.useLegacyMergeSort" value="true"/>
 
                     <classpath>
                         <path refid="test.class.path"/>
@@ -1066,6 +1045,9 @@
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/${project.name}.war">
                 <include name="${versioned-name}.war"/>
             </zipfileset>
+            <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/proxy-portlet.war">
+                <include name="${versioned-proxy-portlet-name}.war"/>
+            </zipfileset>
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-embedding.war">
                 <include name="${project.name}-${release.number}-embedding.war"/>
             </zipfileset>
@@ -1147,8 +1129,7 @@
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
                 <path refid="class.path"/>
-                <pathelement location="build/lib/orbeon.jar"/>
-                <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->
+                <pathelement location="${compiled.classes}"/>
             </classpath>
         </typedef>
     </target>

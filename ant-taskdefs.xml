@@ -1,0 +1,58 @@
+<!--
+    Copyright (C) 2004-2014 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<project name="orbeon" basedir=".">
+    <!-- ant-contrib, for tasks like <if> -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!-- Scala tasks -->
+    <!-- http://www.scala-lang.org/node/98 -->
+    <taskdef resource="scala/tools/ant/antlib.xml">
+        <classpath>
+            <pathelement location="lib/scala-compiler-2.10.3.jar"/>
+            <pathelement location="lib/scala-library-2.10.3.jar"/>
+            <pathelement location="lib/scala-reflect-2.10.3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!-- JUnit tasks -->
+    <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+        <classpath>
+            <pathelement location="lib/junit-4.11-SNAPSHOT.jar"/>
+            <pathelement location="lib/ant-junit-1.7.1.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!-- Ant task for the YUI Compressor -->
+    <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
+    <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
+        <classpath>
+            <pathelement location="lib/yui-compressor-ant-task-0.5.jar"/>
+            <pathelement location="lib/jargs-1.0.jar"/>
+            <pathelement location="lib/yuicompressor-2.4.7.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
+        <classpath>
+            <pathelement location="lib/jarjar-1.3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef resource="proguard/ant/task.properties"
+         classpath="lib/proguard-5.0.beta2.jar"/>
+</project>

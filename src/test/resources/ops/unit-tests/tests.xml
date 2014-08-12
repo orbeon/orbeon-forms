@@ -28,6 +28,7 @@
     <xi:include href="xforms-server/tests-xforms-variable.xml"/>
     <xi:include href="xforms-server/tests-xforms-functions.xml"/>
     <xi:include href="xforms-server/tests-xforms-validation.xml"/>
+    <xi:include href="xforms-server/tests-xforms-xpath-analysis.xml"/>
     <xi:include href="xforms-server/tests-xforms-ajax.xml"/>
     <xi:include href="xforms-server/tests-xforms-actions.xml"/>
 

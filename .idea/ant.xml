@@ -10,6 +10,7 @@
       <maximumStackSize value="32" />
       <properties>
         <property name="skip.compilation" value="true" />
+        <property name="build.edition" value="CE" />
       </properties>
       <executeOn event="beforeCompilation" target="intellij-before-make" />
     </buildFile>

@@ -19,10 +19,10 @@ object Headers {
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
     //
-    // - Don't proxy Content-Length. Proxies must associate Content-Length with the content and propagate via other
-    //   means.
+    // - Don't proxy Content-Length and Content-Type. Proxies must associate these with the content and propagate via
+    //   other means.
     // - We are not able to properly proxy directly a content-encoded response, so we don't proxy the relevant headers.
-    private val HeadersToRemove = Set("connection", "transfer-encoding", "content-length")
+    private val HeadersToRemove = Set("connection", "transfer-encoding", "content-length", "content-type")
     val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "cookie", "cookie2", "accept-encoding")
     val ResponseHeadersToRemove = HeadersToRemove ++ List("set-cookie", "set-cookie2", "content-encoding")
 

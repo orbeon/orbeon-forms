@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.serializer;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.ApacheHttpUrlConnection;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
@@ -75,10 +76,13 @@ public class URLSerializer extends ProcessorImpl {
                 }
             } else {
                 // Open the URL
+                // NOTE: Could use PropertiesApacheHttpClient directly so we can remove support for POST/PUT in
+                // ApacheHttpUrlConnection.
                 final URLConnection conn = url.openConnection();
                 try {
                     conn.setDoOutput(true);
-                    conn.connect();
+                    if (! (conn instanceof ApacheHttpUrlConnection))
+                        conn.connect();
                     final OutputStream os = conn.getOutputStream();
                     try {
                         // Create an identity transformer and start the transformation
@@ -90,6 +94,8 @@ public class URLSerializer extends ProcessorImpl {
                         if (os != null)
                             os.close();
                     }
+                    if (conn instanceof ApacheHttpUrlConnection)
+                        conn.connect();
                 } finally {
                     // Clean up
                     if (conn instanceof HttpURLConnection)

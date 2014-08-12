@@ -23,6 +23,10 @@ import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
+// Expose ApacheHttpClient as HttpURLConnection
+// This has limitations and should generally NOT be used for any request with a body, as this requires calling
+// getOutputStream before connect(), which is incompatible with the contract of HttpURLConnection.
+// Currently only used with POST by URLSerializer. Should remove that use and then we can make this support only GET.
 class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends HttpURLConnection(url) {
 
     private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]

@@ -328,7 +328,7 @@
             replace="instance"
             instance="fr-search-drafts-response">
         <!-- Remove documents we can't update (search might still return them if we can only ready them) -->
-        <xf:delete event="xforms-submit-done" ref="instance('fr-search-drafts-response')/document[not(xxf:split(@operations) = 'update')]"/>
+        <xf:delete event="xforms-submit-done" ref="instance('fr-search-drafts-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
     </xf:submission>
     <xf:instance id="fr-search-drafts-request">
         <search>

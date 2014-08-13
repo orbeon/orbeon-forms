@@ -149,7 +149,7 @@
                 <xsl:variable name="search-permissions"         select="$permissions/permission[p:split(@operations) = $search-operations]"/>
 
                 <!-- Are we authorized to see all the data based because of our role? -->
-                <xsl:variable name="operations-from-role"       select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xsl:variable name="operations-from-role"       select="frf:authorizedOperationsBasedOnRoles($permissions)"/>
                 <xsl:variable name="authorized-based-on-role"   select="$operations-from-role = $search-operations"/>
 
                 <!-- Are we authorized to see data if we are the owner / group member? -->
@@ -433,7 +433,7 @@
                               last-modified="{last-modified}"
                               draft="{if (draft = 'Y') then 'true' else if (draft = 'N') then 'false' else ''}"
                               name="{document-id}"
-                              operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
+                              operations="{frf:allAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

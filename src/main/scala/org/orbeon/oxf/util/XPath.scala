@@ -14,18 +14,19 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.xml.{XMLParsing, ShareableXPathStaticContext, NamespaceMapping}
+import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathStaticContext, XPathExpression}
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.`type`.{AnyItemType, Type}
 import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
-import org.orbeon.saxon.value.{Value, AtomicValue}
+import org.orbeon.saxon.value.{SequenceExtent, Value, AtomicValue}
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.saxon.Configuration
-import javax.xml.transform.{TransformerException, Source, URIResolver}
+import javax.xml.transform.{Result, TransformerException, Source, URIResolver}
 import org.orbeon.oxf.resources.URLFactory
 import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
@@ -57,10 +58,50 @@ object XPath {
     // Compiled expression with source information
     case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
+    private val GlobalNamePool = new NamePool
+
+    // HACK: We can't register a new JPConverter directly, so we register an external object model, even though this is
+    // not going to be used by Saxon as such. But Saxon tests for external object model when looking for a JPConverter,
+    // so it will find and use this for converting types from Java/Scala.
+    private val GlobalDataConverter = new ExternalObjectModel {
+        def getIdentifyingURI = "http://scala-lang.org/"
+        def sendSource(source: Source, receiver: Receiver, pipe: PipelineConfiguration) = false
+        def getDocumentBuilder(result: Result) = null
+        def getPJConverter(targetClass: Class[_]) = null
+        def getNodeListCreator(node: scala.Any) = null
+        def unravel(source: Source, config: Configuration) = null
+
+        val Converter = new JPConverter {
+
+            private def anyToItem(any: Any, context: XPathContext) =
+                Option(Value.asItem(JPConverter.allocate(any.getClass, context.getConfiguration).convert(any, context)))
+
+            def convert(any: Any, context: XPathContext): ValueRepresentation = any match {
+                case v: Traversable[_] ⇒
+                    new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
+                case v: Option[_] ⇒
+                    convert(v.toList, context)
+                case v: Iterator[_] ⇒
+                    convert(v.toList, context) // we have to return a Value
+            }
+
+            def getItemType = AnyItemType.getInstance
+        }
+
+        val SupportedClasses = List(classOf[Traversable[_]], classOf[Option[_]], classOf[Iterator[_]])
+
+        def getJPConverter(targetClass: Class[_]) =
+            if (SupportedClasses exists(_.isAssignableFrom(targetClass)))
+                Converter
+            else
+                null
+    }
+
     // Global Saxon configuration with a global name pool
     val GlobalConfiguration = new Configuration {
 
-        setNamePool(new NamePool)
+        setNamePool(GlobalNamePool)
+        registerExternalObjectModel(GlobalDataConverter)
 
         override def setAllowExternalFunctions(allowExternalFunctions: Boolean): Unit =
             throw new IllegalStateException("Global XPath configuration is read-only")
@@ -68,6 +109,13 @@ object XPath {
         override def setConfigurationProperty(name: String, value: AnyRef): Unit =
             throw new IllegalStateException("Global XPath configuration is read-only")
     }
+
+    // New mutable configuration sharing the same name pool and converters, for use by mutating callers
+    def newConfiguration =
+        new Configuration {
+            setNamePool(GlobalNamePool)
+            registerExternalObjectModel(GlobalDataConverter)
+        }
 
     // Create and compile an expression
     def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean)(implicit logger: IndentedLogger): CompiledExpression = {
@@ -81,7 +129,7 @@ object XPath {
             val tempExpression = AttributeValueTemplate.make(xpathString, -1, staticContext)
             prepareExpressionForAVT(staticContext, tempExpression)
         } else {
-            val evaluator = new XPathEvaluator
+            val evaluator = new XPathEvaluator(GlobalConfiguration)
             evaluator.setStaticContext(staticContext)
             evaluator.createExpression(xpathString)
         }
@@ -99,7 +147,7 @@ object XPath {
         ExpressionTool.allocateSlots(expression, numberOfExternalVariables, map)
 
         // Set an evaluator as later it might be requested
-        val evaluator = new XPathEvaluator
+        val evaluator = new XPathEvaluator(GlobalConfiguration)
         evaluator.setStaticContext(staticContext)
 
         // See history for comment on CustomXPathExpression vs. modifying Saxon

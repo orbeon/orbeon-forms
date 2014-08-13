@@ -33,8 +33,8 @@ object Index {
     }
 
     // For Summary page
-    def jFindIndexedControls(formDoc: DocumentInfo): JList[NodeInfo] =
-        findIndexedControls(formDoc) map (_.toXML) asJava
+    def findIndexedControlsAsXML(formDoc: DocumentInfo): Seq[NodeInfo] =
+        findIndexedControls(formDoc) map (_.toXML)
 
     // Returns the controls that are searchable from a form definition
     def findIndexedControls(formDoc: DocumentInfo): Seq[IndexedControl] = {

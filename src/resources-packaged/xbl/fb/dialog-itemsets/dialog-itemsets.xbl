@@ -123,7 +123,7 @@
                         <xf:var
                             name="available-languages"
                             model="fr-resources-model"
-                            value="fbf:allLangsXPath(fbf:resourcesRoot())"/>
+                            value="fbf:allLangs(fbf:resourcesRoot())"/>
 
                         <!-- Don't display language selector if there is only one language -->
                         <xf:group ref=".[count($available-languages) gt 1 and normalize-space(xxf:get-request-header('orbeon-liferay-language')) = '']">

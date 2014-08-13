@@ -218,7 +218,7 @@
                 <xf:var name="search-permissions"         value="$permissions/permission[xxf:split(@operations) = $search-operations]"/>
 
                 <!-- Are we authorized to see all the data based because of our role? -->
-                <xf:var name="operations-from-role"       value="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xf:var name="operations-from-role"       value="frf:authorizedOperationsBasedOnRoles($permissions)"/>
                 <xf:var name="authorized-based-on-role"   value="$operations-from-role = $search-operations"/>
 
                 <!-- Are we authorized to see data if we are the owner / group member? -->
@@ -285,7 +285,7 @@
                 <xf:insert
                     context="instance('fr-search-instance')"
                     ref="query"
-                    origin="index:jFindIndexedControls(instance('fr-source-form-instance')/root())"/>
+                    origin="index:findIndexedControlsAsXML(instance('fr-source-form-instance')/root())"/>
 
                 <!-- If requested to, only show drafts for never saved document -->
                 <xf:insert if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"

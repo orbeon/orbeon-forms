@@ -595,7 +595,7 @@ object XML {
     implicit def asStringSequenceIterator(i: Iterator[String]): SequenceIterator =
         asSequenceIterator(i map stringToStringValue)
 
-    implicit def asSequenceIterator(i: Iterator[Item]) = new SequenceIterator {
+    implicit def asSequenceIterator(i: Iterator[Item]): SequenceIterator = new SequenceIterator {
 
         private var currentItem: Item = _
         private var _position = 0

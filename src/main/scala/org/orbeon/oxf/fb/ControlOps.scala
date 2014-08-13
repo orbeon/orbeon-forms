@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fb
 
-import collection.JavaConverters._
 import annotation.tailrec
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -560,6 +559,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                    lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha) :+ lhhaElement
             }
 
-        allUnneededHolders.flatten.asJava
+        allUnneededHolders.flatten
     }
 }

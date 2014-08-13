@@ -42,7 +42,7 @@
     <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
                                            and $autosave-delay gt 0
                                            and normalize-space(xxf:get-request-header('orbeon-username')) != ''
-                                           and frf:javaAllAuthorizedOperations(
+                                           and frf:allAuthorizedOperations(
                                                     xxf:instance('fr-form-metadata')/permissions,
                                                     xxf:get-request-header('orbeon-username'),
                                                     xxf:get-request-header('orbeon-group')
@@ -203,7 +203,7 @@
             <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
             <xf:var name="ops" value="if (exists($from-persistence))
                                       then xxf:split($from-persistence)
-                                      else frf:javaAuthorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
+                                      else frf:authorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
 
             <xf:setvalue
                 ref="instance('fr-authorized-operations')"

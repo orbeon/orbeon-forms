@@ -64,9 +64,9 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         assert(Some("it") === findRequestedLang(getAppForm(app, form), "it"))
 
         // Language selector
-        assert(Seq("en", "fr", "it") === getFormLangSelection(app, form, Seq("fr", "it", "en").asJava).asScala)
-        assert(Seq("fr", "it", "es") === getFormLangSelection(app, form, Seq("fr", "it", "es").asJava).asScala)
-        assert(Seq.empty[String]     === getFormLangSelection(app, form, Seq.empty[String].asJava).asScala)
+        assert(Seq("en", "fr", "it") === getFormLangSelection(app, form, Seq("fr", "it", "en").asJava))
+        assert(Seq("fr", "it", "es") === getFormLangSelection(app, form, Seq("fr", "it", "es").asJava))
+        assert(Seq.empty[String]     === getFormLangSelection(app, form, Seq.empty[String].asJava))
 
         // Select form language
         assert("it" === selectFormLang(app, form, "it", Seq("fr", "it", "en").asJava))

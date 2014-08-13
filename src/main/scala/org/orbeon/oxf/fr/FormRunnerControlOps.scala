@@ -178,8 +178,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     def findRepeatedControlsForTarget(actionSourceAbsoluteId: String, targetControlName: String) = {
 
-        import scala.collection.JavaConverters._
-
         val controls =
             Controls.findRepeatedControlsForTarget(
                 XFormsFunction.context.containingDocument,
@@ -187,6 +185,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
                 controlId(targetControlName)
             )
 
-        (controls map (_.getEffectiveId) map XFormsUtils.effectiveIdToAbsoluteId toList).asJava
+        controls map (_.getEffectiveId) map XFormsUtils.effectiveIdToAbsoluteId toList
     }
 }

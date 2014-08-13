@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
-import collection.JavaConverters._
 import collection.mutable
-import java.util.{List ⇒ JList}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ScalaUtils._
@@ -530,13 +528,13 @@ trait GridOps extends ContainerOps {
     )
 
     // Return all classes that need to be added to an editable grid
-    def gridCanDoClasses(gridId: String): JList[String] = {
+    def gridCanDoClasses(gridId: String): Seq[String] = {
         val grid = containerById(gridId)
 
         val deleteClasses = DeleteTests collect { case (what, test) if test(grid) ⇒ "fb-can-delete-" + what }
         val insertClasses = getGridSize(grid) < maxGridColumns list "fb-can-add-col"
 
-        ("fr-editable" :: deleteClasses ::: insertClasses) asJava
+        "fr-editable" :: deleteClasses ::: insertClasses
     }
 
     // Find the new td to select if we are removing the currently selected td

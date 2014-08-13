@@ -17,13 +17,13 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -138,7 +138,7 @@ public final class DOMGenerator extends ProcessorImpl {
         if (nodeInfo instanceof DocumentInfo)
             return (DocumentInfo) nodeInfo;
         else
-            return TransformerUtils.readTinyTree(new Configuration(), nodeInfo, false);
+            return TransformerUtils.readTinyTree(XPath.GlobalConfiguration(), nodeInfo, false);
     }
 
     private final SourceFactory sourceFactory;

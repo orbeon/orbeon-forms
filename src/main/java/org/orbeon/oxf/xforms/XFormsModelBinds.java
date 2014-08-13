@@ -509,7 +509,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 // Need an evaluator to check and convert type below
                 final XPathEvaluator xpathEvaluator;
                 try {
-                    xpathEvaluator = new XPathEvaluator();
+                    xpathEvaluator = new XPathEvaluator(XPath.GlobalConfiguration());
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                     final IndependentContext context = (IndependentContext) xpathEvaluator.getStaticContext();
                     for (final Map.Entry<String, String> entry : staticBind.namespaceMapping().mapping.entrySet()) {

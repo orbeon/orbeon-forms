@@ -13,6 +13,7 @@
 */
 package org.orbeon.saxon.expr;
 
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.Axis;
@@ -908,7 +909,7 @@ public class PathMap implements Cloneable {
      */
 
     public static void main(String[] args) throws Exception {
-        Configuration config = new Configuration();
+        Configuration config = XPath.GlobalConfiguration();
         Expression exp;
         if (args[0].equals("xpath")) {
             XPathEvaluator xpath = new XPathEvaluator(config);

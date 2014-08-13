@@ -24,6 +24,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
@@ -48,7 +49,6 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.instruct.TerminationException;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.StructuredQName;
 import org.orbeon.saxon.sxpath.IndependentContext;
@@ -601,7 +601,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             // Create a Saxon Configuration which adds the Orbeon pipeline function library
             private Configuration createXSLTConfiguration() {
-                final Configuration newConfiguration = new Configuration();
+                final Configuration newConfiguration = XPath.newConfiguration();
                 final FunctionLibrary javaFunctionLibrary = newConfiguration.getExtensionBinder("java");
 
                 final FunctionLibraryList functionLibraryList = new FunctionLibraryList();
@@ -785,12 +785,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
          * It is just used to parse XPath expression and get an AST.
          */
         private IndependentContext dummySaxonXPathContext;
-        private final NamePool namePool = new NamePool();
 
         private void initDummySaxonXPathContext() {
-            final Configuration config = new Configuration();
+            final Configuration config = XPath.newConfiguration();
             config.setHostLanguage(Configuration.XSLT);
-            config.setNamePool(namePool);
             dummySaxonXPathContext = new IndependentContext(config) {
                 {
                     // Dummy Function lib that accepts any name

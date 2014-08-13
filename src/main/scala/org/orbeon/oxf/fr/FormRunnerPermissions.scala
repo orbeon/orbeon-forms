@@ -148,9 +148,6 @@ trait FormRunnerPermissions {
                 .distinct                                                    // Remove duplicate operations
     }
 
-    def javaAuthorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): java.util.List[String] =
-        authorizedOperationsBasedOnRoles(permissionsElement).asJava
-
     def allAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
 
         // Both username and groupname must be specified; if we don't have a username/groupname, instead,
@@ -188,9 +185,6 @@ trait FormRunnerPermissions {
      * you are the owner and a group member. It is used in the Form Runner home page to determine if it is even
      * worth linking to the summary page for a given form.
      */
-    def javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): java.util.List[String] =
-        allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).asJava
-
     def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
         val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
         val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption.getOrElse("")
@@ -198,9 +192,6 @@ trait FormRunnerPermissions {
 
         allAuthorizedOperations(permissionsElement, username, group)
     }
-
-    def javaAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): java.util.List[String] =
-        allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname).asJava
 
     def setAllAuthorizedOperationsHeader(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Unit = {
         val operations = allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname)

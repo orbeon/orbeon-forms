@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -73,7 +74,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
                     // NOTE: Don't use global configuration, which is immutable
-                    final Configuration configuration = new Configuration();
+                    final Configuration configuration = XPath.GlobalConfiguration();
                     {
                         configuration.setErrorListener(new StringErrorListener(logger));
 

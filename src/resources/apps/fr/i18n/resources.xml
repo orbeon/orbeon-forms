@@ -69,6 +69,9 @@
             
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
+
+            <yes>&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no>&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -352,6 +355,9 @@
             
             <test>&lt;i class="icon-cog"/&gt; Tester</test>
             <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
+
+            <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
+            <no>&lt;i class="icon-remove"/&gt; Non</no>
         </buttons>
         <components>
             <labels>
@@ -639,6 +645,9 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testear</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+
+            <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
+            <no>&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -912,6 +921,9 @@
             
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Publiser…</publish>
+
+            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -1183,6 +1195,9 @@
             
             <test>&lt;i class="icon-cog"/&gt; Тестировать</test>
             <publish>&lt;i class="icon-globe"/&gt; Публиковать</publish>
+
+            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -1452,6 +1467,9 @@
             
             <test>&lt;i class="icon-cog"/&gt; Prova</test>
             <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
+
+            <yes>&lt;i class="icon-ok"/&gt; Si</yes>
+            <no>&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -1734,6 +1752,9 @@
 
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+
+            <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
+            <no>&lt;i class="icon-remove"/&gt; Nein</no>
         </buttons>
         <components>
             <labels>
@@ -2016,6 +2037,9 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testaa</test>
             <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
+
+            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -2298,6 +2322,9 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testa</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
+
+            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -2580,6 +2607,9 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testen</test>
             <publish>&lt;i class="icon-globe"/&gt; Publiceren</publish>
+
+            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>
@@ -2862,6 +2892,9 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testar</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+
+            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
+            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>
             <labels>

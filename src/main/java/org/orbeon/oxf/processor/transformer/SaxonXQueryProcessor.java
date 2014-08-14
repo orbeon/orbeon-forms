@@ -73,8 +73,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     // Create XQuery configuration (depends on attributes input)
                     final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
-                    // NOTE: Don't use global configuration, which is immutable
-                    final Configuration configuration = XPath.GlobalConfiguration();
+                    final Configuration configuration = XPath.newConfiguration();
                     {
                         configuration.setErrorListener(new StringErrorListener(logger));
 

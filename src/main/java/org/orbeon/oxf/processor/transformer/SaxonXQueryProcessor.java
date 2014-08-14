@@ -43,10 +43,10 @@ import java.util.Map;
  *
  * TODO: should work like the XSLT processor, and handle:
  *
- *   o caching [BE CAREFUL WITH NOT CACHING TransformerURIResolver!]
- *   o errors
- *   o additional inputs
- *   o etc.
+ * - caching [BE CAREFUL WITH NOT CACHING TransformerURIResolver!]
+ * - errors
+ * - additional inputs
+ * - etc.
  *
  * To get there, should maybe abstract what's in XSLT processor and derive from it here.
  */

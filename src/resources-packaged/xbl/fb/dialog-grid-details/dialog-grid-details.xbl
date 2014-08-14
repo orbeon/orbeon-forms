@@ -44,6 +44,10 @@
                 <xf:setvalue ref="$i/relevant"           value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
                 <xf:setvalue ref="$i/readonly"           value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
 
+                <!-- Whether we repeat or not, always true until dialog used for non-repeated grids-->
+                <xf:setvalue ref="$i/was-repeat"         value="true()"/>
+                <xf:setvalue ref="$i/is-repeat"          value="$i/was-repeat"/>
+
                 <xf:setvalue ref="$i/control-names"      value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
 
                 <xf:var name="control"                   value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
@@ -115,6 +119,9 @@
                         <relevant/>              <!-- XPath: whether the grid is relevant -->
                         <readonly/>              <!-- XPath: whether the grid is readonly -->
 
+                        <was-repeat/>
+                        <is-repeat/>
+
                         <min-repeat/>            <!-- Minimum number of repetitions -->
                         <max-repeat/>            <!-- Maximum number of repetitions -->
 
@@ -135,6 +142,8 @@
 
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
 
+                <xf:bind ref="was-repeat | is-repeat" type="xs:boolean"/>
+
                 <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
                 <xf:bind ref="min-repeat | max-repeat"
                          type="xxf:xpath2"
@@ -143,13 +152,19 @@
 
                 <xf:bind ref="min-repeat"
                          required="../is-repeat = true()"
-                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 0)"/>
+                         constraint="../is-repeat = false()
+                                     or not(string() castable as xs:integer)
+                                     or xs:integer(.) ge 0"/>
 
                 <xf:bind ref="max-repeat"
-                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 1)"/>
+                         constraint="../is-repeat = false()
+                                     or not(string() castable as xs:integer)
+                                     or xs:integer(.) ge 1"/>
 
                 <xf:bind ref="max-repeat"
-                         constraint="../is-repeat = false() or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer and xs:integer(.) lt xs:integer(../min-repeat))"/>
+                         constraint="../is-repeat = false()
+                                     or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer)
+                                     or (xs:integer(.) ge xs:integer(../min-repeat))"/>
 
             </xf:model>
         </xbl:implementation>

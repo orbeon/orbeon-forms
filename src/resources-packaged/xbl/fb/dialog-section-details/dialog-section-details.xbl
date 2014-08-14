@@ -176,13 +176,19 @@
 
                 <xf:bind ref="min-repeat"
                          required="../is-repeat = true()"
-                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 0)"/>
+                         constraint="../is-repeat = false()
+                                     or not(string() castable as xs:integer)
+                                     or xs:integer(.) ge 0"/>
 
                 <xf:bind ref="max-repeat"
-                         constraint="../is-repeat = false() or not(string() castable as xs:integer and xs:integer(.) le 1)"/>
+                         constraint="../is-repeat = false()
+                                     or not(string() castable as xs:integer)
+                                     or xs:integer(.) ge 1"/>
 
                 <xf:bind ref="max-repeat"
-                         constraint="../is-repeat = false() or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer and xs:integer(.) lt xs:integer(../min-repeat))"/>
+                         constraint="../is-repeat = false()
+                                     or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer)
+                                     or (xs:integer(.) ge xs:integer(../min-repeat))"/>
 
             </xf:model>
         </xbl:implementation>

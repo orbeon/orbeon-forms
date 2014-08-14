@@ -13,27 +13,31 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.xml.{XMLParsing, ShareableXPathStaticContext, NamespaceMapping}
-import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
-import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathStaticContext, XPathExpression}
-import org.orbeon.saxon.style.AttributeValueTemplate
-import org.orbeon.saxon.expr._
-import org.orbeon.saxon.`type`.{AnyItemType, Type}
-import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
-import org.orbeon.saxon.value.{SequenceExtent, Value, AtomicValue}
-import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.saxon.Configuration
-import javax.xml.transform.{Result, TransformerException, Source, URIResolver}
-import org.orbeon.oxf.resources.URLFactory
 import javax.xml.transform.sax.SAXSource
-import org.xml.sax.InputSource
+import javax.xml.transform.{Result, Source, TransformerException, URIResolver}
+
 import org.apache.commons.lang3.StringUtils._
+import org.orbeon.oxf.common.OrbeonLocationException
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import util.Try
-import util.control.NonFatal
+import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
+import org.orbeon.saxon.Configuration
+import org.orbeon.saxon.`type`.{AnyItemType, Type}
+import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
+import org.orbeon.saxon.expr._
+import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om._
+import org.orbeon.saxon.style.AttributeValueTemplate
+import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
+import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
+import org.orbeon.scaxon.XML
+import org.xml.sax.InputSource
+
+import scala.util.Try
+import scala.util.control.NonFatal
 
 object XPath {
 
@@ -60,39 +64,72 @@ object XPath {
 
     private val GlobalNamePool = new NamePool
 
-    // HACK: We can't register a new JPConverter directly, so we register an external object model, even though this is
+    // HACK: We can't register new converters directly, so we register an external object model, even though this is
     // not going to be used by Saxon as such. But Saxon tests for external object model when looking for a JPConverter,
     // so it will find and use this for converting types from Java/Scala.
     private val GlobalDataConverter = new ExternalObjectModel {
         def getIdentifyingURI = "http://scala-lang.org/"
         def sendSource(source: Source, receiver: Receiver, pipe: PipelineConfiguration) = false
         def getDocumentBuilder(result: Result) = null
-        def getPJConverter(targetClass: Class[_]) = null
         def getNodeListCreator(node: scala.Any) = null
         def unravel(source: Source, config: Configuration) = null
 
-        val Converter = new JPConverter {
+        val SupportedScalaToSaxonClasses = List(classOf[Traversable[_]], classOf[Option[_]], classOf[Iterator[_]])
+        val SupportedSaxonToScalaClasses = List(classOf[List[_]], classOf[Option[_]], classOf[Iterator[_]])
+
+        val ScalaToSaxonConverter = new JPConverter {
 
             private def anyToItem(any: Any, context: XPathContext) =
                 Option(Value.asItem(JPConverter.allocate(any.getClass, context.getConfiguration).convert(any, context)))
 
             def convert(any: Any, context: XPathContext): ValueRepresentation = any match {
-                case v: Traversable[_] ⇒
-                    new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
-                case v: Option[_] ⇒
-                    convert(v.toList, context)
-                case v: Iterator[_] ⇒
-                    convert(v.toList, context) // we have to return a Value
+                case v: Traversable[_] ⇒ new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
+                case v: Option[_]      ⇒ convert(v.toList, context)
+                case v: Iterator[_]    ⇒ convert(v.toList, context) // we have to return a ValueRepresentation
             }
 
             def getItemType = AnyItemType.getInstance
         }
 
-        val SupportedClasses = List(classOf[Traversable[_]], classOf[Option[_]], classOf[Iterator[_]])
+        val SaxonToScalaConverter = new PJConverter {
+
+            private def itemToAny(item: Item, context: XPathContext) = item match {
+                case v: AtomicValue ⇒
+                    val config = context.getConfiguration
+                    val th     = config.getTypeHierarchy
+
+                    val pj = PJConverter.allocate(config, v.getItemType(th), StaticProperty.EXACTLY_ONE, classOf[AnyRef])
+                    pj.convert(v, classOf[AnyRef], context)
+                case v: VirtualNode ⇒ v.getUnderlyingNode // ???
+                case v              ⇒ v
+            }
+
+            def convert(value: ValueRepresentation, targetClass: Class[_], context: XPathContext): AnyRef =
+                if (targetClass.isAssignableFrom(classOf[List[_]])) {
+
+                    val values =
+                        for (item ← XML.asScalaIterator(Value.asIterator(value)))
+                        yield itemToAny(item, context)
+
+                    values.toList
+                } else if (targetClass.isAssignableFrom(classOf[Option[_]])) {
+                    XML.asScalaIterator(Value.asIterator(value)).nextOption map (itemToAny(_, context))
+                } else if (targetClass.isAssignableFrom(classOf[Iterator[_]])) {
+                    XML.asScalaIterator(Value.asIterator(value)) map (itemToAny(_, context))
+                } else {
+                    throw new IllegalStateException(targetClass.getName)
+                }
+        }
 
         def getJPConverter(targetClass: Class[_]) =
-            if (SupportedClasses exists(_.isAssignableFrom(targetClass)))
-                Converter
+            if (SupportedScalaToSaxonClasses exists(_.isAssignableFrom(targetClass)))
+                ScalaToSaxonConverter
+            else
+                null
+
+        def getPJConverter(targetClass: Class[_]) =
+            if (SupportedSaxonToScalaClasses exists(_.isAssignableFrom(targetClass)))
+                SaxonToScalaConverter
             else
                 null
     }

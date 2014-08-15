@@ -123,7 +123,8 @@ trait FormRunnerPermissions {
      * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
      * the operations attribute.
      */
-    private def permissionOperations(permission: NodeInfo): Seq[String] = (permission \@ "operations").stringValue.split("\\s+")
+    private def permissionOperations(permissionElement: NodeInfo): Seq[String] =
+        permissionElement attTokens "operations" toList
 
     /**
      * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
@@ -175,7 +176,7 @@ trait FormRunnerPermissions {
                 val dataOperations =
                     Seq((OrbeonUsernameHeaderName, dataUsername,  "owner"),
                         (OrbeonGroupHeaderName,    dataGroupname, "group-member"))
-                        .flatMap(Function.tupled(operations _)(_))
+                        .flatMap(Function.tupled(operations _))
                 (rolesOperations ++ dataOperations).distinct
         }
     }
@@ -186,7 +187,7 @@ trait FormRunnerPermissions {
      * worth linking to the summary page for a given form.
      */
     def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
-        val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
+        val headers  = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
         val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption.getOrElse("")
         val group    = headers.get(OrbeonGroupHeaderName   ).toSeq.flatten.headOption.getOrElse("")
 

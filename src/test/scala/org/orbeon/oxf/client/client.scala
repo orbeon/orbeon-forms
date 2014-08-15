@@ -129,15 +129,18 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     // Extension methods on Element
     implicit class ElementOps(val e: STElement) {
         def classes = e.attribute("class") map stringToSet getOrElse Set()
-        def tabOut(wait: Boolean = true) = sendKeys(Keys.TAB)
-        def sendKeys(keys: CharSequence, wait: Boolean = true): STElement = e match {
+
+        def tabOut(wait: Boolean = true) = setFieldText(Keys.TAB)
+
+        def setFieldText(keys: CharSequence): STElement = e match {
             case control if classes("xforms-control") ⇒ // && isFocusable
-                withAjaxAction(wait) {
-                    nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
-                }
+                nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
                 e
             case _ ⇒ throw new IllegalArgumentException("Element is not a focusable XForms control")
         }
+
+        def replaceFieldText(keys: CharSequence): Unit =
+            setFieldText(Keys.HOME + Keys.chord(Keys.SHIFT, Keys.END) + keys)
 
         def findAll(by: By) = e.underlying.findElements(by).asScala.toIterator
 
@@ -150,6 +153,15 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     implicit class TextfieldOps(val textfield: TextField) {
         def enter(): Unit = textfield.underlying.sendKeys(Keys.ENTER)
     }
+}
+
+trait XFormsOps extends OrbeonFormsOps {
+
+    object XForms {
+        def fullItemSelector(controlEffectiveId: String, position: Int) =
+            cssSelector(s"""#$controlEffectiveId .xforms-items > span:nth-child(${position + 1}) input""")
+    }
+
 }
 
 // Form Runner API
@@ -178,18 +190,31 @@ trait FormBuilderOps extends FormRunnerOps {
 
     object Builder {
         val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
-        val SaveButton = cssSelector(".fr-save-button button")
+        val SaveButton        = cssSelector(".fr-save-button button")
 
         def onNewForm[T](block: ⇒ T): Unit = {
-            loadOrbeonPage("/fr/orbeon/builder/new")
-            elementByStaticId("fb-application-name-input").sendKeys("a")
-            elementByStaticId("fb-form-name-input").sendKeys("a")
-            click on NewContinueButton
-            waitForAjaxResponse()
-            block
-            eventually { click on SaveButton }
-            waitForAjaxResponse()
+
+            for {
+                _ ← loadOrbeonPage("/fr/orbeon/builder/new")
+                _ ← elementByStaticId("fb-application-name-input").setFieldText("a")
+                _ ← elementByStaticId("fb-form-name-input").setFieldText("a")
+                _ ← click on NewContinueButton
+                _ ← waitForAjaxResponse() // other way to test that dialog is hidden
+                _ ← block
+                _ ← click on SaveButton
+            }()
         }
+
+        // We have trouble using hover/click, so we directly dispatch the event to the server
+        def openGridDetails(gridEffectiveId: String) =
+            executeScript(
+                s"""ORBEON.xforms.Document.dispatchEvent({
+                   |    "targetId":   "grid-details-trigger",
+                   |    "eventName":  "DOMActivate",
+                   |    "properties": {
+                   |        "grid-id": "$gridEffectiveId"
+                   |    }
+                   |})""".stripMargin)
     }
 }
 

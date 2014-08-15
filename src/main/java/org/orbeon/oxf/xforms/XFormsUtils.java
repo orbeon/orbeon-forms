@@ -22,7 +22,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
@@ -52,14 +51,9 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 
 public class XFormsUtils {
-
-    public static final IndentedLogger indentedLogger = Loggers.getIndentedLogger("utils");
-
-    private static final int SRC_CONTENT_BUFFER_SIZE = NetUtils.COPY_BUFFER_SIZE / 2;
 
     public static String encodeXMLAsDOM(org.w3c.dom.Node node) {
         try {
@@ -376,14 +370,6 @@ public class XFormsUtils {
         return valueRepresentation;
     }
 
-    public static org.w3c.dom.Document decodeXMLAsDOM(String encodedXML) {
-        try {
-            return TransformerUtils.dom4jToDomDocument(XFormsUtils.decodeXML(encodedXML));
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-    }
-
     public static Document decodeXML(String encodedXML) {
 
         final byte[] bytes = decodeBytes(encodedXML);
@@ -448,27 +434,6 @@ public class XFormsUtils {
             }
         }
         return resultBytes;
-    }
-
-    public static String retrieveSrcValue(String src) throws IOException {
-
-        // Handle HHRI
-        src = NetUtils.encodeHRRI(src, true);
-
-        final URL url = URLFactory.createURL(src);
-
-        // Load file into buffer
-        // TODO: this is wrong, must use regular URL resolution methods
-        final InputStreamReader reader = new InputStreamReader(url.openStream());
-        try {
-            final StringBuilder value = new StringBuilder();
-            final char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
-            int c;
-            while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
-            return value.toString();
-        } finally {
-            reader.close();
-        }
     }
 
     /**
@@ -1223,14 +1188,14 @@ public class XFormsUtils {
             // Saxon doesn't allow equals() between numeric and non-numeric values
             if (item2 instanceof NumericValue) {
                 final NumericValue currentNumericValue = (NumericValue) item1;
-                if (currentNumericValue.equals((NumericValue) item2)) {
+                if (currentNumericValue.equals(item2)) {
                     return true;
                 }
             }
         } else if (item1 instanceof AtomicValue) {
             if (item2 instanceof AtomicValue) {
                 final AtomicValue currentAtomicValue = (AtomicValue) item1;
-                if (currentAtomicValue.equals((AtomicValue) item2)) {
+                if (currentAtomicValue.equals(item2)) {
                     return true;
                 }
             }

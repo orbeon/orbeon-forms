@@ -974,6 +974,7 @@
                         <pathelement location="${build.test-classes.dir}"/>
                         <pathelement location="${resources-private.jar.file}"/>
                     </classpath>
+                    <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
                 </junit>
 
                 <!-- Stop Tomcat -->

@@ -15,7 +15,6 @@ package org.orbeon.oxf.client
 
 import collection.JavaConverters._
 import java.net.URL
-import java.util.concurrent.TimeUnit
 import org.apache.commons.lang3.StringUtils
 import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium._
@@ -128,19 +127,23 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
 
     // Extension methods on Element
     implicit class ElementOps(val e: STElement) {
+
         def classes = e.attribute("class") map stringToSet getOrElse Set()
 
-        def tabOut(wait: Boolean = true) = setFieldText(Keys.TAB)
+        def tabOut(wait: Boolean = true) = insertFieldText(Keys.TAB)
 
-        def setFieldText(keys: CharSequence): STElement = e match {
+        def insertFieldText(keys: CharSequence): Unit = e match {
             case control if classes("xforms-control") ⇒ // && isFocusable
                 nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
-                e
-            case _ ⇒ throw new IllegalArgumentException("Element is not a focusable XForms control")
+            case _ ⇒
+                throw new IllegalArgumentException("Element is not a focusable XForms control")
         }
 
         def replaceFieldText(keys: CharSequence): Unit =
-            setFieldText(Keys.HOME + Keys.chord(Keys.SHIFT, Keys.END) + keys)
+            insertFieldText(Keys.HOME + Keys.chord(Keys.SHIFT, Keys.END) + keys)
+
+        def fieldText =
+            nativeControlUnder(e.attribute("id").get).underlying.getAttribute("value")
 
         def findAll(by: By) = e.underlying.findElements(by).asScala.toIterator
 
@@ -196,12 +199,12 @@ trait FormBuilderOps extends FormRunnerOps {
 
             for {
                 _ ← loadOrbeonPage("/fr/orbeon/builder/new")
-                _ ← elementByStaticId("fb-application-name-input").setFieldText("a")
-                _ ← elementByStaticId("fb-form-name-input").setFieldText("a")
+                _ ← elementByStaticId("fb-application-name-input").replaceFieldText("a")
+                _ ← elementByStaticId("fb-form-name-input").replaceFieldText("a")
                 _ ← click on NewContinueButton
-                _ ← waitForAjaxResponse() // other way to test that dialog is hidden
+                _ ← waitForAjaxResponse() // other way to test that dialog is hidden?
                 _ ← block
-                _ ← click on SaveButton
+                _ ← click on SaveButton   // so that we can close the browser window
             }()
         }
 
@@ -215,6 +218,9 @@ trait FormBuilderOps extends FormRunnerOps {
                    |        "grid-id": "$gridEffectiveId"
                    |    }
                    |})""".stripMargin)
+
+        def insertNewRepeatedGrid() =
+            clickOn(cssSelector("#insert-new-repeated-grid-trigger"))
     }
 }
 

@@ -40,18 +40,23 @@ trait RepeatSettings extends AssertionsForJUnit with FormBuilderOps with XFormsO
             for {
                 _ ← clickOn(XForms.fullItemSelector(MinRepeatSelect1Id, min))
                 _ ← clickOn(XForms.fullItemSelector(MaxRepeatSelect1Id, max))
-                _ ← if (min >= 2) MinInputSelector.element.replaceFieldText(min toString)
-                _ ← if (max >= 1) MaxInputSelector.element.replaceFieldText((min + 1) max 1 toString)
+                minValue      = min.toString
+                maxValue      = ((min + 1) max 1).toString
+                checkMinField = min >= 2
+                checkMaxField = max >= 1
+                _ ← if (checkMinField) MinInputSelector.element.replaceFieldText(minValue)
+                _ ← if (checkMaxField) MaxInputSelector.element.replaceFieldText(maxValue)
                 _ ← clickOn(SaveButtonSelector)
                 _ ← Builder.openGridDetails("fb≡section-1-control≡grid-3-grid")
                 _ ← assert(radioButton(XForms.fullItemSelector(MinRepeatSelect1Id, min)).isSelected)
                 _ ← assert(radioButton(XForms.fullItemSelector(MaxRepeatSelect1Id, max)).isSelected)
+                _ ← if (checkMinField) assert(minValue === MinInputSelector.element.fieldText)
+                _ ← if (checkMaxField) assert(maxValue === MaxInputSelector.element.fieldText)
             }()
-
 
         Builder.onNewForm {
             for {
-                _ ← clickOn(cssSelector("#insert-new-repeated-grid-trigger"))
+                _ ← Builder.insertNewRepeatedGrid()
                 _ ← Builder.openGridDetails("fb≡section-1-control≡grid-3-grid")
             }()
 

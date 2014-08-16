@@ -493,7 +493,7 @@ object ClientEvents extends Logging {
                 // Disallow focus/blur if the control is no focusable
                 // Relevance and read-only above are already caught. This catches hidden controls, which must not be
                 // focusable from the client.
-                case (control: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! control.isFocusable(withToggles = false) ⇒
+                case (control: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! (control.isFocusable && ! Focus.isHidden(control)) ⇒
                     warn(s"non-focusable control for ${e.name}")
 
                 // The client must dispatch xxforms-blur only to a control which had the focus

@@ -149,7 +149,8 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
         }
     }
 
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) = false
+    override def focusableControls = Iterator.empty
+
     override def supportFullAjaxUpdates = false
 }
 

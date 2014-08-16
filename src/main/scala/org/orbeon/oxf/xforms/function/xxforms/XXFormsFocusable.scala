@@ -19,5 +19,5 @@ import org.orbeon.saxon.value.BooleanValue
 
 class XXFormsFocusable extends XFormsFunction with FunctionSupport {
     override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-        relevantControl(0)(xpathContext) map (_.setFocus(inputOnly = false, dryRun = true))
+        relevantControl(0)(xpathContext).iterator flatMap (_.focusableControls) nonEmpty
 }

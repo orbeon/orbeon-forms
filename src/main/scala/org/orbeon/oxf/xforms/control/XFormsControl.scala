@@ -247,11 +247,10 @@ class XFormsControl(
     }
 
     // Whether focus can be set to this control
-    def isFocusable(withToggles: Boolean) = false
+    def isFocusable = false
 
-    // Set the focus on this control and return true iif control accepted focus
     // By default, a control doesn't accept focus
-    def setFocus(inputOnly: Boolean, dryRun: Boolean = false) = false
+    def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
     // Build children controls if any, delegating the actual construction to the given `buildTree` function
     def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =

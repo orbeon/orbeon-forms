@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import XFormsInputControl._
+import org.orbeon.oxf.util.ScalaUtils._
 import collection.JavaConverters._
 import java.util.{GregorianCalendar, Calendar}
 import org.dom4j.Element

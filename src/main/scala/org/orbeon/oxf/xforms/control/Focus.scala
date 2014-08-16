@@ -24,42 +24,37 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
 object Focus {
 
     // Focus on the given control and dispatch appropriate focus events
-    def focusWithEvents(control: XFormsControl): Boolean =
-        if (! control.isFocusable(withToggles = false)) {
-            false
-        } else {
+    def focusWithEvents(control: XFormsControl): Unit =
+        if (control.isFocusable && ! isHidden(control)) {
             val doc = control.containingDocument
 
             // Read previous control
             val previousOption = Option(doc.getControls.getFocusedControl)
 
             // Focus has not changed so don't do anything
-            if (previousOption exists (_ eq control))
-                return true
+            if (! (previousOption exists (_ eq control))) {
+                // Remember first that the new control has focus
+                doc.getControls.setFocusedControl(control)
 
-            // Remember first that the new control has focus
-            doc.getControls.setFocusedControl(control)
+                // Ancestor-or-self chains from root to leaf
+                val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
+                val currentChain = containersAndSelf(control).reverse
 
-            // Ancestor-or-self chains from root to leaf
-            val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
-            val currentChain = containersAndSelf(control).reverse
+                // Number of common ancestor containers, if any
+                val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) ⇒ previous eq current}
 
-            // Number of common ancestor containers, if any
-            val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) ⇒ previous eq current}
+                // Focus out of the previous control and grouping controls we are leaving
+                // Events are dispatched from leaf to root
+                (previousChain drop commonPrefix reverse) foreach focusOut
 
-            // Focus out of the previous control and grouping controls we are leaving
-            // Events are dispatched from leaf to root
-            (previousChain drop commonPrefix reverse) foreach focusOut
-
-            // Focus into the grouping controls we are entering and the current control
-            // Events are dispatched from root to leaf
-            currentChain drop commonPrefix foreach focusIn
-
-            true
+                // Focus into the grouping controls we are entering and the current control
+                // Events are dispatched from root to leaf
+                currentChain drop commonPrefix foreach focusIn
+            }
         }
 
     // Update focus based on a previously focused control
-    def updateFocusWithEvents(focusedBefore: XFormsControl, repeat: Option[XFormsRepeatControl] = None) = repeat match {
+    def updateFocusWithEvents(focusedBefore: XFormsControl, repeat: Option[XFormsRepeatControl] = None): Unit = repeat match {
         case Some(repeat) ⇒
             // Update the focus based on a previously focused control for which focus out events up to a repeat have
             // already been dispatched when a repeat iteration has been removed
@@ -85,7 +80,7 @@ object Focus {
     }
 
     // Update focus based on a previously focused control
-    private def updateFocus(focusedBefore: XFormsControl, onRemoveFocus: () ⇒ Any, onFocus: XFormsControl ⇒ Any) =
+    private def updateFocus(focusedBefore: XFormsControl, onRemoveFocus: () ⇒ Any, onFocus: XFormsControl ⇒ Any): Unit =
         if (focusedBefore ne null) {
             // There was a control with focus before
 
@@ -114,7 +109,7 @@ object Focus {
                         // Control might be a ghost that has been removed from the tree (iteration removed)
                         onRemoveFocus()
 
-                    case Some(newReference) if ! newReference.isFocusable(withToggles = false) ⇒
+                    case Some(newReference) if ! (newReference.isFocusable && ! isHidden(newReference)) ⇒
                         // New reference exists, but is not focusable
                         onRemoveFocus()
 

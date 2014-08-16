@@ -200,9 +200,8 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     // XForms doesn't specify this as of XForms 2.0, but we already read the other MIPs so it makes sense.
     override def valueType = super.valueType
 
-    // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data". So we
-    // disallow this for now.
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) = false
+    // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
+    override def focusableControls = Iterator.empty
 
     override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
         var added = super.addAjaxExtensionAttributes(attributesImpl, isNewRepeatIteration, other)

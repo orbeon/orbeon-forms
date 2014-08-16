@@ -584,12 +584,12 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         Collections.singletonMap("index", Integer.toString(getIndex))
 
     // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
-    // repeat object  associated with the repeat index"
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) =
+    // repeat object associated with the repeat index"
+    override def focusableControls =
         if (isRelevant && getIndex > 0)
-            children(getIndex - 1).setFocus(inputOnly, dryRun)
+            children(getIndex - 1).focusableControls
         else
-            false
+            Iterator.empty
 
     // NOTE: pushBindingImpl ensures that any item we are bound to is relevant
     override def computeRelevant = super.computeRelevant && getSize > 0

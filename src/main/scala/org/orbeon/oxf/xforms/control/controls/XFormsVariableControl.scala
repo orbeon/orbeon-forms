@@ -51,7 +51,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override def bindingContextForFollowing = _bindingContextForFollowing
     override def bindingContextForChild = _bindingContextForChild
     override def supportAjaxUpdates = false
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) = false
+    override def focusableControls = Iterator.empty
 
     override def onCreate() {
         super.onCreate()

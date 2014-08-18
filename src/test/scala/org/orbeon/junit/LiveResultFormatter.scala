@@ -11,26 +11,26 @@ class LiveResultFormatter extends JUnitResultFormatter {
 
     private var out = System.out
 
-    override def addError(test: Test, error: Throwable): Unit = {
+    def addError(test: Test, error: Throwable): Unit = {
         logResult(test, "ERR")
         out.println(error.getMessage)
     }
 
-    override def addFailure(test: Test, failure: AssertionFailedError): Unit = {
+    def addFailure(test: Test, failure: AssertionFailedError): Unit = {
         logResult(test, "FAIL")
         out.println(failure.getMessage)
     }
 
-    override def endTest(test: Test): Unit = {
+    def endTest(test: Test): Unit = {
         logResult(test, "PASS")
     }
 
-    override def startTest(test: Test): Unit = { }
-    override def endTestSuite(testSuite: JUnitTest): Unit = { }
-    override def setOutput(out: OutputStream): Unit = this.out = new PrintStream(out)
-    override def setSystemError(text: String): Unit = {}
-    override def setSystemOutput(text: String): Unit = {}
-    override def startTestSuite(testSuite: JUnitTest): Unit = { }
+    def startTest(test: Test) = ()
+    def endTestSuite(testSuite: JUnitTest) = ()
+    def setOutput(out: OutputStream): Unit = this.out = new PrintStream(out)
+    def setSystemError(text: String) = ()
+    def setSystemOutput(text: String) = ()
+    def startTestSuite(testSuite: JUnitTest) = ()
 
     private def logResult(test: Test, result: String): Unit = {
         out.println("[" + result + "] " + test)

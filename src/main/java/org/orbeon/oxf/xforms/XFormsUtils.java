@@ -1168,45 +1168,6 @@ public class XFormsUtils {
         return namespaceId(containingDocument, "xforms-form");
     }
 
-    public static boolean compareItems(Item item1, Item item2) {
-        if (item1 == null && item2 == null) {
-            return true;
-        }
-        if (item1 == null || item2 == null) {
-            return false;
-        }
-
-        if (item1 instanceof StringValue) {
-            // Saxon doesn't allow equals() on StringValue because it requires a collation and equals() might throw
-            if (item2 instanceof StringValue) {
-                final StringValue currentStringValue = (StringValue) item1;
-                if (currentStringValue.codepointEquals((StringValue) item2)) {
-                    return true;
-                }
-            }
-        } else if (item1 instanceof NumericValue) {
-            // Saxon doesn't allow equals() between numeric and non-numeric values
-            if (item2 instanceof NumericValue) {
-                final NumericValue currentNumericValue = (NumericValue) item1;
-                if (currentNumericValue.equals(item2)) {
-                    return true;
-                }
-            }
-        } else if (item1 instanceof AtomicValue) {
-            if (item2 instanceof AtomicValue) {
-                final AtomicValue currentAtomicValue = (AtomicValue) item1;
-                if (currentAtomicValue.equals(item2)) {
-                    return true;
-                }
-            }
-        } else {
-            if (item1.equals(item2)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Get an element's id.
      *

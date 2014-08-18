@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.state.InstancesControls
@@ -382,22 +383,6 @@ object Controls {
 
             level -= 1
         }
-    }
-
-    // Whether two nodesets contain identical items
-    def compareNodesets(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean = {
-        // Can't be the same if the size has changed
-        if (nodeset1.size != nodeset2.size)
-            return false
-
-        val j = nodeset2.iterator
-        for (currentItem1 ← nodeset1) {
-            val currentItem2 = j.next()
-            if (! XFormsUtils.compareItems(currentItem1, currentItem2))
-                return false
-        }
-
-        true
     }
 
     // Iterator over a control's ancestors

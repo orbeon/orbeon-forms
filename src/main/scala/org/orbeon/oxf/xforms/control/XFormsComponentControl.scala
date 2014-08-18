@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.xml.SaxonUtils
+
 import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
@@ -219,7 +221,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
         super.onBindingUpdate(oldBinding, newBinding)
-        val isNodesetChange = ! Controls.compareNodesets(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
+        val isNodesetChange = ! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
         if (isNodesetChange) {
             destroyMirrorListenerIfNeeded()
             initializeMirrorListenerIfNeeded(dispatch = true)

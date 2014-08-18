@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{NodeInfo, Item}
 import org.orbeon.oxf.xforms.XFormsConstants._
 
@@ -286,7 +287,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
         // Move things around and create new iterations if needed
-        if (! Controls.compareNodesets(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
+        if (! SaxonUtils.compareItemSeqs(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
             // Update iterationsInitialStateIfNeeded()
 
             val focusedBefore = containingDocument.getControls.getFocusedControl
@@ -571,10 +572,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
     private def findNodeIndexes(nodeset1: Seq[Item], nodeset2: Seq[Item]) = {
 
-        val nodeset2Scala = nodeset2
-
         def indexOfItem(otherItem: Item) =
-            nodeset2Scala indexWhere (XFormsUtils.compareItems(_, otherItem))
+            nodeset2 indexWhere (SaxonUtils.compareItems(_, otherItem))
 
         nodeset1 map indexOfItem toArray
     }

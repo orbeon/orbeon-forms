@@ -39,7 +39,9 @@
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <!-- Remove xf:bind/@relevant, so can know about itemsets also for non-relevant controls -->
-                <xsl:template match="xf:bind/@relevant"/>
+                <xsl:template match="xf:bind/@relevant">
+                    <xsl:attribute name="fr:has-relevant">true</xsl:attribute>
+                </xsl:template>
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/1623 -->
                 <xsl:template match="fr:dropdown-select1">
                     <xf:select1 appearance="minimal">

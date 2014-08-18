@@ -56,12 +56,13 @@ object SchemaGenerator {
     private def handleBind(libraries: Libraries, resolve: String ⇒ Option[XFormsObject], bind: NodeInfo): Elem = {
 
         case class BindInfo(
-            elemName: String,
-            required: Boolean,
-            elemType: Option[QName],
-            repeated: Boolean,
-            min:      Option[String],
-            max:      Option[String]
+            elemName   : String,
+            required   : Boolean,
+            hasRelevant: Boolean,
+            elemType   : Option[QName],
+            repeated   : Boolean,
+            min        : Option[String],
+            max        : Option[String]
         )
 
         // Returns control corresponding to a bind, with a given name (e.g. *:grid)
@@ -79,12 +80,13 @@ object SchemaGenerator {
                 val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter (_.attValue("repeat") == "true") toList
 
                 Some(BindInfo(
-                    elemName = bind \@ ("ref" || "nodeset"),
-                    required = bind.attValue("required") == "true()",
-                    elemType = (bind \@ "type").headOption map (_.stringValue) map bind.resolveQName filterNot Set(XS_STRING_QNAME, XFORMS_STRING_QNAME),
-                    repeated = repeatGridNode nonEmpty,
-                    min = repeatGridNode \@ "min",
-                    max = repeatGridNode \@ "max"
+                    elemName    = bind \@ ("ref" || "nodeset"),
+                    required    = bind.attValue("required") == "true()",
+                    hasRelevant = ! bind.att("has-relevant").isEmpty,
+                    elemType    = bind.att("type").headOption.map(_.stringValue).map(bind.resolveQName).filterNot(Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)),
+                    repeated    = repeatGridNode nonEmpty,
+                    min         = repeatGridNode \@ "min",
+                    max         = repeatGridNode \@ "max"
                 ))
             }
         }
@@ -92,7 +94,7 @@ object SchemaGenerator {
         // Build xs:element for this bind
         val xsElem = bind match {
             case RootBind() ⇒ <xs:element name="form"/>
-            case Bind(BindInfo(elemName, required, elemType, repeated, min, max)) ⇒
+            case Bind(BindInfo(elemName, required, hasRelevant, elemType, repeated, min, max)) ⇒
 
                 // Optional type attribute
                 def attr(name: String, value: String) = scala.xml.Attribute(None, name, scala.xml.Text(value), Null)
@@ -125,11 +127,11 @@ object SchemaGenerator {
                         }
 
                         def listSimpleType: Elem =
-                            <xs:simpleType>
-                                <xs:list>
-                                    {oneValueSimpleType(allowEmpty = false)}
-                                </xs:list>
-                            </xs:simpleType>
+                                <xs:simpleType>
+                                    <xs:list>
+                                        {oneValueSimpleType(allowEmpty = false)}
+                                    </xs:list>
+                                </xs:simpleType>
 
                         def listMinLengthOneSimpleType: Elem =
                             <xs:simpleType>
@@ -139,15 +141,15 @@ object SchemaGenerator {
                                 </xs:restriction>
                             </xs:simpleType>
 
-
+                        val allowEmpty = ! required || hasRelevant
                         select match {
                             case _: XFormsSelectControl ⇒
-                                if (required)
-                                    listMinLengthOneSimpleType
-                                else
+                                if (allowEmpty)
                                     listSimpleType
+                                else
+                                    listMinLengthOneSimpleType
                             case _ ⇒
-                                oneValueSimpleType(allowEmpty = ! required)
+                                oneValueSimpleType(allowEmpty)
                         }
                     }
 

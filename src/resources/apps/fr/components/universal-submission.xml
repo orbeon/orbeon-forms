@@ -42,15 +42,13 @@
         <params uri="" prune="" annotate="" method="" content="" serialization=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
-        <xf:action iterate="instance('fr-send-submission-params')/@*">
-            <xf:setvalue
-                ref="."
-                value="for $value in event(name(context()))
-                       (: Evaluate all properties as AVTs in the context of the main form data :)
-                       return xxf:instance('fr-form-instance')/xxf:evaluate-avt($value)"/>
-        </xf:action>
-        <xf:setvalue ref="instance('fr-send-submission-params')/@serialization"
-                     value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
+        <xf:setvalue
+            iterate="instance('fr-send-submission-params')/@*"
+            ref="."
+            value="event(name(context()))"/>
+        <xf:setvalue
+            ref="instance('fr-send-submission-params')/@serialization"
+            value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
     </xf:action>
 
     <!-- Reset data-safe-override after completion -->

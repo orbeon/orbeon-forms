@@ -225,19 +225,20 @@ trait FormRunnerActions {
                 case name @ "noscript"     ⇒ name → isNoscript.toString
             }
 
-            // Append query parameters to the URL
-            val propertiesAsMap =
+            // Append query parameters to the URL and evaluate XVTs
+            val evaluatedPropertiesAsMap =
                 propertiesAsPairs map {
-                    case ("uri", Some(uri)) ⇒ "uri" → Some(recombineQuery(uri, paramValuesToAppend))
-                    case other              ⇒ other
+                    case ("uri", some @ Some(_)) ⇒ "uri" → (some map (recombineQuery(_, paramValuesToAppend)))
+                    case (name,  some @ Some(_)) ⇒ name  → (some map evaluateValueTemplate)
+                    case other                   ⇒ other
                 } toMap
 
             // Create PDF if needed
-            if (stringOptionToSet(propertiesAsMap("content")) exists Set("pdf", "pdf-url"))
+            if (stringOptionToSet(evaluatedPropertiesAsMap("content")) exists Set("pdf", "pdf-url"))
                 tryCreatePDFIfNeeded(EmptyActionParams).get
 
             // TODO: Remove duplication once @replace is an AVT
-            val replace = if (propertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
+            val replace = if (evaluatedPropertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
 
             // Set data-safe-override as we know we are not losing data upon navigation. This happens:
             // - with changing mode (tryChangeMode)
@@ -245,7 +246,7 @@ trait FormRunnerActions {
             if (replace == "all")
                 setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
 
-            sendThrowOnError(s"fr-send-submission-$replace", propertiesAsMap)
+            sendThrowOnError(s"fr-send-submission-$replace", evaluatedPropertiesAsMap)
         }
 
     private val TestCommonParams = List[(String, () ⇒ Boolean)](

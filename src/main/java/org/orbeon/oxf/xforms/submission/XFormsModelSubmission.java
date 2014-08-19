@@ -36,7 +36,6 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.VirtualNode;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -1209,7 +1208,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             modelForInstance.doRecalculateRevalidate(false);
 
         // Get selected nodes (re-root and prune)
-        documentToSubmit = reRootAndPrune(currentNodeInfo, resolvedRelevant, resolvedAnnotate);
+        documentToSubmit = prepareXML(containingDocument, currentNodeInfo, resolvedRelevant, resolvedAnnotate);
 
         // Check that there are no validation errors
         // NOTE: If the instance is read-only, it can't have MIPs at the moment, and can't fail validation/requiredness, so we don't go through the process at all.
@@ -1228,71 +1227,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.VALIDATION_ERROR(), null));
         }
 
-        return documentToSubmit;
-    }
-
-    private Document reRootAndPrune(final NodeInfo currentNodeInfo, boolean resolvedRelevant, String resolvedAnnotate) {
-
-        final Document documentToSubmit;
-        if (currentNodeInfo instanceof VirtualNode) {
-            final Node currentNode = (Node) ((VirtualNode) currentNodeInfo).getUnderlyingNode();
-
-            // "A node from the instance data is selected, based on attributes on the submission
-            // element. The indicated node and all nodes for which it is an ancestor are considered for
-            // the remainder of the submit process. "
-            if (currentNode instanceof Element) {
-                // Create subset of document
-                documentToSubmit = Dom4jUtils.createDocumentCopyParentNamespaces((Element) currentNode);
-            } else {
-                // Use entire instance document
-                documentToSubmit = Dom4jUtils.createDocumentCopyElement(currentNode.getDocument().getRootElement());
-            }
-
-            if (resolvedRelevant) {
-                // "Any node which is considered not relevant as defined in 6.1.4 is removed."
-                final Node[] nodeToDetach = new Node[1];
-                do {
-                    // NOTE: This is not very efficient, but at least we avoid NPEs that we would get by
-                    // detaching elements within accept(). Should implement a more efficient algorithm to
-                    // prune non-relevant nodes.
-                    nodeToDetach[0] = null;
-                    documentToSubmit.accept(new VisitorSupport() {
-
-                        public final void visit(Element element) {
-                            checkInstanceData(element);
-                        }
-
-                        public final void visit(Attribute attribute) {
-                            checkInstanceData(attribute);
-                        }
-
-                        private void checkInstanceData(Node node) {
-                            if (nodeToDetach[0] == null) {
-                                // Check "relevant" MIP and remove non-relevant nodes
-                                if (! InstanceData.getInheritedRelevant(node))
-                                    nodeToDetach[0] = node;
-                            }
-                        }
-                    });
-                    if (nodeToDetach[0] != null)
-                        nodeToDetach[0].detach();
-
-                } while (nodeToDetach[0] != null);
-            }
-
-            // Annotate with alerts if needed
-            if (StringUtils.isNotBlank(resolvedAnnotate))
-                annotateWithAlerts(containingDocument, documentToSubmit, resolvedAnnotate);
-
-            // TODO: handle includenamespaceprefixes
-        } else {
-            // Submitting read-only instance backed by TinyTree (no MIPs to check)
-            if (currentNodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE) {
-                documentToSubmit = TransformerUtils.tinyTreeToDom4j(currentNodeInfo);
-            } else {
-                documentToSubmit = TransformerUtils.tinyTreeToDom4j(currentNodeInfo.getRoot());
-            }
-        }
         return documentToSubmit;
     }
 

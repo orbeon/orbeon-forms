@@ -20,7 +20,7 @@ import org.apache.log4j.Logger
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
 import reflect.ClassTag
-import scala.collection.mutable
+import scala.collection.{TraversableLike, mutable}
 import scala.util.control.NonFatal
 import scala.util.{Success, Failure, Try}
 
@@ -203,6 +203,22 @@ object ScalaUtils extends PathOps {
             }
         }
         builder.result()
+    }
+
+    implicit class TraversableLikeOps[A, Repr](val t: TraversableLike[A, Repr]) extends AnyVal {
+        def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
+            val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
+            for (elem ← t) {
+                val key = f(elem)
+                val bldr = m.getOrElseUpdate(key, cbf())
+                bldr += elem
+            }
+            val b = List.newBuilder[(K, Repr)]
+            for ((k, v) ← m)
+                b += ((k, v.result()))
+
+            b.result()
+        }
     }
 
     private class OnFailurePF[U](f: PartialFunction[Throwable, Any]) extends PartialFunction[Throwable, Try[U]] {

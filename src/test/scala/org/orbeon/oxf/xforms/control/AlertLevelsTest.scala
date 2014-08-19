@@ -88,11 +88,8 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
                 Dom4jUtils.createDocumentCopyElement(formInstance.getRootElement)
             }
 
-            def copyAndAnnotate(tokens: String) = {
-                val copy = copyFormInstance
-                XFormsModelSubmissionBase.annotateWithAlerts(document, copy, tokens)
-                copy
-            }
+            def copyAndAnnotate(tokens: String) =
+                XFormsModelSubmissionBase.prepareXML(document, instance("fr-form-instance").get.root, prune = false, tokens)
 
             // Cause warnings and info
             setControlValue(NumberControlId, "1001")

@@ -13,7 +13,8 @@
   -->
 <xf:model
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- TODO: Remove duplication when https://github.com/orbeon/orbeon-forms/issues/1302 is fixed -->
     <xf:submission id="fr-send-submission-all"
@@ -23,7 +24,11 @@
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then xxf:instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url')
+             then xxf:instance('fr-pdf-url-instance')
+             else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata')
+             then frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+             else xxf:instance('fr-form-instance')"
         replace="all">
     </xf:submission>
 
@@ -34,7 +39,11 @@
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then xxf:instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url')
+             then xxf:instance('fr-pdf-url-instance')
+             else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata')
+             then frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+             else xxf:instance('fr-form-instance')"
         replace="none"/>
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
@@ -46,9 +55,6 @@
             iterate="instance('fr-send-submission-params')/@*"
             ref="."
             value="event(name(context()))"/>
-        <xf:setvalue
-            ref="instance('fr-send-submission-params')/@serialization"
-            value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
     </xf:action>
 
     <!-- Reset data-safe-override after completion -->

@@ -19,11 +19,14 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.saxon.om.{NodeInfo, Navigator, DocumentInfo}
 import scala.util.control.NonFatal
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
+
+    def dataNodeHash(node: NodeInfo) =
+        SecureUtils.hmacString(Navigator.getPath(node), "hex")
 
     def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
         processGETConnection(model, resolvedURL) { result ⇒

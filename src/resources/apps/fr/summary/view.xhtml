@@ -352,9 +352,10 @@
             <xf:instance id="fr-duplicate-form-data"><dummy/></xf:instance>
             <xf:instance id="fr-duplicate-document"><document/></xf:instance>
 
-            <!-- Read form data -->
+            <!-- Read form data for the duplicate button -->
+            <!-- NOTE: It would be nice if this could be done entirely with a process. -->
             <xf:submission
-                id="read-form-data"
+                id="read-form-data-for-duplicate"
                 method="get"
                 serialization="none"
                 resource="{frf:createFormDataBasePath($app, $form, false(), event('document'))}/data.xml"
@@ -905,7 +906,7 @@
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/duplicate"/>
                                     <xf:action ev:event="DOMActivate">
                                         <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
-                                            <xf:send submission="read-form-data">
+                                            <xf:send submission="read-form-data-for-duplicate">
                                                 <xf:property name="document" value="substring-after(., '/')"/>
                                             </xf:send>
                                         </xf:action>

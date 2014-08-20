@@ -460,7 +460,7 @@
                            or normalize-space(xxf:get-request-header('orbeon-username')) != ''"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
-                 relevant="empty(xxf:instance('fr-form-attachments')/pdf) or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
+                 relevant="normalize-space(xxf:instance('fr-form-attachments')/pdf) = '' or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and exf:readonly(../strict-submit)"/>
 

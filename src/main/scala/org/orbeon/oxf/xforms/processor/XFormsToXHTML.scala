@@ -13,21 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsProperties
-import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
-import org.orbeon.oxf.xforms.processor.handlers.NullHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XXFormsAttributeHandler
-import org.orbeon.oxf.xforms.processor.handlers.xml._
+import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
+
 import scala.collection.JavaConverters._
 
 /**
@@ -36,7 +29,7 @@ import scala.collection.JavaConverters._
  */
 class XFormsToXHTML extends XFormsToSomething {
     
-    import XFormsToXHTML._
+    import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
     
     protected def produceOutput(
             pipelineContext      : PipelineContext,
@@ -64,27 +57,13 @@ class XFormsToXHTML extends XFormsToSomething {
 
 object XFormsToXHTML {
 
-    def register[T](
-        clazz               : Class[T],
-        ns                  : String,
-        elementName         : String = null,
-        any                 : Boolean = false)(
-        implicit controller : ElementHandlerController
-    ): Unit =
-        controller.registerHandler(
-            clazz.getName,
-            ns,
-            elementName,
-            if (any) XHTMLBodyHandler.ANY_MATCHER else null
-        )
-
     def outputResponseDocument(
         externalContext    : ExternalContext,
         indentedLogger     : IndentedLogger,
         template           : AnnotatedTemplate,
         containingDocument : XFormsContainingDocument,
         xmlReceiver        : XMLReceiver
-      ): Unit = {
+    ): Unit = {
 
         val nonJavaScriptLoads =
             containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
@@ -104,59 +83,15 @@ object XFormsToXHTML {
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
             SAXUtils.streamNullDocument(xmlReceiver)
         } else {
-            // 3. Regular case: produce an XHTML document out
-            implicit val controller = new ElementHandlerController
-            
-            // Register handlers on controller (the other handlers are registered by the body handler)
-            locally {
-                val isHTMLDocument = containingDocument.getStaticState.isHTMLDocument
-
-                import XMLConstants.{XHTML_NAMESPACE_URI ⇒ XH}
-                import XFormsConstants.{XFORMS_NAMESPACE_URI⇒ XF, XXFORMS_NAMESPACE_URI ⇒ XXF, XBL_NAMESPACE_URI}
-                
-                if (isHTMLDocument) {
-                    register(classOf[XHTMLHeadHandler], XH, "head")
-                    register(classOf[XHTMLBodyHandler], XH, "body")
-                } else {
-                    register(classOf[XFormsDefaultControlHandler], XF, "input",    any = true)
-                    register(classOf[XFormsDefaultControlHandler], XF, "secret",   any = true)
-                    register(classOf[XFormsDefaultControlHandler], XF, "range",    any = true)
-                    register(classOf[XFormsDefaultControlHandler], XF, "textarea", any = true)
-                    register(classOf[XFormsDefaultControlHandler], XF, "output",   any = true)
-                    register(classOf[XFormsDefaultControlHandler], XF, "trigger",  any = true)
-                    register(classOf[XFormsDefaultControlHandler], XF, "submit",   any = true)
-                    register(classOf[XFormsSelectHandler],         XF, "select",   any = true)
-                    register(classOf[XFormsSelectHandler],         XF, "select1",  any = true)
-                    register(classOf[XFormsGroupHandler],          XF, "group",    any = true)
-                    register(classOf[XFormsCaseHandler],           XF, "case",     any = true)
-                    register(classOf[XFormsRepeatHandler],         XF, "repeat",   any = true)
-                }
-                
-                // Register a handler for AVTs on HTML elements
-                if (XFormsProperties.isHostLanguageAVTs) {
-                    register(classOf[XXFormsAttributeHandler], XXF, "attribute")
-
-                    if (isHTMLDocument)
-                        register(classOf[XHTMLElementHandler], XH)
-
-                    for (additionalAvtElementNamespace ← XFormsProperties.getAdditionalAvtElementNamespaces)
-                        register(classOf[ElementHandlerXML], additionalAvtElementNamespace)
-                }
-
-                // Swallow XForms elements that are unknown
-                if (isHTMLDocument) {
-                    register(classOf[NullHandler], XF)
-                    register(classOf[NullHandler], XXF)
-                    register(classOf[NullHandler], XBL_NAMESPACE_URI)
-                }
+            // 3. Regular case: produce a document
+            containingDocument.hostLanguage match {
+                case "xhtml" ⇒
+                    XHTMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+                case "xml" ⇒
+                    XMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+                case unknown ⇒
+                    throw new OXFException(s"Unknown host language specified: $unknown")
             }
-            
-            // Set final output and handler context
-            controller.setOutput(new DeferredXMLReceiverImpl(xmlReceiver))
-            controller.setElementHandlerContext(new HandlerContext(controller, containingDocument, externalContext, null))
-            
-            // Process the entire input
-            template.saxStore.replay(new ExceptionWrapperXMLReceiver(controller, "converting XHTML+XForms document to XHTML"))
         }
         containingDocument.afterInitialResponse()
     }

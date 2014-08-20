@@ -259,4 +259,9 @@ object ScalaUtils extends PathOps {
 
         def iterator: Iterator[U] = t.toOption.iterator
     }
+
+    implicit class anyToCollectable[A](val a: A) extends AnyVal {
+        def collect[B](pf: PartialFunction[A, B]): Option[B] =
+            pf.isDefinedAt(a) option pf(a)
+    }
 }

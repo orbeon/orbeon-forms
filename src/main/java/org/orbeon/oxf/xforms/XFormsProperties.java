@@ -46,6 +46,8 @@ public class XFormsProperties {
     public static final String ORDER_PROPERTY = "order";
     public static final String DEFAULT_ORDER_PROPERTY = "label control help alert hint";
 
+    public static final String HOST_LANGUAGE = "host-language";
+
     public static final String LABEL_ELEMENT_NAME_PROPERTY = "label-element";
     public static final String HINT_ELEMENT_NAME_PROPERTY = "hint-element";
     public static final String HELP_ELEMENT_NAME_PROPERTY = "help-element";
@@ -200,6 +202,7 @@ public class XFormsProperties {
             new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT_PROPERTY, "full", false),
             new PropertyDefinition(READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY, "full", false),
             new PropertyDefinition(ORDER_PROPERTY, DEFAULT_ORDER_PROPERTY, false),
+            new PropertyDefinition(HOST_LANGUAGE, "xhtml", false),
             new PropertyDefinition(LABEL_ELEMENT_NAME_PROPERTY, "label", false),
             new PropertyDefinition(HINT_ELEMENT_NAME_PROPERTY, "span", false),
             new PropertyDefinition(HELP_ELEMENT_NAME_PROPERTY, "span", false),

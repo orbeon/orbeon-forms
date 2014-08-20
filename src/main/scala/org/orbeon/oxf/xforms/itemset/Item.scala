@@ -24,11 +24,13 @@ import org.orbeon.oxf.xml.dom4j.LocationData
  * Represents an item (xf:item, xf:choice, or item in itemset).
  */
 case class Item(
-    label: LHHAValue,
-    help: Option[LHHAValue],
-    hint: Option[LHHAValue],
-    value: String,
-    attributes: Map[QName, String])(val position: Int) extends ItemContainer {
+    label      : LHHAValue,
+    help       : Option[LHHAValue],
+    hint       : Option[LHHAValue],
+    value      : String,
+    attributes : Map[QName, String])(val
+    position   : Int)
+extends ItemContainer {
 
     require(help.isEmpty || help.get.label.nonEmpty)
     require(hint.isEmpty || hint.get.label.nonEmpty)
@@ -72,9 +74,24 @@ case class Item(
             super.equals(other)
         case _ ⇒ false
     }
+
+    def iterateLHHA =
+        Iterator(
+            Option(label) map ("label" →),
+            help          map ("help"  →),
+            hint          map ("hint"  →)
+        ).flatten
 }
 
 object Item {
-    def apply(position: Int, isMultiple: Boolean, attributes: JMap[QName, String], label: LHHAValue, help: Option[LHHAValue], hint: Option[LHHAValue], value: String): Item =
+    def apply(
+        position   : Int,
+        isMultiple : Boolean,
+        attributes : JMap[QName, String],
+        label      : LHHAValue,
+        help       : Option[LHHAValue],
+        hint       : Option[LHHAValue],
+        value      : String
+    ): Item =
         Item(label, help, hint, value, if (attributes eq null) Map.empty else attributes.asScala.toMap)(position)
 }

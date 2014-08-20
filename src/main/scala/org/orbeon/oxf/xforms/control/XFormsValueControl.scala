@@ -186,6 +186,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         externalValue
     }
 
+    final def externalValueOpt = Option(getExternalValue)
+
     /**
      * Return the external value ready to be inserted into the client after an Ajax response.
      */

@@ -152,7 +152,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
                 // Add second field for dateTime's time part
                 // NOTE: In the future, we probably want to do this as an XBL component
                 if (isDateTime) {
-                    val inputIdName  = getSecondInputEffectiveId(effectiveId)
+                    val inputIdName = getSecondInputEffectiveId(effectiveId)
                     reusableAttributes.clear()
                     reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
                     reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")

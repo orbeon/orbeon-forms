@@ -359,8 +359,8 @@ public class XFormsConstants {
     public static final QName XFORMS_STRING_QNAME = new QName("string", XFORMS_NAMESPACE);
     public static final QName XFORMS_BASE64BINARY_QNAME = new QName("base64Binary", XFORMS_NAMESPACE);
 
-    public static final String XS_STRING_EXPLODED_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XS_STRING_QNAME);
-    public static final String XFORMS_STRING_EXPLODED_QNAME = Dom4jUtils.buildExplodedQName(XFORMS_STRING_QNAME);
+    public static final String XS_STRING_EXPLODED_QNAME = Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME);
+    public static final String XFORMS_STRING_EXPLODED_QNAME = Dom4jUtils.qNameToExplodedQName(XFORMS_STRING_QNAME);
 
     public static final QName XXFORMS_EVENT_MODE_QNAME = new QName("events-mode", XXFORMS_NAMESPACE);
 

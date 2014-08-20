@@ -79,7 +79,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // Type
     private var _valueType: QName = null
-    def valueType = _valueType
+    def valueType    = _valueType
+    def valueTypeOpt = Option(valueType)
 
     // Custom MIPs
     private var _customMIPs = Map.empty[String, String]
@@ -212,7 +213,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     }
 
     def isValueChangedCommit() = false // TODO: move this to trait shared by value control and variable
-    def typeExplodedQName = Dom4jUtils.qNameToExplodedQName(valueType)
+    def typeExplodedQName    = Dom4jUtils.qNameToExplodedQName(valueType)
 
     /**
      * Convenience method to return the local name of a built-in XML Schema or XForms type.

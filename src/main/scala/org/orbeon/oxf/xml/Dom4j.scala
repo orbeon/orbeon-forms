@@ -26,6 +26,10 @@ import scala.xml.{XML, Elem}
 
 object Dom4j {
 
+    implicit class QNameOps(val q: QName) extends AnyVal {
+        def uriQualifiedName = XMLUtils.buildURIQualifiedName(q.getNamespaceURI, q.getName)
+    }
+
     /**
      * Compare two dom4j documents.
      *
@@ -76,7 +80,7 @@ object Dom4j {
     // An ordering for attributes, which takes into account the namespace URI and the local name
     private implicit object AttributeOrdering extends Ordering[Attribute] {
         def compare(x: Attribute, y: Attribute) =
-            Dom4jUtils.buildExplodedQName(x.getQName) compare Dom4jUtils.buildExplodedQName(y.getQName)
+            Dom4jUtils.buildURIQualifiedName(x.getQName) compare Dom4jUtils.buildURIQualifiedName(y.getQName)
     }
 
     private def compareTwoNodes(left: Node, right: Node)(normalizeText: String ⇒ String): Boolean =

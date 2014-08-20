@@ -191,6 +191,9 @@
                 xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
                 xxf:order="{{if (property('xxf:noscript')) then 'label control alert hint help' else 'help label control alert hint'}}"
 
+                xxf:host-language="xhtml"
+                xxf:no-updates="false"
+
                 xxf:noscript-support="{$is-noscript-support}"
                 xxf:external-events="{@xxf:external-events} fr-open-pdf"
                 xxf:xforms11-switch="false"

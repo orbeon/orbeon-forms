@@ -27,7 +27,7 @@ trait ControlExtensionAttributesSupport {
     // Optional extension attributes supported by the control
     private[ControlExtensionAttributesSupport] var _extensionAttributes: Option[Map[QName, String]] = None
 
-    private final def evaluatedExtensionAttributes =
+    final def evaluatedExtensionAttributes =
         _extensionAttributes getOrElse {
 
             val result =

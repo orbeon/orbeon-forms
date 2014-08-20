@@ -75,6 +75,10 @@ trait FileMetadata extends XFormsValueControl {
     def filename              = Option(props("filename") .value)
     def fileSize              = Option(props("size")     .value)
 
+    def iterateProperties = props.iterator map {
+        case (k, v) ⇒ k → Option(v.value)
+    }
+
     def humanReadableFileSize = fileSize filter StringUtils.isNotBlank map humanReadableBytes
 
     // "Instant" evaluators which go straight to the bound nodes if possible
@@ -155,13 +159,13 @@ object FileMetadata {
 
     // How to evaluate each property and default values used when control is non-relevant
     private val Evaluators = Map[String, Evaluator](
-        "state"              → Evaluator(m ⇒ if (StringUtils.isBlank(m.getValue)) "empty" else "file", "empty"),
-        "mediatype"          → Evaluator(m ⇒ m.mediatypeElement map (childMetadataValue(m, _)) orNull, null),
-        "filename"           → Evaluator(m ⇒ m.filenameElement  map (childMetadataValue(m, _)) orNull, null),
-        "size"               → Evaluator(m ⇒ m.sizeElement      map (childMetadataValue(m, _)) orNull, null),
-        "progress-state"     → Evaluator(m ⇒ progress(m) map (_.state.toString.toLowerCase) orNull, null),
-        "progress-received"  → Evaluator(m ⇒ progress(m) map (_.receivedSize.toString) orNull, null),
-        "progress-expected"  → Evaluator(m ⇒ progress(m) flatMap (_.expectedSize) map (_.toString) orNull, null)
+        "state"             → Evaluator(m ⇒ if (StringUtils.isBlank(m.getValue)) "empty" else "file", "empty"),
+        "mediatype"         → Evaluator(m ⇒ m.mediatypeElement map     (childMetadataValue(m, _))        orNull, null),
+        "filename"          → Evaluator(m ⇒ m.filenameElement  map     (childMetadataValue(m, _))        orNull, null),
+        "size"              → Evaluator(m ⇒ m.sizeElement      map     (childMetadataValue(m, _))        orNull, null),
+        "progress-state"    → Evaluator(m ⇒ progress(m)        map     (_.state.toString.toLowerCase)    orNull, null),
+        "progress-received" → Evaluator(m ⇒ progress(m)        map     (_.receivedSize.toString)         orNull, null),
+        "progress-expected" → Evaluator(m ⇒ progress(m)        flatMap (_.expectedSize) map (_.toString) orNull, null)
     )
 
     // All possible property names

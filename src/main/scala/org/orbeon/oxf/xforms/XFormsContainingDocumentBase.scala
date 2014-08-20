@@ -157,6 +157,12 @@ trait ContainingDocumentProperties {
             ORDER_PROPERTY,
             identity
         )
+
+    def hostLanguage =
+        dynamicProperty(
+            HOST_LANGUAGE,
+            identity
+        )
     
     // Static properties
     def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)

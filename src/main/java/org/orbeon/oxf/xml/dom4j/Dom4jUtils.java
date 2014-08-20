@@ -590,13 +590,6 @@ public class Dom4jUtils {
         return new QName(localName, new Namespace("p1", namespaceURI));
     }
 
-    /**
-     * Encode a QName to an exploded QName (also known as a "Clark name") String.
-     */
-    public static String qNameToExplodedQName(QName qName) {
-        return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
-    }
-
     public static XPath createXPath(final String expression) throws InvalidXPathException {
         final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createXPath(expression);
@@ -887,8 +880,16 @@ public class Dom4jUtils {
         return result.getDocument();
     }
 
-    public static String buildExplodedQName(QName qName) {
-        return XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
+    /**
+     * Encode a QName to an exploded QName (also known as a "Clark name") String.
+     */
+    public static String qNameToExplodedQName(QName qName) {
+        return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
+    }
+
+    // http://www.w3.org/TR/xpath-30/#doc-xpath30-URIQualifiedName
+    public static String buildURIQualifiedName(QName qName) {
+        return XMLUtils.buildURIQualifiedName(qName.getNamespaceURI(), qName.getName());
     }
 
     public static interface VisitorListener {

@@ -212,7 +212,7 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
 
             implicit val controller = new ElementHandlerController
 
-            import XFormsToXHTML.register
+            import XHTMLOutput.register
 
             XHTMLBodyHandler.registerHandlers(controller, document)
 

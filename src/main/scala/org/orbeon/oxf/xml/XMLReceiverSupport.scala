@@ -16,7 +16,21 @@ package org.orbeon.oxf.xml
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+import scala.collection.immutable.Seq
+
 trait XMLReceiverSupport {
+
+    support ⇒
+
+    def withDocument[T](body: ⇒ T)(implicit receiver: XMLReceiver) = {
+        receiver.startDocument()
+        val result = body
+        receiver.endDocument()
+        result
+    }
+
+    def withElement[T](localName: String, atts: Seq[(String, String)] = Nil)(body: ⇒ T)(implicit receiver: XMLReceiver): T =
+        withElement(prefix = "", uri = "", localName, atts)(body)
 
     def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes)(body: ⇒ T)(implicit receiver: XMLReceiver): T = {
         val qName = XMLUtils.buildQName(prefix, localName)
@@ -26,19 +40,29 @@ trait XMLReceiverSupport {
         result
     }
 
+    def element(localName: String, atts: Seq[(String, String)] = Nil, text: String = "")(implicit receiver: XMLReceiver) =
+        withElement(prefix = "", uri = "", localName, atts) {
+            support.text(text)
+        }
+
+    def text(text: String)(implicit receiver: XMLReceiver) =
+        if (text.nonEmpty) {
+            val chars = text.toCharArray
+            receiver.characters(chars, 0, chars.length)
+        }
+
     def element(prefix: String, uri: String, localName: String, atts: Attributes)(implicit receiver: XMLReceiver) =
         withElement(prefix, uri, localName, atts) {}
 
-    def addAttributes(attributesImpl: AttributesImpl, atts: List[(String, String)]): Unit = {
+    def addAttributes(attributesImpl: AttributesImpl, atts: Seq[(String, String)]): Unit =
         atts foreach {
             case (name, value) ⇒
                 require(name ne null)
                 if (value ne null)
                     attributesImpl.addAttribute("", name, name, "CDATA", value)
         }
-    }
 
-    implicit def pairsToAttributes(atts: List[(String, String)]): Attributes = {
+    implicit def pairsToAttributes(atts: Seq[(String, String)]): Attributes = {
         val saxAtts = new AttributesImpl
         addAttributes(saxAtts, atts)
         saxAtts

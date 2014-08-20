@@ -47,22 +47,44 @@ class XFormsToXHTML extends XFormsToSomething {
             containingDocument   : XFormsContainingDocument,
             xmlReceiver          : XMLReceiver) =
         if (outputName == "document")
-            outputResponseDocument(externalContext, indentedLogger, stage2CacheableState.template, containingDocument, xmlReceiver)
+            outputResponseDocument(
+                externalContext,
+                indentedLogger,
+                stage2CacheableState.template,
+                containingDocument,
+                xmlReceiver
+            )
         else
-            testOutputResponseState(containingDocument, indentedLogger, xmlReceiver)
+            testOutputResponseState(
+                containingDocument,
+                indentedLogger,
+                xmlReceiver
+            )
 }
 
 object XFormsToXHTML {
 
-    def register[T](clazz: Class[T], ns: String, elementName: String = null, any: Boolean = false)(implicit controller: ElementHandlerController) =
-        controller.registerHandler(clazz.getName, ns, elementName, if (any) XHTMLBodyHandler.ANY_MATCHER else null)
+    def register[T](
+        clazz               : Class[T],
+        ns                  : String,
+        elementName         : String = null,
+        any                 : Boolean = false)(
+        implicit controller : ElementHandlerController
+    ): Unit =
+        controller.registerHandler(
+            clazz.getName,
+            ns,
+            elementName,
+            if (any) XHTMLBodyHandler.ANY_MATCHER else null
+        )
 
     def outputResponseDocument(
-            externalContext    : ExternalContext,
-            indentedLogger     : IndentedLogger,
-            template           : AnnotatedTemplate,
-            containingDocument : XFormsContainingDocument,
-            xmlReceiver        : XMLReceiver): Unit = {
+        externalContext    : ExternalContext,
+        indentedLogger     : IndentedLogger,
+        template           : AnnotatedTemplate,
+        containingDocument : XFormsContainingDocument,
+        xmlReceiver        : XMLReceiver
+      ): Unit = {
 
         val nonJavaScriptLoads =
             containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
@@ -140,9 +162,21 @@ object XFormsToXHTML {
     }
 
     def testOutputResponseState(
-            containingDocument   : XFormsContainingDocument,
-            indentedLogger       : IndentedLogger,
-            xmlReceiver          : XMLReceiver) =
+        containingDocument : XFormsContainingDocument,
+        indentedLogger     : IndentedLogger,
+        xmlReceiver        : XMLReceiver
+    ): Unit =
         if (! containingDocument.isGotSubmissionReplaceAll)
-            XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, null, xmlReceiver, false, true)
+            XFormsServer.outputAjaxResponse(
+                containingDocument,
+                indentedLogger,
+                null,
+                null,
+                null,
+                null,
+                null,
+                xmlReceiver,
+                false,
+                true
+            )
 }

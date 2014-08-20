@@ -34,13 +34,11 @@ object SchemaGenerator {
     private val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
 
     def createSchema(appName: String, formSource: DocumentInfo, containingDocument: XFormsContainingDocument): Elem = {
-        // Read form and library
-        val libraries = Libraries(FormRunner.readPublishedForm("orbeon", "library"), FormRunner.readPublishedForm(appName, "library"))
 
         // Compute root xs:element
         val rootBind = FormRunner.findTopLevelBind(formSource).get
         val resolve = containingDocument.getControls.getCurrentControlTree.getRoot.resolve(_: String)
-        val rootXsElem = handleBind(libraries, resolve, rootBind)
+        val rootXsElem = handleBind(formSource, resolve, rootBind)
 
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
                    xmlns:xf="http://www.w3.org/2002/xforms"
@@ -53,7 +51,7 @@ object SchemaGenerator {
     }
 
     // Recursive function generating an xs:element from an xf:bind
-    private def handleBind(libraries: Libraries, resolve: String ⇒ Option[XFormsObject], bind: NodeInfo): Elem = {
+    private def handleBind(formSource: DocumentInfo, resolve: String ⇒ Option[XFormsObject], bind: NodeInfo): Elem = {
 
         case class BindInfo(
             elemName   : String,
@@ -82,7 +80,7 @@ object SchemaGenerator {
                 Some(BindInfo(
                     elemName    = bind \@ ("ref" || "nodeset"),
                     required    = bind.attValue("required") == "true()",
-                    hasRelevant = ! bind.att("has-relevant").isEmpty,
+                    hasRelevant = bind.att("has-relevant").nonEmpty,
                     elemType    = bind.att("type").headOption.map(_.stringValue).map(bind.resolveQName).filterNot(Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)),
                     repeated    = repeatGridNode nonEmpty,
                     min         = repeatGridNode \@ "min",
@@ -215,23 +213,34 @@ object SchemaGenerator {
                 def findComponentNodeForSection(sectionNode: NodeInfo) =
                     sectionNode child * find (e ⇒ matchesComponentURI(e.getURI))
 
-                // NOTE: This also returns None if we can't find the library. Is this the best thing to do?
-                def findComponentBindNodes(componentNode: NodeInfo) = {
-                    def libraryDocumentOpt =
-                        componentNode.getURI match {
-                            case ComponentNS("orbeon") ⇒ libraries.orbeon
-                            case _ ⇒ libraries.app
+                // NOTE: This also returns Nil if we can't find the library. Is this the best thing to do?
+                def findComponentBindNodes(componentNode: NodeInfo): Seq[NodeInfo] = {
+
+                    // Find the <xbl:xbl> XBL container, as we might have two (one for the orbeon library, one for the app library)
+                    val xblEl = {
+                        val xblEls = formSource.rootElement \ "*:head" \ "*:xbl"
+                        val xblEl = xblEls filter { xblEl ⇒
+                            val componentNamespace = xblEl.namespaces.filter(_.getLocalPart == "component")
+                            componentNamespace.head.getStringValue == componentNode.namespaceURI
                         }
+                        assert(xblEl.length == 1, "expect exactly one <xbl:xbl> container for given namespace")
+                        xblEl.head
+                    }
 
-                    def componentBindOpt(rootBind: NodeInfo) =
-                        rootBind \ "*:bind" find (_.attValue("name") == componentNode.getLocalPart)
+                    // Find the <xbl:binding> for this component
+                    val xblBindingEl = {
+                        val els = xblEl \ "*:binding" filter (_.attValue("element").endsWith("|" + componentNode.localname))
+                        assert(els.length == 1, "expect exactly one <xbl:binding> for given component")
+                        els.head
+                    }
 
-                    for {
-                        libraryDocument ← libraryDocumentOpt
-                        libraryRootBind ← FormRunner.findTopLevelBind(libraryDocument)
-                        componentBind ← componentBindOpt(libraryRootBind)
-                    } yield
-                        componentBind \ "*:bind"
+                    // Find top-level xf:bind, which is the one without a `ref`
+                    // (there is a xf:bind making instance('fr-form-instance') readonly in certain cases; is it really needed?)
+                    val componentTopLevelBind = xblBindingEl \ "*:implementation" \ "*:model" \ "*:bind" filter (_.att("ref").isEmpty)
+                    assert(componentTopLevelBind.length == 1, "expect exactly one top-level bind in component")
+
+                    // Find xf:bind for the nodes inside this component
+                    componentTopLevelBind \ "*:bind"
                 }
 
                 // We want a new resolver as what's inside the section template component is in inner scope
@@ -262,7 +271,7 @@ object SchemaGenerator {
                         componentNode ← findComponentNodeForSection(sectionNode)
                         sectionStaticId = sectionNode.id
                     } yield
-                        (findComponentBindNodes(componentNode) getOrElse Nil, resolverForSectionComponent(sectionStaticId))
+                        (findComponentBindNodes(componentNode), resolverForSectionComponent(sectionStaticId))
 
                 findSectionTemplateBindsAndResolver getOrElse(Nil, resolve)
 
@@ -271,7 +280,7 @@ object SchemaGenerator {
         }
 
         // Recurse on children if any
-        childrenBinds flatMap (handleBind(libraries, newResolve, _)) match {
+        childrenBinds flatMap (handleBind(formSource, newResolve, _)) match {
             case Nil ⇒ xsElem
             case xsElems ⇒ xsElem.copy(child = <xs:complexType>
                 <xs:all>

@@ -264,11 +264,11 @@ trait ElementEventHandlers {
     // Reasoning is great but the only way to know for sure what's best would be to run a solid performance test of the
     // options.
     def handlersForEvent(eventName: String): HandlerAnalysis =
-        handlersCache.get(eventName) getOrElse {
+        handlersCache.getOrElse(eventName, {
             val result = handlersForEventImpl(eventName)
             handlersCache += eventName → result
             result
-        }
+        })
 
     private def handlersForObserver(observer: ElementAnalysis) =
         observer.part.getEventHandlers(observer.prefixedId)

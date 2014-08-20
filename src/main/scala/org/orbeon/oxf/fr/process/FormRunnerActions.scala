@@ -122,7 +122,7 @@ trait FormRunnerActions {
                     "before-urls" → Some(beforeURLs),
                     "after-urls"  → Some(afterURLs)
                 ))
-        } recover {
+        } onFailure {
             case _ ⇒
                 dispatch(name = "fr-data-save-error", targetId = FormModel)
         }

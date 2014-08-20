@@ -16,6 +16,7 @@ package org.orbeon.oxf.http
 import java.io.IOException
 import java.net.{CookieStore ⇒ _, _}
 import java.security.KeyStore
+import javax.net.ssl.SSLContext
 
 import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
 import jcifs.util.Base64
@@ -228,8 +229,8 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             // Create SSL hostname verifier
             val hostnameVerifier = settings.sslHostnameVerifier match {
                 case "browser-compatible" ⇒ SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
-                case "allow-all" ⇒ SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
-                case _ ⇒ SSLSocketFactory.STRICT_HOSTNAME_VERIFIER
+                case "allow-all"          ⇒ SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+                case _                    ⇒ SSLSocketFactory.STRICT_HOSTNAME_VERIFIER
             }
 
             // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
@@ -237,16 +238,29 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
 
             // Calling "full" constructor: https://github.com/apache/httpclient/blob/4.2.x/httpclient/src/main/java/org/apache/http/conn/ssl/SSLSocketFactory.java#L203
-            val sslSocketFactory =
-                new SSLSocketFactory(
-                    SSLSocketFactory.TLS,
-                    trustStore map (_._1) orNull,
-                    trustStore map (_._2) orNull,
-                    trustStore map (_._1) orNull,
-                    null,
-                    null,
-                    hostnameVerifier
-                )
+            val sslSocketFactory = trustStore match {
+                case Some(trustStore) ⇒
+                    new SSLSocketFactory(
+                        SSLSocketFactory.TLS,
+                        trustStore._1,
+                        trustStore._2,
+                        trustStore._1,
+                        null,
+                        null,
+                        hostnameVerifier
+                    )
+                case None ⇒
+                    // See http://docs.oracle.com/javase/7/docs/technotes/guides/security/jsse/JSSERefGuide.html#CustomizingStores
+                    // "This default SSLContext is initialized with a default KeyManager and a TrustManager. If a
+                    // keystore is specified by the javax.net.ssl.keyStore system property and an appropriate
+                    // javax.net.ssl.keyStorePassword system property, then the KeyManager created by the default
+                    // SSLContext will be a KeyManager implementation for managing the specified keystore.
+                    // (The actual implementation will be as specified in Customizing the Default Key and Trust
+                    // Managers.) If no such system property is specified, then the keystore managed by the KeyManager
+                    // will be a new empty keystore."
+                    new SSLSocketFactory(SSLContext.getInstance("Default"), hostnameVerifier)
+            }
+
 
             schemeRegistry.register(new Scheme("https", 443, sslSocketFactory))
 

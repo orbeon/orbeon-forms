@@ -23,9 +23,9 @@ import RequestReader._
 
 private object FlatView {
 
-    val MetadataColumns         = List("document_id", "created", "last_modified_time", "last_modified_by") map (_.toUpperCase)
-    val PrefixedMetadataColumns = MetadataColumns map (col ⇒ s"METADATA_$col")
-    val MetadataPairs           = MetadataColumns zip PrefixedMetadataColumns
+    val MetadataColumns         = List("document_id", "created", "last_modified_time", "last_modified_by").map(_.toUpperCase)
+    val PrefixedMetadataColumns = MetadataColumns.map(col ⇒ s"METADATA_$col")
+    val MetadataPairs           = MetadataColumns.map("d." + _).zip(PrefixedMetadataColumns)
     val MaxNameLength           = 30
     val TablePrefix             = "ORBEON_F_"
 
@@ -39,24 +39,31 @@ private object FlatView {
         val formXML = xmlToSQLId(req.form)
 
         val tableName = TablePrefix + joinParts(appXML, formXML, MaxNameLength - TablePrefix.length)
-        val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(xml, '/*/$path')" → col }
+        val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(d.xml, '/*/$path')" → col }
         val allCols   = MetadataPairs.iterator ++ userCols
 
         // NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations
-        val ps = connection.prepareStatement(
-            s"""|CREATE OR REPLACE VIEW $tableName AS
-                |SELECT
-                |    ${allCols map { case (col, name) ⇒ col + " " + name } mkString ", "}
-                |FROM (
-                |    SELECT d.*, DENSE_RANK() OVER (PARTITION BY document_id ORDER BY last_modified_time DESC) AS LATEST
-                |    FROM orbeon_form_data d
-                |    WHERE
-                |        app = '${escapeSQL(req.app)}'
-                |        and form = '${escapeSQL(req.form)}'
-                |)
-                |WHERE latest = 1 AND deleted = 'N'
-                |""".stripMargin)
-
+        val query =
+            s"""|CREATE  OR REPLACE VIEW $tableName AS
+                |SELECT  ${allCols map { case (col, name) ⇒ col + " " + name } mkString ", "}
+                |  FROM  orbeon_form_data d,
+                |        (
+                |            SELECT   max(last_modified_time) last_modified_time,
+                |                     app, form, document_id
+                |              FROM   orbeon_form_data d
+                |             WHERE       app   = '${escapeSQL(req.app)}'
+                |                     AND form  = '${escapeSQL(req.form)}'
+                |                     AND draft = 'N'
+                |            GROUP BY app, form, document_id
+                |        ) m
+                | WHERE      d.last_modified_time = m.last_modified_time
+                |        AND d.app                = m.app
+                |        AND d.form               = m.form
+                |        AND d.document_id        = m.document_id
+                |        AND d.deleted            = 'N'
+                |""".stripMargin
+        System.out.println(query)
+        val ps = connection.prepareStatement(query)
         ps.executeUpdate()
     }
 

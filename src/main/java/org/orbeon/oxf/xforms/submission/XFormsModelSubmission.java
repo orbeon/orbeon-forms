@@ -397,7 +397,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 /* ***** Serialization ********************************************************************************** */
 
                 // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = XFormsSubmissionUtils.getRequestedSerialization(p.serialization, p.resolvedMethod);
+                final String requestedSerialization = getRequestedSerializationOrNull(p.serialization, p.resolvedMethod);
                 if (requestedSerialization == null)
                     throw new XFormsSubmissionException(this, "xf:submission: invalid submission method requested: " + p.resolvedMethod, "serializing instance");
 

@@ -96,4 +96,21 @@ object XFormsModelSubmissionBase {
             }
         }
     }
+    
+    import XFormsSubmissionUtils._
+    
+    def defaultSerialization(xformsMethod: String): Option[String] =
+        nonEmptyOrNone(xformsMethod) collect {
+            case "multipart-post"                             ⇒ "multipart/related"
+            case "form-data-post"                             ⇒ "multipart/form-data"
+            case "urlencoded-post"                            ⇒ "application/x-www-form-urlencoded"
+            case method if isPost(method) || isPut(method)    ⇒ "application/xml"
+            case method if isGet(method)  || isDelete(method) ⇒ "application/x-www-form-urlencoded"
+        }
+
+    def requestedSerialization(xformsSerialization: String, xformsMethod: String) =
+        nonEmptyOrNone(xformsSerialization) orElse defaultSerialization(xformsMethod)
+
+    def getRequestedSerializationOrNull(xformsSerialization: String, xformsMethod: String) =
+        requestedSerialization(xformsSerialization, xformsMethod).orNull
 }

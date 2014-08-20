@@ -59,28 +59,6 @@ public class XFormsSubmissionUtils {
         return actualMethod;
     }
 
-    public static String getRequestedSerialization(String serializationAttribute, String methodAttribute) {
-        final String actualSerialization;
-        if (serializationAttribute == null) {
-            if (methodAttribute.equals("multipart-post")) {
-                actualSerialization = "multipart/related";
-            } else if (methodAttribute.equals("form-data-post")) {
-                actualSerialization = "multipart/form-data";
-            } else if (methodAttribute.equals("urlencoded-post")) {
-                actualSerialization = "application/x-www-form-urlencoded";
-            } else if (XFormsSubmissionUtils.isPost(methodAttribute) || XFormsSubmissionUtils.isPut(methodAttribute)) {
-                actualSerialization = "application/xml";
-            } else if (XFormsSubmissionUtils.isGet(methodAttribute) || XFormsSubmissionUtils.isDelete(methodAttribute)) {
-                actualSerialization = "application/x-www-form-urlencoded";
-            } else {
-                actualSerialization = null;
-            }
-        } else {
-            actualSerialization = serializationAttribute;
-        }
-        return actualSerialization;
-    }
-
     public static boolean isGet(String method) {
         return method.equals("get");
     }

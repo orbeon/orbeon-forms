@@ -73,6 +73,7 @@ case class HttpClientSettings(
     sslHostnameVerifier : String,
     sslKeystoreURI      : Option[String],
     sslKeystorePassword : Option[String],
+    sslKeystoreType     : Option[String],
 
     proxySSL            : Boolean,
     proxyUsername       : Option[String],
@@ -112,6 +113,7 @@ object HttpClientSettings {
             sslHostnameVerifier  = stringParamWithDefault(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
             sslKeystoreURI       = stringParam(SSLKeystoreURIProperty),
             sslKeystorePassword  = stringParam(SSLKeystorePasswordProperty),
+            sslKeystoreType      = stringParam(SSLKeystoreTypeProperty),
   
             proxySSL             = booleanParamWithDefault(ProxySSLProperty, ProxySSLPropertyDefault),
             proxyUsername        = stringParam(ProxyUsernameProperty),
@@ -130,6 +132,7 @@ object HttpClientSettings {
     val SSLHostnameVerifierProperty  = "oxf.http.ssl.hostname-verifier"
     val SSLKeystoreURIProperty       = "oxf.http.ssl.keystore.uri"
     val SSLKeystorePasswordProperty  = "oxf.http.ssl.keystore.password"
+    val SSLKeystoreTypeProperty      = "oxf.http.ssl.keystore.type"
     val ProxySSLProperty             = "oxf.http.proxy.use-ssl"
     val ProxyUsernameProperty        = "oxf.http.proxy.username"
     val ProxyPasswordProperty        = "oxf.http.proxy.password"

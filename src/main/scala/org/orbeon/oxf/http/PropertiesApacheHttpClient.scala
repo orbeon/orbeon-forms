@@ -37,6 +37,7 @@ object PropertiesConnectionSettings {
             sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
             sslKeystoreURI       = Option(props.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
             sslKeystorePassword  = Option(props.getString(SSLKeystorePasswordProperty)),
+            sslKeystoreType      = Option(props.getString(SSLKeystoreTypeProperty)),
 
             proxySSL             = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
             proxyUsername        = Option(props.getString(ProxyUsernameProperty)),

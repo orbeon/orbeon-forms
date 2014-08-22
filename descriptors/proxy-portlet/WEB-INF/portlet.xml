@@ -74,6 +74,10 @@
             <param-value/>
         </init-param>
         <init-param>
+            <param-name>oxf.http.ssl.keystore.type</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
             <param-name>oxf.http.proxy.use-ssl</param-name>
             <param-value>false</param-value>
         </init-param>

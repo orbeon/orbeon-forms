@@ -215,9 +215,12 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
                 (settings.sslKeystoreURI, settings.sslKeystorePassword) match {
                     case (Some(keyStoreURI), Some(keyStorePassword)) ⇒
 
+                        val keyStoreType =
+                            settings.sslKeystoreType getOrElse KeyStore.getDefaultType
+
                         val keyStore =
                             useAndClose(new URL(keyStoreURI).openStream) { is ⇒ // URL is typically local (file:, etc.)
-                                KeyStore.getInstance(KeyStore.getDefaultType) |!>
+                                KeyStore.getInstance(keyStoreType) |!>
                                     (_.load(is, keyStorePassword.toCharArray))
                             }
 

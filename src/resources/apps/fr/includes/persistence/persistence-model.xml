@@ -273,53 +273,6 @@
             resource="/fr/service/persistence/crud/{$app}/{$form}/{event('document-data-or-draft-id')}/data.xml"
             replace="none"/>
 
-    <!-- Instance to store the result of the create/update submission -->
-    <xf:instance id="fr-create-update-submission-response">
-        <response xmlns=""/>
-    </xf:instance>
-
-    <!-- Submission to create/update the XML form -->
-    <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
-         enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
-         code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
-         form instance is created. -->
-    <xf:submission id="fr-create-update-submission"
-            validate="false"
-            relevant="false"
-            method="put"
-            ref="event('holder')"
-            resource="{event('resource')}"
-            xxf:username="{event('username')}"
-            xxf:password="{event('password')}"
-            replace="text"
-            target="instance('fr-create-update-submission-response')">
-
-        <!-- Clear response if not HTML -->
-        <xf:setvalue
-            if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
-            ref="instance('fr-create-update-submission-response')"/>
-        <xf:header ref=".[normalize-space(event('form-version'))]">
-            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="event('form-version')"/>
-        </xf:header>
-    </xf:submission>
-
-    <!-- Submission to create/update an attachment -->
-    <xf:submission id="fr-create-update-attachment-submission"
-            validate="false"
-            method="put"
-            serialization="application/octet-stream"
-            ref="event('holder')"
-            resource="{event('resource')}"
-            xxf:username="{event('username')}"
-            xxf:password="{event('password')}"
-            replace="none">
-        <xf:header ref=".[normalize-space(event('form-version'))]">
-            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="event('form-version')"/>
-        </xf:header>
-    </xf:submission>
-
     <!-- Search for drafts, to possibly warn users there is a newer draft -->
     <xf:submission id="fr-search-drafts-submission"
             method="post"

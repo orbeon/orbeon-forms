@@ -1,0 +1,101 @@
+<!--
+  Copyright (C) 2014 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
+
+            <xf:instance id="fr-parameters-instance" src="input:data"/>
+            <xf:instance id="fr-request"             src="input:instance"/>
+
+            <xf:instance id="fr-response"><document-id/></xf:instance>
+            <xf:instance id="fr-form-instance"><dummy/></xf:instance>
+
+            <xf:var name="app"  value="instance('fr-parameters-instance')/app/string()"/>
+            <xf:var name="form" value="instance('fr-parameters-instance')/form/string()"/>
+
+            <xf:var name="requested-document-id" value="instance('fr-request')/root()/document-id/string()"/>
+
+            <xf:action event="xforms-model-construct-done">
+                <xf:message level="xxf:log-error">
+                    xxxxx
+                    <xf:output value="$requested-document-id"/>
+                    <xf:output value="saxon:serialize(instance('fr-request'), 'xml')"/>
+                </xf:message>
+                <xf:send submission="read-form-data-for-duplicate"/>
+            </xf:action>
+
+            <!-- Read form data for the duplicate button -->
+            <!-- NOTE: It would be nice if this could be done entirely with a process. -->
+            <xf:submission
+                id="read-form-data-for-duplicate"
+                method="get"
+                serialization="none"
+                action="{frf:createFormDataBasePath($app, $form, false(), $requested-document-id)}/data.xml"
+                replace="instance"
+                instance="fr-form-instance">
+
+                <!-- New unique id for duplicated data -->
+                <xf:setvalue
+                    event="xforms-submit"
+                    ref="instance('fr-response')"
+                    value="secure:randomHexId()"
+                    xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"/>
+
+                <!-- Duplicate form data and attachments under new document id, using the same form version if any is specified -->
+                <xf:action event="xforms-submit-done">
+                    <xf:action type="xpath">
+                        frf:duplicate(
+                            instance('fr-form-instance'),
+                            $app,
+                            $form,
+                            $requested-document-id,
+                            instance('fr-response'),
+                            event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value
+                        )
+                    </xf:action>
+                    <xf:send submission="send-result"/>
+                </xf:action>
+
+                <!-- Clear form data when submission terminates -->
+                <xf:insert
+                    event="xforms-submit-done xforms-submit-error"
+                    ref="instance('fr-form-instance')"
+                    origin="xxf:element('dummy')"/>
+
+            </xf:submission>
+
+            <!-- Send result out -->
+            <xf:submission
+                id="send-result"
+                method="post"
+                action="echo:"
+                ref="instance('fr-response')"
+                replace="all"/>
+
+            <xf:action type="xpath" event="xforms-submit-error">
+                frf:sendError(500)
+            </xf:action>
+
+        </xf:model>
+        <xi:include href="../components/universal-submission.xml" xxi:omit-xml-base="true"/>
+    </xh:head>
+</xh:html>

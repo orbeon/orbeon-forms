@@ -202,9 +202,9 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
         // It seems that credentials and state are not thread-safe, so create every time
         def newProxyAuthState = proxyCredentials map {
-            case c: NTCredentials ⇒ new AuthState |!> (_.update(new NTLMScheme(JCIFSEngine), c))
+            case c: NTCredentials               ⇒ new AuthState |!> (_.update(new NTLMScheme(JCIFSEngine), c))
             case c: UsernamePasswordCredentials ⇒ new AuthState |!> (_.update(new BasicScheme, c))
-            case _ ⇒ throw new IllegalStateException
+            case _                              ⇒ throw new IllegalStateException
         }
 
         // The single ConnectionManager
@@ -240,9 +240,9 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             val schemeRegistry = new SchemeRegistry
             schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
 
-            // Calling "full" constructor: https://github.com/apache/httpclient/blob/4.2.x/httpclient/src/main/java/org/apache/http/conn/ssl/SSLSocketFactory.java#L203
             val sslSocketFactory = trustStore match {
                 case Some(trustStore) ⇒
+                    // Calling full constructor
                     new SSLSocketFactory(
                         SSLSocketFactory.TLS,
                         trustStore._1,
@@ -269,7 +269,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
             // Pooling connection manager with limits removed
             new PoolingClientConnectionManager(schemeRegistry) |!>
-                    (_.setMaxTotal(Integer.MAX_VALUE)) |!>
+                    (_.setMaxTotal(Integer.MAX_VALUE))         |!>
                     (_.setDefaultMaxPerRoute(Integer.MAX_VALUE))
         }
 
@@ -314,12 +314,10 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             }
         }
 
-        /**
-         * The Apache folks are afraid we misuse preemptive authentication, and so force us to copy paste some code rather
-         * than providing a simple configuration flag. See:
-         *
-         * http://hc.apache.org/httpcomponents-client-ga/tutorial/html/authentication.html#d4e950
-         */
+        // The Apache folks are afraid we misuse preemptive authentication, and so force us to copy paste some code
+        // rather than providing a simple configuration flag. See:
+        // http://hc.apache.org/httpcomponents-client-ga/tutorial/html/authentication.html#d4e950
+
         object PreemptiveAuthHttpRequestInterceptor extends HttpRequestInterceptor {
             def process(request: HttpRequest, context: HttpContext) {
 

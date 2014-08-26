@@ -45,7 +45,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     // NOTE: Clear the PDF URL *before* the process, because if we clear it after, it will be already cleared during the
     // second pass of a two-pass submission.
     // TODO: Delete temp file if any.
-    override def beforeProcess() = Try(setvalue(pdfURLInstanceRootElement, ""))
+    override def beforeProcess() = Try(setvalue(pdfURLInstanceRootElementOpt.toList, ""))
 
     override def processError(t: Throwable) =
         tryErrorMessage(Map(Some("resource") → "process-error"))
@@ -57,13 +57,10 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
         topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
 
     // Search first in properties, then try legacy workflow-send
+    // The scope is interpreted as a property prefix.
     def findProcessByName(scope: String, name: String) = {
         implicit val formRunnerParams = FormRunnerParams()
-
-        // The scope is interpreted as a property prefix
-        formRunnerProperty(scope + '.' + name) flatMap
-        nonEmptyOrNone                         orElse // don't accept an existing but blank property [why?]
-        buildProcessFromLegacyProperties(name)
+        formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
     }
 
     // Legacy: build "workflow-send" process based on properties

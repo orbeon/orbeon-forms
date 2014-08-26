@@ -21,16 +21,19 @@
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
-
+        <!-- This is to help the process engine which assumes the existing of this model and instance -->
+        <xf:model id="fr-parameters-model" xxf:xpath-analysis="true">
             <xf:instance id="fr-parameters-instance" src="input:data"/>
-            <xf:instance id="fr-request"             src="input:instance"/>
+        </xf:model>
+        <xf:model id="fr-form-model">
+
+            <xf:instance id="fr-request" src="input:instance"/>
 
             <xf:instance id="fr-response"><document-id/></xf:instance>
             <xf:instance id="fr-form-instance"><dummy/></xf:instance>
 
-            <xf:var name="app"  value="instance('fr-parameters-instance')/app/string()"/>
-            <xf:var name="form" value="instance('fr-parameters-instance')/form/string()"/>
+            <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
+            <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
 
             <xf:var name="requested-document-id" value="instance('fr-request')/root()/document-id/string()"/>
 
@@ -57,6 +60,12 @@
 
                 <!-- Duplicate form data and attachments under new document id, using the same form version if any is specified -->
                 <xf:action event="xforms-submit-done">
+
+                    <!-- See also https://github.com/orbeon/orbeon-forms/issues/1874 -->
+                    <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                        process:runProcessByName('oxf.fr.service', 'duplicate.transform')
+                    </xf:action>
+
                     <xf:action type="xpath">
                         frf:duplicate(
                             instance('fr-form-instance'),

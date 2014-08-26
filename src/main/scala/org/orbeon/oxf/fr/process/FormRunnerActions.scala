@@ -396,12 +396,14 @@ trait FormRunnerActions {
     def tryWizardNext(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
 
-    def pdfURLInstanceRootElement = topLevelInstance(PersistenceModel, "fr-pdf-url-instance").get.rootElement
+    def pdfURLInstanceRootElementOpt = topLevelInstance(PersistenceModel, "fr-pdf-url-instance") map (_.rootElement)
 
     def tryCreatePDFIfNeeded(params: ActionParams): Try[Any] =
         Try {
-            // Only create if not available yet
-            if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
-                sendThrowOnError("fr-pdf-service-submission")
+            pdfURLInstanceRootElementOpt foreach { pdfURLInstanceRootElement ⇒
+                // Only create if not available yet
+                if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
+                    sendThrowOnError("fr-pdf-service-submission")
+            }
         }
 }

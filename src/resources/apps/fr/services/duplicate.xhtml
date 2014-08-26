@@ -35,11 +35,6 @@
             <xf:var name="requested-document-id" value="instance('fr-request')/root()/document-id/string()"/>
 
             <xf:action event="xforms-model-construct-done">
-                <xf:message level="xxf:log-error">
-                    xxxxx
-                    <xf:output value="$requested-document-id"/>
-                    <xf:output value="saxon:serialize(instance('fr-request'), 'xml')"/>
-                </xf:message>
                 <xf:send submission="read-form-data-for-duplicate"/>
             </xf:action>
 

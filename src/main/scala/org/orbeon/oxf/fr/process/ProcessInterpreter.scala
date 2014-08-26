@@ -64,6 +64,13 @@ trait ProcessInterpreter extends Logging {
     def paramByNameOrDefault(params: ActionParams, name: String) =
         params.get(Some(name)) orElse params.get(None)
 
+    def requiredParamByName(params: ActionParams, action: String, name: String) =
+        params.getOrElse(Some(name), missingArgument(action, name))
+
+    // TODO: Obtain action name automatically.
+    def missingArgument(action: String, name: String) =
+        throw new IllegalArgumentException(s"$action: `$name` parameter is required")
+
     private object ProcessRuntime {
 
         import org.orbeon.oxf.util.DynamicVariable

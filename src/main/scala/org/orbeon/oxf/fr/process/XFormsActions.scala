@@ -15,7 +15,10 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML
 import util.Try
+import XML._
 
 trait XFormsActions {
 
@@ -24,7 +27,8 @@ trait XFormsActions {
     def AllowedXFormsActions = Map[String, Action](
         "xf:send"     → tryXFormsSend,
         "xf:dispatch" → tryXFormsDispatch,
-        "xf:show"     → tryShowDialog
+        "xf:show"     → tryShowDialog,
+        "xf:setvalue" → trySetvalue
     )
 
     def tryXFormsSend(params: ActionParams): Try[Any] =
@@ -53,5 +57,19 @@ trait XFormsActions {
             val dialogName = paramByNameOrDefault(params, "dialog")
 
             dialogName foreach (show(_, properties = collectCustomProperties(params, StandardShowParams)))
+        }
+
+    def trySetvalue(params: ActionParams): Try[Any] =
+        Try {
+            evaluateOne(requiredParamByName(params, "setvalue", "ref")) match {
+                case nodeInfo: NodeInfo ⇒
+                    val valueToSet = params.get(Some("value")) match {
+                        case Some(valueExpr) ⇒ evalOne(nodeInfo, "string(" + valueExpr + ")").getStringValue
+                        case None            ⇒ ""
+                    }
+                    setvalue(nodeInfo, valueToSet)
+                case _ ⇒
+                    debug("setvalue: `ref` parameter did not return a node, ignoring")
+            }
         }
 }

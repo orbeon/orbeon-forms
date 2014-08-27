@@ -48,6 +48,7 @@ import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
 import org.orbeon.oxf.util.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,7 +122,7 @@ public class HTTPURLConnection extends URLConnection {
             if (keyStoreURI != null) {
                 final URL url = new URL(null, keyStoreURI);
                 final InputStream is = url.openStream();
-                trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 trustStore.load(is, keyStorePassword.toCharArray());
             }
 
@@ -137,7 +138,13 @@ public class HTTPURLConnection extends URLConnection {
             schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
 
             // Calling "full" constructor: https://github.com/apache/httpclient/blob/4.2.x/httpclient/src/main/java/org/apache/http/conn/ssl/SSLSocketFactory.java#L203
-            final SSLSocketFactory sslSocketFactory = new SSLSocketFactory(SSLSocketFactory.TLS, trustStore, keyStorePassword, trustStore, null, null, hostnameVerifier);
+            final SSLSocketFactory sslSocketFactory;
+            if (trustStore != null) {
+                sslSocketFactory = new SSLSocketFactory(SSLSocketFactory.TLS, trustStore, keyStorePassword, trustStore, null, null, hostnameVerifier);
+            } else {
+                sslSocketFactory = new SSLSocketFactory(SSLContext.getInstance("Default"), hostnameVerifier);
+            }
+
             schemeRegistry.register(new Scheme("https", 443, sslSocketFactory));
 
             connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);

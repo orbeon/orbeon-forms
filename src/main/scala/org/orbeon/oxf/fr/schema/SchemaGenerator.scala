@@ -96,41 +96,92 @@ object SchemaGenerator {
 
                 // Optional type attribute
                 def attr(name: String, value: String) = scala.xml.Attribute(None, name, scala.xml.Text(value), Null)
-
                 // Optional min/max attributes
                 def attrDefault(value: Option[String], name: String, default: String) =
                     if (repeated) Some(attr(name, value getOrElse default)) else None
 
-                val minAttr = attrDefault(min, "minOccurs", "0")
-                val maxAttr = attrDefault(max, "maxOccurs", "unbounded")
+                // Build the <xs:element> we end up returning
+                def xsElement(
+                    attributes       : List[Attribute],
+                    namespaceBinding : Option[(String, String)],
+                    content          : Option[Elem]
+                ):  Elem = {
+                    val xsElem =
+                        <xs:element name={elemName}>
+                            {content.toList}
+                        </xs:element>
+                    val xsElemWithNS = namespaceBinding.map(ns ⇒ NamespaceBinding(ns._1, ns._2, xsElem.scope)).map(s ⇒ xsElem.copy(scope = s)).getOrElse(xsElem)
+                    attributes.foldLeft(xsElemWithNS)(_ % _)
+                }
 
-                // For controls with an itemset, generate a xs:simpleType
-                val simpleTypeRestrictionElemOpt =
-                    for {
-                        control       ← resolve(elemName + "-control")
-                        select        ← collectByErasedType[XFormsSelect1Control](control)
-                        if select.isRelevant
-                        itemset       = select.getItemset
-                        itemsetValues = itemset.children map (_.value)
-                        if itemsetValues.nonEmpty
-                    } yield {
+                case class ItemsetTypeValues(isSelect: Boolean, values: List[String])
+                val itemsetOpt: Option[ItemsetTypeValues] = {
+                    val control = resolve(elemName + "-control")
+                    val select  = control.flatMap(collectByErasedType[XFormsSelect1Control](_))
+                    select.map(s ⇒ {
+                        val itemsetOpt = s.isRelevant.option(s.getItemset)
+                        val values     = itemsetOpt.toList.flatMap(_.children.map(_.value))
+                        val isSelect   = s.isInstanceOf[XFormsSelectControl]
+                        ItemsetTypeValues(isSelect, values)
+                    })
+                }
 
+                def isBindForAttachmentControl = {
+                    val xsdOrXFormsURI = Set(XSD_URI, XFORMS_NAMESPACE_URI)
+                    def isBindTypeAnyURI = elemType.exists(qname ⇒ xsdOrXFormsURI(qname.getNamespaceURI) && qname.getName == "anyURI")
+                    def isControlAttachment = findControlNodeForBind(bind, *) exists (_.attClasses("fr-attachment"))
+                    isBindTypeAnyURI && isControlAttachment
+                }
+
+                // Different types of schema element we generate
+                sealed trait              SchemaGenerationCase
+                object Repeated   extends SchemaGenerationCase
+                object Attachment extends SchemaGenerationCase
+                object Selection  extends SchemaGenerationCase
+                object MaybeTyped extends SchemaGenerationCase
+
+                val controlType = if (repeated)                   Repeated
+                             else if (itemsetOpt.isDefined)       Selection
+                             else if (isBindForAttachmentControl) Attachment
+                             else                                 MaybeTyped
+
+                controlType match {
+
+                    case Repeated ⇒
+                        val minAttr    = attrDefault(min, "minOccurs", "0")
+                        val maxAttr    = attrDefault(max, "maxOccurs", "unbounded")
+                        val attributes = (minAttr ++ maxAttr).toList
+                        xsElement(attributes, None, None)
+
+                    case Attachment ⇒
+                        val content =
+                            <xs:complexType>
+                                <xs:simpleContent>
+                                    <xs:extension base="xs:anyURI">
+                                        <xs:attribute name="filename" type="xs:string"/>
+                                        <xs:attribute name="mediatype" type="xs:string"/>
+                                        <xs:attribute name="size" type="xf:integer"/>
+                                    </xs:extension>
+                                </xs:simpleContent>
+                            </xs:complexType>
+                        xsElement(Nil, None, Some(content))
+
+                    case Selection ⇒
+                        val itemset = itemsetOpt.get
                         def oneValueSimpleType(allowEmpty: Boolean): Elem = {
-                            val values = if (allowEmpty) "" :: itemsetValues else itemsetValues
+                            val values = if (allowEmpty) "" :: itemset.values else itemset.values
                             <xs:simpleType>
                                 <xs:restriction base="xs:string">
                                     {values map (value ⇒ <xs:enumeration value={value}/>)}
                                 </xs:restriction>
                             </xs:simpleType>
                         }
-
                         def listSimpleType: Elem =
                                 <xs:simpleType>
                                     <xs:list>
                                         {oneValueSimpleType(allowEmpty = false)}
                                     </xs:list>
                                 </xs:simpleType>
-
                         def listMinLengthOneSimpleType: Elem =
                             <xs:simpleType>
                                 <xs:restriction>
@@ -140,65 +191,26 @@ object SchemaGenerator {
                             </xs:simpleType>
 
                         val allowEmpty = ! required || hasRelevant
-                        select match {
-                            case _: XFormsSelectControl ⇒
-                                if (allowEmpty)
-                                    listSimpleType
-                                else
-                                    listMinLengthOneSimpleType
-                            case _ ⇒
+                        val content =
+                            if (itemset.isSelect)
+                                if (allowEmpty) listSimpleType else listMinLengthOneSimpleType
+                            else
                                 oneValueSimpleType(allowEmpty)
-                        }
-                    }
+                        xsElement(Nil, None, Some(content))
 
-                // The xf:bind is for an attachment control if it has type="xs|xf:anyURI" and the corresponding control
-                // has a class 'fr-attachment'
-                val isBindForAttachmentControl = {
-                    val xsdOrXFormsURI = Set(XSD_URI, XFORMS_NAMESPACE_URI)
-                    def isBindTypeAnyURI = elemType.exists(qname ⇒ xsdOrXFormsURI(qname.getNamespaceURI) && qname.getName == "anyURI")
-                    def isControlAttachment = findControlNodeForBind(bind, *) exists (_.attClasses("fr-attachment"))
-                    isBindTypeAnyURI && isControlAttachment
+                    case MaybeTyped ⇒
+                        val typeAttr = elemType map (_.getQualifiedName) map (attr("type", _))
+                        // Create namespace binding for type, filtering the already declared XSD namespace
+                        val typeNamespaceBinding = elemType flatMap (qname ⇒
+                            (qname.getNamespacePrefix, qname.getNamespaceURI) match {
+                                case (XSD_PREFIX, XSD_URI) ⇒ None
+                                case (XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
+                                case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
+                                case (XFORMS_SHORT_PREFIX, _) ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
+                                case (prefix, uri) ⇒ Some(prefix → uri)
+                            })
+                        xsElement(typeAttr.toList, typeNamespaceBinding, None)
                 }
-
-                // Value of xs:type attribute added to the xs:element, except for attachment controls, where
-                // that type is defined as part of a complex type (see complexTypeForAttachment below)
-                val typeAttr =
-                    if (isBindForAttachmentControl) None
-                    else elemType map (_.getQualifiedName) map (attr("type", _))
-
-                // Create namespace binding for type, filtering the already declared XSD namespace
-                val typeNamespaceBinding =
-                    if (isBindForAttachmentControl) None
-                    else elemType flatMap (qname ⇒
-                        (qname.getNamespacePrefix, qname.getNamespaceURI) match {
-                            case (XSD_PREFIX, XSD_URI) ⇒ None
-                            case (XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
-                            case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
-                            case (XFORMS_SHORT_PREFIX, _) ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
-                            case (prefix, uri) ⇒ Some(NamespaceBinding(prefix, uri, _: NamespaceBinding))
-                        })
-
-                val complexTypeForAttachment =
-                    isBindForAttachmentControl option
-                        <xs:complexType>
-                            <xs:simpleContent>
-                                <xs:extension base="xs:anyURI">
-                                    <xs:attribute name="filename" type="xs:string"/>
-                                    <xs:attribute name="mediatype" type="xs:string"/>
-                                    <xs:attribute name="size" type="xf:integer"/>
-                                </xs:extension>
-                            </xs:simpleContent>
-                        </xs:complexType>
-
-                // Build element with optional attributes and new namespace
-                val xsElemContent = simpleTypeRestrictionElemOpt.toList ++ complexTypeForAttachment.toList
-                val xsElem = <xs:element name={elemName}>
-                    {xsElemContent}
-                </xs:element>
-                val xsElemWithNS = typeNamespaceBinding map (_(xsElem.scope)) map (s ⇒ xsElem.copy(scope = s)) getOrElse xsElem
-                val attributes = typeAttr ++ minAttr ++ maxAttr
-
-                attributes.foldLeft(xsElemWithNS)(_ % _)
         }
 
         // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from

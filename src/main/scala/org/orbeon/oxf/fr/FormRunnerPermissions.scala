@@ -13,17 +13,23 @@
  */
 package org.orbeon.oxf.fr
 
-import scala.util.control.NonFatal
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.fb.FormBuilder
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
-import collection.JavaConverters._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 trait FormRunnerPermissions {
 
-    import FormRunner._
-    import FormRunnerPermissions._
+    import org.orbeon.oxf.fr.FormRunner._
+    import org.orbeon.oxf.fr.FormRunnerPermissions._
 
     val PropertyPrefix = "oxf.fr.authentication."
 
@@ -137,14 +143,14 @@ trait FormRunnerPermissions {
             Seq("*")                                                         // No permissions defined for this form, authorize any operation
         else
             (permissionsElement \ "permission")
-                .filter(p ⇒
+                    .filter(p ⇒
                     (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
                     (p \ * forall (_.localname == "user-role")))             // … or with only `user-role` constraints
-                .filter(p ⇒
+                    .filter(p ⇒
                     p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
                         ScalaUtils.split((r \@ "any-of").stringValue)        // Constraint is satisfied if user has at least one of the roles
                         .map(_.replace("%20", " "))                          // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
-                        .intersect(orbeonRoles.toSeq).nonEmpty))
+                            .intersect(orbeonRoles.toSeq).nonEmpty))
                 .flatMap(permissionOperations)                               // For the permissions that passed, return the list operations
                 .distinct                                                    // Remove duplicate operations
     }
@@ -160,13 +166,13 @@ trait FormRunnerPermissions {
             val request = NetUtils.getExternalContext.getRequest
             val headerValue = request.getHeaderValuesMap.asScala.get(header).toSeq.flatten.headOption
             headerValue
-                // Does the user info from the header match the user info on the data
-                .filter(_ == dataUserInfo)
-                // If it does, return the operation the owner or group-member can perform
-                .map(_ ⇒ (permissionsElement \ "permission")
+                    // Does the user info from the header match the user info on the data
+                    .filter(_ == dataUserInfo)
+                    // If it does, return the operation the owner or group-member can perform
+                    .map(_ ⇒ (permissionsElement \ "permission")
                     .filter(p ⇒ p \ * forall (_.localname == condition))
                     .flatMap(permissionOperations))
-                .getOrElse(Seq.empty)
+                    .getOrElse(Seq.empty)
         }
 
         val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
@@ -176,7 +182,7 @@ trait FormRunnerPermissions {
                 val dataOperations =
                     Seq((OrbeonUsernameHeaderName, dataUsername,  "owner"),
                         (OrbeonGroupHeaderName,    dataGroupname, "group-member"))
-                        .flatMap(Function.tupled(operations _))
+                            .flatMap(Function.tupled(operations _))
                 (rolesOperations ++ dataOperations).distinct
         }
     }
@@ -194,6 +200,62 @@ trait FormRunnerPermissions {
         allAuthorizedOperations(permissionsElement, username, group)
     }
 
+    /** Given a list of forms metadata:
+     *  - determines the operations the current user can perform,
+     *  - annotates the `<form>` with an `operations="…"` attribute,
+     *  - filters out forms the current user can perform no operation on.
+     */
+    def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo]): List[NodeInfo] = {
+
+        // We only need one wrapper; create it when we encounter the first <form>
+        var wrapperOpt: Option[DocumentWrapper] = None
+
+        val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.fbRoles, orbeonRoles)
+
+        formsEls.flatMap { case formEl: NodeInfo ⇒
+
+            val wrapper = wrapperOpt.getOrElse(
+                // Create wrapper we don't have one already
+                new DocumentWrapper(Dom4jUtils.createDocument, null, formEl.getConfiguration)
+                // Save wrapper for following iterations
+                |!> (w ⇒ wrapperOpt = Some(w))
+            )
+
+            val appName  = formEl.elemValue("application-name")
+            val formName = formEl.elemValue("form-name")
+            val isAdmin  = {
+                def canAccessEverything = fbPermissions.isDefinedAt("*")
+                def canAccessAppForm = {
+                    val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
+                    formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)
+                }
+                canAccessEverything || canAccessAppForm
+            }
+
+            // For each form, compute the operations the user can potentially perform
+            val operations = {
+                val adminOperation = isAdmin.list("admin")
+                val permissionsElement = formEl.child("permissions").headOption.orNull
+                val otherOperations = allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
+                adminOperation ++ otherOperations
+            }
+
+            // Is this form metadata returned by the API?
+            val keepForm = isAdmin ||                             // Admins can see everything, otherwise:
+                ! (   formName == "library"                       // Filter libraries
+                   || operations.isEmpty                          // Filter forms on which user can't possibly do anything
+                   || formEl.elemValue("available") == "false")   // Filter forms marked as not available
+
+            // If kept, rewrite <form>, removing <permissions> and adding operations="…"
+            keepForm.list {
+                val formChildrenWithoutPermissions = formEl.child(*).filter(_.localname != "permissions")
+                val operationsAttr = attributeInfo("operations", operations mkString " ")
+                val content = operationsAttr +: formChildrenWithoutPermissions
+                wrapper.wrap(element("form")) |!> (f ⇒ insert(into = Seq(f), origin = content))
+            }
+        }
+    }
+
     def setAllAuthorizedOperationsHeader(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Unit = {
         val operations = allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname)
         val response = NetUtils.getExternalContext.getResponse
@@ -205,7 +267,7 @@ trait FormRunnerPermissions {
         // Split header values on commas, in case the incoming header was not processed, see:
         // https://github.com/orbeon/orbeon-forms/issues/1690
         request.getHeaderValuesMap.asScala.getOrElse(OrbeonRolesHeaderName, Array.empty[String]) flatMap
-            (ScalaUtils.split[Array](_, ",")) toSet
+                (ScalaUtils.split[Array](_, ",")) toSet
     }
 
     def orbeonRolesSequence: SequenceIterator =

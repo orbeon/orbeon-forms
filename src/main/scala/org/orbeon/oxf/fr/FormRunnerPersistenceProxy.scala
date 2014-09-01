@@ -160,7 +160,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             }
         }
 
-        val formElements = providers map FormRunner.getPersistenceURLHeadersFromProvider flatMap { case (baseURI, headers) ⇒
+        val allFormElements = providers map FormRunner.getPersistenceURLHeadersFromProvider flatMap { case (baseURI, headers) ⇒
             // Read all the forms for the current service
             val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
 
@@ -171,11 +171,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             }
         }
 
+        val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements)
+
         // Aggregate and serialize
         // TODO: Add @operations="|admin" based on FB permissions. It is better if this is done in a centralized way.
         // See https://github.com/orbeon/orbeon-forms/issues/1316
         val documentElement = elementInfo("forms")
-        XFormsAPI.insert(into = documentElement, origin = formElements)
+        XFormsAPI.insert(into = documentElement, origin = filteredFormElements)
 
         response.setContentType("application/xml")
         TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))

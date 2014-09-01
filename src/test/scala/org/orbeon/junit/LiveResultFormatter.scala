@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2014 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.junit
 
 import java.io.OutputStream
@@ -12,13 +25,12 @@ class LiveResultFormatter extends JUnitResultFormatter {
     private var out = System.out
 
     def addError(test: Test, error: Throwable): Unit = {
-        logResult(test, "ERR")
-        out.println(error.getMessage)
+        logResult(test, "FAIL")
+        error.printStackTrace(out)
     }
 
     def addFailure(test: Test, failure: AssertionFailedError): Unit = {
-        logResult(test, "FAIL")
-        out.println(failure.getMessage)
+        addError(test, failure)
     }
 
     def endTest(test: Test): Unit = {

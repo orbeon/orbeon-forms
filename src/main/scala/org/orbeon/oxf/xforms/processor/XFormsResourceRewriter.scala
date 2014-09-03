@@ -18,7 +18,6 @@ import org.orbeon.oxf.util._
 import ScalaUtils._
 import java.io._
 import java.util.regex.Matcher
-import java.util.{List ⇒ JList}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.URLRewriter
@@ -26,10 +25,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
-import collection.JavaConverters._
-import util.{Failure, Try}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 object XFormsResourceRewriter extends Logging {
@@ -201,9 +198,6 @@ object XFormsResourceRewriter extends Logging {
             os.write('\n')
         }
     }
-
-    def jComputeCombinedLastModified(resources: JList[ResourceConfig], isMinimal: Boolean) =
-        computeCombinedLastModified(resources.asScala, isMinimal)
 
     // Compute the last modification date of the given resources.
     def computeCombinedLastModified(resources: Seq[ResourceConfig], isMinimal: Boolean): Long = {

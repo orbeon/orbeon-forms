@@ -62,7 +62,6 @@ private object FlatView {
                 |        AND d.document_id        = m.document_id
                 |        AND d.deleted            = 'N'
                 |""".stripMargin
-        System.out.println(query)
         val ps = connection.prepareStatement(query)
         ps.executeUpdate()
     }

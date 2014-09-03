@@ -399,7 +399,7 @@
 
     <target name="embedding-jar" depends="classes">
         <local name="temp.jar"/>
-        <tempfile property="temp.jar" suffix=".jar"/>
+        <tempfile property="temp.jar" suffix=".jar" destdir="${build.temp.dir}" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -448,11 +448,12 @@
             <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <target name="proxy-portlet-jar" depends="classes">
         <local name="temp.jar"/>
-        <tempfile property="temp.jar" suffix=".jar"/>
+        <tempfile property="temp.jar" suffix=".jar" destdir="${build.temp.dir}" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -497,12 +498,13 @@
             <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <target name="xforms-filter-jar" depends="classes">
 
         <local name="temp.jar"/>
-        <tempfile property="temp.jar" suffix=".jar"/>
+        <tempfile property="temp.jar" suffix=".jar" destdir="${build.temp.dir}" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -534,6 +536,7 @@
             <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <!-- JARs -->
@@ -764,6 +767,8 @@
                 <exclude name="build/**"/>
                 <exclude name="tools"/>
                 <exclude name="tools/**"/>
+                <!-- In case there were some temporary files left by the ProGuard tasks here -->
+                <exclude name="*.jar"/>
                 <!-- Not sure why JUnit outputs those here -->
                 <exclude name="junit*.properties"/>
                 <!-- Don't include a license with the source -->

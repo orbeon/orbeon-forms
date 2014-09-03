@@ -246,12 +246,13 @@ trait FormRunnerPermissions {
                    || operations.isEmpty                          // Filter forms on which user can't possibly do anything
                    || formEl.elemValue("available") == "false")   // Filter forms marked as not available
 
-            // If kept, rewrite <form>, removing <permissions> and adding operations="…"
+            // If kept, rewrite <form> to add operations="…" attribute
             keepForm.list {
-                val formChildrenWithoutPermissions = formEl.child(*).filter(_.localname != "permissions")
+                val newFormEl = wrapper.wrap(element("form"))
                 val operationsAttr = attributeInfo("operations", operations mkString " ")
-                val content = operationsAttr +: formChildrenWithoutPermissions
-                wrapper.wrap(element("form")) |!> (f ⇒ insert(into = Seq(f), origin = content))
+                val newFormContent = operationsAttr +: formEl.child(*)
+                insert(into = Seq(newFormEl), origin = newFormContent)
+                newFormEl
             }
         }
     }

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor
 
 import org.orbeon.errorified.Exceptions
+import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.ExceptionGenerator
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, SAXStore}
@@ -58,6 +59,11 @@ class ExceptionCatcher extends ProcessorImpl {
                 } catch {
                     case NonFatal(t) ⇒
                         // Exception was thrown while reading input: generate a document with that exception
+
+                        // It is up to the caller to decide what to do with the exception
+                        if (logger.isDebugEnabled)
+                            logger.debug("oxf:exception-catcher caught:\n" + OrbeonFormatter.format(t))
+
                         val helper = new XMLReceiverHelper(xmlReceiver)
 
                         helper.startDocument()

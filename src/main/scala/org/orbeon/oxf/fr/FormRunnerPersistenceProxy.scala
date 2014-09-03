@@ -84,6 +84,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             // Proxy status code
             response.setStatus(downstreamResponse.statusCode)
             // Proxy incoming headers
+            downstreamResponse.content.contentType foreach (response.setHeader("Content-Type", _))
             proxyCapitalizeAndCombineHeaders(downstreamResponse.headers, request = false) foreach (response.setHeader _).tupled
             copyStream(is, response.getOutputStream)
         }

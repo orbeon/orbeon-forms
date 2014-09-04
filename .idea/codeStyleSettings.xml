@@ -4,6 +4,9 @@
     <option name="PER_PROJECT_SETTINGS">
       <value>
         <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="" />
+        <ScalaCodeStyleSettings>
+          <option name="ENFORCE_PROCEDURE_SYNTAX_FOR_UNIT" value="false" />
+        </ScalaCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>

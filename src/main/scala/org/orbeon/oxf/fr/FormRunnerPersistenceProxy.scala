@@ -14,20 +14,20 @@
 package org.orbeon.oxf.fr
 
 
+import java.net.URI
 import javax.xml.transform.stream.StreamResult
 
-import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.http.{PropertiesApacheHttpClient, StreamedContent}
+import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.XML._
@@ -77,16 +77,16 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
 
-        val downstreamResponse =
+        val cxr =
             proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
 
-        useAndClose(downstreamResponse.content.inputStream) { is ⇒
+        useAndClose(cxr) { cxr ⇒
             // Proxy status code
-            response.setStatus(downstreamResponse.statusCode)
+            response.setStatus(cxr.statusCode)
             // Proxy incoming headers
-            downstreamResponse.content.contentType foreach (response.setHeader("Content-Type", _))
-            proxyCapitalizeAndCombineHeaders(downstreamResponse.headers, request = false) foreach (response.setHeader _).tupled
-            copyStream(is, response.getOutputStream)
+            cxr.content.contentType foreach (response.setHeader(Headers.ContentType, _))
+            proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
+            copyStream(cxr.content.inputStream, response.getOutputStream)
         }
     }
 
@@ -107,7 +107,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         if (! Set("GET", "DELETE", "PUT", "POST")(method))
             throw new OXFException(s"Unsupported method: $method")
 
-        val content =
+        val requestContent =
             Set("PUT", "POST")(method) option {
                 // Ask the request generator first, as the body might have been read already
                 // Q: Could this be handled automatically in ExternalContext?
@@ -124,13 +124,17 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
                 )
             }
 
-        PropertiesApacheHttpClient.connect(
-            url         = outgoingURL,
+        Connection(
+            httpMethod  = method,
+            url         = new URI(outgoingURL),
             credentials = None,
-            cookieStore = new BasicCookieStore,
-            method      = method,
-            headers     = persistenceHeaders ++ proxiedHeaders, // proxied headers win over persistence headers
-            content     = content
+            content     = requestContent,
+            headers     = persistenceHeaders ++ proxiedHeaders,
+            loadState   = true,
+            logBody     = false)(
+            logger      = new IndentedLogger(ProcessorImpl.logger, "")
+        ).connect(
+            saveState = true
         )
     }
 
@@ -161,16 +165,19 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             }
         }
 
-        val allFormElements = providers map FormRunner.getPersistenceURLHeadersFromProvider flatMap { case (baseURI, headers) ⇒
-            // Read all the forms for the current service
-            val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
+        val allFormElements =
+            providers map
+            FormRunner.getPersistenceURLHeadersFromProvider flatMap {
+                case (baseURI, headers) ⇒
+                    // Read all the forms for the current service
+                    val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
+                    val cxr        = proxyEstablishConnection(request, serviceURI, headers)
 
-            // TODO: Handle connection.getResponseCode.
-            useAndClose(proxyEstablishConnection(request, serviceURI, headers).content.inputStream) { is ⇒
-                val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
-                forms \\ "forms" \\ "form"
+                    ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+                        val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
+                        forms \\ "forms" \\ "form"
+                    }
             }
-        }
 
         val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements)
 

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -74,7 +75,7 @@ public abstract class TextConverterBase extends ConverterBase {
                     final AttributesImpl attributes = new AttributesImpl();
                     attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
                     if (contentType != null)
-                        attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType + "; charset=" + encoding);
+                        attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType + "; charset=" + encoding);
 
                     // Start document
                     xmlReceiver.startDocument();

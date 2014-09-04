@@ -24,7 +24,6 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -34,6 +33,8 @@ import org.xhtmlrenderer.resource.ImageResource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -119,25 +120,33 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
                     final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
 
-                    final URL url = URLFactory.createURL(resolvedURI);
-                    final scala.collection.immutable.Map<String, String[]> headers =
-                        Connection.jBuildConnectionHeaders(url.getProtocol(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
+                    final URI url;
+                    try {
+                        url = new URI(resolvedURI);
+                    } catch (URISyntaxException e) {
+                        throw new OXFException(e);
+                    }
+                    final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
+                        Connection.jBuildConnectionHeaders(url.getScheme(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
 
-                    final ConnectionResult connectionResult =
+                    final ConnectionResult cxr =
                         Connection.jApply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);
 
-                    if (connectionResult.statusCode() != 200) {
-                        connectionResult.close();
-                        throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.statusCode());
-                    }
+                    final InputStream is =
+                        ConnectionResult.withSuccessConnection(cxr, false, new Function1Adapter<InputStream, InputStream>() {
+                            public InputStream apply(InputStream is) {
+                                return is;
+                            }
+
+                        });
 
                     pipelineContext.addContextListener(new PipelineContext.ContextListener() {
                         public void contextDestroyed(boolean success) {
-                            connectionResult.close();
+                            cxr.close();
                         }
                     });
 
-                    return connectionResult.getResponseInputStream();
+                    return is;
                 }
 
                 public ImageResource getImageResource(String uri) {

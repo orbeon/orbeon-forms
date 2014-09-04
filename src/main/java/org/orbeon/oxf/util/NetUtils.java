@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -51,10 +52,6 @@ public class NetUtils {
     public static final int SESSION_SCOPE = 1;
     public static final int APPLICATION_SCOPE = 2;
 
-    // Default HTTP 1.1 charset for text/* mediatype
-    public static final String DEFAULT_HTTP_TEXT_READING_ENCODING = "iso-8859-1";
-    // Default RFC 3023 default charset for txt/xml mediatype
-    public static final String DEFAULT_TEXT_XML_READING_ENCODING = "us-ascii";
     public static final String APPLICATION_SOAP_XML = "application/soap+xml";
 
     static {
@@ -588,8 +585,7 @@ public class NetUtils {
     /**
      * Convert an InputStream to an xs:anyURI.
      *
-     * The implementation creates a temporary file. The PipelineContext is required so that the file can be deleted
-     * when no longer used.
+     * The implementation creates a temporary file.
      */
     public static String inputStreamToAnyURI(InputStream inputStream, int scope, Logger logger) {
         // Get FileItem
@@ -771,7 +767,7 @@ public class NetUtils {
      * @param contentType   Content-Type header value
      * @return              charset
      */
-    public static String getTextCharsetFromContentType(String contentType) {
+    public static String getTextCharsetFromContentTypeOrDefault(String contentType) {
         final String charset;
         final String connectionCharset = getContentTypeCharset(contentType);
         if (connectionCharset != null) {
@@ -791,9 +787,9 @@ public class NetUtils {
             // is already used by MIME.)"
 
             if (XMLUtils.isXMLMediatype(contentType))
-                charset = DEFAULT_TEXT_XML_READING_ENCODING;
+                charset = Defaults.DefaultTextXMLEncodingWhenReading();
             else
-                charset = DEFAULT_HTTP_TEXT_READING_ENCODING;
+                charset = Defaults.DefaultEncodingForServletCompatibility();
         }
         return charset;
     }

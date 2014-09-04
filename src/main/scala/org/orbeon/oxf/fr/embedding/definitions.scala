@@ -14,9 +14,8 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.{OutputStream, Writer}
-import javax.servlet.ServletContext
 
-import org.orbeon.oxf.http.{StreamedContent, HttpClient}
+import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
 import org.orbeon.oxf.util.ScalaUtils.combineValues
 
 import scala.collection.immutable
@@ -36,10 +35,10 @@ case class RequestDetails(
         content flatMap (_.contentType)
     
     def contentTypeHeader =
-        contentType map ("Content-Type" →)
+        contentType map (Headers.ContentType →)
 
     def headersMapWithContentType =
-        combineValues[String, String, List](headers).toMap ++ (contentType map ("Content-Type" → List(_)))
+        combineValues[String, String, List](headers).toMap ++ (contentType map (Headers.ContentType → List(_)))
 }
 
 trait EmbeddingContext {

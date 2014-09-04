@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.relational.crud
 import java.io.OutputStreamWriter
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.relational.{Next, Unspecified, RelationalUtils}
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
@@ -108,7 +109,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                     NetUtils.copyStream(blob.getBinaryStream, httpResponse.getOutputStream)
                 } else {
                     val clob = resultSet.getClob("xml")
-                    httpResponse.setHeader("Content-Type", "application/xml")
+                    httpResponse.setHeader(Headers.ContentType, "application/xml")
                     val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
                     NetUtils.copyStream(clob.getCharacterStream, writer)
                     writer.close()

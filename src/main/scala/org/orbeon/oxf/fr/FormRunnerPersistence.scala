@@ -13,22 +13,24 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util._
-import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
+import java.net.URI
+
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
-import org.orbeon.oxf.util.Headers._
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.XML._
+
 import scala.collection.JavaConverters._
 
 trait FormRunnerPersistence {
 
-    import FormRunner._
+    import org.orbeon.oxf.fr.FormRunner._
 
     val CRUDBasePath                       = "/fr/service/persistence/crud"
     val FormMetadataBasePath               = "/fr/service/persistence/form"
@@ -136,20 +138,34 @@ trait FormRunnerPersistence {
 
     // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
     def readDocument(uri: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
-        val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
-        val url = URLFactory.createURL(urlString)
 
-        val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
-        val connectionResult = Connection("GET", url, credentials = None, messageBody = None, headers = headers, loadState = true, logBody = false).connect(saveState = true)
+        val urlString =
+            URLRewriterUtils.rewriteServiceURL(
+                NetUtils.getExternalContext.getRequest,
+                uri,
+                URLRewriter.REWRITE_MODE_ABSOLUTE
+            )
 
-        // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the first test),
-        // but the MySQL persistence layer returns a [200 with an empty body][1] (thus the second test).
+        val cxr = Connection(
+            httpMethod  = "GET",
+            url         = new URI(urlString),
+            credentials = None,
+            content     = None,
+            headers     = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders)),
+            loadState   = true,
+            logBody     = false
+        ).connect(
+            saveState = true
+        )
+
+        // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
+        // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
+        // required).
         //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-        connectionResult.statusCode == 200 && connectionResult.hasContent option
-            useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                // do process XInclude, so FB's model gets included
-                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, inputStream, url.toString, true, false)
-            }
+        ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+            // do process XInclude, so FB's model gets included
+            TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, urlString, true, false)
+        } toOption
     }
 
     // Retrieves a form definition from the persistence layer

@@ -22,7 +22,7 @@ import org.dom4j.{QName, Element}
 import collection.mutable
 import org.orbeon.oxf.util.XPathCache
 
-object Headers {
+object SubmissionHeaders {
     /**
      * Evaluate children <xf:header> elements.
      *
@@ -31,16 +31,20 @@ object Headers {
      * @param enclosingElement  enclosing element
      * @return map of headers or null if no header elements
      */
-    def evaluateHeaders(xblContainer: XBLContainer, contextStack: XFormsContextStack,
-                        sourceEffectiveId: String, enclosingElement: Element,
-                        initialHeaders: Map[String, Array[String]]): Map[String, Array[String]] = {
+    def evaluateHeaders(
+        xblContainer     : XBLContainer,
+        contextStack     : XFormsContextStack,
+        sourceEffectiveId: String,
+        enclosingElement : Element,
+        initialHeaders   : Map[String, List[String]]
+   ): Map[String, List[String]] = {
 
         val fullPrefix = xblContainer.getFullPrefix
 
         val headerElements = Dom4jUtils.elements(enclosingElement, XFormsConstants.XFORMS_HEADER_QNAME)
         if (headerElements.nonEmpty) {
 
-            val headerNameValues = mutable.LinkedHashMap[String, Array[String]](initialHeaders.toList: _*)
+            val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
 
             // Handle a single header element
             def handleHeaderElement(headerElement: Element) = {
@@ -64,7 +68,7 @@ object Headers {
 
                 // Evaluate combine attribute as AVT
                 val combine = {
-                    val avtCombine = headerElement.attributeValue("combine", defaultCombineValue)
+                    val avtCombine = headerElement.attributeValue("combine", DefaultCombineValue)
                     val result = XPathCache.evaluateAsAvt(
                         contextStack.getCurrentBindingContext.nodeset,
                         contextStack.getCurrentBindingContext.position,
@@ -76,20 +80,20 @@ object Headers {
                         headerElement.getData.asInstanceOf[LocationData],
                         xblContainer.getContainingDocument.getRequestStats.getReporter)
 
-                    if (! allowedCombineValues(result))
+                    if (! AllowedCombineValues(result))
                         throw new OXFException("Invalid value '" + result + "' for attribute combine.")
 
                     result
                 }
 
                 // Array of existing values (an empty Array if none)
-                def existingHeaderValues = headerNameValues.getOrElse(headerName, Array.empty[String])
+                def existingHeaderValues = headerNameValues.getOrElse(headerName, Nil)
 
                 // Append/prepend/replace
                 headerNameValues += headerName → (combine match {
                     case "append"  ⇒ existingHeaderValues :+ headerValue
                     case "prepend" ⇒ headerValue +: existingHeaderValues
-                    case _         ⇒ Array(headerValue)
+                    case _         ⇒ List(headerValue)
                 })
             }
 
@@ -117,6 +121,6 @@ object Headers {
             initialHeaders
     }
 
-    val defaultCombineValue = "append"
-    val allowedCombineValues = Set("append", "prepend", "replace")
+    val DefaultCombineValue = "append"
+    val AllowedCombineValues = Set("append", "prepend", "replace")
 }

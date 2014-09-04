@@ -238,13 +238,13 @@ trait ContainingDocumentRequestStats {
 
 trait ContainingDocumentRequest {
     
-    private var _deploymentType: XFormsConstants.DeploymentType = null
-    private var _requestContextPath: String = null
-    private var _requestPath: String = null
-    private var _requestHeaders: Map[String, Array[String]] = null
-    private var _requestParameters: Map[String, Array[String]] = null
-    private var _containerType: String = null
-    private var _containerNamespace: String = null
+    private var _deploymentType       : XFormsConstants.DeploymentType = null
+    private var _requestContextPath   : String = null
+    private var _requestPath          : String = null
+    private var _requestHeaders       : Map[String, List[String]] = null
+    private var _requestParameters    : Map[String, List[String]] = null
+    private var _containerType        : String = null
+    private var _containerNamespace   : String = null
     private var _versionedPathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
     
     def getDeploymentType        = _deploymentType
@@ -284,10 +284,10 @@ trait ContainingDocumentRequest {
                     request.getRequestPath
 
                 _requestHeaders =
-                    request.getHeaderValuesMap.asScala.toMap
+                    request.getHeaderValuesMap.asScala mapValues (_.toList) toMap
 
                 _requestParameters =
-                    request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray toMap // mapValues ok because of toMap
+                    request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap
 
                 _containerType = request.getContainerType
                 _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
@@ -311,12 +311,12 @@ trait ContainingDocumentRequest {
         dynamicState.deploymentType match {
             case Some(_) ⇒
                 // Normal case where information below was previously serialized
-                _deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
+                _deploymentType     = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
                 _requestContextPath = dynamicState.decodeRequestContextPathJava
-                _requestPath = dynamicState.decodeRequestPathJava
-                _requestHeaders = dynamicState.decodeRequestHeadersJava
-                _requestParameters = dynamicState.decodeRequestParametersJava
-                _containerType = dynamicState.decodeContainerTypeJava
+                _requestPath        = dynamicState.decodeRequestPathJava
+                _requestHeaders     = dynamicState.requestHeaders.toMap
+                _requestParameters  = dynamicState.requestParameters.toMap
+                _containerType      = dynamicState.decodeContainerTypeJava
                 _containerNamespace = dynamicState.decodeContainerNamespaceJava
             case None ⇒
                 // Use information from the request

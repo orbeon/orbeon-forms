@@ -15,8 +15,9 @@ package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.webapp.ProcessorService._
-import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
+import org.orbeon.oxf.pipeline.api.{ProcessorDefinition, PipelineContext}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.ScalaUtils._
 
 // Servlet/portlet helper for processor definitions and services
 trait ServletPortlet {
@@ -30,17 +31,17 @@ trait ServletPortlet {
     def logPrefix: String
     def initParameters: Map[String, String]
 
-    private var _processorService: ProcessorService = _
-    def processorService = _processorService
+    private var _processorService: Option[ProcessorService] = None
+    def processorService = _processorService.get
 
     // Web application context instance shared between all components of a web application
-    private var _webAppContext: WebAppContext = _
-    def webAppContext = _webAppContext
+    private var _webAppContext: Option[WebAppContext] = None
+    def webAppContext = _webAppContext.get
 
     // Initialize the servlet or portlet
     def init(webAppContext: WebAppContext, processor: Option[(String, String)]): Unit = {
-        _webAppContext = webAppContext
-        _processorService = getProcessorService
+        _webAppContext    = Some(webAppContext)
+        _processorService = Some(createProcessorService)
 
         // Run listener if needed
         processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
@@ -54,8 +55,8 @@ trait ServletPortlet {
         Logger.info(logPrefix + " destroyed.")
 
          // Clean-up
-        _processorService = null
-        _webAppContext = null
+        _processorService = None
+        _webAppContext    = None
     }
 
     private def runInitDestroyListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
@@ -69,7 +70,7 @@ trait ServletPortlet {
         }
     }
 
-    private def getProcessorService =
+    private def createProcessorService =
         searchDefinition(MainProcessorPropertyPrefix, MainProcessorInputPropertyPrefix) match {
             case Some(definition) ⇒
                 // Create and initialize service
@@ -80,13 +81,14 @@ trait ServletPortlet {
 
     // Search a processor definition in order from: servlet/portlet parameters, properties, context parameters
     private def searchDefinition(processorPrefix: String, inputPrefix: String) = {
-        // All search functions
-        val functions: Seq[(String, String) ⇒ Option[ProcessorDefinition]] =
-            Seq(getDefinitionFromMap(initParameters, _, _),
-                getDefinitionFromProperties _,
-                getDefinitionFromMap(webAppContext.initParameters, _, _))
 
-        // Call functions until we find a result
-        functions flatMap (_(processorPrefix, inputPrefix)) headOption
+        val functions: Iterator[(String, String) ⇒ Option[ProcessorDefinition]] =
+            Iterator(
+                getDefinitionFromMap(initParameters, _, _),
+                getDefinitionFromProperties _,
+                getDefinitionFromMap(webAppContext.initParameters, _, _)
+            )
+
+        functions flatMap (_(processorPrefix, inputPrefix)) nextOption
     }
 }

@@ -13,175 +13,144 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URLConnection
+import java.io._
+import java.lang.{Long ⇒ JLong}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 
 import org.apache.log4j.Level
-import org.orbeon.oxf.http.HttpResponse
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.xml.{XMLUtils, XMLParsing}
-import java.io._
+import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.xml.{XMLParsing, XMLUtils}
 
 import scala.collection.JavaConverters._
-import ScalaUtils._
-import java.lang.{Long ⇒ JLong}
-import java.util.{Map ⇒ JMap, List ⇒ JList}
+import scala.util.Try
+import scala.util.control.NonFatal
 
-import scala.collection.immutable
+case class ConnectionResult(
+    url               : String,
+    statusCode        : Int,
+    headers           : Map[String, List[String]],
+    content           : StreamedContent,
+    hasContent        : Boolean,
+    dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
+) extends Logging {
 
-class ConnectionResult(val resourceURI: String) extends Logging {
+    val lastModified     = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+    def lastModifiedJava = lastModified map (_.asInstanceOf[JLong]) orNull
+        
+    def close() = content.close()
+        
+    val mediaType =
+        content.contentType map NetUtils.getContentTypeMediaType
 
-    var dontHandleResponse = false
-    def setDontHandleResponseJava() = dontHandleResponse = true
+    def contentTypeOrDefault(default: String) =
+        content.contentType getOrElse default
 
-    var statusCode: Int = 0
-    def setStatusCodeJava(statusCode: Int) = this.statusCode = statusCode
+    def mediatypeOrDefault(default: String) =
+        mediaType getOrElse default
+    
+    def contentTypeCharsetOrDefault(defaultMediatype: String) =
+        NetUtils.getTextCharsetFromContentTypeOrDefault(mediatypeOrDefault(defaultMediatype))
 
-    private var _responseMediaType          : Option[String]      = None
-    private var _responseContentType        : Option[String]      = None
-    private var _originalResponseContentType: Option[String]      = None
-    private var _lastModified               : Option[Long]        = None
-    private var _responseInputStream        : Option[InputStream] = None
+    def jHeaders: JMap[String, JList[String]] =
+        headers mapValues (_.asJava) asJava
 
-    private var _responseHeaders            = Map.empty[String, immutable.Seq[String]]
-    private var _didLogResponseDetails      = false
-    private var _hasContent                 = false
-
-    def getResponseInputStream = _responseInputStream.orNull
-    def hasContent             = _hasContent
-
-    def setResponseInputStream(responseInputStream: InputStream): Unit = {
-
-        val bis = if (responseInputStream.markSupported) responseInputStream else new BufferedInputStream(responseInputStream)
-
-        def hasContent(bis: InputStream) = {
-            bis.mark(1)
-            val result = bis.read != -1
-            bis.reset()
-            result
-        }
-
-        this._hasContent = hasContent(bis)
-        this._responseInputStream = Some(bis)
-    }
-
-    def responseHeaders = _responseHeaders
-    def jResponseHeaders: JMap[String, JList[String]] =
-        responseHeaders.toMap.map{ case (k, v) ⇒ k → v.asJava }.asJava
-
-    def responseHeaders_= (headers: Map[String, immutable.Seq[String]]): Unit =
-        _responseHeaders = headers
-
-    def setResponseContentType(responseContentType: String): Unit =
-        setResponseContentType(responseContentType, null)
-
-    def setResponseContentType(responseContentType: String, defaultContentType: String): Unit = {
-        val responseContentTypeOpt = Option(responseContentType)
-        this._originalResponseContentType = responseContentTypeOpt
-        this._responseContentType         = responseContentTypeOpt orElse Option(defaultContentType)
-        this._responseMediaType           = this._responseContentType map NetUtils.getContentTypeMediaType
-    }
-
-    def getResponseContentType         = _responseContentType.orNull
-    def getOriginalResponseContentType = _originalResponseContentType.orNull
-    def getResponseMediaType           = _responseMediaType.orNull
-
-    def getLastModifiedJava: JLong     = _lastModified map (_.asInstanceOf[JLong]) orNull
-
-    def setLastModified(urlConnection: URLConnection): Unit = {
-        val connectionLastModified = NetUtils.getLastModified(urlConnection)
-        // Zero and negative values often have a special meaning, make sure to normalize here
-        this._lastModified = if (connectionLastModified <= 0) None else Some(connectionLastModified)
-    }
-
-    def setLastModified(response: HttpResponse) =
-        this._lastModified = response.lastModified
-
-    def forwardResponseHeaders(response: ExternalContext.Response): Unit =
-        for {
-            (headerName, headerValues) ← Headers.proxyHeaders(responseHeaders, request = false)
-            headerValue ← headerValues
-        } locally {
-            response.addHeader(headerName, headerValue)
-        }
-
-    /**
-     * Close the result once everybody is done with it.
-     *
-     * This can be overridden by specific subclasses.
-     */
-    def close(): Unit =
-        useAndClose(getResponseInputStream)(identity)
-
-    // Return the response body as text, null if not a text or XML result.
-    def getTextResponseBody =
-        if (XMLUtils.isTextOrJSONContentType(getResponseMediaType)) {
+    def readTextResponseBody(defaultMediatype: String) = Some(content) collect {
+        case content if XMLUtils.isTextOrJSONContentType(mediatypeOrDefault(defaultMediatype)) ⇒
             // Text mediatype (including text/xml), read stream into String
-            val charset = NetUtils.getTextCharsetFromContentType(getResponseContentType)
-            useAndClose(new InputStreamReader(getResponseInputStream, charset)) { reader ⇒
+            useAndClose(new InputStreamReader(content.inputStream, contentTypeCharsetOrDefault(defaultMediatype))) { reader ⇒
                 NetUtils.readStreamAsString(reader)
             }
-        } else if (XMLUtils.isXMLMediatype(getResponseMediaType)) {
+        case content if XMLUtils.isXMLMediatype(mediatypeOrDefault(defaultMediatype)) ⇒ 
             // XML mediatype other than text/xml
-            useAndClose(XMLParsing.getReaderFromXMLInputStream(getResponseInputStream)) { reader ⇒
+            useAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream)) { reader ⇒
                 NetUtils.readStreamAsString(reader)
             }
-        } else
-            null
+    }
+    
+    private var _didLogResponseDetails = false
 
-    /**
-     * Log response details if not already logged.
-     *
-     * @param indentedLogger    logger
-     * @param logLevel          log level
-     * @param logType           log type string
-     */
-    def logResponseDetailsIfNeeded(indentedLogger: IndentedLogger, logLevel: Level, logType: String): Unit = {
-        implicit val logger = indentedLogger
+    // See https://github.com/orbeon/orbeon-forms/issues/1900
+    def logResponseDetailsOnce(logLevel: Level)(implicit logger: IndentedLogger): Unit = {
         if (! _didLogResponseDetails) {
             log(logLevel, "response", Seq("status code" → statusCode.toString))
-            if (responseHeaders.nonEmpty) {
+            if (headers.nonEmpty) {
 
                 val headersToLog =
-                    for ((name, values) ← responseHeaders; value ← values)
+                    for ((name, values) ← headers; value ← values)
                         yield name → value
 
                 log(logLevel, "response headers", headersToLog.toList)
             }
-            if (getOriginalResponseContentType eq null)
-                log(logLevel, "received null response Content-Type", Seq("default Content-Type" → getResponseContentType))
             _didLogResponseDetails = true
         }
     }
 
-    /**
-     * Log response body.
-     *
-     * @param indentedLogger    logger
-     * @param logLevel          log level
-     * @param logType           log type string
-     * @param logBody           whether to actually log the body
-     */
-    def logResponseBody(indentedLogger: IndentedLogger, logLevel: Level, logType: String, logBody: Boolean): Unit = {
-        implicit val logger = indentedLogger
-        if (hasContent) {
+    // See https://github.com/orbeon/orbeon-forms/issues/1900
+    def logResponseBody(logLevel: Level, logBody: Boolean)(implicit logger: IndentedLogger): Unit =
+        if (hasContent)
             log(logLevel, "response has content")
-            if (logBody) {
-                val tempResponse =
-                    useAndClose(getResponseInputStream) { is ⇒
-                        NetUtils.inputStreamToByteArray(is)
-                    }
-
-                setResponseInputStream(new ByteArrayInputStream(tempResponse))
-                val responseBody = getTextResponseBody
-                if (responseBody ne null) {
-                    log(logLevel, "response body", Seq("body" → responseBody))
-                    setResponseInputStream(new ByteArrayInputStream(tempResponse))
-                } else {
-                    log(logLevel, "binary response body")
-                }
-            }
-        } else {
+        else
             log(logLevel, "response has no content")
+}
+
+object ConnectionResult {
+    
+    def apply(
+        url               : String,
+        statusCode        : Int,
+        headers           : Map[String, List[String]],
+        content           : StreamedContent,
+        dontHandleResponse: Boolean = false // TODO: Should be outside of ConnectionResult.
+    ): ConnectionResult = {
+        
+        val (hasContent, resetInputStream) = {
+    
+            val bis =
+                if (content.inputStream.markSupported)
+                    content.inputStream
+                else
+                    new BufferedInputStream(content.inputStream)
+    
+            def hasContent(bis: InputStream) = {
+                bis.mark(1)
+                val result = bis.read != -1
+                bis.reset()
+                result
+            }
+    
+            (hasContent(bis), bis)
+        }
+        
+        ConnectionResult(
+            url                = url,
+            statusCode         = statusCode,
+            headers            = headers,
+            content            = content.copy(inputStream = resetInputStream),
+            hasContent         = hasContent,
+            dontHandleResponse = dontHandleResponse
+        )
+    }
+
+    def withSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream ⇒ T): T =
+        tryWithSuccessConnection(cxr, closeOnSuccess)(body).get
+
+    def tryWithSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream ⇒ T): Try[T] = Try {
+        try {
+            cxr match {
+                case ConnectionResult(_, statusCode, _, StreamedContent(inputStream, _, _, _), _, _) if NetUtils.isSuccessCode(statusCode) ⇒
+                    val result = body(inputStream)
+                    if (closeOnSuccess)
+                        cxr.close() // this eventually calls InputStream.close()
+                    result
+                case ConnectionResult(_, statusCode, _, _, _, _) ⇒
+                    throw new HttpStatusCodeException(if (statusCode != 200) statusCode else 500)
+            }
+        } catch {
+            case NonFatal(t) ⇒
+                cxr.close()
+                throw t
         }
     }
 }

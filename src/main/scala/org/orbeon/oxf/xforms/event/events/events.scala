@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -131,12 +132,12 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
     // These properties come from the client
     def file      = property[String]("file").get
     def filename  = property[String]("filename").get
-    def mediatype = property[String]("content-type").get
-    def size      = property[String]("content-length").get // comes as String from the client
+    def mediatype = property[String](Headers.ContentTypeLower).get
+    def size      = property[String](Headers.ContentLengthLower).get // comes as String from the client
 }
 
 object XXFormsUploadDoneEvent {
-    val StandardProperties = Map(XXFORMS_UPLOAD_DONE → Seq("file", "filename", "content-type", "content-length"))
+    val StandardProperties = Map(XXFORMS_UPLOAD_DONE → Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower))
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.

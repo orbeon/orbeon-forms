@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.http.Headers;
+import org.orbeon.oxf.http.StreamedContent;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.SecureUtils;
@@ -21,12 +23,10 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
 
-import java.io.ByteArrayInputStream;
 import java.util.concurrent.Callable;
 
 /**
@@ -57,7 +57,7 @@ public class CacheableSubmission extends BaseSubmission {
         // This can only happen is method="get" and replace="instance" and xxf:cache="true"
 
         // Convert URL to string
-        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission.isURLNorewrite());
+        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission().isURLNorewrite());
 
         // Compute a hash of the body if needed
         final String requestBodyHash;
@@ -70,7 +70,7 @@ public class CacheableSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Parameters to callable
-        final String submissionEffectiveId = submission.getEffectiveId();
+        final String submissionEffectiveId = submission().getEffectiveId();
 
         // Find and check replacement location
         final XFormsInstance instanceToUpdate = checkInstanceToUpdate(detailsLogger, p);
@@ -82,7 +82,7 @@ public class CacheableSubmission extends BaseSubmission {
         // Pass a pseudo connection result which contains information used by getReplacer()
         // We know that we will get an InstanceReplacer
         final ConnectionResult connectionResult = createPseudoConnectionResult(absoluteResolvedURLString);
-        final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(connectionResult, p);
+        final InstanceReplacer replacer = (InstanceReplacer) submission().getReplacer(connectionResult, p);
 
         // As an optimization, try from cache first
         // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
@@ -110,7 +110,7 @@ public class CacheableSubmission extends BaseSubmission {
                 public SubmissionResult call() {
 
                     if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                        timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId(), "cacheable", "true");
+                        timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission().getEffectiveId(), "cacheable", "true");
 
                     final boolean[] status = { false , false};
                     try {
@@ -131,10 +131,10 @@ public class CacheableSubmission extends BaseSubmission {
                                             final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
 
                                             // For now support caching local portlet, request dispatcher, and regular submissions
-                                            final Submission[] submissions = new Submission[]{
-                                                    new LocalPortletSubmission(submission),
-                                                    new RequestDispatcherSubmission(submission),
-                                                    new RegularSubmission(submission)
+                                            final Submission[] submissions = new Submission[] {
+                                                new LocalPortletSubmission(submission()),
+                                                new RequestDispatcherSubmission(submission()),
+                                                new RegularSubmission(submission())
                                             };
 
                                             // Iterate through submissions and run the first match
@@ -196,7 +196,7 @@ public class CacheableSubmission extends BaseSubmission {
                         return new SubmissionResult(submissionEffectiveId, throwable, null);
                     } finally {
                         if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                            timingLogger.endHandleOperation("id", submission.getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous),
+                            timingLogger.endHandleOperation("id", submission().getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous),
                                     "loading attempted", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
                     }
                 }
@@ -228,8 +228,8 @@ public class CacheableSubmission extends BaseSubmission {
 
     private XFormsInstance checkInstanceToUpdate(IndentedLogger indentedLogger, XFormsModelSubmission.SubmissionParameters p) {
         XFormsInstance updatedInstance;
-        final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(p.xpathContext,
-                submission.findReplaceInstanceNoTargetref(p.refInstance), p.submissionElementContextItem);
+        final NodeInfo destinationNodeInfo = submission().evaluateTargetRef(p.xpathContext,
+                submission().findReplaceInstanceNoTargetref(p.refInstance), p.submissionElementContextItem);
 
         if (destinationNodeInfo == null) {
             // Throw target-error
@@ -238,16 +238,16 @@ public class CacheableSubmission extends BaseSubmission {
             // then submission processing ends after dispatching the event
             // xforms-submit-error with an error-type of target-error."
 
-            throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.TARGET_ERROR(), null));
+            throw new XFormsSubmissionException(submission(), "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
+                    new XFormsSubmitErrorEvent(submission(), XFormsSubmitErrorEvent.TARGET_ERROR(), null));
         }
 
-        updatedInstance = submission.containingDocument().getInstanceForNode(destinationNodeInfo);
+        updatedInstance = submission().containingDocument().getInstanceForNode(destinationNodeInfo);
         if (updatedInstance == null || !updatedInstance.rootElement().isSameNodeInfo(destinationNodeInfo)) {
             // Only support replacing the root element of an instance
             // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
-            throw new XFormsSubmissionException(submission, "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.TARGET_ERROR(), null));
+            throw new XFormsSubmissionException(submission(), "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
+                    new XFormsSubmitErrorEvent(submission(), XFormsSubmitErrorEvent.TARGET_ERROR(), null));
         }
 
         if (indentedLogger.isDebugEnabled())
@@ -256,16 +256,14 @@ public class CacheableSubmission extends BaseSubmission {
         return updatedInstance;
     }
 
+    // NOTE: This is really weird: the ConnectionResult returned must essentially say that it has some content.
     private ConnectionResult createPseudoConnectionResult(String resourceURI) {
-        final ConnectionResult connectionResult = new ConnectionResult(resourceURI) {
-            @Override
-            public boolean hasContent() {
-                return true;
-            }
-        };
-        connectionResult.setStatusCodeJava(200);
-        connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
-        connectionResult.setResponseInputStream(new ByteArrayInputStream(new byte[] {}));
-        return connectionResult;
+        return ConnectionResult.apply(
+            resourceURI,
+            200,
+            Headers.EmptyHeaders(),
+            StreamedContent.fromBytes(new byte[]{0}, scala.Option.<String>apply(null), scala.Option.<String>apply(null)),
+            false
+        );
     }
 }

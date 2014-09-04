@@ -76,7 +76,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
     }
 
     private def serviceStaticError(externalContext: ExternalContext, throwable: Throwable): Unit = {
-        val sb: StringBuilder = new StringBuilder
+        val sb = new StringBuilder
         val response  = externalContext.getResponse
         if (! response.isCommitted) {
             // Send new headers and HTML prologue

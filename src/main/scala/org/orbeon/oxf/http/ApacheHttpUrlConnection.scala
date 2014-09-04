@@ -17,7 +17,6 @@ import java.io.{OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
 import java.net._
 
 import org.apache.http.impl.client.BasicCookieStore
-import org.orbeon.oxf.util.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.JavaConverters._
@@ -84,7 +83,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
                         cookieStore = new BasicCookieStore,
                         method      = methodName,
                         headers     = _requestHeaders mapValues (_.toList) toMap,
-                        content     = body map (StreamedContent(_, Option(getRequestProperty("Content-Type")), bodyLength, None))
+                        content     = body map (StreamedContent(_, Option(getRequestProperty(Headers.ContentType)), bodyLength, None))
                     )
                 )
             }
@@ -120,7 +119,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
         withConnection(_.disconnect())
 
     override def getLastModified =
-        Option(getHeaderField("last-modified")) match {
+        Option(getHeaderField(Headers.LastModifiedLower)) match {
             case Some(_) ⇒ super.getLastModified
             case None    ⇒ 0L
         }

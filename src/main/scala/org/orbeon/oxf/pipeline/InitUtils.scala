@@ -219,34 +219,34 @@ object InitUtils {
     // Read-only view of the properties as a Map
     private object PropertiesMap extends Map[String, String] {
         def get(key: String) = Option(Properties.instance.getPropertySet.getObject(key)) map (_.toString)
-        def iterator = Properties.instance.getPropertySet.keySet.asScala.toIterator map (key ⇒ key → this(key))
+        def iterator         = Properties.instance.getPropertySet.keySet.asScala.toIterator map (key ⇒ key → this(key))
 
-        def -(key: String) = Map() ++ this - key
+        def -(key: String)                    = Map() ++ this - key
         def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
     }
 
     // Read-only view of the ServletContext initialization parameters as a Map
     private class ServletContextInitMap(servletContext: ServletContext) extends Map[String, String] {
         def get(key: String) = Option(servletContext.getInitParameter(key))
-        def iterator = servletContext.getInitParameterNames.asInstanceOf[JEnumeration[String]].asScala.toIterator map (key ⇒ key → this(key))
+        def iterator         = servletContext.getInitParameterNames.asInstanceOf[JEnumeration[String]].asScala.toIterator map (key ⇒ key → this(key))
 
-        def -(key: String) = Map() ++ this - key
+        def -(key: String)                    = Map() ++ this - key
         def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
     }
 
     // View of the HttpSession properties as a Map
-    class SessionMap(httpSession: HttpSession) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
-        def getAttribute(s: String) = httpSession.getAttribute(s)
-        def getAttributeNames = httpSession.getAttributeNames.asInstanceOf[JEnumeration[String]]
-        def removeAttribute(s: String): Unit = httpSession.removeAttribute(s)
-        def setAttribute(s: String, o: AnyRef): Unit = httpSession.setAttribute(s, o)
+    class SessionMap(session: HttpSession) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
+        def getAttribute(s: String)                  = session.getAttribute(s)
+        def getAttributeNames                        = session.getAttributeNames.asInstanceOf[JEnumeration[String]]
+        def removeAttribute(s: String): Unit         = session.removeAttribute(s)
+        def setAttribute(s: String, o: AnyRef): Unit = session.setAttribute(s, o)
     })
 
     // View of the HttpServletRequest properties as a Map
-    class RequestMap(httpServletRequest: HttpServletRequest) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
-        def getAttribute(s: String) = httpServletRequest.getAttribute(s)
-        def getAttributeNames = httpServletRequest.getAttributeNames.asInstanceOf[JEnumeration[String]]
-        def removeAttribute(s: String): Unit = httpServletRequest.removeAttribute(s)
-        def setAttribute(s: String, o: AnyRef): Unit =  httpServletRequest.setAttribute(s, o)
+    class RequestMap(request: HttpServletRequest) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
+        def getAttribute(s: String)                  = request.getAttribute(s)
+        def getAttributeNames                        = request.getAttributeNames.asInstanceOf[JEnumeration[String]]
+        def removeAttribute(s: String): Unit         = request.removeAttribute(s)
+        def setAttribute(s: String, o: AnyRef): Unit = request.setAttribute(s, o)
     })
 }

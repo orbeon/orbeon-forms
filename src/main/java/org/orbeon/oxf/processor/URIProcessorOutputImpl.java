@@ -27,6 +27,9 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLParsing;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -371,13 +374,21 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Compute absolute submission URL
-                final URL submissionURL =
-                        URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+                final URI submissionURL;
+                try {
+                    submissionURL = new URI(
+                        URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(),
+                        urlString,
+                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE)
+                    );
+                } catch (URISyntaxException e) {
+                    throw new OXFException(e);
+                }
 
                 // Open connection
                 final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
-                final scala.collection.immutable.Map<String, String[]> headers =
-                    Connection.jBuildConnectionHeaders(submissionURL.getProtocol(), credentials, null, headersToForward, indentedLogger);
+                final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
+                    Connection.jBuildConnectionHeaders(submissionURL.getScheme(), credentials, null, headersToForward, indentedLogger);
 
                 final ConnectionResult connectionResult
                     = Connection.jApply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
@@ -388,10 +399,16 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                 // Read connection into SAXStore
                 documentSAXStore = new SAXStore();
-                XMLParsing.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), documentSAXStore, XMLParsing.ParserConfiguration.PLAIN, true);
+
+                ConnectionResult.withSuccessConnection(connectionResult, true, new Function1Adapter<InputStream, Object>() {
+                    public Object apply(InputStream is) {
+                        XMLParsing.inputStreamToSAX(is, connectionResult.url(), documentSAXStore, XMLParsing.ParserConfiguration.PLAIN, true);
+                        return null;
+                    }
+                });
 
                 // Obtain last modified
-                lastModifiedLong = connectionResult.getLastModifiedJava();
+                lastModifiedLong = connectionResult.lastModifiedJava();
             }
 
             // Cache document and last modified

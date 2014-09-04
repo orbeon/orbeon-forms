@@ -25,7 +25,7 @@ trait Content {
     def inputStream  : InputStream
     def contentType  : Option[String]
     def contentLength: Option[Long]
-    def title        : Option[String]
+    def title        : Option[String] // this is only for portlet and should be moved out
 }
 
 sealed trait StreamedContentOrRedirect
@@ -40,6 +40,32 @@ case class StreamedContent(
     def close() = runQuietly(inputStream.close())
 }
 
+object StreamedContent {
+    def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None) =
+        StreamedContent(
+            inputStream   = new ByteArrayInputStream(bytes),
+            contentType   = contentType,
+            contentLength = Some(bytes.size.toLong),
+            title         = title
+        )
+
+    def fromStreamAndHeaders(inputStream: InputStream, headers: Map[String, Seq[String]], title: Option[String] = None) =
+        StreamedContent(
+            inputStream   = inputStream,
+            contentType   = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
+            contentLength = Headers.firstLongHeaderIgnoreCase(headers, Headers.ContentLength),
+            title         = title
+        )
+
+    val Empty =
+        StreamedContent(
+            inputStream   = EmptyInputStream,
+            contentType   = None,
+            contentLength = None,
+            title         = None
+        )
+}
+
 case class BufferedContent(
     body         : Array[Byte],
     contentType  : Option[String],
@@ -50,8 +76,8 @@ case class BufferedContent(
 }
 
 object BufferedContent {
-    def apply(content: StreamedContent): BufferedContent
-        = BufferedContent(useAndClose(content.inputStream)(IOUtils.toByteArray), content.contentType, content.title)
+    def apply(content: StreamedContent): BufferedContent =
+        BufferedContent(useAndClose(content.inputStream)(IOUtils.toByteArray), content.contentType, content.title)
 }
 
 case class Redirect(
@@ -163,7 +189,7 @@ object Credentials {
 
 trait HttpResponse {
     def statusCode   : Int
-    def headers      : Map[String, Seq[String]]
+    def headers      : Map[String, List[String]]
     def lastModified : Option[Long]
     def content      : StreamedContent
     def disconnect() : Unit
@@ -175,7 +201,7 @@ trait HttpClient {
         credentials: Option[Credentials],
         cookieStore: org.apache.http.client.CookieStore,
         method     : String,
-        headers    : Map[String, Seq[String]],
+        headers    : Map[String, List[String]],
         content    : Option[StreamedContent]
     ): HttpResponse
 

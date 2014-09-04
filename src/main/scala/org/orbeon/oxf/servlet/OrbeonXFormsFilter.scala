@@ -19,6 +19,7 @@ import javax.servlet._
 import javax.servlet.http._
 
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
@@ -40,7 +41,7 @@ class OrbeonXFormsFilter extends Filter {
                 FilterSettings(
                     filterConfig.getServletContext,
                     Option(filterConfig.getInitParameter(RendererContextParameterName)) map normalizeContextPath,
-                    Option(filterConfig.getInitParameter(DefaultEncodingParameterName)) getOrElse DefaultEncoding
+                    Option(filterConfig.getInitParameter(DefaultEncodingParameterName)) getOrElse Defaults.DefaultEncodingForServletCompatibility
                 )
             )
 
@@ -164,7 +165,6 @@ object OrbeonXFormsFilter {
     private val RendererContextParameterName = "oxf.xforms.renderer.context"
     private val DefaultEncodingParameterName = "oxf.xforms.renderer.default-encoding"
     private val RendererPath                 = "/xforms-renderer"
-    private val DefaultEncoding              = "ISO-8859-1" // antique and for backward compatibility, could change
 
     private def normalizeContextPath(s: String) =
         "/" + dropStartingSlash(dropTrailingSlash(s))

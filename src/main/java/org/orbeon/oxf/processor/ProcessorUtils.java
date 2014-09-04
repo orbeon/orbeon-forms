@@ -17,7 +17,9 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.QName;
+import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
@@ -43,7 +45,6 @@ public class ProcessorUtils {
     public static final String DEFAULT_CONTENT_TYPE = XMLUtils.XML_CONTENT_TYPE2;
     //public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
-    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
     public static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
     public static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
@@ -158,7 +159,7 @@ public class ProcessorUtils {
     public static void readText(InputStream is, String encoding, ContentHandler output, String contentType, Long lastModified, int statusCode) {
         try {
             if (encoding == null)
-                encoding = DEFAULT_TEXT_READING_ENCODING;
+                encoding = Defaults.DefaultEncodingForServletCompatibility();
             outputStartDocument(output, contentType, lastModified, statusCode, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
             SAXUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
             outputEndDocument(output, DEFAULT_TEXT_DOCUMENT_ELEMENT);
@@ -224,11 +225,11 @@ public class ProcessorUtils {
             final AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", type.getQualifiedName());
             if (contentType != null)
-                attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+                attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType);
             if (fileName != null)
                 attributes.addAttribute("", "filename", "filename", "CDATA", fileName);
             if (lastModified != null)
-                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", DateUtils.RFC1123Date().print(lastModified));
+                attributes.addAttribute("", Headers.LastModifiedLower(), Headers.LastModifiedLower(), "CDATA", DateUtils.RFC1123Date().print(lastModified));
             if (statusCode > 0)
                 attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode));
 

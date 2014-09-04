@@ -14,20 +14,20 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.ExternalContext.Response
+import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}
 import org.orbeon.oxf.webapp.WebAppContext
 
-// This context copies all the values of the given request. It uses the original session.
-class AsyncExternalContext(val webAppContext: WebAppContext, request: AsyncRequest, response: Response) extends ExternalContext {
+// This context uses the original WebAppContext and session
+class LocalExternalContext(val webAppContext: WebAppContext, request: Request, response: Response) extends ExternalContext {
 
     def getWebAppContext = webAppContext
     def getSession(create: Boolean) = request.getSession(create)
 
-    val getRequest = request
+    val getRequest  = request
     val getResponse = response
 
-    def getStartLoggerString = getRequest.getRequestPath + " - Received request";
-    def getEndLoggerString = getRequest.getRequestPath
+    def getStartLoggerString = getRequest.getRequestPath + " - Received request"
+    def getEndLoggerString   = getRequest.getRequestPath
 
     def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException
 }

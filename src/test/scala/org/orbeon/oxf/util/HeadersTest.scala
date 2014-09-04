@@ -15,8 +15,9 @@
 package org.orbeon.oxf.util
 
 import org.junit.Test
+import org.orbeon.oxf.http.Headers
 import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.util.Headers._
+import Headers._
 
 class HeadersTest extends AssertionsForJUnit {
 

@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.Function1Adapter;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xforms.*;
@@ -28,6 +30,7 @@ import org.orbeon.saxon.om.NodeInfo;
 import scala.Option;
 import org.orbeon.oxf.xforms.model.DataModel;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,49 +50,56 @@ public class InstanceReplacer extends BaseReplacer {
 
     public void deserialize(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws Exception {
         // Deserialize here so it can run in parallel
-        if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
+        final String mediatype = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE);
+        if (XMLUtils.isXMLMediatype(mediatype)) {
             // XML media type
             final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
             resultingDocumentOrDocumentInfo = deserializeInstance(detailsLogger, p2.isReadonly, p2.isHandleXInclude, connectionResult);
         } else {
             // Other media type is not allowed
-            throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
+            throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + mediatype, "processing instance replacement",
                     new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
         }
     }
 
-    private Object deserializeInstance(IndentedLogger indentedLogger, boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
-        final Object resultingDocument;
-
+    private Object deserializeInstance(
+        final IndentedLogger indentedLogger,
+        final boolean isReadonly,
+        final boolean isHandleXInclude,
+        final ConnectionResult connectionResult
+    ) throws Exception {
         // Create resulting instance whether entire instance is replaced or not, because this:
         // 1. Wraps a Document within a DocumentInfo if needed
         // 2. Performs text nodes adjustments if needed
         try {
-            if (! isReadonly) {
-                // Resulting instance must not be read-only
+            return
+                ConnectionResult.withSuccessConnection(connectionResult, true, new Function1Adapter<InputStream, Object>() {
+                    public Object apply(InputStream is) {
+                        if (! isReadonly) {
+                            // Resulting instance must not be read-only
 
-                // TODO: What about configuring validation? And what default to choose?
-                resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), isHandleXInclude, true);
+                            if (indentedLogger.isDebugEnabled())
+                                indentedLogger.logDebug("", "deserializing to mutable instance");
 
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("", "deserializing to mutable instance");
-            } else {
-                // Resulting instance must be read-only
+                            // TODO: What about configuring validation? And what default to choose?
+                            return TransformerUtils.readDom4j(is, connectionResult.url(), isHandleXInclude, true);
+                        } else {
+                            // Resulting instance must be read-only
 
-                // TODO: What about configuring validation? And what default to choose?
-                // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                resultingDocument = TransformerUtils.readTinyTree(XPath.GlobalConfiguration(),
-                        connectionResult.getResponseInputStream(), connectionResult.resourceURI(), isHandleXInclude, true);
+                            if (indentedLogger.isDebugEnabled())
+                                indentedLogger.logDebug("", "deserializing to read-only instance");
 
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("", "deserializing to read-only instance");
-            }
+                            // TODO: What about configuring validation? And what default to choose?
+                            // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
+                            return TransformerUtils.readTinyTree(XPath.GlobalConfiguration(),
+                                    is, connectionResult.url(), isHandleXInclude, true);
+                        }
+                    }
+                });
         } catch (Exception e) {
             throw new XFormsSubmissionException(submission, e, "xf:submission: exception while reading XML response.", "processing instance replacement",
                     new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.PARSE_ERROR(), connectionResult));
         }
-
-        return resultingDocument;
     }
 
     public Runnable replace(final ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {

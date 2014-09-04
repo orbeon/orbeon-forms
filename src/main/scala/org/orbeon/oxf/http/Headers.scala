@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Orbeon, Inc.
+ * Copyright (C) 2014 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,20 +11,36 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.util
+package org.orbeon.oxf.http
+
+import org.orbeon.oxf.util.DateUtils
 
 import collection.breakOut
 
 object Headers {
+
+    val TokenKey           = "Orbeon-Token"
+    val ContentType        = "Content-Type"
+    val ContentLength      = "Content-Length"
+    val LastModified       = "Last-Modified"
+    val Authorization      = "Authorization"
+
+    val TokenKeyLower      = TokenKey.toLowerCase
+    val ContentTypeLower   = ContentType.toLowerCase
+    val ContentLengthLower = ContentLength.toLowerCase
+    val LastModifiedLower  = LastModified.toLowerCase
+    val AuthorizationLower = Authorization.toLowerCase
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
     //
     // - Don't proxy Content-Length and Content-Type. Proxies must associate these with the content and propagate via
     //   other means.
     // - We are not able to properly proxy directly a content-encoded response, so we don't proxy the relevant headers.
-    private val HeadersToRemove = Set("connection", "transfer-encoding", "content-length", "content-type")
+    private val HeadersToRemove = Set("connection", "transfer-encoding", ContentLength, ContentType) map (_.toLowerCase)
     val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "cookie", "cookie2", "accept-encoding")
     val ResponseHeadersToRemove = HeadersToRemove ++ List("set-cookie", "set-cookie2", "content-encoding")
+
+    val EmptyHeaders = Map.empty[String, List[String]]
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
     // Q: Doesn't Scala already have such a type?
@@ -64,6 +80,17 @@ object Headers {
     // Capitalize a header of the form foo-bar-baz to Foo-Bar-Baz
     def capitalizeSplitHeader(name: String) =
         name split '-' map (_.toLowerCase.capitalize) mkString "-"
+
+    def firstHeaderIgnoreCase[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], name: String): Option[String] =
+        headers collectFirst {
+            case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value.head
+        }
+
+    def firstLongHeaderIgnoreCase[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], name: String): Option[Long] =
+        firstHeaderIgnoreCase(headers, name) map (_.toLong) filter (_ >= 0L)
+
+    def firstDateHeaderIgnoreCase[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], name: String): Option[Long] =
+        firstHeaderIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
     // List of common HTTP headers
     val CommonHeaders = Seq(

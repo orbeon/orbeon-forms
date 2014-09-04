@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.externalcontext.AsyncExternalContext;
+import org.orbeon.oxf.externalcontext.LocalExternalContext;
 import org.orbeon.oxf.externalcontext.AsyncRequest;
 import org.orbeon.oxf.externalcontext.ExternalContextWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.portlet.OrbeonPortlet2Delegate;
+import org.orbeon.oxf.portlet.OrbeonPortlet;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
@@ -59,7 +59,7 @@ public class LocalPortletSubmission extends BaseSubmission {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
                 "resource", p2.actionOrResource,
                 "container type", request.getContainerType(),
-                "deployment type", containingDocument.getDeploymentType().name()
+                "deployment type", containingDocument().getDeploymentType().name()
             );
         }
 
@@ -80,7 +80,7 @@ public class LocalPortletSubmission extends BaseSubmission {
         }
 
         // Separate deployment not supported for portlet local submission as callee is a servlet, not a portlet!
-        if (containingDocument.getDeploymentType() == XFormsConstants.DeploymentType.separate) {
+        if (containingDocument().getDeploymentType().equals(XFormsConstants.DeploymentType.separate)) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "deployment type is separate");
@@ -100,21 +100,21 @@ public class LocalPortletSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument(), submission().getSubmissionElement(), p2.actionOrResource);
 
         // Headers
-        final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
-        final String headersToForward = containingDocument.getForwardSubmissionHeaders();
+        final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
+        final String headersToForward = containingDocument().getForwardSubmissionHeaders();
 
-        final String submissionEffectiveId = submission.getEffectiveId();
+        final String submissionEffectiveId = submission().getEffectiveId();
 
         // If async, use a "safe" copy of the context
-        final OrbeonPortlet2Delegate currentPortlet = (OrbeonPortlet2Delegate) OrbeonPortlet2Delegate.currentPortlet().value().get();
+        final OrbeonPortlet currentPortlet = OrbeonPortlet.currentPortlet().value().get();
 
         final ExternalContext currentExternalContext = NetUtils.getExternalContext();
-        final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : currentExternalContext.getResponse();
+        final ExternalContext.Response response = containingDocument().getResponse() != null ? containingDocument().getResponse() : currentExternalContext.getResponse();
         final ExternalContext newExternalContext = p2.isAsynchronous
-                ? new AsyncExternalContext(currentExternalContext.getWebAppContext(), new AsyncRequest(currentExternalContext.getRequest()), response)
+                ? new LocalExternalContext(currentExternalContext.getWebAppContext(), new AsyncRequest(currentExternalContext.getRequest()), response)
                 : currentExternalContext;
 
         // Pack external call into a Runnable so it can be run synchronously or asynchronously.
@@ -122,7 +122,7 @@ public class LocalPortletSubmission extends BaseSubmission {
             public SubmissionResult call() throws Exception {
 
                 if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                    timingLogger.startHandleOperation("", "running asynchronous local portlet submission submission", "id", submission.getEffectiveId());
+                    timingLogger.startHandleOperation("", "running asynchronous local portlet submission submission", "id", submission().getEffectiveId());
 
                 // TODO: This refers to XFormsContainingDocument, and Submission. FIXME!
 
@@ -130,7 +130,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                 final boolean[] status = { false , false };
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openLocalConnection(newExternalContext, response,
+                    connectionResult = openLocalConnection(newExternalContext.getRequest(), response,
                         detailsLogger, resolvedURI.toString(), p, sp.actualRequestMediatype, p2.encoding, sp.messageBody,
                         sp.queryString, headersToForward, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
@@ -154,10 +154,10 @@ public class LocalPortletSubmission extends BaseSubmission {
 
                     // TODO: can we put this in the Replacer?
                     if (connectionResult.dontHandleResponse())
-                        containingDocument.setGotSubmissionReplaceAll();
+                        containingDocument().setGotSubmissionReplaceAll();
 
                     // Obtain replacer, deserialize and update status
-                    final Replacer replacer = submission.getReplacer(connectionResult, p);
+                    final Replacer replacer = submission().getReplacer(connectionResult, p);
                     replacer.deserialize(connectionResult, p, p2);
                     status[1] = true;
 

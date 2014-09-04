@@ -15,15 +15,15 @@ package org.orbeon.oxf.fr.embedding
 
 import java.io.Writer
 import java.{util ⇒ ju}
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
-import org.orbeon.oxf.http.{Content, StreamedContent, Redirect, StreamedContentOrRedirect}
-import org.orbeon.oxf.util.Headers._
+import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
@@ -34,7 +34,7 @@ import scala.collection.immutable
 
 object APISupport {
 
-    import Private._
+    import org.orbeon.oxf.fr.embedding.APISupport.Private._
 
     val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
 
@@ -103,7 +103,7 @@ object APISupport {
         val res = connectURL(requestDetails)
         
         ctx.setStatusCode(res.statusCode)
-        res.content.contentType foreach (ctx.setHeader("Content-Type", _))
+        res.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
 
         proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
 

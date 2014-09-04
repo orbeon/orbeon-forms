@@ -14,14 +14,17 @@
 package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayOutputStream
+import java.net.URI
+
 import org.dom4j.Document
+import org.orbeon.oxf.fr.FormRunnerPermissions._
 import org.orbeon.oxf.fr.relational._
-import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+
 import scala.util.Try
-import org.orbeon.oxf.fr.FormRunnerPermissions._
 
 private object HttpRequest {
 
@@ -33,33 +36,60 @@ private object HttpRequest {
     case class XML   (doc : Document   ) extends Body
     case class Binary(file: Array[Byte]) extends Body
 
-    private def request(url: String, method: String, version: Version, body: Option[Body], credentials: Option[Credentials])(implicit logger: IndentedLogger): ConnectionResult = {
-        val documentUrl = URLFactory.createURL(PersistenceBase + url)
+    private def request(
+        url         : String,
+        method      : String,
+        version     : Version,
+        body        : Option[Body],
+        credentials : Option[Credentials])(implicit
+        logger      : IndentedLogger
+    ): ConnectionResult = {
+
+        val documentURL = new URI(PersistenceBase + url)
+
         val headers = {
-            val contentTypeHeader = body.map {
-                    case XML   (_) ⇒ "application/xml"
-                    case Binary(_) ⇒ "application/octet-stream"
-                }.map("Content-Type" → Array(_)).toSeq
-            val versionHeader =  version match {
+
+            val versionHeader = version match {
                 case Unspecified             ⇒ Nil
-                case Next                    ⇒ Seq("Orbeon-Form-Definition-Version" → Array("next"))
-                case Specific(version)       ⇒ Seq("Orbeon-Form-Definition-Version" → Array(version.toString))
-                case ForDocument(documentId) ⇒ Seq("Orbeon-For-Document-Id"         → Array(documentId))
+                case Next                    ⇒ List("Orbeon-Form-Definition-Version" → List("next"))
+                case Specific(version)       ⇒ List("Orbeon-Form-Definition-Version" → List(version.toString))
+                case ForDocument(documentId) ⇒ List("Orbeon-For-Document-Id"         → List(documentId))
             }
-            val credentialHeaders = credentials.map(c ⇒ Seq(
-                OrbeonUsernameHeaderName → Array(c.username),
-                OrbeonGroupHeaderName    → Array(c.group),
-                OrbeonRolesHeaderName    → Array(c.roles.mkString(","))// split on commas as for other HTTP headers
+
+            val credentialHeaders = credentials.map(c ⇒ List(
+                OrbeonUsernameHeaderName → List(c.username),
+                OrbeonGroupHeaderName    → List(c.group),
+                OrbeonRolesHeaderName    → List(c.roles.mkString(","))// split on commas as for other HTTP headers
             )).toSeq.flatten
-            val myHeaders = Seq(contentTypeHeader, versionHeader, credentialHeaders).flatten.toMap
+
+            val myHeaders = List(versionHeader, credentialHeaders).flatten.toMap
             Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
         }
+
+        val contentType = body.map {
+            case XML   (_) ⇒ "application/xml"
+            case Binary(_) ⇒ "application/octet-stream"
+        }
+
         val messageBody = body map {
             case XML   (doc ) ⇒ Dom4jUtils.domToString(doc).getBytes
             case Binary(file) ⇒ file
         }
-        Connection(method, documentUrl, credentials = None, messageBody = messageBody, headers = headers,
-            loadState = true, logBody = false).connect(saveState = true)
+
+        val content = messageBody map
+            (StreamedContent.fromBytes(_, contentType))
+
+        Connection(
+            httpMethod  = method,
+            url         = documentURL,
+            credentials = None,
+            content     = content,
+            headers     = headers,
+            loadState   = true,
+            logBody     = false
+        ).connect(
+            saveState = true
+        )
     }
 
     def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
@@ -69,16 +99,20 @@ private object HttpRequest {
         useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
 
     def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
-        useAndClose(request(url, "GET", version, None, credentials)) { connectionResult ⇒
-            useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                val statusCode = connectionResult.statusCode
-                val headers = connectionResult.responseHeaders.toMap
-                val body = Try({
-                    val outputStream = new ByteArrayOutputStream
-                    NetUtils.copyStream(inputStream, outputStream)
-                    outputStream.toByteArray
-                })
-                (statusCode, headers, body)
-            }
+        useAndClose(request(url, "GET", version, None, credentials)) { cxr ⇒
+
+            val statusCode = cxr.statusCode
+            val headers    = cxr.headers
+
+            val body =
+                useAndClose(cxr.content.inputStream) { inputStream ⇒
+                    Try {
+                        val outputStream = new ByteArrayOutputStream
+                        NetUtils.copyStream(inputStream, outputStream)
+                        outputStream.toByteArray
+                    }
+                }
+
+            (statusCode, headers, body)
         }
 }

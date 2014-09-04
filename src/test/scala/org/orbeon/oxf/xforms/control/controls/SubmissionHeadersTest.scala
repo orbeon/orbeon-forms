@@ -21,7 +21,7 @@ import collection.mutable.LinkedHashMap
 import collection.JavaConverters._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
-class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
+class SubmissionHeadersTest extends DocumentTestBase with AssertionsForJUnit {
 
     @Test def outputHeaders() {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version

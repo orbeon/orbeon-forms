@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.controls.OutputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
-import org.orbeon.oxf.xforms.submission.{SubmissionUtils, Headers}
+import org.orbeon.oxf.xforms.submission.{SubmissionUtils, SubmissionHeaders}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.exception.OrbeonFormatter
@@ -108,11 +108,11 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     // Keep public for unit tests
-    def evaluatedHeaders: Map[String, Array[String]] = {
+    def evaluatedHeaders: Map[String, List[String]] = {
         // TODO: pass BindingContext directly
         getContextStack.setBinding(bindingContext)
         val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
-        try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward)
+        try SubmissionHeaders.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward)
         catch {
             case NonFatal(t) ⇒
                 XFormsError.handleNonFatalXPathError(container, t)

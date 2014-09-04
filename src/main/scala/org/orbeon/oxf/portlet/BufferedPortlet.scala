@@ -60,7 +60,7 @@ class PortletEmbeddingContextWithResponse(
     def setStatusCode(code: Int)   = () // Q: Can we do anything meaningful for resource caching?
 
     def setHeader(name: String, value: String): Unit =
-        if (name.toLowerCase == "content-type")
+        if (name equalsIgnoreCase Headers.ContentType)
             response.setContentType(value)
         else
             response.setProperty(name, value)

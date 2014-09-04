@@ -18,9 +18,9 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <p:param name="default-submission" type="input"/>
-    <p:param name="matcher-result" type="input"/>
-    <p:param name="setvalues" type="input"/>
-    <p:param name="instance" type="output"/>
+    <p:param name="matcher-result"     type="input"/>
+    <p:param name="setvalues"          type="input"/>
+    <p:param name="instance"           type="output"/>
 
     <!-- Check content type -->
     <p:processor name="oxf:request">

@@ -17,6 +17,7 @@ import org.apache.commons.fileupload._
 import org.apache.commons.fileupload.util.Streams
 import org.apache.commons.fileupload.disk.DiskFileItemFactory
 import org.apache.commons.fileupload.servlet.ServletFileUpload
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import java.util.{Map ⇒ JMap}
@@ -177,7 +178,7 @@ object Multipart {
                 def expectedSizeFromPart =
                     for {
                         headers ← Option(fis.getHeaders)
-                        header  ← Option(headers.getHeader("content-length"))
+                        header  ← Option(headers.getHeader(Headers.ContentLengthLower))
                     } yield
                         header.toLong
 

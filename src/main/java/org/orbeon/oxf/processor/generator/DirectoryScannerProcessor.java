@@ -25,7 +25,9 @@ import com.drew.metadata.exif.ExifReader;
 import com.drew.metadata.iptc.IptcReader;
 import org.dom4j.Document;
 import org.dom4j.Node;
+import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -438,7 +440,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                     if (config.isBasicInfo()) {
 
                         helper.startElement("basic-info");
-                        helper.element("content-type", contentType);
+                        helper.element(Headers.ContentTypeLower(), contentType);
 
                         byte[] startOfFrameSegment = segmentData.getSegment(JpegSegmentType.SOF0);
                         if (startOfFrameSegment != null) {
@@ -450,7 +452,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         }
                         byte[] commentSegment = segmentData.getSegment(JpegSegmentType.COM);
                         if (commentSegment != null)
-                            helper.element("comment", new String(commentSegment), "iso-8859-1"); // probably just ASCII
+                            helper.element("comment", new String(commentSegment), Defaults.DefaultEncodingForServletCompatibility()); // probably just ASCII
 
                         helper.endElement();
                     }
@@ -478,7 +480,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                     // Basic info: content-type and size
                     if (config.isBasicInfo()) {
                         helper.startElement("basic-info");
-                        helper.element("content-type", contentType);
+                        helper.element(Headers.ContentTypeLower(), contentType);
 
                         byte[] bytes = new byte[10];
                         int count = is.read(bytes);
@@ -496,7 +498,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                     // Basic info: content-type and size
                     if (config.isBasicInfo()) {
                         helper.startElement("basic-info");
-                        helper.element("content-type", contentType);
+                        helper.element(Headers.ContentTypeLower(), contentType);
 
                         // See http://www.libpng.org/pub/png/spec/1.2/
 
@@ -525,7 +527,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                     // Basic info: just content-type
                     if (config.isBasicInfo()) {
                         helper.startElement("basic-info");
-                        helper.element("content-type", contentType);
+                        helper.element(Headers.ContentTypeLower(), contentType);
                         helper.endElement();
                     }
                 }

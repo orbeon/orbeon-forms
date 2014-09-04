@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.scope;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
@@ -38,7 +39,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
                 final Element rootElement = readInputAsDOM4J(context, input).getRootElement();
                 final String contextName = rootElement.element("scope").getStringValue();
                 final Element sessionScopeElement = rootElement.element("session-scope");
-                final Element contentTypeElement = rootElement.element("content-type");
+                final Element contentTypeElement = rootElement.element(Headers.ContentTypeLower());
                 final String contentType = (contentTypeElement == null) ? APPLICATION_XML : (TEXT_PLAIN.equals(contentTypeElement.getStringValue())) ? TEXT_PLAIN : null ;
                 final String sessionScopeValue = (sessionScopeElement == null) ? null : sessionScopeElement.getStringValue();
                 return new ContextConfig("request".equals(contextName) ? REQUEST_CONTEXT

@@ -21,6 +21,7 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -343,10 +344,10 @@ public class RequestGenerator extends ProcessorImpl {
         addTextElement(requestElement, "container-type", request.getContainerType());
         addTextElement(requestElement, "container-namespace", request.getContainerNamespace());
         addTextElement(requestElement, "character-encoding", request.getCharacterEncoding());
-        addTextElement(requestElement, "content-length", Integer.toString(request.getContentLength()));
+        addTextElement(requestElement, Headers.ContentLengthLower(), Integer.toString(request.getContentLength()));
         {
             final String contentType = request.getContentType();
-            addTextElement(requestElement, "content-type", (contentType == null) ? "" : contentType);
+            addTextElement(requestElement, Headers.ContentTypeLower(), (contentType == null) ? "" : contentType);
         }
         addParameters(context, requestElement, request);
         addBody(requestElement);
@@ -533,8 +534,8 @@ public class RequestGenerator extends ProcessorImpl {
                         if (fileItem.getName() != null)
                             parameterElement.addElement("filename").addText(fileItem.getName());
                         if (fileItem.getContentType() != null)
-                            parameterElement.addElement("content-type").addText(fileItem.getContentType());
-                        parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
+                            parameterElement.addElement(Headers.ContentTypeLower()).addText(fileItem.getContentType());
+                        parameterElement.addElement(Headers.ContentLengthLower()).addText(Long.toString(fileItem.getSize()));
 
                         if (!isFileItemEmpty(fileItem)) {
                             // Create private placeholder element with parameter name as attribute

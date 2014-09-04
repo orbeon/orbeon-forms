@@ -46,7 +46,7 @@ class XXFormsGetRequestParameter extends RequestFunction {
         containingDocument.getRequestParameters.get(name)
 
     def fromRequest(request: Request, name: String) =
-        Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray
+        Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
 }
 
 // xxf:get-request-header($a as xs:string) as xs:string*
@@ -56,13 +56,13 @@ class XXFormsGetRequestHeader extends RequestFunction {
         containingDocument.getRequestHeaders.get(name.toLowerCase)
 
     def fromRequest(request: Request, name: String) =
-        Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase))
+        Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
 }
 
 trait RequestFunction extends XFormsFunction with FunctionSupport {
 
-    def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[Array[String]]
-    def fromRequest(request: Request, name: String): Option[Array[String]]
+    def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[List[String]]
+    def fromRequest(request: Request, name: String): Option[List[String]]
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import java.io.InputStream
+import java.net.URI
+
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.http
+import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{NodeInfo, Navigator, DocumentInfo}
-import scala.util.control.NonFatal
+import org.orbeon.saxon.om.{DocumentInfo, Navigator, NodeInfo}
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
@@ -29,48 +31,47 @@ object SubmissionUtils {
         SecureUtils.hmacString(Navigator.getPath(node), "hex")
 
     def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
-        processGETConnection(model, resolvedURL) { result ⇒
-            NetUtils.inputStreamToByteArray(result.getResponseInputStream)
+        processGETConnection(model, resolvedURL) { is ⇒
+            NetUtils.inputStreamToByteArray(is)
         }
 
     def readTinyTree(model: XFormsModel, resolvedURL: String, handleXInclude: Boolean): DocumentInfo =
-        processGETConnection(model, resolvedURL) { result ⇒
+        processGETConnection(model, resolvedURL) { is ⇒
             TransformerUtils.readTinyTree(
                 XPath.GlobalConfiguration,
-                result.getResponseInputStream,
-                result.resourceURI,
+                is,
+                resolvedURL,
                 handleXInclude,
-                true)
+                true
+            )
         }
 
-    def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: ConnectionResult ⇒ T): T =
-        useAndClose(openGETConnection(model, resolvedURL)) { result ⇒
-            if (NetUtils.isSuccessCode(result.statusCode))
-                try body(result)
-                catch { case NonFatal(t) ⇒ throw new OXFException("Got exception while while reading URL: " + resolvedURL, t) }
-            else
-                throw new OXFException("Got invalid return code while reading URL: " + resolvedURL + ", " + result.statusCode)
-        }
+    def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: InputStream ⇒ T): T =
+        ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedURL), closeOnSuccess = true)(body)
 
     def openGETConnection(model: XFormsModel, resolvedURL: String) =
         Connection(
-            "GET",
-            URLFactory.createURL(resolvedURL),
-            None,
-            None,
-            Connection.buildConnectionHeaders(None, Map(), getHeadersToForward(model.containingDocument))(model.indentedLogger),
-            loadState = true,
-            logBody = BaseSubmission.isLogBody)(model.indentedLogger).connect(saveState = true)
+            httpMethod  = "GET",
+            url         = new URI(resolvedURL),
+            credentials = None,
+            content     = None,
+            headers     = Connection.buildConnectionHeaders(None, Map(), getHeadersToForward(model.containingDocument))(model.indentedLogger) mapValues (_.toList),
+            loadState   = true,
+            logBody     = BaseSubmission.isLogBody)(
+            model.indentedLogger
+        ).connect(
+            saveState = true
+        )
 
     private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
         Option(containingDocument.getForwardSubmissionHeaders)
 
-    def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): Map[String, Array[String]] = {
+    def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): Map[String, List[String]] = {
         try {
             val headersToForward =
                 clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
 
-            Headers.evaluateHeaders(
+            SubmissionHeaders.evaluateHeaders(
                 submission.container,
                 submission.getModel.getContextStack,
                 submission.getEffectiveId,
@@ -83,7 +84,7 @@ object SubmissionUtils {
         }
     }
 
-    def clientHeadersToForward(allHeaders: Map[String, Array[String]], forwardClientHeaders: Boolean) = {
+    def clientHeadersToForward(allHeaders: Map[String, List[String]], forwardClientHeaders: Boolean) = {
         if (forwardClientHeaders) {
             // Forwarding the user agent and accept headers makes sense when dealing with resources that
             // typically would come from the client browser, including:
@@ -103,6 +104,14 @@ object SubmissionUtils {
             // Give priority to explicit headers
             toForward.toMap
         } else
-            Map.empty[String, Array[String]]
+            Map.empty[String, List[String]]
     }
+
+    def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
+        for {
+            (headerName, headerValues) ← http.Headers.proxyHeaders(cxr.headers, request = false)
+            headerValue                ← headerValues
+        } locally {
+            response.addHeader(headerName, headerValue)
+        }
 }

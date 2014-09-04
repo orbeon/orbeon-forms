@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.Base64XMLReceiver
@@ -114,7 +115,7 @@ class BinaryTextXMLReceiver(
             response foreach { response ⇒
 
                 // This will override caching settings which may have taken place before
-                nonEmptyOrNone(attributes.getValue("last-modified")) foreach
+                nonEmptyOrNone(attributes.getValue(Headers.LastModifiedLower)) foreach
                     (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
 
                 nonEmptyOrNone(attributes.getValue("filename")) foreach
@@ -125,7 +126,7 @@ class BinaryTextXMLReceiver(
             }
 
             // Set ContentHandler and headers depending on input type
-            val contentTypeAttribute = Option(attributes.getValue("content-type"))
+            val contentTypeAttribute = Option(attributes.getValue(Headers.ContentTypeLower))
             if (isBinaryInput) {
                 response foreach { response ⇒
                     // Get content-type and encoding

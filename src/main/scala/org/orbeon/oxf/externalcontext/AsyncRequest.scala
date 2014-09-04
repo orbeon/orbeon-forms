@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import java.lang.String
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.URLRewriterUtils
-import java.util.{Collections, HashMap}
+import java.{util ⇒ ju}
 
 // This request copies all values of the given request ahead of time
 class AsyncRequest(req: Request) extends ExternalContext.Request {
@@ -37,9 +36,9 @@ class AsyncRequest(req: Request) extends ExternalContext.Request {
     val getReader = null
     val getInputStream = null
 
-    val getAttributesMap = new HashMap[String, Object](req.getAttributesMap)
-    val getHeaderValuesMap = Collections.unmodifiableMap[String, Array[String]](new HashMap[String, Array[String]](req.getHeaderValuesMap))
-    val getParameterMap = Collections.unmodifiableMap[String, Array[Object]](new HashMap[String, Array[Object]](req.getParameterMap))
+    val getAttributesMap   = new ju.HashMap[String, Object](req.getAttributesMap)
+    val getHeaderValuesMap = ju.Collections.unmodifiableMap[String, Array[String]](new ju.HashMap[String, Array[String]](req.getHeaderValuesMap))
+    val getParameterMap    = ju.Collections.unmodifiableMap[String, Array[Object]](new ju.HashMap[String, Array[Object]](req.getParameterMap))
 
     def getClientContextPath(urlString: String) =
         if (URLRewriterUtils.isPlatformPath(urlString)) platformClientContextPath else applicationClientContextPath
@@ -47,38 +46,38 @@ class AsyncRequest(req: Request) extends ExternalContext.Request {
     def getNativeRequest = null
 
     // Copy all other values right away
-    val getWindowState = req.getWindowState
-    val getPortletMode = req.getPortletMode
-    val getRequestURL = req.getRequestURL
-    val getRequestURI = req.getRequestURI
-    val getQueryString = req.getQueryString
-    val getPathTranslated = req.getPathTranslated
-    val getLocales = req.getLocales
-    val getLocale = req.getLocale
-    val getUserPrincipal = req.getUserPrincipal
+    val getWindowState            = req.getWindowState
+    val getPortletMode            = req.getPortletMode
+    val getRequestURL             = req.getRequestURL
+    val getRequestURI             = req.getRequestURI
+    val getQueryString            = req.getQueryString
+    val getPathTranslated         = req.getPathTranslated
+    val getLocales                = req.getLocales
+    val getLocale                 = req.getLocale
+    val getUserPrincipal          = req.getUserPrincipal
 
-    val getRemoteUser = req.getRemoteUser
-    val isSecure = req.isSecure
-    val getAuthType = req.getAuthType
-    val getRequestedSessionId = req.getRequestedSessionId
+    val getRemoteUser             = req.getRemoteUser
+    val isSecure                  = req.isSecure
+    val getAuthType               = req.getAuthType
+    val getRequestedSessionId     = req.getRequestedSessionId
     val isRequestedSessionIdValid = req.isRequestedSessionIdValid
 
-    val getServerPort = req.getServerPort
-    val getServerName = req.getServerName
-    val getMethod = req.getMethod
-    val getScheme = req.getScheme
-    val getRemoteAddr = req.getRemoteAddr
-    val getRemoteHost = req.getRemoteHost
-    val getProtocol = req.getProtocol
+    val getServerPort             = req.getServerPort
+    val getServerName             = req.getServerName
+    val getMethod                 = req.getMethod
+    val getScheme                 = req.getScheme
+    val getRemoteAddr             = req.getRemoteAddr
+    val getRemoteHost             = req.getRemoteHost
+    val getProtocol               = req.getProtocol
 
-    val getContentType = req.getContentType
-    val getContentLength = req.getContentLength
-    val getCharacterEncoding = req.getCharacterEncoding
+    val getContentType            = req.getContentType
+    val getContentLength          = req.getContentLength
+    val getCharacterEncoding      = req.getCharacterEncoding
 
-    val getServletPath = req.getServletPath
-    val getContextPath = req.getContextPath
-    val getRequestPath = req.getRequestPath
-    val getPathInfo = req.getPathInfo
-    val getContainerNamespace = req.getContainerNamespace
-    val getContainerType = req.getContainerType
+    val getServletPath            = req.getServletPath
+    val getContextPath            = req.getContextPath
+    val getRequestPath            = req.getRequestPath
+    val getPathInfo               = req.getPathInfo
+    val getContainerNamespace     = req.getContainerNamespace
+    val getContainerType          = req.getContainerType
 }

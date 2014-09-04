@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
+import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.resources.URLFactory
 
 import collection.JavaConverters._
@@ -35,7 +36,7 @@ import scala.util.control.NonFatal
 trait SubmitResponseEvent extends XFormsEvent {
 
     def connectionResult: Option[ConnectionResult]
-    final def headers = connectionResult map (_.responseHeaders)
+    final def headers = connectionResult map (_.headers)
 
     override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
     override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
@@ -90,12 +91,11 @@ private object SubmitResponseEvent {
         }
     }
 
-    def tryToReadBody(connectionResult: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
+    def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
         // Log response details if not done already
-        connectionResult.logResponseDetailsIfNeeded(logger, Level.ERROR, "xforms-submit-error")
+        cxr.logResponseDetailsOnce(Level.ERROR)
 
-        // Try to add body information if present
-        if (connectionResult.hasContent) {
+        if (cxr.hasContent) {
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
             // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
@@ -110,7 +110,7 @@ private object SubmitResponseEvent {
 
             // Read the whole stream to a temp URI so we can read it more than once if needed
             val tempURIOpt =
-                try useAndClose(connectionResult.getResponseInputStream) { is ⇒
+                try useAndClose(cxr.content.inputStream) { is ⇒
                     Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
                 } catch
                     warn("error while reading response body.")
@@ -118,12 +118,12 @@ private object SubmitResponseEvent {
             tempURIOpt flatMap { tempURI ⇒
 
                 def asDocument =
-                    if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType)) {
+                    if (XMLUtils.isXMLMediatype(cxr.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE))) {
                         // XML content-type
                         // Read stream into Document
                         // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
                         try useAndClose(new URL(tempURI).openStream()) { is ⇒
-                            val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.resourceURI, false, true)
+                            val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
                             if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
                                 logger.logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(document))
                             Some(document)
@@ -133,13 +133,12 @@ private object SubmitResponseEvent {
                         None
 
                 def asString =
-                    if (XMLUtils.isTextOrJSONContentType(connectionResult.getResponseMediaType)) {
+                    if (XMLUtils.isTextOrJSONContentType(cxr.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE))) {
                         // XML parsing failed, or we got a text content-type
                         // Read stream into String
                         try {
-                            val charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType)
                             val is = URLFactory.createURL(tempURI).openStream()
-                            useAndClose(new InputStreamReader(is, charset)) { reader ⇒
+                            useAndClose(new InputStreamReader(is, cxr.contentTypeCharsetOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE))) { reader ⇒
                                 val string = NetUtils.readStreamAsString(reader)
                                 if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
                                     logger.logError("xforms-submit-error", "setting body string", "body", "\n" + string)
@@ -155,8 +154,8 @@ private object SubmitResponseEvent {
 
                 asDocument orElse asString match {
                     case Some(document: DocumentInfo) ⇒ Some(Right(document))
-                    case Some(string: String) ⇒ Some(Left(string))
-                    case _ ⇒ None
+                    case Some(string: String)         ⇒ Some(Left(string))
+                    case _                            ⇒ None
                 }
             }
         } else
@@ -172,7 +171,7 @@ private object SubmitResponseEvent {
         "response-reason-phrase" → (e ⇒ throw new ValidationException("Property Not implemented yet: " + "response-reason-phrase", e.locationData)),
         "response-body"          → body,
         "body"                   → body,
-        "resource-uri"           → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.resourceURI))),
+        "resource-uri"           → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.url))),
         "response-status-code"   → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.statusCode) filter (_ > 0)))
     )
 }

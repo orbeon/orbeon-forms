@@ -13,24 +13,26 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.ByteArrayInputStream
-
-import ScalaUtils._
-import Headers._
-import org.apache.http.impl.client.BasicCookieStore
-import collection.JavaConverters._
-import java.net.{URI, URL}
+import java.net.URI
 import java.util.{Map ⇒ JMap}
 import javax.servlet.http.{Cookie, HttpServletRequest}
+
+import org.apache.commons.lang3.StringUtils
 import org.apache.http.client.CookieStore
+import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
-import org.orbeon.oxf.common.{ValidationException, OXFException}
+import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.http.{StreamedContent, PropertiesApacheHttpClient, Credentials}
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.apache.commons.lang3.StringUtils
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 /**
@@ -46,59 +48,52 @@ import scala.util.control.NonFatal
  * - managing SOAP POST and GET a la XForms 1.1 (should this be here?)
  */
 class Connection(
-        httpMethod   : String,
-        connectionURL: URL,
-        credentials  : Option[Credentials],
-        requestBody  : Option[Array[Byte]],// TODO: Option[InputStream]
-        headers      : Map[String, Array[String]],
-        logBody      : Boolean)(implicit
-        logger       : IndentedLogger
-    ) extends ConnectionState with Logging {
+    httpMethod  : String,
+    url         : URI,
+    credentials : Option[Credentials],
+    content     : Option[StreamedContent],
+    headers     : Map[String, List[String]],
+    logBody     : Boolean)(implicit
+    logger      : IndentedLogger
+) extends ConnectionState with Logging {
 
-    import Connection._
+    import org.orbeon.oxf.util.Connection._
 
     require(StringUtils.isAllUpperCase(httpMethod))
 
     // Open the connection. This sends request headers, request body, and reads status and response headers.
     def connect(saveState: Boolean): ConnectionResult = {
-        val scheme = connectionURL.getProtocol
+
+        val urlString = url.toString
+        val scheme    = url.getScheme
 
         try {
             if (httpMethod == "GET" && Set("file", "oxf")(scheme)) {
                 // GET with file: or oxf:
 
                 // Create URL connection object
-                val urlConnection = connectionURL.openConnection
+                val urlConnection = URLFactory.createURL(urlString).openConnection
                 urlConnection.connect()
 
+                val headers = urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+
                 // Create result
-                val connectionResult = new ConnectionResult(connectionURL.toExternalForm)
+                val connectionResult = ConnectionResult.apply(
+                    url        = urlString,
+                    statusCode = 200,
+                    headers    = headers,
+                    content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headers)
+                )
 
-                connectionResult.statusCode = 200
-                connectionResult.responseHeaders =
-                    urlConnection.getHeaderFields.asScala map
-                    { case (k, v) ⇒ k → v.asScala.to[List] } toMap
-
-                connectionResult.setLastModified(urlConnection)
-                connectionResult.setResponseContentType(urlConnection.getContentType, "application/xml")
-                connectionResult.setResponseInputStream(urlConnection.getInputStream)
-
-                // Log response details except body
-                if (debugEnabled)
-                    connectionResult.logResponseDetailsIfNeeded(logger, Level.DEBUG, "")
-
-                // Log response body
-                if (debugEnabled)
-                    connectionResult.logResponseBody(logger, Level.DEBUG, "", logBody)
+                if (debugEnabled) {
+                    connectionResult.logResponseDetailsOnce(Level.DEBUG)
+                    connectionResult.logResponseBody(Level.DEBUG, logBody)
+                }
 
                 connectionResult
 
             } else if (isHTTPOrHTTPS(scheme)) {
                 // Any method with http: or https:
-
-                val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
-
-                cookieStoreOpt = Some(cookieStore)
 
                 val cleanHeaders = {
 
@@ -115,20 +110,34 @@ class Connection(
                     combineValues[String, String, List](capitalizedHeaders).toMap
                 }
 
-                val content = requestBody map { bytes ⇒
+                val internalPath = {
 
-                    val contentType = cleanHeaders.get("Content-Type") flatMap (_.lastOption) getOrElse "application/octet-stream"
+                    val servicePrefix =
+                        URLRewriterUtils.rewriteServiceURL(
+                            NetUtils.getExternalContext.getRequest,
+                            "/",
+                            URLRewriter.REWRITE_MODE_ABSOLUTE
+                        )
 
-                    if (logBody)
-                        logRequestBody(logger, contentType, bytes)
+                    val matchesServicePrefix = urlString.startsWith(servicePrefix)
 
-                    StreamedContent(new ByteArrayInputStream(bytes), Some(contentType), Some(bytes.size.toLong), None)
+                    val servicePath = matchesServicePrefix option urlString.substring(servicePrefix.size - 1)
+
+                    servicePath filter isInternalPath
                 }
 
-                // Create URL connection object
+                val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
+                cookieStoreOpt = Some(cookieStore)
+
+                val (effectiveConnectionURL, client) =
+                    internalPath match {
+                        case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
+                        case _                  ⇒ (urlString, PropertiesApacheHttpClient)
+                    }
+
                 val response =
-                    PropertiesApacheHttpClient.connect(
-                        connectionURL.toExternalForm,
+                    client.connect(
+                        effectiveConnectionURL,
                         credentials,
                         cookieStore,
                         httpMethod,
@@ -148,13 +157,13 @@ class Connection(
 
                     val connectionURI =
                         new URI(
-                            connectionURL.getProtocol,
-                            Option(connectionURL.getUserInfo) map replacePassword orNull,
-                            connectionURL.getHost,
-                            connectionURL.getPort,
-                            connectionURL.getPath,
-                            connectionURL.getQuery,
-                            connectionURL.getRef
+                            url.getScheme,
+                            Option(url.getUserInfo) map replacePassword orNull,
+                            url.getHost,
+                            url.getPort,
+                            url.getPath,
+                            url.getQuery,
+                            url.getFragment
                         )
 
                     debug("opening URL connection",
@@ -165,23 +174,16 @@ class Connection(
                 }
 
                 // Create result
-                val connectionResult = new ConnectionResult(connectionURL.toExternalForm) {
-                    override def close(): Unit = {
-                        super.close()
-                        response.disconnect()
-                    }
-                }
-
-                // Get response information
-                connectionResult.statusCode = response.statusCode
-                connectionResult.responseHeaders = response.headers
-                connectionResult.setLastModified(response)
-                connectionResult.setResponseContentType(response.content.contentType.orNull, "application/xml")
-                connectionResult.setResponseInputStream(response.content.inputStream)
+                val connectionResult = ConnectionResult.apply(
+                    url        = urlString,
+                    statusCode = response.statusCode,
+                    headers    = response.headers,
+                    content    = response.content
+                )
 
                 ifDebug {
-                    connectionResult.logResponseDetailsIfNeeded(logger, Level.DEBUG, "")
-                    connectionResult.logResponseBody(logger, Level.DEBUG, "", logBody)
+                    connectionResult.logResponseDetailsOnce(Level.DEBUG)
+                    connectionResult.logResponseBody(Level.DEBUG, logBody)
                 }
 
                 // Save state if possible
@@ -200,7 +202,7 @@ class Connection(
                 throw new OXFException("submission URL scheme not supported: " + scheme)
             }
         } catch {
-            case NonFatal(t) ⇒ throw new ValidationException(t, new LocationData(connectionURL.toExternalForm, -1, -1))
+            case NonFatal(t) ⇒ throw new ValidationException(t, new LocationData(url.toString, -1, -1))
         }
     }
 }
@@ -208,7 +210,7 @@ class Connection(
 trait ConnectionState {
     self: Connection ⇒
 
-    import ConnectionState._
+    import org.orbeon.oxf.util.ConnectionState._
 
     private val stateScope = stateScopeFromProperty
     var cookieStoreOpt: Option[CookieStore] = None
@@ -277,13 +279,17 @@ private object ConnectionState {
 
 object Connection extends Logging {
 
-    val TokenKey = "orbeon-token"
-    val AuthorizationHeader = "Authorization"
-
-    val EmptyHeaders = Map.empty[String, Array[String]]
-
+    private val HttpInternalPathsProperty  = "oxf.http.internal-paths"
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
+
+    def isInternalPath(path: String) = {
+        val propertySet = Properties.instance.getPropertySet
+        val p = propertySet.getProperty(HttpInternalPathsProperty)
+        val r = p.associatedValue(_.value.toString.r)
+
+        r.pattern.matcher(path).matches()
+    }
 
     // Whether the given method requires a request body
     def requiresRequestBody(method: String) = Set("POST", "PUT")(method)
@@ -298,10 +304,10 @@ object Connection extends Logging {
     def buildConnectionHeaders(
         scheme          : String,
         credentials     : Option[Credentials],
-        headers         : Map[String, Array[String]],
+        headers         : Map[String, List[String]],
         headersToForward: Option[String])(
         logger          : IndentedLogger
-    ): Map[String, Array[String]] =
+    ): Map[String, List[String]] =
         if (requiresHeaders(scheme))
             buildConnectionHeaders(credentials, headers, headersToForward)(logger)
         else
@@ -309,28 +315,30 @@ object Connection extends Logging {
 
     // For Java callers
     def jBuildConnectionHeaders(
-            scheme: String,
+            scheme           : String,
             credentialsOrNull: Credentials,
-            headersOrNull: JMap[String, Array[String]],
-            headersToForward: String,
-            logger: IndentedLogger): Map[String, Array[String]] =
+            headersOrNull    : JMap[String, Array[String]],
+            headersToForward : String,
+            logger           : IndentedLogger
+   ): Map[String, List[String]] =
         buildConnectionHeaders(
             scheme,
             Option(credentialsOrNull),
-            Option(headersOrNull) map (_.asScala.toMap) getOrElse EmptyHeaders,
+            Option(headersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
             Option(headersToForward))(
             logger
         )
 
     // For Java callers
     def buildConnectionHeadersWithSOAP(
-            httpMethod: String,
-            credentialsOrNull: Credentials,
-            mediatype: String,
-            encodingForSOAP: String,
-            headersOrNull: Map[String, Array[String]],
-            headersToForward: String,
-            logger: IndentedLogger): Map[String, Array[String]] = {
+        httpMethod       : String,
+        credentialsOrNull: Credentials,
+        mediatype        : String,
+        encodingForSOAP  : String,
+        headersOrNull    : Map[String, List[String]],
+        headersToForward : String,
+        logger           : IndentedLogger
+    ): Map[String, List[String]] = {
 
         // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
         // mediatype attribute"
@@ -338,14 +346,14 @@ object Connection extends Logging {
 
             val headers = Option(headersOrNull) map (_.toMap) getOrElse EmptyHeaders
 
-            if (requiresRequestBody(httpMethod) && ! headers.contains("content-type"))
-                headers + ("content-type" → Array(mediatype ensuring (_ ne null)))
+            if (requiresRequestBody(httpMethod) && ! headers.contains(ContentTypeLower))
+                headers + (ContentTypeLower → List(mediatype ensuring (_ ne null)))
             else
                 headers
         }
 
         // Also make sure that if a header element defines Content-Type, this overrides the mediatype attribute
-        def soapMediatypeWithContentType = headersWithContentType.getOrElse("content-type", Array(mediatype)) head
+        def soapMediatypeWithContentType = headersWithContentType.getOrElse(ContentTypeLower, List(mediatype)) head
 
         // NOTE: SOAP processing overrides Content-Type in the case of a POST
         // So we have: @serialization → @mediatype →  xf:header → SOAP
@@ -356,10 +364,10 @@ object Connection extends Logging {
     // For Java callers
     def jApply(
         httpMethod       : String,
-        connectionURL    : URL,
+        url              : URI,
         credentialsOrNull: Credentials,
         messageBodyOrNull: Array[Byte],
-        headers          : Map[String, Array[String]],
+        headers          : Map[String, List[String]],
         loadState        : Boolean,
         logBody          : Boolean,
         logger           : IndentedLogger
@@ -368,28 +376,40 @@ object Connection extends Logging {
         val messageBody: Option[Array[Byte]] =
             if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
-        apply(httpMethod, connectionURL, Option(credentialsOrNull), messageBody, headers, loadState, logBody)(logger)
+        val content = messageBody map
+            (StreamedContent.fromBytes(_, Headers.firstHeaderIgnoreCase(headers, Headers.ContentType)))
+
+        apply(
+            httpMethod  = httpMethod,
+            url         = url,
+            credentials = Option(credentialsOrNull),
+            content     = content,
+            headers     = headers,
+            loadState   = loadState,
+            logBody     = logBody)(
+            logger      = logger
+        )
     }
 
     // Create a new Connection
     def apply(
-        httpMethod   : String,
-        connectionURL: URL,
-        credentials  : Option[Credentials],
-        messageBody  : Option[Array[Byte]],
-        headers      : Map[String, Array[String]],
-        loadState    : Boolean,
-        logBody      : Boolean)(implicit
-        logger       : IndentedLogger
+        httpMethod  : String,
+        url         : URI,
+        credentials : Option[Credentials],
+        content     : Option[StreamedContent],
+        headers     : Map[String, List[String]],
+        loadState   : Boolean,
+        logBody     : Boolean)(implicit
+        logger      : IndentedLogger
     ): Connection = {
 
-        require(! requiresRequestBody(httpMethod) || messageBody.isDefined)
+        require(! requiresRequestBody(httpMethod) || content.isDefined)
 
         val connection =
-            new Connection(httpMethod, connectionURL, credentials, messageBody, headers, logBody)
+            new Connection(httpMethod, url, credentials, content, headers, logBody)
 
         // Get connection state if possible
-        if (loadState && isHTTPOrHTTPS(connectionURL.getProtocol))
+        if (loadState && isHTTPOrHTTPS(url.getScheme))
             connection.loadHttpState()
 
         connection
@@ -421,10 +441,10 @@ object Connection extends Logging {
      */
     def buildConnectionHeaders(
         credentials     : Option[Credentials],
-        headers         : Map[String, Array[String]],
+        headers         : Map[String, List[String]],
         headersToForward: Option[String])(implicit
         logger          : IndentedLogger
-    ): Map[String, Array[String]] = {
+    ): Map[String, List[String]] = {
 
         val externalContext = NetUtils.getExternalContext
 
@@ -440,7 +460,7 @@ object Connection extends Logging {
 
                     def canForwardHeader(name: String) = {
                         // Only forward Authorization header if there is no credentials provided
-                        val canForward = ! name.equalsIgnoreCase(AuthorizationHeader) || credentials.isEmpty
+                        val canForward = ! name.equalsIgnoreCase(Headers.Authorization) || credentials.isEmpty
 
                         if (! canForward)
                             debug("not forwarding Authorization header because credentials are present")
@@ -454,7 +474,7 @@ object Connection extends Logging {
                         if canForwardHeader(nameLowercase)
                     } yield {
                         debug("forwarding header", Seq("name" → nameLowercase, "value" → (values mkString " ")))
-                        nameLowercase → values
+                        nameLowercase → values.toList
                     }
                 case None ⇒
                     Seq()
@@ -474,9 +494,9 @@ object Connection extends Logging {
 
             // Get token from web app scope
             val token =
-                externalContext.getWebAppContext.attributes.getOrElseUpdate(TokenKey, SecureUtils.randomHexId).asInstanceOf[String]
+                externalContext.getWebAppContext.attributes.getOrElseUpdate(TokenKeyLower, SecureUtils.randomHexId).asInstanceOf[String]
 
-            Seq(TokenKey → Array(token))
+            Seq(TokenKeyLower → List(token))
         }
 
         // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
@@ -484,7 +504,7 @@ object Connection extends Logging {
         headersToForwardLowercase.toMap ++ explicitHeadersLowercase ++ newCookieHeader ++ tokenHeader
     }
 
-    private def sessionCookieHeader(externalContext: ExternalContext)(implicit logger: IndentedLogger): Option[(String, Array[String])] = {
+    private def sessionCookieHeader(externalContext: ExternalContext)(implicit logger: IndentedLogger): Option[(String, List[String])] = {
         // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
         val cookiesToForward = getForwardCookies
         if (cookiesToForward.nonEmpty) {
@@ -569,7 +589,7 @@ object Connection extends Logging {
         cookiesToForward : Seq[String],
         sessionCookieName: String)(implicit
         logger           : IndentedLogger
-    ): Option[(String, Array[String])] = {
+    ): Option[(String, List[String])] = {
 
         def requestedSessionIdMatches =
             Option(externalContext.getSession(false)) exists { session ⇒
@@ -600,16 +620,16 @@ object Connection extends Logging {
                     "cookie" → cookieHeaderValue,
                     "requested session id" → externalContext.getRequest.getRequestedSessionId))
 
-                Some("cookie" → Array(cookieHeaderValue))
+                Some("cookie" → List(cookieHeaderValue))
             } else
                 None
         } else
             None
     }
 
-    private def sessionCookieFromGuess(externalContext: ExternalContext, sessionCookieName: String): Option[(String, Array[String])] =
+    private def sessionCookieFromGuess(externalContext: ExternalContext, sessionCookieName: String): Option[(String, List[String])] =
         Option(externalContext.getSession(false)) map
-            { session ⇒ "cookie" →  Array(sessionCookieName + "=" + session.getId) }
+            { session ⇒ "cookie" →  List(sessionCookieName + "=" + session.getId) }
 
     // Return SOAP-related headers if needed
     def soapHeaders(
@@ -617,11 +637,11 @@ object Connection extends Logging {
         mediatypeMaybeWithCharset: String,
         encoding                 : String)(implicit
         logger                   : IndentedLogger
-    ): Seq[(String, Array[String])] = {
+    ): Seq[(String, List[String])] = {
 
         require(encoding ne null)
 
-        import NetUtils.{APPLICATION_SOAP_XML, getContentTypeMediaType, getContentTypeParameters}
+        import org.orbeon.oxf.util.NetUtils.{APPLICATION_SOAP_XML, getContentTypeMediaType, getContentTypeParameters}
 
         val contentTypeMediaType = getContentTypeMediaType(mediatypeMaybeWithCharset)
 
@@ -642,7 +662,7 @@ object Connection extends Logging {
                     val acceptHeader = APPLICATION_SOAP_XML + charsetSuffix(parameters)
 
                     // Accept header with optional charset
-                    Seq("accept" → Array(acceptHeader))
+                    Seq("accept" → List(acceptHeader))
 
                 case "POST" if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
                     // Set Content-Type and optionally SOAPAction headers
@@ -652,7 +672,7 @@ object Connection extends Logging {
                     val actionParameter = parameters.get("action")
 
                     // Content-Type with optional charset and SOAPAction header if any
-                    Seq("content-type" → Array(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → Array(a)))
+                    Seq(ContentTypeLower → List(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → List(a)))
                 case _ ⇒
                     // Not a SOAP submission
                     Seq()
@@ -664,7 +684,7 @@ object Connection extends Logging {
         newHeaders
     }
 
-    def logRequestBody(logger: IndentedLogger, mediatype: String, messageBody: Array[Byte]): Unit =
+    def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =
         if (XMLUtils.isXMLMediatype(mediatype) ||
             XMLUtils.isTextOrJSONContentType(mediatype) ||
             mediatype == "application/x-www-form-urlencoded")

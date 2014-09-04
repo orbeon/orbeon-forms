@@ -8,7 +8,6 @@ public class XMLUtils {
     public static final String XML_CONTENT_TYPE2 = "application/xml";
     public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
     public static final String TEXT_CONTENT_TYPE_PREFIX = "text/";
-    public static final String XML_CONTENT_TYPE = XML_CONTENT_TYPE2;
 
     public static String unescapeXMLMinimal(String str) {
         str = StringUtils.replace(str, "&amp;", "&");

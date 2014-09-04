@@ -41,6 +41,8 @@ import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -838,7 +840,7 @@ public class URLGenerator extends ProcessorImpl {
                 return null;
             // Otherwise, try URLConnection
             openConnection();
-            return connectionResult.getResponseMediaType();
+            return connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE);
         }
 
         public String getConnectionEncoding() throws IOException {
@@ -847,7 +849,7 @@ public class URLGenerator extends ProcessorImpl {
                 return null;
             // Otherwise, try URLConnection
             openConnection();
-            return NetUtils.getContentTypeCharset(connectionResult.getResponseContentType());
+            return connectionResult.contentTypeCharsetOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE);
         }
 
         public int getConnectionStatusCode() throws IOException {
@@ -861,7 +863,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public Long getValidity() throws IOException {
             openConnection();
-            return isFailureStatusCode() ? null : connectionResult.getLastModifiedJava();
+            return isFailureStatusCode() ? null : connectionResult.lastModifiedJava();
         }
 
         public Long getConditional(Long lastModified) throws IOException {
@@ -902,19 +904,24 @@ public class URLGenerator extends ProcessorImpl {
                     null :
                     Credentials.apply(config.getUsername(), config.getPassword(), config.isPreemptiveAuth() ? "true" : "false", config.getDomain());
 
-                final URL url = config.getURL();
-                final scala.collection.immutable.Map<String, String[]> headers =
-                    Connection.jBuildConnectionHeaders(url.getProtocol(), credentials, newHeaders, config.getForwardHeaders(), indentedLogger);
+                final URI url;
+                try {
+                    url = config.getURL().toURI();
+                } catch (URISyntaxException e) {
+                    throw new OXFException(e);
+                }
+                final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
+                    Connection.jBuildConnectionHeaders(url.getScheme(), credentials, newHeaders, config.getForwardHeaders(), indentedLogger);
 
                 connectionResult =
                     Connection.jApply("GET", url, credentials, null, headers, true, false, indentedLogger).connect(true);
-                inputStream =
-                    connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
+
+                inputStream = connectionResult.content().inputStream();
 
                 // Save headers as request attributes
                 final List<String> readHeader = config.getReadHeaders();
                 if (readHeader != null && ! readHeader.isEmpty()) {
-                    final Map<String, List<String>> responseHeaders = connectionResult.jResponseHeaders();
+                    final Map<String, List<String>> responseHeaders = connectionResult.jHeaders();
                     final Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
                     for (final String nameMixed : config.getReadHeaders()) {
                         // We only support headers with one value

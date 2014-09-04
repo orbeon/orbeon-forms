@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
@@ -132,9 +133,9 @@ public class Portlet2ExternalContext implements ExternalContext {
                 if (portletRequest instanceof ClientDataRequest) {
                     final ClientDataRequest clientDataRequest = (ClientDataRequest) portletRequest;
                     if (clientDataRequest.getContentType() != null)
-                        headerValuesMap.put("content-type", new String[] { clientDataRequest.getContentType() });
+                        headerValuesMap.put(Headers.ContentTypeLower(), new String[] { clientDataRequest.getContentType() });
                     if (clientDataRequest.getContentLength() != -1)
-                        headerValuesMap.put("content-length", new String[] { Integer.toString(clientDataRequest.getContentLength()) });
+                        headerValuesMap.put(Headers.ContentLengthLower(), new String[] { Integer.toString(clientDataRequest.getContentLength()) });
                 }
             }
             return headerValuesMap;

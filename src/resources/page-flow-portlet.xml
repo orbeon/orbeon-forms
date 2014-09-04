@@ -15,7 +15,7 @@
 
     <!-- ==== XForms Server ======================================================================================== -->
 
-    <page path="/xforms-server.*" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
+    <!-- Handled in prologue-portlet.xpl -->
 
     <!-- ==== Forward application services ========================================================================= -->
 

@@ -34,8 +34,8 @@ case class DynamicState(
     deploymentType      : Option[String],
     requestContextPath  : Option[String],
     requestPath         : Option[String],
-    requestHeaders      : Seq[(String, Seq[String])],
-    requestParameters   : Seq[(String, Seq[String])],
+    requestHeaders      : List[(String, List[String])],
+    requestParameters   : List[(String, List[String])],
     containerType       : Option[String],
     containerNamespace  : Option[String],
     pathMatchers        : Seq[Byte],
@@ -47,19 +47,17 @@ case class DynamicState(
     controls            : Seq[Byte]
 ) {
     // Decode individual bits
-    def decodePathMatchers = fromByteSeq[List[PathMatcher]](pathMatchers)
-    def decodePendingUploads = fromByteSeq[Set[String]](pendingUploads)
-    def decodeAnnotatedTemplate = annotatedTemplate map (AnnotatedTemplate(_))
-    def decodeLastAjaxResponse = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
-    def decodeInstances = fromByteSeq[List[InstanceState]](instances)
-    def decodeControls = fromByteSeq[List[ControlState]](controls)
+    def decodePathMatchers           = fromByteSeq[List[PathMatcher]](pathMatchers)
+    def decodePendingUploads         = fromByteSeq[Set[String]](pendingUploads)
+    def decodeAnnotatedTemplate      = annotatedTemplate map (AnnotatedTemplate(_))
+    def decodeLastAjaxResponse       = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
+    def decodeInstances              = fromByteSeq[List[InstanceState]](instances)
+    def decodeControls               = fromByteSeq[List[ControlState]](controls)
 
     // For Java callers
     def decodeDeploymentTypeJava     = deploymentType.orNull
     def decodeRequestContextPathJava = requestContextPath.orNull
     def decodeRequestPathJava        = requestPath.orNull
-    def decodeRequestHeadersJava     = requestHeaders.toMap    map { case (k, v) ⇒ k → v.toArray }
-    def decodeRequestParametersJava  = requestParameters.toMap map { case (k, v) ⇒ k → v.toArray }
     def decodeContainerTypeJava      = containerType.orNull
     def decodeContainerNamespaceJava = containerNamespace.orNull
     def decodePathMatchersJava       = decodePathMatchers.asJava
@@ -70,7 +68,7 @@ case class DynamicState(
     def decodeInstancesJava          = decodeInstances.asJava
     def decodeControlsJava           = decodeControls.asJava
 
-    def decodeInstancesControls = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
+    def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
     
     // For tests only
     def copyUpdateSequence(sequence: Int) = copy(sequence = sequence)

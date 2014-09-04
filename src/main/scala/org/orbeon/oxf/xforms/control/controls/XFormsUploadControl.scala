@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -316,8 +317,8 @@ object XFormsUploadControl {
             name = parameterElement.element("name").getTextTrim
             value = parameterElement.element("value").getTextTrim
             filename = Option(parameterElement.element("filename")) map (_.getTextTrim) getOrElse ""
-            mediatype = Option(parameterElement.element("content-type")) map (_.getTextTrim) getOrElse ""
-            size = parameterElement.element("content-length").getTextTrim
+            mediatype = Option(parameterElement.element(Headers.ContentTypeLower)) map (_.getTextTrim) getOrElse ""
+            size = parameterElement.element(Headers.ContentLengthLower).getTextTrim
 
             // A file was selected in the UI (the file may be empty)
             if size != "0" || filename != ""

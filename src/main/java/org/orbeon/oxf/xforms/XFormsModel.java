@@ -19,7 +19,6 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
@@ -44,7 +43,9 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Value;
 import scala.Option;
 
-import java.net.URL;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -609,7 +610,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     /*
      * Load an external instance using an absolute URL.
      */
-    private void loadNonCachedExternalInstance(Instance instance) {
+    private void loadNonCachedExternalInstance(final Instance instance) {
 
         final String absoluteURLString = resolveInstanceURL(instance);
 
@@ -625,36 +626,34 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             if (indentedLogger().isDebugEnabled())
                 indentedLogger().logDebug("load", "getting document from URI", "URI", absoluteURLString);
 
-            final URL absoluteResolvedURL = URLFactory.createURL(absoluteURLString);
+            final URI absoluteResolvedURL;
+            try {
+                absoluteResolvedURL = new URI(absoluteURLString);
+            } catch (URISyntaxException e) {
+                throw new OXFException(e);
+            }
 
-            final scala.collection.immutable.Map<String, String[]> headers =
-                Connection.jBuildConnectionHeaders(absoluteResolvedURL.getProtocol(), instance.credentialsOrNull(), null,
+            final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
+                Connection.jBuildConnectionHeaders(absoluteResolvedURL.getScheme(), instance.credentialsOrNull(), null,
                         containingDocument().getForwardSubmissionHeaders(), indentedLogger());
 
             final ConnectionResult connectionResult = Connection.jApply(
                 "GET", absoluteResolvedURL, instance.credentialsOrNull(), null,
                 headers, true, BaseSubmission.isLogBody(), indentedLogger()).connect(true);
 
-            try {
-                // Handle connection errors
-                if (connectionResult.statusCode() != 200) {
-                    throw new OXFException("Got invalid return code while loading instance: " + absoluteURLString + ", " + connectionResult.statusCode());
-                }
+            instanceDocument =
+                ConnectionResult.withSuccessConnection(connectionResult, true, new Function1Adapter<InputStream, Object>() {
+                    public Object apply(InputStream is) {
+                        // TODO: Handle validating and XInclude!
 
-                // TODO: Handle validating and XInclude!
-
-                // Read result as XML
-                // TODO: use submission code
-                if (!instance.readonly()) {
-                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), false, true);
-                } else {
-                    instanceDocument = TransformerUtils.readTinyTree(XPath.GlobalConfiguration(),
-                            connectionResult.getResponseInputStream(), connectionResult.resourceURI(), false, true);
-                }
-            } finally {
-                // Clean-up
-                connectionResult.close();
-            }
+                        // Read result as XML
+                        // TODO: use submission code?
+                        if (! instance.readonly())
+                            return TransformerUtils.readDom4j(is, connectionResult.url(), false, true);
+                        else
+                            return TransformerUtils.readTinyTree(XPath.GlobalConfiguration(), is, connectionResult.url(), false, true);
+                    }
+                });
 
         } else {
             // Optimized case that uses the provided resolver

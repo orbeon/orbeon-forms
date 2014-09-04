@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -64,7 +65,7 @@ public class ContentHandlerOutputStream extends OutputStream {
             AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
             if (contentType != null)
-                attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+                attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType);
             if (statusCode != null)
                 attributes.addAttribute("", "status-code", "status-code", "CDATA", statusCode);
 

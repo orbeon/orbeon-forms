@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.action.XFormsActions
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.model.DataModel._
-
+import org.orbeon.saxon.om.NodeInfo
 
 /**
  * Handle replace="text".
@@ -30,7 +30,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     private var responseBody: String = _
 
     def deserialize(connectionResult: ConnectionResult, p: XFormsModelSubmission#SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters) =
-        Option(connectionResult.getTextResponseBody) match {
+        connectionResult.readTextResponseBody(ProcessorUtils.DEFAULT_CONTENT_TYPE) match {
             case Some(responseBody) ⇒
                 this.responseBody = responseBody
             case None ⇒
@@ -44,7 +44,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
                 // type not matching text/*), when the value of the replace attribute on element submission is "text",
                 // nothing in the document is replaced and submission processing concludes after dispatching
                 // xforms-submit-error with appropriate context information, including an error-type of resource-error."
-                val message = """Mediatype is neither text nor XML for replace="text": """ + connectionResult.getResponseMediaType
+                val message = """Mediatype is neither text nor XML for replace="text": """ + connectionResult.mediaType
                 throw new XFormsSubmissionException(submission, message, "reading response body",
                     new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR, connectionResult))
         }

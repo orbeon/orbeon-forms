@@ -24,6 +24,8 @@ import scala.collection.{TraversableLike, mutable}
 import scala.util.control.NonFatal
 import scala.util.{Success, Failure, Try}
 
+abstract class Function1Adapter[-T1, +R] extends (T1 ⇒ R)
+
 object ScalaUtils extends PathOps {
 
     private val CopyBufferSize = 8192

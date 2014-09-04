@@ -13,26 +13,26 @@
  */
 package org.orbeon.oxf.controller
 
-import collection.JavaConverters._
-import java.net.URI
-import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.Headers._
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.externalcontext.URLRewriter
 import java.lang.{Boolean ⇒ JBoolean}
-import org.orbeon.oxf.properties.PropertySet
+import java.net.URI
+
+import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.{EmptyInputStream, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 object Authorizer extends Logging {
 
-    import PageFlowControllerProcessor._
-    import URLRewriter._
-
-    val TokenKey = "orbeon-token"
+    import org.orbeon.oxf.controller.PageFlowControllerProcessor._
 
     // For now don't remember authorization, because simply remembering in the session is not enough if the authorization
     // depends on the request method, path, or headers.
@@ -50,10 +50,10 @@ object Authorizer extends Logging {
     def authorizedWithToken(header: String ⇒ Option[Array[String]], attribute: String ⇒ Option[AnyRef]): Boolean = {
 
         val requestToken =
-            header(TokenKey).toList.flatten.headOption
+            header(TokenKeyLower).toList.flatten.headOption
 
         def applicationToken =
-            attribute(TokenKey) collect { case token: String ⇒ token }
+            attribute(TokenKeyLower) collect { case token: String ⇒ token }
 
         requestToken.isDefined && requestToken == applicationToken
     }
@@ -106,23 +106,38 @@ object Authorizer extends Logging {
                 // point, we just follow the header proxying method we use in other places and remove Cookie/Set-Cookie.
 
                 val method  = request.getMethod
-                val body    = Connection.requiresRequestBody(method) option Array.empty[Byte]
-                val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString)).toString
-                val headers =
-                    proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true) ++
-                    (body.isDefined list ("Content-Type" → Array("application/octet-stream")))
+                val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString))
+                val headers = proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true)
 
-                debug("Delegating to authorizer", Seq("url" → newURL))
+                val content = Connection.requiresRequestBody(method) option
+                    StreamedContent(
+                        EmptyInputStream,
+                        Some("application/octet-stream"),
+                        Some(0L),
+                        None
+                    )
 
-                val connection = Connection(method, URLFactory.createURL(newURL), None, body, headers.toMap, loadState = true, logBody = false)
+                debug("Delegating to authorizer", Seq("url" → newURL.toString))
 
-                def isAuthorized(result: ConnectionResult) = NetUtils.isSuccessCode(result.statusCode)
+                val connection =
+                    Connection(
+                        httpMethod  = method,
+                        url         = newURL,
+                        credentials = None,
+                        content     = content,
+                        headers     = headers.toMap mapValues (_.toList),
+                        loadState   = true,
+                        logBody     = false
+                    )
 
                 // TODO: state must be saved in session, not anywhere else; why is this configurable globally?
-                try useAndClose(connection.connect(saveState = true))(isAuthorized)
+                try ConnectionResult.withSuccessConnection(connection.connect(saveState = true), closeOnSuccess = true)(_ ⇒ true)
                 catch {
+                    case HttpStatusCodeException(code, _, _) ⇒
+                        debug("Unauthorized", Seq("code" → code.toString))
+                        false
                     case NonFatal(t) ⇒
-                        error("Could not connect to authorizer", Seq("url" → newURL))
+                        error("Could not connect to authorizer", Seq("url" → newURL.toString))
                         error(OrbeonFormatter.format(t))
                         false
                 }

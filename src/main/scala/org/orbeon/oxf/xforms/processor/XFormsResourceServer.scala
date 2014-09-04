@@ -15,20 +15,17 @@ package org.orbeon.oxf.xforms.processor
 
 import java.io._
 import java.net.{URI, URLEncoder}
-import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.processor.ResourceServer
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.Caches
-import org.orbeon.oxf.xforms.Loggers
-import org.orbeon.oxf.xforms.XFormsProperties
-import ExternalContext.Session.APPLICATION_SCOPE
-import ExternalContext._
-import ScalaUtils._
+
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.pipeline.api.ExternalContext.Session.APPLICATION_SCOPE
+import org.orbeon.oxf.pipeline.api.ExternalContext._
+import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
+
 import scala.util.control.NonFatal
 
 /**
@@ -36,7 +33,7 @@ import scala.util.control.NonFatal
  */
 class XFormsResourceServer extends ProcessorImpl with Logging {
 
-    import XFormsResourceServer._
+    import org.orbeon.oxf.xforms.processor.XFormsResourceServer._
 
     override def start(pipelineContext: PipelineContext): Unit = {
 
@@ -90,13 +87,20 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
                 // Copy stream out
                 try {
-                    val connection = URLFactory.createURL(resource.uri.toString).openConnection
+                    val cxr =
+                        Connection(
+                            httpMethod  = "GET",
+                            url         = resource.uri,
+                            credentials = None,
+                            content     = None,
+                            headers     = resource.headers,
+                            loadState   = true,
+                            logBody     = false
+                        ).connect(
+                            saveState = true
+                        )
 
-                    // Set outgoing headers
-                    for { (name, values) ← resource.headers; value ← values }
-                        connection.addRequestProperty(name, value)
-
-                    useAndClose(connection.getInputStream) { is ⇒
+                    useAndClose(cxr.content.inputStream) { is ⇒
                         useAndClose(response.getOutputStream) { os ⇒
                             copyStream(is, os)
                         }
@@ -205,12 +209,14 @@ object XFormsResourceServer {
     // Transform an URI accessible from the server into a URI accessible from the client.
     // The mapping expires with the session.
     def proxyURI(
-        uri: String,
-        filename: Option[String],
-        contentType: Option[String],
-        lastModified: Long,
-        headers: Map[String, Array[String]],
-        headersToForward: Option[String])(implicit logger: IndentedLogger): String = {
+        uri             : String,
+        filename        : Option[String],
+        contentType     : Option[String],
+        lastModified    : Long,
+        headers         : Map[String, List[String]],
+        headersToForward: Option[String])(implicit
+        logger          : IndentedLogger
+    ): String = {
 
         // Create a digest, so that for a given URI we always get the same key
         val digest = SecureUtils.digestString(uri, "hex")
@@ -226,7 +232,9 @@ object XFormsResourceServer {
 
             // Store mapping into session
             val outgoingHeaders = Connection.buildConnectionHeaders(serviceURI.getScheme, None, headers, headersToForward)(logger)
-            session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, DynamicResource(serviceURI, filename, contentType, -1, lastModified, outgoingHeaders))
+            val resource        = DynamicResource(serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
+
+            session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)
         }
 
         // Rewrite new URI to absolute path without the context
@@ -242,7 +250,7 @@ object XFormsResourceServer {
         Option(Caches.resourcesCache.get(key)) map (_.getObjectValue.asInstanceOf[Array[String]]) orNull
 
     // Information about the resource, stored into the session
-    case class DynamicResource(uri: URI, filename: Option[String], contentType: Option[String], size: Long, lastModified: Long, headers: Map[String, Array[String]])
+    case class DynamicResource(uri: URI, filename: Option[String], contentType: Option[String], size: Long, lastModified: Long, headers: Map[String, List[String]])
 
     private def filename(requestPath: String) = requestPath.substring(requestPath.lastIndexOf('/') + 1)
 }

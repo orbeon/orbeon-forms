@@ -14,11 +14,10 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.dom4j.Node;
+import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.processor.ProcessorUtils;
 
 public class TidyConfig {
-
-    private static String DEFAULT_HTML_ENCODING = "iso-8859-1";
 
     private static boolean DEFAULT_SHOW_WARNINGS = false;
     private static boolean DEFAULT_QUIET = true;
@@ -75,6 +74,6 @@ public class TidyConfig {
     }
 
     public static String getTidyEncoding(String encoding) {
-        return (encoding == null) ? encoding = DEFAULT_HTML_ENCODING : encoding;
+        return (encoding == null) ? encoding = Defaults.DefaultEncodingForServletCompatibility() : encoding;
     }
 }

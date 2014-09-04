@@ -145,12 +145,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
             Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
         else {
             val bytes = bufferedResponse.getBytes
-            StreamedContent(
-                new ByteArrayInputStream(bytes),
-                Option(bufferedResponse.getContentType),
-                Some(bytes.size.toLong),
-                Option(bufferedResponse.getTitle)
-            )
+            StreamedContent.fromBytes(bytes, Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
         }
 }
 

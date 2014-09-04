@@ -19,6 +19,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.URLRewriter;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.EmailProcessor;
@@ -131,7 +132,7 @@ public class TestExternalContext implements ExternalContext  {
             try {
                 final Element bodyNode = (Element) XPathUtils.selectSingleNode(requestDocument, "/*/body");
                 if (bodyNode != null) {
-                    final String contentTypeAttribute = bodyNode.attributeValue("content-type");
+                    final String contentTypeAttribute = bodyNode.attributeValue(Headers.ContentTypeLower());
                     final String contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
                     final String charset = NetUtils.getContentTypeCharset(contentTypeAttribute);
 

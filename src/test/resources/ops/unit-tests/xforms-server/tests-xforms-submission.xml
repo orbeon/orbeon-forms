@@ -1668,14 +1668,20 @@
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>
-                        <xf:send ev:event="xforms-model-construct-done" submission="submission"/>
-                        <xf:submission id="submission" serialization="none" method="get" action="oxf:/ops/unit-tests/test-data/book-diderot.xml"/>
+                        <xf:send
+                            ev:event="xforms-model-construct-done"
+                            submission="submission"/>
+                        <xf:submission
+                            id="submission"
+                            serialization="none"
+                            method="get"
+                            action="oxf:/ops/unit-tests/test-data/book-diderot.xml"/>
                     </xf:model>
                 </xh:head>
             </xh:html>
         </input>
         <output name="response">
-            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/xml">PGJvb2s+CiAgICA8ZGV0YWlscz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUg
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/xml" status-code="200">PGJvb2s+CiAgICA8ZGV0YWlscz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUg
 ZXQgc29uIG1hw650cmU8L3RpdGxlPgogICAgICAgIDxhdXRob3I+RGVuaXMgRGlkZXJvdDwvYXV0
 aG9yPgogICAgICAgIDxsYW5ndWFnZT5mcjwvbGFuZ3VhZ2U+CiAgICAgICAgPGxpbmsvPgogICAg
 ICAgIDxyYXRpbmcvPgogICAgICAgIDxwdWJsaWNhdGlvbi15ZWFyLz4KICAgICAgICA8cmV2aWV3

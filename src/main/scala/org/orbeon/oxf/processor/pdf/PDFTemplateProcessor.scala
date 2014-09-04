@@ -13,36 +13,30 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.lowagie.text.Image
-import com.lowagie.text.Rectangle
+import java.io.{ByteArrayOutputStream, OutputStream}
+import java.net.URI
+import java.net.URLDecoder.{decode ⇒ decodeURL}
+import java.util.{List ⇒ JList}
+
+import com.lowagie.text.{Image, Rectangle}
 import com.lowagie.text.pdf._
 import org.dom4j.Element
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.processor.ProcessorInput
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo
-import org.orbeon.oxf.processor.serializer.{HttpSerializerBase, BinaryTextXMLReceiver}
+import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
+import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor._
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
+import org.orbeon.oxf.processor.serializer.{BinaryTextXMLReceiver, HttpSerializerBase}
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.om.ValueRepresentation
-import org.orbeon.saxon.value.FloatValue
-import org.orbeon.saxon.value.Int64Value
-import java.io.ByteArrayOutputStream
-import java.io.OutputStream
-import java.util.{List ⇒ JList}
-import PDFTemplateProcessor._
+import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.value.{FloatValue, Int64Value}
+
 import scala.collection.JavaConverters._
-import ScalaUtils._
-import java.net.URLDecoder.{decode ⇒ decodeURL}
-import org.orbeon.exception.OrbeonFormatter
 import scala.util.control.NonFatal
 
 /**
@@ -288,30 +282,25 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     readInputAsSAX(context.pipelineContext, inputName, new BinaryTextXMLReceiver(os))
                     Image.getInstance(os.toByteArray)
                 case None ⇒
-                    val url = URLFactory.createURL(hrefAttribute)
-
-                    val connectionResult =
+                    val cxr =
                         Connection(
-                            "GET",
-                            url,
-                            None,
-                            None,
-                            Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))(context.logger),
-                            loadState = true,
-                            logBody = false)(context.logger).connect(saveState = true)
+                            httpMethod  = "GET",
+                            url         = new URI(hrefAttribute),
+                            credentials = None,
+                            content     = None,
+                            headers     = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))(context.logger),
+                            loadState   = true,
+                            logBody     = false)(
+                            logger      = context.logger
+                        ).connect(
+                            saveState = true
+                        )
 
-                    if (connectionResult.statusCode != 200) {
-                        connectionResult.close()
-                        throw new OXFException("Got invalid return code while loading image: " + url.toExternalForm + ", " + connectionResult.statusCode)
+                    ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+                        val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, Logger)
+                        // NOTE: iText's Image.getInstance() closes the local URL's InputStream
+                        Image.getInstance(URLFactory.createURL(tempURLString))
                     }
-                    context.pipelineContext.addContextListener(new PipelineContext.ContextListener {
-                        def contextDestroyed(success: Boolean) {
-                            connectionResult.close()
-                        }
-                    })
-                    val tempURLString = NetUtils.inputStreamToAnyURI(connectionResult.getResponseInputStream, NetUtils.REQUEST_SCOPE, Logger)
-                    // TODO: close connectionResult.getResponseInputStream
-                    Image.getInstance(URLFactory.createURL(tempURLString))
             }
         }
 

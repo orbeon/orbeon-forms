@@ -48,28 +48,37 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
-        final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
+        final IndentedLogger indentedLogger   = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
 
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
-                "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
-                "is asynchronous", Boolean.toString(p2.isAsynchronous),
-                "container type", request.getContainerType(),
-                "norewrite", Boolean.toString(submission.isURLNorewrite()),
-                "url type", submission.getUrlType(),
-                "local-submission-forward", Boolean.toString(containingDocument.isLocalSubmissionForward()),
-                "local-submission-include", Boolean.toString(containingDocument.isLocalSubmissionInclude())
+                "resource",                 p2.actionOrResource,
+                "noscript",                 Boolean.toString(p.isNoscript),
+                "is asynchronous",          Boolean.toString(p2.isAsynchronous),
+                "container type",           request.getContainerType(),
+                "norewrite",                Boolean.toString(submission().isURLNorewrite()),
+                "url type",                 submission().getUrlType(),
+                "local-submission-forward", Boolean.toString(containingDocument().isLocalSubmissionForward()),
+                "local-submission-include", Boolean.toString(containingDocument().isLocalSubmissionInclude())
             );
         }
 
         // Only for servlet for now
-        if (!request.getContainerType().equals("servlet")) {
+        if (! request.getContainerType().equals("servlet")) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "container type is not servlet");
+            return false;
+        }
+
+        // Separate deployment not supported for portlet local submission as callee is a servlet, not a portlet!
+        if (! containingDocument().getDeploymentType().equals(XFormsConstants.DeploymentType.separate)) {
+            if (isDebugEnabled)
+                indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
+                        "reason", "deployment type is not separate");
             return false;
         }
 
@@ -99,7 +108,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         if (p.isReplaceAll) {
             // replace="all"
-            if (! containingDocument.isLocalSubmissionForward()) {
+            if (! containingDocument().isLocalSubmissionForward()) {
                 if (isDebugEnabled)
                     indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                             "reason", "forward submissions are disallowed in properties");
@@ -107,7 +116,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             }
         } else {
             // replace="instance|text|none"
-            if (! containingDocument.isLocalSubmissionInclude()) {
+            if (! containingDocument().isLocalSubmissionInclude()) {
                 if (isDebugEnabled)
                     indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                             "reason", "include submissions are disallowed in properties");
@@ -133,17 +142,17 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // f:url-norewrite="true" with an absolute path allows accessing other servlet contexts.
 
         // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument(), submission().getSubmissionElement(), p2.actionOrResource);
 
         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
         // in that case
 
         // Headers
-        final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
-        final String headersToForward = containingDocument.getForwardSubmissionHeaders();
+        final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
+        final String headersToForward = containingDocument().getForwardSubmissionHeaders();
 
-        final String submissionEffectiveId = submission.getEffectiveId();
+        final String submissionEffectiveId = submission().getEffectiveId();
 
         // Pack external call into a Runnable so it can be run:
         // - now and synchronously
@@ -159,8 +168,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
-                        containingDocument, detailsLogger, resolvedURI.toString(), p,
-                        submission.isURLNorewrite(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
+                        containingDocument(), detailsLogger, resolvedURI.toString(), p,
+                        submission().isURLNorewrite(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
                         sp.queryString, headersToForward, customHeaderNameValues);
 
                     // Update status
@@ -168,10 +177,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
                     // TODO: can we put this in the Replacer?
                     if (connectionResult.dontHandleResponse())
-                        containingDocument.setGotSubmissionReplaceAll();
+                        containingDocument().setGotSubmissionReplaceAll();
 
                     // Obtain replacer, deserialize and update status
-                    final Replacer replacer = submission.getReplacer(connectionResult, p);
+                    final Replacer replacer = submission().getReplacer(connectionResult, p);
                     replacer.deserialize(connectionResult, p, p2);
                     status[1] = true;
 
@@ -196,26 +205,28 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     /**
      * Perform a local connection using the Servlet API.
      */
-    public ConnectionResult openRequestDispatcherConnection(ExternalContext externalContext,
-                                                            XFormsContainingDocument containingDocument,
-                                                            IndentedLogger indentedLogger,
-                                                            final String resource,
-                                                            final XFormsModelSubmission.SubmissionParameters p,
-                                                            boolean isNorewrite,
-                                                            String actualRequestMediatype,
-                                                            String encoding,
-                                                            byte[] messageBody,
-                                                            String queryString,
-                                                            String headerNames,
-                                                            scala.collection.immutable.Map<String, String[]> customHeaderNameValues) {
+    public ConnectionResult openRequestDispatcherConnection(
+        ExternalContext externalContext,
+        XFormsContainingDocument containingDocument,
+        IndentedLogger indentedLogger,
+        final String resource,
+        final XFormsModelSubmission.SubmissionParameters p,
+        boolean isNorewrite,
+        String actualRequestMediatype,
+        String encoding,
+        byte[] messageBody,
+        String queryString,
+        String headerNames,
+        scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues
+    ) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether
         // the page was produced through a filter in separate deployment or not.
         final boolean isContextRelative;
         final String effectiveResource;
-        if (!isNorewrite) {
+        if (! isNorewrite) {
             // Must rewrite
-            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.separate) {
+            if (! containingDocument.getDeploymentType().equals(XFormsConstants.DeploymentType.separate)) {
                 // We are not in separate deployment, so keep path relative to the current servlet context
                 isContextRelative = true;
                 effectiveResource = resource;
@@ -235,9 +246,20 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final boolean isDefaultContext = requestDispatcher.isDefaultContext();
 
         final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
-        return openLocalConnection(externalContext, response, indentedLogger,
-           effectiveResource, p, actualRequestMediatype, encoding,
-           messageBody, queryString, headerNames, customHeaderNameValues, new SubmissionProcess() {
+
+        return openLocalConnection(
+            externalContext.getRequest(),
+            response,
+            indentedLogger,
+            effectiveResource,
+            p,
+            actualRequestMediatype,
+            encoding,
+            messageBody,
+            queryString,
+            headerNames,
+            customHeaderNameValues,
+            new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
                   try {
                       if (p.isReplaceAll)
@@ -248,6 +270,9 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                       throw new OXFException(e);
                   }
                }
-           }, isContextRelative, isDefaultContext);
+            },
+            isContextRelative,
+            isDefaultContext
+        );
     }
 }

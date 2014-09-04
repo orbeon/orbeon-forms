@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.servlet
 
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
@@ -110,7 +111,7 @@ trait RequestEmptyBody extends BaseServletRequestWrapper {
 }
 
 object BaseServletRequestWrapper {
-    var HeadersToFilter= Set("content-length", "content-type")
+    var HeadersToFilter= Set(Headers.ContentLengthLower, Headers.ContentTypeLower) // TODO: same filtering as in Headers?
 
     def appendExtraQueryParameters(pathQuery: String, extraQueryParameters: JMap[String, Array[String]]) = {
 

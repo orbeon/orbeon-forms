@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor
 
 import EmailProcessor._
+import org.orbeon.oxf.http.Headers
 import collection.JavaConverters._
 import java.io._
 import java.util.{Properties ⇒ JProperties}
@@ -234,7 +235,7 @@ class EmailProcessor extends ProcessorImpl {
                 else
                     None
             } else {
-                Option(NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"))) filter
+                Option(NetUtils.getContentTypeMediaType(bodyElement.attributeValue(Headers.ContentTypeLower))) filter
                 (_.startsWith("multipart/")) map
                 (_.substring("multipart/".length))
             }
@@ -260,7 +261,7 @@ class EmailProcessor extends ProcessorImpl {
 
     private def handlePart(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, partOrBodyElement: Element) {
         val name = partOrBodyElement.attributeValue("name")
-        val contentTypeAttribute = partOrBodyElement.attributeValue("content-type")
+        val contentTypeAttribute = partOrBodyElement.attributeValue(Headers.ContentTypeLower)
         val contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute)
         val charset = Option(NetUtils.getContentTypeCharset(contentTypeAttribute)) getOrElse DEFAULT_CHARACTER_ENCODING
 

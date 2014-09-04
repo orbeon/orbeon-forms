@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.StreamedContent
+
 import collection.JavaConverters._
 import org.junit.Test
 import org.mockito.Mockito
@@ -32,8 +35,8 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         
         // Custom headers
         val customHeaderValuesMap = Map(
-            "my-stuff"   → Array("my-value"),
-            "your-stuff" → Array("your-value-1", "your-value-2")
+            "my-stuff"   → List("my-value"),
+            "your-stuff" → List("your-value-1", "your-value-2")
         )
         
         // Create request and wrapper
@@ -56,10 +59,24 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         // NOTE: Should instead use withExternalContext()
         PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
         val headers =
-            Connection.buildConnectionHeadersWithSOAP("GET", null, null, "UTF-8", customHeaderValuesMap,
-            "cookie authorization user-agent", ResourceManagerTestBase.newIndentedLogger)
+            Connection.buildConnectionHeadersWithSOAP(
+                "GET",
+                null,
+                null,
+                "UTF-8",
+                customHeaderValuesMap,
+                "cookie authorization user-agent",
+                ResourceManagerTestBase.newIndentedLogger
+            )
 
-        val request = new LocalRequest(externalContext, null, "/orbeon", "/foo/bar", "GET", headers)
+        val request = new LocalRequest(
+            incomingRequest         = externalContext.getRequest,
+            contextPath             = "/orbeon",
+            pathQuery               = "/foo/bar",
+            method                  = "GET",
+            headersMaybeCapitalized = headers,
+            content                 = None
+        )
 
         // Test standard headers received
         val headerValuesMap = request.getHeaderValuesMap.asScala
@@ -83,14 +100,28 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         // POST configuration
         val method = "POST"
         val bodyMediaType = "application/x-www-form-urlencoded"
-        val explicitHeaders = Map("content-type" → Array(bodyMediaType))
+        val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
         val headers =
-            Connection.buildConnectionHeadersWithSOAP(method, null, bodyMediaType, "UTF-8", explicitHeaders, "",
-            ResourceManagerTestBase.newIndentedLogger)
+            Connection.buildConnectionHeadersWithSOAP(
+                method,
+                null,
+                bodyMediaType,
+                "UTF-8",
+                explicitHeaders,
+                "",
+                ResourceManagerTestBase.newIndentedLogger
+            )
 
         val wrapper =
-            new LocalRequest(NetUtils.getExternalContext, null, "/orbeon", "/foobar?" + queryString, method, messageBody, headers)
+            new LocalRequest(
+                incomingRequest         = NetUtils.getExternalContext.getRequest,
+                contextPath             = "/orbeon",
+                pathQuery               = s"/foobar?$queryString",
+                method                  = method,
+                headersMaybeCapitalized = headers,
+                content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
+            )
 
         val parameters = wrapper.getParameterMap
         assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === NetUtils.encodeQueryString(parameters))

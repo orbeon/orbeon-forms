@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.controller
 
+import org.orbeon.oxf.http.Headers._
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
 import org.junit.Test
@@ -41,13 +42,13 @@ class AuthorizerTest extends AssertionsForJUnit with MockitoSugar {
 
         assert(! authorizedWithToken(ec))
 
-        appAttributes += TokenKey → "1234567890"
+        appAttributes += TokenKeyLower → "1234567890"
         assert(! authorizedWithToken(ec))
 
-        requestAttributes += TokenKey → Array("abcdefghij")
+        requestAttributes += TokenKeyLower → Array("abcdefghij")
         assert(! authorizedWithToken(ec))
 
-        requestAttributes += TokenKey → Array("1234567890")
+        requestAttributes += TokenKeyLower → Array("1234567890")
         assert(authorizedWithToken(ec))
     }
 }

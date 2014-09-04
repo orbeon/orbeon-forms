@@ -35,7 +35,7 @@ import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
-import org.orbeon.oxf.util.{DateUtils, Headers}
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.immutable.Seq
@@ -49,7 +49,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         credentials: Option[Credentials],
         cookieStore: CookieStore,
         method     : String,
-        headers    : Map[String, Seq[String]],
+        headers    : Map[String, List[String]],
         content    : Option[StreamedContent]
     ): HttpResponse = {
 
@@ -125,11 +125,8 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
                 def contentTypeFromContent =
                     content flatMap (_.contentType)
 
-                def contentTypeFromRequest = (
-                    headers
-                    collectFirst { case (key, values) if key.toLowerCase == "content-type" ⇒ values }
-                    flatMap (_.lastOption)
-                )
+                def contentTypeFromRequest =
+                    Headers.firstHeaderIgnoreCase(headers, Headers.ContentType)
 
                 val contentTypeHeader = (
                     contentTypeFromContent
@@ -174,15 +171,12 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
                 ) toMap
 
             lazy val lastModified =
-                headers.get("Last-Modified") flatMap (_.lastOption) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
+                Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
 
-            lazy val content =
-                StreamedContent(
-                    inputStream   = Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream,
-                    contentType   = headers.get("Content-Type") flatMap (_.lastOption),
-                    contentLength = headers.get("Content-Length") flatMap (_.lastOption) map (_.toLong) filter (_ >= 0L),
-                    title         = None
-                )
+            lazy val content = StreamedContent.fromStreamAndHeaders(
+                Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream,
+                headers
+            )
 
             def disconnect() =
                 EntityUtils.consume(response.getEntity)

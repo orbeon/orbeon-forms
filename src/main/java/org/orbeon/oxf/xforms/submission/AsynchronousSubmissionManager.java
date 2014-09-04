@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.AsyncExternalContext;
+import org.orbeon.oxf.externalcontext.LocalExternalContext;
 import org.orbeon.oxf.externalcontext.AsyncRequest;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -93,7 +93,7 @@ public class AsynchronousSubmissionManager {
 
             // Submission should not need an ExternalContext, but if it does we must provide access to a safe one
             final ExternalContext currentExternalContext = NetUtils.getExternalContext();
-            final ExternalContext newExternalContext = new AsyncExternalContext(
+            final ExternalContext newExternalContext = new LocalExternalContext(
                 currentExternalContext.getWebAppContext(),
                 new AsyncRequest(currentExternalContext.getRequest()),
                 currentExternalContext.getResponse());

@@ -43,7 +43,7 @@ public class RedirectReplacer extends BaseReplacer {
     }
 
     public static void replace(ConnectionResult connectionResult, final ExternalContext.Response response) throws IOException {
-        connectionResult.forwardResponseHeaders(response);
+        SubmissionUtils.forwardResponseHeaders(connectionResult, response);
         response.setStatus(connectionResult.statusCode());
     }
 }

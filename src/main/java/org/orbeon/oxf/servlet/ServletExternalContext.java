@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.*;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -509,7 +510,7 @@ public class ServletExternalContext implements ExternalContext  {
                 if (lastModified <= 0) lastModified = now;
 
                 // Set last-modified
-                nativeResponse.setDateHeader("Last-Modified", lastModified);
+                nativeResponse.setDateHeader(Headers.LastModified(), lastModified);
 
                 // Make sure the client does not load from cache without revalidation
                 nativeResponse.setDateHeader("Expires", now);
@@ -533,7 +534,7 @@ public class ServletExternalContext implements ExternalContext  {
                 }
 
                 // Set caching headers
-                nativeResponse.setDateHeader("Last-Modified", lastModified);
+                nativeResponse.setDateHeader(Headers.LastModified(), lastModified);
                 nativeResponse.setDateHeader("Expires", expires);
 
                 setResponseHeaders(nativeResponse, getResourceCacheHeaders());

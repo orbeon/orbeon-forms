@@ -594,7 +594,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     if (result.getReplacer() != null) {
                         // Replacer provided, perform replacement
                         if (result.getReplacer() instanceof AllReplacer)
-                            AllReplacer.replace(result.getConnectionResult(), response);
+                            AllReplacer.forwardResultToResponse(result.getConnectionResult(), response);
                         else if (result.getReplacer() instanceof RedirectReplacer)
                             RedirectReplacer.replace(result.getConnectionResult(), response);
                         else
@@ -641,7 +641,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
             submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this,
-                submitErrorEvent.XXFORMS_INTERNAL_ERROR(), submissionResult.getConnectionResult());
+                XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), submissionResult.getConnectionResult());
         }
 
         // Dispatch event
@@ -664,7 +664,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
             submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, scala.Option.apply(resolvedActionOrResource),
-                submitErrorEvent.XXFORMS_INTERNAL_ERROR(), 0);
+                XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), 0);
         }
 
         // Dispatch event

@@ -4,7 +4,7 @@
     <!-- Orbeon Forms portlet (for Orbeon Forms running directly within a portlet) -->
     <portlet>
         <portlet-name>orbeon-forms-portlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet2Delegate</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet</portlet-class>
         <!-- Initialization parameters -->
         <init-param>
             <name>oxf.main-processor.name</name>

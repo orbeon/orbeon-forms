@@ -236,7 +236,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             return (result != null) ? new StringValue(result) : null;
         } else {
             // Try custom MIPs
-            final String result = evaluateCustomMIP(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
+            final String result = evaluateCustomMIPByName(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
             return (result != null) ? new StringValue(result) : null;
         }
     }

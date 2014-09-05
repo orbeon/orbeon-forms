@@ -272,7 +272,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         if (bindNode.staticBind.customMIPNameToXPathMIP.nonEmpty) // in most cases there are no custom MIPs
             for {
                 (name, mips) ← bindNode.staticBind.customMIPNameToXPathMIP
-                result = evaluateCustomMIP(bindNode, name)
+                mip          ← mips.headOption
+                result       = evaluateCustomMIP(bindNode, mip)
                 if result ne null
             } locally {
                 bindNode.setCustom(name, result)
@@ -280,11 +281,15 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
     // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
     // ones statically, but don't have yet a solution to combine them. Should we string-join them?
-    protected def evaluateCustomMIP(bindNode: BindNode, propertyName: String): String =
-        try evaluateStringExpression(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(propertyName).head)
+    protected def evaluateCustomMIPByName(bindNode: BindNode, propertyName: String): String =
+        evaluateCustomMIP(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(propertyName).head)
+
+    protected def evaluateCustomMIP(bindNode: BindNode, mip: StaticXPathMIP): String = {
+        try evaluateStringExpression(bindNode, mip)
         catch {
             case NonFatal(e) ⇒
-                handleMIPXPathException(e, bindNode, bindNode.staticBind.getCalculate, "evaluating XForms custom bind")
+                handleMIPXPathException(e, bindNode, mip, "evaluating XForms custom bind")
                 null
         }
+    }
 }

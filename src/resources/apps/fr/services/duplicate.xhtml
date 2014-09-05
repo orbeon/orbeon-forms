@@ -29,25 +29,26 @@
 
             <xf:instance id="fr-request" src="input:instance"/>
 
-            <xf:instance id="fr-response"><document-id/></xf:instance>
-            <xf:instance id="fr-form-instance"><dummy/></xf:instance>
+            <xf:instance id="fr-response"      xxf:exclude-result-prefixes="#all"><document-id/></xf:instance>
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
 
             <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
             <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
 
             <xf:var name="requested-document-id" value="instance('fr-request')/root()/document-id/string()"/>
+            <xf:var name="data-base-path"        value="frf:createFormDataBasePath($app, $form, false(), $requested-document-id)"/>
 
             <xf:action event="xforms-model-construct-done">
-                <xf:send submission="read-form-data-for-duplicate"/>
+                <xf:send submission="read-form-data"/>
             </xf:action>
 
             <!-- Read form data for the duplicate button -->
             <!-- NOTE: It would be nice if this could be done entirely with a process. -->
             <xf:submission
-                id="read-form-data-for-duplicate"
+                id="read-form-data"
                 method="get"
                 serialization="none"
-                action="{frf:createFormDataBasePath($app, $form, false(), $requested-document-id)}/data.xml"
+                action="{$data-base-path}/data.xml"
                 replace="instance"
                 instance="fr-form-instance">
 

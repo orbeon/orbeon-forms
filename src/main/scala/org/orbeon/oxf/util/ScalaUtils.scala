@@ -130,9 +130,13 @@ object ScalaUtils extends PathOps {
         def nextOption = i.hasNext option i.next()
     }
 
+    // Extensions on Iterator object
     object IteratorExt {
         def iterateWhile[T](cond: ⇒ Boolean, elem: ⇒ T): Iterator[T] =
-            Iterator.continually(cond option elem).takeWhile(_.isDefined).flatten
+            iterateWhileDefined(cond option elem)
+
+        def iterateWhileDefined[T](elemOpt: ⇒ Option[T]): Iterator[T] =
+            Iterator.continually(elemOpt).takeWhile(_.isDefined).flatten
     }
     implicit def fromIteratorExt(i: Iterator.type) = IteratorExt
 

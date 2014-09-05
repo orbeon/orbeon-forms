@@ -78,7 +78,7 @@ object XFormsModelSubmissionBase {
         }
 
     def pruneNonRelevantNodes(doc: Document): Unit =
-        (Iterator.continually(findNextNodeToDetach(doc)) takeWhile (_.isDefined) flatten) foreach (_.detach())
+        Iterator.iterateWhileDefined(findNextNodeToDetach(doc)) foreach (_.detach())
 
     def annotateWithHashes(doc: Document): Unit = {
         val wrapper = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
@@ -188,10 +188,10 @@ object XFormsModelSubmissionBase {
             tryBreakable[Option[Node]] {
                 doc.accept(
                     new VisitorSupport {
-                        final override def visit(element: Element) =
+                        override def visit(element: Element) =
                             checkInstanceData(element)
 
-                        final override def visit(attribute: Attribute) =
+                        override def visit(attribute: Attribute) =
                             checkInstanceData(attribute)
 
                         private def checkInstanceData(node: Node) =

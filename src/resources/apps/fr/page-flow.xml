@@ -116,6 +116,11 @@
              model="request-parameters.xpl"
              view="services/duplicate.xhtml"/>
 
+    <!-- List form data attachments -->
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(attachments)"
+             model="request-parameters.xpl"
+             view="services/attachments.xhtml"/>
+
     <!-- ==== Custom services and pages ============================================================================ -->
 
     <!-- Custom persistence implementation provided by the application -->

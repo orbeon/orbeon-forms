@@ -257,7 +257,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 epilogueURL,
                 epilogueElement,
                 pathIdToPath.asJava,
-                pageIdToSetvaluesDocument.asJava)
+                pageIdToSetvaluesDocument.asJava
+            )
 
             // For debugging
             if (logger.isDebugEnabled) {
@@ -282,19 +283,27 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
                 { pageId ⇒ routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id == Some(pageId) ⇒ page } }
 
-        PageFlow(routes, handler(Set("not-found-handler")), handler(Set("unauthorized-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
+        PageFlow(
+            routes,
+            handler(Set("not-found-handler")),
+            handler(Set("unauthorized-handler")),
+            handler(Set("error-handler")),
+            pathMatchers,
+            Option(urlBase)
+        )
     }
 
     def createPipelineAST(
-            element: Element,
-            controllerValidity: AnyRef,
-            stepProcessorContext: StepProcessorContext,
-            urlBase: String,
-            globalInstancePassing: String,
-            epilogueURL: Option[String],
-            epilogueElement: Element,
-            pageIdToPathInfo: JMap[String, String],
-            pageIdToSetvaluesDocument: JMap[String, Document]) =
+            element                  : Element,
+            controllerValidity       : AnyRef,
+            stepProcessorContext     : StepProcessorContext,
+            urlBase                  : String,
+            globalInstancePassing    : String,
+            epilogueURL              : Option[String],
+            epilogueElement          : Element,
+            pageIdToPathInfo         : JMap[String, String],
+            pageIdToSetvaluesDocument: JMap[String, Document]
+     ): ASTPipeline =
         new ASTPipeline {
 
             setValidity(controllerValidity)
@@ -302,15 +311,24 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             // The pipeline has an input with matcher results
             val matcherParam = addParam(new ASTParam(ASTParam.INPUT, "matches"))
 
-            val epilogueData = new ASTOutput(null, "html")
+            val epilogueData      = new ASTOutput(null, "html")
             val epilogueModelData = new ASTOutput(null, "epilogue-model-data")
-            val epilogueInstance = new ASTOutput(null, "epilogue-instance")
+            val epilogueInstance  = new ASTOutput(null, "epilogue-instance")
 
             // Page
-            handlePage(stepProcessorContext, urlBase, getStatements, element,
-                    matcherParam.getName, epilogueData, epilogueModelData,
-                    epilogueInstance, pageIdToPathInfo, pageIdToSetvaluesDocument,
-                    globalInstancePassing)
+            handlePage(
+                stepProcessorContext,
+                urlBase,
+                getStatements,
+                element,
+                matcherParam.getName,
+                epilogueData,
+                epilogueModelData,
+                epilogueInstance,
+                pageIdToPathInfo,
+                pageIdToSetvaluesDocument,
+                globalInstancePassing
+            )
 
             // Epilogue
             addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {

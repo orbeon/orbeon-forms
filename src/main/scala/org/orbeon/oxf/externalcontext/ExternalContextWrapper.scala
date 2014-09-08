@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 class ExternalContextWrapper(val externalContext: ExternalContext) extends ExternalContext {
 
     def getWebAppContext = externalContext.getWebAppContext
-    def getSession(create: Boolean) = externalContext.getSession(create)
+    def getSession(create: Boolean): ExternalContext.Session = externalContext.getSession(create)
 
     def getRequest: ExternalContext.Request = externalContext.getRequest
     def getResponse: ExternalContext.Response = externalContext.getResponse

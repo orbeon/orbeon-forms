@@ -368,7 +368,7 @@
                 <hint>Whether the data is required</hint>
                 <item id="0">Yes</item>
                 <item id="1">No</item>
-                <item id="2">XPath</item>
+                <item id="2">Formula</item>
             </required>
             <constraint>
                 <label>Constraint</label>
@@ -1240,7 +1240,7 @@
                 <hint>Est-ce que la donnée est obligatoire</hint>
                 <item id="0">Oui</item>
                 <item id="1">Non</item>
-                <item id="2">XPath</item>
+                <item id="2">Formule</item>
             </required>
             <constraint>
                 <label>Contrainte</label>
@@ -2115,7 +2115,7 @@
                 <hint>Hvorvidt feltet er påkrevd eller ikke</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nei</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Restriksjon</label>
@@ -2988,7 +2988,7 @@
                 <hint>Является ли поле обязательным</hint>
                 <item id="0">Да</item>
                 <item id="1">Нет</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Ограничение</label>
@@ -3862,7 +3862,7 @@
                 <hint>Se è necessario immettere i dati</hint>
                 <item id="0">Sì</item>
                 <item id="1">No</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Costrizione</label>
@@ -4728,7 +4728,7 @@
                 <hint>Ob die Eingabe erforderlich ist</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nein</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Einschränkung</label>
@@ -5597,7 +5597,7 @@
                 <hint>Pakollinen data?</hint>
                 <item id="0">Kyllä</item>
                 <item id="1">Ei</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Rajoite</label>
@@ -6464,7 +6464,7 @@
                 <hint>Indica si el dato es requerido</hint>
                 <item id="0">Si</item>
                 <item id="1">No</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Restricción</label>
@@ -7338,7 +7338,7 @@
                 <hint>Indica se é ou não obrigatório</hint>
                 <item id="0">Sim</item>
                 <item id="1">Não</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Restrição</label>
@@ -8211,7 +8211,7 @@
                 <hint>Indikerar om fältet måste fyllas i</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nej</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Villkor</label>

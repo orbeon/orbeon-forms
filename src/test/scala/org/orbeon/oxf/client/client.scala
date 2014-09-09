@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.client
 
+import org.openqa.selenium.chrome.ChromeDriverService
+
 import collection.JavaConverters._
 import java.net.URL
 import org.apache.commons.lang3.StringUtils
@@ -231,30 +233,43 @@ abstract class OrbeonClientBase
 
 object OrbeonClientBase {
 
-    private var _driver: WebDriver = _
-    def driver = _driver ensuring (_ ne null)
+    private var serviceOpt: Option[ChromeDriverService] = None
+    private var driverOpt : Option[WebDriver]           = None
+
+    def driver = driverOpt.get
     val DefaultTimeout = Span(10, Seconds)
 
     @BeforeClass
     def createAndStartService(): Unit = {
-        val capabilities = (
-            DesiredCapabilities.firefox()
-            |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
-            |!> (_.setCapability("name", "Orbeon Forms unit tests"))
-            |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
-            |!> (_.setCapability("version", "28"))
-            |!> (_.setCapability("platform", Platform.XP))
-        )
-        val server = {
-            val username = System.getenv("SAUCE_USERNAME")
-            val password = System.getenv("SAUCE_ACCESS_KEY")
-            new URL("http://" + username + ":" + password + "@localhost:4445/wd/hub")
+        System.getProperty("oxf.test.driver") match {
+            case "chromedriver" ⇒
+                val service = ChromeDriverService.createDefaultService()
+                service.start()
+                serviceOpt = Some(service)
+                driverOpt = Some(new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome()))
+            case _ ⇒
+                val capabilities = (
+                    DesiredCapabilities.firefox()
+                    |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
+                    |!> (_.setCapability("name", "Orbeon Forms unit tests"))
+                    |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
+                    |!> (_.setCapability("version", "28"))
+                    |!> (_.setCapability("platform", Platform.XP))
+                )
+                val server = {
+                    val username = System.getenv("SAUCE_USERNAME")
+                    val password = System.getenv("SAUCE_ACCESS_KEY")
+                    new URL("http://" + username + ":" + password + "@localhost:4445/wd/hub")
+                }
+                driverOpt = Some(new RemoteWebDriver(server, capabilities))
         }
-        _driver = new RemoteWebDriver(server, capabilities)
     }
 
     @AfterClass
-    def createAndStopService(): Unit = {
-        _driver.quit()
+    def stopService(): Unit = {
+        driverOpt.map(_.quit())
+        driverOpt = None
+        serviceOpt.map(_.stop())
+        serviceOpt = None
     }
 }

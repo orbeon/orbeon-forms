@@ -153,7 +153,15 @@ public abstract class BaseSubmission implements Submission {
 
         // Determine headers
         final scala.collection.immutable.Map<String, String[]> headers =
-            Connection.buildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
+            Connection.buildConnectionHeadersWithSOAP(
+                httpMethod,
+                null,
+                actualRequestMediatype,
+                encoding,
+                customHeaderNameValues,
+                headerNames,
+                indentedLogger
+            );
 
         // Create requestAdapter depending on method
         final LocalRequest requestAdapter;

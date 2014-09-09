@@ -26,7 +26,7 @@ class LiveResultFormatter extends JUnitResultFormatter {
 
     def addError(test: Test, error: Throwable): Unit = {
         logResult(test, "FAIL")
-        error.printStackTrace(out)
+        error.printStackTrace(out) // TODO: use orbeon-errorified API/jar
     }
 
     def addFailure(test: Test, failure: AssertionFailedError): Unit = {

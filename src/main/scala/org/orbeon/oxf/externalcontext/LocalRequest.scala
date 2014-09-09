@@ -58,8 +58,16 @@ class LocalRequest(
             contextPath: String,
             pathQuery: String,
             method: String,
-            headers: Map[String, Array[String]]) =
-        this(externalContext, indentedLogger, contextPath, pathQuery, method, null, headers)
+            headers: Map[String, Array[String]]
+    ) = this(
+        externalContext,
+        indentedLogger,
+        contextPath,
+        pathQuery,
+        method,
+        null,
+        headers
+    )
 
     private lazy val queryString = {
         val mark = pathQuery.indexOf('?')

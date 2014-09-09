@@ -23,9 +23,12 @@ import RequestReader._
 
 private object FlatView {
 
-    val MetadataColumns         = List("document_id", "created", "last_modified_time", "last_modified_by").map(_.toUpperCase)
-    val PrefixedMetadataColumns = MetadataColumns.map(col ⇒ s"METADATA_$col")
-    val MetadataPairs           = MetadataColumns.map("d." + _).zip(PrefixedMetadataColumns)
+    case class Col(extractExpression: String, colName: String)
+    val MetadataPairs           =
+        List("document_id", "created", "last_modified_time", "last_modified_by")
+                .map(_.toUpperCase)
+                .map(col ⇒ Col(s"d.$col", s"METADATA_$col"))
+    val PrefixedMetadataColumns = MetadataPairs.map{case Col(_, colName) ⇒ colName}
     val MaxNameLength           = 30
     val TablePrefix             = "ORBEON_F_"
 
@@ -35,35 +38,70 @@ private object FlatView {
     // - https://github.com/orbeon/orbeon-forms/issues/1571
     def createFlatView(req: Request, connection: Connection): Unit = {
 
-        val appXML  = xmlToSQLId(req.app)
-        val formXML = xmlToSQLId(req.form)
+        val viewName = {
+            val appXML  = xmlToSQLId(req.app)
+            val formXML = xmlToSQLId(req.form)
+            TablePrefix + joinParts(appXML, formXML, MaxNameLength - TablePrefix.length)
+        }
 
-        val tableName = TablePrefix + joinParts(appXML, formXML, MaxNameLength - TablePrefix.length)
-        val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒ s"extractValue(d.xml, '/*/$path')" → col }
-        val allCols   = MetadataPairs.iterator ++ userCols
+        // Delete view if it exists
+        // - Only for DB2; on Oracle we can use "OR REPLACE" when creating the view.
+        if (req.provider == "db2") {
+            val viewExists = {
+                val query =
+                    s"""|SELECT *
+                        |  FROM SYSIBM.SYSVIEWS
+                        | WHERE      creator =  (SELECT current_schema
+                        |                          FROM SYSIBM.SYSDUMMY1)
+                        |       AND  name    = ?
+                        |""".stripMargin
+                val ps = connection.prepareStatement(query)
+                ps.setString(1, viewName)
+                val rs = ps.executeQuery()
+                rs.next()
+            }
+            if (viewExists)
+                connection.prepareStatement(s"DROP VIEW $viewName").executeUpdate()
+        }
 
-        // NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations
-        val query =
-            s"""|CREATE  OR REPLACE VIEW $tableName AS
-                |SELECT  ${allCols map { case (col, name) ⇒ col + " " + name } mkString ", "}
-                |  FROM  orbeon_form_data d,
-                |        (
-                |            SELECT   max(last_modified_time) last_modified_time,
-                |                     app, form, document_id
-                |              FROM   orbeon_form_data d
-                |             WHERE       app   = '${escapeSQL(req.app)}'
-                |                     AND form  = '${escapeSQL(req.form)}'
-                |                     AND draft = 'N'
-                |            GROUP BY app, form, document_id
-                |        ) m
-                | WHERE      d.last_modified_time = m.last_modified_time
-                |        AND d.app                = m.app
-                |        AND d.form               = m.form
-                |        AND d.document_id        = m.document_id
-                |        AND d.deleted            = 'N'
-                |""".stripMargin
-        val ps = connection.prepareStatement(query)
-        ps.executeUpdate()
+        // Computer columns in the view
+        val cols = {
+            val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒
+                val extractFunction = req.provider match {
+                    case "oracle" ⇒ s"extractValue(d.xml, '/*/$path')"
+                    case "db2"    ⇒ s"XMLSERIALIZE(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
+                    case _        ⇒ ???
+                }
+                Col(extractFunction, col)
+            }
+            MetadataPairs.iterator ++ userCols
+        }
+
+        // Create view
+        // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
+        locally {
+            val query =
+                s"""|CREATE  ${if (req.provider == "oracle") "OR REPLACE" else ""} VIEW $viewName AS
+                    |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
+                    |  FROM  orbeon_form_data d,
+                    |        (
+                    |            SELECT   max(last_modified_time) last_modified_time,
+                    |                     app, form, document_id
+                    |              FROM   orbeon_form_data d
+                    |             WHERE       app   = '${escapeSQL(req.app)}'
+                    |                     AND form  = '${escapeSQL(req.form)}'
+                    |                     AND draft = 'N'
+                    |            GROUP BY app, form, document_id
+                    |        ) m
+                    | WHERE      d.last_modified_time = m.last_modified_time
+                    |        AND d.app                = m.app
+                    |        AND d.form               = m.form
+                    |        AND d.document_id        = m.document_id
+                    |        AND d.deleted            = 'N'
+                    |""".stripMargin
+            val ps = connection.prepareStatement(query)
+            ps.executeUpdate()
+        }
     }
 
     def collectControls(document: DocumentInfo): Iterator[(NodeInfo, NodeInfo)] = {

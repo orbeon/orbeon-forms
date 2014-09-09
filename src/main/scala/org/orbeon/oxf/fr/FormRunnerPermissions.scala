@@ -212,7 +212,7 @@ trait FormRunnerPermissions {
 
         val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.fbRoles, orbeonRoles)
 
-        formsEls.flatMap { case formEl: NodeInfo ⇒
+        formsEls.flatMap { formEl ⇒
 
             val wrapper = wrapperOpt.getOrElse(
                 // Create wrapper we don't have one already

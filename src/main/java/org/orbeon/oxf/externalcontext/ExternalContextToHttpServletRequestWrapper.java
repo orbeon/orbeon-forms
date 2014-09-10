@@ -32,12 +32,12 @@ import java.util.*;
  *
  * This is intended to "simulate" request information upon servlet forward/include. Information supported is:
  *
- * o request method
- * o request path and query string
- * o request parameters
- * o request body
- * o request attributes
- * o request headers
+ * - request method
+ * - request path and query string
+ * - request parameters
+ * - request body
+ * - request attributes
+ * - request headers
  *
  * Often, an HttpServletRequestWrapper is used to forward within the same application, and in this case developers have
  * good control over all the aspects of the application.

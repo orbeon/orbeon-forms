@@ -15,9 +15,11 @@ package org.orbeon.oxf.client
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.scalatest.junit.{MustMatchersForJUnit, AssertionsForJUnit}
+import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.{By, Keys, WebElement}
 import org.orbeon.oxf.util.ScalaUtils._
-import org.openqa.selenium.{WebElement, By, Keys}
+import org.scalatest.junit.{AssertionsForJUnit, MustMatchersForJUnit}
+
 import scala.util.Try
 
 trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunnerOps {
@@ -141,5 +143,30 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
         $("#send-event button").click()
         waitForAjaxResponse()
         checkOutputs(Seq("triggered" → "true", "p1" → "v1", "p2" → "v2"))
+    }
+
+    @Test def issue1888(): Unit = {
+
+        val Tooltips = "ORBEON.xforms.Globals.hintTooltipForControl"
+        val InputTooltip = s"$Tooltips['my-input']"
+
+        for {
+            _ ← loadOrbeonPage("/unit-tests/issue-1888")
+            body   ← webDriver.findElement(By.cssSelector("body"))
+            output ← webDriver.findElement(By.cssSelector("#my-output .xforms-output-output"))
+            input  ← webDriver.findElement(By.cssSelector("input.xforms-input-input"))
+            // At first, the tooltip isn't initialized
+            _ ← assertJSExpression(s"_.isUndefined($InputTooltip)")
+            // After a mouseover, we set it to null, since the message is empty
+            _ ← new Actions(webDriver).moveToElement(input).build().perform()
+            _ ← assertJSExpression(s"_.isNull($InputTooltip)")
+            // Enter "a"
+            _ ← new Actions(webDriver).click().sendKeys("a").moveToElement(body).click().build().perform()
+            _ ← assert(output.getText == "a")
+            // On mouseover, the tooltip with "a" shows
+            _ ← new Actions(webDriver).moveToElement(input).build().perform()
+            _ ← assertJSExpression(s"_.isObject($Tooltips['my-input'])")
+            _ ← assertJSExpression(s"$$($Tooltips['my-input'].element).css('visibility') == 'visible'")
+        }()
     }
 }

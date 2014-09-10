@@ -110,6 +110,11 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     def isCaseSelected(clientIdNoCasePrefix: String) =
         executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
 
+    def assertJSExpression(expression: String): Unit = {
+        val result = executeScript(s"return $expression")
+        assert(collectByErasedType[java.lang.Boolean](result) == Some(java.lang.Boolean.TRUE))
+    }
+
     // Functions from xforms.js we must provide access to:
     //
     // - isRelevant

@@ -2135,22 +2135,14 @@ ORBEON.xforms.Controls = {
         // If we have a YUI tooltip for this control, update the tooltip
         var currentTooltip = tooltipForControl[control.id];
         if (currentTooltip) {
-            if (currentTooltip == true) {
-                // Message used to be empty: we didn't create a YUI tooltip
-                if (message != "") {
-                    // Now there is a message: set to null so we'll create the YUI tooltip on mouseover
-                    tooltipForControl[control.id] = null;
-                }
+            // Message used not to be empty: we had a YUI tooltip
+            if (message == "") {
+                // Disable this tooltip, but keep the object tied to the control
+                currentTooltip.cfg.setProperty("disabled", true);
             } else {
-                // Message used not to be empty: we had a YUI tooltip
-                if (message == "") {
-                    // Disable this tooltip, but keep the object tied to the control
-                    currentTooltip.cfg.setProperty("disabled", true);
-                } else {
-                    // Update the tooltip message
-                    currentTooltip.cfg.setProperty("text", message);
-                    currentTooltip.cfg.setProperty("disabled", false);
-                }
+                // Update the tooltip message
+                currentTooltip.cfg.setProperty("text", message);
+                currentTooltip.cfg.setProperty("disabled", false);
             }
         }
 
@@ -2975,7 +2967,10 @@ ORBEON.xforms.Events = {
 
         // Create tooltip if have never "seen" this control
         if (tooltipForControl[control.id] == null) {
-            if (message != "") {
+            if (message == "") {
+                // Makes it easier for test to check that the mouseover did run
+                tooltipForControl[control.id] = null;
+            } else {
                 // We have a hint, initialize YUI tooltip
                 var yuiTooltip = new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
                     context: target,
@@ -2995,9 +2990,6 @@ ORBEON.xforms.Events = {
                 yuiTooltip.onContextMouseOver.call(target, event, yuiTooltip);
                 // Save reference to YUI tooltip
                 tooltipForControl[control.id] = yuiTooltip;
-            } else {
-                // Remember we looked at this control already
-                tooltipForControl[control.id] = true;
             }
         }
     },
@@ -3240,7 +3232,7 @@ ORBEON.xforms.Events = {
             var collection = collections[i];
             for (var control in collection) {
                 var tooltip = collection[control];
-                if (tooltip != null && tooltip != true) {
+                if (tooltip != null) {
                     if (YAHOO.lang.isObject(tooltip.element) && tooltip.element.style.visibility == "hidden") {
                         tooltip.element.style.top = 0;
                         tooltip.element.style.left = 0;

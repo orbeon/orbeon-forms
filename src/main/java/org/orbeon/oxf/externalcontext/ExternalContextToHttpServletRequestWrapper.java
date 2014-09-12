@@ -133,8 +133,8 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
         return NetUtils.encodeQueryString(request.getParameterMap());
     }
 
-    public String getParameter(String clazz) {
-        final String[] values = getParameterValues(clazz);
+    public String getParameter(String name) {
+        final String[] values = getParameterValues(name);
         return (values == null) ? null : values[0];
     }
 
@@ -190,20 +190,20 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
 
     /* SUPPORTED: request attributes */
 
-    public Object getAttribute(String clazz) {
-        return request.getAttributesMap().get(clazz);
+    public Object getAttribute(String name) {
+        return request.getAttributesMap().get(name);
     }
 
     public Enumeration getAttributeNames() {
         return Collections.enumeration(request.getAttributesMap().keySet());
     }
 
-    public void removeAttribute(String clazz) {
-        request.getAttributesMap().remove(clazz);
+    public void removeAttribute(String name) {
+        request.getAttributesMap().remove(name);
     }
 
-    public void setAttribute(String clazz, Object o) {
-        request.getAttributesMap().put(clazz, o);
+    public void setAttribute(String name, Object o) {
+        request.getAttributesMap().put(name, o);
     }
 
     /* SUPPORTED: request headers */
@@ -271,8 +271,8 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
         return super.getUserPrincipal();
     }
 
-    public boolean isUserInRole(String clazz) {
-        return super.isUserInRole(clazz);
+    public boolean isUserInRole(String role) {
+        return super.isUserInRole(role);
     }
 
     /*

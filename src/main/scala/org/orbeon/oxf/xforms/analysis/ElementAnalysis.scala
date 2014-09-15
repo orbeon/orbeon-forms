@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ValueTrait, RepeatControl}
 import model.Model
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
@@ -67,7 +67,7 @@ abstract class ElementAnalysis(
             Some(LiteralLangRef(lang))
         else {
             val staticId   = lang.substring(1)
-            val prefixedId = scope.prefixedIdForStaticId(staticId)
+            val prefixedId = XFormsUtils.getRelatedEffectiveId(self.prefixedId, staticId)
             Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
         }
 

@@ -28,14 +28,22 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
+    // NOTE: For #1890, place and use lang AVTs, see https://github.com/orbeon/orbeon-forms/issues/1890
     val simpleDoc: Document =
         <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
                  xmlns:xh="http://www.w3.org/1999/xhtml"
-                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                 lang="{xxf:instance('fr-language-instance')}"
+                 xml:lang="{xxf:instance('fr-language-instance')}"
+                 xxf:xpath-analysis="true">
             <xh:head>
+                <xh:title><xf:output value="xxf:lang()"/></xh:title>
                 <xf:model>
                     <xf:instance id="instance">
                         <value>0</value>
+                    </xf:instance>
+                    <xf:instance id="fr-language-instance">
+                        <value>en</value>
                     </xf:instance>
                 </xf:model>
             </xh:head>
@@ -78,6 +86,9 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         val expectedDocs = Seq[Document](
             <xf:instance id="instance" xmlns:xf="http://www.w3.org/2002/xforms">
                 <value>0</value>
+            </xf:instance>,
+            <xf:instance id="fr-language-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+                <value>en</value>
             </xf:instance>,
             <xf:input id="input" ref="instance()" xmlns:xf="http://www.w3.org/2002/xforms"/>,
             <xf:trigger id="trigger" xmlns:xf="http://www.w3.org/2002/xforms"><xf:label/></xf:trigger>
@@ -191,6 +202,9 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     }
 
     @Test def staticState() {
+
+        Assume.assumeTrue(Version.isPE)
+
         val doc = this setupDocument simpleDoc
         val staticStateXML = doc.getStaticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocument.xmlDocument
 

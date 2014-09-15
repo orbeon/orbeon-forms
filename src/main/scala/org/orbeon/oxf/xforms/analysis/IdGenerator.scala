@@ -19,31 +19,31 @@ import scala.collection.mutable
 //
 // The working assumption is that automatic ids will typically be allocated in a continuous way. Using a regular Set
 // to hold this information is a waste. We also assume that there are at most a few thousand ids. Over that, ids are
-// placed in a Set.
+// placed in a Set. Ids which are not automatically generated are also added to a Set.
 class IdGenerator(var _lastId: Int = 1) {
 
     import IdGenerator._
 
-    private val bits   = mutable.BitSet()
-    private val others = mutable.Set[String]()
+    private val _bits   = mutable.BitSet()
+    private val _others = mutable.Set[String]()
 
     private def containsStandardId(id: Int): Boolean =
-        bits(id - 1) || others.contains(AutomaticIdPrefix + id)
+        _bits(id - 1) || _others.contains(AutomaticIdPrefix + id)
 
-    def ids = (bits.iterator map (i ⇒ AutomaticIdPrefix + (i + 1).toString)) ++ others.iterator
+    def ids = (_bits.iterator map (i ⇒ AutomaticIdPrefix + (i + 1).toString)) ++ _others.iterator
 
     def isDuplicate(id: String): Boolean =  id match {
-        case AutomaticIdFormat(digits) ⇒
-            bits contains (digits.toInt - 1)
+        case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
+            _bits contains (digits.toInt - 1)
         case _ ⇒
-            others contains id
+            _others contains id
     }
     
     def add(id: String): Unit = id match {
         case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
-            bits += digits.toInt - 1
+            _bits += digits.toInt - 1
         case _ ⇒
-            others += id
+            _others += id
     }
     
     // Skip existing ids to handle these cases:

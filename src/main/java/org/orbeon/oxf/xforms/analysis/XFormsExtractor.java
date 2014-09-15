@@ -185,7 +185,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
             if (isTopLevel) {
                 // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
                 final AttributesImpl newAttributes = new AttributesImpl();
-                newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, Integer.toString(metadata.idGenerator().getCurrentId()));
+                newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, Integer.toString(metadata.idGenerator().lastId()));
                 final String lastIdName = LAST_ID_QNAME.getName();
                 super.startElement("", lastIdName, lastIdName, newAttributes);
                 super.endElement("", lastIdName, lastIdName);

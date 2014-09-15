@@ -14,34 +14,31 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
-import collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.dom4j.{Element, QName}
-import collection.mutable.HashMap
+import scala.collection.mutable
 
 trait PartXBLAnalysis extends TransientState {
 
     self: PartAnalysisImpl ⇒
 
     val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
-    private[PartXBLAnalysis] val scopesById = HashMap[String, Scope]()
-    private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = HashMap[String, Scope]()
+
+    private[PartXBLAnalysis] val scopesById              = mutable.HashMap[String, Scope]()
+    private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = mutable.HashMap[String, Scope]()
 
     protected def initializeScopes() {
         // Add existing ids to scope map
         val prefix = startScope.fullPrefix
         metadata.idGenerator.add("#document") // top-level is not added to the id generator until now
         for {
-            staticId ← metadata.idGenerator.ids.asScala
+            staticId   ← metadata.idGenerator.ids
             prefixedId = prefix + staticId
-        } yield
+        } locally {
             mapScopeIds(staticId, prefixedId, startScope, ignoreIfPresent = false)
-
-        // Tell top-level static id generator to stop checking for duplicate ids
-        // TODO: not nice, check what this is about (seems needed as of 2012-02-29)
-        metadata.idGenerator.setCheckDuplicates(false)
+        }
 
         registerScope(startScope)
     }
@@ -62,7 +59,7 @@ trait PartXBLAnalysis extends TransientState {
     def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit =
         if (prefixedIdToXBLScopeMap.contains(prefixedId)) {
             if (! ignoreIfPresent)
-                throw new OXFException(" Duplicate id found for prefixed id: " + prefixedId)
+                throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
         } else {
             scope += staticId → prefixedId
             prefixedIdToXBLScopeMap += prefixedId → scope

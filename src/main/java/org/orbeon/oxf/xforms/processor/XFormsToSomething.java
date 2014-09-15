@@ -368,7 +368,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                             false,
                             false
                         ),
-                        metadata
+                        metadata,
+                        true
                     ),
                     Whitespace.defaultHTMLPolicy(),
                     Whitespace.htmlPolicyMatcher()

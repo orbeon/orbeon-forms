@@ -86,14 +86,15 @@ object Controls {
             container: XBLContainer,
             controlIndex: ControlIndex,
             containerControl: XFormsContainerControl,
-            rootAnalysis: ElementAnalysis) = {
+            rootAnalysis: ElementAnalysis,
+            state: Option[Map[String, ControlState]]) = {
 
         val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
         val bindingContext = containerControl.bindingContextForChild
 
         buildTree(
             controlIndex,
-            None,
+            state,
             container,
             bindingContext,
             Some(containerControl),
@@ -481,8 +482,9 @@ object Controls {
 
     // Get state to restore
     private def restoringDynamicState = instancesControlsToRestore.value
-    def restoringControls             = restoringDynamicState map (_._1.controls)
-    def restoringInstancesJava        = restoringDynamicState map (_._1.instancesJava) orNull
+    def restoringInstanceControls     = restoringDynamicState map (_._1)
+    def restoringControls             = restoringInstanceControls map (_.controls)
+    def restoringInstancesJava        = restoringInstanceControls map (_.instancesJava) orNull
 
     // Whether we are restoring state
     def isRestoringDynamicState = restoringDynamicState exists (_._2)

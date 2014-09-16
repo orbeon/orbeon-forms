@@ -61,7 +61,7 @@ public class ControlTree implements ExternalCopyable {
         final Collection<XFormsControl> allControls = controlIndex.getEffectiveIdsToControls().values();
 
         // Dispatch initialization events for all controls created in index
-        if (! Controls.isRestoringDynamicState()) {
+        if (state.isEmpty()) {
             // Copy list because it can be modified concurrently as events are being dispatched and handled
             final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
             dispatchRefreshEvents(controlsEffectiveIds);
@@ -202,9 +202,14 @@ public class ControlTree implements ExternalCopyable {
         dispatchRefreshEvents(effectiveIdsToControls.keySet());
     }
 
-    public void createAndInitializeDynamicSubTree(XBLContainer container, XFormsContainerControl containerControl, ElementAnalysis elementAnalysis) {
+    public void createAndInitializeDynamicSubTree(
+        XBLContainer container,
+        XFormsContainerControl containerControl,
+        ElementAnalysis elementAnalysis,
+        scala.Option<scala.collection.immutable.Map<String, ControlState>> state
+    ) {
 
-        Controls.createSubTree(container, controlIndex, containerControl, elementAnalysis);
+        Controls.createSubTree(container, controlIndex, containerControl, elementAnalysis, state);
 
         // NOTE: We dispatch refresh events for the subtree right away, by consistency with repeat iterations. But we
         // don't really have to do this, we could wait for the following refresh.

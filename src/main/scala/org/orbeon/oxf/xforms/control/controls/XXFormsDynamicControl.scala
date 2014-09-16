@@ -19,7 +19,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.Controls._
 import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.DocumentWrapper
@@ -243,9 +243,20 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
         // Create new control subtree, attempting to restore switch state
         // LATER: See above comments
-        // withDynamicStateToRestore(dynamicState.decodeInstancesControls) {
-        withDynamicStateToRestore(InstancesControls(Nil, relevantSwitchState)) {
-            tree.createAndInitializeDynamicSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
+        // There are two cases:
+        //
+        // 1. Regular full update
+        // 2. Restore after serialization
+        val stateToRestore =
+            Controls.restoringInstanceControls getOrElse InstancesControls(Nil, relevantSwitchState)
+
+        withDynamicStateToRestore(stateToRestore) {
+            tree.createAndInitializeDynamicSubTree(
+                childContainer,
+                this,
+                partAnalysis.getTopLevelControls.head,
+                Controls.restoringControls
+            )
         }
     }
 
@@ -291,7 +302,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
                         val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
                         templateTree foreach
-                            (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _))
+                            (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _, None))
 
                         // Tell client
                         containingDocument.addControlStructuralChange(componentControl.prefixedId)

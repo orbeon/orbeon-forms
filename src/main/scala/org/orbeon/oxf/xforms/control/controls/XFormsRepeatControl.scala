@@ -75,9 +75,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         // Ensure that the initial state is set, either from default value, or for state deserialization.
         state match {
             case Some(state) ⇒
-                // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
-                val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
-                local.index = state.keyValues("index").toInt
+                setLocal(new XFormsRepeatControlLocal(state.keyValues("index").toInt))
             case None ⇒
                 setIndexInternal(getStartIndex)
         }
@@ -602,9 +600,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
 object XFormsRepeatControl {
 
-    class XFormsRepeatControlLocal extends ControlLocalSupport.XFormsControlLocal {
-        var index = -1
-    }
+    class XFormsRepeatControlLocal(var index: Int = -1)
+        extends ControlLocalSupport.XFormsControlLocal
 
     case class RefreshInfo(
         isNodesetChanged: Boolean,

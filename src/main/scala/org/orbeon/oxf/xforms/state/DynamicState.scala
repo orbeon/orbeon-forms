@@ -140,9 +140,11 @@ case class DynamicState(
             if (controls.nonEmpty) {
                 val controlsElement = rootElement.addElement("controls")
                 controls foreach {
-                    case ControlState(effectiveId, _, keyValues) ⇒
+                    case ControlState(effectiveId, visited, keyValues) ⇒
                         val controlElement = controlsElement.addElement("control")
                         controlElement.addAttribute("effective-id", effectiveId)
+                        if (visited)
+                            controlElement.addAttribute("visited", "true")
                         for ((k, v) ← keyValues)
                             controlElement.addAttribute(k, v)
                 }

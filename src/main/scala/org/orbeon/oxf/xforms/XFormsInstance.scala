@@ -34,10 +34,11 @@ import org.orbeon.oxf.xforms.state.InstanceState
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
-        timeToLive: Long,
-        handleXInclude: Boolean,
-        sourceURI: String,
-        requestBodyHash: Option[String]) {
+    timeToLive     : Long,
+    handleXInclude : Boolean,
+    sourceURI      : String,
+    requestBodyHash: Option[String]
+) {
     
     require(sourceURI ne null, """Only XForms instances externally loaded through the src attribute may have xxf:cache="true".""")
 
@@ -81,14 +82,14 @@ object InstanceCaching {
  *   - whether the instance has been modified
  */
 class XFormsInstance(
-        val parent: XFormsModel,                                // concrete parent model
-        val instance: Instance,                                 // static instance
-        private var _instanceCaching: Option[InstanceCaching],  // information to restore cached instance content
-        private var _documentInfo: DocumentInfo,                // fully wrapped document
-        private var _readonly: Boolean,                         // whether the instance is readonly (can change upon submission)
-        private var _modified: Boolean,                         // whether the instance was modified
-        var valid: Boolean)                                     // whether the instance was valid as of the last revalidation
-    extends ListenersTrait
+    val parent                  : XFormsModel,              // concrete parent model
+    val instance                : Instance,                 // static instance
+    private var _instanceCaching: Option[InstanceCaching],  // information to restore cached instance content
+    private var _documentInfo   : DocumentInfo,             // fully wrapped document
+    private var _readonly       : Boolean,                  // whether the instance is readonly (can change upon submission)
+    private var _modified       : Boolean,                  // whether the instance was modified
+    var valid                   : Boolean                   // whether the instance was valid as of the last revalidation
+)   extends ListenersTrait
     with XFormsInstanceIndex
     with XFormsEventObserver
     with Logging {
@@ -488,7 +489,8 @@ object XFormsInstance extends Logging {
             documentInfo,
             instance.readonly,
             false,
-            true)
+            true
+        )
 
     def createDocumentInfo(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean) = documentOrDocumentInfo match {
         case dom4jDocument: Document    ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
@@ -529,13 +531,27 @@ object XFormsInstance extends Logging {
                     // NOTE: No XInclude supported to read instances with @src for now
                     // TODO: must pass method and request body in case of POST/PUT
 
-                    (Some(caching),
-                        XFormsServerSharedInstancesCache.findContentOrLoad(logger, instance, caching, instanceState.readonly, loader))
+                    (
+                        Some(caching),
+                        XFormsServerSharedInstancesCache.findContentOrLoad(
+                            logger,
+                            instance,
+                            caching,
+                            instanceState.readonly,
+                            loader
+                        )
+                    )
 
                 case Right(content) ⇒
                     debug("using initialized instance from state", Seq("id" → instanceState.effectiveId))
-                    (None,
-                        createDocumentInfo(content, instanceState.readonly, instance.exposeXPathTypes))
+                    (
+                        None,
+                        createDocumentInfo(
+                            content,
+                            instanceState.readonly,
+                            instance.exposeXPathTypes
+                        )
+                    )
             }
 
         model.indexInstance(
@@ -546,6 +562,8 @@ object XFormsInstance extends Logging {
                 documentInfo,
                 instanceState.readonly,
                 instanceState.modified,
-                instanceState.valid))
+                instanceState.valid
+            )
+        )
     }
 }

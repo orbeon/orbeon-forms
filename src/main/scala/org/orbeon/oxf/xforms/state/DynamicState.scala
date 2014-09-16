@@ -29,22 +29,22 @@ import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 
 // Immutable representation of the dynamic state
 case class DynamicState(
-    uuid: String,
-    sequence: Long,
-    deploymentType: Option[String],
-    requestContextPath: Option[String],
-    requestPath: Option[String],
-    requestHeaders: Seq[(String, Seq[String])],
-    requestParameters: Seq[(String, Seq[String])],
-    containerType: Option[String],
-    containerNamespace: Option[String],
-    pathMatchers: Seq[Byte],
-    focusedControl: Option[String],
-    pendingUploads: Seq[Byte],
-    annotatedTemplate: Option[Seq[Byte]],
-    lastAjaxResponse: Seq[Byte],
-    instances: Seq[Byte],
-    controls: Seq[Byte]
+    uuid                : String,
+    sequence            : Long,
+    deploymentType      : Option[String],
+    requestContextPath  : Option[String],
+    requestPath         : Option[String],
+    requestHeaders      : Seq[(String, Seq[String])],
+    requestParameters   : Seq[(String, Seq[String])],
+    containerType       : Option[String],
+    containerNamespace  : Option[String],
+    pathMatchers        : Seq[Byte],
+    focusedControl      : Option[String],
+    pendingUploads      : Seq[Byte],
+    annotatedTemplate   : Option[Seq[Byte]],
+    lastAjaxResponse    : Seq[Byte],
+    instances           : Seq[Byte],
+    controls            : Seq[Byte]
 ) {
     // Decode individual bits
     def decodePathMatchers = fromByteSeq[List[PathMatcher]](pathMatchers)
@@ -233,12 +233,11 @@ object DynamicState {
         // NOTE: As of 2012-02-02, only repeat, switch and dialogs controls serialize state. The state of all the other
         // controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
         // more information might be serialized.
-        // TODO: What about about visited state? right now only for controls which have other data to serialize.
         def controlsToSerialize = {
             val iterator =
                 for {
-                    start ← startOpt.toList
-                    control ← ControlsIterator(start, includeSelf = false)
+                    start        ← startOpt.toList
+                    control      ← ControlsIterator(start, includeSelf = false)
                     if control.isRelevant
                     controlState ← control.controlState
                 } yield

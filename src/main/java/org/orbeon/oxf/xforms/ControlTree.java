@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
+import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.*;
@@ -49,12 +50,12 @@ public class ControlTree implements ExternalCopyable {
     /**
      * Build the entire tree of controls and associated information.
      */
-    public void initialize(XFormsContainingDocument containingDocument) {
+    public void initialize(XFormsContainingDocument containingDocument, scala.Option<scala.collection.immutable.Map<String, ControlState>> state) {
 
         indentedLogger.startHandleOperation("controls", "building");
 
         // Visit the static tree of controls to create the actual tree of controls
-        Controls.createTree(containingDocument, controlIndex);
+        Controls.createTree(containingDocument, controlIndex, state);
 
         // Evaluate all controls
         final Collection<XFormsControl> allControls = controlIndex.getEffectiveIdsToControls().values();

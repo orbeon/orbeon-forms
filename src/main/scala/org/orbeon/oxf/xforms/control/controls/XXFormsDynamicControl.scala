@@ -34,7 +34,7 @@ import org.orbeon.oxf.xforms.event.events.{XXFormsValueChangedEvent, XFormsDelet
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import InstanceMirror._
-import org.orbeon.oxf.xforms.state.InstancesControls
+import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
 import org.orbeon.oxf.util.XPath
 import scala.collection.generic.Growable
@@ -84,7 +84,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             contextStack.getCurrentBindingContext
         } orNull
 
-    override def onCreate(): Unit =
+    override def onCreate(state: Option[ControlState]): Unit =
         getBoundElement match {
             case Some(node) ⇒ updateSubTree(node)
             case _ ⇒ // don't create binding (maybe we could for a read-only instance)

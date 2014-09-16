@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.controls.VariableControl
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.EmptySequence
@@ -53,8 +54,8 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override def supportAjaxUpdates = false
     override def focusableControls = Iterator.empty
 
-    override def onCreate() {
-        super.onCreate()
+    override def onCreate(state: Option[ControlState]) {
+        super.onCreate(state)
         // FIXME: Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
         _value = null
     }

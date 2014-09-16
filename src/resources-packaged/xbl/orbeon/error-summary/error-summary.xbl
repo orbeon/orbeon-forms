@@ -193,7 +193,7 @@ Inserting error information into error list:
                             xbl:attr="xbl:text=observer"/>
 
                         <!-- Make sure the model is recalculated when there is a chance visited controls might have
-                             changed. We do this because there is no dependency handling wit hthe xxf:visited()
+                             changed. We do this because there is no dependency handling wit the xxf:visited()
                              function. -->
                         <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-visited xxforms-unvisited" xxf:phantom="true">
                             <xf:recalculate xxbl:scope="inner" xxf:deferred="true"/>

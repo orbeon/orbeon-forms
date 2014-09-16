@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.xforms.state.ControlState
+
 import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
@@ -105,8 +107,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         contextStack.getCurrentBindingContext
     }
 
-    override def onCreate(): Unit = {
-        super.onCreate()
+    override def onCreate(state: Option[ControlState]): Unit = {
+        super.onCreate(state)
         if (Controls.isRestoringDynamicState)
             nestedContainer.restoreModelsState()
         else

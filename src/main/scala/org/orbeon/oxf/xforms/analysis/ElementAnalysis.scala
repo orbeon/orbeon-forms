@@ -38,12 +38,11 @@ case class AVTLangRef(att: AttributeControl) extends LangRef
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */
 abstract class ElementAnalysis(
-        val part: PartAnalysisImpl,
-        val element: Element,
-        val parent: Option[ElementAnalysis],
-        val preceding: Option[ElementAnalysis])
-    extends ElementEventHandlers
-    with ElementRepeats {
+    val part     : PartAnalysisImpl,
+    val element  : Element,
+    val parent   : Option[ElementAnalysis],
+    val preceding: Option[ElementAnalysis]
+) extends ElementEventHandlers with ElementRepeats {
 
     self ⇒
 

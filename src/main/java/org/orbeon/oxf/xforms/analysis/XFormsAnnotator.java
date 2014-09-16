@@ -531,7 +531,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Check for duplicate ids
                 // See https://github.com/orbeon/orbeon-forms/issues/1892
                 // TODO: create Element to provide more location info?
-                if (topLevel && metadata.idGenerator().isDuplicate(rawId))
+                if (topLevel && metadata.idGenerator().contains(rawId))
                     throw new ValidationException("Duplicate id for XForms element: " + rawId,
                         new ExtendedLocationData(LocationData.createIfPresent(documentLocator()), "analyzing control element",
                                 new String[] { "element", SAXUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));

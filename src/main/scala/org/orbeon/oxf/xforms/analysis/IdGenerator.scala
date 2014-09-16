@@ -20,19 +20,18 @@ import scala.collection.mutable
 // The working assumption is that automatic ids will typically be allocated in a continuous way. Using a regular Set
 // to hold this information is a waste. We also assume that there are at most a few thousand ids. Over that, ids are
 // placed in a Set. Ids which are not automatically generated are also added to a Set.
-class IdGenerator(var _lastId: Int = 1) {
+class IdGenerator(var _nextSequenceNumber: Int = 1) {
 
     import IdGenerator._
 
     private val _bits   = mutable.BitSet()
     private val _others = mutable.Set[String]()
 
-    private def containsStandardId(id: Int): Boolean =
-        _bits(id - 1) || _others.contains(AutomaticIdPrefix + id)
+    def nextSequenceNumber = _nextSequenceNumber
 
     def ids = (_bits.iterator map (i ⇒ AutomaticIdPrefix + (i + 1).toString)) ++ _others.iterator
 
-    def isDuplicate(id: String): Boolean =  id match {
+    def contains(id: String): Boolean =  id match {
         case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
             _bits contains (digits.toInt - 1)
         case _ ⇒
@@ -52,15 +51,19 @@ class IdGenerator(var _lastId: Int = 1) {
     // - XBL copies id attributes from bound element, so within template the id may be of the form xf-*
     def nextId(): String = {
 
-        while (containsStandardId(_lastId))
-            _lastId += 1
+        def containsAutomaticId(id: Int): Boolean =
+            if (id <= MaxBits)
+                _bits(id - 1)
+            else
+                _others.contains(AutomaticIdPrefix + id)
 
-        val result = AutomaticIdPrefix + _lastId
-        _lastId += 1
+        while (containsAutomaticId(_nextSequenceNumber))
+            _nextSequenceNumber += 1
+
+        val result = AutomaticIdPrefix + _nextSequenceNumber
+        _nextSequenceNumber += 1
         result
     }
-    
-    def lastId = _lastId
 }
 
 private object IdGenerator {

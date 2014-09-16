@@ -92,11 +92,11 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             final ControlState controlState = state.get();
             final Map<String, String> keyValues = controlState.keyValuesJava();
 
-            // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-            final String visibleString = keyValues.get("visible");
-            setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
-                     "true".equals(keyValues.get("constrain")),
-                     keyValues.get("neighbor")));
+            setLocal(
+                new XXFormsDialogControlLocal("true".equals(keyValues.get("visible")),
+                "true".equals(keyValues.get("constrain")),
+                keyValues.get("neighbor"))
+            );
         }
     }
 

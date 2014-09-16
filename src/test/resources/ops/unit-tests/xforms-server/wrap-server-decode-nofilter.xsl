@@ -23,6 +23,12 @@
             <xsl:apply-templates select="xpl:decodeDynamicStateString(normalize-space(.))"/>
         </xsl:copy>
     </xsl:template>
+    <!-- Don't output information about controls which only have visited="true" so we don't have to modify the unit
+         tests (and also because this information is maybe not useful?). -->
+    <xsl:template match="controls[empty(control[count(@* except (@effective-id, @visited)) gt 0])]"/>
+    <xsl:template match="controls/control[count(@* except (@effective-id, @visited)) = 0]"/>
+    <xsl:template match="controls/control/@visited"/>
+    <!-- Deserialize instances -->
     <xsl:template match="instances/instance">
         <xsl:copy>
             <xsl:copy-of select="@*"/>

@@ -45,9 +45,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         // Ensure that the initial state is set, either from default value, or for state deserialization.
         state match {
             case Some(state) ⇒
-                // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-                val local = getCurrentLocal.asInstanceOf[XFormsSwitchControlLocal]
-                local.selectedCaseControlId = state.keyValues("case-id")
+                setLocal(new XFormsSwitchControlLocal(state.keyValues("case-id")))
             case None ⇒
                 val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
                 local.selectedCaseControlId = findDefaultSelectedCaseId
@@ -193,7 +191,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
                 // TODO: This should not be needed because the repeat template should have a reasonable default.
                 getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl ⇒
                     ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", Array(
-                        "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId),
+                        "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),
                         "visibility", "hidden")
                     )
                 }
@@ -204,6 +202,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     private def getOtherSelectedCaseEffectiveId(switchControl1: XFormsSwitchControl): String =
         if ((switchControl1 ne null) && switchControl1.isRelevant) {
             val selectedCaseId = switchControl1.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
+            assert(selectedCaseId ne null)
             XFormsUtils.getRelatedEffectiveId(switchControl1.getEffectiveId, selectedCaseId)
         } else
             null
@@ -219,6 +218,5 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     override def valueType = null
 }
 
-private class XFormsSwitchControlLocal extends ControlLocalSupport.XFormsControlLocal {
-    var selectedCaseControlId: String = null
-}
+private class XFormsSwitchControlLocal(var selectedCaseControlId: String = null)
+    extends ControlLocalSupport.XFormsControlLocal

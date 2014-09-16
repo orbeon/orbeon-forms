@@ -20,6 +20,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.util.*;
@@ -790,7 +791,7 @@ public class XFormsUtils {
 
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {
-                    outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false);
+                    outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, scala.Option.<ControlState>apply(null));
                     outputControl.evaluate();
                 }
                 contextStack.popBinding();
@@ -843,14 +844,14 @@ public class XFormsUtils {
 
                             contextStack.pushBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element));
                             {
-                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false);
+                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false,  scala.Option.<ControlState >apply(null));
                                 attributeControl.evaluate();
                             }
                             contextStack.popBinding();
 
                             resolvedValue = attributeControl.getExternalValue();
                         } else if (currentAttributeName.equals("id")) {
-                            // This is an id, prefix if needed
+                            // This is an id, prefix if needed  
                             resolvedValue = prefix + currentAttributeValue;
                         } else {
                             // Simply use control value

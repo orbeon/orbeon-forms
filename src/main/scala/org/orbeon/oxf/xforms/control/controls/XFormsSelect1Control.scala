@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
 import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
@@ -51,8 +52,8 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     def mustEncodeValues = XFormsSelect1Control.mustEncodeValues(containingDocument, staticControl)
     def isFullAppearance = staticControl.isFull
 
-    override def onCreate() {
-        super.onCreate()
+    override def onCreate(state: Option[ControlState]) {
+        super.onCreate(state)
         // Evaluate itemsets only if restoring dynamic state
         // NOTE: This doesn't sound like it is the right place to do this, does it?
         if (Controls.isRestoringDynamicState)

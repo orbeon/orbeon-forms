@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{NodeInfo, Item}
@@ -53,19 +54,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     // Initial local state
     setLocal(new XFormsRepeatControlLocal)
 
-    // Restore state if needed
-    @transient
-    private var restoredState =
-        stateToRestore match {
-            case Some(state) ⇒
-                // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
-                val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
-                local.index = state.keyValues("index").toInt
-                true
-            case None ⇒
-                false
-        }
-
     // The repeat's sequence binding
     final override def binding = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Seq()
 
@@ -81,15 +69,18 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     override def getJavaScriptInitialization =
         if (isDnD) getCommonJavaScriptInitialization else null
 
-    override def onCreate() {
-        super.onCreate()
+    override def onCreate(state: Option[ControlState]) {
+        super.onCreate(state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
-        if (! restoredState)
-            setIndexInternal(getStartIndex)
-        else
-            // NOTE: state deserialized → state previously serialized → control was relevant → onCreate() called
-            restoredState = false
+        state match {
+            case Some(state) ⇒
+                // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
+                val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
+                local.index = state.keyValues("index").toInt
+            case None ⇒
+                setIndexInternal(getStartIndex)
+        }
 
         // Reset refresh information
         refreshInfo = null
@@ -283,7 +274,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             // Do this before evaluating the binding because after that controls are temporarily in an inconsistent state
             containingDocument.getControls.cloneInitialStateIfNeeded()
 
-            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true)
+            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true, state = None)
         }
 
         // Move things around and create new iterations if needed

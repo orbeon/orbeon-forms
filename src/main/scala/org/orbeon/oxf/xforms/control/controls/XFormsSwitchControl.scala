@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.{ControlLocalSupport, XFormsControl, XForms
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 import org.xml.sax.helpers.AttributesImpl
@@ -34,34 +35,22 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    @transient
-    private var restoredState: Boolean = false
-
     // Initial local state
     setLocal(new XFormsSwitchControlLocal)
 
-    // Restore state if needed
-    stateToRestore foreach { state ⇒
-        val keyValues = state.keyValues
-
-        // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-        val local = getCurrentLocal.asInstanceOf[XFormsSwitchControlLocal]
-        local.selectedCaseControlId = keyValues("case-id")
-
-        // Indicate that deserialized state must be used
-        restoredState = true
-    }
-
-    override def onCreate(): Unit = {
-        super.onCreate()
+    // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
+    override def onCreate(state: Option[ControlState]): Unit = {
+        super.onCreate(state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
-        if (! restoredState) {
-            val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
-            local.selectedCaseControlId = findDefaultSelectedCaseId
-        } else {
-            // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
-            restoredState = false
+        state match {
+            case Some(state) ⇒
+                // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
+                val local = getCurrentLocal.asInstanceOf[XFormsSwitchControlLocal]
+                local.selectedCaseControlId = state.keyValues("case-id")
+            case None ⇒
+                val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
+                local.selectedCaseControlId = findDefaultSelectedCaseId
         }
     }
 

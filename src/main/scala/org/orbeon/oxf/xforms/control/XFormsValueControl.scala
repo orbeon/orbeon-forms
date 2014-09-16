@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import XFormsValueControl._
+import org.orbeon.oxf.xforms.state.ControlState
 import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
@@ -55,8 +56,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     private[XFormsValueControl] var isExternalValueEvaluated: Boolean = false
     private[XFormsValueControl] var externalValue: String = null
 
-    override def onCreate(): Unit = {
-        super.onCreate()
+    override def onCreate(state: Option[ControlState]): Unit = {
+        super.onCreate(state)
 
         _value = null
         _previousValue = null

@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLConstants._
@@ -92,8 +93,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         setDefaultMIPs()
     }
 
-    override def onCreate(): Unit = {
-        super.onCreate()
+    override def onCreate(state: Option[ControlState]): Unit = {
+        super.onCreate(state)
 
         readBinding()
 

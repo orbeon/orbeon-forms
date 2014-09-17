@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.client
 
-import org.orbeon.oxf.client.fb.{RepeatSettings, Permissions, ControlResourcesEditor}
-import org.junit.runners.MethodSorters
 import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.orbeon.oxf.client.fb.{Permissions, ControlResourcesEditor, RepeatSettings, Services}
 import org.orbeon.oxf.client.fr.{Grid, Currency}
 
 // List all client tests which we want to run with a single run of the driver
@@ -28,5 +28,6 @@ class CombinedClientTest
     with OrbeonFormsDemoPath
     with ControlResourcesEditor
     with Permissions
+    with Services
     with Currency
     with Grid

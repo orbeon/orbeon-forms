@@ -59,7 +59,7 @@
                 </xh:div>
             </xf:group>
             <xh:span>
-                <xf:trigger ref="$variables/new-language-trigger" appearance="xxf:primary">
+                <xf:trigger ref="$variables/new-language-trigger" id="fb-language-add" appearance="xxf:primary">
                     <xf:label ref="$form-resources/add/label"/>
                     <xf:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->

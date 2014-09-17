@@ -168,7 +168,7 @@
                                     <xh:tr class="fr-grid-master-row">
                                         <xsl:if test="not($readonly)">
                                             <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]">
-                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1">
+                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" id="fr-grid-add" tabindex="-1">
                                                     <xf:label><xh:i class="icon-plus-sign"/></xf:label>
                                                     <xf:action event="DOMActivate">
                                                         <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>

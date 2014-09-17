@@ -36,12 +36,12 @@
                 </xf:input>
 
                 <xf:group ref="request" xxf:internal="true">
-                    <xf:input ref="resource" incremental="true">
+                    <xf:input ref="resource" id="fb-service-resource" incremental="true">
                         <xf:label ref="$form-resources/dialog-http-services/resource/label"/>
                         <xf:hint ref="$form-resources/dialog-http-services/resource/hint"/>
                     </xf:input>
 
-                    <xf:select1 ref="method">
+                    <xf:select1 ref="method" id="fb-service-method">
                         <xf:label ref="$form-resources/dialog-http-services/method/label"/>
                         <xf:item>
                             <xf:label>GET</xf:label>
@@ -100,7 +100,7 @@
                         </xf:secret>
                     </xf:group>
 
-                    <xf:textarea ref="body" incremental="true">
+                    <xf:textarea ref="body" id="fb-service-body" incremental="true">
                         <xf:label ref="$form-resources/dialog-http-services/request-body/label"/>
                         <xf:hint ref="$form-resources/dialog-http-services/request-body/hint"/>
                     </xf:textarea>
@@ -235,7 +235,7 @@
                 </xf:action>
             </xf:trigger>
             <!-- Save button -->
-            <xf:trigger ref="$instance/save-test-trigger" appearance="xxf:primary">
+            <xf:trigger ref="$instance/save-test-trigger" id="fb-service-save" appearance="xxf:primary">
                 <xf:label>
                     <xf:output value="$form-resources/dialog-http-services/save/label"/>
                 </xf:label>

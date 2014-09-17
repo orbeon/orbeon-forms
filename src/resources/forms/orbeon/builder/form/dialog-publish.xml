@@ -114,7 +114,7 @@
             <xh:div class="fr-dialog-buttons">
                 <xf:group>
                     <!-- Publish button -->
-                    <xf:trigger xxf:modal="true" appearance="xxf:primary">
+                    <xf:trigger xxf:modal="true" id="fb-publish-publish" appearance="xxf:primary">
                         <xf:label value="$form-resources/dialog-publish/publish"/>
                         <!-- Dispatch publish event -->
                         <xf:dispatch event="DOMActivate" name="fb-publish-form" targetid="fr-form-model">
@@ -149,7 +149,7 @@
                     <xh:ul>
                         <xf:repeat ref="$buttons">
                             <xh:li>
-                                <xh:a href="/fr/{$app}/{$form}/{.}" target="_blank">
+                                <xh:a href="/fr/{$app}/{$form}/{.}" target="_blank" id="fb-publish-open-{.}">
                                     <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
                                 </xh:a>
                             </xh:li>
@@ -158,7 +158,7 @@
                 </xf:group>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
-                <xf:trigger appearance="xxf:primary">
+                <xf:trigger appearance="xxf:primary" id="fb-publish-close">
                     <xf:label value="$form-resources/close/label"/>
                     <xxf:hide event="DOMActivate" dialog="fb-publish-dialog"/>
                 </xf:trigger>

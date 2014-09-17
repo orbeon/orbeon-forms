@@ -127,7 +127,10 @@
                     <xf:var name="is-section-component" value="xxf:has-class('fr-section-component', $binding)" as="xs:boolean"/>
 
                     <xh:div class="fb-tool">
-                        <xf:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)">
+                        <!-- The class is added so unit tests can find the trigger more easily -->
+                        <xf:trigger id="fb-add-component-trigger"
+                                    ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
+                                    class="fb-add-{$binding/@id}">
                             <xf:label>
                                 <xh:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                 <xf:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/>
@@ -222,7 +225,7 @@
                     </xh:div>
                 </xf:repeat>
                 <xh:div class="fb-tool">
-                    <xf:trigger>
+                    <xf:trigger id="fb-add-service">
                         <xf:label>
                             <xh:i class="icon-plus-sign"/>
                             <xf:output value="$form-resources/add/label"/>
@@ -282,7 +285,7 @@
                     </xh:div>
                 </xf:repeat>
                 <xh:div class="fb-tool">
-                    <xf:trigger>
+                    <xf:trigger id="fb-add-action">
                         <xf:label>
                             <xh:i class="icon-plus-sign"/>
                             <xf:output value="$form-resources/add/label"/>

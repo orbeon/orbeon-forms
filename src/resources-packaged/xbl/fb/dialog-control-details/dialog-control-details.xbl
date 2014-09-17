@@ -301,10 +301,10 @@
                 <xf:var name="schema"        value="fbf:findSchemaOrEmpty($form)"       as="xs:string?"/>
                 <xf:var name="schema-prefix" value="fbf:findSchemaPrefixOrEmpty($form)" as="xs:string?"/>
 
-                <fr:tabbable>
+                <fr:tabbable id="fb-tabbable">
                     <fr:tab id="base-tab">
                         <fr:label ref="$resources/dialog-control-details/tab-base/label"/>
-                        <fr:grid>
+                        <fr:grid id="fb-base-tab-grid">
                             <xh:tr>
                                 <xh:td>
                                     <!-- Control name -->

@@ -14,6 +14,8 @@
 package org.orbeon.oxf.client
 
 import org.openqa.selenium.chrome.ChromeDriverService
+import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.support.ui.Select
 
 import collection.JavaConverters._
 import java.net.URL
@@ -158,10 +160,20 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
         // Chrome:  name(input) = 'input' and local-name(input) = 'input'.
         private def nativeControlUnder(clientId: String) =
             xpath(s"//*[@id = '$clientId']//*[local-name() = 'input' or local-name() = 'textarea' or local-name() = 'select' or local-name() = 'button']").element
+
+        def moveToElement(): Unit =
+            new Actions(webDriver).moveToElement(e.underlying).build().perform()
     }
 
     implicit class TextfieldOps(val textfield: TextField) {
         def enter(): Unit = textfield.underlying.sendKeys(Keys.ENTER)
+    }
+
+    implicit class SingleSelOps(val singleSel: SingleSel) {
+        def selectByVisibleText(text: String): Unit =
+            new Select(singleSel.underlying).selectByVisibleText(text)
+        def labels: List[String] =
+            new Select(singleSel.underlying).getOptions.asScala.toList.map(_.getText)
     }
 }
 

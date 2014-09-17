@@ -39,13 +39,17 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     setLocal(new XFormsSwitchControlLocal)
 
     // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
-    override def onCreate(state: Option[ControlState]): Unit = {
-        super.onCreate(state)
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
         state match {
             case Some(state) ⇒
                 setLocal(new XFormsSwitchControlLocal(state.keyValues("case-id")))
+            case None if restoreState ⇒
+                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
+                // particular control might not be found.
+                setLocal(new XFormsSwitchControlLocal(findDefaultSelectedCaseId))
             case None ⇒
                 val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
                 local.selectedCaseControlId = findDefaultSelectedCaseId

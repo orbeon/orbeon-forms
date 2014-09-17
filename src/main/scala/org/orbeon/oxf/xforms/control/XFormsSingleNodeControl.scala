@@ -93,8 +93,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         setDefaultMIPs()
     }
 
-    override def onCreate(state: Option[ControlState]): Unit = {
-        super.onCreate(state)
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
 
         readBinding()
 

@@ -53,8 +53,8 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override def supportAjaxUpdates = false
     override def focusableControls = Iterator.empty
 
-    override def onCreate(state: Option[ControlState]) {
-        super.onCreate(state)
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
         // FIXME: Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
         _value = null
     }

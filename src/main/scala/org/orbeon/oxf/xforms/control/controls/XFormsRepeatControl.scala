@@ -69,13 +69,17 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     override def getJavaScriptInitialization =
         if (isDnD) getCommonJavaScriptInitialization else null
 
-    override def onCreate(state: Option[ControlState]) {
-        super.onCreate(state)
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]) {
+        super.onCreate(restoreState, state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
         state match {
             case Some(state) ⇒
                 setLocal(new XFormsRepeatControlLocal(state.keyValues("index").toInt))
+            case None if restoreState ⇒
+                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
+                // particular control might not be found.
+                setLocal(new XFormsRepeatControlLocal(ensureIndexBounds(getStartIndex)))
             case None ⇒
                 setIndexInternal(getStartIndex)
         }
@@ -272,7 +276,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             // Do this before evaluating the binding because after that controls are temporarily in an inconsistent state
             containingDocument.getControls.cloneInitialStateIfNeeded()
 
-            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true, state = None)
+            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true, restoreState = false, state = None)
         }
 
         // Move things around and create new iterations if needed

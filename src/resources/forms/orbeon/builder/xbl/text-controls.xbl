@@ -34,6 +34,7 @@
         <display-name lang="de">Text-Steuerelemente</display-name>
         <display-name lang="it">Controlli di testo</display-name>
         <display-name lang="nl">Tekst-elementen</display-name>
+        <display-name lang="sv">Textfält</display-name>
         <display-name lang="pt">Controlos de Texto</display-name>
     </metadata>
 
@@ -47,6 +48,7 @@
             <display-name lang="de">Textfeld</display-name>
             <display-name lang="it">Campo di testo</display-name>
             <display-name lang="nl">Invoerveld</display-name>
+            <display-name lang="sv">Textrad</display-name>
             <display-name lang="pt">Campo de Texto</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
@@ -75,6 +77,7 @@
             <display-name lang="de">Textbereich</display-name>
             <display-name lang="it">Area di testo</display-name>
             <display-name lang="nl">Tekstveld</display-name>
+            <display-name lang="sv">Textyta</display-name>
             <display-name lang="pt">Área de Texto</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/textarea.png</small-icon>
@@ -103,6 +106,7 @@
             <display-name lang="de">Textausgabe</display-name>
             <display-name lang="it">Testo statico</display-name>
             <display-name lang="nl">Tekstuitvoer</display-name>
+            <display-name lang="sv">Fast text</display-name>
             <display-name lang="pt">Saída de Texto</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/text_align_left.png</small-icon>
@@ -131,6 +135,7 @@
             <display-name lang="de">Passwortfeld</display-name>
             <display-name lang="it">Campo password</display-name>
             <display-name lang="nl">Wachtwoordveld</display-name>
+            <display-name lang="sv">Passord</display-name>
             <display-name lang="pt">Campo de Senha</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/key.png</small-icon>

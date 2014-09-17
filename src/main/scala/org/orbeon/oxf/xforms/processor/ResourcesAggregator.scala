@@ -177,9 +177,6 @@ class ResourcesAggregator extends ProcessorImpl {
                                 val builder = new StringBuilder
                                 builder append """{"scripts":["""
 
-//                                def outputStuff()
-//                                outputStuff(baselineJS, supplementalJS, preservedJS, false, appendJS, appendPreservedElement)
-
                                 builder append
                                     (aggregate(baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
                                         aggregate(supplementalJS -- baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
@@ -266,11 +263,12 @@ object ResourcesAggregator extends Logging {
 
     // Output combined resources
     def aggregate[T](
-            resources: scala.collection.Set[String],
-            outputElement: String ⇒ T,
-            namespaceOpt: Option[String],
-            isCacheCombinedResources: Boolean,
-            isCSS: Boolean): Option[T] =
+        resources               : scala.collection.Set[String],
+        outputElement           : String ⇒ T,
+        namespaceOpt            : Option[String],
+        isCacheCombinedResources: Boolean,
+        isCSS                   : Boolean
+    ): Option[T] =
         resources.nonEmpty option {
 
             implicit val logger = Loggers.getIndentedLogger("resources")

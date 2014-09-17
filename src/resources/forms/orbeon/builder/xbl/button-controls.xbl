@@ -34,6 +34,7 @@
         <display-name lang="de">Schaltflächen</display-name>
         <display-name lang="it">Pulsanti</display-name>
         <display-name lang="nl">Knoppen</display-name>
+        <display-name lang="sv">Knappar</display-name>
         <display-name lang="pt">Botões</display-name>
     </metadata>
 
@@ -47,6 +48,7 @@
             <display-name lang="de">Schaltfläche</display-name>
             <display-name lang="it">Pulsante</display-name>
             <display-name lang="nl">Knop</display-name>
+            <display-name lang="sv">Knapp</display-name>
             <display-name lang="pt">Botão</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
@@ -70,9 +72,10 @@
             <display-name lang="fi">Linkitä painike</display-name>
             <display-name lang="fr">Bouton lien</display-name>
             <display-name lang="ru">Кнопка-ссылка</display-name>
-            <display-name lang="de">Link-Schaltfäche</display-name>
+            <display-name lang="de">Link-Schaltfläche</display-name>
             <display-name lang="it">Pulsante link</display-name>
             <display-name lang="nl">Knop met link</display-name>
+            <display-name lang="sv">Knapp med länk</display-name>
             <display-name lang="pt">Botão para endereço</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/link.png</small-icon>

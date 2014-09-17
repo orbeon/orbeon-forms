@@ -61,14 +61,15 @@ trait ProxyPortletEdit extends GenericPortlet {
     sealed trait Pref { val tpe: ControlType; val nameLabel: NameLabel }
 
     val PageNameLabels = List(
-        NameLabel("home", "Home Page"),
+        NameLabel("home",    "Home Page"),
         NameLabel("summary", "Summary Page"),
-        NameLabel("new", "New Page")
+        NameLabel("new",     "New Page")
     )
 
     case object FormRunnerURL        extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-runner-url", "Form Runner URL") }
     case object AppName              extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("app-name", "Form Runner app name") }
     case object FormName             extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-name", "Form Runner form name") }
+    case object DocumentId           extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("document-id", "Form Runner document id") }
     case object ReadOnly             extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("read-only", "Readonly access") }
     case object SendLiferayLanguage  extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-language", "Send Liferay language") }
     case object SendLiferayUser      extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-user", "Send Liferay user") }

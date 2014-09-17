@@ -13,7 +13,10 @@
   -->
 <xf:model
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+
+    <!-- ==== Form Runner send submissions ========================================================================= -->
 
     <!-- TODO: Remove duplication when https://github.com/orbeon/orbeon-forms/issues/1302 is fixed -->
     <xf:submission id="fr-send-submission-all"
@@ -23,7 +26,11 @@
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then xxf:instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url')
+             then xxf:instance('fr-pdf-url-instance')
+             else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata')
+             then frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+             else xxf:instance('fr-form-instance')"
         replace="all">
     </xf:submission>
 
@@ -34,7 +41,11 @@
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then xxf:instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url')
+             then xxf:instance('fr-pdf-url-instance')
+             else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata')
+             then frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+             else xxf:instance('fr-form-instance')"
         replace="none"/>
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
@@ -42,15 +53,10 @@
         <params uri="" prune="" annotate="" method="" content="" serialization=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
-        <xf:action iterate="instance('fr-send-submission-params')/@*">
-            <xf:setvalue
-                ref="."
-                value="for $value in event(name(context()))
-                       (: Evaluate all properties as AVTs in the context of the main form data :)
-                       return xxf:instance('fr-form-instance')/xxf:evaluate-avt($value)"/>
-        </xf:action>
-        <xf:setvalue ref="instance('fr-send-submission-params')/@serialization"
-                     value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
+        <xf:setvalue
+            iterate="instance('fr-send-submission-params')/@*"
+            ref="."
+            value="event(name(context()))"/>
     </xf:action>
 
     <!-- Reset data-safe-override after completion -->
@@ -58,5 +64,55 @@
         event="xforms-submit-done xforms-submit-error"
         observer="fr-send-submission-all fr-send-submission-none"
         ref="xxf:instance('fr-persistence-instance')/data-safe-override"/>
+
+    <!-- ==== Form Runner persistence submissions ================================================================== -->
+
+    <!-- Instance to store the result of the create/update submission -->
+    <xf:instance id="fr-create-update-submission-response">
+        <response xmlns=""/>
+    </xf:instance>
+
+    <!-- Submission to create/update the XML form -->
+    <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
+         enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
+         code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
+         form instance is created. -->
+    <xf:submission id="fr-create-update-submission"
+            validate="false"
+            relevant="false"
+            method="put"
+            ref="event('holder')"
+            resource="{event('resource')}"
+            xxf:username="{event('username')}"
+            xxf:password="{event('password')}"
+            replace="text"
+            target="instance('fr-create-update-submission-response')">
+
+        <!-- Clear response if not HTML -->
+        <xf:setvalue
+            event="xforms-submit-done"
+            if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
+            ref="instance('fr-create-update-submission-response')"/>
+        <xf:header ref=".[normalize-space(event('form-version'))]">
+            <xf:name>Orbeon-Form-Definition-Version</xf:name>
+            <xf:value value="event('form-version')"/>
+        </xf:header>
+    </xf:submission>
+
+    <!-- Submission to create/update an attachment -->
+    <xf:submission id="fr-create-update-attachment-submission"
+            validate="false"
+            method="put"
+            serialization="application/octet-stream"
+            ref="event('holder')"
+            resource="{event('resource')}"
+            xxf:username="{event('username')}"
+            xxf:password="{event('password')}"
+            replace="none">
+        <xf:header ref=".[normalize-space(event('form-version'))]">
+            <xf:name>Orbeon-Form-Definition-Version</xf:name>
+            <xf:value value="event('form-version')"/>
+        </xf:header>
+    </xf:submission>
 
 </xf:model>

@@ -79,9 +79,11 @@ public abstract class BaseSubmission implements Submission {
      * @return ConnectionResult or null if asynchronous
      * @throws Exception
      */
-    protected SubmissionResult submitCallable(final XFormsModelSubmission.SubmissionParameters p,
-                                              final XFormsModelSubmission.SecondPassParameters p2,
-                                              final Callable<SubmissionResult> callable) throws Exception {
+    protected SubmissionResult submitCallable(
+        final XFormsModelSubmission.SubmissionParameters p,
+        final XFormsModelSubmission.SecondPassParameters p2,
+        final Callable<SubmissionResult> callable
+    ) throws Exception {
         if (p2.isAsynchronous) {
 
             // Tell XFCD that we have one more async submission
@@ -119,20 +121,22 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Perform a local (request dispatcher or portlet) submission.
      */
-    protected ConnectionResult openLocalConnection(ExternalContext externalContext,
-                                                   ExternalContext.Response response,
-                                                   final IndentedLogger indentedLogger,
-                                                   final String resource,
-                                                   XFormsModelSubmission.SubmissionParameters p,
-                                                   String actualRequestMediatype,
-                                                   String encoding,
-                                                   byte[] messageBody,
-                                                   String queryString,
-                                                   String headerNames,
-                                                   scala.collection.immutable.Map<String, String[]> customHeaderNameValues,
-                                                   SubmissionProcess submissionProcess,
-                                                   boolean isContextRelative,
-                                                   boolean isDefaultContext) {
+    protected ConnectionResult openLocalConnection(
+        ExternalContext externalContext,
+        ExternalContext.Response response,
+        final IndentedLogger indentedLogger,
+        final String resource,
+        XFormsModelSubmission.SubmissionParameters p,
+        String actualRequestMediatype,
+        String encoding,
+        byte[] messageBody,
+        String queryString,
+        String headerNames,
+        scala.collection.immutable.Map<String, String[]> customHeaderNameValues,
+        SubmissionProcess submissionProcess,
+        boolean isContextRelative,
+        boolean isDefaultContext
+    ) {
 
         // Action must be an absolute path
         if (!resource.startsWith("/"))
@@ -149,7 +153,15 @@ public abstract class BaseSubmission implements Submission {
 
         // Determine headers
         final scala.collection.immutable.Map<String, String[]> headers =
-            Connection.buildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
+            Connection.buildConnectionHeadersWithSOAP(
+                httpMethod,
+                null,
+                actualRequestMediatype,
+                encoding,
+                customHeaderNameValues,
+                headerNames,
+                indentedLogger
+            );
 
         // Create requestAdapter depending on method
         final LocalRequest requestAdapter;
@@ -169,8 +181,14 @@ public abstract class BaseSubmission implements Submission {
                     throw new OXFException("Action must start with a servlet context path: " + resource);
 
                 requestAdapter = new LocalRequest(
-                    externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod,
-                    messageBody, headers);
+                    externalContext,
+                    indentedLogger,
+                    destinationContextPath,
+                    rootAdjustedResourceURI,
+                    httpMethod,
+                    messageBody,
+                    headers
+                );
             } else {
                 // Simulate a GET or DELETE
                 {
@@ -190,7 +208,13 @@ public abstract class BaseSubmission implements Submission {
                     throw new OXFException("Action must start with a servlet context path: " + resource);
 
                 requestAdapter = new LocalRequest(
-                    externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod, headers);
+                    externalContext,
+                    indentedLogger,
+                    destinationContextPath,
+                    rootAdjustedResourceURI,
+                    httpMethod,
+                    headers
+                );
             }
         }
 

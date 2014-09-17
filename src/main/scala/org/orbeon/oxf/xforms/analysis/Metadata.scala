@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import collection.JavaConverters._
-import collection.immutable.TreeMap
-import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import java.util.{Map ⇒ JMap}
+
 import org.dom4j.io.DocumentSource
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLResources
-import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping, SAXStore}
+import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, TransformerUtils}
+
+import scala.collection.JavaConverters._
+import scala.collection.{immutable, mutable}
 
 /**
  * Container for element metadata gathered during document annotation/extraction:
@@ -32,6 +33,8 @@ import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping, SAXStore}
  * - namespace mappings
  * - automatic XBL mappings
  * - full update marks
+ *
+ * There is one distinct Metadata instance per part.
  *
  * Split into traits for modularity.
  */
@@ -61,7 +64,7 @@ object Metadata {
 
 // Handling of template marks
 trait Marks {
-    private val marks = new HashMap[String, SAXStore#Mark]
+    private val marks = new mutable.HashMap[String, SAXStore#Mark]
 
     def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
     def getMark(prefixedId: String) = marks.get(prefixedId)
@@ -72,10 +75,10 @@ trait Marks {
 
 // Handling of XBL bindings
 trait Bindings {
-    private val xblBindings = new HashMap[String, collection.mutable.Set[String]]
+    private val xblBindings = new mutable.HashMap[String, collection.mutable.Set[String]]
     private var lastModified = -1L
 
-    val bindingIncludes = new LinkedHashSet[String]
+    val bindingIncludes = new mutable.LinkedHashSet[String]
 
     def isXBLBindingCheckAutomaticBindings(uri: String, localname: String): Boolean = {
 
@@ -95,7 +98,7 @@ trait Bindings {
     }
 
     def storeXBLBinding(bindingURI: String, localname: String) {
-        val localnames = xblBindings.getOrElseUpdate(bindingURI, new HashSet[String])
+        val localnames = xblBindings.getOrElseUpdate(bindingURI, new mutable.HashSet[String])
         localnames += localname
     }
 
@@ -131,12 +134,12 @@ trait Bindings {
 
 // Handling of namespaces
 trait NamespaceMappings {
-    private val namespaceMappings = new HashMap[String, NamespaceMapping]
-    private val hashes = new LinkedHashMap[String, NamespaceMapping]
+    private val namespaceMappings = new mutable.HashMap[String, NamespaceMapping]
+    private val hashes = new mutable.LinkedHashMap[String, NamespaceMapping]
 
     def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]): Unit = {
         // Sort mappings by prefix
-        val sorted = TreeMap(mapping.asScala.toSeq: _*)
+        val sorted = immutable.TreeMap(mapping.asScala.toSeq: _*)
         // Hash key/values
         val hexHash = NamespaceMapping.hashMapping(sorted.asJava)
 

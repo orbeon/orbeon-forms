@@ -150,7 +150,7 @@ class StaticBind(
     }
 
     // Custom XPath MIPs
-    val customMIPNameToXPathMIP = {
+    val customMIPNameToXPathMIP = { // Q: Why String → List[XPathMIP] and not String → XPathMIP?
 
         def attributeCustomMIP =
             for {

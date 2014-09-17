@@ -50,7 +50,7 @@
         <p:input name="config">
             <root xsl:version="2.0">
                 <xsl:variable name="permissions"                select="/forms/form/permissions"/>
-                <xsl:variable name="operations-from-role"       select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xsl:variable name="operations-from-role"       select="frf:authorizedOperationsBasedOnRoles($permissions)"/>
                 <xsl:variable name="search-operations"          select="('*', 'read', 'update', 'delete')"/>
                 <xsl:variable name="authorized-based-on-role"   select="$operations-from-role = $search-operations"/>
                 <xsl:if test="not($authorized-based-on-role)">

@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.process.ProcessParser.ConditionNode
 import org.orbeon.oxf.fr.process.ProcessParser.GroupNode
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.oxf.util.{SecureUtils, IndentedLogger, Logging}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
@@ -47,6 +47,7 @@ trait ProcessInterpreter extends Logging {
     def xpathFunctionContext: FunctionContext
     def writeSuspendedProcess(process: String): Unit
     def readSuspendedProcess: String
+    def createUniqueProcessId: String = SecureUtils.randomHexId
     implicit def logger: IndentedLogger
 
     // May be overridden by implementation
@@ -62,6 +63,13 @@ trait ProcessInterpreter extends Logging {
 
     def paramByNameOrDefault(params: ActionParams, name: String) =
         params.get(Some(name)) orElse params.get(None)
+
+    def requiredParamByName(params: ActionParams, action: String, name: String) =
+        params.getOrElse(Some(name), missingArgument(action, name))
+
+    // TODO: Obtain action name automatically.
+    def missingArgument(action: String, name: String) =
+        throw new IllegalArgumentException(s"$action: `$name` parameter is required")
 
     private object ProcessRuntime {
 
@@ -85,7 +93,7 @@ trait ProcessInterpreter extends Logging {
 
         // Scope an empty stack around a process execution
         def withEmptyStack[T](scope: String)(body: ⇒ T): T = {
-            processStackDyn.withValue(Process(scope, Nil)) {
+            processStackDyn.withValue(Process(scope, createUniqueProcessId, Nil)) {
                 body
             }
         }
@@ -99,12 +107,13 @@ trait ProcessInterpreter extends Logging {
 
         // Return a process string which contains the continuation of the process after the current action
         def serializeContinuation = {
-            val stack = processStackDyn.value.get.frames
+
+            val process = processStackDyn.value.get
 
             // Find the continuation, which is the concatenation of the continuation of all the sub-processes up to the
             // top-level process.
             val continuation =
-                stack flatMap {
+                process.frames flatMap {
                     case StackFrame(group, pos) ⇒
                         group.rest drop pos flatMap { case (combinator, expr) ⇒
                             List(combinator.name, expr.serialize)
@@ -112,10 +121,11 @@ trait ProcessInterpreter extends Logging {
                 }
 
             // Continuation is either empty or starts with a combinator. We prepend the (always successful) "nop".
-            "nop" :: continuation mkString ("(", " ", ")")
+            val serializedContinuation = "nop" :: continuation mkString ("(", " ", ")")
+            process.processId + '|' + serializedContinuation
         }
 
-        case class Process(scope: String, var frames: List[StackFrame])
+        case class Process(scope: String, processId: String, var frames: List[StackFrame])
         case class StackFrame(group: GroupNode, actionCounter: Int)
 
         def runSubProcess(process: String): Try[Any] = {
@@ -234,6 +244,9 @@ trait ProcessInterpreter extends Logging {
         }
     }
 
+    // Id of the currently running process
+    def runningProcessId: Option[String] = processStackDyn.value map (_.processId)
+
     // Interrupt the process and complete with a success
     // We will rethrow this as we explicitly check for ControlThrowable above
     def trySuccess(params: ActionParams): Try[Any] = Try(break())
@@ -256,9 +269,13 @@ trait ProcessInterpreter extends Logging {
 
     // Resume a process
     def tryResume(params: ActionParams): Try[Any] = {
-        val process = readSuspendedProcess
+        val serialized = readSuspendedProcess
+
+        // TODO: Restore processId
+        val processId :: continuation = split[List](serialized, "|")
+
         writeSuspendedProcess("")
-        runSubProcess(process)
+        runSubProcess(continuation mkString "|")
     }
 
     // Abort a suspended process

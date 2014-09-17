@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet-app version="2.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
+
+    <!-- Orbeon Forms proxy portlet (to access a remote Form Runner instance) -->
+    <portlet>
+        <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OrbeonProxyPortlet</portlet-class>
+
+        <!-- Basic configuration -->
+        <init-param>
+            <name>form-runner-url</name>
+            <value>http://localhost:8080/orbeon/</value>
+        </init-param>
+        <init-param>
+            <name>app-name</name>
+            <value>orbeon</value>
+        </init-param>
+        <init-param>
+            <name>form-name</name>
+            <value>bookshelf</value>
+        </init-param>
+        <init-param>
+            <name>action</name>
+            <value>new</value>
+        </init-param>
+        <init-param>
+            <name>read-only</name>
+            <value>false</value>
+        </init-param>
+        <init-param>
+            <name>send-liferay-language</name>
+            <value>false</value>
+        </init-param>
+        <init-param>
+            <name>send-liferay-user</name>
+            <value>false</value>
+        </init-param>
+
+        <!-- HTTP client configuration -->
+        <init-param>
+            <param-name>oxf.http.stale-checking-enabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.so-timeout</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.chunk-requests</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.host</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.port</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.exclude</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.hostname-verifier</param-name>
+            <param-value>strict</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.uri</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.password</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.ssl.keystore.type</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.use-ssl</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.username</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.password</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.ntlm.host</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>oxf.http.proxy.ntlm.domain</param-name>
+            <param-value/>
+        </init-param>
+        
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+            <portlet-mode>edit</portlet-mode>
+        </supports>
+
+        <portlet-info>
+            <title>Form Runner</title>
+        </portlet-info>
+        
+    </portlet>
+
+</portlet-app>

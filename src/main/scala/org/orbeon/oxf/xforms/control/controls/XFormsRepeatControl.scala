@@ -28,7 +28,9 @@ import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{NodeInfo, Item}
 import org.orbeon.oxf.xforms.XFormsConstants._
 
@@ -52,21 +54,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     // Initial local state
     setLocal(new XFormsRepeatControlLocal)
 
-    // Restore state if needed
-    @transient
-    private var restoredState =
-        stateToRestore match {
-            case Some(state) ⇒
-                // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
-                val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
-                local.index = state.keyValues("index").toInt
-                true
-            case None ⇒
-                false
-        }
-
     // The repeat's sequence binding
-    override def binding = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Seq()
+    final override def binding = Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Seq()
 
     // Store initial repeat index information
     private val startIndexString = element.attributeValue("startindex")
@@ -80,15 +69,20 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     override def getJavaScriptInitialization =
         if (isDnD) getCommonJavaScriptInitialization else null
 
-    override def onCreate() {
-        super.onCreate()
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]) {
+        super.onCreate(restoreState, state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
-        if (! restoredState)
-            setIndexInternal(getStartIndex)
-        else
-            // NOTE: state deserialized → state previously serialized → control was relevant → onCreate() called
-            restoredState = false
+        state match {
+            case Some(state) ⇒
+                setLocal(new XFormsRepeatControlLocal(state.keyValues("index").toInt))
+            case None if restoreState ⇒
+                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
+                // particular control might not be found.
+                setLocal(new XFormsRepeatControlLocal(ensureIndexBounds(getStartIndex)))
+            case None ⇒
+                setIndexInternal(getStartIndex)
+        }
 
         // Reset refresh information
         refreshInfo = null
@@ -282,11 +276,11 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             // Do this before evaluating the binding because after that controls are temporarily in an inconsistent state
             containingDocument.getControls.cloneInitialStateIfNeeded()
 
-            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true)
+            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true, restoreState = false, state = None)
         }
 
         // Move things around and create new iterations if needed
-        if (! Controls.compareNodesets(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
+        if (! SaxonUtils.compareItemSeqs(oldRepeatNodeset, bindingContext.nodeset.asScala)) {
             // Update iterationsInitialStateIfNeeded()
 
             val focusedBefore = containingDocument.getControls.getFocusedControl
@@ -571,10 +565,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
     private def findNodeIndexes(nodeset1: Seq[Item], nodeset2: Seq[Item]) = {
 
-        val nodeset2Scala = nodeset2
-
         def indexOfItem(otherItem: Item) =
-            nodeset2Scala indexWhere (XFormsUtils.compareItems(_, otherItem))
+            nodeset2 indexWhere (SaxonUtils.compareItems(_, otherItem))
 
         nodeset1 map indexOfItem toArray
     }
@@ -584,12 +576,12 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         Collections.singletonMap("index", Integer.toString(getIndex))
 
     // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
-    // repeat object  associated with the repeat index"
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) =
+    // repeat object associated with the repeat index"
+    override def focusableControls =
         if (isRelevant && getIndex > 0)
-            children(getIndex - 1).setFocus(inputOnly, dryRun)
+            children(getIndex - 1).focusableControls
         else
-            false
+            Iterator.empty
 
     // NOTE: pushBindingImpl ensures that any item we are bound to is relevant
     override def computeRelevant = super.computeRelevant && getSize > 0
@@ -616,9 +608,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
 object XFormsRepeatControl {
 
-    class XFormsRepeatControlLocal extends ControlLocalSupport.XFormsControlLocal {
-        var index = -1
-    }
+    class XFormsRepeatControlLocal(var index: Int = -1)
+        extends ControlLocalSupport.XFormsControlLocal
 
     case class RefreshInfo(
         isNodesetChanged: Boolean,

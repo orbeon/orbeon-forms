@@ -13,27 +13,90 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
+
 import collection.JavaConverters._
 import collection.mutable
-import org.dom4j.{QName, Element, VisitorSupport, Document}
+import org.dom4j._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ListenersTrait
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{InstanceData, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.model.BindNode
 
 abstract class XFormsModelSubmissionBase extends ListenersTrait
 
 object XFormsModelSubmissionBase {
 
+    import Private._
+
+    // Prepare XML for submission
+    //
+    // - re-root if `ref` points to an element other than the root element
+    // - annotate with `xxf:id` if requested
+    // - prune non-relevant nodes if requested
+    // - annotate with alerts if requested
+    def prepareXML(xfcd: XFormsContainingDocument, ref: NodeInfo, prune: Boolean, annotateWith: String): Document =
+        ref match {
+            case virtualNode: VirtualNode ⇒
+                
+                // "A node from the instance data is selected, based on attributes on the submission
+                // element. The indicated node and all nodes for which it is an ancestor are considered for
+                // the remainder of the submit process. "
+                val copy = 
+                    virtualNode.getUnderlyingNode match {
+                        case e: Element ⇒ Dom4jUtils.createDocumentCopyParentNamespaces(e)
+                        case n: Node    ⇒ Dom4jUtils.createDocumentCopyElement(n.getDocument.getRootElement)
+                        case _          ⇒ throw new IllegalStateException
+                    }
+
+                val annotationTokens = stringToSet(annotateWith)
+
+                // Annotate ids before pruning so that it is easier for other code (Form Runner) to infer the same ids
+                if (annotationTokens("id"))
+                    annotateWithHashes(copy)
+
+                // "Any node which is considered not relevant as defined in 6.1.4 is removed."
+                if (prune)
+                    pruneNonRelevantNodes(copy)
+
+                annotateWithAlerts(xfcd, copy, annotationTokens collect LevelByName)
+                copy
+
+            // Submitting read-only instance backed by TinyTree (no MIPs to check)
+            // TODO: What about re-rooting and annotations?
+            case nodeInfo if ref.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE  ⇒
+                TransformerUtils.tinyTreeToDom4j(ref)
+            case nodeInfo ⇒
+                TransformerUtils.tinyTreeToDom4j(ref.getRoot)
+        }
+
+    def pruneNonRelevantNodes(doc: Document): Unit =
+        Iterator.iterateWhileDefined(findNextNodeToDetach(doc)) foreach (_.detach())
+
+    def annotateWithHashes(doc: Document): Unit = {
+        val wrapper = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
+        var annotated = false
+        doc.accept(new VisitorSupport() {
+            override def visit(element: Element): Unit = {
+                val hash = SubmissionUtils.dataNodeHash(wrapper.wrap(element))
+                element.addAttribute(QName.get("id", XXFORMS_NAMESPACE_SHORT), hash)
+                annotated = true
+            }
+        })
+        if (annotated)
+            addRootElementNamespace(doc)
+    }
+
     // Annotate elements which have failed constraints with an xxf:error, xxf:warning or xxf:info attribute containing
     // the alert message. Only the levels passed in `annotate` are handled.
-    def annotateWithAlerts(containingDocument: XFormsContainingDocument, doc: Document, annotate: String): Unit = {
-
-        val levelsToAnnotate = stringToSet(annotate) collect LevelByName
-
+    def annotateWithAlerts(xfcd: XFormsContainingDocument, doc: Document, levelsToAnnotate: Set[ValidationLevel]): Unit =
         if (levelsToAnnotate.nonEmpty) {
 
             val elementsToAnnotate = mutable.Map[ValidationLevel, mutable.Map[Set[String], Element]]()
@@ -56,7 +119,7 @@ object XFormsModelSubmissionBase {
             })
 
             if (elementsToAnnotate.nonEmpty) {
-                val controls = containingDocument.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala
+                val controls = xfcd.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala
 
                 val relevantLevels = elementsToAnnotate.keySet
 
@@ -92,8 +155,59 @@ object XFormsModelSubmissionBase {
 
                 // If there is any annotation, make sure the attribute's namespace prefix is in scope on the root element
                 if (annotated)
-                    doc.getRootElement.addNamespace(XXFORMS_NAMESPACE_SHORT.getPrefix, XXFORMS_NAMESPACE_SHORT.getURI)
+                    addRootElementNamespace(doc)
             }
         }
+
+    import XFormsSubmissionUtils._
+    
+    def defaultSerialization(xformsMethod: String): Option[String] =
+        nonEmptyOrNone(xformsMethod) collect {
+            case "multipart-post"                             ⇒ "multipart/related"
+            case "form-data-post"                             ⇒ "multipart/form-data"
+            case "urlencoded-post"                            ⇒ "application/x-www-form-urlencoded"
+            case method if isPost(method) || isPut(method)    ⇒ "application/xml"
+            case method if isGet(method)  || isDelete(method) ⇒ "application/x-www-form-urlencoded"
+        }
+
+    def requestedSerialization(xformsSerialization: String, xformsMethod: String) =
+        nonEmptyOrNone(xformsSerialization) orElse defaultSerialization(xformsMethod)
+
+    def getRequestedSerializationOrNull(xformsSerialization: String, xformsMethod: String) =
+        requestedSerialization(xformsSerialization, xformsMethod).orNull
+
+    private object Private {
+
+        val processBreaks = new scala.util.control.Breaks
+        import processBreaks._
+
+        def findNextNodeToDetach(doc: Document) = {
+
+            var nodeToDetach: Node = null
+
+            tryBreakable[Option[Node]] {
+                doc.accept(
+                    new VisitorSupport {
+                        override def visit(element: Element) =
+                            checkInstanceData(element)
+
+                        override def visit(attribute: Attribute) =
+                            checkInstanceData(attribute)
+
+                        private def checkInstanceData(node: Node) =
+                            if (! InstanceData.getInheritedRelevant(node)) {
+                                nodeToDetach = node
+                                break()
+                            }
+                    }
+                )
+                None
+            } catchBreak {
+                Some(nodeToDetach)
+            }
+        }
+
+        def addRootElementNamespace(doc: Document) =
+            doc.getRootElement.addNamespace(XXFORMS_NAMESPACE_SHORT.getPrefix, XXFORMS_NAMESPACE_SHORT.getURI)
     }
 }

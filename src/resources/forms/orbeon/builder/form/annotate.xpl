@@ -52,7 +52,7 @@
 
                 <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
                               name="new-validation-ids"
-                              select="fbf:nextIdsJava(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
+                              select="fbf:nextIds(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
 
                 <xsl:template match="xf:help[generate-id() = $unneeded-elements]"/>
 

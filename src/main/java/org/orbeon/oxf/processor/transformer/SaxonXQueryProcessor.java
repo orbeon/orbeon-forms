@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -42,10 +43,10 @@ import java.util.Map;
  *
  * TODO: should work like the XSLT processor, and handle:
  *
- *   o caching [BE CAREFUL WITH NOT CACHING TransformerURIResolver!]
- *   o errors
- *   o additional inputs
- *   o etc.
+ * - caching [BE CAREFUL WITH NOT CACHING TransformerURIResolver!]
+ * - errors
+ * - additional inputs
+ * - etc.
  *
  * To get there, should maybe abstract what's in XSLT processor and derive from it here.
  */
@@ -72,8 +73,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     // Create XQuery configuration (depends on attributes input)
                     final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
-                    // NOTE: Don't use global configuration, which is immutable
-                    final Configuration configuration = new Configuration();
+                    final Configuration configuration = XPath.newConfiguration();
                     {
                         configuration.setErrorListener(new StringErrorListener(logger));
 

@@ -15,14 +15,12 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.state.ControlState
 
 trait VisitableTrait extends XFormsControl {
 
     // Whether the control has been visited
-    private[this] var _visited = stateToRestore match {
-        case Some(state) ⇒ state.visited
-        case None ⇒ false
-    }
+    private[this] var _visited = false
 
     // Previous values for refresh
     private[this] var _wasVisited = false
@@ -40,10 +38,12 @@ trait VisitableTrait extends XFormsControl {
             _visited = visited
         }
 
-    override def onCreate() = {
-        super.onCreate()
-        _visited = false
-        visited = false
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]) = {
+        super.onCreate(restoreState, state)
+        _visited = state match {
+            case Some(state) ⇒ state.visited
+            case None        ⇒ false
+        }
     }
 
     final def wasVisitedCommit(): Boolean = {
@@ -51,7 +51,6 @@ trait VisitableTrait extends XFormsControl {
         _wasVisited = _visited
         result
     }
-
 
     override def commitCurrentUIState() = {
         super.commitCurrentUIState()

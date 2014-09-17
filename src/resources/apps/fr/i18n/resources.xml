@@ -1468,7 +1468,7 @@
             <test>&lt;i class="icon-cog"/&gt; Prova</test>
             <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
 
-            <yes>&lt;i class="icon-ok"/&gt; Si</yes>
+            <yes>&lt;i class="icon-ok"/&gt; Sì</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
         </buttons>
         <components>

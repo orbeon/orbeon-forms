@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLConstants._
@@ -92,8 +93,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         setDefaultMIPs()
     }
 
-    override def onCreate(): Unit = {
-        super.onCreate()
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
 
         readBinding()
 
@@ -172,10 +173,10 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     }
 
     // Binding as a Seq of Item
-    override def binding: Seq[Item] = Option(_boundItem).toList
+    final override def binding: Seq[Item] = Option(_boundItem).toList
 
     // Bound node if any
-    final def boundNode = binding.headOption collect { case node: NodeInfo ⇒ node }
+    final def boundNode = Option(_boundItem) collect { case node: NodeInfo ⇒ node }
 
     // Single-node controls support refresh events
     override def supportsRefreshEvents = true
@@ -275,12 +276,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     def hasStaticReadonlyAppearance =
         containingDocument.staticReadonly ||
             XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
-
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false): Boolean =
-        if (! dryRun)
-            Focus.focusWithEvents(this)
-        else
-            isFocusable(withToggles = true)
 
     override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {
         assert(attributesImpl.getLength == 0)

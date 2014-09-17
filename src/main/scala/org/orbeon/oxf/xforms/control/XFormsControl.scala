@@ -36,7 +36,6 @@ import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, SingleNodeTrait, AppearanceTrait}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
-import Controls._
 
 /**
  * Represents an XForms control.
@@ -76,9 +75,6 @@ class XFormsControl(
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
     final def absoluteId = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
-
-    final def stateToRestore     = restoringControl(effectiveId)
-    final def stateToRestoreJava = stateToRestore.orNull
 
     // Whether the control has been visited
     def visited = false
@@ -245,11 +241,10 @@ class XFormsControl(
     }
 
     // Whether focus can be set to this control
-    def isFocusable(withToggles: Boolean) = false
+    def isFocusable = false
 
-    // Set the focus on this control and return true iif control accepted focus
     // By default, a control doesn't accept focus
-    def setFocus(inputOnly: Boolean, dryRun: Boolean = false) = false
+    def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
     // Build children controls if any, delegating the actual construction to the given `buildTree` function
     def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =

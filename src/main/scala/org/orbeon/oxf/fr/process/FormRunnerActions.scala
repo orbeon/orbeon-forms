@@ -23,9 +23,11 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.scaxon.XML._
-import util.Try
+import scala.util.Try
 
 trait FormRunnerActions {
+
+    def runningProcessId: Option[String]
 
     def AllowedFormRunnerActions = Map[String, Action](
         "pending-uploads"  → tryPendingUploads,
@@ -87,7 +89,7 @@ trait FormRunnerActions {
                 data              = formInstance.root,
                 toBaseURI         = "", // local save
                 fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
-                toBasePath        = createFormDataBasePath(app, form, isDraft, document),
+                toBasePath        = createFormDataBasePath(app, form,   isDraft, document),
                 filename          = "data.xml",
                 commonQueryString = s"valid=$dataValid" + querySuffix,
                 forceAttachments  = false,
@@ -95,7 +97,7 @@ trait FormRunnerActions {
             )
 
             // If we were in new mode, now we must be in edit mode
-            if (isNew) setvalue(modeElement, "edit")
+            if (isNew && ! isDraft) setvalue(modeElement, "edit")
 
             // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
             // before calling the submission
@@ -122,7 +124,7 @@ trait FormRunnerActions {
                     "before-urls" → Some(beforeURLs),
                     "after-urls"  → Some(afterURLs)
                 ))
-        } recover {
+        } onFailure {
             case _ ⇒
                 dispatch(name = "fr-data-save-error", targetId = FormModel)
         }
@@ -145,10 +147,10 @@ trait FormRunnerActions {
     }
 
     def trySuccessMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.successMessage(messageFromResourceOrParam(params).get))
+        Try(FormRunner.successMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.errorMessage(messageFromResourceOrParam(params).get))
+        Try(FormRunner.errorMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
 
     def tryConfirm(params: ActionParams): Try[Any] =
         Try {
@@ -183,15 +185,15 @@ trait FormRunnerActions {
 
     // Defaults except for "uri"
     private val DefaultSendParameters = Map(
-        "method"     → "post",
-        "prune"      → "true",
-        "annotate"   → "",
-        "replace"    → "none",
-        "content"    → "xml",
-        "parameters" → "app form document valid language"
+        "method"        → "post",
+        "prune"         → "true",
+        "annotate"      → "",
+        "replace"       → "none",
+        "content"       → "xml",
+        "parameters"    → "app form form-version document valid language process"
     )
 
-    private val SendParameterKeys = List("uri") ++ DefaultSendParameters.keys
+    private val SendParameterKeys = List("uri", "serialization") ++ DefaultSendParameters.keys
 
     def trySend(params: ActionParams): Try[Any] =
         Try {
@@ -213,9 +215,10 @@ trait FormRunnerActions {
                 SendParameterKeys map (key ⇒ key → findParamValue(key))
 
             val paramsToAppend =
-                stringOptionToSet(findParamValue("parameters")).toList
+                stringOptionToSet(findParamValue("parameters")).to[List]
 
             val paramValuesToAppend = paramsToAppend collect {
+                case name @ "process"      ⇒ name → runningProcessId.get
                 case name @ "app"          ⇒ name → app
                 case name @ "form"         ⇒ name → form
                 case name @ "form-version" ⇒ name → formVersion
@@ -225,19 +228,32 @@ trait FormRunnerActions {
                 case name @ "noscript"     ⇒ name → isNoscript.toString
             }
 
-            // Append query parameters to the URL
-            val propertiesAsMap =
+            // Append query parameters to the URL and evaluate XVTs
+            val evaluatedPropertiesAsMap =
                 propertiesAsPairs map {
-                    case ("uri", Some(uri)) ⇒ "uri" → Some(recombineQuery(uri, paramValuesToAppend))
-                    case other              ⇒ other
+                    case ("uri", some @ Some(_)) ⇒ "uri" → (some map (recombineQuery(_, paramValuesToAppend)))
+                    case (name,  some @ Some(_)) ⇒ name  → (some map evaluateValueTemplate)
+                    case other                   ⇒ other
                 } toMap
 
+            def findDefaultSerialization(method: String) = method match {
+                case "post" | "put" ⇒ "application/xml"
+                case _              ⇒ "none"
+            }
+
+            val effectiveSerialization =
+                evaluatedPropertiesAsMap.get("serialization").flatten orElse
+                    (evaluatedPropertiesAsMap.get("method").flatten map findDefaultSerialization)
+
+            val evaluatedSendProperties =
+                evaluatedPropertiesAsMap + ("serialization" → effectiveSerialization)
+
             // Create PDF if needed
-            if (stringOptionToSet(propertiesAsMap("content")) exists Set("pdf", "pdf-url"))
+            if (stringOptionToSet(evaluatedSendProperties("content")) exists Set("pdf", "pdf-url"))
                 tryCreatePDFIfNeeded(EmptyActionParams).get
 
             // TODO: Remove duplication once @replace is an AVT
-            val replace = if (propertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
+            val replace = if (evaluatedSendProperties.get("replace") exists (_ == Some("all"))) "all" else "none"
 
             // Set data-safe-override as we know we are not losing data upon navigation. This happens:
             // - with changing mode (tryChangeMode)
@@ -245,7 +261,7 @@ trait FormRunnerActions {
             if (replace == "all")
                 setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
 
-            sendThrowOnError(s"fr-send-submission-$replace", propertiesAsMap)
+            sendThrowOnError(s"fr-send-submission-$replace", evaluatedSendProperties)
         }
 
     private val TestCommonParams = List[(String, () ⇒ Boolean)](
@@ -380,12 +396,14 @@ trait FormRunnerActions {
     def tryWizardNext(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
 
-    def pdfURLInstanceRootElement = topLevelInstance(PersistenceModel, "fr-pdf-url-instance").get.rootElement
+    def pdfURLInstanceRootElementOpt = topLevelInstance(PersistenceModel, "fr-pdf-url-instance") map (_.rootElement)
 
     def tryCreatePDFIfNeeded(params: ActionParams): Try[Any] =
         Try {
-            // Only create if not available yet
-            if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
-                sendThrowOnError("fr-pdf-service-submission")
+            pdfURLInstanceRootElementOpt foreach { pdfURLInstanceRootElement ⇒
+                // Only create if not available yet
+                if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
+                    sendThrowOnError("fr-pdf-service-submission")
+            }
         }
 }

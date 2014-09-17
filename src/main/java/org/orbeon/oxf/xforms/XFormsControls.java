@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.saxon.om.Item;
 
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class XFormsControls implements XFormsObjectResolver {
     /**
      * Create the controls, whether upon initial creation of restoration of the controls.
      */
-    public void createControlTree() {
+    public void createControlTree(scala.Option<scala.collection.immutable.Map<String, ControlState>> state) {
 
         assert !initialized;
 
@@ -136,7 +137,7 @@ public class XFormsControls implements XFormsObjectResolver {
             initialized = true;
 
             // Initialize new control tree
-            currentControlTree.initialize(containingDocument);
+            currentControlTree.initialize(containingDocument, state);
         } else {
             // Consider initialized
             initialized = true;

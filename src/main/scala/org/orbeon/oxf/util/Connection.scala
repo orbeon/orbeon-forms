@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.util
 
+import java.io.ByteArrayInputStream
+
 import ScalaUtils._
 import Headers._
+import org.apache.http.impl.client.BasicCookieStore
 import collection.JavaConverters._
-import java.net.{URI, URLConnection, URL}
+import java.net.{URI, URL}
 import java.util.{Map ⇒ JMap}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
@@ -24,11 +27,10 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.resources.handler.HTTPURLConnection
+import org.orbeon.oxf.http.{StreamedContent, PropertiesApacheHttpClient, Credentials}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils
-import Connection._
 import scala.util.control.NonFatal
 
 /**
@@ -44,13 +46,16 @@ import scala.util.control.NonFatal
  * - managing SOAP POST and GET a la XForms 1.1 (should this be here?)
  */
 class Connection(
-        httpMethod: String,
+        httpMethod   : String,
         connectionURL: URL,
-        credentials: Option[Credentials],
-        requestBody: Option[Array[Byte]],
-        headers: collection.Map[String, Array[String]],
-        logBody: Boolean)(implicit logger: IndentedLogger)
-    extends ConnectionState with Logging {
+        credentials  : Option[Credentials],
+        requestBody  : Option[Array[Byte]],// TODO: Option[InputStream]
+        headers      : Map[String, Array[String]],
+        logBody      : Boolean)(implicit
+        logger       : IndentedLogger
+    ) extends ConnectionState with Logging {
+
+    import Connection._
 
     require(StringUtils.isAllUpperCase(httpMethod))
 
@@ -70,7 +75,10 @@ class Connection(
                 val connectionResult = new ConnectionResult(connectionURL.toExternalForm)
 
                 connectionResult.statusCode = 200
-                connectionResult.responseHeaders = urlConnection.getHeaderFields
+                connectionResult.responseHeaders =
+                    urlConnection.getHeaderFields.asScala map
+                    { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+
                 connectionResult.setLastModified(urlConnection)
                 connectionResult.setResponseContentType(urlConnection.getContentType, "application/xml")
                 connectionResult.setResponseInputStream(urlConnection.getInputStream)
@@ -88,38 +96,45 @@ class Connection(
             } else if (isHTTPOrHTTPS(scheme)) {
                 // Any method with http: or https:
 
+                val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
+
+                cookieStoreOpt = Some(cookieStore)
+
+                val cleanHeaders = {
+
+                    // Gather all headers nicely capitalized
+                    val capitalizedHeaders =
+                        for {
+                            (name, values) ← headers.toList
+                            if values ne null
+                            value ← values
+                            if value ne null
+                        } yield
+                            capitalizeCommonOrSplitHeader(name) → value
+
+                    combineValues[String, String, List](capitalizedHeaders).toMap
+                }
+
+                val content = requestBody map { bytes ⇒
+
+                    val contentType = cleanHeaders.get("Content-Type") flatMap (_.lastOption) getOrElse "application/octet-stream"
+
+                    if (logBody)
+                        logRequestBody(logger, contentType, bytes)
+
+                    StreamedContent(new ByteArrayInputStream(bytes), Some(contentType), Some(bytes.size.toLong), None)
+                }
+
                 // Create URL connection object
-                val httpURLConnection = connectionURL.openConnection.asInstanceOf[HTTPURLConnection]
-
-                // Configure HTTPURLConnection
-                httpURLConnection.setDoOutput(requestBody.isDefined)
-                httpURLConnection.setCookieStore(cookieStoreOption.orNull)
-                httpURLConnection.setRequestMethod(httpMethod)
-
-                // Set credentials if any
-                credentials foreach { credentials ⇒
-                    httpURLConnection.setUsername(credentials.username)
-                    if (credentials.password ne null)
-                        httpURLConnection.setPassword(credentials.password)
-                    if (credentials.preemptiveAuthentication ne null)
-                        httpURLConnection.setPreemptiveAuthentication(credentials.preemptiveAuthentication)
-                    if (credentials.domain ne null)
-                        httpURLConnection.setDomain(credentials.domain)
-                }
-
-                // Set headers on connection
-                val capitalizedHeaders = setHeaders(headers, httpURLConnection)
-
-                // Set request body if any
-                requestBody foreach { messageBody ⇒
-
-                    if (logBody) {
-                        val contentType = headers.get("content-type") flatMap (_.lift(0)) getOrElse "application/octet-stream"
-                        logRequestBody(logger, contentType, messageBody)
-                    }
-
-                    httpURLConnection.setRequestBody(messageBody)
-                }
+                val response =
+                    PropertiesApacheHttpClient.connect(
+                        connectionURL.toExternalForm,
+                        credentials,
+                        cookieStore,
+                        httpMethod,
+                        cleanHeaders,
+                        content
+                    )
 
                 ifDebug {
 
@@ -139,33 +154,30 @@ class Connection(
                             connectionURL.getPort,
                             connectionURL.getPath,
                             connectionURL.getQuery,
-                            connectionURL.getRef)
+                            connectionURL.getRef
+                        )
 
                     debug("opening URL connection",
-                        Seq("method" → httpMethod, "URL" → connectionURI.toString) ++ capitalizedHeaders)
+                        Seq(
+                            "method" → httpMethod,
+                            "URL"    → connectionURI.toString
+                        ) ++ (cleanHeaders mapValues (_ mkString ",")))
                 }
-
-                // Connect
-                httpURLConnection.connect()
-
-                // Get state if possible
-                // This is either the state we set above before calling connect(), or a new state if we didn't provide any
-                cookieStoreOption = Option(httpURLConnection.getCookieStore)
 
                 // Create result
                 val connectionResult = new ConnectionResult(connectionURL.toExternalForm) {
                     override def close(): Unit = {
                         super.close()
-                        httpURLConnection.disconnect()
+                        response.disconnect()
                     }
                 }
 
                 // Get response information
-                connectionResult.statusCode = httpURLConnection.getResponseCode
-                connectionResult.responseHeaders = httpURLConnection.getHeaderFields
-                connectionResult.setLastModified(httpURLConnection)
-                connectionResult.setResponseContentType(httpURLConnection.getContentType, "application/xml")
-                connectionResult.setResponseInputStream(httpURLConnection.getInputStream)
+                connectionResult.statusCode = response.statusCode
+                connectionResult.responseHeaders = response.headers
+                connectionResult.setLastModified(response)
+                connectionResult.setResponseContentType(response.content.contentType.orNull, "application/xml")
+                connectionResult.setResponseInputStream(response.content.inputStream)
 
                 ifDebug {
                     connectionResult.logResponseDetailsIfNeeded(logger, Level.DEBUG, "")
@@ -199,28 +211,34 @@ trait ConnectionState {
     import ConnectionState._
 
     private val stateScope = stateScopeFromProperty
-    var cookieStoreOption: Option[CookieStore] = None
+    var cookieStoreOpt: Option[CookieStore] = None
 
     def loadHttpState()(implicit logger: IndentedLogger): Unit = {
-        cookieStoreOption = stateAttributes(createSession = false) flatMap (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+        cookieStoreOpt =
+            stateAttributes(createSession = false) flatMap
+            (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+
         debugStore("loaded HTTP state", "did not load HTTP state")
     }
 
     def saveHttpState()(implicit logger: IndentedLogger): Unit = {
-        cookieStoreOption foreach { cookieStore ⇒
-            stateAttributes(createSession = true) foreach (_.put(HttpCookieStoreAttribute, cookieStore))
+        cookieStoreOpt foreach { cookieStore ⇒
+            stateAttributes(createSession = true) foreach
+            (_.put(HttpCookieStoreAttribute, cookieStore))
         }
+
         debugStore("saved HTTP state", "did not save HTTP state")
     }
 
     private def debugStore(positive: String, negative: String)(implicit logger: IndentedLogger) =
         ifDebug {
-            cookieStoreOption match {
+            cookieStoreOpt match {
                 case Some(cookieStore) ⇒
                     val cookies = cookieStore.getCookies.asScala map (_.getName) mkString " | "
                     debug(positive, Seq(
                         "scope" → stateScope,
-                        "cookie names" → (if (cookies.nonEmpty) cookies else null)))
+                        "cookie names" → (if (cookies.nonEmpty) cookies else null))
+                    )
                 case None ⇒
                     debug(negative)
             }
@@ -267,11 +285,6 @@ object Connection extends Logging {
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
 
-    case class Credentials(username: String, password: String, preemptiveAuthentication: String, domain: String) {
-        assert(username ne null)
-        def getPrefix = Option(password) map (username + ":" + _ + "@") getOrElse username + "@"
-    }
-
     // Whether the given method requires a request body
     def requiresRequestBody(method: String) = Set("POST", "PUT")(method)
 
@@ -283,10 +296,12 @@ object Connection extends Logging {
 
     // Build all the connection headers
     def buildConnectionHeaders(
-            scheme: String,
-            credentials: Option[Credentials],
-            headers: Map[String, Array[String]],
-            headersToForward: Option[String])(logger: IndentedLogger): Map[String, Array[String]] =
+        scheme          : String,
+        credentials     : Option[Credentials],
+        headers         : Map[String, Array[String]],
+        headersToForward: Option[String])(
+        logger          : IndentedLogger
+    ): Map[String, Array[String]] =
         if (requiresHeaders(scheme))
             buildConnectionHeaders(credentials, headers, headersToForward)(logger)
         else
@@ -299,7 +314,13 @@ object Connection extends Logging {
             headersOrNull: JMap[String, Array[String]],
             headersToForward: String,
             logger: IndentedLogger): Map[String, Array[String]] =
-        buildConnectionHeaders(scheme, Option(credentialsOrNull), Option(headersOrNull) map (_.asScala.toMap) getOrElse EmptyHeaders, Option(headersToForward))(logger)
+        buildConnectionHeaders(
+            scheme,
+            Option(credentialsOrNull),
+            Option(headersOrNull) map (_.asScala.toMap) getOrElse EmptyHeaders,
+            Option(headersToForward))(
+            logger
+        )
 
     // For Java callers
     def buildConnectionHeadersWithSOAP(
@@ -334,14 +355,15 @@ object Connection extends Logging {
 
     // For Java callers
     def jApply(
-            httpMethod: String,
-            connectionURL: URL,
-            credentialsOrNull: Credentials,
-            messageBodyOrNull: Array[Byte],
-            headers: Map[String, Array[String]],
-            loadState: Boolean,
-            logBody: Boolean,
-            logger: IndentedLogger): Connection = {
+        httpMethod       : String,
+        connectionURL    : URL,
+        credentialsOrNull: Credentials,
+        messageBodyOrNull: Array[Byte],
+        headers          : Map[String, Array[String]],
+        loadState        : Boolean,
+        logBody          : Boolean,
+        logger           : IndentedLogger
+    ): Connection = {
 
         val messageBody: Option[Array[Byte]] =
             if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
@@ -351,13 +373,15 @@ object Connection extends Logging {
 
     // Create a new Connection
     def apply(
-            httpMethod: String,
-            connectionURL: URL,
-            credentials: Option[Credentials],
-            messageBody: Option[Array[Byte]],
-            headers: collection.Map[String, Array[String]],
-            loadState: Boolean,
-            logBody: Boolean)(implicit logger: IndentedLogger): Connection = {
+        httpMethod   : String,
+        connectionURL: URL,
+        credentials  : Option[Credentials],
+        messageBody  : Option[Array[Byte]],
+        headers      : Map[String, Array[String]],
+        loadState    : Boolean,
+        logBody      : Boolean)(implicit
+        logger       : IndentedLogger
+    ): Connection = {
 
         require(! requiresRequestBody(httpMethod) || messageBody.isDefined)
 
@@ -396,9 +420,11 @@ object Connection extends Logging {
      * NOTE: All header names returned are lowercase.
      */
     def buildConnectionHeaders(
-            credentials: Option[Credentials],
-            headers: Map[String, Array[String]],
-            headersToForward: Option[String])(implicit logger: IndentedLogger): Map[String, Array[String]] = {
+        credentials     : Option[Credentials],
+        headers         : Map[String, Array[String]],
+        headersToForward: Option[String])(implicit
+        logger          : IndentedLogger
+    ): Map[String, Array[String]] = {
 
         val externalContext = NetUtils.getExternalContext
 
@@ -447,7 +473,8 @@ object Connection extends Logging {
         val tokenHeader = {
 
             // Get token from web app scope
-            val token = externalContext.getWebAppContext.attributes.getOrElseUpdate(TokenKey, SecureUtils.randomHexId).asInstanceOf[String]
+            val token =
+                externalContext.getWebAppContext.attributes.getOrElseUpdate(TokenKey, SecureUtils.randomHexId).asInstanceOf[String]
 
             Seq(TokenKey → Array(token))
         }
@@ -493,7 +520,9 @@ object Connection extends Logging {
             // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
             // WebSphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
             // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
-            def fromIncoming = nativeRequestOption flatMap (sessionCookieFromIncoming(externalContext, _, cookiesToForward, sessionCookieName))
+            def fromIncoming =
+                nativeRequestOption flatMap
+                (sessionCookieFromIncoming(externalContext, _, cookiesToForward, sessionCookieName))
 
             // 2. If there is no incoming session cookie, try to make our own cookie. This may fail with e.g. WebSphere.
             def fromSession = sessionCookieFromGuess(externalContext, sessionCookieName)
@@ -535,14 +564,13 @@ object Connection extends Logging {
     }
 
     private def sessionCookieFromIncoming(
-            externalContext: ExternalContext,
-            nativeRequest: HttpServletRequest,
-            cookiesToForward: Seq[String],
-            sessionCookieName: String)(implicit logger: IndentedLogger): Option[(String, Array[String])] = {
+        externalContext  : ExternalContext,
+        nativeRequest    : HttpServletRequest,
+        cookiesToForward : Seq[String],
+        sessionCookieName: String)(implicit
+        logger           : IndentedLogger
+    ): Option[(String, Array[String])] = {
 
-        // Figure out if we need to forward session cookies. We only forward if there is the requested
-        // session id is the same as the current session. Otherwise, it means that the current session is no
-        // longer valid, or that the incoming cookie is out of date.
         def requestedSessionIdMatches =
             Option(externalContext.getSession(false)) exists { session ⇒
                 val requestedSessionId = externalContext.getRequest.getRequestedSessionId
@@ -550,12 +578,16 @@ object Connection extends Logging {
             }
 
         val cookies = Option(nativeRequest.getCookies) getOrElse Array.empty[Cookie]
-        if (requestedSessionIdMatches && cookies.nonEmpty) {
+        if (cookies.nonEmpty) {
 
             val pairsToForward =
                 for {
                     cookie ← cookies
+                    // Only forward cookie listed as cookies to forward
                     if cookiesToForward.contains(cookie.getName)
+                    // Only forward if there is the requested session id is the same as the current session. Otherwise,
+                    // it means that the current session is no longer valid, or that the incoming cookie is out of date.
+                    if sessionCookieName != cookie.getName || requestedSessionIdMatches
                 } yield
                     cookie.getName + '=' + cookie.getValue
 
@@ -580,7 +612,12 @@ object Connection extends Logging {
             { session ⇒ "cookie" →  Array(sessionCookieName + "=" + session.getId) }
 
     // Return SOAP-related headers if needed
-    def soapHeaders(httpMethod: String, mediatypeMaybeWithCharset: String, encoding: String)(implicit logger: IndentedLogger): Seq[(String, Array[String])] = {
+    def soapHeaders(
+        httpMethod               : String,
+        mediatypeMaybeWithCharset: String,
+        encoding                 : String)(implicit
+        logger                   : IndentedLogger
+    ): Seq[(String, Array[String])] = {
 
         require(encoding ne null)
 
@@ -627,26 +664,6 @@ object Connection extends Logging {
         newHeaders
     }
 
-    private def setHeaders(headers: collection.Map[String, Array[String]], urlConnection: URLConnection) = {
-
-        // Gather all headers nicely capitalized
-        val capitalizedHeaders =
-            for {
-                (name, values) ← headers.toList
-                if values ne null
-                value ← values
-                if value ne null
-            } yield
-                capitalizeCommonOrSplitHeader(name) → value
-
-        // Set headers on connection
-        capitalizedHeaders foreach {
-            case (name, value) ⇒ urlConnection.addRequestProperty(name, value)
-        }
-
-        capitalizedHeaders
-    }
-    
     def logRequestBody(logger: IndentedLogger, mediatype: String, messageBody: Array[Byte]): Unit =
         if (XMLUtils.isXMLMediatype(mediatype) ||
             XMLUtils.isTextOrJSONContentType(mediatype) ||

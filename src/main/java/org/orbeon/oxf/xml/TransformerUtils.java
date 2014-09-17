@@ -173,9 +173,7 @@ public class TransformerUtils {
      * @throws TransformerConfigurationException
      */
     public static Transformer getIdentityTransformer() throws TransformerConfigurationException {
-        final Transformer transformer = new TransformerFactoryImpl().newTransformer();
-        // Wrap Transformer for properties
-        return new TransformerWrapper(transformer, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
+        return getIdentityTransformer(XPath.GlobalConfiguration());
     }
 
     public static Transformer getIdentityTransformer(Configuration configuration) throws TransformerConfigurationException {
@@ -190,13 +188,7 @@ public class TransformerUtils {
      * @return  a new identity TransformerHandler object
      */
     public static TransformerXMLReceiver getIdentityTransformerHandler() {
-        try {
-            TransformerHandler transformerHandler = new TransformerFactoryImpl().newTransformerHandler();
-            // Wrap TransformerHandler for properties
-            return new TransformerHandlerWrapper(transformerHandler, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
+        return getIdentityTransformerHandler(XPath.GlobalConfiguration());
     }
 
     public static TransformerXMLReceiver getIdentityTransformerHandler(Configuration configuration) {

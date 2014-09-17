@@ -14,145 +14,94 @@
 package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
-import javax.servlet.ServletContext
+import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
-import org.apache.commons.io.IOUtils
-import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.util.Headers._
-import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.fr.embedding.APISupport._
+import org.orbeon.oxf.fr.embedding.Action
+
+import scala.collection.JavaConverters._
+import scala.collection.immutable.Seq
 
 object API {
-    
-    import org.orbeon.oxf.fr.embedding.servlet.ServletFilter._
 
+    // Embed an Orbeon Forms page by path
     def embedPageJava(
-            servletCtx: ServletContext,
-            req       : HttpServletRequest,
-            writer    : Writer,
-            path      : String): Unit = {
+        req       : HttpServletRequest,
+        writer    : Writer,
+        path      : String,
+        headers   : ju.Map[String, String]
+     ): Unit =
+        withSettings(req, writer) { settings ⇒
 
-        val settings = req.getAttribute(SettingsKey).asInstanceOf[FilterSettings]
+            implicit val ctx = new ServletEmbeddingContextWithResponse(
+                req,
+                Left(writer),
+                nextNamespace(req),
+                settings.orbeonPrefix,
+                settings.httpClient
+            )
 
-        implicit val ctx = new ServletEmbeddingContextWithResponse(
-            req,
-            servletCtx.log,
-            Left(writer),
-            nextNamespace(req),
-            settings.orbeonPrefix
-        )
+            proxyPage(
+                settings.formRunnerURL,
+                path,
+                Option(headers) map (_.asScala.to[List]) getOrElse Nil
+            )
+        }
 
-        APISupport.proxyPage(settings.formRunnerURL, path)
-    }
-
+    // Embed a Form Runner form
     def embedFormJava(
-            servletCtx: ServletContext,
-            req       : HttpServletRequest,
-            writer    : Writer,
-            app       : String,
-            form      : String,
-            action    : String,
-            documentId: String,
-            query     : String) =
+        req       : HttpServletRequest,
+        writer    : Writer,
+        app       : String,
+        form      : String,
+        action    : String,
+        documentId: String,
+        query     : String,
+        headers   : ju.Map[String, String]
+     ): Unit =
         embedPageJava(
-            servletCtx,
             req,
             writer,
-            APISupport.formRunnerPath(app, form, action, Option(documentId), Option(query))
+            formRunnerPath(app, form, action, Option(documentId), Option(query)),
+            headers
         )
 
+    // Embed an Orbeon Forms page by path
     def embedPage(
-            servletCtx: ServletContext,
-            req       : HttpServletRequest,
-            out       : Writer Either HttpServletResponse,
-            path      : String): Unit = {
+        req       : HttpServletRequest,
+        out       : Writer Either HttpServletResponse,
+        path      : String,
+        headers   : Seq[(String, String)] = Nil
+     ): Unit =
+        withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
 
-        val settings = req.getAttribute(SettingsKey).asInstanceOf[FilterSettings]
-
-        implicit val ctx = new ServletEmbeddingContextWithResponse(
-            req,
-            servletCtx.log,
-            out,
-            nextNamespace(req),
-            settings.orbeonPrefix
-        )
-
-        APISupport.proxyPage(settings.formRunnerURL, path)
-    }
-
-    def embedForm(
-            servletCtx: ServletContext,
-            req       : HttpServletRequest,
-            out       : Writer Either HttpServletResponse,
-            app       : String,
-            form      : String,
-            action    : Action,
-            documentId: Option[String],
-            query     : Option[String]) =
-        embedPage(
-            servletCtx,
-            req,
-            out,
-            APISupport.formRunnerPath(app, form, action.name, documentId, query)
-        )
-
-    def proxyServletResources(
-            servletCtx  : ServletContext,
-            req         : HttpServletRequest,
-            res         : HttpServletResponse,
-            namespace   : String,
-            resourcePath: String) = {
-
-        val settings = req.getAttribute(SettingsKey).asInstanceOf[FilterSettings]
-
-        implicit val ctx = new ServletEmbeddingContextWithResponse(
-            req,
-            servletCtx.log,
-            Right(res),
-            namespace,
-            settings.orbeonPrefix
-        )
-
-        def contentFromRequest =
-            req.getMethod == "POST" option {
-
-                val body =
-                    if (XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(req.getContentType)))
-                        Left(IOUtils.toString(req.getInputStream, Option(req.getCharacterEncoding) getOrElse "utf-8"))
-                    else
-                        Right(IOUtils.toByteArray(req.getInputStream))
-
-                Content(body, Option(req.getContentType), None)
-            }
-
-        val requestHeaders =
-            filterCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], out = true).to[List]
-
-        APISupport.proxyResource(
-            RequestDetails(
-                content  = contentFromRequest,
-                url      = APISupport.formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = true),
-                headers  = requestHeaders,
-                params   = Nil
+            implicit val ctx = new ServletEmbeddingContextWithResponse(
+                req,
+                out,
+                nextNamespace(req),
+                settings.orbeonPrefix,
+                settings.httpClient
             )
+
+            proxyPage(settings.formRunnerURL, path, headers)
+        }
+
+    // Embed a Form Runner form
+    def embedForm(
+        req       : HttpServletRequest,
+        out       : Writer Either HttpServletResponse,
+        app       : String,
+        form      : String,
+        action    : Action,
+        documentId: Option[String] = None,
+        query     : Option[String] = None,
+        headers   : Seq[(String, String)] = Nil
+    ): Unit =
+        embedPage(
+            req,
+            out,
+            formRunnerPath(app, form, action.name, documentId, query),
+            headers
         )
-    }
-    
-    private val LastNamespaceIndexKey = "orbeon-form-runner-last-namespace-index"
-    private val NamespacePrefix       = "o"
-
-    private def nextNamespace(req: HttpServletRequest) = {
-
-        val newValue =
-            Option(req.getAttribute(LastNamespaceIndexKey).asInstanceOf[Integer]) match {
-                case Some(value) ⇒ value + 1
-                case None        ⇒ 0
-            }
-
-        req.setAttribute(LastNamespaceIndexKey, newValue)
-
-        NamespacePrefix + newValue
-    }
 }

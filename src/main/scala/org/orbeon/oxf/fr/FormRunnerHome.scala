@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.StringReplacer._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash => _, _}
 import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.xforms.action.XFormsAPI.insert
-import org.orbeon.oxf.fb.FormBuilder
-import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash ⇒ _, _}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringReplacer._
+import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.XML._
 
 import scala.util.Try
 
@@ -211,30 +209,8 @@ trait FormRunnerHome {
             }
         }
 
-        def relevantFormNode(formNode: NodeInfo, formName: String, hasAdminPermissions: Boolean, operations: List[String]): Boolean =
-            (formNode / * nonEmpty) &&
-            (hasAdminPermissions || ! (
-                formName == "library" ||
-                operations.isEmpty    ||
-                (formNode elemValue "available") == "false")
-            )
-
-        def addOperations(formNode: NodeInfo, operations: List[String]): Unit =
-            insert(into = formNode, origin = attributeInfo("operations", operations mkString " "))
-
-        import FormBuilder._
-
-        for {
-            ((app, form), localAndOrRemote) ← combinedIndexIterator
-            hasAdminPermissions = hasAdminPermissionsFor(permissionInstance, app, form)
-            newNode             = createNode(localAndOrRemote)
-            permissionsElement  = (newNode / "permissions" headOption).orNull
-            operations          = (hasAdminPermissions list "admin") ::: allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).to[List]
-            if relevantFormNode(newNode, form, hasAdminPermissions, operations)
-        } yield {
-            addOperations(newNode, operations)
-            newNode
-        }
+        for (((app, form), localAndOrRemote) ← combinedIndexIterator)
+            yield createNode(localAndOrRemote)
     }
 
     // Return remote servers information:

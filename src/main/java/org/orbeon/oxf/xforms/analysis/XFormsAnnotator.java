@@ -59,6 +59,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
     private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
     private boolean inXBLBinding;   // whether we are in the body of an XBL binding (meaningful only if inPreserve == true)
 
+    private final boolean topLevel;
     private final Metadata metadata;
     private final boolean isGenerateIds;
 
@@ -87,11 +88,12 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
      * @param extractorReceiver     extractor output (can be null for XBL for now)
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata) {
+    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean topLevel) {
         super(templateReceiver, extractorReceiver);
 
         this.metadata = metadata;
         this.isGenerateIds = true;
+        this.topLevel = topLevel;
 
         if (templateReceiver instanceof SAXStore)
             this.templateSAXStore = (SAXStore) templateReceiver;
@@ -108,6 +110,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.metadata = metadata;
         this.isGenerateIds = false;
+        this.topLevel = true;
     }
 
     @Override
@@ -274,7 +277,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // This is a non-XForms element and we allow AVTs
                 final int attributesCount = attributes.getLength();
                 if (attributesCount > 0) {
-                    boolean elementOutput = false;
+                    boolean elementWithAVTHasBeenOutput = false;
                     for (int i = 0; i < attributesCount; i++) {
                         final String currentAttributeURI = attributes.getURI(i);
                         if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
@@ -292,10 +295,10 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                                     // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
                                 }
 
-                                if (!elementOutput) {
+                                if (!elementWithAVTHasBeenOutput) {
                                     // Output the element with the new or updated id attribute
                                     stackElement.startElement(uri, localname, qName, attributes);
-                                    elementOutput = true;
+                                    elementWithAVTHasBeenOutput = true;
                                 }
 
                                 // Create a new xxf:attribute control
@@ -331,7 +334,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     }
 
                     // Output the element as is if no AVT was found
-                    if (!elementOutput)
+                    if (!elementWithAVTHasBeenOutput)
                         stackElement.startElement(uri, localname, qName, attributes);
                 } else {
                     stackElement.startElement(uri, localname, qName, attributes);
@@ -518,7 +521,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                rawId = metadata.idGenerator().getNextId();
+                rawId = metadata.idGenerator().nextId();
                 newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, rawId);
                 attributes = newAttributes;
             } else {
@@ -526,8 +529,9 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 rawId = attributes.getValue(idIndex);
 
                 // Check for duplicate ids
+                // See https://github.com/orbeon/orbeon-forms/issues/1892
                 // TODO: create Element to provide more location info?
-                if (metadata.idGenerator().isDuplicate(rawId))
+                if (topLevel && metadata.idGenerator().contains(rawId))
                     throw new ValidationException("Duplicate id for XForms element: " + rawId,
                         new ExtendedLocationData(LocationData.createIfPresent(documentLocator()), "analyzing control element",
                                 new String[] { "element", SAXUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));

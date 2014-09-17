@@ -18,8 +18,6 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
 import org.apache.commons.lang3.StringUtils._
-import collection.JavaConverters._
-import java.{util ⇒ ju}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.apache.commons.lang3.StringUtils
 
@@ -32,7 +30,6 @@ trait ResourcesOps extends BaseOps {
     def resourcesInLang(lang: String)      = allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
     def allResources(resources: NodeInfo)  = resources child "resource"
     def allLangs(resources: NodeInfo)      = allResources(resources) attValue "*:lang"
-    def allLangsXPath(resources: NodeInfo) = allLangs(resources).asJava
 
     def allLangsWithResources(resources: NodeInfo) =
         allLangs(resources) zip allResources(resources)
@@ -90,7 +87,7 @@ trait ResourcesOps extends BaseOps {
         findControlByName(getFormDoc, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
 
     // Get the control's items for all languages
-    def getControlItemsGroupedByValue(controlName: String): ju.List[NodeInfo] = {
+    def getControlItemsGroupedByValue(controlName: String): Seq[NodeInfo] = {
 
         val localResourcesRoot = resourcesRoot
 
@@ -146,7 +143,7 @@ trait ResourcesOps extends BaseOps {
         def itemElemsToReturn =
             if (newItemElems.nonEmpty) newItemElems else List(emptyItemElem)
 
-        itemElemsToReturn map elemToNodeInfo asJava
+        itemElemsToReturn map elemToNodeInfo
     }
 
     // Set the control's items for all languages

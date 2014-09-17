@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
 import control.Controls.AncestorOrSelfIterator
 import event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventObserver}
 import Dispatch.EventListener
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 
 trait ControlEventSupport {
@@ -60,8 +61,17 @@ trait ControlEventSupport {
                     // NOTE: We don't allow this behavior when events come from the client in ClientEvents
                     // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
                     Focus.hiddenCases(this) foreach (_.toggle())
-                    
-                    setFocus(focusEvent.inputOnly, dryRun = false)
+
+                    val allIt =
+                        focusableControls filterNot Focus.isHidden
+
+                    val filteredIt =
+                        if (focusEvent.inputOnly)
+                            allIt collectFirst { case input: XFormsInputControl ⇒ input }
+                        else
+                            allIt.nextOption
+
+                    filteredIt foreach Focus.focusWithEvents
                 case _ ⇒
             }
 

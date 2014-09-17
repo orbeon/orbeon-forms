@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import analysis._
 import collection.JavaConverters._
 import org.orbeon.oxf.xml._
-import dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
 import org.orbeon.oxf.xml.XMLConstants._
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -212,7 +212,7 @@ object XFormsStaticStateImpl {
         val prefix = startScope.fullPrefix
 
         // Annotator with prefix
-        class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotator(template, extractorReceiver, metadata) {
+        class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotator(template, extractorReceiver, metadata, startScope.isTopLevelScope) {
             protected override def rewriteId(id: String) = prefix + id
         }
 

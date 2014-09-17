@@ -13,23 +13,22 @@
  */
 package org.orbeon.oxf.fr.persistence.rest
 
+import java.io.ByteArrayInputStream
+
+import org.dom4j.Document
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.relational.ForDocument
-import org.orbeon.oxf.fr.relational.Specific
-import org.orbeon.oxf.fr.relational.{Next, Unspecified}
-import org.orbeon.oxf.test.{TestSupport, ResourceManagerTestBase}
+import org.orbeon.oxf.fr.relational.{ForDocument, Next, Specific, Unspecified}
+import org.orbeon.oxf.test.{ResourceManagerTestBase, TestSupport}
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
+import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
+
 import scala.util.Random
 import scala.xml.Elem
-import org.dom4j.Document
-import java.io.ByteArrayInputStream
-import org.orbeon.oxf.xml.Dom4j
-import scala.util.control.NonFatal
-import org.orbeon.oxf.util.{Logging, LoggerFactory, IndentedLogger}
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -321,7 +320,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
             val expectedBody: Document =
                 <forms>
-                    <form>
+                    <form operations="read create">
                         <permissions>
                             <permission operations="read create"/>
                         </permissions>

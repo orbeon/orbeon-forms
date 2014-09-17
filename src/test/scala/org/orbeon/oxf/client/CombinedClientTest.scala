@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.client
 
-import org.orbeon.oxf.client.fb.{Permissions, ControlResourcesEditor}
+import org.orbeon.oxf.client.fb.{RepeatSettings, Permissions, ControlResourcesEditor}
 import org.junit.runners.MethodSorters
 import org.junit.FixMethodOrder
 import org.orbeon.oxf.client.fr.{Grid, Currency}
@@ -22,6 +22,7 @@ import org.orbeon.oxf.client.fr.{Grid, Currency}
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class CombinedClientTest
     extends OrbeonClientBase
+    with RepeatSettings
     with XForms
     with FormRunnerSummary
     with OrbeonFormsDemoPath

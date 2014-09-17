@@ -50,7 +50,7 @@ trait FormRunnerLang {
     // List of available languages for the given form
     // Empty if the form doesn't have resources
     // If all of the form's resources are filtered via property, return the first language of the form, if any.
-    def getFormLangSelection(app: String, form: String, formLanguages: JList[String]): JList[String] = {
+    def getFormLangSelection(app: String, form: String, formLanguages: JList[String]): List[String] = {
 
         val appForm = getAppForm(app, form)
 
@@ -58,13 +58,10 @@ trait FormRunnerLang {
         val defaultLanguage = getDefaultLang(appForm)
 
         // Reorder to put default language first if it is allowed
-        val withDefaultPrepended =
-            if (allowedFormLanguages contains defaultLanguage)
-                defaultLanguage :: (allowedFormLanguages filterNot (_ == defaultLanguage))
-            else
-                allowedFormLanguages
-
-        withDefaultPrepended.asJava
+        if (allowedFormLanguages contains defaultLanguage)
+            defaultLanguage :: (allowedFormLanguages filterNot (_ == defaultLanguage))
+        else
+            allowedFormLanguages
     }
 
     // Find the best match for the current form language
@@ -73,7 +70,7 @@ trait FormRunnerLang {
 
         val appForm = getAppForm(app, form)
 
-        val availableFormLangs  = getFormLangSelection(app, form, formLangs).asScala.toList
+        val availableFormLangs  = getFormLangSelection(app, form, formLangs)
         val actualRequestedLang = findRequestedLang(appForm, requestedLang) filter isAllowedLang(appForm)
 
         selectLangUseDefault(appForm, actualRequestedLang, availableFormLangs).orNull

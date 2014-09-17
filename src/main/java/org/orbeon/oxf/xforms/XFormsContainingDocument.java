@@ -282,7 +282,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
                         // Restore controls state
                         // Store serialized control state for retrieval later
-                        xformsControls.createControlTree();
+                        xformsControls.createControlTree(Controls.restoringControls());
 
                         // Once the control tree is rebuilt, restore focus if needed
                         if (dynamicState.decodeFocusedControlJava() != null)
@@ -930,7 +930,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         rebuildRecalculateRevalidateIfNeeded();
 
         // Initialize controls
-        xformsControls.createControlTree();
+        xformsControls.createControlTree( scala.Option.<scala.collection.immutable.Map<String, ControlState >>apply(null));
     }
 
     public Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();

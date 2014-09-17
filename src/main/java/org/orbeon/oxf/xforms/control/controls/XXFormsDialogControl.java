@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Option;
 import scala.Tuple3;
 
 import java.util.HashMap;
@@ -80,16 +81,30 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
         // Initial local state
         setLocal(new XXFormsDialogControlLocal(initiallyVisible));
+    }
+
+    @Override
+    public void onCreate(boolean restoreState, Option<ControlState> state) {
+        super.onCreate(restoreState, state);
 
         // Restore state if needed
-        final ControlState state = stateToRestoreJava();
-        if (state != null) {
-            final Map<String, String> keyValues = state.keyValuesJava();
-            // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-            final String visibleString = keyValues.get("visible");
-            setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
-                     "true".equals(keyValues.get("constrain")),
-                     keyValues.get("neighbor")));
+        if (state.isDefined()) {
+            final ControlState controlState = state.get();
+            final Map<String, String> keyValues = controlState.keyValuesJava();
+
+            setLocal(
+                new XXFormsDialogControlLocal(
+                    "true".equals(keyValues.get("visible")),
+                    "true".equals(keyValues.get("constrain")),
+                    keyValues.get("neighbor")
+                )
+            );
+        } else if (restoreState) {
+            // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
+            // particular control might not be found.
+            setLocal(
+                new XXFormsDialogControlLocal(initiallyVisible)
+            );
         }
     }
 

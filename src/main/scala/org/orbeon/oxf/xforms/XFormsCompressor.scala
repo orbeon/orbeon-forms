@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.apache.commons.pool.BasePoolableObjectFactory
+import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util._
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -23,7 +24,9 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import scala.util.control.NonFatal
 
-object XFormsCompressor {
+object XFormsCompressor extends Logging {
+
+    private implicit val Logger = Loggers.getIndentedLogger("utils")
 
     // Use a Deflater pool as creating deflaters is expensive
     private val deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory)
@@ -78,12 +81,11 @@ object XFormsCompressor {
             Deflater.BEST_COMPRESSION    → "BEST_COMPRESSION"
         )
 
-        for ((level, description) ← settings) {
-            XFormsUtils.indentedLogger.startHandleOperation("compressor", description)
-            for (v ← 1 to 100)
-                compressBytes(bytesToEncode, level)
-            XFormsUtils.indentedLogger.endHandleOperation()
-        }
+        for ((level, description) ← settings)
+            withDebug(description) {
+                for (v ← 1 to 100)
+                    compressBytes(bytesToEncode, level)
+            }
 
         compressBytes(bytesToEncode, Deflater.BEST_SPEED)
     }
@@ -98,7 +100,7 @@ object XFormsCompressor {
     private class DeflaterPoolableObjectFactory extends BasePoolableObjectFactory[Deflater] {
 
         def makeObject = {
-            XFormsUtils.indentedLogger.logDebug("compressor", "creating new Deflater")
+            debug("creating new Deflater")
             // Use BEST_SPEED as profiler shows that DEFAULT_COMPRESSION is slower
             new Deflater(Deflater.BEST_SPEED, true)
         }
@@ -106,7 +108,8 @@ object XFormsCompressor {
         override def passivateObject(o: Deflater): Unit =
             try o.reset()
             catch {
-                case NonFatal(t) ⇒ XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", t)
+                case NonFatal(t) ⇒
+                    error("exception while passivating Deflater", Seq("throwable" → OrbeonFormatter.format(t)))
             }
     }
 

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
@@ -254,10 +255,10 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         public final String context;
         public final String spec;
-        public final Connection.Credentials credentials;
+        public final Credentials credentials;
         public final String headersToForward;
 
-        public URIReference(String context, String spec, Connection.Credentials credentials, String headersToForward) {
+        public URIReference(String context, String spec, Credentials credentials, String headersToForward) {
             this.context = context;
             this.spec = spec;
             this.credentials = credentials;
@@ -284,22 +285,22 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         private Map<String, DocumentInfo> map;
 
-        public void setDocument(String urlString, Connection.Credentials credentials, SAXStore documentSAXStore, Long lastModified) {
+        public void setDocument(String urlString, Credentials credentials, SAXStore documentSAXStore, Long lastModified) {
             if (map == null)
                 map = new HashMap<String, DocumentInfo>();
             map.put(buildURIUsernamePasswordString(urlString, credentials), new DocumentInfo(documentSAXStore, lastModified));
         }
 
-        public boolean isDocumentSet(String urlString, Connection.Credentials credentials) {
+        public boolean isDocumentSet(String urlString, Credentials credentials) {
             return map != null && map.get(buildURIUsernamePasswordString(urlString, credentials)) != null;
         }
 
-        public Long getLastModified(String urlString, Connection.Credentials credentials) {
+        public Long getLastModified(String urlString, Credentials credentials) {
             final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.lastModified;
         }
 
-        public SAXStore getDocument(String urlString, Connection.Credentials credentials) {
+        public SAXStore getDocument(String urlString, Credentials credentials) {
             final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.saxStore;
         }
@@ -321,7 +322,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
          * @param credentials       optional credentials
          * @param headersToForward  headers to forward
          */
-        public void addReference(String context, String spec, Connection.Credentials credentials, String headersToForward) {
+        public void addReference(String context, String spec, Credentials credentials, String headersToForward) {
             if (references == null)
                 references = new ArrayList<URIReference>();
 
@@ -356,7 +357,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
      * @param credentials       optional credentials
      * @param headersToForward  headers to forward
      */
-    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, Connection.Credentials credentials, String headersToForward) {
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, Credentials credentials, String headersToForward) {
 
         final String urlString = url.toExternalForm();
 
@@ -398,7 +399,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
         }
     }
 
-    private static String buildURIUsernamePasswordString(String uriString, Connection.Credentials credentials) {
+    private static String buildURIUsernamePasswordString(String uriString, Credentials credentials) {
         // We don't care that the result is an actual URI
         if (credentials != null)
             return credentials.getPrefix() + uriString;

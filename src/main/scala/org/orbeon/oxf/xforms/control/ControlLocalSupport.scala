@@ -33,11 +33,15 @@ trait ControlLocalSupport {
     def serializeLocal = JCollections.emptyMap[String, String]
 
     final def controlState = {
-        val serialized = serializeLocal
-        if (serialized.isEmpty)
+        val keyValues = serializeLocal
+        val isVisited = visited
+
+        if (keyValues.isEmpty && ! isVisited)
             None
+        else if (keyValues.isEmpty && isVisited)
+            Some(ControlState(effectiveId, isVisited, Map.empty))
         else
-            Some(ControlState(effectiveId, visited, serialized.asScala.toMap))
+            Some(ControlState(effectiveId, isVisited, keyValues.asScala.toMap))
     }
 
     final def updateLocalCopy(copy: XFormsControl) {

@@ -42,7 +42,7 @@
     <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
                                            and $autosave-delay gt 0
                                            and normalize-space(xxf:get-request-header('orbeon-username')) != ''
-                                           and frf:javaAllAuthorizedOperations(
+                                           and frf:allAuthorizedOperations(
                                                     xxf:instance('fr-form-metadata')/permissions,
                                                     xxf:get-request-header('orbeon-username'),
                                                     xxf:get-request-header('orbeon-group')
@@ -64,9 +64,9 @@
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
         <xf:action if="$mode = ('new', 'test', 'edit', 'view', 'pdf', 'email')">
 
-            <xf:var name="is-new-id" value="normalize-space($document) = ''"/>
+            <xf:var name="is-new-id"     value="normalize-space($document) = ''"/>
             <xf:var name="is-xml-submit" value="exists(xxf:get-request-attribute('fr-form-data'))"/>
-            <xf:var name="is-submit" value="$is-xml-submit or exists(xxf:get-request-parameter('fr-form-data'))"/>
+            <xf:var name="is-submit"     value="$is-xml-submit or exists(xxf:get-request-parameter('fr-form-data'))"/>
 
             <!-- Create random document id if none is provided. This is the default for 'new', but a missing id is also
                  allowed for 'edit', 'view', etc., when data is posted to the page. -->
@@ -203,7 +203,7 @@
             <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
             <xf:var name="ops" value="if (exists($from-persistence))
                                       then xxf:split($from-persistence)
-                                      else frf:javaAuthorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
+                                      else frf:authorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
 
             <xf:setvalue
                 ref="instance('fr-authorized-operations')"
@@ -273,53 +273,6 @@
             resource="/fr/service/persistence/crud/{$app}/{$form}/{event('document-data-or-draft-id')}/data.xml"
             replace="none"/>
 
-    <!-- Instance to store the result of the create/update submission -->
-    <xf:instance id="fr-create-update-submission-response">
-        <response xmlns=""/>
-    </xf:instance>
-
-    <!-- Submission to create/update the XML form -->
-    <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
-         enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
-         code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
-         form instance is created. -->
-    <xf:submission id="fr-create-update-submission"
-            validate="false"
-            relevant="false"
-            method="put"
-            ref="event('holder')"
-            resource="{event('resource')}"
-            xxf:username="{event('username')}"
-            xxf:password="{event('password')}"
-            replace="text"
-            target="instance('fr-create-update-submission-response')">
-
-        <!-- Clear response if not HTML -->
-        <xf:setvalue
-            if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
-            ref="instance('fr-create-update-submission-response')"/>
-        <xf:header ref=".[normalize-space(event('form-version'))]">
-            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="event('form-version')"/>
-        </xf:header>
-    </xf:submission>
-
-    <!-- Submission to create/update an attachment -->
-    <xf:submission id="fr-create-update-attachment-submission"
-            validate="false"
-            method="put"
-            serialization="application/octet-stream"
-            ref="event('holder')"
-            resource="{event('resource')}"
-            xxf:username="{event('username')}"
-            xxf:password="{event('password')}"
-            replace="none">
-        <xf:header ref=".[normalize-space(event('form-version'))]">
-            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="event('form-version')"/>
-        </xf:header>
-    </xf:submission>
-
     <!-- Search for drafts, to possibly warn users there is a newer draft -->
     <xf:submission id="fr-search-drafts-submission"
             method="post"
@@ -328,7 +281,7 @@
             replace="instance"
             instance="fr-search-drafts-response">
         <!-- Remove documents we can't update (search might still return them if we can only ready them) -->
-        <xf:delete event="xforms-submit-done" ref="instance('fr-search-drafts-response')/document[not(xxf:split(@operations) = 'update')]"/>
+        <xf:delete event="xforms-submit-done" ref="instance('fr-search-drafts-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
     </xf:submission>
     <xf:instance id="fr-search-drafts-request">
         <search>
@@ -460,7 +413,7 @@
                            or normalize-space(xxf:get-request-header('orbeon-username')) != ''"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
-                 relevant="empty(xxf:instance('fr-form-attachments')/pdf) or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
+                 relevant="normalize-space(xxf:instance('fr-form-attachments')/pdf) = '' or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and exf:readonly(../strict-submit)"/>
 
@@ -480,8 +433,12 @@
     <!-- Call PDF service -->
     <xf:submission id="fr-pdf-service-submission"
         resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
-        relevant="false" validate="false" method="post" ref="xxf:instance('fr-form-instance')"
-        replace="instance" instance="fr-pdf-url-instance"/>
+        relevant="false"
+        validate="false"
+        method="post"
+        ref="xxf:instance('fr-form-instance')"
+        replace="instance"
+        instance="fr-pdf-url-instance"/>
 
     <xf:instance id="fr-pdf-url-instance">
         <uri/>

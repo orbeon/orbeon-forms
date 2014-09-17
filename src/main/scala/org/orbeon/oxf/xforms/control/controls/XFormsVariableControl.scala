@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.control.controls
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.controls.VariableControl
+import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, Variable}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.EmptySequence
-import org.orbeon.saxon.value.Value
-import XFormsVariableControl._
-import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.{BindingContext, Variable, XFormsUtils}
 
 /**
  * Representation of a variable in a tree of controls.
@@ -51,10 +51,10 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override def bindingContextForFollowing = _bindingContextForFollowing
     override def bindingContextForChild = _bindingContextForChild
     override def supportAjaxUpdates = false
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) = false
+    override def focusableControls = Iterator.empty
 
-    override def onCreate() {
-        super.onCreate()
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
         // FIXME: Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
         _value = null
     }
@@ -96,33 +96,11 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     }
 
     override def isValueChangedCommit() = {
-        val result = ! compareValues(_previousValue, _value)
+        val result = ! SaxonUtils.compareValueRepresentations(_previousValue, _value)
         _previousValue = _value
         result
     }
 
     // Variables don't support Ajax updates
     override def equalsExternal(other: XFormsControl) = throw new IllegalStateException
-}
-
-object XFormsVariableControl {
-    private def compareValues(value1: ValueRepresentation, value2: ValueRepresentation): Boolean = {
-        if (value1.isInstanceOf[Value] && value2.isInstanceOf[Value]) {
-            val iter1 = value1.asInstanceOf[Value].iterate
-            val iter2 = value2.asInstanceOf[Value].iterate
-            while (true) {
-                val item1 = iter1.next()
-                val item2 = iter2.next()
-                if (item1 == null && item2 == null)
-                    return true
-
-                if (! XFormsUtils.compareItems(item1, item2))
-                    return false
-            }
-            false
-        } else if (value1 == null && value2 == null)
-            true
-        else
-            false
-    }
 }

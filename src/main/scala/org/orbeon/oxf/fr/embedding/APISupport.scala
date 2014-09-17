@@ -13,57 +13,101 @@
  */
 package org.orbeon.oxf.fr.embedding
 
-import java.io.{ByteArrayInputStream, InputStream, OutputStream, Writer}
+import java.io.Writer
 import java.{util ⇒ ju}
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import org.apache.commons.io.IOUtils
+import org.apache.http.client.CookieStore
+import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
+import org.orbeon.oxf.http.{Content, StreamedContent, Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
 
-sealed trait Action { val name: String }
-case object New  extends Action { val name = "new" }
-case object Edit extends Action { val name = "edit" }
-case object View extends Action { val name = "view" }
-
 object APISupport {
+
+    import Private._
+
+    val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
 
     val AllActions       = List(New, Edit, View)
     val AllActionsByName = AllActions map (a ⇒ a.name → a) toMap
-
+    
     def proxyPage(
-            baseURL     : String,
-            path        : String,
-            headers     : immutable.Seq[(String, String)] = Nil,
-            params      : immutable.Seq[(String, String)] = Nil)(
-            implicit ctx: EmbeddingContextWithResponse): Unit = {
+        baseURL     : String,
+        path        : String,
+        headers     : immutable.Seq[(String, String)] = Nil,
+        params      : immutable.Seq[(String, String)] = Nil)(
+        implicit ctx: EmbeddingContextWithResponse
+    ): Unit = {
 
         val url  = formRunnerURL(baseURL, path, embeddable = true)
 
         callService(RequestDetails(None, url, headers, params)) match {
-            case Content(content, contentType, _) ⇒
-                writeResponseBody(content.right map (new ByteArrayInputStream(_)), contentType)
+            case content: StreamedContent ⇒
+                useAndClose(content)(writeResponseBody)
             case Redirect(_, _) ⇒
                 throw new UnsupportedOperationException
         }
     }
+    
+    def proxyServletResources(
+        req         : HttpServletRequest,
+        res         : HttpServletResponse,
+        namespace   : String,
+        resourcePath: String
+    ): Unit =
+        withSettings(req, res.getWriter) { settings ⇒
+
+            implicit val ctx = new ServletEmbeddingContextWithResponse(
+                req,
+                Right(res),
+                namespace,
+                settings.orbeonPrefix,
+                settings.httpClient
+            )
+
+            val url = formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false)
+
+            val contentFromRequest =
+                req.getMethod == "POST" option
+                    StreamedContent(
+                        req.getInputStream,
+                        Option(req.getContentType),
+                        Some(req.getContentLength.toLong) filter (_ >= 0L),
+                        None
+                    )
+
+            proxyResource(
+                RequestDetails(
+                    content = contentFromRequest,
+                    url     = url,
+                    headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
+                    params  = Nil
+                )
+            )
+        }
 
     def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
+
+        Logger.debug("proxying resource {}", requestDetails.url)
 
         val res = connectURL(requestDetails)
         
         ctx.setStatusCode(res.statusCode)
-        filterCapitalizeAndCombineHeaders(res.headers mapValues (List(_)), out = false) foreach (ctx.setHeader _).tupled
+        res.content.contentType foreach (ctx.setHeader("Content-Type", _))
 
-        useAndClose(res.inputStream) { is ⇒
-            writeResponseBody(Right(is), Option(res.contentType))
-        }
+        proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
+
+        useAndClose(res.content)(writeResponseBody)
     }
 
     def formRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
@@ -86,64 +130,30 @@ object APISupport {
     // header specified in the init parameter.
     def headersToForward(clientHeaders: List[(String, List[String])], configuredHeaders: Map[String, String]) =
         for {
-            (name, value) ← filterAndCombineHeaders(clientHeaders, out = true)
+            (name, value) ← proxyAndCombineRequestHeaders(clientHeaders)
             originalName  ← configuredHeaders.get(name.toLowerCase)
         } yield
             originalName → value
 
     // Call the Orbeon service at the other end
-    def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): ContentOrRedirect = {
+    def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): StreamedContentOrRedirect = {
+
+        Logger.debug("proxying page {}", requestDetails.url)
+
         val cx = connectURL(requestDetails)
-        useAndClose(cx.inputStream) { is ⇒
-            if (isRedirectCode(cx.statusCode))
-                Redirect(cx.headers("Location"), exitPortal = true)
-            else
-                Content(Right(IOUtils.toByteArray(is)), Option(cx.contentType), None)
-        }
+        if (isRedirectCode(cx.statusCode))
+            Redirect(cx.headers("Location").head, exitPortal = true)
+        else
+            cx.content
     }
 
-    // POST when we get ClientDataRequest for:
-    //
-    // - actions requests
-    // - resources requests: Ajax requests, form posts, and uploads
-    //
-    // GET otherwise for:
-    //
-    // - render requests
-    // - resources: typically image, CSS, JavaScript, etc.
-    def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
-        PlainHttpClient.openConnection(
-            recombineQuery(requestDetails.url, requestDetails.params),
-            requestDetails.content map { content ⇒
-
-                def write(os: OutputStream): Unit =
-                    content.body match {
-                        case Left(string) ⇒ os.write(string.getBytes("utf-8"))
-                        case Right(bytes) ⇒ os.write(bytes)
-                    }
-
-                (content.contentType, write _)
-            },
-            ("Orbeon-Client" → "portlet") +: requestDetails.headers
-        )
-
-    def writeResponseBody(
-            data        : String Either InputStream,
-            contentType : Option[String])(
-            implicit ctx: EmbeddingContextWithResponse): Unit =
-        contentType map getContentTypeMediaType match {
+    def writeResponseBody(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
+        content.contentType map getContentTypeMediaType match {
             case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
                 // Text/JSON/XML content type: rewrite response content
-                val contentAsString =
-                    data match {
-                        case Left(string) ⇒
-                            string
-                        case Right(is) ⇒
-                            val encoding = contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
-                            IOUtils.toString(is, encoding)
-                    }
-
-                val encodeForXML = XMLUtils.isXMLMediatype(mediatype)
+                val encoding        = content.contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
+                val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
+                val encodeForXML    = XMLUtils.isXMLMediatype(mediatype)
 
                 def decodeURL(encoded: String) = {
                     val decodedURL = ctx.decodeURL(encoded)
@@ -158,88 +168,113 @@ object APISupport {
                 )
             case _ ⇒
                 // All other types: just output
-                data match {
-                    case Left(string) ⇒
-                        ctx.writer.write(string)
-                    case Right(is) ⇒
-                        IOUtils.copy(is, ctx.outputStream)
-                }
+                useAndClose(content.inputStream)(IOUtils.copy(_, ctx.outputStream))
         }
 
-    // Parse a string containing WSRP encodings and encode the URLs and namespaces
-    def decodeWSRPContent(content: String, ns: String, decodeURL: String ⇒ String, writer: Writer): Unit = {
-
-        val stringLength = content.length
-        var currentIndex = 0
-        var index        = 0
-
-        import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
-
-        while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
-
-            // Write up to the current mark
-            writer.write(content, currentIndex, index - currentIndex)
-
-            // Check if escaping is requested
-            if (index + BaseTagLength * 2 <= stringLength &&
-                    content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
-                // Write escaped tag, update index and keep looking
-                writer.write(BaseTag)
-                currentIndex = index + BaseTagLength * 2
-            } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '?') {
-                // URL encoding
-                // Find the matching end mark
-                val endIndex = content.indexOf(EndTag, index)
-                if (endIndex == -1)
-                    throw new OXFException("Missing end tag for WSRP encoded URL.")
-                val encodedURL = content.substring(index + StartTagLength, endIndex)
-                currentIndex = endIndex + EndTagLength
-
-                writer.write(decodeURL(encodedURL))
-            } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '_') {
-                // Namespace encoding
-                writer.write(ns)
-                currentIndex = index + PrefixTagLength
-            } else
-                throw new OXFException("Invalid WSRP rewrite tagging.")
-        }
-
-        // Write remainder of string
-        if (currentIndex < stringLength)
-            writer.write(content, currentIndex, content.length - currentIndex)
+    def scopeSettings[T](req: HttpServletRequest, settings: EmbeddingSettings)(body: ⇒ T): T = {
+        req.setAttribute(SettingsKey, settings)
+        try body
+        finally req.removeAttribute(SettingsKey)
     }
-}
+    
+    def withSettings[T](req: HttpServletRequest, writer: ⇒ Writer)(body: EmbeddingSettings ⇒ T): Unit =
+        Option(req.getAttribute(SettingsKey).asInstanceOf[EmbeddingSettings]) match {
+            case Some(settings) ⇒
+                body(settings)
+            case None ⇒
+                val msg = "ERROR: Orbeon Forms embedding filter is not configured."
+                Logger.error(msg)
+                writer.write(msg)
+        }
 
-// Immutable responses
-sealed trait ContentOrRedirect
+    def nextNamespace(req: HttpServletRequest) = {
 
-case class Content(body: String Either Array[Byte], contentType: Option[String], title: Option[String])
-    extends ContentOrRedirect
+        val newValue =
+            Option(req.getAttribute(LastNamespaceIndexKey).asInstanceOf[Integer]) match {
+                case Some(value) ⇒ value + 1
+                case None        ⇒ 0
+            }
 
-case class Redirect(location: String, exitPortal: Boolean = false) extends ContentOrRedirect {
-    require(location ne null, "Missing Location header in redirect response")
-}
+        req.setAttribute(LastNamespaceIndexKey, newValue)
 
-// Immutable information about an outgoing request
-case class RequestDetails(
-    content  : Option[Content],
-    url      : String,
-    headers  : immutable.Seq[(String, String)],
-    params   : immutable.Seq[(String, String)]
-)
+        NamespacePrefix + newValue
+    }
 
-trait EmbeddingContext {
-    def namespace: String
-    def getSessionAttribute(name: String): AnyRef
-    def setSessionAttribute(name: String, value: AnyRef): Unit
-    def removeSessionAttribute(name: String): Unit
-    def log(message: String): Unit                              // consider removing
-}
+    val NamespacePrefix = "o"
 
-trait EmbeddingContextWithResponse extends EmbeddingContext{
-    def writer: Writer
-    def outputStream: OutputStream                              // for binary resources only
-    def setHeader(name: String, value: String): Unit
-    def setStatusCode(code: Int): Unit
-    def decodeURL(encoded: String): String
+    private object Private {
+
+        val SettingsKey           = "orbeon.form-runner.filter-settings"
+        val RemoteSessionIdKey    = "orbeon.form-runner.remote-session-id"
+        val LastNamespaceIndexKey = "orbeon.form-runner.last-namespace-index"
+
+        // POST when we get RequestDetails for:
+        //
+        // - actions requests
+        // - resources requests: Ajax requests, form posts, and uploads
+        //
+        // GET otherwise for:
+        //
+        // - render requests
+        // - resources: typically image, CSS, JavaScript, etc.
+        def connectURL(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext) =
+            ctx.httpClient.connect(
+                url         = recombineQuery(requestDetails.url, requestDetails.params),
+                credentials = None,
+                cookieStore = getOrCreateCookieStore,
+                method      = if (requestDetails.content.isEmpty) "GET" else "POST",
+                headers     = requestDetails.headersMapWithContentType + ("Orbeon-Client" → List("portlet")),
+                content     = requestDetails.content
+            )
+
+        // Parse a string containing WSRP encodings and encode the URLs and namespaces
+        def decodeWSRPContent(content: String, ns: String, decodeURL: String ⇒ String, writer: Writer): Unit = {
+
+            val stringLength = content.length
+            var currentIndex = 0
+            var index        = 0
+
+            import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
+
+            while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
+
+                // Write up to the current mark
+                writer.write(content, currentIndex, index - currentIndex)
+
+                // Check if escaping is requested
+                if (index + BaseTagLength * 2 <= stringLength &&
+                        content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
+                    // Write escaped tag, update index and keep looking
+                    writer.write(BaseTag)
+                    currentIndex = index + BaseTagLength * 2
+                } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '?') {
+                    // URL encoding
+                    // Find the matching end mark
+                    val endIndex = content.indexOf(EndTag, index)
+                    if (endIndex == -1)
+                        throw new OXFException("Missing end tag for WSRP encoded URL.")
+                    val encodedURL = content.substring(index + StartTagLength, endIndex)
+                    currentIndex = endIndex + EndTagLength
+
+                    writer.write(decodeURL(encodedURL))
+                } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '_') {
+                    // Namespace encoding
+                    writer.write(ns)
+                    currentIndex = index + PrefixTagLength
+                } else
+                    throw new OXFException("Invalid WSRP rewrite tagging.")
+            }
+
+            // Write remainder of string
+            if (currentIndex < stringLength)
+                writer.write(content, currentIndex, content.length - currentIndex)
+        }
+
+        def getOrCreateCookieStore(implicit ctx: EmbeddingContext) =
+            Option(ctx.getSessionAttribute(RemoteSessionIdKey).asInstanceOf[CookieStore]) getOrElse {
+                val newCookieStore = new BasicCookieStore
+                ctx.setSessionAttribute(RemoteSessionIdKey, newCookieStore)
+                newCookieStore
+            }
+    }
 }

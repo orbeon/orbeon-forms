@@ -23,7 +23,7 @@
                     <a class="brand" href="#">Orbeon Forms Embedding Demo</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
-                            <li class="active"><a href="?form=bookshelf">Bookshelf</a></li>
+                            <li><a href="?form=bookshelf">Bookshelf</a></li>
                             <li><a href="?form=dmv-14">DMV-14</a></li>
                             <li><a href="?form=w9">W-9</a></li>
                             <li><a href="?form=controls">Controls</a></li>
@@ -36,20 +36,18 @@
         </div>
 
         <div class="container">
-
             <%
                 API.embedFormJava(
-                        getServletConfig().getServletContext(),
-                        request,
-                        out,
-                        "orbeon",
-                        request.getParameter("form") != null ? request.getParameter("form") : "bookshelf",
-                        "new",
-                        null,
-                        null
+                    request,
+                    out,
+                    "orbeon",
+                    request.getParameter("form") != null ? request.getParameter("form") : "bookshelf",
+                    "new",
+                    null,
+                    null,
+                    null
                 );
             %>
-
         </div>
     </body>
 </html>

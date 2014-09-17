@@ -19,22 +19,22 @@ import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
-import org.orbeon.oxf.xforms.state.InstancesControls
+import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.util.ScalaUtils._
 
 object Controls {
 
     // Create the entire tree of control from the root
-    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex) = {
+    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex, state: Option[Map[String, ControlState]]) = {
 
         val bindingContext = containingDocument.getContextStack.resetBindingContext()
         val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
         buildTree(
             controlIndex,
+            state,
             containingDocument,
             bindingContext,
             None,
@@ -68,6 +68,7 @@ object Controls {
         val controlOpt =
             buildTree(
                 controlIndex,
+                None,
                 container,
                 bindingContext,
                 Some(repeatControl),
@@ -84,13 +85,15 @@ object Controls {
             container: XBLContainer,
             controlIndex: ControlIndex,
             containerControl: XFormsContainerControl,
-            rootAnalysis: ElementAnalysis) = {
+            rootAnalysis: ElementAnalysis,
+            state: Option[Map[String, ControlState]]) = {
 
         val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
         val bindingContext = containerControl.bindingContextForChild
 
         buildTree(
             controlIndex,
+            state,
             container,
             bindingContext,
             Some(containerControl),
@@ -103,6 +106,7 @@ object Controls {
     // Build a component subtree
     private def buildTree(
             controlIndex: ControlIndex,
+            state: Option[Map[String, ControlState]],
             container: XBLContainer,
             bindingContext: BindingContext,
             parentOption: Option[XFormsControl],
@@ -128,10 +132,10 @@ object Controls {
                 controlIndex.indexControl(control)
 
                 // Determine binding
-                control.evaluateBindingAndValues(bindingContext, update = false)
+                control.evaluateBindingAndValues(bindingContext, update = false, restoreState = state.isDefined, state = state flatMap (_.get(effectiveId)))
 
                 // Build the control's children if any
-                control.buildChildren(buildTree(controlIndex, _, _, Some(control), _, _), idSuffix)
+                control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _), idSuffix)
 
                 control
         }
@@ -332,7 +336,7 @@ object Controls {
                     case repeatControl: XFormsRepeatControl ⇒
                         // Update iterations
                         val oldRepeatSeq = control.bindingContext.nodeset.asScala
-                        control.evaluateBindingAndValues(bindingContext, update = true)
+                        control.evaluateBindingAndValues(bindingContext, update = true, restoreState = false, state = None)
                         val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
 
                         // Remember partial focus out of repeat if needed
@@ -346,7 +350,7 @@ object Controls {
                         this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
                     case control ⇒
                         // Simply set new binding
-                        control.evaluateBindingAndValues(bindingContext, update = true)
+                        control.evaluateBindingAndValues(bindingContext, update = true, restoreState = false, state = None)
                 }
                 _updatedCount += 1
             } else {
@@ -382,22 +386,6 @@ object Controls {
 
             level -= 1
         }
-    }
-
-    // Whether two nodesets contain identical items
-    def compareNodesets(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean = {
-        // Can't be the same if the size has changed
-        if (nodeset1.size != nodeset2.size)
-            return false
-
-        val j = nodeset2.iterator
-        for (currentItem1 ← nodeset1) {
-            val currentItem2 = j.next()
-            if (! XFormsUtils.compareItems(currentItem1, currentItem2))
-                return false
-        }
-
-        true
     }
 
     // Iterator over a control's ancestors
@@ -476,9 +464,10 @@ object Controls {
         withDynamicStateToRestore(instancesControls, topLevel = true)(runnable.run())
 
     // Get state to restore
-    private def restoringDynamicState         = instancesControlsToRestore.value
-    def restoringControl(effectiveId: String) = restoringDynamicState flatMap (_._1.controls.get(effectiveId))
-    def restoringInstancesJava                = restoringDynamicState map (_._1.instancesJava) orNull
+    private def restoringDynamicState = instancesControlsToRestore.value
+    def restoringInstanceControls     = restoringDynamicState map (_._1)
+    def restoringControls             = restoringInstanceControls map (_.controls)
+    def restoringInstancesJava        = restoringInstanceControls map (_.instancesJava) orNull
 
     // Whether we are restoring state
     def isRestoringDynamicState = restoringDynamicState exists (_._2)

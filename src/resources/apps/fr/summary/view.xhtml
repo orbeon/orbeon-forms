@@ -11,7 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<!-- This is the Orbeon Forms Form Runner standard summary page -->
 <html xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -20,7 +19,6 @@
       xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
@@ -40,8 +38,8 @@
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
-            <xf:var name="app" as="xs:string" value="xxf:instance('fr-parameters-instance')/app"/>
-            <xf:var name="form" as="xs:string" value="xxf:instance('fr-parameters-instance')/form"/>
+            <xf:var name="app"  value="$parameters/app/string()"/>
+            <xf:var name="form" value="$parameters/form/string()"/>
 
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
             <xf:var name="has-fb-roles" value="$is-fb and not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
@@ -218,7 +216,7 @@
                 <xf:var name="search-permissions"         value="$permissions/permission[xxf:split(@operations) = $search-operations]"/>
 
                 <!-- Are we authorized to see all the data based because of our role? -->
-                <xf:var name="operations-from-role"       value="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xf:var name="operations-from-role"       value="frf:authorizedOperationsBasedOnRoles($permissions)"/>
                 <xf:var name="authorized-based-on-role"   value="$operations-from-role = $search-operations"/>
 
                 <!-- Are we authorized to see data if we are the owner / group member? -->
@@ -285,7 +283,7 @@
                 <xf:insert
                     context="instance('fr-search-instance')"
                     ref="query"
-                    origin="index:jFindIndexedControls(instance('fr-source-form-instance')/root())"/>
+                    origin="index:findIndexedControlsAsXML(instance('fr-source-form-instance')/root())"/>
 
                 <!-- If requested to, only show drafts for never saved document -->
                 <xf:insert if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"
@@ -348,47 +346,27 @@
                 if="$is-fb"
                 submission="search-submission"/>
 
-            <!-- Form data for duplicate -->
-            <xf:instance id="fr-duplicate-form-data"><dummy/></xf:instance>
-            <xf:instance id="fr-duplicate-document"><document/></xf:instance>
+            <!-- Duplicate -->
+            <xf:instance id="fr-duplicate" xmlns=""><document-id/></xf:instance>
 
-            <!-- Read form data -->
+            <!-- Read form data for the duplicate button -->
+            <!-- NOTE: It would be nice if this could be done entirely with a process. -->
             <xf:submission
-                id="read-form-data"
-                method="get"
-                serialization="none"
-                resource="{frf:createFormDataBasePath($app, $form, false(), event('document'))}/data.xml"
-                replace="instance"
-                instance="fr-duplicate-form-data">
+                id="call-duplicate-service"
+                ref="instance('fr-duplicate')"
+                method="post"
+                action="/fr/service/{$app}/{$form}/duplicate"
+                replace="instance">
 
-                <!-- For use in xforms-submit-done below -->
-                <xf:setvalue ev:event="xforms-submit"
-                    ref="instance('fr-duplicate-document')"
+                <xf:setvalue
+                    event="xforms-submit"
+                    ref="instance('fr-duplicate')"
                     value="event('document')"/>
 
-                <!-- Duplicate form data and attachments under a new document id, using the same form version if any is specified -->
-                <xf:action event="xforms-submit-done">
-                    <xf:action type="xpath" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils">
-                        frf:duplicate(
-                            instance('fr-duplicate-form-data'),
-                            $app,
-                            $form,
-                            instance('fr-duplicate-document'),
-                            secure:randomHexId(),
-                            event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value)
-                    </xf:action>
-                </xf:action>
-
                 <xf:action ev:event="xforms-submit-error">
-                    <!-- i18n -->
+                    <!-- TODO: i18n -->
                     <xf:message>Error performing duplication.</xf:message>
                 </xf:action>
-
-                <!-- Clear form data when submission terminates -->
-                <xf:insert
-                    event="xforms-submit-done xforms-submit-error"
-                    ref="instance('fr-duplicate-form-data')"
-                    origin="xxf:element('dummy')"/>
 
             </xf:submission>
 
@@ -905,7 +883,7 @@
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/duplicate"/>
                                     <xf:action ev:event="DOMActivate">
                                         <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
-                                            <xf:send submission="read-form-data">
+                                            <xf:send submission="call-duplicate-service">
                                                 <xf:property name="document" value="substring-after(., '/')"/>
                                             </xf:send>
                                         </xf:action>

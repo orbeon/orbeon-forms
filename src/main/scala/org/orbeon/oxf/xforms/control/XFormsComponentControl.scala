@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.xforms.state.ControlState
+import org.orbeon.oxf.xml.SaxonUtils
+
 import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
@@ -105,8 +108,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         contextStack.getCurrentBindingContext
     }
 
-    override def onCreate(): Unit = {
-        super.onCreate()
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
         if (Controls.isRestoringDynamicState)
             nestedContainer.restoreModelsState()
         else
@@ -219,7 +222,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
         super.onBindingUpdate(oldBinding, newBinding)
-        val isNodesetChange = ! Controls.compareNodesets(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
+        val isNodesetChange = ! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
         if (isNodesetChange) {
             destroyMirrorListenerIfNeeded()
             initializeMirrorListenerIfNeeded(dispatch = true)
@@ -260,11 +263,4 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Consider LHHA hasn't externally changed for custom-lhha mode
     override def compareLHHA(other: XFormsControl) =
         ! handleLHHA || super.compareLHHA(other)
-
-    // If component is directly focusable, attempt focus, otherwise delegate to container behavior
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false) =
-        if (isFocusable(withToggles = false))
-            Focus.focusWithEvents(this)
-        else
-            super.setFocus(inputOnly, dryRun)
 }

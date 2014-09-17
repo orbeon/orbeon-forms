@@ -29,7 +29,13 @@ private object HttpAssert extends TestSupport {
     case   class ExpectedCode(code: Int) extends Expected
 
     def get(url: String, version: Version, expected: Expected, credentials: Option[HttpRequest.Credentials] = None)(implicit logger: IndentedLogger): Unit = {
-        val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
+
+        val (resultCode, headers, resultBody) = {
+            val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
+            val lowerCaseHeaders = headers.map{case (header, value) ⇒ header.toLowerCase → value}
+            (resultCode, lowerCaseHeaders, resultBody)
+        }
+
         expected match {
             case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
                 assert(resultCode === 200)

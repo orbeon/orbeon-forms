@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
+import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
@@ -62,7 +63,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         return resolve(href, base, null, Connection.getForwardHeaders());
     }
 
-    public SAXSource resolve(String href, String base, final Connection.Credentials credentials, final String headersToForward) throws TransformerException {
+    public SAXSource resolve(String href, String base, final Credentials credentials, final String headersToForward) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {
@@ -106,7 +107,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readAsDom4j(String urlString, Connection.Credentials credentials, String headersToForward) {
+    public Document readAsDom4j(String urlString, Credentials credentials, String headersToForward) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials, headersToForward);
             // XInclude handled by source if needed
@@ -116,7 +117,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Connection.Credentials credentials, String headersToForward) {
+    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Credentials credentials, String headersToForward) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials, headersToForward);
             // XInclude handled by source if needed

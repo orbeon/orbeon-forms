@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Orbeon, Inc.
+ * Copyright (C) 2006 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,24 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.embedding
+package org.orbeon.oxf.resources.handler
 
-import java.io.{InputStream, OutputStream}
+import java.net.{URL, URLStreamHandler}
 
-import scala.collection.immutable
+import org.orbeon.oxf.http.{ApacheHttpUrlConnection, PropertiesApacheHttpClient}
 
-trait HttpResponse {
-    def statusCode : Int
-    def headers    : immutable.Map[String, String]
-    def inputStream: InputStream
-    def contentType: String
-}
-
-trait HttpClient {
-    def openConnection(
-        url         : String,
-        content     : Option[(Option[String], OutputStream ⇒ Unit)],
-        headers     : immutable.Iterable[(String, String)])(
-        implicit ctx: EmbeddingContext
-    ): HttpResponse
+class HTTPHandler extends URLStreamHandler {
+    protected def openConnection(url: URL) =
+        new ApacheHttpUrlConnection(url)(PropertiesApacheHttpClient)
 }

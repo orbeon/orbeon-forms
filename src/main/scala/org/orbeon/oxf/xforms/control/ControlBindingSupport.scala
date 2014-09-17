@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
 
@@ -53,17 +54,34 @@ trait ControlBindingSupport {
     def contentRelevant = _isRelevant && contentVisible
 
     // Evaluate the control's binding and value either during create or update
-    final def evaluateBindingAndValues(parentContext: BindingContext, update: Boolean): Unit = {
+    final def evaluateBindingAndValues(
+        parentContext: BindingContext,
+        update       : Boolean,
+        restoreState : Boolean,
+        state        : Option[ControlState]
+    ): Unit = {
         // Evaluate and set binding context as needed
         val pr = parentContentRelevant
-        setBindingContext(if (pr) computeBinding(parentContext) else BindingContext.empty(element, staticControl.scope), pr, update)
+        setBindingContext(
+            if (pr) computeBinding(parentContext) else BindingContext.empty(element, staticControl.scope),
+            pr,
+            update,
+            restoreState,
+            state
+        )
     }
 
     // Refresh the control's binding during update, in case a re-evaluation is not needed
     final def refreshBindingAndValues(parentContext: BindingContext) = {
         // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
         // ensure that the chain of bindings is consistent
-        setBindingContext(bindingContext.copy(parent = parentContext), parentContentRelevant, update = true)
+        setBindingContext(
+            bindingContext.copy(parent = parentContext),
+            parentContentRelevant,
+            update = true,
+            restoreState = false,
+            None
+        )
     }
 
     // Default binding evaluation
@@ -85,7 +103,13 @@ trait ControlBindingSupport {
     def bindingContextForFollowing = _bindingContext.parent
 
     // Set this control's binding context and handle create/destroy/update lifecycle
-    final def setBindingContext(bindingContext: BindingContext, parentRelevant: Boolean, update: Boolean) {
+    final def setBindingContext(
+        bindingContext: BindingContext,
+        parentRelevant: Boolean,
+        update        : Boolean,
+        restoreState  : Boolean,
+        state         : Option[ControlState]
+    ) {
         val oldBinding = this._bindingContext
         this._bindingContext = bindingContext
 
@@ -96,7 +120,7 @@ trait ControlBindingSupport {
         if (! oldRelevant && newRelevant) {
             // Control becomes relevant
             this._isRelevant = true
-            onCreate()
+            onCreate(restoreState, state)
             if (update)
                 markDirtyImpl()
             evaluate()
@@ -118,7 +142,7 @@ trait ControlBindingSupport {
     }
 
     // Control lifecycle
-    def onCreate() = { _wasRelevant = false; _wasContentRelevant = false }
+    def onCreate(restoreState: Boolean, state: Option[ControlState]) = { _wasRelevant = false; _wasContentRelevant = false }
     def onDestroy() = ()
     def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) = ()
 

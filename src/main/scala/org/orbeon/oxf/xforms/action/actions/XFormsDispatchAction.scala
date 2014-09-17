@@ -95,15 +95,15 @@ class XFormsDispatchAction extends XFormsAction {
 object XFormsDispatchAction {
 
     def dispatch(
-            name: String,
-            target: XFormsEventTarget,
-            bubbles: Boolean = true,
-            cancelable: Boolean = true,
-            properties: XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
-            delay: Int = 0,
-            showProgress: Boolean = true,
-            progressMessage: String = null): Unit = {
-
+        name           : String,
+        target         : XFormsEventTarget,
+        bubbles        : Boolean                    = true,
+        cancelable     : Boolean                    = true,
+        properties     : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
+        delay          : Int                        = 0,
+        showProgress   : Boolean                    = true,
+        progressMessage: String                     = null
+    ): Unit =
         if (delay <= 0) {
             // Event is dispatched immediately
 
@@ -112,15 +112,16 @@ object XFormsDispatchAction {
             // action."
 
             // Create and dispatch the event including custom properties (AKA context information)
-            val newEvent = createEvent(
-                name,
-                target,
-                properties,
-                allowCustomEvents = true,
-                bubbles,
-                cancelable)
-
-            Dispatch.dispatchEvent(newEvent)
+            Dispatch.dispatchEvent(
+                createEvent(
+                    name,
+                    target,
+                    properties,
+                    allowCustomEvents = true,
+                    bubbles,
+                    cancelable
+                )
+            )
         } else {
             // Event is dispatched after a delay
 
@@ -139,7 +140,7 @@ object XFormsDispatchAction {
                 delay,
                 false,
                 showProgress,
-                progressMessage)
+                progressMessage
+            )
         }
-    }
 }

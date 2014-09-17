@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.fb
 
-import collection.JavaConverters._
-import java.util.{List ⇒ JList}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -93,14 +91,14 @@ trait SectionOps extends ContainerOps {
     )
 
     // Return all classes that need to be added to an editable section
-    def sectionCanDoClasses(container: NodeInfo): JList[String] = {
+    def sectionCanDoClasses(container: NodeInfo): Seq[String] = {
         val directionClasses =
             DirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction }
 
         val deleteClasses =
             canDeleteSection(container) list "fb-can-delete"
 
-        ("fr-section-container" :: deleteClasses ::: directionClasses) asJava
+        "fr-section-container" :: deleteClasses ::: directionClasses
     }
 
     private def precedingSection(container: NodeInfo) =

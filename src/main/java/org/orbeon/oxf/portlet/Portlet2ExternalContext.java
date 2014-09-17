@@ -499,12 +499,13 @@ public class Portlet2ExternalContext implements ExternalContext {
             return redirectLocation;
         }
 
-        public StringBuilderWriter getStringBuilderWriter() {
-            return stringBuilderWriter;
-        }
-
-        public ByteArrayOutputStream getByteStream() {
-            return byteStream;
+        public byte[] getBytes() throws IOException {
+            if (stringBuilderWriter != null)
+                return stringBuilderWriter.toString().getBytes(getContentType()); // TODO: what if content type not specified?
+            else if (byteStream != null)
+                return byteStream.toByteArray();
+            else
+                return new byte[] {};
         }
 
         public boolean isRedirectIsExitPortal() {
@@ -530,9 +531,6 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         /**
-         *
-         * @param pathInfo      path to redirect to
-         * @param parameters    parameters to redirect to
          * @param isServerSide  this is ignored for portlets
          * @param isExitPortal  if this is true, the redirect will exit the portal
          */

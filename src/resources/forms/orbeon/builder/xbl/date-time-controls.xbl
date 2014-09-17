@@ -34,6 +34,7 @@
         <display-name lang="de">Datum und Uhrzeit</display-name>
         <display-name lang="it">Controlli data e ora</display-name>
         <display-name lang="nl">Datum en tijd</display-name>
+        <display-name lang="sv">Datum och tid</display-name>
         <display-name lang="pt">Data e Hora</display-name>
     </metadata>
 
@@ -47,6 +48,7 @@
             <display-name lang="de">Datum</display-name>
             <display-name lang="it">Data</display-name>
             <display-name lang="nl">Datum</display-name>
+            <display-name lang="sv">Datum</display-name>
             <display-name lang="pt">Data</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
@@ -76,6 +78,7 @@
             <display-name lang="de">Uhrzeit</display-name>
             <display-name lang="it">Ora</display-name>
             <display-name lang="nl">Tijd</display-name>
+            <display-name lang="sv">Tid</display-name>
             <display-name lang="pt">Hora</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/time.png</small-icon>
@@ -105,6 +108,7 @@
             <display-name lang="de">Datum und Uhrzeit</display-name>
             <display-name lang="it">Data e ora</display-name>
             <display-name lang="nl">Datum en tijd</display-name>
+            <display-name lang="sv">Datum och tid</display-name>
             <display-name lang="pt">Data e Hora</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/clock_link.png</small-icon>

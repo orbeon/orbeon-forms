@@ -112,9 +112,22 @@
     </p:processor>
 
     <!-- Serialize out -->
+    <!--
+        WARNING: Don't remove the XSLT transformation until we have fixed:
+
+            https://github.com/orbeon/orbeon-forms/issues/1363
+
+        See the bug description:
+
+            https://github.com/orbeon/orbeon-forms/issues/1881
+    -->
     <p:processor name="oxf:http-serializer">
-        <p:input name="config">
-            <config><cache-control><use-local-cache>false</use-local-cache></cache-control></config>
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#components-xml">
+            <config xsl:version="2.0">
+                <cache-control>
+                    <use-local-cache>false</use-local-cache>
+                </cache-control>
+            </config>
         </p:input>
         <p:input name="data" href="#components-xml"/>
     </p:processor>

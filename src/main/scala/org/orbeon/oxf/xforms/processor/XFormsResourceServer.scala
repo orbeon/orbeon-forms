@@ -96,7 +96,11 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                     for { (name, values) ← resource.headers; value ← values }
                         connection.addRequestProperty(name, value)
 
-                    copyStream(connection.getInputStream, response.getOutputStream)
+                    useAndClose(connection.getInputStream) { is ⇒
+                        useAndClose(response.getOutputStream) { os ⇒
+                            copyStream(is, os)
+                        }
+                    }
                 } catch {
                     case NonFatal(t) ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(t)))
                 }
@@ -156,7 +160,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
             return
         }
 
-        response.setContentType(if (isCSS) "text/css" else "application/x-javascript")
+        response.setContentType(if (isCSS) "text/css; charset=UTF-8" else "application/x-javascript")
 
         // Namespace to use, must be None if empty
         def namespaceOpt = {
@@ -174,20 +178,18 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
             if (resourceFile ne null) {
                 // Caching could take place, send out cached result
                 debug("serving from cache ", debugParameters)
-                copyStream(new FileInputStream(resourceFile), response.getOutputStream)
+                useAndClose(response.getOutputStream) { os ⇒
+                    copyStream(new FileInputStream(resourceFile), os)
+                }
             } else {
                 // Was unable to cache, just serve
                 debug("caching requested but not possible, serving directly", debugParameters)
-                useAndClose(response.getOutputStream) { os ⇒
-                    XFormsResourceRewriter.generate(resources, namespaceOpt, os, isCSS, isMinimal)(indentedLogger)
-                }
+                XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)(indentedLogger)
             }
         } else {
             // Should not cache, just serve
             debug("caching not requested, serving directly", debugParameters)
-            useAndClose(response.getOutputStream) { os ⇒
-                XFormsResourceRewriter.generate(resources, namespaceOpt, os, isCSS, isMinimal)(indentedLogger)
-            }
+            XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)(indentedLogger)
         }
     }
 }

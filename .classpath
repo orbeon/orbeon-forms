@@ -76,7 +76,7 @@
 	<classpathentry kind="lib" path="lib/jtidy-8.0-20060801.131059-3.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.11-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/junit-dep-4.11-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1_2_15.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="lib/looks-1_1_2.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1_3_2.jar"/>
 	<classpathentry kind="lib" path="lib/metadata-extractor-2_1.jar"/>

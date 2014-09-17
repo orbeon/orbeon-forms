@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import XFormsValueControl._
+import org.orbeon.oxf.xforms.state.ControlState
 import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
@@ -40,10 +41,6 @@ abstract class XFormsValueFocusableControlBase(container: XBLContainer, parent: 
     extends XFormsValueControlBase(container, parent, element, effectiveId)
     with FocusableTrait
 
-abstract class XFormsSingleNodeFocusableControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsSingleNodeControl(container, parent, element, effectiveId)
-    with FocusableTrait
-
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {
 
@@ -59,8 +56,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     private[XFormsValueControl] var isExternalValueEvaluated: Boolean = false
     private[XFormsValueControl] var externalValue: String = null
 
-    override def onCreate(): Unit = {
-        super.onCreate()
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
 
         _value = null
         _previousValue = null

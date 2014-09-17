@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.XPathCache._
 import org.orbeon.oxf.util.XPath._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.JavaConverters._
-import org.orbeon.oxf.xforms.XFormsInstance
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsInstance}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{XMLReceiver, XMLParsing, TransformerUtils, NamespaceMapping}
@@ -370,10 +370,10 @@ object XML {
             case Seq() ⇒ None
             case s     ⇒ Some(s.stringValue)
         }
-        
+
         def elemValue(elemName: String) = /(elemName).stringValue
         def elemValue(elemName: QName)  = /(elemName).stringValue
-        
+
         def elemValueOpt(elemName: String) = /(elemName) match {
             case Seq() ⇒ None
             case s     ⇒ Some(s.stringValue)
@@ -436,6 +436,12 @@ object XML {
 
         def stringValue = nodeInfo.getStringValue
 
+        // Intended to be used for debugging
+        def serializeToString: String = {
+            val dom4jNode = XFormsUtils.getNodeFromNodeInfoConvert(nodeInfo)
+            Dom4jUtils.nodeToString(dom4jNode)
+        }
+
         def hasIdValue(id: String) = nodeInfo /@ "id" === id
 
         private def find(axisNumber: Byte, test: Test): Seq[NodeInfo] = {
@@ -467,7 +473,7 @@ object XML {
         def /@(attName: QName): Seq[NodeInfo] = seq flatMap (_ /@ attName)
         def /@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ /@ attName)
         def /@(test: Test): Seq[NodeInfo] = seq flatMap (_ /@ test)
-        
+
         def \@(attName: String): Seq[NodeInfo] = /@(attName)
         def \@(attName: QName): Seq[NodeInfo]  = /@(attName)
         def \@(attName: (String, String))      = /@(attName)
@@ -595,7 +601,7 @@ object XML {
     implicit def asStringSequenceIterator(i: Iterator[String]): SequenceIterator =
         asSequenceIterator(i map stringToStringValue)
 
-    implicit def asSequenceIterator(i: Iterator[Item]) = new SequenceIterator {
+    implicit def asSequenceIterator(i: Iterator[Item]): SequenceIterator = new SequenceIterator {
 
         private var currentItem: Item = _
         private var _position = 0

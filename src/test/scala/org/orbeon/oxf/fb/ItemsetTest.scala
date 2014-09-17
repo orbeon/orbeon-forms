@@ -13,21 +13,16 @@
  */
 package org.orbeon.oxf.fb
 
-import collection.JavaConverters._
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.{XMLParsing, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 import scala.xml.Elem
-import scala.xml.XML
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.util.XPath
 
 class ItemsetTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
@@ -39,7 +34,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
             def assertControl(controlName: String, expectedItems: Seq[Elem]): Unit = {
 
                 val actualItems =
-                    FormBuilder.getControlItemsGroupedByValue(controlName).asScala map TransformerUtils.tinyTreeToDom4j
+                    FormBuilder.getControlItemsGroupedByValue(controlName) map TransformerUtils.tinyTreeToDom4j
 
                 for ((expected, actual) ← expectedItems.zipAll(actualItems, null, null))
                     assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)

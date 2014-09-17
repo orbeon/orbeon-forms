@@ -84,7 +84,10 @@
         <include name="msv-20081113-orbeon.jar"/>
 
         <include name="dom4j-1_6_1.jar"/>
-        <include name="log4j-1_2_15.jar"/>
+        <include name="slf4j-api-1.7.7.jar"/>
+        <include name="slf4j-log4j12-1.7.7.jar"/>
+        <include name="jcl-over-slf4j-1.7.7.jar"/>
+        <include name="log4j-1.2.17.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
         <include name="saxpath-dev_orbeon.jar"/>
 
@@ -97,7 +100,6 @@
         <include name="commons-fileupload-1.2.2.jar"/>
         <include name="commons-io-2.0.1.jar"/>
         <include name="commons-lang3-3.1.jar"/>
-        <include name="commons-logging-1.1.1.jar"/>
         <include name="commons-pool-1.6.jar"/>
         <include name="commons-validator-1.4.0.jar"/>
         <include name="joda-time-2.1.jar"/> <!--We don't include joda-convert-1.2.jar; it is only a compile-time dependency for Scala -->
@@ -150,8 +152,6 @@
         <include name="exist-dependency-resolver-1.2.jar"/>
 
         <include name="ehcache-core-2.6.3.jar"/>
-        <include name="ehcache-dependency-slf4j-api-1.6.1.jar"/>
-        <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
 
         <include name="scala-library-2.10.3.jar"/>
         <include name="sbinary_2.10-0.4.1.jar"/>
@@ -399,7 +399,7 @@
 
     <target name="embedding-jar" depends="classes">
         <local name="temp.jar"/>
-        <tempfile property="temp.jar" suffix=".jar"/>
+        <tempfile property="temp.jar" suffix=".jar" destdir="${build.temp.dir}" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -418,17 +418,26 @@
             -injars      lib/httpclient-cache-4.2.3.jar
             -injars      lib/httpcore-4.2.2.jar
             -injars      lib/httpmime-4.2.3.jar
+            -injars      lib/jcl-over-slf4j-1.7.7.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
             <!-- -outjars     build/lib/check-resources.jar -->
 
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
+            -libraryjars lib/slf4j-api-1.7.7.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
             -keep public class org.orbeon.oxf.fr.embedding.servlet.API {
                 public static *;
+            }
+            <!-- For HttpClient -->
+            -keep public class org.apache.commons.logging.impl.LogFactoryImpl {
+                public *;
+            }
+            -keep public class org.apache.commons.logging.impl.Jdk14Logger {
+                public *;
             }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-embedding.jar">
@@ -439,11 +448,12 @@
             <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <target name="proxy-portlet-jar" depends="classes">
         <local name="temp.jar"/>
-        <tempfile property="temp.jar" suffix=".jar"/>
+        <tempfile property="temp.jar" suffix=".jar" destdir="${build.temp.dir}" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -462,15 +472,24 @@
             -injars      lib/httpclient-cache-4.2.3.jar
             -injars      lib/httpcore-4.2.2.jar
             -injars      lib/httpmime-4.2.3.jar
+            -injars      lib/jcl-over-slf4j-1.7.7.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
 
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
             -libraryjars lib/portlet-api_2.0.jar
+            -libraryjars lib/slf4j-api-1.7.7.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
+            <!-- For HttpClient -->
+            -keep public class org.apache.commons.logging.impl.LogFactoryImpl {
+                public *;
+            }
+            -keep public class org.apache.commons.logging.impl.Jdk14Logger {
+                public *;
+            }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">
             <zipfileset src="${temp.jar}"/>
@@ -479,12 +498,13 @@
             <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <target name="xforms-filter-jar" depends="classes">
 
         <local name="temp.jar"/>
-        <tempfile property="temp.jar" suffix=".jar"/>
+        <tempfile property="temp.jar" suffix=".jar" destdir="${build.temp.dir}" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
@@ -516,6 +536,7 @@
             <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
         </jarjar>
+        <delete file="${temp.jar}"/>
     </target>
 
     <!-- JARs -->
@@ -698,19 +719,27 @@
     <target name="proxy-portlet-war" depends="proxy-portlet-jar" description="Create proxy portlet WAR">
     	<mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
-            <webinf dir="descriptors/proxy-portlet"/>
+            <webinf dir="descriptors/proxy-portlet/WEB-INF"/>
             <lib dir="${build.lib.dir}">
                 <include name="orbeon-proxy-portlet.jar"/>
+            </lib>
+            <lib dir="lib">
+                <include name="slf4j-api-1.7.7.jar"/>
+                <include name="slf4j-log4j12-1.7.7.jar"/>
+                <include name="log4j-1.2.17.jar"/>
             </lib>
         </war>
     </target>
 
     <target name="embedding-war" depends="embedding-jar" description="Create embedding WAR">
     	<mkdir dir="${build.distrib.dir}"/>
-        <war destfile="${build.distrib.dir}/${project.name}-${release.number}-embedding.war"
-             webxml="descriptors/embedding/web.xml">
+        <war destfile="${build.distrib.dir}/${project.name}-${release.number}-embedding.war">
+            <webinf dir="descriptors/embedding/WEB-INF"/>
             <lib dir="${build.lib.dir}">
                 <include name="orbeon-embedding.jar"/>
+            </lib>
+            <lib dir="lib">
+                <include name="slf4j-api-1.7.7.jar"/>
             </lib>
             <zipfileset dir="descriptors/embedding" prefix="">
                 <include name="*.jsp"/>
@@ -738,6 +767,8 @@
                 <exclude name="build/**"/>
                 <exclude name="tools"/>
                 <exclude name="tools/**"/>
+                <!-- In case there were some temporary files left by the ProGuard tasks here -->
+                <exclude name="*.jar"/>
                 <!-- Not sure why JUnit outputs those here -->
                 <exclude name="junit*.properties"/>
                 <!-- Don't include a license with the source -->
@@ -760,7 +791,7 @@
                 <pathelement location="src/main/resources"/>
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
-                <pathelement location="lib/log4j-1_2_15.jar"/>
+                <pathelement location="lib/log4j-1.2.17.jar"/>
                 <pathelement location="lib/scala-library-2.10.3.jar"/>
                 <pathelement location="lib/orbeon-errorified-20130923.jar"/>
             </classpath>
@@ -948,6 +979,7 @@
                         <pathelement location="${build.test-classes.dir}"/>
                         <pathelement location="${resources-private.jar.file}"/>
                     </classpath>
+                    <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
                 </junit>
 
                 <!-- Stop Tomcat -->

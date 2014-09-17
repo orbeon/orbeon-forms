@@ -107,8 +107,19 @@
 
     <!-- Generate a schema for a form -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(schema)"
-          model="detail/detail-model.xpl" view="schema/schema.xpl">
+             model="detail/detail-model.xpl"
+             view="services/schema.xpl">
     </service>
+
+    <!-- Duplicate form data -->
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(duplicate)"
+             model="request-parameters.xpl"
+             view="services/duplicate.xhtml"/>
+
+    <!-- List form data attachments -->
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(attachments)"
+             model="request-parameters.xpl"
+             view="services/attachments.xhtml"/>
 
     <!-- ==== Custom services and pages ============================================================================ -->
 

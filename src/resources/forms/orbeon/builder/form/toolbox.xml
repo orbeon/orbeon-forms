@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xh:div xmlns:xh="http://www.w3.org/1999/xhtml"
+<xf:group xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -91,7 +91,7 @@
             </xh:div>
             <!-- Add grids -->
             <xh:div class="fb-tool">
-                <xf:trigger appearance="full" id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
+                <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
                     <xf:label>
                         <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
                         <xf:output value="$form-resources/new-grid/label"/>
@@ -102,7 +102,7 @@
                 </xf:trigger>
             </xh:div>
             <xh:div class="fb-tool">
-                <xf:trigger appearance="full" ref="instance('fb-variables')/grid-trigger" >
+                <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
                     <xf:label>
                         <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
                         <xf:output value="$form-resources/new-repeated-grid/label"/>
@@ -306,4 +306,4 @@
         <fr:neutral-choice/>
     </fr:alert-dialog>
 
-</xh:div>
+</xf:group>

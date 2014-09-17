@@ -302,7 +302,8 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                                 containerScope.fullPrefix,
                                 baseURI
                             ),
-                            metadata) {
+                            metadata,
+                            false) {
                             // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls and shadow trees
                             protected override def rewriteId(id: String) = containerScope.fullPrefix + id
                         },
@@ -417,7 +418,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
-        TransformerUtils.writeDom4j(shadowTree, new XFormsAnnotator(output, null, metadata) {
+        TransformerUtils.writeDom4j(shadowTree, new XFormsAnnotator(output, null, metadata, false) {
             // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls and shadow trees
             protected override def rewriteId(id: String) = prefix + id
         })

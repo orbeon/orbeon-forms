@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.util.ScalaUtils._
+
 // Trait indicating that the control can directly receive keyboard focus
-// NOTE: This is different from supporting `setFocus()`. `setFocus()` can apply to groups, etc. which by themselves
-// do not directly receive focus. Concretely, only leaf controls are focusable, but not all of them. For example,
-// an output control is not focusable.
 trait FocusableTrait extends VisitableTrait {
 
     self ⇒
 
-    // Whether the control is actually focusable depending on relevance, visibility, readonliness
-    override def isFocusable(withToggles: Boolean) = self match {
-        case single: XFormsSingleNodeControl ⇒ isRelevant && (withToggles || ! Focus.isHidden(self)) && ! single.isReadonly
-        case _                               ⇒ isRelevant && (withToggles || ! Focus.isHidden(self))
+    override def isFocusable = self match {
+        case single: XFormsSingleNodeControl ⇒ isRelevant && ! single.isReadonly
+        case _                               ⇒ isRelevant
     }
+
+    override def focusableControls: Iterator[XFormsControl] =
+        isFocusable iterator self
 }

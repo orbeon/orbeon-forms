@@ -21,6 +21,8 @@ import java.util.{Properties, Locale}
 import javax.xml.transform.Result
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat, ISODateTimeFormat}
 
+import scala.util.Try
+
 object DateUtils {
 
     // ISO 8601 xs:dateTime formats with timezone, which we should always use when serializing a date
@@ -88,6 +90,8 @@ object DateUtils {
                         RFC1123Date3.parseDateTime(date).getMillis
                 }
         }
+
+    def tryParseRFC1123(date: String) = Try(parseRFC1123(date)).toOption
 }
 
 // Mock XPathContext

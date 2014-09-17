@@ -91,8 +91,14 @@ object ProcessParser extends Parser {
 
     def ParamSeparator = OptWhiteSpace ~ "," ~ OptWhiteSpace
 
-    def ValueString: Rule1[String] = rule {
-        "\"" ~ zeroOrMore(Character) ~> identity ~ "\""
+    def ValueString = ValueString1 | ValueString2
+
+    def ValueString1: Rule1[String] = rule {
+        "\"" ~ zeroOrMore(Character | "'") ~> identity ~ "\""
+    }
+
+    def ValueString2: Rule1[String] = rule {
+        "'" ~ zeroOrMore(Character | "\"") ~> identity ~ "'"
     }
 
     def Combinator: Rule1[Combinator] = rule {
@@ -101,9 +107,10 @@ object ProcessParser extends Parser {
 
     def Character     = rule { EscapedChar | NormalChar }
     def EscapedChar   = rule { "\\" ~ (anyOf("\"\\/bfnrt") | Unicode) }
-    def NormalChar    = rule { ! anyOf("\"\\") ~ ANY }
+    def NormalChar    = rule { ! anyOf("\"'\\") ~ ANY }
     def Unicode       = rule { "u" ~ HexDigit ~ HexDigit ~ HexDigit ~ HexDigit }
     def HexDigit      = rule { "0" - "9" | "a" - "f" | "A" - "Z" }
+
     def WhiteSpace    = rule { oneOrMore(anyOf(" \n\r\t\f")) }
     def OptWhiteSpace = rule { zeroOrMore(anyOf(" \n\r\t\f")) }
 

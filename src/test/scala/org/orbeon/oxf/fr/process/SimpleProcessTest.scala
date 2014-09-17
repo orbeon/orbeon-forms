@@ -26,6 +26,8 @@ import scala.collection.mutable.ListBuffer
 
 class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
+    val ConstantProcessId = "9fbcdd2e3caf46045e2d545c26d54ffd5b241e97"
+
     class TestProcessInterpreter extends ProcessInterpreter {
 
         implicit val logger = new IndentedLogger(LoggerFactory.createLogger(classOf[TestProcessInterpreter]), true, "test")
@@ -40,6 +42,9 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         def writeSuspendedProcess(process: String) = _suspendedProcess = Some(process)
         def readSuspendedProcess = _suspendedProcess.get
 
+        // Constant so that we can test properly
+        override def createUniqueProcessId = ConstantProcessId
+
         private var _suspendedProcess: Option[String] = None
         def savedProcess = _suspendedProcess
 
@@ -49,7 +54,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         }
 
         // a1-a20 successful actions which log a trace of their execution
-        override def extensionActions = 1 to 20 map ("a" + _) map (name ⇒ name → (mySuccessAction(name) _))
+        override def extensionActions = 1 to 20 map ("a" + _) map (name ⇒ name → mySuccessAction(name) _)
 
         private val _trace = ListBuffer[String]()
         def trace = _trace mkString " "
@@ -112,7 +117,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         for ((process, context, continuation, trace) ← expected) {
             interpreter.xpathContext = context
             interpreter.runProcessByName("", process)
-            assert(Some(normalize(continuation)) === interpreter.savedProcess)
+            assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
             assert(trace === interpreter.trace)
             interpreter.runProcess("", "resume").get
         }

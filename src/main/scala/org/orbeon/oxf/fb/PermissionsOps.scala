@@ -13,11 +13,27 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.XPath
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner.orbeonRoles
 
 trait PermissionsOps {
+
+    /** Loads the form-builder-permissions.xml. For code called from XForms, that instance is loaded in
+     *  fr/includes/permissions-model.xml.
+     */
+    def fbRoles: DocumentInfo = {
+        val supportedPaths  = List("/config/form-builder-permissions.xml",
+                                   "/config/form-runner-roles.xml")
+        val resourceManager = ResourceManagerWrapper.instance
+        val documentOpt     = supportedPaths.collectFirst{case key if resourceManager.exists(key) ⇒ resourceManager.getContentAsDOM4J(key)}
+        val document        = documentOpt.getOrElse(throw new OXFException("Can't find configuration for Form Builder permissions"))
+        new DocumentWrapper(document, null, XPath.GlobalConfiguration)
+    }
 
     // Whether, given permissions specified in XML, the user has Form Builder access to the given app/form
     def hasAdminPermissionsFor(fbPermissions: NodeInfo, app: String, form: String): Boolean = {

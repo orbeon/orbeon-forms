@@ -368,7 +368,7 @@
                 <hint>Whether the data is required</hint>
                 <item id="0">Yes</item>
                 <item id="1">No</item>
-                <item id="2">XPath</item>
+                <item id="2">Formula</item>
             </required>
             <constraint>
                 <label>Constraint</label>
@@ -1240,7 +1240,7 @@
                 <hint>Est-ce que la donnée est obligatoire</hint>
                 <item id="0">Oui</item>
                 <item id="1">Non</item>
-                <item id="2">XPath</item>
+                <item id="2">Formule</item>
             </required>
             <constraint>
                 <label>Contrainte</label>
@@ -2115,7 +2115,7 @@
                 <hint>Hvorvidt feltet er påkrevd eller ikke</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nei</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Restriksjon</label>
@@ -2988,7 +2988,7 @@
                 <hint>Является ли поле обязательным</hint>
                 <item id="0">Да</item>
                 <item id="1">Нет</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Ограничение</label>
@@ -3862,7 +3862,7 @@
                 <hint>Se è necessario immettere i dati</hint>
                 <item id="0">Sì</item>
                 <item id="1">No</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Costrizione</label>
@@ -4728,7 +4728,7 @@
                 <hint>Ob die Eingabe erforderlich ist</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nein</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Einschränkung</label>
@@ -5597,7 +5597,7 @@
                 <hint>Pakollinen data?</hint>
                 <item id="0">Kyllä</item>
                 <item id="1">Ei</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Rajoite</label>
@@ -6464,7 +6464,7 @@
                 <hint>Indica si el dato es requerido</hint>
                 <item id="0">Si</item>
                 <item id="1">No</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Restricción</label>
@@ -7338,7 +7338,7 @@
                 <hint>Indica se é ou não obrigatório</hint>
                 <item id="0">Sim</item>
                 <item id="1">Não</item>
-                <item id="2">XPath</item>
+                <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
                 <label>Restrição</label>
@@ -7849,6 +7849,880 @@
                 </item>
                 <item>
                     <label>Terceira Opção</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+            </items>
+        </template>
+    </resource>
+    <resource xml:lang="sv">
+        <!-- Form metadata -->
+        <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+        <application-name>
+            <label>Område</label>
+            <hint>Ett namn som håller samman en grupp formulär, med exempelvis gemensam funktionalitet eller organisation (som "försäljning" eller företagsnamn). Detta namn visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+            <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+        </application-name>
+        <form-name>
+            <label>Formulär</label>
+            <hint>Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+            <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+        </form-name>
+        <title>
+            <label>Titel</label>
+            <hint>Formulärets titel på aktuellt språk</hint>
+        </title>
+        <description>
+            <label>Beskrivning</label>
+            <hint>Beskrivning av formuläret på aktuellt språk</hint>
+        </description>
+        <logo>
+            <label>Logotyp</label>
+            <hint>Bild som visas överst på formuläret</hint>
+        </logo>
+        <!-- Toolbox -->
+        <cut>
+            <label>Klipp ut</label>
+        </cut>
+        <copy>
+            <label>Kopiera</label>
+        </copy>
+        <paste>
+            <label>Klistra in</label>
+        </paste>
+        <form-structure>
+            <label>Struktur</label>
+        </form-structure>
+        <controls>
+            <label>Kontroller</label>
+        </controls>
+        <i18n>
+            <label>Internationalisering</label>
+        </i18n>
+        <language>
+            <label>Aktuellt språk</label>
+        </language>
+        <advanced>
+            <label>Avancerat</label>
+        </advanced>
+        <services-actions>
+            <label>Funktioner &amp; kommandon</label>
+        </services-actions>
+        <http-services>
+            <label>HTTP-funktioner</label>
+        </http-services>
+        <database-services>
+            <label>Databasfunktioner</label>
+        </database-services>
+        <actions>
+            <label>Kommandon</label>
+        </actions>
+        <new-section>
+            <label>Ny sektion</label>
+        </new-section>
+        <new-grid>
+            <label>Nytt rutnät</label>
+        </new-grid>
+        <new-repeated-grid>
+            <label>Nytt repeterande rutnät</label>
+        </new-repeated-grid>
+        <change-schema>
+            <label>Ändra schema</label>
+        </change-schema>
+        <upload-schema>
+            <label>Infoga schema</label>
+        </upload-schema>
+        <change-pdf>
+            <label>Ändra PDF</label>
+        </change-pdf>
+        <upload-pdf>
+            <label>Infoga PDF</label>
+        </upload-pdf>
+        <change-css>
+            <label>Ändra CSS</label>
+        </change-css>
+        <upload-css>
+            <label>Infoga CSS</label>
+        </upload-css>
+        <show-source>
+            <label>Visa källkod</label>
+        </show-source>
+        <edit-source>
+            <label>Ändra källkod</label>
+        </edit-source>
+        <custom-xml>
+            <label>Koda XML</label>
+        </custom-xml>
+        <permissions>
+            <label>Rättigheter</label>
+        </permissions>
+        <reload-components>
+            <label>Ladda om verktygslådan</label>
+        </reload-components>
+        <enter-section-title>
+            <label>Klicka för att ange sektionens titel</label>
+		</enter-section-title>
+        <type-section-title>
+            <label>Ange sektionens titel</label>
+        </type-section-title>
+        <enter-label>
+            <label>Klicka för att ange ledtext</label>
+        </enter-label>
+        <type-label>
+            <label>Ange ledtext</label>
+        </type-label>
+        <enter-hint>
+            <label>Klicka för att skriva en anvisning</label>
+        </enter-hint>
+        <enter-text>
+            <label>Skriv texten här</label>
+        </enter-text>
+        <type-hint>
+            <label>Skriv anvisningen här</label>
+        </type-hint>
+        <enter-text>
+            <label>Klicka för att skriva in text</label>
+        </enter-text>
+        <click-cell>
+            <label>Klicka för att välja denna cell</label>
+        </click-cell>
+        <insert-control>
+            <label>Använd verktygsraden för att infoga en kontroll</label>
+        </insert-control>
+        <edit-items>
+            <label>Ändra alternativ</label>
+        </edit-items>
+        <expand-icon>
+            <label>Utvidga</label>
+        </expand-icon>
+        <shrink-icon>
+            <label>Krymp</label>
+        </shrink-icon>
+        <delete-control-icon>
+            <label>Ta bort kontroll</label>
+        </delete-control-icon>
+        <delete-grid-icon>
+            <label>Ta bort rutnät</label>
+        </delete-grid-icon>
+        <delete-section-icon>
+            <label>Ta bort sektion</label>
+        </delete-section-icon>
+        <delete-row-icon>
+            <label>Ta bort rad</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>Ta bort kolumn</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>Ny kolumn till vänster</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>Ny kolumn till höger</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>Ny rad ovanför</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>Ny rad nedanför</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>Sektionsinställningar</label>
+        </section-details-icon>
+        <grid-details-icon>
+            <label>Inställningar för rutnät</label>
+        </grid-details-icon>
+        <move-up-icon>
+            <label>Flytta uppåt</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>Flytta nedåt</label>
+        </move-down-icon>
+        <move-right-icon>
+            <label>Flytta åt höger</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>Flytta åt vänster</label>
+        </move-left-icon>
+        <control-details-icon>
+            <label>Inställningar för kontroll</label>
+        </control-details-icon>
+        <switch-appearance-icon>
+            <label>Ändra utseende</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>Ändra anvisning</label>
+        </help-icon>
+        <!-- Common -->
+        <add>
+            <label>Lägg till</label>
+        </add>
+        <remove>
+            <label>Ta bort</label>
+        </remove>
+        <edit>
+            <label>Ändra</label>
+        </edit>
+        <classes>
+            <label>Anpassade CSS-klasser</label>
+        </classes>
+        <!-- Dialogs -->
+        <continue>
+            <label>Fortsätt</label>
+        </continue>
+        <apply>
+            <label>Verkställ</label>
+        </apply>
+        <cancel>
+            <label>Avbryt</label>
+        </cancel>
+        <close>
+            <label>Stäng</label>
+        </close>
+        <delete>
+            <label>Ta bort</label>
+        </delete>
+        <or>
+            <label>eller</label>
+        </or>
+        <dialog-form-settings>
+            <label>Inställningar för formulär</label>
+            <save-as>Spara som…</save-as>
+            <open><label>Inställningar för formulär</label></open>
+            <stats>Formulärstatistik</stats>
+            <sections>Sektioner</sections>
+            <repeats>Upprepningar</repeats>
+            <grids>Rutnät</grids>
+            <section-templates>Sektionsmallar</section-templates>
+            <controls>Kontroller</controls>
+            <all>Allt</all>
+        </dialog-form-settings>
+        <dialog-control-details>
+            <label>Inställningar för kontroll</label>
+            <tab-base><label>Basinställningar</label></tab-base>
+            <tab-validations><label>Valideringar och aviseringar</label></tab-validations>
+            <tab-formulas><label>Formler</label></tab-formulas>
+            <tab-help><label>Hjälp</label></tab-help>
+            <control-name>
+                <label>Kontrollnamn</label>
+                <alert>Namnet används redan eller innehåller otillåtna tecken</alert>
+                <hint>Exempel: "efternamn"</hint>
+            </control-name>
+            <options>
+                <label>Val</label>
+                <item>
+                    <label>Visa i sammanställningen</label>
+                    <value>fr-summary</value>
+                </item>
+                <item>
+                    <label>Visa i sökning</label>
+                    <value>fr-search</value>
+                </item>
+                <item>
+                    <label>Mottagare av mejl</label>
+                    <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>Visa i ärenderaden för mejl</label>
+                    <value>fr-email-subject</value>
+                </item>
+            </options>
+            <types>
+                <label>Datatyp</label>
+            </types>
+            <builtin-type>
+                <label>Inbyggd datatyp</label>
+                <hint>Inbyggd datatyp</hint>
+
+                <use-schema-type>Använd schemats datatyp</use-schema-type>
+
+                <choices>
+                    <choices>
+                        <label>Vanliga datatyper</label>
+                        <type label="Text">string</type>
+                        <type label="Boolesk">boolean</type>
+                        <type label="Mejladress">email</type>
+                    </choices>
+                    <choices>
+                        <label>Numeriska datatyper</label>
+                        <type label="Decimaltal">decimal</type>
+
+                        <type label="Heltal">integer</type>
+                        <type label="Positivt heltal">positiveInteger</type>
+                        <type label="Icke-positivt heltal">nonPositiveInteger</type>
+                        <type label="Negativt heltal">negativeInteger</type>
+                        <type label="Icke-negativt heltal">nonNegativeInteger</type>
+
+                        <type label="Flyttal, enkel precision">float</type>
+                        <type label="Flyttal, dubbel precision">double</type>
+
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Datum och tid</label>
+                        <type label="Datum">date</type>
+                        <type label="Tid">time</type>
+                        <type label="Datum och tid">dateTime</type>
+                        <type label="Tidsintervall">duration</type>
+                        <type label="År och månad">gYearMonth</type>
+                        <type label="Månad och dag">gMonthDay</type>
+                        <type label="År">gYear</type>
+                        <type label="Månad">gMonth</type>
+                        <type label="Dag">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>XML</label>
+                        <type label="">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                        <type label="XML qualified name">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                    <choices>
+                        <label>Andra datatyper</label>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="Base64-kodad binär">base64Binary</type>
+                        <type label="Hexadecimalt kodad binär">hexBinary</type>
+                        <type label="URI">anyURI</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>Schematyp</label>
+                <hint>Datatyp från importerat schema</hint>
+            </schema-type>
+            <required>
+                <label>Obligatorisk</label>
+                <hint>Indikerar om fältet måste fyllas i</hint>
+                <item id="0">Ja</item>
+                <item id="1">Nej</item>
+                <item id="2" todo="true">XPath</item>
+            </required>
+            <constraint>
+                <label>Villkor</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </constraint>
+            <visibility>
+                <label>Synlighet</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </visibility>
+            <readonly>
+                <label>Skrivskydd</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </readonly>
+            <default>
+                <label>Förvalt värde</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>XPath-uttryck</hint>
+            </default>
+            <calculate>
+	        <label>Beräknat värde</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>XPath-uttryck</hint>
+            </calculate>
+            <help>
+                <label>Hjälpmeddelande</label>
+                <hint>Visas när hjälp är aktivt</hint>
+            </help>
+            <alert>
+                <label>Avisering</label>
+                <hint>Visas när avisering är aktiv</hint>
+            </alert>
+            <default-alert>
+                <label>Förvald avisering</label>
+                <hint>Aktiv när det inte finns en mer specifik avisering</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>Använd den globalt förvalda aviseringen</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>Använd förvald avisering</label>
+            </use-default-alert>
+            <validation-type><label>Typ av validering</label></validation-type>
+            <validation-details><label>Valideringsdetaljer</label></validation-details>
+            <level><label>Nivå</label></level>
+            <use-html>Använd HTML</use-html>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Sektionsinställningar</label>
+            <control-name>
+                <label>Namn</label>
+                <alert>Namnet är felaktigt eller redan definierat</alert>
+                <hint>Exempel: "adress"</hint>
+            </control-name>
+            <options>
+                <label>Val</label>
+                <item>
+                    <label>Sidbrytning före</label>
+                    <value>fr-page-break-before</value>
+                </item>
+            </options>
+            <visibility>
+                <label>Synlighet</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </visibility>
+            <readonly>
+                <label>Skrivskydd</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </readonly>
+            <repeat>
+                <label>Upprepa sektionen</label>
+            </repeat>
+            <custom-iteration-name>
+                <label>Namnge iterationen</label>
+                <hint/>
+            </custom-iteration-name>
+            <iteration-name>
+                <label>Iterationens namn</label>
+                <alert>Namnet är felaktigt eller redan definierat</alert>
+                <hint/>
+            </iteration-name>
+            <tab-base><label>Grundinställningar och formler</label></tab-base>
+            <tab-repeat><label>Upprepat innehåll</label></tab-repeat>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Inställningar för rutnät</label>
+            <control-name>
+                <label>Namn</label>
+                <alert>Namnet är felaktigt eller redan definierat</alert>
+                <hint>Exempel: "mitt-namn"</hint>
+            </control-name>
+            <visibility>
+                <label>Synlighet</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </visibility>
+            <readonly>
+                <label>Skrivskydd</label>
+                <alert>Felaktigt XPath-uttryck</alert>
+                <hint>Booleskt XPath-uttryck</hint>
+            </readonly>
+            <min>
+                <label>Minsta antal upprepningar</label>
+                <alert>Felaktigt värde</alert>
+                <hint>Ett icke negativt heltal eller ett XPath-uttryck</hint>
+            </min>
+            <max>
+                <label>Maximalt antal upprepningar</label>
+                <alert>Felaktigt värde</alert>
+                <hint>Ett positivt heltal eller ett XPath-uttryck</hint>
+            </max>
+            <other>Specificera</other>
+            <one>En upprepning</one>
+            <unlimited>Obegränsat</unlimited>
+            <no-minimum>Inget minsta antal</no-minimum>
+        </dialog-grid-details>
+        <dialog-confirmation>
+            <label>Bekräfta</label>
+        </dialog-confirmation>
+        <dialog-help>
+            <label>Hjälp</label>
+            <help-message>
+                <label>Anvisning</label>
+            </help-message>
+        </dialog-help>
+        <dialog-publish>
+            <label>Publicera formuläret</label>
+            <publish>Publicera</publish>
+            <publish-success>Formulärdefinitionen publicerades som version {1,number,integer}, {0,choice,0#inga bilagor|1#com 1 bilaga|1&lt;com {0,number,integer} bilagor}.</publish-success>
+            <publish-error>Ett fel inträffade under publiceringen.</publish-error>
+            <latest-published-version>Senast publicerade version</latest-published-version>
+            <create-new-version-item>skapa ett nytt formulär med version {0,number,integer}</create-new-version-item>
+            <overwrite-version-item>ersätt existerande formulär med version {0,number,integer}</overwrite-version-item>
+            <create-new-version-help>
+	        OBS: Publicering av detta formulär skapar en ny version av formulärdefinitionen i
+		databasen. Ifyllda formulär som redan finns i databasen visas och redigeras med de tidigare
+		versioner av formulärdefinitionen som de är associerade med. Den nya versionen av formulärdefinitionen
+		används för nya formulär.
+            </create-new-version-help>
+            <overwrite-version-help>
+	        OBS: Detta ersätter en existerande formulärdefinition. Om ändringarna du har gjort
+		är små (ex: ändra i fasta texter) blir den nya formulärdefinitionen utbytbar och kan användas
+		för redan ifyllda formulär. Men om du har gjort ändringar i strukturen (ex: lägga till eller
+		ta bort kontroller) blir formulärdefinitionen inkompatibel med redan ifyllda formulär. Vi rekommenderar
+		försiktighet med att ersätta existerande formulärdefinitioner.
+            </overwrite-version-help>
+            <open-summary>Öppna översikten över publicerade formulär</open-summary>
+            <open-new>Öppna ny sida med publicerade formulär</open-new>
+        </dialog-publish>
+        <dialog-add-language>
+            <label>Tillfoga språk</label>
+            <new-language>
+                <label>Tillfoga följande språk</label>
+            </new-language>
+            <common>Vanligaste språk</common>
+            <all>Övriga språk</all>
+            <add-language>
+                <label>Tillfoga språk</label>
+            </add-language>
+            <remove-language>
+                <label>Ta bort språk</label>
+            </remove-language>
+        </dialog-add-language>
+        <dialog-upload-schema>
+            <label>Ladda upp XML-schema</label>
+            <schema-type>
+                <label>Tillgängliga schematyper</label>
+                <hint>Enkla typer tillgängliga i det uppladdade schemat</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>Schemats namnrymds-URI</label>
+                <hint>Den namnrymds-URI som finns i det uppladdade schemat</hint>
+            </namespace-uri>
+            <operations>
+                <label>Operationer</label>
+            </operations>
+            <delete-schema>
+                <label>Ta bort XML-schema</label>
+            </delete-schema>
+            <change-schema>
+                <label>Ändra XML-schema</label>
+            </change-schema>
+            <replace-schema>
+                <label>Ersätt XML-schema</label>
+            </replace-schema>
+            <upload-schema>
+                <label>Bifoga XML-schema</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>Schemat ser inte ut att innehålla enkla typer. Du kommer inte att kunna välja typer från detta schema för validering.</no-simple-types>
+                <has-includes>Schemat innehåller import- eller include-kommandon. De används inte.</has-includes>
+                <not-a-schema>Den uppladdade filen är inte ett giltigt schema.</not-a-schema>
+                <new-schema-information>Ny schemainformation</new-schema-information>
+                <existing-schema-information>Existerande schemainformation</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
+        <dialog-edit-source>
+            <label>Källkod</label>
+            <source>
+                <alert>Innehållet måste vara välformad XML.</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <label>Visa källkod</label>
+        </dialog-view-source>
+        <dialog-upload-pdf>
+            <label>Bifoga en PDF-mall</label>
+            <upload-pdf>
+                <label>PDF-fil</label>
+            </upload-pdf>
+        </dialog-upload-pdf>
+        <dialog-itemsets>
+            <label>Ändra alternativ</label>
+            <resources-language>
+                <label>Resursspråk</label>
+            </resources-language>
+            <label>
+                <label>Etikett</label>
+            </label>
+            <value>
+                <label>Värde</label>
+            </value>
+            <hint>
+                <label>Anvisning</label>
+            </hint>
+        </dialog-itemsets>
+        <dialog-http-services>
+            <label>HTTP-tjänster</label>
+            <service-name>
+                <label>Namn</label>
+                <hint>Definiera ett unikt namn för denna HTTP-tjänst</hint>
+            </service-name>
+            <resource>
+                <label>URL</label>
+                <hint>URL som ska användas för att nå tjänsten</hint>
+            </resource>
+            <method>
+                <label>Metod</label>
+            </method>
+            <serialization>
+                <label>Serialisering</label>
+            </serialization>
+            <soap-submission>
+                <label>Serviço SOAP</label>
+                <hint>Indica se é um serviço SOAP</hint>
+            </soap-submission>
+            <soap-action>
+                <label>SOAP</label>
+                <hint>Indikerar att detta är en SOAP-tjänst</hint>
+            </soap-action>
+            <http-authentication>
+                <label>Autentisering</label>
+                <hint>HTTP-autentisering</hint>
+            </http-authentication>
+            <username>
+                <label>Användarnamn</label>
+            </username>
+            <password>
+                <label>Passord</label>
+            </password>
+            <request-body>
+                <label>Anrop</label>
+                <hint>XML-data, troligen SOAP envelope</hint>
+            </request-body>
+            <response>
+                <label>Svar</label>
+            </response>
+            <error-type>
+                <label>Feltyper</label>
+                <item>
+                    <label>Skickas...</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>Inga data</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>Valideringsfel</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>Resursfel</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>Mottagningsfel</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>Internt fel</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>Resursens URL</label>
+            </resource-uri>
+            <status-code>
+                <label>Statuskod</label>
+            </status-code>
+            <headers>
+                <label>HTTP-attribut</label>
+            </headers>
+            <header-name>
+                <label>Namn</label>
+            </header-name>
+            <header-value>
+                <label>Värde</label>
+            </header-value>
+            <response-body>
+                <label>Svar</label>
+            </response-body>
+            <save>
+                <label>Spara</label>
+            </save>
+            <test>
+                <label>Test</label>
+            </test>
+        </dialog-http-services>
+        <dialog-database-services>
+            <label>Databastjänster</label>
+            <service-name>
+                <label>Namn</label>
+                <hint>Definiera ett unikt namn för denna databastjänst</hint>
+            </service-name>
+            <datasource>
+                <label>Datakälla</label>
+                <hint>Använd JNDI för att identifiera datakällan</hint>
+            </datasource>
+            <query>
+                <label>SQL-fråga</label>
+                <hint>SQL-fråga (som kan innehålla frågetecken för parametrar)</hint>
+            </query>
+            <save>
+                <label>Spara</label>
+            </save>
+            <test>
+                <label>Testa</label>
+            </test>
+        </dialog-database-services>
+        <dialog-actions>
+            <label>Kommandon</label>
+            <service-name>
+                <label>Namn</label>
+                <hint>Definiera ett unikt namn för detta kommando</hint>
+            </service-name>
+            <event-type>
+                <label>Reagera på</label>
+                <hint>Händelse som ska trigga kommandot</hint>
+                <!-- Just a value change -->
+                <item>
+                    <label>Värdeändring</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <!-- Value change AND the first time the control shows -->
+                <item>
+                    <label>Värdeändring eller formulär laddas in</label>
+                    <value>xforms-value-changed xforms-enabled</value>
+                </item>
+                <!-- Control activation -->
+                <item>
+                    <label>Aktivering</label>
+                    <value>DOMActivate</value>
+                </item>
+                <!-- Form load -->
+                <item>
+                    <label>Formulär inladdat</label>
+                    <value>xforms-ready</value>
+                </item>
+            </event-type>
+            <event-condition>
+                <label>Villkor</label>
+                <item>
+                    <label>Kör alltid</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>Kör bara när nytt formulär fylls i</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
+            <event-control>
+                <label>Kontroll</label>
+            </event-control>
+            <service-to-call>
+                <label>Tjänst att anropa</label>
+                <hint>Tjänst som ska anropas när händelse triggar kommandot</hint>
+            </service-to-call>
+            <request-parameters>
+                <label>Parametervärden för tjänsten</label>
+            </request-parameters>
+            <source-control>
+                <label>Ursprungskontroll</label>
+            </source-control>
+            <destination-xpath>
+                <label>XPath-uttryck för destinationen</label>
+            </destination-xpath>
+            <request-database-parameter>
+                <label>Parametrar för databastjänst</label>
+            </request-database-parameter>
+            <parameter-number>
+                <label>Parameternummer</label>
+            </parameter-number>
+            <response-values>
+                <label>Ange kontrollvärden för svar</label>
+            </response-values>
+            <destination-control>
+                <label>Destinationskontroll</label>
+            </destination-control>
+            <source-xpath>
+                <label>XPath-uttryck för ursprunget</label>
+            </source-xpath>
+            <response-itemset>
+                <label>Ange kontrollvärden för svar</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>Kontroll för val av destination</label>
+            </destination-selection-control>
+            <itemset>
+                <label>Itemset</label>
+                <hint>XPath-uttryck för att bygga ett nytt itemset</hint>
+            </itemset>
+            <items>
+                <label>Items</label>
+                <hint>XPath-uttryck som returnerar en nod per item</hint>
+            </items>
+            <label>
+                <label>Label</label>
+                <hint>XPath-uttryck relativt en nod</hint>
+            </label>
+            <value>
+                <label>Värde</label>
+                <hint>XPath-uttryck relativt en nod</hint>
+            </value>
+            <save>
+                <label>Spara</label>
+            </save>
+            <test>
+                <label>Testa</label>
+            </test>
+        </dialog-actions>
+        <dialog-test>
+            <label>Förhandsvisa formulär</label>
+        </dialog-test>
+        <dialog-pe>
+            <label>Funktioner i Orbeon Forms PE</label>
+            <message>
+                <div>
+                    <p>Denna funktion finns endast i Orbeon Forms PE.</p>
+                    <p>För ytterligare information, besök <a href="http://www.orbeon.com/download" target="_blank">Orbeons webbplats</a>.</p>
+                </div>
+            </message>
+        </dialog-pe>
+        <dialog-custom-xml>
+            <label>XML-kod</label>
+            <mode-label>Information som fylls i av användare lagras i ett XML-dokument:</mode-label>
+            <mode-automatic>Låt Form Builder generera XML åt mig</mode-automatic>
+            <mode-custom>Jag tillhandahåller ett XML-dokument</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <label>Rättigheter</label>
+            <enable-permissions>Tillämpa rättigheter för detta formulär</enable-permissions>
+            <role>Roll</role>
+            <permissions>Rättigheter</permissions>
+            <operations>Operationer</operations>
+            <anyone>Alla</anyone>
+            <owner>Ägaren</owner>
+            <group-members>Grupp</group-members>
+            <create>Skapa</create>
+            <read>Läsa</read>
+            <update>Ändra</update>
+            <delete>Ta bort</delete>
+        </dialog-permissions>
+        <!-- Messages -->
+        <messages>
+            <delete-section>Bekräfta att du vill ta bort denna sektion</delete-section>
+            <delete-grid>Bekräfta att du vill ta bort detta rutnät</delete-grid>
+            <delete-column>Bekräfta att du vill ta bort denna kolumn</delete-column>
+            <delete-row>Bekräfta att du vill ta bort denna rad</delete-row>
+            <expand-cell>Bekräfta att du vill utvidga denna cell. En kontroll kommer att tas bort.</expand-cell>
+            <delete-resources>Bekräfta att du vill ta bort alla resurser för detta språk</delete-resources>
+            <delete-service>Bekräfta att du vill ta bort denna tjänst</delete-service>
+            <delete-action>Bekräfta att du vill ta bort detta kommando</delete-action>
+            <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
+            <metadata-edit-title>Metadata</metadata-edit-title>
+            <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret (men går även att ändra senare):</new-metadata-output>
+            <edit-metadata-output/>
+            <save-as-metadata-output>Var god definiera namn på område och formulär att användas för kopian av formuläret:</save-as-metadata-output>
+            <xpath-errors>Det finns {0,choice,1#ett XPath-fel|1&lt;{0,number,integer} XPath-fel} i formuläret.</xpath-errors>
+            <lhha-checkbox>Kryssa denna ruta om du vill skriva HTML-taggar</lhha-checkbox>
+        </messages>
+        <template>
+            <untitled-form>Formulär utan titel</untitled-form>
+            <untitled-section>Sektion utan titel</untitled-section>
+            <items>
+                <item>
+                    <label>Första val</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Andra val</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Tredje val</label>
                     <value>3</value>
                     <hint/>
                 </item>

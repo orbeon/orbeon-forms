@@ -412,7 +412,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 deleteDraft(connection, req)
 
             // Create flat view if needed
-            if (requestFlatView && req.provider == "oracle" && req.forForm && ! delete && req.form != "library")
+            if (requestFlatView && Set("oracle", "db2")(req.provider) && req.forForm && ! delete && req.form != "library")
                 FlatView.createFlatView(req, connection)
 
             // Inform caller of the form definition version used

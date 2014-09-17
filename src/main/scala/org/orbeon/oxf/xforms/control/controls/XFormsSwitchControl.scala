@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.{ControlLocalSupport, XFormsControl, XForms
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 import org.xml.sax.helpers.AttributesImpl
@@ -34,34 +35,24 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    @transient
-    private var restoredState: Boolean = false
-
     // Initial local state
     setLocal(new XFormsSwitchControlLocal)
 
-    // Restore state if needed
-    stateToRestore foreach { state ⇒
-        val keyValues = state.keyValues
-
-        // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-        val local = getCurrentLocal.asInstanceOf[XFormsSwitchControlLocal]
-        local.selectedCaseControlId = keyValues("case-id")
-
-        // Indicate that deserialized state must be used
-        restoredState = true
-    }
-
-    override def onCreate(): Unit = {
-        super.onCreate()
+    // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
-        if (! restoredState) {
-            val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
-            local.selectedCaseControlId = findDefaultSelectedCaseId
-        } else {
-            // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
-            restoredState = false
+        state match {
+            case Some(state) ⇒
+                setLocal(new XFormsSwitchControlLocal(state.keyValues("case-id")))
+            case None if restoreState ⇒
+                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
+                // particular control might not be found.
+                setLocal(new XFormsSwitchControlLocal(findDefaultSelectedCaseId))
+            case None ⇒
+                val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
+                local.selectedCaseControlId = findDefaultSelectedCaseId
         }
     }
 
@@ -154,8 +145,11 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     override def serializeLocal =
         ju.Collections.singletonMap("case-id", XFormsUtils.getStaticIdFromId(getSelectedCaseEffectiveId))
 
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false): Boolean =
-        isRelevant && (selectedCase exists (_.setFocus(inputOnly, dryRun)))
+    override def focusableControls =
+        if (isRelevant)
+            selectedCase.iterator flatMap (_.focusableControls)
+        else
+            Iterator.empty
 
     override def equalsExternal(other: XFormsControl): Boolean = {
         if (! other.isInstanceOf[XFormsSwitchControl])
@@ -201,7 +195,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
                 // TODO: This should not be needed because the repeat template should have a reasonable default.
                 getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl ⇒
                     ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", Array(
-                        "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId),
+                        "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),
                         "visibility", "hidden")
                     )
                 }
@@ -212,6 +206,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     private def getOtherSelectedCaseEffectiveId(switchControl1: XFormsSwitchControl): String =
         if ((switchControl1 ne null) && switchControl1.isRelevant) {
             val selectedCaseId = switchControl1.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
+            assert(selectedCaseId ne null)
             XFormsUtils.getRelatedEffectiveId(switchControl1.getEffectiveId, selectedCaseId)
         } else
             null
@@ -227,6 +222,5 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     override def valueType = null
 }
 
-private class XFormsSwitchControlLocal extends ControlLocalSupport.XFormsControlLocal {
-    var selectedCaseControlId: String = null
-}
+private class XFormsSwitchControlLocal(var selectedCaseControlId: String = null)
+    extends ControlLocalSupport.XFormsControlLocal

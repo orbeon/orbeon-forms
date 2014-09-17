@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.util._
-import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import scala.collection.JavaConverters._
 
 trait FormRunnerPersistence {
 
@@ -166,6 +167,10 @@ trait FormRunnerPersistence {
 
     // Return the number of failed validations captured by the error summary for the given level
     def countValidationsByLevel(level: ValidationLevel) = (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
+
+    // Return all nodes which refer to data attachments
+    def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String) =
+        collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true)._1.asJava
 
     def collectAttachments(data: DocumentInfo, fromBasePath: String, toBasePath: String, forceAttachments: Boolean) = (
         for {

@@ -236,7 +236,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             return (result != null) ? new StringValue(result) : null;
         } else {
             // Try custom MIPs
-            final String result = evaluateCustomMIP(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
+            final String result = evaluateCustomMIPByName(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
             return (result != null) ? new StringValue(result) : null;
         }
     }
@@ -509,7 +509,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 // Need an evaluator to check and convert type below
                 final XPathEvaluator xpathEvaluator;
                 try {
-                    xpathEvaluator = new XPathEvaluator();
+                    xpathEvaluator = new XPathEvaluator(XPath.GlobalConfiguration());
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                     final IndependentContext context = (IndependentContext) xpathEvaluator.getStaticContext();
                     for (final Map.Entry<String, String> entry : staticBind.namespaceMapping().mapping.entrySet()) {

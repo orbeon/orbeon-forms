@@ -356,9 +356,9 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         this.template.saxStore(),
                         new XFormsExtractor(
                             new WhitespaceXMLReceiver(
-                                    extractorOutput,
-                                    Whitespace.defaultBasePolicy(),
-                                    Whitespace.basePolicyMatcher()
+                                extractorOutput,
+                                Whitespace.defaultBasePolicy(),
+                                Whitespace.basePolicyMatcher()
                             ),
                             metadata,
                             template,
@@ -368,7 +368,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                             false,
                             false
                         ),
-                        metadata
+                        metadata,
+                        true
                     ),
                     Whitespace.defaultHTMLPolicy(),
                     Whitespace.htmlPolicyMatcher()

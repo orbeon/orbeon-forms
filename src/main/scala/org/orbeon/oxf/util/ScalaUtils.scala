@@ -20,7 +20,7 @@ import org.apache.log4j.Logger
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
 import reflect.ClassTag
-import scala.collection.mutable
+import scala.collection.{TraversableLike, mutable}
 import scala.util.control.NonFatal
 import scala.util.{Success, Failure, Try}
 
@@ -68,14 +68,6 @@ object ScalaUtils extends PathOps {
             if (closable ne null)
                 runQuietly(closable.close())
         }
-
-    def connectAndDisconnect[T <: {def connect(); def disconnect()}, U](connection: T)(block: ⇒ U): U = {
-        connection.connect()
-        try block
-        finally {
-            runQuietly(connection.disconnect())
-        }
-    }
 
     // Run a block and swallow any exception. Use only for things like close().
     def runQuietly(block: ⇒ Unit) =
@@ -138,9 +130,13 @@ object ScalaUtils extends PathOps {
         def nextOption = i.hasNext option i.next()
     }
 
+    // Extensions on Iterator object
     object IteratorExt {
         def iterateWhile[T](cond: ⇒ Boolean, elem: ⇒ T): Iterator[T] =
-            Iterator.continually(cond option elem).takeWhile(_.isDefined).flatten
+            iterateWhileDefined(cond option elem)
+
+        def iterateWhileDefined[T](elemOpt: ⇒ Option[T]): Iterator[T] =
+            Iterator.continually(elemOpt).takeWhile(_.isDefined).flatten
     }
     implicit def fromIteratorExt(i: Iterator.type) = IteratorExt
 
@@ -211,6 +207,22 @@ object ScalaUtils extends PathOps {
             }
         }
         builder.result()
+    }
+
+    implicit class TraversableLikeOps[A, Repr](val t: TraversableLike[A, Repr]) extends AnyVal {
+        def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
+            val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
+            for (elem ← t) {
+                val key = f(elem)
+                val bldr = m.getOrElseUpdate(key, cbf())
+                bldr += elem
+            }
+            val b = List.newBuilder[(K, Repr)]
+            for ((k, v) ← m)
+                b += ((k, v.result()))
+
+            b.result()
+        }
     }
 
     private class OnFailurePF[U](f: PartialFunction[Throwable, Any]) extends PartialFunction[Throwable, Try[U]] {

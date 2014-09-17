@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.oxf.util.ScalaUtils._
+
 import collection.JavaConverters._
 import collection.mutable.{ArrayBuffer, Buffer}
 import org.orbeon.oxf.xml.XMLReceiverHelper
@@ -79,16 +81,12 @@ trait XFormsContainerControl extends VisitableTrait {
                 currentControl.iterationRemoved()
     }
 
-    override def setFocus(inputOnly: Boolean, dryRun: Boolean = false): Boolean = {
-        // "4.3.7 The xforms-focus Event [...] Setting the focus to a group or switch container form control set the
-        // focus to the first form control in the container that is able to accept focus"
+    // focus to the first form control in the container that is able to accept focus"
+    override def focusableControls =
         if (isRelevant && hasChildren)
-            for (currentControl ← _children)
-                if (currentControl.setFocus(inputOnly, dryRun))
-                    return true
-
-        false
-    }
+            _children.iterator flatMap (_.focusableControls)
+        else
+            Iterator.empty
 
     override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit) {
         super.toXML(helper, attributes) {

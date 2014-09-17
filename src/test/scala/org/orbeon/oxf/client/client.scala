@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.client
 
+import org.openqa.selenium.chrome.ChromeDriverService
+
 import collection.JavaConverters._
 import java.net.URL
-import java.util.concurrent.TimeUnit
 import org.apache.commons.lang3.StringUtils
 import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium._
@@ -109,6 +110,11 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     def isCaseSelected(clientIdNoCasePrefix: String) =
         executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
 
+    def assertJSExpression(expression: String): Unit = {
+        val result = executeScript(s"return $expression")
+        assert(collectByErasedType[java.lang.Boolean](result) == Some(java.lang.Boolean.TRUE))
+    }
+
     // Functions from xforms.js we must provide access to:
     //
     // - isRelevant
@@ -128,16 +134,23 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
 
     // Extension methods on Element
     implicit class ElementOps(val e: STElement) {
+
         def classes = e.attribute("class") map stringToSet getOrElse Set()
-        def tabOut(wait: Boolean = true) = sendKeys(Keys.TAB)
-        def sendKeys(keys: CharSequence, wait: Boolean = true): STElement = e match {
+
+        def tabOut(wait: Boolean = true) = insertFieldText(Keys.TAB)
+
+        def insertFieldText(keys: CharSequence): Unit = e match {
             case control if classes("xforms-control") ⇒ // && isFocusable
-                withAjaxAction(wait) {
-                    nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
-                }
-                e
-            case _ ⇒ throw new IllegalArgumentException("Element is not a focusable XForms control")
+                nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
+            case _ ⇒
+                throw new IllegalArgumentException("Element is not a focusable XForms control")
         }
+
+        def replaceFieldText(keys: CharSequence): Unit =
+            insertFieldText(Keys.HOME + Keys.chord(Keys.SHIFT, Keys.END) + keys)
+
+        def fieldText =
+            nativeControlUnder(e.attribute("id").get).underlying.getAttribute("value")
 
         def findAll(by: By) = e.underlying.findElements(by).asScala.toIterator
 
@@ -150,6 +163,15 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     implicit class TextfieldOps(val textfield: TextField) {
         def enter(): Unit = textfield.underlying.sendKeys(Keys.ENTER)
     }
+}
+
+trait XFormsOps extends OrbeonFormsOps {
+
+    object XForms {
+        def fullItemSelector(controlEffectiveId: String, position: Int) =
+            cssSelector(s"""#$controlEffectiveId .xforms-items > span:nth-child(${position + 1}) input""")
+    }
+
 }
 
 // Form Runner API
@@ -178,18 +200,34 @@ trait FormBuilderOps extends FormRunnerOps {
 
     object Builder {
         val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
-        val SaveButton = cssSelector(".fr-save-button button")
+        val SaveButton        = cssSelector(".fr-save-button button")
 
         def onNewForm[T](block: ⇒ T): Unit = {
-            loadOrbeonPage("/fr/orbeon/builder/new")
-            elementByStaticId("fb-application-name-input").sendKeys("a")
-            elementByStaticId("fb-form-name-input").sendKeys("a")
-            click on NewContinueButton
-            waitForAjaxResponse()
-            block
-            eventually { click on SaveButton }
-            waitForAjaxResponse()
+
+            for {
+                _ ← loadOrbeonPage("/fr/orbeon/builder/new")
+                _ ← elementByStaticId("fb-application-name-input").replaceFieldText("a")
+                _ ← elementByStaticId("fb-form-name-input").replaceFieldText("a")
+                _ ← click on NewContinueButton
+                _ ← waitForAjaxResponse() // other way to test that dialog is hidden?
+                _ ← block
+                _ ← click on SaveButton   // so that we can close the browser window
+            }()
         }
+
+        // We have trouble using hover/click, so we directly dispatch the event to the server
+        def openGridDetails(gridEffectiveId: String) =
+            executeScript(
+                s"""ORBEON.xforms.Document.dispatchEvent({
+                   |    "targetId":   "grid-details-trigger",
+                   |    "eventName":  "DOMActivate",
+                   |    "properties": {
+                   |        "grid-id": "$gridEffectiveId"
+                   |    }
+                   |})""".stripMargin)
+
+        def insertNewRepeatedGrid() =
+            clickOn(cssSelector("#insert-new-repeated-grid-trigger"))
     }
 }
 
@@ -200,30 +238,43 @@ abstract class OrbeonClientBase
 
 object OrbeonClientBase {
 
-    private var _driver: WebDriver = _
-    def driver = _driver ensuring (_ ne null)
+    private var serviceOpt: Option[ChromeDriverService] = None
+    private var driverOpt : Option[WebDriver]           = None
+
+    def driver = driverOpt.get
     val DefaultTimeout = Span(10, Seconds)
 
     @BeforeClass
     def createAndStartService(): Unit = {
-        val capabilities = (
-            DesiredCapabilities.firefox()
-            |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
-            |!> (_.setCapability("name", "Orbeon Forms unit tests"))
-            |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
-            |!> (_.setCapability("version", "28"))
-            |!> (_.setCapability("platform", Platform.XP))
-        )
-        val server = {
-            val username = System.getenv("SAUCE_USERNAME")
-            val password = System.getenv("SAUCE_ACCESS_KEY")
-            new URL("http://" + username + ":" + password + "@localhost:4445/wd/hub")
+        System.getProperty("oxf.test.driver") match {
+            case "chromedriver" ⇒
+                val service = ChromeDriverService.createDefaultService()
+                service.start()
+                serviceOpt = Some(service)
+                driverOpt = Some(new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome()))
+            case _ ⇒
+                val capabilities = (
+                    DesiredCapabilities.firefox()
+                    |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
+                    |!> (_.setCapability("name", "Orbeon Forms unit tests"))
+                    |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
+                    |!> (_.setCapability("version", "28"))
+                    |!> (_.setCapability("platform", Platform.XP))
+                )
+                val server = {
+                    val username = System.getenv("SAUCE_USERNAME")
+                    val password = System.getenv("SAUCE_ACCESS_KEY")
+                    new URL("http://" + username + ":" + password + "@localhost:4445/wd/hub")
+                }
+                driverOpt = Some(new RemoteWebDriver(server, capabilities))
         }
-        _driver = new RemoteWebDriver(server, capabilities)
     }
 
     @AfterClass
-    def createAndStopService(): Unit = {
-        _driver.quit()
+    def stopService(): Unit = {
+        driverOpt.map(_.quit())
+        driverOpt = None
+        serviceOpt.map(_.stop())
+        serviceOpt = None
     }
 }

@@ -109,33 +109,23 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
-            <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]"/>
+            <xsl:apply-templates select="(*:variable | *:var)[@name = 'control-name']"/>
+            <xsl:variable name="resource-items-value" select="(*:variable | *:var)[@name = 'response-items']/@value"/>
+
             <!-- Set itemset -->
-
-            <!-- Find resource container for all languages, as we are not yet able to handle an internationalized
-                 service response. See: https://github.com/orbeon/orbeon-forms/issues/691 -->
-            <xf:var name="resource-holders"
-                    value="xxf:instance('fr-form-resources')/resource/*[name() = $control-name]"/>
-
-            <xf:delete ref="$resource-holders/item"/>
-
-            <!-- First language -->
-            <!-- PERF: Optimize this in a single insert. -->
-            <xf:action iterate="$response-items">
-                <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]}"/>
-                <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]}"/>
-                <xf:insert
-                    context="$resource-holders[1]"
-                    ref="*"
-                    origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
-            </xf:action>
-
-            <!-- Other languages -->
-            <xf:action iterate="$resource-holders[position() gt 1]">
-                <xf:insert
-                    context="."
-                    ref="*"
-                    origin="$resource-holders[1]/item"/>
+            <xf:action iterate="xxf:instance('fr-form-resources')/resource">
+                <xf:var name="fr-lang" value="@xml:lang"/>
+                <xf:var name="response-items" context="instance('fr-service-response-instance')" value="{$resource-items-value}"/>
+                <xf:var name="resource-holder" value="*[name() = $control-name]"/>
+                <xf:delete ref="$resource-holder/item"/>
+                <xf:action iterate="$response-items">
+                    <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]}"/>
+                    <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]}"/>
+                    <xf:insert
+                        context="$resource-holder"
+                        ref="*"
+                        origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
+                </xf:action>
             </xf:action>
 
             <!-- Filter item values that are out of range -->
@@ -143,19 +133,21 @@
             <!-- NOTE: We guess whether the control is a select or select1 based on the element name. One exception is
                  autocomplete, which is also a single selection control. -->
             <xf:var name="element-name" value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
+            <xf:var name="possible-values"
+                    value="xxf:instance('fr-form-resources')/resource[1]/*[name() = $control-name]/item/value/string()"/>
             <xf:action if="frf:isMultipleSelectionControl($element-name)">
                 <xf:action iterate="{fr:resolve-targets()}">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         ref="$bind"
-                        value="string-join(xxf:split($bind)[. = $resource-holders[1]/item/value/string()], ' ')"/>
+                        value="string-join(xxf:split($bind)[. = $possible-values], ' ')"/>
                 </xf:action>
             </xf:action>
             <xf:action if="frf:isSingleSelectionControl($element-name) or $element-name = 'autocomplete'">
                 <xf:action iterate="{fr:resolve-targets()}">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
-                        if="not(string($bind) = $resource-holders[1]/item/value)"
+                        if="not(string($bind) = $possible-values)"
                         ref="$bind"/>
                 </xf:action>
             </xf:action>

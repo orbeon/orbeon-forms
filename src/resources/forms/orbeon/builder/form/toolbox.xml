@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xh:div xmlns:xh="http://www.w3.org/1999/xhtml"
+<xf:group xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -306,4 +306,4 @@
         <fr:neutral-choice/>
     </fr:alert-dialog>
 
-</xh:div>
+</xf:group>

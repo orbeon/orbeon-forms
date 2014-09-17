@@ -38,6 +38,7 @@ import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
 import org.orbeon.oxf.util.XPath
 import scala.collection.generic.Growable
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * xxf:dynamic control
@@ -84,12 +85,14 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             contextStack.getCurrentBindingContext
         } orNull
 
-    override def onCreate(state: Option[ControlState]): Unit =
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
         getBoundElement match {
-            case Some(node) ⇒ updateSubTree(node)
+            case Some(node) ⇒ updateSubTree(create = true, node)
             case _ ⇒ // don't create binding (maybe we could for a read-only instance)
                 _nested = None
         }
+    }
 
     override def onDestroy(): Unit = {
         // TODO: XXX remove child container from parent
@@ -100,14 +103,14 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit =
         getBoundElement match {
-            case Some(node) ⇒ updateSubTree(node)
+            case Some(node) ⇒ updateSubTree(create = false, node)
             case _ ⇒
         }
 
-    private def updateSubTree(node: VirtualNode): Unit =
-        if (previousChangeCount != changeCount) {
+    private def updateSubTree(create: Boolean, node: VirtualNode): Unit =
+        if (create || previousChangeCount != changeCount) {
             // Document has changed and needs to be fully recreated
-            processFullUpdate(node)
+            processFullUpdate(create, node)
         } else {
             // Changes to nested binds
             if (bindChanges.nonEmpty)
@@ -118,7 +121,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 processXBLUpdates()
         }
 
-    private def processFullUpdate(node: VirtualNode): Unit = {
+    private def processFullUpdate(create: Boolean, node: VirtualNode): Unit = {
         previousChangeCount = changeCount
         xblChanges.clear()
         bindChanges.clear()
@@ -129,7 +132,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             throw new IllegalArgumentException
 
         // Gather relevant switch state before removing children
-        val relevantSwitchState = gatherRelevantSwitchState(this)
+        val relevantSwitchState = if (create) Map.empty[String, ControlState] else gatherRelevantSwitchState(this)
         // LATER: Could also restore everything including models, but need to think about implications. It's
         // conservative to attempt to restore only switch state, but restoring models should not take place for every
         // full update.
@@ -243,20 +246,26 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
         // Create new control subtree, attempting to restore switch state
         // LATER: See above comments
-        // There are two cases:
         //
-        // 1. Regular full update
-        // 2. Restore after serialization
+        // Cases:
+        //
+        // 1. XFCD deserialization     : use full InstanceControls state
+        // 2. xxf:dynamic full update  : use only switch state
+        // 3. Initial controls creation: don't restore any state
         val stateToRestore =
-            Controls.restoringInstanceControls getOrElse InstancesControls(Nil, relevantSwitchState)
+            Controls.restoringInstanceControls orElse ((! create) option InstancesControls(Nil, relevantSwitchState))
 
-        withDynamicStateToRestore(stateToRestore) {
+        def createAndInitializeDynamicSubTree() =
             tree.createAndInitializeDynamicSubTree(
                 childContainer,
                 this,
                 partAnalysis.getTopLevelControls.head,
                 Controls.restoringControls
             )
+
+        stateToRestore match {
+            case Some(state) ⇒ withDynamicStateToRestore(state)(createAndInitializeDynamicSubTree())
+            case None        ⇒ createAndInitializeDynamicSubTree()
         }
     }
 
@@ -302,7 +311,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
                         val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
                         templateTree foreach
-                            (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _, None))
+                            (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _, Controls.restoringControls))
 
                         // Tell client
                         containingDocument.addControlStructuralChange(componentControl.prefixedId)

@@ -826,7 +826,7 @@ public class XFormsUtils {
 
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {
-                    outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, scala.Option.<ControlState>apply(null));
+                    outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, false, scala.Option.<ControlState>apply(null));
                     outputControl.evaluate();
                 }
                 contextStack.popBinding();
@@ -879,7 +879,7 @@ public class XFormsUtils {
 
                             contextStack.pushBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element));
                             {
-                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false,  scala.Option.<ControlState >apply(null));
+                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, false, scala.Option.<ControlState >apply(null));
                                 attributeControl.evaluate();
                             }
                             contextStack.popBinding();

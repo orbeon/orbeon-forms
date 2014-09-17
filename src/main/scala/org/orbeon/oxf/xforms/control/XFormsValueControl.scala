@@ -56,8 +56,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     private[XFormsValueControl] var isExternalValueEvaluated: Boolean = false
     private[XFormsValueControl] var externalValue: String = null
 
-    override def onCreate(state: Option[ControlState]): Unit = {
-        super.onCreate(state)
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
 
         _value = null
         _previousValue = null

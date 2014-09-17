@@ -107,8 +107,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         contextStack.getCurrentBindingContext
     }
 
-    override def onCreate(state: Option[ControlState]): Unit = {
-        super.onCreate(state)
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+        super.onCreate(restoreState, state)
         if (Controls.isRestoringDynamicState)
             nestedContainer.restoreModelsState()
         else

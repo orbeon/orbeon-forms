@@ -84,8 +84,8 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void onCreate(Option<ControlState> state) {
-        super.onCreate(state);
+    public void onCreate(boolean restoreState, Option<ControlState> state) {
+        super.onCreate(restoreState, state);
 
         // Restore state if needed
         if (state.isDefined()) {
@@ -93,9 +93,17 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             final Map<String, String> keyValues = controlState.keyValuesJava();
 
             setLocal(
-                new XXFormsDialogControlLocal("true".equals(keyValues.get("visible")),
-                "true".equals(keyValues.get("constrain")),
-                keyValues.get("neighbor"))
+                new XXFormsDialogControlLocal(
+                    "true".equals(keyValues.get("visible")),
+                    "true".equals(keyValues.get("constrain")),
+                    keyValues.get("neighbor")
+                )
+            );
+        } else if (restoreState) {
+            // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
+            // particular control might not be found.
+            setLocal(
+                new XXFormsDialogControlLocal(initiallyVisible)
             );
         }
     }

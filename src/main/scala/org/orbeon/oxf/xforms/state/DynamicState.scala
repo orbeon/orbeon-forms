@@ -232,10 +232,11 @@ object DynamicState {
         }
 
         // Serialize relevant controls that have data
-        // NOTE: As of 2012-02-02, only repeat, switch and dialogs controls serialize state. The state of all the other
-        // controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
-        // more information might be serialized.
-        // TODO: What about about visited state? right now only for controls which have other data to serialize.
+        //
+        // - Repeat, switch and dialogs controls serialize state (have been for a long time). The state of all the other
+        //   controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
+        //   more information might be serialized.
+        // - VisitableTrait controls serialize state if `visited == true`
         def controlsToSerialize = {
             val iterator =
                 for {

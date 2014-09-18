@@ -92,7 +92,7 @@ object SchemaGenerator {
         // Build xs:element for this bind
         val xsElem = bind match {
             case RootBind() ⇒ <xs:element name="form"/>
-            case Bind(BindInfo(elemName, required, hasRelevant, elemType, repeated, min, max)) ⇒
+            case Bind(BindInfo(elemName, required, hasRelevant, elemTypeOpt, repeated, min, max)) ⇒
 
                 // Optional type attribute
                 def attr(name: String, value: String) = scala.xml.Attribute(None, name, scala.xml.Text(value), Null)
@@ -128,7 +128,7 @@ object SchemaGenerator {
 
                 def isBindForAttachmentControl = {
                     val xsdOrXFormsURI = Set(XSD_URI, XFORMS_NAMESPACE_URI)
-                    def isBindTypeAnyURI = elemType.exists(qname ⇒ xsdOrXFormsURI(qname.getNamespaceURI) && qname.getName == "anyURI")
+                    def isBindTypeAnyURI = elemTypeOpt.exists(qname ⇒ xsdOrXFormsURI(qname.getNamespaceURI) && qname.getName == "anyURI")
                     def isControlAttachment = findControlNodeForBind(bind, *) exists (_.attClasses("fr-attachment"))
                     isBindTypeAnyURI && isControlAttachment
                 }
@@ -199,17 +199,26 @@ object SchemaGenerator {
                         xsElement(Nil, None, Some(content))
 
                     case MaybeTyped ⇒
-                        val typeAttr = elemType map (_.getQualifiedName) map (attr("type", _))
-                        // Create namespace binding for type, filtering the already declared XSD namespace
-                        val typeNamespaceBinding = elemType flatMap (qname ⇒
-                            (qname.getNamespacePrefix, qname.getNamespaceURI) match {
-                                case (XSD_PREFIX, XSD_URI) ⇒ None
-                                case (XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
-                                case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
-                                case (XFORMS_SHORT_PREFIX, _) ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
-                                case (prefix, uri) ⇒ Some(prefix → uri)
-                            })
-                        xsElement(typeAttr.toList, typeNamespaceBinding, None)
+
+                        val (attributes, namespaceBinding) =
+                            if (hasRelevant) {
+                                // Don't check type if the control might not be shown to users
+                                (Nil, None)
+                            } else {
+                                val typeQNameOpt = elemTypeOpt.map(_.getQualifiedName)
+                                val typeAttrOpt = typeQNameOpt.map(attr("type", _))
+                                // Create namespace binding for type, filtering the already declared XSD namespace
+                                val typeNamespaceBindingOpt = elemTypeOpt flatMap (qname ⇒
+                                    (qname.getNamespacePrefix, qname.getNamespaceURI) match {
+                                        case (XSD_PREFIX, XSD_URI) ⇒ None
+                                        case (XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
+                                        case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
+                                        case (XFORMS_SHORT_PREFIX, _) ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
+                                        case (prefix, uri) ⇒ Some(prefix → uri)
+                                    })
+                                (typeAttrOpt.toList, typeNamespaceBindingOpt)
+                            }
+                        xsElement(attributes, namespaceBinding, None)
                 }
         }
 

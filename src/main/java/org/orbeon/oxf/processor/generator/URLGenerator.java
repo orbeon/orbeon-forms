@@ -21,7 +21,6 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -30,7 +29,7 @@ import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.HttpStatusCodeException;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
@@ -722,13 +721,36 @@ public class URLGenerator extends ProcessorImpl {
         void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
     }
 
-    private static class OXFResourceHandler implements ResourceHandler {
-        private Config config;
+    private static abstract class ResourceHandlerBase implements ResourceHandler {
+
+        protected Config config;
+
+        public ResourceHandlerBase(Config config) {
+            this.config = config;
+        }
+
+        protected String getExternalEncoding() throws IOException {
+            if (config.isForceEncoding())
+                return config.getEncoding();
+
+            final String connectionEncoding = getConnectionEncoding();
+            if (! config.isIgnoreConnectionEncoding() && connectionEncoding != null)
+                return connectionEncoding;
+
+            final String userEncoding = config.getEncoding();
+            if (userEncoding != null)
+                return userEncoding;
+
+            return null;
+        }
+    }
+
+    private static class OXFResourceHandler extends ResourceHandlerBase {
         private String resourceManagerKey;
         private InputStream inputStream;
 
         public OXFResourceHandler(Config config) {
-            this.config = config;
+            super(config);
         }
 
         public String getResourceMediaType() throws IOException {
@@ -772,21 +794,6 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        private String getExternalEncoding() throws IOException {
-            if (config.isForceEncoding())
-                return config.getEncoding();
-
-            String connectionEncoding = getConnectionEncoding();
-            if (!config.isIgnoreConnectionEncoding() && connectionEncoding != null)
-                return connectionEncoding;
-
-            String userEncoding = config.getEncoding();
-            if (userEncoding != null)
-                return userEncoding;
-
-            return null;
-        }
-
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
             URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
@@ -825,38 +832,25 @@ public class URLGenerator extends ProcessorImpl {
         }
     }
 
-    private static class URLResourceHandler implements ResourceHandler {
-        private Config config;
+    private static class URLResourceHandler extends ResourceHandlerBase {
         private ConnectionResult connectionResult;
         private InputStream inputStream;
 
         public URLResourceHandler(Config config) {
-            this.config = config;
+            super(config);
         }
 
         public String getResourceMediaType() throws IOException {
-            // Return null for file protocol, as it returns incorrect content types
-            if ("file".equals(config.getURL().getProtocol()))
-                return null;
-            // Otherwise, try URLConnection
             openConnection();
             return connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE);
         }
 
         public String getConnectionEncoding() throws IOException {
-            // Return null for file protocol, as it returns incorrect content types
-            if ("file".equals(config.getURL().getProtocol()))
-                return null;
-            // Otherwise, try URLConnection
             openConnection();
-            return connectionResult.contentTypeCharsetOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE);
+            return connectionResult.charsetJava();
         }
 
         public int getConnectionStatusCode() throws IOException {
-            // Return -1 for file protocol, as it returns nothing significant
-            if ("file".equals(config.getURL().getProtocol()))
-                return -1;
-            // Otherwise, try URLConnection
             openConnection();
             return connectionResult.statusCode();
         }
@@ -934,21 +928,6 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        private String getExternalEncoding() throws IOException {
-            if (config.isForceEncoding())
-                return config.getEncoding();
-
-            String connectionEncoding = getConnectionEncoding();
-            if (!config.isIgnoreConnectionEncoding() && connectionEncoding != null)
-                return connectionEncoding;
-
-            String userEncoding = config.getEncoding();
-            if (userEncoding != null)
-                return userEncoding;
-
-            return null;
-        }
-
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             openConnection();
             checkStatusCode();
@@ -1022,11 +1001,10 @@ public class URLGenerator extends ProcessorImpl {
     /**
      * Read from System.in.
      */
-    private static class SystemResourceHandler implements ResourceHandler {
-        private Config config;
+    private static class SystemResourceHandler extends ResourceHandlerBase {
 
         public SystemResourceHandler(Config config) {
-            this.config = config;
+            super(config);
         }
 
         public String getResourceMediaType() throws IOException {
@@ -1061,19 +1039,10 @@ public class URLGenerator extends ProcessorImpl {
         public void destroy() throws IOException {
         }
 
-        private String getExternalEncoding() throws IOException {
-            if (config.isForceEncoding())
-                return config.getEncoding();
-
-            String connectionEncoding = getConnectionEncoding();
-            if (!config.isIgnoreConnectionEncoding() && connectionEncoding != null)
-                return connectionEncoding;
-
-            String userEncoding = config.getEncoding();
-            if (userEncoding != null)
-                return userEncoding;
-
-            return java.nio.charset.Charset.defaultCharset().name();
+        @Override
+        protected String getExternalEncoding() throws IOException {
+            final String encoding = super.getExternalEncoding();
+            return encoding != null ? encoding : java.nio.charset.Charset.defaultCharset().name();
         }
 
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {

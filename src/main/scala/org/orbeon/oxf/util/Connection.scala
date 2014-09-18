@@ -75,14 +75,22 @@ class Connection(
                 val urlConnection = URLFactory.createURL(urlString).openConnection
                 urlConnection.connect()
 
-                val headers = urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+                // Try to get a reasonable mediatype based on the extension
+                def contentTypeHeader =
+                    Mediatypes.getMimeType(url.getPath) map (ct ⇒ ContentType → List(ct))
+
+                val headers =
+                    urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+
+                val headersWithContentType =
+                    headers ++ contentTypeHeader.toList
 
                 // Create result
                 val connectionResult = ConnectionResult.apply(
                     url        = urlString,
                     statusCode = 200,
-                    headers    = headers,
-                    content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headers)
+                    headers    = headersWithContentType,
+                    content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headersWithContentType)
                 )
 
                 if (debugEnabled) {

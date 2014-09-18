@@ -13,23 +13,21 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.resources.URLFactory
-
-import collection.JavaConverters._
+import org.apache.log4j.Level
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om._
-import org.apache.log4j.Level
-import org.orbeon.oxf.util.ScalaUtils._
-import java.net.URL
-import org.orbeon.oxf.xforms.XFormsProperties
-import java.io.InputStreamReader
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+
+import scala.collection.JavaConverters._
 import scala.collection.immutable
+import scala.util.Try
 import scala.util.control.NonFatal
 
 // Helper trait for xforms-submit-done/xforms-submit-error
@@ -45,8 +43,8 @@ trait SubmitResponseEvent extends XFormsEvent {
 
 private object SubmitResponseEvent {
 
-    import NamespaceMapping.EMPTY_MAPPING
-    import XPathCache._
+    import org.orbeon.oxf.util.XPathCache._
+    import org.orbeon.oxf.xml.NamespaceMapping.EMPTY_MAPPING
 
     // "Zero or more elements, each one representing a content header in the error response received by a
     // failed submission. The returned node-set is empty if the failed submission did not receive an error
@@ -97,10 +95,14 @@ private object SubmitResponseEvent {
 
         if (cxr.hasContent) {
 
+            // XForms 1.1:
+            //
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
             // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
             // the error response specifies a text media type (starting with text/), then the response body is returned
             // as a string. Otherwise, an empty string is returned."
+            //
+            // We go a bit further, trying to read independently from the returned mediatype.
 
             def warn[T](message: String): PartialFunction[Throwable, Option[T]] = {
                 case NonFatal(t) ⇒
@@ -117,46 +119,35 @@ private object SubmitResponseEvent {
 
             tempURIOpt flatMap { tempURI ⇒
 
-                def asDocument =
-                    if (XMLUtils.isXMLMediatype(cxr.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE))) {
-                        // XML content-type
-                        // Read stream into Document
-                        // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
-                        try useAndClose(new URL(tempURI).openStream()) { is ⇒
-                            val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
-                            if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
-                                logger.logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(document))
-                            Some(document)
-                        } catch
-                            warn("error while parsing response body as XML, defaulting to plain text.")
-                    } else
-                        None
-
-                def asString =
-                    if (XMLUtils.isTextOrJSONContentType(cxr.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE))) {
-                        // XML parsing failed, or we got a text content-type
-                        // Read stream into String
-                        try {
-                            val is = URLFactory.createURL(tempURI).openStream()
-                            useAndClose(new InputStreamReader(is, cxr.contentTypeCharsetOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE))) { reader ⇒
-                                val string = NetUtils.readStreamAsString(reader)
-                                if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
-                                    logger.logError("xforms-submit-error", "setting body string", "body", "\n" + string)
-                                Some(string)
+                // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
+                // Should modify readTinyTree() and readDom4j()
+                def tryXML: Try[String Either DocumentInfo] =
+                    Try {
+                        Right(
+                            useAndClose(URLFactory.createURL(tempURI).openStream()) { is ⇒
+                                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
                             }
-                        } catch
-                            warn("error while reading response body ")
-                    } else {
-                        // This is binary
-                        // Don't store anything for now
-                        None
+                        )
                     }
 
-                asDocument orElse asString match {
-                    case Some(document: DocumentInfo) ⇒ Some(Right(document))
-                    case Some(string: String)         ⇒ Some(Left(string))
-                    case _                            ⇒ None
+                def tryText: Try[String Either DocumentInfo]  =
+                    Try {
+                        Left(ConnectionResult.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
+                    }
+
+                def asString(value: String Either DocumentInfo) = value match {
+                    case Left(text) ⇒ text
+                    case Right(xml) ⇒ TransformerUtils.tinyTreeToString(xml)
                 }
+
+                val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption
+
+                if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
+                    result map asString foreach { value ⇒
+                        logger.logError("xforms-submit-error", "setting body document", "body", s"\n$value")
+                    }
+
+                result
             }
         } else
             None

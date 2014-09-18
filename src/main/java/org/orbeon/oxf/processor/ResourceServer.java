@@ -18,20 +18,16 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.Mediatypes;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.xml.ForwardingXMLReceiver;
-import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.w3c.dom.Node;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,27 +36,13 @@ import java.util.List;
 public class ResourceServer extends ProcessorImpl {
 
     public static final String RESOURCE_SERVER_NAMESPACE_URI = "http://www.orbeon.com/oxf/resource-server";
-    public static final String MIMETYPES_NAMESPACE_URI = "http://www.orbeon.com/oxf/mime-types";
-
-    public static final String MIMETYPE_INPUT = "mime-types";
-
     public static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
     public ResourceServer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, RESOURCE_SERVER_NAMESPACE_URI));
-        addInputInfo(new ProcessorInputOutputInfo(MIMETYPE_INPUT, MIMETYPES_NAMESPACE_URI));
     }
 
     public void start(PipelineContext context) {
-
-        final MimeTypeConfig mimeTypeConfig = readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader<MimeTypeConfig>() {
-            public MimeTypeConfig read(PipelineContext context, ProcessorInput input) {
-            final MimeTypesContentHandler ch = new MimeTypesContentHandler();
-            readInputAsSAX(context, input, ch);
-            return ch.getMimeTypes();
-            }
-        });
-
         try {
             // Read config input into a String, cache if possible
             final Node configNode = readCacheInputAsDOM(context, INPUT_CONFIG);
@@ -78,13 +60,13 @@ public class ResourceServer extends ProcessorImpl {
             }
 
             final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
-            serveResource(mimeTypeConfig, urlString, URLRewriterUtils.isVersionedURL(urlString, pathMatchers));
+            serveResource(urlString, URLRewriterUtils.isVersionedURL(urlString, pathMatchers));
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
-    public static void serveResource(MimeTypeConfig mimeTypeConfig, String urlString, boolean isVersioned) throws IOException {
+    public static void serveResource(String urlString, boolean isVersioned) throws IOException {
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Response response = externalContext.getResponse();
@@ -126,7 +108,7 @@ public class ResourceServer extends ProcessorImpl {
                 }
 
                 // Lookup and set the content type
-                final String contentType = mimeTypeConfig.getMimeType(urlString);
+                final String contentType = Mediatypes.getMimeTypeJava(urlString);
                 if (contentType != null)
                     response.setContentType(contentType);
 
@@ -149,95 +131,6 @@ public class ResourceServer extends ProcessorImpl {
             if (urlConnectionInputStream != null) {
                 urlConnectionInputStream.close();
             }
-        }
-    }
-
-    public static MimeTypeConfig readMimeTypeConfig() {
-        final MimeTypesContentHandler ch = new MimeTypesContentHandler();
-        XMLParsing.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLParsing.ParserConfiguration.PLAIN, false);
-        return ch.getMimeTypes();
-    }
-
-    private static class MimeTypesContentHandler extends ForwardingXMLReceiver {
-        public static final String MIMETYPE_ELEMENT = "mime-type";
-        public static final String NAME_ELEMENT = "name";
-        public static final String PATTERN_ELEMENT = "pattern";
-
-        public static final int NAME_STATUS = 1;
-        public static final int EXT_STATUS = 2;
-
-        private int status = 0;
-        private StringBuilder buff = new StringBuilder();
-        private String name;
-        private MimeTypeConfig mimeTypeConfig = new MimeTypeConfig();
-
-        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-            if (NAME_ELEMENT.equals(localname))
-                status = NAME_STATUS;
-            else if (PATTERN_ELEMENT.equals(localname))
-                status = EXT_STATUS;
-        }
-
-        public void characters(char[] chars, int start, int length) throws SAXException {
-            if (status == NAME_STATUS || status == EXT_STATUS)
-                buff.append(chars, start, length);
-        }
-
-        public void endElement(String uri, String localname, String qName) throws SAXException {
-            if (NAME_ELEMENT.equals(localname)) {
-                name = buff.toString().trim();
-            } else if (PATTERN_ELEMENT.equals(localname)) {
-                mimeTypeConfig.define(buff.toString().trim(), name);
-            } else if (MIMETYPE_ELEMENT.equals(localname)) {
-                name = null;
-            }
-            buff.delete(0, buff.length());
-        }
-
-        public MimeTypeConfig getMimeTypes() {
-            return mimeTypeConfig;
-        }
-    }
-
-    private static class PatternToMimeType {
-        public final String pattern;
-        public final String mimeType;
-
-        public PatternToMimeType(String pattern, String mimeType) {
-            this.pattern = pattern;
-            this.mimeType = mimeType;
-        }
-
-        public boolean matches(String path) {
-            if (pattern.equals("*")) {
-                return true;
-            } else if (pattern.startsWith("*") && pattern.endsWith("*")) {
-                String middle = pattern.substring(1, pattern.length() - 1);
-                return path.contains(middle);
-            } else if (pattern.startsWith("*")) {
-                return path.endsWith(pattern.substring(1));
-            } else if (pattern.endsWith("*")) {
-                return path.startsWith(pattern.substring(0, pattern.length() - 1));
-            } else {
-                return path.equals(pattern);
-            }
-        }
-    }
-
-    private static class MimeTypeConfig {
-        private List<PatternToMimeType> patternToMimeTypes = new ArrayList<PatternToMimeType>();
-
-        public void define(String pattern, String mimeType) {
-            patternToMimeTypes.add(new PatternToMimeType(pattern.toLowerCase(), mimeType.toLowerCase()));
-        }
-
-        public String getMimeType(String path) {
-            path = path.toLowerCase();
-            for (final PatternToMimeType patternToMimeType: patternToMimeTypes) {
-                if (patternToMimeType.matches(path))
-                    return patternToMimeType.mimeType;
-            }
-            return null;
         }
     }
 }

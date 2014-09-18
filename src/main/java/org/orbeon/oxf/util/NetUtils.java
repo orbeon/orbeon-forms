@@ -19,7 +19,6 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -27,8 +26,8 @@ import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.webapp.WebAppListener;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.SAXUtils;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -758,40 +757,6 @@ public class NetUtils {
                 }
             }
         }
-    }
-
-    /**
-     * Return the charset associated with a text/* Content-Type header. If a charset is present, return it. Otherwise,
-     * guess depending on whether the mediatype is text/xml or not.
-     *
-     * @param contentType   Content-Type header value
-     * @return              charset
-     */
-    public static String getTextCharsetFromContentTypeOrDefault(String contentType) {
-        final String charset;
-        final String connectionCharset = getContentTypeCharset(contentType);
-        if (connectionCharset != null) {
-            charset = connectionCharset;
-        } else {
-
-            // RFC 3023: "Conformant with [RFC2046], if a text/xml entity is
-            // received with the charset parameter omitted, MIME processors and
-            // XML processors MUST use the default charset value of
-            // "us-ascii"[ASCII]. In cases where the XML MIME entity is
-            // transmitted via HTTP, the default charset value is still
-            // "us-ascii". (Note: There is an inconsistency between this
-            // specification and HTTP/1.1, which uses ISO-8859-1[ISO8859] as the
-            // default for a historical reason. Since XML is a new format, a new
-            // default should be chosen for better I18N. US-ASCII was chosen,
-            // since it is the intersection of UTF-8 and ISO-8859-1 and since it
-            // is already used by MIME.)"
-
-            if (XMLUtils.isXMLMediatype(contentType))
-                charset = Defaults.DefaultTextXMLEncodingWhenReading();
-            else
-                charset = Defaults.DefaultEncodingForServletCompatibility();
-        }
-        return charset;
     }
 
     /**

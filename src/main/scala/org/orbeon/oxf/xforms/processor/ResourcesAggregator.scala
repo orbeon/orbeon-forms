@@ -281,7 +281,7 @@ object ResourcesAggregator extends Logging {
             val itemsToHash = resources ++ (if (hasAppResource && StringUtils.isNotBlank(appVersion)) Set(appVersion) else Set())
             val resourcesHash = SecureUtils.digestString(itemsToHash mkString "|", "hex")
 
-            // Cache mapping so that resource can be served by oxf:resource-server
+            // Cache mapping so that resource can be served by resource server
             Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is compact, serializable and usable from Java
 
             // Extension and optional namespace parameter

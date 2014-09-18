@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -73,7 +72,8 @@ public class AllReplacer extends BaseReplacer {
             return; // can be null for some unit tests only :(
 
         response.setStatus(cxr.statusCode());
-        response.setContentType(cxr.contentTypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE));
+        if (cxr.content().contentType().isDefined())
+            response.setContentType(cxr.content().contentType().get());
         SubmissionUtils.forwardResponseHeaders(cxr, response);
 
         // Forward content to response

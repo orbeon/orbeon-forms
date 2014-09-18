@@ -96,7 +96,6 @@ public class SchemaRepository {
         SCHEMAS.put(EmailProcessor.ConfigNamespaceURI(), "schemas/email.rng");
         SCHEMAS.put(BeanGenerator.BEAN_CONFIG_NAMESPACE_URI, "schemas/bean-generator-config.rng");
         SCHEMAS.put(ResourceServer.RESOURCE_SERVER_NAMESPACE_URI, "schemas/resource-server.rng");
-        SCHEMAS.put(ResourceServer.MIMETYPES_NAMESPACE_URI, "schemas/mime-types.rng");
         SCHEMAS.put(LDAPProcessor.LDAP_CONFIG_NAMESPACE_URI, "schemas/ldap-config.rng");
         SCHEMAS.put(LDAPProcessor.LDAP_FILTER_NAMESPACE_URI, "schemas/ldap-filter.rng");
         SCHEMAS.put(SchedulerProcessor.SCHEDULER_CONFIG_NAMESPACE_URI, "schemas/scheduler-config.rng");

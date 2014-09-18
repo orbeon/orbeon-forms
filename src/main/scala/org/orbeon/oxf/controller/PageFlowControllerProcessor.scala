@@ -439,9 +439,6 @@ object PageFlowControllerProcessor {
         }
     }
 
-    // Only read mime types config once (used for serving files)
-    lazy val MimeTypes = ResourceServer.readMimeTypeConfig
-
     // Routes
     sealed trait Route {
         def routeElement: RouteElement
@@ -453,7 +450,7 @@ object PageFlowControllerProcessor {
         def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, authorize: Boolean = true)(implicit logger: IndentedLogger) = {
             debug("processing route", Seq("route" → this.toString))
             if (ec.getRequest.getMethod == "GET")
-                ResourceServer.serveResource(MimeTypes, ec.getRequest.getRequestPath, routeElement.versioned)
+                ResourceServer.serveResource(ec.getRequest.getRequestPath, routeElement.versioned)
             else
                 unauthorized()
         }

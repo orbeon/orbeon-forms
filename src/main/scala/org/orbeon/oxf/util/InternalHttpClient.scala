@@ -34,7 +34,7 @@ object InternalHttpClient extends HttpClient{
         content    : Option[StreamedContent]
     ): HttpResponse = {
 
-        require(url.startsWith(""), "InternalHttpClient only supports absolute paths")
+        require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
 
         val currentServlet = OrbeonServlet.currentServlet.value.get
 

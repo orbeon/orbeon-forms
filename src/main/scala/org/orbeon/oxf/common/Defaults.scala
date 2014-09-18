@@ -16,6 +16,5 @@ package org.orbeon.oxf.common
 
 object Defaults {
     val DefaultEncodingForModernUse            = "UTF-8"
-    val DefaultEncodingForServletCompatibility = "ISO-8859-1" // from HTTP 1.1
-    val DefaultTextXMLEncodingWhenReading      = "US-ASCII"   // from RFC 3023
+    val DefaultEncodingForServletCompatibility = "ISO-8859-1" // from RFC 2616 (RFC 7231 removes this) and Servlet
 }

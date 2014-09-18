@@ -18,6 +18,7 @@ import java.lang.{Long ⇒ JLong}
 import java.util.{List ⇒ JList, Map ⇒ JMap}
 
 import org.apache.log4j.Level
+import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
@@ -35,38 +36,59 @@ case class ConnectionResult(
     hasContent        : Boolean,
     dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
 ) extends Logging {
+    
+    import ConnectionResult._
 
     val lastModified     = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
     def lastModifiedJava = lastModified map (_.asInstanceOf[JLong]) orNull
         
     def close() = content.close()
         
-    val mediaType =
-        content.contentType map NetUtils.getContentTypeMediaType
+    val mediatype =
+        content.contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeMediaType(ct)))
 
-    def contentTypeOrDefault(default: String) =
-        content.contentType getOrElse default
+    val charset =
+        content.contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeCharset(ct)))
 
     def mediatypeOrDefault(default: String) =
-        mediaType getOrElse default
-    
-    def contentTypeCharsetOrDefault(defaultMediatype: String) =
-        NetUtils.getTextCharsetFromContentTypeOrDefault(mediatypeOrDefault(defaultMediatype))
+        mediatype getOrElse default
+
+    def charsetJava =
+        charset.orNull
 
     def jHeaders: JMap[String, JList[String]] =
         headers mapValues (_.asJava) asJava
 
-    def readTextResponseBody(defaultMediatype: String) = Some(content) collect {
-        case content if XMLUtils.isTextOrJSONContentType(mediatypeOrDefault(defaultMediatype)) ⇒
-            // Text mediatype (including text/xml), read stream into String
-            useAndClose(new InputStreamReader(content.inputStream, contentTypeCharsetOrDefault(defaultMediatype))) { reader ⇒
-                NetUtils.readStreamAsString(reader)
-            }
-        case content if XMLUtils.isXMLMediatype(mediatypeOrDefault(defaultMediatype)) ⇒ 
-            // XML mediatype other than text/xml
+    def readTextResponseBody = mediatype collect {
+        case mediatype if XMLUtils.isXMLMediatype(mediatype) ⇒
+            // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
+            //
+            // http://tools.ietf.org/html/rfc7303:
+            //
+            //  The former confusion
+            //  around the question of default character sets for the two text/ types
+            //  no longer arises because
+            //
+            //     [RFC7231] changes [RFC2616] by removing the ISO-8859-1 default and
+            //     not defining any default at all;
+            //
+            //     [RFC6657] updates [RFC2046] to remove the US-ASCII [ASCII]
+            //
+            // [...]
+            //
+            // this specification sets the priority as follows:
+            //
+            //    A BOM (Section 3.3) is authoritative if it is present in an XML
+            //    MIME entity;
+            //
+            //    In the absence of a BOM (Section 3.3), the charset parameter is
+            //    authoritative if it is present
+            //
             useAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream)) { reader ⇒
                 NetUtils.readStreamAsString(reader)
             }
+        case mediatype if XMLUtils.isTextOrJSONContentType(mediatype) ⇒
+            readStreamAsText(content.inputStream, charset) 
     }
     
     private var _didLogResponseDetails = false
@@ -151,6 +173,16 @@ object ConnectionResult {
             case NonFatal(t) ⇒
                 cxr.close()
                 throw t
+        }
+    }
+
+    // TODO: Move to some IOUtils object.
+    def readStreamAsText(is: InputStream, charset: Option[String]): String = {
+        // - JSON: "JSON text SHALL be encoded in Unicode.  The default encoding is UTF-8."
+        //   http://www.ietf.org/rfc/rfc4627.txt
+        // - other: we pick UTF-8 anyway (2014-09-18)
+        useAndClose(new InputStreamReader(is, charset getOrElse Defaults.DefaultEncodingForModernUse)) { reader ⇒
+            NetUtils.readStreamAsString(reader)
         }
     }
 }

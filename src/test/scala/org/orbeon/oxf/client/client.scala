@@ -14,6 +14,7 @@
 package org.orbeon.oxf.client
 
 import org.openqa.selenium.chrome.ChromeDriverService
+import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.Select
 
@@ -264,6 +265,8 @@ object OrbeonClientBase {
                 service.start()
                 serviceOpt = Some(service)
                 driverOpt = Some(new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome()))
+            case "firefoxdriver" ⇒
+                driverOpt = Some(new FirefoxDriver())
             case _ ⇒
                 val capabilities = (
                     DesiredCapabilities.firefox()

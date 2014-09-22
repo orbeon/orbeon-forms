@@ -13,10 +13,6 @@
   -->
 <controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
-    <!-- ==== XForms Server ======================================================================================== -->
-
-    <page path="/xforms-server($|/.*)" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
-
     <!-- ==== Forward application services ========================================================================= -->
 
     <service path="/([^/]+)/service/.+" model="apps/${1}/page-flow.xml" public-methods="#all"/>

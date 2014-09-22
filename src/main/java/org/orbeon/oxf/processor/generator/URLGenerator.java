@@ -743,6 +743,22 @@ public class URLGenerator extends ProcessorImpl {
 
             return null;
         }
+
+        public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, XMLReceiver output) {
+            final Tidy tidy = new Tidy();
+            tidy.setShowWarnings(tidyConfig.isShowWarnings());
+            tidy.setQuiet(tidyConfig.isQuiet());
+
+            tidy.setTrimEmptyElements(false);
+            tidy.setDropEmptyParas(false);
+
+            // Set encoding
+            // If the encoding is null, we get a default
+            tidy.setInputEncoding(TidyConfig.getTidyEncoding(encoding));
+
+            // Parse and output to SAXResult
+            TransformerUtils.sourceToSAX(new DOMSource(tidy.parseDOM(is, null)), output);
+        }
     }
 
     private static class OXFResourceHandler extends ResourceHandlerBase {
@@ -796,7 +812,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
+            ResourceHandlerBase.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
@@ -931,7 +947,7 @@ public class URLGenerator extends ProcessorImpl {
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             openConnection();
             checkStatusCode();
-            readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
+            ResourceHandlerBase.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
@@ -979,22 +995,6 @@ public class URLGenerator extends ProcessorImpl {
         private void checkStatusCode() throws IOException {
             if (isFailureStatusCode())
                 throw new HttpStatusCodeException(getConnectionStatusCode(), Option.<String>apply(config.getURL().toExternalForm()), Option.<Throwable>apply(null));
-        }
-
-        public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, XMLReceiver output) {
-            final Tidy tidy = new Tidy();
-            tidy.setShowWarnings(tidyConfig.isShowWarnings());
-            tidy.setQuiet(tidyConfig.isQuiet());
-
-            tidy.setTrimEmptyElements(false);
-            tidy.setDropEmptyParas(false);
-
-            // Set encoding
-            // If the encoding is null, we get a default
-            tidy.setInputEncoding(TidyConfig.getTidyEncoding(encoding));
-
-            // Parse and output to SAXResult
-            TransformerUtils.sourceToSAX(new DOMSource(tidy.parseDOM(is, null)), output);
         }
     }
 
@@ -1046,7 +1046,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public void readHTML(XMLReceiver xmlReceiver) throws IOException {
-            URLResourceHandler.readHTML(System.in, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
+            ResourceHandlerBase.readHTML(System.in, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {

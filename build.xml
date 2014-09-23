@@ -1072,9 +1072,6 @@
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-auth.war">
                 <include name="orbeon-auth.war"/>
             </zipfileset>
-            <zipfileset dir="build/lib" fullpath="${versioned-name}/orbeon-embedding.jar">
-                <include name="orbeon-embedding.jar"/>
-            </zipfileset>
             <zipfileset file="README.md" prefix="${versioned-name}"/>
             <zipfileset file="README.md" fullpath="${versioned-name}/README.txt"/>
             <zipfileset file="LICENSE.txt" prefix="${versioned-name}"/>

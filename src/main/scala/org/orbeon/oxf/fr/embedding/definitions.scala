@@ -20,10 +20,10 @@ import org.orbeon.oxf.util.ScalaUtils.combineValues
 
 import scala.collection.immutable
 
-sealed trait  Action              { val name: String }
-case   object New  extends Action { val name = "new" }
-case   object Edit extends Action { val name = "edit" }
-case   object View extends Action { val name = "view" }
+sealed trait  Mode              { val name: String }
+case   object New  extends Mode { val name = "new" }
+case   object Edit extends Mode { val name = "edit" }
+case   object View extends Mode { val name = "view" }
 
 case class RequestDetails(
     content: Option[StreamedContent],

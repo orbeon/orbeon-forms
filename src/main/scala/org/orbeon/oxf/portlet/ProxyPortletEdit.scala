@@ -23,7 +23,12 @@ trait ProxyPortletEdit extends GenericPortlet {
     import OrbeonProxyPortlet._
     implicit def portletContext = getPortletContext
     
-    case class NameLabel(name: String, label: String)
+    case class NameLabel(name: String, label: String, publicName: String)
+
+    object NameLabel {
+        def apply(name: String, label: String, publicName: Option[String] = None): NameLabel =
+            NameLabel(name, label, publicName getOrElse name)
+    }
 
     sealed trait ControlType { def render(pref: Pref, value: String): Elem }
 
@@ -66,16 +71,17 @@ trait ProxyPortletEdit extends GenericPortlet {
         NameLabel("new",     "New Page")
     )
 
-    case object FormRunnerURL        extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-runner-url", "Form Runner URL") }
-    case object AppName              extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("app-name", "Form Runner app name") }
-    case object FormName             extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-name", "Form Runner form name") }
-    case object DocumentId           extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("document-id", "Form Runner document id") }
-    case object ReadOnly             extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("read-only", "Readonly access") }
+    case object FormRunnerURL        extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-runner-url",       "Form Runner URL") }
+    case object EnableURLParameters  extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("enable-url-parameters", "Enable form selection via URL parameters") }
+    case object AppName              extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("app-name",              "Form Runner app name",    Some("orbeon-app")) }
+    case object FormName             extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-name",             "Form Runner form name",   Some("orbeon-form")) }
+    case object DocumentId           extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("document-id",           "Form Runner document id", Some("orbeon-document")) }
+    case object ReadOnly             extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("read-only",             "Readonly access") }
     case object SendLiferayLanguage  extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-language", "Send Liferay language") }
-    case object SendLiferayUser      extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-user", "Send Liferay user") }
-    case object Page                 extends Pref { val tpe = new SelectControl(PageNameLabels); val nameLabel = NameLabel("action", "Form Runner page") }
+    case object SendLiferayUser      extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-user",     "Send Liferay user") }
+    case object Page                 extends Pref { val tpe = new SelectControl(PageNameLabels); val nameLabel = NameLabel("action",                "Form Runner page",        Some("orbeon-page")) }
 
-    val AllPreferences = Seq(
+    val AllPreferences = List(
         Page,
         FormRunnerURL,
         AppName,
@@ -89,6 +95,9 @@ trait ProxyPortletEdit extends GenericPortlet {
     // NOTE: We should be able to use portlet.xml portlet-preferences/preference, but somehow this doesn't work properly
     def getPreference(request: PortletRequest, pref: Pref) =
         request.getPreferences.getValue(pref.nameLabel.name, getPortletConfig.getInitParameter(pref.nameLabel.name))
+
+    def getBooleanPreference(request: PortletRequest, pref: Pref) =
+        getPreference(request, pref) == "true"
 
     // Very simple preferences editor
     override def doEdit(request: RenderRequest, response: RenderResponse): Unit =

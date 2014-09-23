@@ -38,8 +38,8 @@ object APISupport {
 
     val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
 
-    val AllActions       = List(New, Edit, View)
-    val AllActionsByName = AllActions map (a ⇒ a.name → a) toMap
+    val AllModes       = List(New, Edit, View)
+    val AllModesByName = AllModes map (a ⇒ a.name → a) toMap
     
     def proxyPage(
         baseURL     : String,
@@ -110,8 +110,8 @@ object APISupport {
         useAndClose(res.content)(writeResponseBody)
     }
 
-    def formRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
-        appendQueryString(s"/fr/$app/$form/$action${documentId map ("/" +) getOrElse ""}", query getOrElse "")
+    def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]) =
+        appendQueryString(s"/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}", query getOrElse "")
 
     def formRunnerHomePath(query: Option[String]) =
         appendQueryString("/fr/", query getOrElse "")

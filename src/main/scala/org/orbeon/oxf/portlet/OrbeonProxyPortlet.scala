@@ -151,7 +151,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         }
 
     private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref) =
-        portalQuery(request) collectFirst { case (pref.nameLabel.name, value) ⇒ value}
+        if (getBooleanPreference(request, EnableURLParameters))
+            None
+        else
+            portalQuery(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value}
 
     private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
         preferenceFromPortalQuery(request, pref) getOrElse getPreference(request, pref)
@@ -175,18 +178,18 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                         None
                     )
 
-            def filterAction(action: String) =
-                if (getPreference(request, ReadOnly) == "true" && action == "edit") "view" else action
+            def filterMode(mode: String) =
+                if (getBooleanPreference(request, ReadOnly) && mode == Edit.name) View.name else mode
 
             pathParameterOpt getOrElse defaultPath match {
                 case path @ "/xforms-server-submit" ⇒
                     path
                 // Incoming path is Form Runner path without document id
-                case FormRunnerPath(appName, formName, action, _, query) ⇒
-                    APISupport.formRunnerPath(appName, formName, filterAction(action), None, Option(query))
+                case FormRunnerPath(appName, formName, mode, _, query) ⇒
+                    APISupport.formRunnerPath(appName, formName, filterMode(mode), None, Option(query))
                 // Incoming path is Form Runner path with document id
-                case FormRunnerDocumentPath(appName, formName, action, documentId, _, query) ⇒
-                    APISupport.formRunnerPath(appName, formName, filterAction(action), Some(documentId), Option(query))
+                case FormRunnerDocumentPath(appName, formName, mode, documentId, _, query) ⇒
+                    APISupport.formRunnerPath(appName, formName, filterMode(mode), Some(documentId), Option(query))
                 // Incoming path is Form Runner Home page
                 case FormRunnerHome(_, query) ⇒
                     APISupport.formRunnerHomePath(Option(query))
@@ -224,8 +227,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             } yield
                 pair
 
-        val sendLanguage = getPreference(request, SendLiferayLanguage) == "true"
-        val sendUser     = getPreference(request, SendLiferayUser)     == "true"
+        val sendLanguage = getBooleanPreference(request, SendLiferayLanguage)
+        val sendUser     = getBooleanPreference(request, SendLiferayUser)
 
         // Language information
         // NOTE: Format returned is e.g. "en_US" or "fr_FR".

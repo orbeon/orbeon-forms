@@ -18,7 +18,7 @@ import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.fr.embedding.APISupport._
-import org.orbeon.oxf.fr.embedding.Action
+import org.orbeon.oxf.fr.embedding.Mode
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -55,7 +55,7 @@ object API {
         writer    : Writer,
         app       : String,
         form      : String,
-        action    : String,
+        mode      : String,
         documentId: String,
         query     : String,
         headers   : ju.Map[String, String]
@@ -63,7 +63,7 @@ object API {
         embedPageJava(
             req,
             writer,
-            formRunnerPath(app, form, action, Option(documentId), Option(query)),
+            formRunnerPath(app, form, mode, Option(documentId), Option(query)),
             headers
         )
 
@@ -93,7 +93,7 @@ object API {
         out       : Writer Either HttpServletResponse,
         app       : String,
         form      : String,
-        action    : Action,
+        mode      : Mode,
         documentId: Option[String] = None,
         query     : Option[String] = None,
         headers   : Seq[(String, String)] = Nil
@@ -101,7 +101,7 @@ object API {
         embedPage(
             req,
             out,
-            formRunnerPath(app, form, action.name, documentId, query),
+            formRunnerPath(app, form, mode.name, documentId, query),
             headers
         )
 }

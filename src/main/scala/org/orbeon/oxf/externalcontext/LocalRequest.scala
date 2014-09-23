@@ -136,6 +136,8 @@ class LocalRequest(
     *
     * NOTE: Checked 2009-02-12 that none of the methods below are called when forwarding through
     * spring/JSP/filter/Orbeon in Tomcat 5.5.27. HOWEVER they are called when including.
+    *
+    * NOTE: 2014-09-22: Checked that getServletPath and getPathInfo are called by JspServlet in tomcat-7.0.47 at least.
     */
     def getPathInfo = _pathInfo
     def getServletPath = ""

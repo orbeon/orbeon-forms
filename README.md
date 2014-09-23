@@ -3,7 +3,7 @@ Orbeon Forms - Open source web forms done the right way
 
 Last updated for Orbeon Forms 4.6.1 July 2014
 
-[![Build Status](https://secure.travis-ci.org/orbeon/orbeon-forms.png)](http://travis-ci.org/orbeon/orbeon-forms)
+[![Build Status](https://secure.travis-ci.org/orbeon/orbeon-forms.png)](https://travis-ci.org/orbeon/orbeon-forms)
 
 What is Orbeon Forms?
 ---------------------
@@ -56,7 +56,7 @@ Community and support
 See the [community](http://www.orbeon.com/community) page. In a nutshell:
 
 - Ask short questions directed to Orbeon on [Twitter](https://twitter.com/intent/tweet?in_reply_to=orbeon&in_reply_to_status_id=261900968369729536&source=webclient&text=%40orbeon+).
-- Ask technical questions on [StackOverflow](http://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
+- Ask technical questions on [StackOverflow](https://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
 - Use the [discussion forum](http://discuss.orbeon.com/) for discussions and feedback.
 - For commercial support and licensing:
     - [PE subscriptions](http://www.orbeon.com/pricing)
@@ -152,9 +152,9 @@ In addition, this product includes the following software:
 - Barcode4j (<http://barcode4j.sourceforge.net/>)
 - Castor (<http://www.castor.org/>)
 - CoffeeScript (<http://coffeescript.org/>)
-- dom4j (<http://dom4j.org/>)
+- dom4j (<http://www.dom4j.org/>)
 - Ehcache (<http://ehcache.org/>)
-- eXist (<http://exist.sourceforge.net/>)
+- eXist (<http://exist-db.org/>)
 - Flying Saucer (<http://code.google.com/p/flying-saucer/>)
 - iText (<http://itextpdf.com/>)
 - Jaxen (<http://jaxen.org/>)
@@ -162,17 +162,17 @@ In addition, this product includes the following software:
 - JCommon (<http://www.jfree.org/jcommon/>)
 - JFreeChart (<http://www.jfree.org/jfreechart/>)
 - JTidy (<http://jtidy.sourceforge.net/>)
-- JUnit (<http://www.junit.org/>)
+- JUnit (<http://junit.org/>)
 - PDFBox (<http://pdfbox.apache.org/>)
-- Rhino (<http://www.mozilla.org/rhino/>)
+- Rhino (<https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino>)
 - Saxon (<http://saxon.sourceforge.net/>)
 - SAXPath (<http://sourceforge.net/projects/saxpath/>)
 - Scala (<http://www.scala-lang.org/>)
 - ScalaTest (<http://www.scalatest.org/>)
 - TagSoup (<http://home.ccil.org/~cowan/XML/tagsoup/>)
 - Sun Multi-Schema XML Validator (<https://msv.java.net//>)
-- YUI Compressor (<http://developer.yahoo.com/yui/compressor/>)
-- YUI Library (<http://developer.yahoo.com/yui/>)
+- YUI Compressor (<https://developer.yahoo.com/yui/compressor/>)
+- YUI Library (<http://yuilibrary.com/>)
 
 This product makes use of schemas for XSLT 2.0 and XForms 1.1 provided
 under W3C Software License. The schemas are available at the following

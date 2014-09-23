@@ -45,8 +45,6 @@ class ForwardServletRequestWrapper(
 abstract class BaseServletRequestWrapper(val request: HttpServletRequest)
     extends HttpServletRequestWrapper(request) {
 
-    override def getServletPath = ""
-
     // Clean-up API by adding type parameters
     override def getHeaders(name: String): JEnumeration[String] = super.getHeaders(name).asInstanceOf[JEnumeration[String]]
     override def getHeaderNames: JEnumeration[String] = super.getHeaderNames.asInstanceOf[JEnumeration[String]]
@@ -55,6 +53,9 @@ abstract class BaseServletRequestWrapper(val request: HttpServletRequest)
 trait RequestPathQuery extends BaseServletRequestWrapper {
 
     def overriddenPathQuery: String // will be called only once
+
+    // 2014-09-22: Was on BaseServletRequestWrapper which was not good. See also comment in LocalRequest.
+    override def getServletPath = ""
 
     private lazy val (pathInfo, queryString) = splitQuery(overriddenPathQuery)
     private lazy val parameters = combineValues[String, String, Array](queryString.toList flatMap decodeSimpleQuery).toMap

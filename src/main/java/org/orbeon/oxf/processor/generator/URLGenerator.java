@@ -931,14 +931,13 @@ public class URLGenerator extends ProcessorImpl {
                 // Save headers as request attributes
                 final List<String> readHeader = config.getReadHeaders();
                 if (readHeader != null && ! readHeader.isEmpty()) {
-                    final Map<String, List<String>> responseHeaders = connectionResult.jHeaders();
                     final Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
                     for (final String nameMixed : config.getReadHeaders()) {
                         // We only support headers with one value
                         final String nameLower = nameMixed.toLowerCase();
-                        final List<String> list = responseHeaders.get(nameLower);
-                        if (list != null && ! list.isEmpty())
-                            requestAttributes.put("oxf.url-generator.header." + nameLower, list.get(0));
+                        final scala.collection.immutable.List<String> list = connectionResult.getHeaderIgnoreCase(nameLower);
+                        if (! list.isEmpty())
+                            requestAttributes.put("oxf.url-generator.header." + nameLower, list.head());
                     }
                 }
             }

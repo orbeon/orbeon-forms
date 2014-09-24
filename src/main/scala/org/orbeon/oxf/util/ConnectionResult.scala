@@ -15,7 +15,6 @@ package org.orbeon.oxf.util
 
 import java.io._
 import java.lang.{Long ⇒ JLong}
-import java.util.{List ⇒ JList, Map ⇒ JMap}
 
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.Defaults
@@ -24,7 +23,6 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLParsing, XMLUtils}
 
-import scala.collection.JavaConverters._
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -56,8 +54,10 @@ case class ConnectionResult(
     def charsetJava =
         charset.orNull
 
-    def jHeaders: JMap[String, JList[String]] =
-        headers mapValues (_.asJava) asJava
+    def getHeaderIgnoreCase(name: String) = {
+        val nameLowercase = name.toLowerCase
+        headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase ⇒ v } getOrElse Nil
+    }
 
     def readTextResponseBody = mediatype collect {
         case mediatype if XMLUtils.isXMLMediatype(mediatype) ⇒

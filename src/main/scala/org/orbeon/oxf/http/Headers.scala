@@ -43,24 +43,37 @@ object Headers {
     val EmptyHeaders = Map.empty[String, List[String]]
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
-    // Q: Doesn't Scala already have such a type?
-    // Q: Should the type be parametrized with String?
-    type ConvertibleToStringSeq[T[_]] = T[String] ⇒ Seq[String]
+    type ConvertibleToSeq[T[_], U] = T[U] ⇒ Seq[U]
 
     // Filter headers that that should never be propagated in our proxies
     // Also combine headers with the same name into a single header
-    def proxyCapitalizeAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], request: Boolean): Iterable[(String, String)] =
+    def proxyCapitalizeAndCombineHeaders[T[_]](
+        headers : Iterable[(String, T[String])],
+        request : Boolean)(implicit
+        _conv   : ConvertibleToSeq[T, String]
+    ): Iterable[(String, String)] =
         proxyAndCapitalizeHeaders(headers, request) map { case (name, values) ⇒ name → (values mkString ",") }
 
-    def proxyAndCapitalizeHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], request: Boolean): Iterable[(String, T[String])] =
+    def proxyAndCapitalizeHeaders[T[_], U](
+        headers : Iterable[(String, T[U])],
+        request : Boolean)(implicit
+        _conv   : ConvertibleToSeq[T, U]
+    ): Iterable[(String, T[U])] =
         proxyHeaders(headers, request) map { case (n, v) ⇒ capitalizeCommonOrSplitHeader(n) → v }
 
     // NOTE: Filtering is case-insensitive, but original case is unchanged
-    def proxyAndCombineRequestHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])]): Iterable[(String, String)] =
+    def proxyAndCombineRequestHeaders[T[_]](
+        headers : Iterable[(String, T[String])])(implicit
+        _conv   : ConvertibleToSeq[T, String]
+    ): Iterable[(String, String)] =
         proxyHeaders(headers, request = true) map { case (name, values) ⇒ name → (values mkString ",") }
 
     // NOTE: Filtering is case-insensitive, but original case is unchanged
-    def proxyHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], request: Boolean): Iterable[(String, T[String])] =
+    def proxyHeaders[T[_], U](
+        headers : Iterable[(String, T[U])],
+        request : Boolean)(implicit
+        _conv   : ConvertibleToSeq[T, U]
+    ): Iterable[(String, T[U])] =
         for {
             (name, values) ← headers
             if name ne null // HttpURLConnection.getHeaderFields returns null names. Great.
@@ -81,15 +94,15 @@ object Headers {
     def capitalizeSplitHeader(name: String) =
         name split '-' map (_.toLowerCase.capitalize) mkString "-"
 
-    def firstHeaderIgnoreCase[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], name: String): Option[String] =
+    def firstHeaderIgnoreCase(headers: Iterable[(String, Seq[String])], name: String): Option[String] =
         headers collectFirst {
             case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value.head
         }
 
-    def firstLongHeaderIgnoreCase[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], name: String): Option[Long] =
+    def firstLongHeaderIgnoreCase(headers: Iterable[(String, Seq[String])], name: String): Option[Long] =
         firstHeaderIgnoreCase(headers, name) map (_.toLong) filter (_ >= 0L)
 
-    def firstDateHeaderIgnoreCase[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], name: String): Option[Long] =
+    def firstDateHeaderIgnoreCase(headers: Iterable[(String, Seq[String])], name: String): Option[Long] =
         firstHeaderIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
     // List of common HTTP headers

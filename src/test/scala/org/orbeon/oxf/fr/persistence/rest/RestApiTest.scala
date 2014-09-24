@@ -47,7 +47,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with T
 
     private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T) {
         withDebug(message) {
-            Provider.all.foreach { provider ⇒
+            Provider.ProvidersTestedAutomatically.foreach { provider ⇒
                 withDebug("on database", List("provider" → provider.name)) {
                     Connect.asTomcat(provider) { connection ⇒
                         val statement = connection.createStatement

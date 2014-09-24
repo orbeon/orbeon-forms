@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.db
 private[persistence] sealed abstract class Provider(val name: String)
 
 object Provider {
-    def all: List[Provider] = List(Oracle, MySQL, SQLServer)
+    val ProvidersTestedAutomatically: List[Provider] = List(Oracle, MySQL, SQLServer)
 }
 
 private[persistence] case object Oracle    extends Provider("oracle")

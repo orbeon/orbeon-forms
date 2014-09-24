@@ -109,7 +109,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
     }
 
     @Test def createAndUpgradeTest(): Unit = {
-        Provider.all.foreach {
+        Provider.ProvidersTestedAutomatically.foreach {
             case Oracle ⇒
                 assertSameTable(Oracle, "4_3", "4_4")
                 assertSameTable(Oracle, "4_4", "4_5")

@@ -24,6 +24,7 @@ import org.orbeon.oxf.util._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import ScalaUtils._
+import java.{util ⇒ ju}
 
 // Request used for local (within Orbeon Forms) requests.
 //
@@ -47,19 +48,28 @@ class LocalRequest(
     private val _contentLengthOpt = content flatMap (_.contentLength)
     private val _contentTypeOpt   = content flatMap (_.contentType)
 
-    private val _headersIncludingBodyLowercase = {
+    private val _headersIncludingAuthBodyLowercase = {
 
-        val lowercaseHeaders =
-            headersMaybeCapitalized map { case (k, v) ⇒ k.toLowerCase → v }
+        def userGroupRoleHeadersIterator = {
+            incomingRequest.getHeaderValuesMap.asScala.iterator collect {
+                case (k, v) if LocalRequest.UserGroupRolesHeadersLower(k.toLowerCase) ⇒ k → v.toList
+            }
+        }
 
-        val bodyHeaders =
+        def bodyHeadersIterator =
             if (Connection.requiresRequestBody(method)) {
-                (_contentLengthOpt.toList map (value ⇒ Headers.ContentLengthLower → List(value.toString))) :::
-                (_contentTypeOpt.toList   map (value ⇒ Headers.ContentTypeLower   → List(value)))
+                (_contentLengthOpt.iterator map (value ⇒ Headers.ContentLengthLower → List(value.toString))) ++
+                (_contentTypeOpt.iterator   map (value ⇒ Headers.ContentTypeLower   → List(value)))
             } else
-                Nil
+                Iterator.empty
 
-        lowercaseHeaders ++ bodyHeaders mapValues (_.toArray) asJava
+        def allHeadersLowercaseIterator =
+            headersMaybeCapitalized.iterator ++
+            userGroupRoleHeadersIterator     ++
+            bodyHeadersIterator              map
+            { case (k, v) ⇒ k.toLowerCase → v.toArray }
+
+        allHeadersLowercaseIterator.toMap.asJava
     }
 
     private val (_pathInfo, _queryString) =
@@ -99,7 +109,7 @@ class LocalRequest(
     def getContentType       = _contentTypeOpt.orNull
     def getInputStream       = content map (_.inputStream) getOrElse EmptyInputStream
     def getReader            = null;//TODO? // not used by our code
-    def getHeaderValuesMap   = _headersIncludingBodyLowercase
+    def getHeaderValuesMap   = _headersIncludingAuthBodyLowercase
 
     // 2013-09-10: We should start with a fresh attributes map:
     //
@@ -109,7 +119,16 @@ class LocalRequest(
     // attributes in its own ApplicationHttpRequest.specialAttributes. So for now we keep the forward, which was in
     // place before the 2013-09-10 refactor anyway.
     //
-    def getAttributesMap = incomingRequest.getAttributesMap
+    lazy val getAttributesMap = {
+
+        val newMap = new ju.HashMap[String, AnyRef]
+
+        newMap.asScala ++= incomingRequest.getAttributesMap.asScala filter {
+            case (k, v) ⇒ k.startsWith("javax.servlet.")
+        }
+
+        ju.Collections.synchronizedMap(newMap)
+    }
 
     /*
     * NOTE: All the path methods are handled by the request dispatcher implementation in the servlet container upon
@@ -193,4 +212,9 @@ class LocalRequest(
     def getUserPrincipal                        = incomingRequest.getUserPrincipal
     def getAuthType                             = incomingRequest.getAuthType
     def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
+}
+
+private object LocalRequest {
+    val UserGroupRolesHeadersLower =
+        Set(Headers.OrbeonUsernameLower, Headers.OrbeonGroupLower, Headers.OrbeonRolesLower)
 }

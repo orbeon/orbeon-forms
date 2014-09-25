@@ -858,7 +858,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public String getResourceMediaType() throws IOException {
             openConnection();
-            return connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE);
+            return connectionResult.mediatypeOrDefault(null);
         }
 
         public String getConnectionEncoding() throws IOException {

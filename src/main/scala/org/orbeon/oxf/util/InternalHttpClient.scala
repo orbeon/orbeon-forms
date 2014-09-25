@@ -14,9 +14,11 @@
 package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, LocalRequest, LocalResponse, URLRewriter}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.portlet.OrbeonPortlet
 import org.orbeon.oxf.servlet.OrbeonServlet
 
 // HTTP client for internal requests
@@ -36,7 +38,10 @@ object InternalHttpClient extends HttpClient{
 
         require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
 
-        val currentServlet = OrbeonServlet.currentServlet.value.get
+        val currentServletPortlet =
+            OrbeonServlet.currentServlet.value orElse
+            OrbeonPortlet.currentPortlet.value getOrElse
+            (throw new OXFException(s"InternalHttpClient: missing current servlet or portlet connecting to $url."))
 
         val incomingExternalContext = NetUtils.getExternalContext
         val incomingRequest         = incomingExternalContext.getRequest
@@ -54,7 +59,7 @@ object InternalHttpClient extends HttpClient{
 
         val response = new LocalResponse(urlRewriter)
 
-        currentServlet.processorService.service(
+        currentServletPortlet.processorService.service(
             new PipelineContext,
             new LocalExternalContext(
                 incomingExternalContext.getWebAppContext,

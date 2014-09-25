@@ -258,12 +258,6 @@ trait FormRunnerPermissions {
         }
     }
 
-    def setAllAuthorizedOperationsHeader(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Unit = {
-        val operations = allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname)
-        val response = NetUtils.getExternalContext.getResponse
-        response.setHeader("Orbeon-Operations", operations.mkString(" "))
-    }
-
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest
         // Split header values on commas, in case the incoming header was not processed, see:

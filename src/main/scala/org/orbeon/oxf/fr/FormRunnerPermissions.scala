@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fb.FormBuilder
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -117,7 +118,7 @@ trait FormRunnerPermissions {
         }
     }
 
-    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): List[(String, Array[String])] = {
+    def getUserGroupRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): List[(String, Array[String])] = {
         val (username, group, roles) = getUserGroupRoles(userRoles, getHeader)
 
         (username.toList map (OrbeonUsernameHeaderName → Array(_))) :::
@@ -276,7 +277,7 @@ trait FormRunnerPermissions {
 }
 
 object FormRunnerPermissions {
-    val OrbeonUsernameHeaderName = "orbeon-username"
-    val OrbeonGroupHeaderName    = "orbeon-group"
-    val OrbeonRolesHeaderName    = "orbeon-roles"
+    val OrbeonUsernameHeaderName = Headers.OrbeonUsernameLower
+    val OrbeonGroupHeaderName    = Headers.OrbeonGroupLower
+    val OrbeonRolesHeaderName    = Headers.OrbeonRolesLower
 }

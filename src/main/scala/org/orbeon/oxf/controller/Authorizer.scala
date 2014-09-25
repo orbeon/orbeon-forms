@@ -50,10 +50,10 @@ object Authorizer extends Logging {
     def authorizedWithToken(header: String ⇒ Option[Array[String]], attribute: String ⇒ Option[AnyRef]): Boolean = {
 
         val requestToken =
-            header(TokenKeyLower).toList.flatten.headOption
+            header(OrbeonTokenLower).toList.flatten.headOption
 
         def applicationToken =
-            attribute(TokenKeyLower) collect { case token: String ⇒ token }
+            attribute(OrbeonTokenLower) collect { case token: String ⇒ token }
 
         requestToken.isDefined && requestToken == applicationToken
     }

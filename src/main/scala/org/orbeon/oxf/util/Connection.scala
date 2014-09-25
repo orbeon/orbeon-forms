@@ -502,9 +502,9 @@ object Connection extends Logging {
 
             // Get token from web app scope
             val token =
-                externalContext.getWebAppContext.attributes.getOrElseUpdate(TokenKeyLower, SecureUtils.randomHexId).asInstanceOf[String]
+                externalContext.getWebAppContext.attributes.getOrElseUpdate(OrbeonTokenLower, SecureUtils.randomHexId).asInstanceOf[String]
 
-            Seq(TokenKeyLower → List(token))
+            Seq(OrbeonTokenLower → List(token))
         }
 
         // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward

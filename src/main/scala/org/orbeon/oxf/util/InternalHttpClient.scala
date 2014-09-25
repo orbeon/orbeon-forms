@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
-import org.orbeon.oxf.externalcontext.{LocalResponse, LocalExternalContext, LocalRequest, URLRewriter}
+import org.orbeon.oxf.externalcontext.{LocalExternalContext, LocalRequest, LocalResponse, URLRewriter}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.servlet.OrbeonServlet

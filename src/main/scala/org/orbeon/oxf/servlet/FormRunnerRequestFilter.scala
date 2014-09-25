@@ -29,7 +29,7 @@ class FormRunnerRequestFilter extends RequestFilter {
             case array   ⇒ Some(array)
         }
 
-        val headers = FormRunner.getUserRolesAsHeaders(servletRequest, getHeader).toMap
+        val headers = FormRunner.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
 
         trait CustomHeaders extends HttpServletRequestWrapper {
             override def getHeaderNames =

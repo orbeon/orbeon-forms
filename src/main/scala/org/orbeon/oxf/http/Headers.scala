@@ -19,17 +19,25 @@ import collection.breakOut
 
 object Headers {
 
-    val TokenKey           = "Orbeon-Token"
-    val ContentType        = "Content-Type"
-    val ContentLength      = "Content-Length"
-    val LastModified       = "Last-Modified"
-    val Authorization      = "Authorization"
-
-    val TokenKeyLower      = TokenKey.toLowerCase
-    val ContentTypeLower   = ContentType.toLowerCase
-    val ContentLengthLower = ContentLength.toLowerCase
-    val LastModifiedLower  = LastModified.toLowerCase
-    val AuthorizationLower = Authorization.toLowerCase
+    val OrbeonToken         = "Orbeon-Token"
+    val OrbeonUsername      = "Orbeon-Username"
+    val OrbeonGroup         = "Orbeon-Group"
+    val OrbeonRoles         = "Orbeon-Roles"
+    
+    val ContentType         = "Content-Type"
+    val ContentLength       = "Content-Length"
+    val LastModified        = "Last-Modified"
+    val Authorization       = "Authorization"
+            
+    val OrbeonTokenLower    = OrbeonToken.toLowerCase
+    val OrbeonUsernameLower = OrbeonUsername.toLowerCase
+    val OrbeonGroupLower    = OrbeonGroup.toLowerCase
+    val OrbeonRolesLower    = OrbeonRoles.toLowerCase
+    
+    val ContentTypeLower    = ContentType.toLowerCase
+    val ContentLengthLower  = ContentLength.toLowerCase
+    val LastModifiedLower   = LastModified.toLowerCase
+    val AuthorizationLower  = Authorization.toLowerCase
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
     //

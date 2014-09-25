@@ -42,13 +42,13 @@ class AuthorizerTest extends AssertionsForJUnit with MockitoSugar {
 
         assert(! authorizedWithToken(ec))
 
-        appAttributes += TokenKeyLower → "1234567890"
+        appAttributes += OrbeonTokenLower → "1234567890"
         assert(! authorizedWithToken(ec))
 
-        requestAttributes += TokenKeyLower → Array("abcdefghij")
+        requestAttributes += OrbeonTokenLower → Array("abcdefghij")
         assert(! authorizedWithToken(ec))
 
-        requestAttributes += TokenKeyLower → Array("1234567890")
+        requestAttributes += OrbeonTokenLower → Array("1234567890")
         assert(authorizedWithToken(ec))
     }
 }

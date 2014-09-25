@@ -63,7 +63,7 @@ class FormRunnerRequestFilter extends RequestFilter {
             }
 
             // 3. Result is all new headers
-            liferayUserRolesHeaders ++ FormRunner.getUserRolesAsHeaders(portletRequest, getCombine)
+            liferayUserRolesHeaders ++ FormRunner.getUserGroupRolesAsHeaders(portletRequest, getCombine)
         }
 
         // Wrap incoming request depending on request type and add to existing properties

@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.ExternalContextWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.portlet.OrbeonPortlet;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
@@ -76,6 +77,13 @@ public class LocalPortletSubmission extends BaseSubmission {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "container type is not portlet");
+            return false;
+        }
+
+        if (! Connection.isInternalPath(p2.actionOrResource)) {
+            if (isDebugEnabled)
+                indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
+                        "reason", "path is not internal");
             return false;
         }
 

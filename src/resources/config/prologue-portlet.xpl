@@ -22,11 +22,16 @@
 
     <!-- Handle different page flows depending on portlet mode -->
     <p:choose href="aggregate('null')"><!-- dummy test input -->
-        <!-- Don't run PFC for uploads as oxf:request cannot be called -->
-        <!-- NOTE: Avoid matching /xforms-server-submit here! -->
-        <p:when test="(p:get-request-path() = '/xforms-server' or starts-with(p:get-request-path(), '/xforms-server/'))
-                   and p:get-request-method() = 'POST'
-                   and starts-with(p:get-request-header('content-type'), 'multipart/form-data')">
+        <!--
+            2014-09-22: Currently we cannot use the following PFC entry, because the PFC uses oxf:request. We might be
+            able to update the PFC so that, when appropriate or via configuration, oxf:request is not inserted. This
+            would allow us to use the PFC only instead of "XPL then PFC".
+
+            <page path="/xforms-server($|/.*)" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
+
+            WARNING: We avoid matching /xforms-server-submit here!
+        -->
+        <p:when test="p:get-request-path() = '/xforms-server' or starts-with(p:get-request-path(), '/xforms-server/')">
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="oxf:/ops/xforms/xforms-server.xpl"/>
             </p:processor>

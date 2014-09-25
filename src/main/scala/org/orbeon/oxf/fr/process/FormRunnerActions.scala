@@ -163,7 +163,7 @@ trait FormRunnerActions {
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {
             show("fr-submission-result-dialog", Map(
-                "fr-content" → Some(topLevelInstance(PersistenceModel, "fr-create-update-submission-response").get.rootElement)
+                "fr-content" → Some(topLevelInstance(FormModel, "fr-create-update-submission-response").get.rootElement)
             ))
         }
 

@@ -35,6 +35,7 @@
                 <!--<url>file:/Users/ebruchez/Desktop/contact2.zip</url>-->
                 <content-type>multipart/x-zip</content-type>
                 <cache-control><use-local-cache>false</use-local-cache></cache-control>
+                <mode>binary</mode>
             </config>
         </p:input>
         <p:output name="data" id="zip"/>

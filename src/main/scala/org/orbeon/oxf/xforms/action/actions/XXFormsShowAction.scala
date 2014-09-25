@@ -40,13 +40,21 @@ class XXFormsShowAction extends XFormsAction {
 }
 
 object XXFormsShowAction {
+
+    import XFormsEvent._
+
     def showDialog(
-            targetDialog: XFormsEventTarget,
-            neighborEffectiveId: Option[String] = None,
-            constrainToViewport: Boolean = true,
-            properties: XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter) = {
-        // Dispatch xxforms-dialog-open event to dialog
-        val newEvent = new XXFormsDialogOpenEvent(properties, targetDialog, neighborEffectiveId.orNull, constrainToViewport)
-        Dispatch.dispatchEvent(newEvent)
-    }
+        targetDialog        : XFormsEventTarget,
+        neighborEffectiveId : Option[String] = None,
+        constrainToViewport : Boolean        = true,
+        properties          : PropertyGetter = EmptyGetter
+    ) =
+        Dispatch.dispatchEvent(
+            new XXFormsDialogOpenEvent(
+                properties,
+                targetDialog,
+                neighborEffectiveId.orNull,
+                constrainToViewport
+            )
+        )
 }

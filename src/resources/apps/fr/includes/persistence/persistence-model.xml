@@ -302,7 +302,7 @@
             xxf:instance="fr-form-instance">
         <!-- Save value of Orbeon-Operations header -->
         <xf:action event="xforms-submit-done">
-            <xf:var name="operations-header" value="event('response-headers')[name = 'orbeon-operations']/value"/>
+            <xf:var name="operations-header" value="event('response-headers')[lower-case(name) = 'orbeon-operations']/value"/>
             <xf:insert if="exists($operations-header)" context="instance('fr-authorized-operations')"
                        origin="xxf:attribute('from-persistence', $operations-header/string())"/>
         </xf:action>

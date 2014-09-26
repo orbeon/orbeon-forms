@@ -82,10 +82,16 @@
                                resource="{doc('input:request')/request/headers/header[name = 'orbeon-exist-uri']/value}/{/*/app}/{/*/form
                                             }/data/?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
-                                            }&amp;query={
-                                                concat(/*/query[empty(@path)],
-                                                       string-join(for $query in /*/query[@path and normalize-space() != '']
-                                                         return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
+                                            }&amp;query={encode-for-uri(/*/query[empty(@path)])
+                                            }{
+                                                   string-join(
+                                                       for $query in /*/query[@path and normalize-space() != '']
+                                                       return concat(
+                                                           '&amp;path=' , encode-for-uri($query/@path),
+                                                           '&amp;value=', encode-for-uri($query)
+                                                       ),
+                                                       ''
+                                                   )
                                             }&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xf:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>

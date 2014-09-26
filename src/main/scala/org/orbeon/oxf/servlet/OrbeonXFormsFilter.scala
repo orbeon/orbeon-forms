@@ -100,55 +100,68 @@ class OrbeonXFormsFilter extends Filter {
                         // Execute filter
                         filterChain.doFilter(requestWrapper, responseWrapper)
 
-                        // Content can be a String or other content set as a request attribute which can be read by the
-                        // scope generator
-                        val content =
-                            Option(httpRequest.getAttribute(RendererDocumentAttributeName)) orElse
-                            responseWrapper.content
+                        val failureCodeOpt =
+                            responseWrapper.statusCode filterNot NetUtils.isSuccessCode
 
-                        val nonEmptyContent = content match {
-                            case Some(s: String) ⇒ StringUtils.isNotBlank(s)
-                            case Some(_)         ⇒ true
-                            case None            ⇒ false
-                        }
+                        failureCodeOpt match {
+                            case None ⇒
+                                // Content can be a String or other content set as a request attribute which can be read by the
+                                // scope generator
+                                val content =
+                                    Option(httpRequest.getAttribute(RendererDocumentAttributeName)) orElse
+                                    responseWrapper.content
 
-                        // Make sure document is set when available
-                        content foreach {
-                            httpRequest.setAttribute(
-                                RendererDocumentAttributeName,
-                                _
-                            )
-                        }
+                                val nonEmptyContent = content match {
+                                    case Some(s: String) ⇒ StringUtils.isNotBlank(s)
+                                    case Some(_)         ⇒ true
+                                    case None            ⇒ false
+                                }
 
-                        // Whether there is a session
-                        httpRequest.setAttribute(
-                            RendererHasSessionAttributeName,
-                            (httpRequest.getSession(false) ne null).toString
-                        )
+                                // Forward to Orbeon Forms for rendering only if there is content to be rendered, otherwise just
+                                // return and let the filterChain finish its life naturally, assuming that when sendRedirect is
+                                // used, no content is available in the response object.
+                                if (nonEmptyContent) {
 
-                        // Mediatype if available
-                        responseWrapper.mediaType foreach {
-                            httpRequest.setAttribute(
-                                RendererContentTypeAttributeName,
-                                _
-                            )
-                        }
+                                    // Make sure document is set when available
+                                    content foreach {
+                                        httpRequest.setAttribute(
+                                            RendererDocumentAttributeName,
+                                            _
+                                        )
+                                    }
 
-                        httpRequest.setAttribute(
-                            RendererBaseUriAttributeName,
-                            requestPath
-                        )
+                                    // Whether there is a session
+                                    httpRequest.setAttribute(
+                                        RendererHasSessionAttributeName,
+                                        (httpRequest.getSession(false) ne null).toString
+                                    )
 
-                        // Forward to Orbeon Forms for rendering only if there is content to be rendered, otherwise just
-                        // return and let the filterChain finish its life naturally, assuming that when sendRedirect is
-                        // used, no content is available in the response object.
-                        if (nonEmptyContent) {
-                            // The request wrapper provides an empty request body if the filtered resource already
-                            // attempted to read the body.
-                            val orbeonRequestWrapper =
-                                new OptionalBodyFilterRequestWrapper(httpRequest, requestWrapper.isRequestBodyRead)
+                                    // Mediatype if available
+                                    responseWrapper.mediaType foreach {
+                                        httpRequest.setAttribute(
+                                            RendererContentTypeAttributeName,
+                                            _
+                                        )
+                                    }
 
-                            getOrbeonDispatcher(RendererPath).forward(orbeonRequestWrapper, httpResponse)
+                                    httpRequest.setAttribute(
+                                        RendererBaseUriAttributeName,
+                                        requestPath
+                                    )
+
+                                    // The request wrapper provides an empty request body if the filtered resource already
+                                    // attempted to read the body.
+                                    val orbeonRequestWrapper =
+                                        new OptionalBodyFilterRequestWrapper(httpRequest, requestWrapper.isRequestBodyRead)
+
+                                    getOrbeonDispatcher(RendererPath).forward(orbeonRequestWrapper, httpResponse)
+                                } else {
+                                    // No content was produced, consider this equivalent to a "not found" status
+                                    httpResponse.setStatus(404)
+                                }
+                            case Some(failureCode) ⇒
+                                // Forward status code
+                                httpResponse.setStatus(failureCode)
                         }
                 }
         }
@@ -218,6 +231,9 @@ private class OptionalBodyFilterRequestWrapper(httpServletRequest: HttpServletRe
 private class FilterResponseWrapper(response: HttpServletResponse, defaultEncoding: String)
         extends HttpServletResponseWrapper(response) {
 
+    private var _statusCode: Option[Int]                      = None
+    def statusCode = _statusCode
+
     private var _byteArrayOutputStream: ByteArrayOutputStream = null
     private var _servletOutputStream: ServletOutputStream     = null
     private var _stringWriter: StringWriter                   = null
@@ -225,17 +241,19 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
     private var _encoding: String                             = null
     private var _mediatype: String                            = null
 
-    override def sendError(i: Int, string: String)            = () // SHOULD HANDLE
-    override def sendError(i: Int)                            = () // SHOULD HANDLE
+    override def setStatus(code: Int)                         = _statusCode = Some(code)
+    override def setStatus(code: Int, message: String)        = setStatus(code)
+    override def sendError(code: Int, string: String)         = setStatus(code)
+    override def sendError(code: Int)                         = setStatus(code)
+
     override def setDateHeader(name: String, value: Long)     = () // SHOULD HANDLE
     override def addDateHeader(name: String, value: Long)     = () // SHOULD HANDLE
     override def setHeader(name: String, value: String)       = () // SHOULD HANDLE
     override def addHeader(name: String, value: String)       = () // SHOULD HANDLE
     override def setIntHeader(name: String, value: Int)       = () // SHOULD HANDLE
     override def addIntHeader(name: String, value: Int)       = () // SHOULD HANDLE
-    override def setStatus(code: Int)                         = () // SHOULD HANDLE
-    override def setStatus(code: Int, message: String)        = () // SHOULD HANDLE
     override def setLocale(locale: Locale)                    = () // SHOULD HANDLE
+
     override def setContentLength(i: Int)                     = () // NOP
     override def setBufferSize(i: Int)                        = () // NOP
     override def getBufferSize                                = Integer.MAX_VALUE // as if we had an "infinite" buffer

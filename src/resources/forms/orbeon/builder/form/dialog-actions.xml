@@ -111,7 +111,7 @@
                 <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/xf:send/@submission" id="fb-bindings-submission-select">
                     <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                     <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
-                    <!-- Show submissions that are NOT yet used by a service. This is a current limitation. -->
+                    <!-- Show submissions that are NOT yet used by an action. See https://github.com/orbeon/orbeon-forms/issues/397 -->
                     <xf:itemset ref="$model/fb:submission[ends-with(@id, '-submission') and not(@id = ../fb:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xf:action[1]/xf:send/@submission)]">
                         <xf:label value="substring-before(@id, '-submission')"/>
                         <xf:value value="@id"/>
@@ -273,7 +273,7 @@
                 </xf:action>
                 <xf:action ev:event="fb-confirmation-yes">
                     <!-- Delete stuff and close dialog -->
-                    <xf:delete ref="$model/fb:action[@id = $instance/fb:action[1]/@id]"/>
+                    <xf:delete ref="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
                     <xxf:hide dialog="fb-action-dialog"/>
                 </xf:action>
             </xf:trigger>
@@ -286,8 +286,7 @@
                 <xf:action ev:event="DOMActivate">
 
                     <!-- Delete existing binding if any -->
-                    <xf:var name="binding-id" value="$instance/fb:action[1]/@id"/>
-                    <xf:delete ref="$model/fb:action[@id = $binding-id]"/>
+                    <xf:delete ref="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
 
                     <!-- Insert new binding -->
                     <xf:insert context="$model" ref="*" origin="$instance/fb:action[1]"/>

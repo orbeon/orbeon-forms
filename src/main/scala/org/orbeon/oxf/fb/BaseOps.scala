@@ -27,7 +27,7 @@ trait BaseOps extends Logging {
     implicit def logger = containingDocument.getIndentedLogger("form-builder")
 
     // Minimal version of IE supported
-    val MinimalIEVersion = 10
+    val MinimalIEVersion = 11
 
     // Id of the xxf:dynamic control holding the edited form
     val DynamicControlId = "fb"
@@ -45,7 +45,7 @@ trait BaseOps extends Logging {
     def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
     def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
-    
+
     def templateRoot(inDoc: NodeInfo, repeatName: String) =
         inlineInstanceRootElement(inDoc, templateId(repeatName))
 

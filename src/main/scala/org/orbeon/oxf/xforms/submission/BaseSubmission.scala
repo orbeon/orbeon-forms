@@ -31,14 +31,14 @@ trait SubmissionProcess {
 
 abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Submission {
 
-    import org.orbeon.oxf.xforms.submission.BaseSubmission._
+    import BaseSubmission._
 
     val containingDocument = submission.containingDocument
 
     protected def getAbsoluteSubmissionURL(
-       resolvedActionOrResource: String,
-       queryString: String,
-       isNorewrite: Boolean
+       resolvedActionOrResource : String,
+       queryString              : String,
+       isNorewrite              : Boolean
     ): String = {
 
         // NOTE: For resolveServiceURL: If the resource or service URL does not start with a protocol or with '/', the
@@ -70,9 +70,9 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
      * @return ConnectionResult or null if asynchronous
      */
     protected def submitCallable(
-        p       : XFormsModelSubmission#SubmissionParameters,
-        p2      : XFormsModelSubmission#SecondPassParameters,
-        callable: Callable[SubmissionResult]
+        p        : XFormsModelSubmission#SubmissionParameters,
+        p2       : XFormsModelSubmission#SecondPassParameters,
+        callable : Callable[SubmissionResult]
     ): SubmissionResult =
         if (p2.isAsynchronous) {
             // Tell XFCD that we have one more async submission
@@ -89,30 +89,34 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
             callable.call
         }
 
-    protected def getDetailsLogger(p: XFormsModelSubmission#SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters) =
-        submission.getDetailsLogger(p, p2)
+    protected def getDetailsLogger(
+        p  : XFormsModelSubmission#SubmissionParameters,
+        p2 : XFormsModelSubmission#SecondPassParameters
+    ) = submission.getDetailsLogger(p, p2)
 
-    protected def getTimingLogger(p: XFormsModelSubmission#SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters) =
-        submission.getTimingLogger(p, p2)
+    protected def getTimingLogger(
+        p  : XFormsModelSubmission#SubmissionParameters,
+        p2 : XFormsModelSubmission#SecondPassParameters
+    ) = submission.getTimingLogger(p, p2)
 
     /**
      * Perform a local (request dispatcher or portlet) submission.
      */
     protected def openLocalConnection(
-        incomingRequest       : Request,
-        response              : ExternalContext.Response,
-        indentedLogger        : IndentedLogger,
-        resource              : String,
-        p                     : XFormsModelSubmission#SubmissionParameters,
-        actualRequestMediatype: String,
-        encoding              : String,
-        messageBodyOrNull     : Array[Byte],
-        queryString           : String,
-        headerNames           : String,
-        customHeaderNameValues: Map[String, List[String]],
-        submissionProcess     : SubmissionProcess,
-        isContextRelative     : Boolean,
-        isDefaultContext      : Boolean
+        incomingRequest        : Request,
+        response               : ExternalContext.Response,
+        indentedLogger         : IndentedLogger,
+        resource               : String,
+        p                      : XFormsModelSubmission#SubmissionParameters,
+        actualRequestMediatype : String,
+        encoding               : String,
+        messageBodyOrNull      : Array[Byte],
+        queryString            : String,
+        headerNames            : String,
+        customHeaderNameValues : Map[String, List[String]],
+        submissionProcess      : SubmissionProcess,
+        isContextRelative      : Boolean,
+        isDefaultContext       : Boolean
     ): ConnectionResult = {
 
         // Action must be an absolute path

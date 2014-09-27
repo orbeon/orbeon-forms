@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 4.6.1 July 2014
+Last updated for Orbeon Forms 4.7 September 2014
 
 [![Build Status](https://secure.travis-ci.org/orbeon/orbeon-forms.png)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -20,6 +20,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](http://www.or
 What's new
 ----------
 
+- [Orbeon Forms 4.7](http://blog.orbeon.com/2014/09/orbeon-forms-47.html)
 - [Orbeon Forms 4.6.2](http://blog.orbeon.com/2014/08/orbeon-forms-462.html)
 - [Orbeon Forms 4.6.1](http://blog.orbeon.com/2014/07/orbeon-forms-461.html)
 - [Orbeon Forms 4.6](http://blog.orbeon.com/2014/06/orbeon-forms-46.html)

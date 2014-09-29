@@ -33,7 +33,7 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
         super.init(uri, localname, qName, attributes, matched)
 
-        elementName = binding.abstractBinding.containerElementName
+        elementName  = binding.abstractBinding.containerElementName
         elementQName = XMLUtils.buildQName(handlerContext.findXHTMLPrefix, elementName)
     }
 
@@ -44,7 +44,14 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
         classes.append(binding.abstractBinding.cssClasses)
     }
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+    protected def handleControlStart(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ): Unit = {
 
         val prefixedId = getPrefixedId
         val controller = handlerContext.getController
@@ -55,8 +62,14 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
         XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
     }
 
-    protected override def handleControlEnd(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) =
-        handlerContext.popComponentContext()
+    protected override def handleControlEnd(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ) = handlerContext.popComponentContext()
 
     protected override def handleLabel() = if (handleLHHA) super.handleLabel()
     protected override def handleAlert() = if (handleLHHA) super.handleAlert()

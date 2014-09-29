@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.ScalaUtils._
-
-import collection.JavaConverters._
-import collection.mutable.{ArrayBuffer, Buffer}
-import org.orbeon.oxf.xml.XMLReceiverHelper
 import java.util.{List ⇒ JList}
+
+import org.orbeon.oxf.xml.XMLReceiverHelper
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 trait XFormsContainerControl extends VisitableTrait {
 
-    private var _children: Buffer[XFormsControl] = _ // allow null internally
+    private var _children: mutable.Buffer[XFormsControl] = _ // allow null internally
     private def hasChildren = (_children ne null) && _children.nonEmpty
 
     // Get all the direct children controls (never null)
@@ -32,7 +32,7 @@ trait XFormsContainerControl extends VisitableTrait {
     // Add a child control
     def addChild(control: XFormsControl) {
         if (_children eq null)
-            _children = Buffer[XFormsControl]()
+            _children = mutable.Buffer[XFormsControl]()
         _children += control
     }
 
@@ -40,7 +40,7 @@ trait XFormsContainerControl extends VisitableTrait {
     def getSize = children.size
 
     // Set all the direct children at once
-    protected def setChildren(children: Buffer[XFormsControl]) = {
+    protected def setChildren(children: mutable.Buffer[XFormsControl]) = {
         require(children ne null)
         this._children = children
     }
@@ -64,7 +64,7 @@ trait XFormsContainerControl extends VisitableTrait {
 
         // Clone children if any
         if (hasChildren) {
-            cloned._children = new ArrayBuffer[XFormsControl](_children.size)
+            cloned._children = new mutable.ArrayBuffer[XFormsControl](_children.size)
             for (currentChildControl ← _children) {
                 val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
                 currentChildClone.parent = null // cloned control doesn't need a parent

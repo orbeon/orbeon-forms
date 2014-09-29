@@ -29,10 +29,10 @@ import java.util.*;
  *
  * The handler controller:
  *
- * o keeps a list of element handlers
- * o reacts to a stream of SAX events
- * o calls handlers when needed
- * o handles repeated content
+ * - keeps a list of element handlers
+ * - reacts to a stream of SAX events
+ * - calls handlers when needed
+ * - handles repeated content
  *
  * TODO: Should use pools of handlers to reduce memory consumption?
  */
@@ -56,27 +56,6 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     // Class.forName is expensive, so we cache mappings
     private static Map<String, Class<ElementHandler>> classNameToHandlerClass = new HashMap<String, Class<ElementHandler>>();
-
-    /**
-     * Register a handler that matches on a URI only.
-     *
-     * @param handlerClassName  class name for the handler
-     * @param uri               URI of the element that triggers the handler
-     */
-    public void registerHandler(String handlerClassName, String uri) {
-        registerHandler(handlerClassName, uri, null, null);
-    }
-
-    /**
-     * Register a handler. The handler can match on a URI + localname, or on URI only in that order.
-     *
-     * @param handlerClassName  class name for the handler
-     * @param uri               URI of the element that triggers the handler
-     * @param localname         local name of the element that triggers the handler, or null if match on URI only
-     */
-    public void registerHandler(String handlerClassName, String uri, String localname) {
-        registerHandler(handlerClassName, uri, localname, null);
-    }
 
     /**
      * Register a handler. The handler can match on a URI + localname + custom matcher, URI + localname, or on URI only

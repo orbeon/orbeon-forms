@@ -18,15 +18,18 @@ import org.dom4j.{Element, Document}
 import org.orbeon.oxf.xml.SAXStore
 
 case class ConcreteBinding(
-    abstractBinding: AbstractBinding,
-    innerScope: Scope,                  // each binding defines a new scope
-    outerScope: Scope,                  // this binding's outer scope
-    handlers: Seq[Element],             // annotated event handler elements
-    models: Seq[Element],               // annotated implementation model elements
-    templateTree: SAXStore,             // template with relevant markup for output, including XHTML when needed
-    compactShadowTree: Document         // without full content, only the XForms controls
+    abstractBinding   : AbstractBinding,
+    innerScope        : Scope,          // each binding defines a new scope
+    outerScope        : Scope,          // this binding's outer scope
+    handlers          : Seq[Element],   // annotated event handler elements
+    models            : Seq[Element],   // annotated implementation model elements
+    templateTree      : SAXStore,       // template with relevant markup for output, including XHTML when needed
+    compactShadowTree : Document        // without full content, only the XForms controls
 ) {
-    require(abstractBinding.bindingId.isDefined, "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement))
+    require(
+        abstractBinding.bindingId.isDefined,
+        s"missing id on XBL binding for ${Dom4jUtils.elementToDebugString(abstractBinding.bindingElement)}"
+    )
 
     def bindingId = abstractBinding.bindingId.get
 }

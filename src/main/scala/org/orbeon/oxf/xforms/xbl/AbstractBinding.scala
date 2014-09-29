@@ -28,15 +28,15 @@ import collection.JavaConverters._
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
-    qNameMatch: QName,
-    bindingElement: Element,
-    lastModified: Long,
-    bindingId: Option[String],
-    scripts: Seq[HeadElement],
-    styles: Seq[HeadElement],
-    handlers: Seq[Element],
-    modelElements: Seq[Element],
-    global: Option[Document]
+    qNameMatch     : QName,
+    bindingElement : Element,
+    lastModified   : Long,
+    bindingId      : Option[String],
+    scripts        : Seq[HeadElement],
+    styles         : Seq[HeadElement],
+    handlers       : Seq[Element],
+    modelElements  : Seq[Element],
+    global         : Option[Document]
 ) {
     val containerElementName =          // "div" by default
         Option(bindingElement.attributeValue(XXBL_CONTAINER_QNAME)) getOrElse
@@ -61,7 +61,11 @@ case class AbstractBinding(
     def printableBindingName = qNameMatch.getQualifiedName
 
     // CSS classes to put in the markup
-    val cssClasses = "xbl-component" :: ("xbl-" + cssName) :: (modeFocus list "xbl-focusable") ::: attSet(bindingElement, CLASS_QNAME).toList mkString " "
+    val cssClasses =
+        "xbl-component"                  ::
+        ("xbl-" + cssName)               ::
+        (modeFocus list "xbl-focusable") :::
+        attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
     val allowedExternalEvents =
         attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (modeFocus set XFORMS_FOCUS)

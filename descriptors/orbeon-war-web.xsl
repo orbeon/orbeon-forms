@@ -412,6 +412,19 @@
             </servlet-mapping>
 
             <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'relational persistence, and change oracle if necessary'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="content">
+                    <resource-ref>
+                        <description>DataSource</description>
+                        <res-ref-name>jdbc/oracle</res-ref-name>
+                        <res-type>javax.sql.DataSource</res-type>
+                        <res-auth>Container</res-auth>
+                    </resource-ref>
+                </xsl:with-param>
+            </xsl:call-template>
+
+            <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'Form Runner authentication'"/>
                 <xsl:with-param name="commented" select="true()"/>
                 <xsl:with-param name="content">

@@ -421,24 +421,24 @@
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
                     <fr:grid columns="3">
-                        <fr:tr>
-                            <fr:td>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search fr-email-subject">
                                     <xf:label ref="$form-resources/title/label"/>
                                     <xf:hint ref="$form-resources/title/hint"/>
                                     <xf:help ref="$form-resources/title/help"/>
                                     <xf:alert ref="$form-resources/title/alert"/>
                                 </xf:input>
-                            </fr:td>
-                            <fr:td>
+                            </xh:td>
+                            <xh:td>
                                 <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search fr-email-subject">
                                     <xf:label ref="$form-resources/author/label"/>
                                     <xf:hint ref="$form-resources/author/hint"/>
                                     <xf:help ref="$form-resources/author/help"/>
                                     <xf:alert ref="$form-resources/author/alert"/>
                                 </xf:input>
-                            </fr:td>
-                            <fr:td rowspan="3">
+                            </xh:td>
+                            <xh:td rowspan="3">
                                 <fr:image-attachment id="image-upload-control" bind="image-bind" class="fr-attachment">
                                     <xf:label ref="$form-resources/image/label"/>
                                     <xf:hint ref="$form-resources/image/hint"/>
@@ -448,10 +448,10 @@
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
                                 </fr:image-attachment>
-                            </fr:td>
-                        </fr:tr>
-                        <fr:tr>
-                            <fr:td>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:select1 id="language-control" bind="language-bind" class="fr-summary fr-search fr-width-10em">
                                     <xf:label ref="$form-resources/language/label"/>
                                     <xf:hint ref="$form-resources/language/hint"/>
@@ -466,18 +466,18 @@
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </xf:select1>
-                            </fr:td>
-                            <fr:td>
+                            </xh:td>
+                            <xh:td>
                                 <xf:input id="link-control" bind="link-bind">
                                     <xf:label ref="$form-resources/link/label"/>
                                     <xf:hint ref="$form-resources/link/hint"/>
                                     <xf:help ref="$form-resources/link/help"/>
                                     <xf:alert ref="$form-resources/link/alert"/>
                                 </xf:input>
-                            </fr:td>
-                        </fr:tr>
-                        <fr:tr>
-                            <fr:td>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:select1 id="rating-control" bind="rating-bind" appearance="minimal" class="fr-width-5em">
                                     <xf:label ref="$form-resources/rating/label"/>
                                     <xf:hint ref="$form-resources/rating/hint"/>
@@ -488,44 +488,44 @@
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </xf:select1>
-                            </fr:td>
-                            <fr:td>
+                            </xh:td>
+                            <xh:td>
                                 <xf:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
                                     <xf:label ref="$form-resources/publication-year/label"/>
                                     <xf:hint ref="$form-resources/publication-year/hint"/>
                                     <xf:help ref="$form-resources/publication-year/help"/>
                                     <xf:alert ref="$form-resources/publication-year/alert"/>
                                 </xf:input>
-                            </fr:td>
-                        </fr:tr>
+                            </xh:td>
+                        </xh:tr>
                     </fr:grid>
                     <fr:grid columns="1">
-                        <fr:tr>
-                            <fr:td>
+                        <xh:tr>
+                            <xh:td>
                                 <fr:tinymce id="review-control" bind="review-bind">
                                     <xf:label ref="$form-resources/review/label"/>
                                     <xf:hint ref="$form-resources/review/hint"/>
                                     <xf:help ref="$form-resources/review/help"/>
                                     <xf:alert ref="$form-resources/review/alert"/>
                                 </fr:tinymce>
-                            </fr:td>
-                        </fr:tr>
+                            </xh:td>
+                        </xh:tr>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="notes-section" bind="notes-bind">
                     <xf:label ref="$form-resources/notes/label"/>
                     <xf:help ref="$form-resources/notes/help"/>
                     <fr:grid repeat="true" ref="note" id="book-repeat" origin="instance('note-template')">
-                        <fr:tr>
-                            <fr:td>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:textarea id="note-control" ref="." appearance="xxf:autosize">
                                     <xf:label ref="$form-resources/note/label"/>
                                     <xf:hint ref="$form-resources/note/hint"/>
                                     <xf:help ref="$form-resources/note/help"/>
                                     <xf:alert ref="$form-resources/note/alert"/>
                                 </xf:textarea>
-                            </fr:td>
-                        </fr:tr>
+                            </xh:td>
+                        </xh:tr>
                     </fr:grid>
                 </fr:section>
             </fr:body>

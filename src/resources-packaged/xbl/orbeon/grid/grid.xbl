@@ -187,10 +187,8 @@
                                         </xsl:if>
                                         <xsl:for-each select="$grid-rows[1]/*:td">
                                             <xsl:variable name="control" select="*[1]"/>
-                                            <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
+                                            <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
                                             <xh:th>
-                                                <!-- NOTE: A bit unclear why we copy td/@class to th class. Itemset
-                                                     editor relies on this to hide hint column as of 2014-02-05. -->
                                                 <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
                                                 <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
                                                 <xsl:copy-of select="@colspan"/>
@@ -391,7 +389,6 @@
                                         </xf:repeat>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <!-- Only one instance of the content -->
                                         <xsl:copy-of select="$content"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
@@ -466,40 +463,43 @@
                         <xf:var name="control" value="$td/*[1]" as="element()?"/>
                     </xsl:if>
 
-                    <xsl:copy-of select="fr:th-td-classes-vars(@class)"/>
-
+                    <!-- Scope AVT vars -->
+                    <xsl:if test="$is-editable or $is-repeat">
+                        <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
+                    </xsl:if>
                     <xh:td>
-                        <xsl:choose>
-                            <xsl:when test="not($is-editable) and $is-repeat">
-                                <xsl:copy-of select="@*"/>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:if test="$is-editable or $is-repeat">
+                            <xsl:copy-of select="fr:th-td-classes-attr('td', @class)"/>
+                        </xsl:if>
 
+                        <xsl:choose>
+                            <xsl:when test="not($is-editable)">
                                 <xh:div class="fr-grid-content">
-                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+
+                                    <xsl:variable name="content">
                                         <xsl:for-each select="$controls">
                                             <xsl:copy>
                                                 <xsl:attribute name="class" select="string-join((@class, concat('fr-grid-', $static-row-pos, '-', $static-col-pos)), ' ')"/>
                                                 <xsl:copy-of select="@* except @class | node()"/>
                                             </xsl:copy>
                                         </xsl:for-each>
-                                    </xf:group>
-                                </xh:div>
-                            </xsl:when>
-                            <xsl:when test="not($is-editable)">
-                                <xsl:copy-of select="@*"/>
+                                    </xsl:variable>
 
-                                <xh:div class="fr-grid-content">
-                                    <xsl:for-each select="$controls">
-                                        <xsl:copy>
-                                            <xsl:attribute name="class" select="string-join((@class, concat('fr-grid-', $static-row-pos, '-', $static-col-pos)), ' ')"/>
-                                            <xsl:copy-of select="@* except @class | node()"/>
-                                        </xsl:copy>
-                                    </xsl:for-each>
+                                    <xsl:choose>
+                                        <xsl:when test="$is-repeat">
+                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                <xsl:copy-of select="$content"/>
+                                            </xf:group>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:copy-of select="$content"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xh:div>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:copy-of select="fr:th-td-classes-attr('td', @class)"/>
                                 <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                <xsl:copy-of select="@* except (@class, @xxf:control)"/>
 
                                 <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
                                 <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
@@ -510,9 +510,15 @@
                                             <!-- Limitation of the editable mode: only handle the first control -->
                                             <xsl:copy>
                                                 <!-- So the client-side code can populate populate the checkbox when editing the label -->
-                                                <xsl:variable name="label-mediatype-class" select="if (xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
-                                                <xsl:variable name="hint-mediatype-class"  select="if (xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
-                                                <xsl:attribute name="class" select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
+                                                <xsl:variable
+                                                    name="label-mediatype-class"
+                                                    select="if (xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
+                                                <xsl:variable
+                                                    name="hint-mediatype-class"
+                                                    select="if (xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
+                                                <xsl:attribute
+                                                    name="class"
+                                                    select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
                                                 <xsl:copy-of select="@* except @class | node()"/>
                                             </xsl:copy>
                                         </xf:group>
@@ -523,10 +529,11 @@
                     </xh:td>
                 </xsl:template>
 
-                <xsl:function name="fr:th-td-classes-vars" as="element(xf:var)*">
+                <!-- Because we expect that <td class="{expr}"> to be in the outer scope. -->
+                <xsl:function name="fr:scope-outer-avt-class" as="element(xf:var)*">
                     <xsl:param name="input-class" as="attribute(class)?"/>
                     <xsl:if test="exists($input-class)">
-                        <xf:var name="class-avt" xxbl:scope="outer"><xsl:value-of select="$input-class"/>                                  </xf:var>
+                        <xf:var name="class-avt" xxbl:scope="outer"><xsl:value-of select="$input-class"/></xf:var>
                         <xf:var name="class-value"                 ><xxf:value xxbl:scope="outer" value="xxf:evaluate-avt($class-avt)"/></xf:var>
                     </xsl:if>
                 </xsl:function>

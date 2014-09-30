@@ -98,18 +98,18 @@ trait ControlLHHASupport {
         LHHA.values forall (lhhaType ⇒ lhhaProperty(lhhaType).value() == other.lhhaProperty(lhhaType).value())
 
     // Convenience accessors
-    final def getLabel = lhhaProperty(LHHA.label).value()
-    final def getEscapedLabel = lhhaProperty(LHHA.label).escapedValue()
-    final def isHTMLLabel = lhhaProperty(LHHA.label).isHTML
-    final def getHelp = lhhaProperty(LHHA.help).value()
-    final def getEscapedHelp = lhhaProperty(LHHA.help).escapedValue()
-    final def isHTMLHelp = lhhaProperty(LHHA.help).isHTML
-    final def getHint = lhhaProperty(LHHA.hint).value()
-    final def getEscapedHint = lhhaProperty(LHHA.hint).escapedValue()
-    final def isHTMLHint = lhhaProperty(LHHA.hint).isHTML
-    final def getAlert = lhhaProperty(LHHA.alert).value()
-    final def isHTMLAlert = lhhaProperty(LHHA.alert).isHTML
-    final def getEscapedAlert = lhhaProperty(LHHA.alert).escapedValue()
+    final def getLabel          = lhhaProperty(LHHA.label).value()
+    final def getEscapedLabel   = lhhaProperty(LHHA.label).escapedValue()
+    final def isHTMLLabel       = lhhaProperty(LHHA.label).isHTML
+    final def getHelp           = lhhaProperty(LHHA.help).value()
+    final def getEscapedHelp    = lhhaProperty(LHHA.help).escapedValue()
+    final def isHTMLHelp        = lhhaProperty(LHHA.help).isHTML
+    final def getHint           = lhhaProperty(LHHA.hint).value()
+    final def getEscapedHint    = lhhaProperty(LHHA.hint).escapedValue()
+    final def isHTMLHint        = lhhaProperty(LHHA.hint).isHTML
+    final def getAlert          = lhhaProperty(LHHA.alert).value()
+    final def isHTMLAlert       = lhhaProperty(LHHA.alert).isHTML
+    final def getEscapedAlert   = lhhaProperty(LHHA.alert).escapedValue()
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy

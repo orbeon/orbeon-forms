@@ -1811,7 +1811,7 @@
             </titles>
             <search>
                 <search>Suchen</search>
-                <search-forms>&lt;i class="icon-search"/&gt; Suche Formular</search-forms>
+                <search-forms>&lt;i class="icon-search"/&gt; Formular suchen</search-forms>
                 <show-options>Suchoptionen anzeigen</show-options>
                 <close-options>Suchoptionen schließen</close-options>
                 <returned>Suchergebnisse: {0,number,integer} von {1,number,integer} Dokumenten.</returned>

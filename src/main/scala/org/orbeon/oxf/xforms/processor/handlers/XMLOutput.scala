@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants, XFormsContainingDocument}
 import org.orbeon.oxf.xml.Dom4j._
 import org.orbeon.oxf.xml._
 
@@ -52,6 +52,14 @@ object XMLOutput extends XMLReceiverSupport {
             applyMatchers(xfcd.getControls.getCurrentControlTree.getRoot, xmlReceiver)
         }
 
+    def writeTextOrHTML(name: String, value: String, html: Boolean)(implicit xmlReceiver: XMLReceiver): Unit =
+        if (html)
+            withElement(name, List("html" → true.toString)) {
+                XFormsUtils.streamHTMLFragment(xmlReceiver, value, null, "")
+            }
+        else
+            element(name, text = value)
+
     def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
         case c: XFormsControl ⇒
             implicit val _xmlReceiver = xmlReceiver
@@ -60,7 +68,7 @@ object XMLOutput extends XMLReceiverSupport {
                 lhhaProp ← Option(c.lhhaProperty(lhhaType))
                 text     ← Option(lhhaProp.value)
             } locally {
-                element(lhhaType.name, lhhaProp.isHTML list ("html" → lhhaProp.isHTML.toString), text = text)
+                writeTextOrHTML(lhhaType.name, text, lhhaProp.isHTML)
             }
     }
 
@@ -91,9 +99,15 @@ object XMLOutput extends XMLReceiverSupport {
     def matchValue(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
         case c: XFormsValueControl if c.isRelevant ⇒
             implicit val _xmlReceiver = xmlReceiver
-            element("value", text = c.getValue)
-            c.externalValueOpt foreach (v ⇒ element("external-value", text = v))
-            // getRelevantEscapedExternalValue?
+
+            // XBL: Should probably do via xforms:htmlFragment and/or possibly the XBL control exposing a mediatype in
+            // its definition.
+            val isHTML =
+                c.mediatype == Some("text/html") ||
+                c.isInstanceOf[XFormsComponentControl] && c.staticControl.localName == "tinymce"
+
+            writeTextOrHTML("value", c.getValue, isHTML)
+            c.externalValueOpt filter (_ != c.getValue) foreach (writeTextOrHTML("external-value", _, isHTML))
     }
 
     def matchVisitable(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
@@ -112,7 +126,7 @@ object XMLOutput extends XMLReceiverSupport {
                         val attsList = atts map { case (k, v) ⇒ k.uriQualifiedName → v }
                         withElement("item", List("value" → value) ++ attsList) {
                             item.iterateLHHA foreach { case (name, lhha) ⇒
-                                element(name, lhha.isHTML list ("html" → lhha.isHTML.toString), text = lhha.label)
+                                writeTextOrHTML(name, lhha.label, lhha.isHTML)
                             }
                         }
                 }
@@ -183,12 +197,15 @@ object XMLOutput extends XMLReceiverSupport {
                 "relevant" → c.isRelevant.toString
             )
 
+            val mediatypeAttribute =
+                c.mediatype.toList map ("mediatype" →)
+
             val extensionAttributes =
                 c.evaluatedExtensionAttributes.iterator collect {
                     case (name, value) if name.getNamespaceURI == "" ⇒ name.getName → value
                 }
 
-            withElement("control", baseAttributes ++ extensionAttributes) {
+            withElement("control", baseAttributes ++ mediatypeAttribute ++ extensionAttributes) {
                 Matchers foreach (_.apply(c, xmlReceiver))
             }
     }

@@ -38,7 +38,7 @@ private object XFormsContainingDocumentBase {
 
 import XFormsContainingDocumentBase._
 
-abstract class XFormsContainingDocumentBase
+abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
         extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
         with ContainingDocumentLogging
         with ContainingDocumentTemplate
@@ -77,6 +77,13 @@ trait ContainingDocumentProperties {
     def getStaticState: XFormsStaticState
     def defaultModel: Option[XFormsModel]
     def getRequestStats: RequestStats
+
+    def disableUpdates: Boolean
+    def isInitializing: Boolean
+
+    // Whether the document supports updates
+    private lazy val _supportUpdates = ! (disableUpdates || isNoUpdates)
+    def supportUpdates = _supportUpdates
 
     // Used by the property() function
     def getProperty(propertyName: String): Any = propertyName match {
@@ -163,6 +170,12 @@ trait ContainingDocumentProperties {
             HOST_LANGUAGE,
             identity
         )
+
+    def isNoUpdates =
+        dynamicProperty(
+            NO_UPDATES,
+            _.toBoolean
+        )
     
     // Static properties
     def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)
@@ -171,9 +184,7 @@ trait ContainingDocumentProperties {
     def isAjaxShowLoadingIcon                 = staticBooleanProperty(AJAX_SHOW_LOADING_ICON_PROPERTY)
     def isExposeXPathTypes                    = staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
     def isSessionHeartbeat                    = staticBooleanProperty(SESSION_HEARTBEAT_PROPERTY)
-    def isNoUpdates                           = staticBooleanProperty(NO_UPDATES)
     def isXForms11Switch                      = staticBooleanProperty(XFORMS11_SWITCH_PROPERTY)
-    
     def isClientStateHandling                 = staticBooleanProperty[String](STATE_HANDLING_PROPERTY, _ == STATE_HANDLING_CLIENT_VALUE)
     def isReadonlyAppearanceStaticSelectFull  = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT_PROPERTY, _ == "full")
     def isReadonlyAppearanceStaticSelect1Full = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY, _ ==  "full")

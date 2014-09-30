@@ -17,14 +17,14 @@ import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xml.{Dom4j, XMLReceiver, XMLReceiverSupport}
-import Dom4j._
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument}
+import org.orbeon.oxf.xml.Dom4j._
+import org.orbeon.oxf.xml._
 
 //
 // TODO:
@@ -38,7 +38,7 @@ import Dom4j._
 //
 // - prune non-relevant controls
 // - prune internals of XBL value controls
-// - show XFormsVariableControl | XXFormsAttributeControl | XFormsActionControl
+// - show XFormsVariableControl | XXFormsAttributeControl | XFormsActionControl | internal XFormsGroupControl
 //
 object XMLOutput extends XMLReceiverSupport {
 
@@ -161,27 +161,31 @@ object XMLOutput extends XMLReceiverSupport {
             matchRepeat,
             matchSwitchCase,
             matchDialog,
-            matchContainer,
-            matchFileMetadata
+            matchFileMetadata,
+            matchContainer
         )
 
     def applyMatchers(c: XFormsControl, xmlReceiver: XMLReceiver) = c match {
         case _: XFormsVariableControl | _: XXFormsAttributeControl | _: XFormsActionControl ⇒
+            // Skip control and its descendants
+        case c: XFormsGroupControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) ⇒
+            // Skip control but process descendants
+            matchContainer(c, xmlReceiver)
         case _ ⇒
             implicit val _xmlReceiver = xmlReceiver
+
+            val baseAttributes = List(
+                "id"       → c.getEffectiveId,
+                "type"     → c.staticControl.localName,
+                "relevant" → c.isRelevant.toString
+            )
 
             val extensionAttributes =
                 c.evaluatedExtensionAttributes.iterator collect {
                     case (name, value) if name.getNamespaceURI == "" ⇒ name.getName → value
                 }
 
-            withElement(
-                "control",
-                List(
-                    "id"       → c.getEffectiveId,
-                    "type"     → c.staticControl.localName,
-                    "relevant" → c.isRelevant.toString
-                ) ++ extensionAttributes) {
+            withElement("control", baseAttributes ++ extensionAttributes) {
                 Matchers foreach (_.apply(c, xmlReceiver))
             }
     }

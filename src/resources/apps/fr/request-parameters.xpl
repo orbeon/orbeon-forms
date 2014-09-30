@@ -62,7 +62,7 @@
                 <uuid><xsl:value-of select="$groups[8]"/></uuid>
             </request>
         </p:input>
-        <p:output name="data" ref="data" debug="xxxxx"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

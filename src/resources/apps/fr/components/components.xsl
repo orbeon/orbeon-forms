@@ -191,8 +191,12 @@
                 xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
                 xxf:order="{{if (property('xxf:noscript')) then 'label control alert hint help' else 'help label control alert hint'}}"
 
-                xxf:host-language="xhtml"
-                xxf:no-updates="false"
+                xxf:host-language="{{
+                    for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                    return if ($mode = 'controls') then 'xml' else 'xhtml'}}"
+                xxf:no-updates="{{
+                    for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                    return if ($mode = 'controls') then 'true' else 'false'}}"
 
                 xxf:noscript-support="{$is-noscript-support}"
                 xxf:external-events="{@xxf:external-events} fr-open-pdf"

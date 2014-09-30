@@ -67,9 +67,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     // Global XForms function library
     private static FunctionLibrary functionLibrary = XFormsFunctionLibrary.instance();
 
-    // Whether the document supports updates
-    private final boolean supportUpdates;
-
     // Whether this document is currently being initialized
     private boolean initializing;
 
@@ -89,7 +86,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     private final XFormsStaticState staticState;
     private final StaticStateGlobalOps staticOps;
     private XFormsControls xformsControls;
-
 
     // Other state
     private Set<String> pendingUploads;
@@ -127,7 +123,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @param initialize  initialize document (false for testing only)
      */
     public XFormsContainingDocument(XFormsStaticState staticState, XFormsURIResolver uriResolver, ExternalContext.Response response, boolean initialize) {
-        super();
+        super(false);
 
         // Create UUID for this document instance
         this.uuid = SecureUtils.randomHexId();
@@ -147,10 +143,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             // NOTE: template is not stored right away, as it depends on the evaluation of the noscript property.
 
             this.xpathDependencies = Version.instance().createUIDependencies(this);
-
-            // Whether we support updates
-            // NOTE: Reading the property requires the static state set above
-            this.supportUpdates = ! isNoUpdates();
 
             // Remember parameters used during initialization
             this.uriResolver = uriResolver;
@@ -204,7 +196,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @param disableUpdates    whether to disable updates (for recreating initial document upon browser back)
      */
     public XFormsContainingDocument(XFormsState xformsState, boolean disableUpdates) {
-        super();
+        super(disableUpdates);
 
         // 1. Restore the static state
         {
@@ -238,8 +230,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
             this.xpathDependencies = Version.instance().createUIDependencies(this);
-
-            this.supportUpdates = ! disableUpdates && ! isNoUpdates();
         }
 
         // 2. Restore the dynamic state
@@ -328,7 +318,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @return  true iif the document must handle differences
      */
     public boolean isHandleDifferences() {
-        return ! initializing && supportUpdates;
+        return ! initializing && supportUpdates();
     }
 
     /**

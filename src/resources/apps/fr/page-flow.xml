@@ -99,6 +99,11 @@
         <setvalue ref="/instance/filename" parameter="filename"/>
     </service>
 
+    <!-- Return the form's tree of control -->
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(controls)(/([^/^.]+))"
+             model="detail/detail-model.xpl"
+             view="html-view.xpl"/>
+
     <!-- Validate a collection of form data -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(validate)" view="import/validate.xpl"/>
 

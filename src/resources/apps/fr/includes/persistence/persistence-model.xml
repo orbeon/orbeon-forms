@@ -218,9 +218,9 @@
             <xf:var name="unauthorized-access" value="
                 ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create')))           or
                 ($mode = 'edit'                                and not($ops = ('*', 'update')))           or
-                ($mode = ('view', 'pdf')                       and not($ops = ('*', 'read'))  )           or
+                ($mode = ('view', 'pdf', 'controls')           and not($ops = ('*', 'read'))  )           or
                 ($mode = ('email')                             and not($ops = ('*', 'create', 'read'))  ) or
-                not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'email', 'schema'))"/>
+                not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'controls', 'email', 'schema'))"/>
 
             <!-- Send an "Unauthorized" error if the user is unauthorized -->
             <xf:action if="$unauthorized-access" type="xpath">frf:sendError(403)</xf:action>

@@ -55,10 +55,13 @@ object XMLOutput extends XMLReceiverSupport {
     def matchLHHA(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
         case c: XFormsControl ⇒
             implicit val _xmlReceiver = xmlReceiver
-            Option(c.getLabel) foreach (v ⇒ element("label", text = v))
-            Option(c.getHelp)  foreach (v ⇒ element("help",  text = v))
-            Option(c.getHint)  foreach (v ⇒ element("hint",  text = v))
-            Option(c.getAlert) foreach (v ⇒ element("alert", text = v))
+            for {
+                lhhaType ← XFormsConstants.LHHA.values
+                lhhaProp ← Option(c.lhhaProperty(lhhaType))
+                text     ← Option(lhhaProp.value)
+            } locally {
+                element(lhhaType.name, lhhaProp.isHTML list ("html" → lhhaProp.isHTML.toString), text = text)
+            }
     }
 
     def matchAppearances(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c.staticControl collect {

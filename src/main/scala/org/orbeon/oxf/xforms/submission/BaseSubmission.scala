@@ -139,14 +139,15 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
         // Determine headers
         val requestHeaders =
-            Connection.buildConnectionHeadersWithSOAP(
-                httpMethod,
-                null,
-                actualRequestMediatype,
-                encoding,
-                customHeaderNameValues,
-                headerNames,
-                indentedLogger
+            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+                scheme            = "http",
+                httpMethod        = httpMethod,
+                credentialsOrNull = null,
+                mediatype         = actualRequestMediatype,
+                encodingForSOAP   = encoding,
+                customHeaders     = customHeaderNameValues,
+                headersToForward  = headerNames)(
+                logger            = indentedLogger
             )
 
         val effectiveResourceURI =  {

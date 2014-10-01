@@ -59,14 +59,15 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         // NOTE: Should instead use withExternalContext()
         PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
         val headers =
-            Connection.buildConnectionHeadersWithSOAP(
-                "GET",
-                null,
-                null,
-                "UTF-8",
-                customHeaderValuesMap,
-                "cookie authorization user-agent",
-                ResourceManagerTestBase.newIndentedLogger
+            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+                scheme            = "http",
+                httpMethod        = "GET",
+                credentialsOrNull = null,
+                mediatype         = null,
+                encodingForSOAP   = "UTF-8",
+                customHeaders     = customHeaderValuesMap,
+                headersToForward  = "cookie authorization user-agent")(
+                logger            = ResourceManagerTestBase.newIndentedLogger
             )
 
         val request = new LocalRequest(
@@ -103,14 +104,15 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
         val headers =
-            Connection.buildConnectionHeadersWithSOAP(
-                method,
-                null,
-                bodyMediaType,
-                "UTF-8",
-                explicitHeaders,
-                "",
-                ResourceManagerTestBase.newIndentedLogger
+            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+                scheme            = "http",
+                httpMethod        = method,
+                credentialsOrNull = null,
+                mediatype         = bodyMediaType,
+                encodingForSOAP   = "UTF-8",
+                customHeaders     = explicitHeaders,
+                headersToForward  = "")(
+                logger            = ResourceManagerTestBase.newIndentedLogger
             )
 
         val wrapper =

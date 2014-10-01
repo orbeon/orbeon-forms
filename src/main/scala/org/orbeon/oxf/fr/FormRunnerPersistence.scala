@@ -137,21 +137,23 @@ trait FormRunnerPersistence {
     }
 
     // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
-    def readDocument(uri: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
+    def readDocument(urlString: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
 
-        val urlString =
+        val rewrittenURLString =
             URLRewriterUtils.rewriteServiceURL(
                 NetUtils.getExternalContext.getRequest,
-                uri,
+                urlString,
                 URLRewriter.REWRITE_MODE_ABSOLUTE
             )
 
+        val url = new URI(rewrittenURLString)
+
         val cxr = Connection(
             httpMethod  = "GET",
-            url         = new URI(urlString),
+            url         = url,
             credentials = None,
             content     = None,
-            headers     = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders)),
+            headers     = Connection.buildConnectionHeadersLowerIfNeeded(url.getScheme, None, Map(), Option(Connection.getForwardHeaders)),
             loadState   = true,
             logBody     = false
         ).connect(
@@ -164,7 +166,7 @@ trait FormRunnerPersistence {
         //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
         ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
             // do process XInclude, so FB's model gets included
-            TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, urlString, true, false)
+            TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, rewrittenURLString, true, false)
         } toOption
     }
 

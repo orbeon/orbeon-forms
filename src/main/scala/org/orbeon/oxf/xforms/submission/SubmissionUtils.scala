@@ -49,19 +49,28 @@ object SubmissionUtils {
     def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: InputStream ⇒ T): T =
         ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedURL), closeOnSuccess = true)(body)
 
-    def openGETConnection(model: XFormsModel, resolvedURL: String) =
+    def openGETConnection(model: XFormsModel, resolvedURL: String) = {
+
+        implicit val _logger = model.indentedLogger
+        val url = new URI(resolvedURL)
+
         Connection(
             httpMethod  = "GET",
-            url         = new URI(resolvedURL),
+            url         = url,
             credentials = None,
             content     = None,
-            headers     = Connection.buildConnectionHeaders(None, Map(), getHeadersToForward(model.containingDocument))(model.indentedLogger) mapValues (_.toList),
+            headers     = Connection.buildConnectionHeadersLowerIfNeeded(
+                scheme           = url.getScheme,
+                credentials      = None,
+                customHeaders    = Map(),
+                headersToForward = getHeadersToForward(model.containingDocument)
+            ) mapValues (_.toList),
             loadState   = true,
-            logBody     = BaseSubmission.isLogBody)(
-            model.indentedLogger
+            logBody     = BaseSubmission.isLogBody
         ).connect(
             saveState = true
         )
+    }
 
     private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
         Option(containingDocument.getForwardSubmissionHeaders)

@@ -37,7 +37,7 @@ private object HttpRequest {
     case class Binary(file: Array[Byte]) extends Body
 
     private def request(
-        url         : String,
+        path        : String,
         method      : String,
         version     : Version,
         body        : Option[Body],
@@ -45,7 +45,7 @@ private object HttpRequest {
         logger      : IndentedLogger
     ): ConnectionResult = {
 
-        val documentURL = new URI(PersistenceBase + url)
+        val documentURL = new URI(PersistenceBase + path)
 
         val headers = {
 
@@ -62,8 +62,12 @@ private object HttpRequest {
                 OrbeonRolesHeaderName    → List(c.roles.mkString(","))// split on commas as for other HTTP headers
             )).toSeq.flatten
 
-            val myHeaders = List(versionHeader, credentialHeaders).flatten.toMap
-            Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
+            Connection.buildConnectionHeadersLowerIfNeeded(
+                scheme           = documentURL.getScheme,
+                credentials      = None,
+                customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
+                headersToForward = Option(Connection.getForwardHeaders)
+            )
         }
 
         val contentType = body.map {

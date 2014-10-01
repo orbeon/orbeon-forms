@@ -167,7 +167,7 @@
                                 <xsl:variable name="query">
                                     select
                                         d.created, d.last_modified_time, d.document_id, d.xml, d.username, d.groupname, d.draft,
-                                        <xsl:if test="/search/provider = ('oracle', 'db2', 'sqlserver')">row_number() over (order by d.created desc) row_number</xsl:if>
+                                        <xsl:if test="/search/provider = ('oracle', 'postgresql', 'db2', 'sqlserver')">row_number() over (order by d.created desc) row_number</xsl:if>
                                         <xsl:if test="/search/provider = 'mysql'">
                                             <!-- MySQL lacks row_number, see http://stackoverflow.com/a/1895127/5295 -->
                                             @rownum := @rownum + 1 row_number
@@ -284,11 +284,12 @@
                                             <!-- Go over detail columns and extract data from XML -->
                                             <xsl:for-each select="/search/query[@path]">
                                                 <xsl:choose>
-                                                    <xsl:when test="/search/provider = 'mysql'    ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
-                                                    <xsl:when test="/search/provider = 'oracle'   ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>')</xsl:when>
-                                                    <xsl:when test="/search/provider = 'db2'      ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'mysql'      ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'postgresql' ">, (xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()', xml))[1]</xsl:when>
+                                                    <xsl:when test="/search/provider = 'oracle'     ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'db2'        ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
                                                     <!-- Even when there is just one value, SQL Server seems to want the (…)[1]; see http://stackoverflow.com/a/1302199/5295 -->
-                                                    <xsl:when test="/search/provider = 'sqlserver'">, xml.value('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> (<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>)[1]', 'nvarchar(255)')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'sqlserver'  ">, xml.value('<xsl:value-of select="f:db2-sqlserver-namespaces(f:namespaces(., @path))"/> (<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>)[1]', 'nvarchar(255)')</xsl:when>
                                                 </xsl:choose>
                                                 detail_<xsl:value-of select="position()"/>
                                             </xsl:for-each>

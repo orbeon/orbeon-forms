@@ -27,6 +27,8 @@
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.create-flat-view"                 value="false"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                               value="/fr/service/mysql"/>
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.postgresql.uri"                          value="/fr/service/postgresql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.postgresql.datasource"                   value="postgresql"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                 value="/fr/service/db2"/>
     <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                           value="/fr/service/sqlserver"/>
@@ -36,6 +38,7 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.autosave"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.autosave"                         value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.autosave"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.autosave"                     value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.autosave"                            value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.autosave"                      value="true"/>
 
@@ -43,6 +46,7 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.permissions"                           value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.permissions"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.permissions"                       value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.permissions"                  value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.permissions"                         value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.permissions"                   value="true"/>
 
@@ -50,6 +54,7 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.versioning"                            value="false"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.versioning"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.versioning"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.versioning"                   value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.versioning"                          value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.sqlserver.versioning"                    value="true"/>
 

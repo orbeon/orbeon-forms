@@ -348,7 +348,7 @@ object XFormsControl {
         protected def evaluateValue(): T
         protected def nonRelevantValue: T = null
 
-        def value(): T = {// NOTE: making this method final produces an AbstractMethodError with Java 5 (ok with Java 6)
+        final def value(): T = {
             if (! isEvaluated) {
                 _value =
                     if (isRelevant) {

@@ -197,7 +197,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
             val possibleCols = List(
                 true                  → "created"            → param(_.setTimestamp, existingRow.map(_.created).getOrElse(now)),
                 true                  → "last_modified_time" → param(_.setTimestamp, now),
-                true                  → "last_modified_by"   → param(_.setString   , requestUsername.getOrElse(null)),
+                true                  → "last_modified_by"   → param(_.setString   , requestUsername.orNull),
                 true                  → "app"                → param(_.setString   , req.app),
                 true                  → "form"               → param(_.setString   , req.form),
                 true                  → "form_version"       → param(_.setInt      , versionToSet),
@@ -206,10 +206,10 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 req.forData           → "draft"              → param(_.setString   , if (req.dataPart.get.isDraft) "Y" else "N"),
                 req.forAttachment     → "file_name"          → param(_.setString   , req.filename.get),
                 req.forAttachment     → "file_content"       → param(_.setBytes    , RequestReader.bytes()),
-                isFormDefinition      → "form_metadata"      → param(_.setString   , metadataOpt.getOrElse(null)),
-                req.forData           → "username"           → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.getOrElse(null))),
-                req.forData           → "groupname"          → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup   .getOrElse(null))),
-                ! req.forAttachment   → xmlCol               → param(_.setString   , xmlOpt.getOrElse(null))
+                isFormDefinition      → "form_metadata"      → param(_.setString   , metadataOpt.orNull),
+                req.forData           → "username"           → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.orNull)),
+                req.forData           → "groupname"          → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup.orNull)),
+                ! req.forAttachment   → xmlCol               → param(_.setString   , xmlOpt.orNull)
             )
 
             val includedCols =

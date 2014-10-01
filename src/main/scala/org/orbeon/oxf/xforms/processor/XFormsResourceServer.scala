@@ -213,7 +213,7 @@ object XFormsResourceServer {
         filename        : Option[String],
         contentType     : Option[String],
         lastModified    : Long,
-        headers         : Map[String, List[String]],
+        customHeaders   : Map[String, List[String]],
         headersToForward: Option[String])(implicit
         logger          : IndentedLogger
     ): String = {
@@ -231,7 +231,7 @@ object XFormsResourceServer {
             val serviceURI = new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE))
 
             // Store mapping into session
-            val outgoingHeaders = Connection.buildConnectionHeaders(serviceURI.getScheme, None, headers, headersToForward)(logger)
+            val outgoingHeaders = Connection.buildConnectionHeadersLowerIfNeeded(serviceURI.getScheme, None, customHeaders, headersToForward)(logger)
             val resource        = DynamicResource(serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
 
             session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)

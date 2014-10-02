@@ -138,7 +138,9 @@
 
                     <xf:group ref="$i/items">
                         <xf:var name="control-element" value="fbf:findControlByNameOrEmpty(fbf:getFormDoc(), $i/control-name)"/>
-                        <fr:grid repeat="true" ref="item" id="fb-itemset-repeat" template="$i/template/item" columns="2">
+                        <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                             decide to remove support for legacy mode. -->
+                        <fr:grid id="fb-itemset-repeat" repeat="true" ref="item" template="$i/template/item">
                             <xh:tr>
                                 <xh:td>
                                     <xf:input ref="label[@lang = $i/lang]" id="fb-itemset-label-input" class="fb-itemset-label-input">

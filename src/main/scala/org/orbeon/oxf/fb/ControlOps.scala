@@ -27,10 +27,10 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.mutable
 import org.orbeon.saxon.value.StringValue
 import org.apache.commons.lang3.StringUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import scala.collection.JavaConverters._
 
 /*
  * Form Builder: operations on controls.
@@ -43,6 +43,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     private val MIPsToRewrite = AllMIPs - Type
     private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
+    
+    val BindElementTest: Test = XF → "bind"
 
     private val topLevelBindTemplate: NodeInfo =
         <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
@@ -51,18 +53,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
     // Find data holders (there can be more than one with repeats)
-    // NOTE: We use XPath to find holders, but with the "new" custom XML data model, we might not need to do this and
-    // just use element names.
     def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
         findBindByName(inDoc, controlName) map { bind ⇒
             // From bind, infer path by looking at ancestor-or-self binds
-            val bindRefs = (bind ancestorOrSelf "*:bind" flatMap bindRefOrNodeset).reverse.tail
+            val bindRefs = (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail
 
             val path = bindRefs map ("(" + _ + ")") mkString "/"
 
             // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
             // overridden along the way!)
-            val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
+            val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
 
             // Evaluate path from instance root element
             eval(
@@ -130,7 +130,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         @tailrec def ensureBind(container: NodeInfo, names: Iterator[String]): NodeInfo = {
             if (names.hasNext) {
                 val bindName = names.next()
-                val bind =  container \ "*:bind" filter (isBindForName(_, bindName)) match {
+                val bind = container \ "*:bind" filter (isBindForName(_, bindName)) match {
                     case Seq(bind: NodeInfo, _*) ⇒ bind
                     case _ ⇒
 
@@ -589,7 +589,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse filterNot isFBBody
 
         val containerIds = ancestorContainers map (_.id)
-        val repeatDepth  = ancestorContainers count IsRepeat
+        val repeatDepth  = ancestorContainers count isRepeat
 
         def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_INDEX_SEPARATOR_STRING
         val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING

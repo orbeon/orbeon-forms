@@ -78,40 +78,56 @@
                 <xsl:variable name="root" select="/*[1]"/>
 
                 <!-- Point to the source element for this grid -->
-                <xsl:variable name="edit-ref"           select="$root/@edit-ref"/>
-                <xsl:variable name="is-editable"        select="exists($edit-ref)"/>
+                <xsl:variable name="edit-ref"                 select="$root/@edit-ref"/>
+                <xsl:variable name="is-editable"              select="exists($edit-ref)"/>
 
-                <xsl:variable name="is-repeat"          select="$root/@repeat = 'true' or exists($root/@minOccurs | $root/@maxOccurs | $root/@min | $root/@max)"/>
-                <xsl:variable name="freeze"             select="(xs:integer($root/@freeze[. castable as xs:integer]), 0)[1]"/>
-                <xsl:variable name="grid-rows"          select="($root/*:body, $root/self::*)[1]/*:tr"/>
+                <!-- Support legacy repeat for backward compatibility -->
+                <xsl:variable name="is-content-repeat"        select="fbf:isContentRepeat($root)"/>
+                <xsl:variable name="is-legacy-repeat"         select="fbf:isLegacyRepeat($root)"/>
 
-                <xsl:variable name="static-row-count"   select="count($grid-rows)"/>
-                <xsl:variable name="static-col-count"   select="count($grid-rows[1]/*:td)"/>
+                <xsl:variable name="is-repeat"                select="$is-content-repeat or $is-legacy-repeat"/>
+                <xsl:variable name="freeze"                   select="(xs:integer($root/@freeze[. castable as xs:integer]), 0)[1]"/>
+                <xsl:variable name="grid-rows"                select="($root/*:body, $root/self::*)[1]/*:tr"/>
+
+                <xsl:variable name="static-row-count"         select="count($grid-rows)"/>
+                <xsl:variable name="static-col-count"         select="count($grid-rows[1]/*:td)"/>
                 <!-- Show LHH in header only if repeating over a row group containing only one row -->
-                <xsl:variable name="lhh-in-header"      select="$is-repeat and $static-row-count = 1"/>
+                <xsl:variable name="lhh-in-header"            select="$is-repeat and $static-row-count = 1"/>
 
-                <xsl:variable name="readonly"           select="$root/@readonly = 'true'"/>
-                <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
-                <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
+                <xsl:variable name="readonly"                 select="$root/@readonly = 'true'"/>
+                <xsl:variable name="remove-constraint"        select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
+                <xsl:variable name="repeat-id"                select="concat($root/@id, '-repeat')"/>
 
-                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+                <xsl:variable name="repeat-expression"        select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+                <xsl:variable name="repeat-expression-suffix" select="if ($is-content-repeat) then '/*' else ''"/>
 
                 <xsl:template match="/*">
 
                     <!-- Root element -->
                     <xf:group appearance="xxf:internal">
+
                         <xsl:if test="$is-editable">
                             <!-- Point to the design-time source -->
                             <xf:var name="grid" value="{$edit-ref}"/>
                         </xsl:if>
 
+                        <xf:var name="repeat-context">
+                            <xxf:value value="{if ($is-content-repeat) then $repeat-expression else '.'}" xxbl:scope="outer"/>
+                        </xf:var>
+
                         <xsl:if test="$is-repeat">
-                            <xf:var name="repeat-context">
-                                <xxf:value value="." xxbl:scope="outer"/>
-                            </xf:var>
-                            <xf:var name="repeat-sequence">
-                                <xxf:value value="{$repeat-expression}" xxbl:scope="outer"/>
-                            </xf:var>
+
+                            <xsl:choose>
+                                <xsl:when test="$is-content-repeat">
+                                    <xf:var name="repeat-sequence" value="$repeat-context/*"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xf:var name="repeat-sequence">
+                                        <xxf:value value="{$repeat-expression}" xxbl:scope="outer"/>
+                                    </xf:var>
+                                </xsl:otherwise>
+                            </xsl:choose>
+
                             <xsl:if test="not($readonly)">
                                 <xf:var name="repeat-template">
                                     <xxf:value value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
@@ -122,7 +138,10 @@
                                 <xxf:value value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
                             <!-- NOTE: We need a better way to get the Form Runner mode. -->
-                            <xf:var name="view-mode" value="xxf:readonly($repeat-context) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                            <xf:var
+                                name="view-mode"
+                                value="xxf:readonly($repeat-context) or
+                                       xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
                             <xf:var name="min-avt" xxbl:scope="outer"><xsl:value-of select="($root/@min, $root/@minOccurs, 0)[1]"/></xf:var>
                             <xf:var name="min">
@@ -139,271 +158,284 @@
                             </xf:var>
                         </xsl:if>
 
-                        <!-- Grid table -->
-                        <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
-                                          (: Control name might not be available (unclear why normalize-space() is needed) :)
-                                          for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
-                                          if ($is-repeat)
-                                                then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
-                                                      if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
-                                                else 'fr-norepeat',
-                                          if ($is-editable)
-                                                then fbf:gridCanDoClasses(@id)
-                                                else ()}">
-                            <!-- Colgroup to make column sizing with CSS easier -->
-                            <xh:colgroup>
-                                <xsl:if test="$is-repeat and not($readonly)">
-                                    <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]"/>
+                        <!-- Group to control visibility of the whole table.
+                             See https://github.com/orbeon/orbeon-forms/issues/1935 -->
+                        <xf:group>
+                            <xsl:choose>
+                                <xsl:when test="$is-content-repeat">
+                                    <xsl:attribute name="ref">$repeat-context</xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="appearance">xxf:internal</xsl:attribute>
+                                </xsl:otherwise>
+                            </xsl:choose>
+
+                            <!-- Grid table -->
+                            <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
+                                              (: Control name might not be available (unclear why normalize-space() is needed) :)
+                                              for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
+                                              if ($is-repeat)
+                                                    then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
+                                                          if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
+                                                    else 'fr-norepeat',
+                                              if ($is-editable)
+                                                    then fbf:gridCanDoClasses(@id)
+                                                    else ()}">
+                                <!-- Colgroup to make column sizing with CSS easier -->
+                                <xh:colgroup>
+                                    <xsl:if test="$is-repeat and not($readonly)">
+                                        <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]"/>
+                                    </xsl:if>
+                                    <xsl:for-each select="$grid-rows[1]/*:td">
+                                        <xh:col class="fr-grid-col-{position()}"/>
+                                    </xsl:for-each>
+                                </xh:colgroup>
+                                <!-- If repeat, add buttons and headers-->
+                                <xsl:if test="$is-repeat">
+                                    <xh:thead>
+                                        <xf:var name="can-add"
+                                                value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
+                                        <!-- Row with column headers -->
+                                        <xh:tr class="fr-grid-master-row">
+                                            <xsl:if test="not($readonly)">
+                                                <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]">
+                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" id="fr-grid-add" tabindex="-1">
+                                                        <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                                        <xf:action event="DOMActivate">
+                                                            <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
+                                                            <xf:insert context="$repeat-context"
+                                                                       ref="$repeat-sequence"
+                                                                       origin="$repeat-template"
+                                                                       at="$p"/>
+                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                    <xf:group ref="$repeat-context[not($can-add)]">
+                                                        <xh:i class="icon-plus-sign disabled"/>
+                                                    </xf:group>
+                                                </xh:th>
+                                            </xsl:if>
+                                            <xsl:for-each select="$grid-rows[1]/*:td">
+                                                <xsl:variable name="control" select="*[1]"/>
+                                                <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
+                                                <xh:th>
+                                                    <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
+                                                    <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
+                                                    <xsl:copy-of select="@colspan"/>
+                                                    <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
+                                                        <!--
+                                                            1. See also https://github.com/orbeon/orbeon-forms/issues/241
+                                                            2. In order to determine an LHH when there is no iteration,
+                                                               XPath expressions on LHH elements can't be relative to
+                                                               control binding, as the context will be empty. This works
+                                                               for Form Runner though, as LHH point to resources and are not
+                                                               relative.
+                                                            3. The bind attribute and bind() function return an empty
+                                                               sequence when the repeat is empty or when not in the context
+                                                               of the repeat (the latter is arguably wrong or at the very
+                                                               least unhelpful!).
+                                                            4. So what we do is this: we try to obtain the binding for the
+                                                               control in the first iteration, within the context of the
+                                                               repeat expression, by copying all binding attributes on a
+                                                               variable. This will return the empty sequence if there is no
+                                                               iteration.
+                                                            5. We can't simply use an enclosing group, otherwise the group
+                                                               will be non-relevant when no binding is found.
+                                                            6. We can't use the xxf:control-binding() function to obtain the
+                                                               binding, because the repeat is further below and might not be
+                                                               up to date.
+                                                            7. If there is no iteration, we cannot determine the binding,
+                                                               so we cannot determine whether the control is required or
+                                                               not.
+                                                            8. Arguably, if there are no iteration, whether a control is
+                                                               required or not doesn't matter ;)
+                                                            9. Even though, in most cases, we *could* know whether the
+                                                               control is required, because if the expression says
+                                                               `required="true()"`, the result is constant. But we don't
+                                                               have a good solution for that.
+                                                        -->
+                                                        <xf:var xxbl:scope="outer" name="control-binding" context="({$repeat-expression}){$repeat-expression-suffix}">
+                                                            <xxf:value value=".">
+                                                                <xsl:apply-templates select="$control/(@bind, @model, @context, @ref)"/>
+                                                            </xxf:value>
+                                                        </xf:var>
+                                                        <!-- Point to control binding if any, dummy value otherwise
+                                                             and make sure there is an empty value. -->
+                                                        <xf:output xxbl:scope="outer" ref="$control-binding, ''" value="''">
+                                                            <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
+                                                        </xf:output>
+                                                    </xsl:if>
+                                                </xh:th>
+                                            </xsl:for-each>
+                                        </xh:tr>
+                                        <!-- Optional row(s) shown before the repeated rows -->
+                                        <!--<xsl:for-each select="fr:header">-->
+                                            <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
+                                            <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
+                                        <!--</xsl:for-each>-->
+                                    </xh:thead>
                                 </xsl:if>
-                                <xsl:for-each select="$grid-rows[1]/*:td">
-                                    <xh:col class="fr-grid-col-{position()}"/>
-                                </xsl:for-each>
-                            </xh:colgroup>
-                            <!-- If repeat, add buttons and headers-->
-                            <xsl:if test="$is-repeat">
-                                <xh:thead>
-                                    <xf:var name="can-add"
-                                            value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
-                                    <!-- Row with column headers -->
-                                    <xh:tr class="fr-grid-master-row">
-                                        <xsl:if test="not($readonly)">
-                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]">
-                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" id="fr-grid-add" tabindex="-1">
-                                                    <xf:label><xh:i class="icon-plus-sign"/></xf:label>
-                                                    <xf:action event="DOMActivate">
-                                                        <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
-                                                        <xf:insert context="$repeat-context"
-                                                                   ref="$repeat-sequence"
-                                                                   origin="$repeat-template"
-                                                                   at="$p"/>
-                                                        <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
-                                                    </xf:action>
-                                                </xf:trigger>
-                                                <xf:group ref="$repeat-context[not($can-add)]">
-                                                    <xh:i class="icon-plus-sign disabled"/>
-                                                </xf:group>
-                                            </xh:th>
-                                        </xsl:if>
-                                        <xsl:for-each select="$grid-rows[1]/*:td">
-                                            <xsl:variable name="control" select="*[1]"/>
-                                            <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
-                                            <xh:th>
-                                                <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
-                                                <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
-                                                <xsl:copy-of select="@colspan"/>
-                                                <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
-                                                    <!--
-                                                        1. See also https://github.com/orbeon/orbeon-forms/issues/241
-                                                        2. In order to determine an LHH when there is no iteration,
-                                                           XPath expressions on LHH elements can't be relative to
-                                                           control binding, as the context will be empty. This works
-                                                           for Form Runner though, as LHH point to resources and are not
-                                                           relative.
-                                                        3. The bind attribute and bind() function return an empty
-                                                           sequence when the repeat is empty or when not in the context
-                                                           of the repeat (the latter is arguably wrong or at the very
-                                                           least unhelpful!).
-                                                        4. So what we do is this: we try to obtain the binding for the
-                                                           control in the first iteration, within the context of the
-                                                           repeat expression, by copying all binding attributes on a
-                                                           variable. This will return the empty sequence if there is no
-                                                           iteration.
-                                                        5. We can't simply use an enclosing group, otherwise the group
-                                                           will be non-relevant when no binding is found.
-                                                        6. We can't use the xxf:control-binding() function to obtain the
-                                                           binding, because the repeat is further below and might not be
-                                                           up to date.
-                                                        7. If there is no iteration, we cannot determine the binding,
-                                                           so we cannot determine whether the control is required or
-                                                           not.
-                                                        8. Arguably, if there are no iteration, whether a control is
-                                                           required or not doesn't matter ;)
-                                                        9. Even though, in most cases, we *could* know whether the
-                                                           control is required, because if the expression says
-                                                           `required="true()"`, the result is constant. But we don't
-                                                           have a good solution for that.
-                                                    -->
-                                                    <xf:var xxbl:scope="outer" name="control-binding" context="{$repeat-expression}">
-                                                        <xxf:value value=".">
-                                                            <xsl:apply-templates select="$control/(@bind, @model, @context, @ref)"/>
-                                                        </xxf:value>
+
+                                <!-- Row group -->
+                                <xsl:variable name="content">
+                                    <xsl:choose>
+                                        <xsl:when test="$is-repeat">
+
+                                            <xsl:choose>
+                                                <xsl:when test="not($readonly)">
+                                                    <!-- Local -->
+                                                    <xf:var name="repeat-position" value="xxf:repeat-position()"/>
+                                                    <xf:var name="frozen"          value="$repeat-position le {$freeze}"/>
+
+                                                    <!-- Local -->
+                                                    <xf:var name="remove-constraint">
+                                                        <!-- Evaluate the constraint in the context of the iteration -->
+                                                        <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
                                                     </xf:var>
-                                                    <!-- Point to control binding if any, dummy value otherwise
-                                                         and make sure there is an empty value. -->
-                                                    <xf:output xxbl:scope="outer" ref="$control-binding, ''" value="''">
-                                                        <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
-                                                    </xf:output>
-                                                </xsl:if>
-                                            </xh:th>
-                                        </xsl:for-each>
-                                    </xh:tr>
-                                    <!-- Optional row(s) shown before the repeated rows -->
-                                    <!--<xsl:for-each select="fr:header">-->
-                                        <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
-                                        <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
-                                    <!--</xsl:for-each>-->
-                                </xh:thead>
-                            </xsl:if>
 
-                            <!-- Row group -->
-                            <xsl:variable name="content">
-                                <xsl:choose>
-                                    <xsl:when test="$is-repeat">
+                                                    <xf:var name="can-classes" value="
+                                                            'can-remove'      [$remove-constraint and not($frozen) and $min castable as xs:integer and count($repeat-sequence) gt xs:integer($min)],
+                                                            'can-move-up'     [$repeat-position gt {$freeze} + 1],
+                                                            'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
+                                                            'can-insert-above'[$can-add and not($frozen)],
+                                                            'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"/>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xf:var name="can-classes"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
 
-                                        <xsl:choose>
-                                            <xsl:when test="not($readonly)">
-                                                <!-- Local -->
-                                                <xf:var name="repeat-position" value="xxf:repeat-position()"/>
-                                                <xf:var name="frozen"          value="$repeat-position le {$freeze}"/>
-
-                                                <!-- Local -->
-                                                <xf:var name="remove-constraint">
-                                                    <!-- Evaluate the constraint in the context of the iteration -->
-                                                    <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
-                                                </xf:var>
-
-                                                <xf:var name="can-classes" value="
-                                                        'can-remove'      [$remove-constraint and not($frozen) and $min castable as xs:integer and count($repeat-sequence) gt xs:integer($min)],
-                                                        'can-move-up'     [$repeat-position gt {$freeze} + 1],
-                                                        'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
-                                                        'can-insert-above'[$can-add and not($frozen)],
-                                                        'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xf:var name="can-classes"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-
-                                        <xsl:apply-templates select="*" mode="grid-content"/>
-                                    </xsl:when>
-                                    <xsl:when test="$is-editable">
-                                        <xsl:apply-templates select="*" mode="grid-content"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                             <xsl:apply-templates select="*" mode="grid-content"/>
-                                        </xf:group>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:variable>
-
-                            <xh:tbody>
-                                <xsl:choose>
-                                    <xsl:when test="$is-repeat">
-                                        <!-- Enclose within repeat -->
-                                        <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
-                                            <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
-
-                                                <!-- Run row operations, checking that they are allowed first -->
-                                                <xsl:if test="not($readonly)">
-                                                    <xf:action
-                                                        event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
-                                                        target="#observer"
-                                                        if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-tr', 'class'))">
-
-                                                        <!-- Make sure we have stable references -->
-                                                        <xf:var name="context" value="$repeat-context"/>
-                                                        <xf:var name="items"   value="xxf:repeat-items()"/>
-                                                        <xf:var name="p"       value="xxf:repeat-position()"/>
-                                                        <xf:var name="source"  value="$items[$p]"/>
-
-                                                        <!-- Delete source node in any case. It's ok because we have a
-                                                             reference to it for operations that still require it. -->
-                                                        <xf:delete ref="$source"/>
-
-                                                        <!-- NOTES:
-
-                                                             1. In actions below, we try to restore focus explicitly
-                                                                as we don't have an xf:move action. See:
-
-                                                                https://github.com/orbeon/orbeon-forms/issues/1426
-
-                                                             2. When the repeat sequence updates immediately, focus
-                                                                handling tends to work, but when the repeat sequence
-                                                                updates upon refresh, information about the order of
-                                                                operations is lost and the focus is not set to the last
-                                                                inserted row.
-
-                                                             3. The client dispatches xxforms-repeat-activate after the
-                                                                operation has run. That event happens to be ignored as
-                                                                we delete the current iteration first.
-                                                         -->
-
-                                                        <xf:action if="event('xxf:type') = 'fr-move-up'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$source"
-                                                                position="before"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1"/>
-
-                                                        </xf:action>
-
-                                                        <xf:action if="event('xxf:type') = 'fr-move-down'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p + 1]"
-                                                                origin="$source"
-                                                                position="after"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2"/>
-
-                                                        </xf:action>
-
-                                                        <xf:action if="event('xxf:type') = 'fr-insert-above'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$repeat-template, $source"
-                                                                position="after"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3"/>
-
-                                                        </xf:action>
-
-                                                        <xf:action if="event('xxf:type') = 'fr-insert-below'">
-
-                                                            <xf:insert
-                                                                context="$context"
-                                                                ref="$items[$p - 1]"
-                                                                origin="$source, $repeat-template"
-                                                                position="after"/>
-
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4"/>
-
-                                                        </xf:action>
-                                                    </xf:action>
-                                                </xsl:if>
-
-                                                <xsl:copy-of select="$content"/>
+                                        </xsl:when>
+                                        <xsl:when test="$is-editable">
+                                            <xsl:apply-templates select="*" mode="grid-content"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                <xsl:apply-templates select="*" mode="grid-content"/>
                                             </xf:group>
-                                        </xf:repeat>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:copy-of select="$content"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xh:tbody>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:variable>
 
-                            <!--<xsl:if test="fr:footer">-->
-                                <!--<xh:tfoot>-->
-                                    <!--&lt;!&ndash; Optional row(s) shown after the repeated rows &ndash;&gt;-->
-                                    <!--<xsl:for-each select="fr:footer">-->
-                                        <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
-                                        <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
-                                    <!--</xsl:for-each>-->
-                                <!--</xh:tfoot>-->
-                            <!--</xsl:if>-->
-                        </xh:table>
+                                <xh:tbody>
+                                    <xsl:choose>
+                                        <xsl:when test="$is-repeat">
+                                            <!-- Enclose within repeat -->
+                                            <xf:repeat ref="({$repeat-expression}){$repeat-expression-suffix}" id="{$repeat-id}" xxbl:scope="outer">
+                                                <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
+
+                                                    <!-- Run row operations, checking that they are allowed first -->
+                                                    <xsl:if test="not($readonly)">
+                                                        <xf:action
+                                                            event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below"
+                                                            target="#observer"
+                                                            if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-tr', 'class'))">
+
+                                                            <!-- Make sure we have stable references -->
+                                                            <xf:var name="context" value="$repeat-context"/>
+                                                            <xf:var name="items"   value="xxf:repeat-items()"/>
+                                                            <xf:var name="p"       value="xxf:repeat-position()"/>
+                                                            <xf:var name="source"  value="$items[$p]"/>
+
+                                                            <!-- Delete source node in any case. It's ok because we have a
+                                                                 reference to it for operations that still require it. -->
+                                                            <xf:delete ref="$source"/>
+
+                                                            <!-- NOTES:
+
+                                                                 1. In actions below, we try to restore focus explicitly
+                                                                    as we don't have an xf:move action. See:
+
+                                                                    https://github.com/orbeon/orbeon-forms/issues/1426
+
+                                                                 2. When the repeat sequence updates immediately, focus
+                                                                    handling tends to work, but when the repeat sequence
+                                                                    updates upon refresh, information about the order of
+                                                                    operations is lost and the focus is not set to the last
+                                                                    inserted row.
+
+                                                                 3. The client dispatches xxforms-repeat-activate after the
+                                                                    operation has run. That event happens to be ignored as
+                                                                    we delete the current iteration first.
+                                                             -->
+
+                                                            <xf:action if="event('xxf:type') = 'fr-move-up'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p - 1]"
+                                                                    origin="$source"
+                                                                    position="before"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1"/>
+
+                                                            </xf:action>
+
+                                                            <xf:action if="event('xxf:type') = 'fr-move-down'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p + 1]"
+                                                                    origin="$source"
+                                                                    position="after"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2"/>
+
+                                                            </xf:action>
+
+                                                            <xf:action if="event('xxf:type') = 'fr-insert-above'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p - 1]"
+                                                                    origin="$repeat-template, $source"
+                                                                    position="after"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3"/>
+
+                                                            </xf:action>
+
+                                                            <xf:action if="event('xxf:type') = 'fr-insert-below'">
+
+                                                                <xf:insert
+                                                                    context="$context"
+                                                                    ref="$items[$p - 1]"
+                                                                    origin="$source, $repeat-template"
+                                                                    position="after"/>
+
+                                                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4"/>
+
+                                                            </xf:action>
+                                                        </xf:action>
+                                                    </xsl:if>
+
+                                                    <xsl:copy-of select="$content"/>
+                                                </xf:group>
+                                            </xf:repeat>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:copy-of select="$content"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xh:tbody>
+
+                                <!--<xsl:if test="fr:footer">-->
+                                    <!--<xh:tfoot>-->
+                                        <!--&lt;!&ndash; Optional row(s) shown after the repeated rows &ndash;&gt;-->
+                                        <!--<xsl:for-each select="fr:footer">-->
+                                            <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
+                                            <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
+                                        <!--</xsl:for-each>-->
+                                    <!--</xh:tfoot>-->
+                                <!--</xsl:if>-->
+                            </xh:table>
+                        </xf:group>
                     </xf:group>
                 </xsl:template>
 

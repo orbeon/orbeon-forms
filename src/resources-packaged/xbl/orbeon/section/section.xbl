@@ -37,7 +37,7 @@
             </xbl:handler>
         </xbl:handlers>
 
-        <xbl:template xxbl:transform="oxf:xslt">
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
@@ -50,7 +50,7 @@
                     <xsl:variable name="collapse"          select="not(@collapse = 'false')"/>
                     <xsl:variable name="animate"           select="not(@animate = 'false')"/>
                     <xsl:variable name="readonly"          select="@readonly = 'true'"/>
-                    <xsl:variable name="is-repeat"         select="@repeat = 'true' or exists(minOccurs | @maxOccurs | @min | @max)"/>
+                    <xsl:variable name="is-repeat"         select="fbf:isRepeat(.)"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -121,7 +121,7 @@
                                         <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
-                                                    <fr:repeater ref="*" xbl:attr="template min max remove-constraint">
+                                                    <fr:repeater ref="*" xbl:attr="template origin min max remove-constraint">
                                                         <xsl:if test="not($readonly)">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-repeat-menu dropdown">
                                                                 <xh:button class="btn btn-mini fr-repeater-dropdown-button">

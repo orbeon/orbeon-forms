@@ -61,7 +61,7 @@
         </xf:action>
     </xf:action>
 
-    <fr:grid columns="2" id="fb-action-grid">
+    <fr:grid id="fb-action-grid">
         <xh:tr>
             <xh:td>
                 <!-- Action name -->
@@ -129,6 +129,8 @@
                 <!-- Set Service Request Values -->
                 <xf:group ref=".[exists($all-services[xxf:has-class('fr-service')])]/xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
+                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                         decide to remove support for legacy mode. -->
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
                         <xh:tr>
                             <xh:td>
@@ -152,6 +154,8 @@
                 <!-- Set Database Service Parameters -->
                 <xf:group ref=".[exists($all-services[xxf:has-class('fr-database-service')])]/xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
+                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                         decide to remove support for legacy mode. -->
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
                         <xh:tr>
                             <xh:td>
@@ -175,6 +179,8 @@
                 <!-- Set Response Control Values -->
                 <xf:group ref="xf:action[@fb:event = 'xforms-submit-done']">
                     <xf:label ref="$form-resources/dialog-actions/response-values/label"/>
+                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                         decide to remove support for legacy mode. -->
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-control-value-action']">
                         <xh:tr>
                             <xh:td>
@@ -201,6 +207,8 @@
                 <xf:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]" as="element()*"/>
                 <xf:group ref=".[exists($controls-with-itemset)]/xf:action[@fb:event = 'xforms-submit-done']">
                     <xf:label ref="$form-resources/dialog-actions/response-itemset/label"/>
+                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                         decide to remove support for legacy mode. -->
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-itemset-action']">
                         <xh:tr>
                             <xh:td>

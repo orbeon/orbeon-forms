@@ -418,10 +418,10 @@
             <level><label>Level</label></level>
             <use-html>Use HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Section Settings</label>
+        <dialog-container-details>
+            <label>Section/Grid Settings</label>
             <control-name>
-                <label>Section Name</label>
+                <label>Name</label>
                 <alert>Name is already in use or incorrect</alert>
                 <hint>E.g.: "address"</hint>
             </control-name>
@@ -443,7 +443,7 @@
                 <hint>Boolean XPath expression</hint>
             </readonly>
             <repeat>
-                <label>Repeat Section Content</label>
+                <label>Repeat Content</label>
             </repeat>
             <custom-iteration-name>
                 <label>Enable Custom Iteration Name</label>
@@ -454,26 +454,6 @@
                 <alert>Name is already in use or incorrect</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Basic Settings and Formulas</label></tab-base>
-            <tab-repeat><label>Repeated Content</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Grid Settings</label>
-            <control-name>
-                <label>Grid Name</label>
-                <alert>Name is already in use or incorrect</alert>
-                <hint>E.g.: "first-name"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibility</label>
-                <alert>Incorrect XPath expression</alert>
-                <hint>Boolean XPath expression</hint>
-            </visibility>
-            <readonly>
-                <label>Read-Only</label>
-                <alert>Incorrect XPath expression</alert>
-                <hint>Boolean XPath expression</hint>
-            </readonly>
             <min>
                 <label>Minimum Number of Repetitions</label>
                 <alert>Incorrect value</alert>
@@ -488,7 +468,9 @@
             <one>One repetition</one>
             <unlimited>Unlimited</unlimited>
             <no-minimum>No minimum</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Basic Settings and Formulas</label></tab-base>
+            <tab-repeat><label>Repeated Content</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Confirm</label>
         </dialog-confirmation>
@@ -1290,10 +1272,10 @@
             <level><label>Niveau</label></level>
             <use-html>En HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Paramètres de la section</label>
+        <dialog-container-details>
+            <label>Paramètres de la section/grille</label>
             <control-name>
-                <label>Nom de la section</label>
+                <label>Nom</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint>Par ex.: "addresse"</hint>
             </control-name>
@@ -1315,7 +1297,7 @@
                 <hint>Expression XPath booléenne</hint>
             </readonly>
             <repeat>
-                <label>Répéter le contenu de la section</label>
+                <label>Répéter le contenu</label>
             </repeat>
             <custom-iteration-name>
                 <label>Activer un nom d'itération personalisé</label>
@@ -1326,26 +1308,6 @@
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Paramètres de base et formules</label></tab-base>
-            <tab-repeat><label>Contenu répété</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Paramètres de la grille</label>
-            <control-name>
-                <label>Nom de la grille</label>
-                <alert>Le nom est déjà utilisé ou incorrect</alert>
-                <hint>Par ex.: "addresse"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibilité</label>
-                <alert>Expression XPath incorrecte</alert>
-                <hint>Expression XPath booléenne</hint>
-            </visibility>
-            <readonly>
-                <label>Lecture seule</label>
-                <alert>Expression XPath incorrecte</alert>
-                <hint>Expression XPath booléenne</hint>
-            </readonly>
             <min>
                 <label>Nombre minimum de répétitions</label>
                 <alert>Valeur incorrecte</alert>
@@ -1360,7 +1322,9 @@
             <one>Une répétition</one>
             <unlimited>Illimité</unlimited>
             <no-minimum>Pas de minimum</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Paramètres de base et formules</label></tab-base>
+            <tab-repeat><label>Contenu répété</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Confirmation</label>
         </dialog-confirmation>
@@ -2165,10 +2129,10 @@
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Rediger seksjonsdetaljer</label>
+        <dialog-container-details>
+            <label todo="true">Rediger seksjonsdetaljer</label>
             <control-name>
-                <label>Seksjonsnavn</label>
+                <label todo="true">Seksjonsnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
                 <hint>F.eks.: «adresse»</hint>
             </control-name>
@@ -2190,7 +2154,7 @@
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Section Content]</label>
+                <label todo="true">[Repeat Content]</label>
             </repeat>
             <custom-iteration-name>
                 <label todo="true">[Enable Custom Iteration Name]</label>
@@ -2201,26 +2165,6 @@
                 <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label todo="true">[Grid Settings]</label>
-            <control-name>
-                <label todo="true">[Grid Name]</label>
-                <alert todo="true">[Name is already in use or incorrect]</alert>
-                <hint todo="true">[E.g.: "first-name"]</hint>
-            </control-name>
-            <visibility>
-                <label>Synlighet</label>
-                <alert>Galt XPath-uttrykk</alert>
-                <hint>Boolsk XPath-uttrykk</hint>
-            </visibility>
-            <readonly>
-                <label>Skrivebeskyttet</label>
-                <alert>Galt XPath-uttrykk</alert>
-                <hint>Boolsk XPath-uttrykk</hint>
-            </readonly>
             <min>
                 <label todo="true">[Minimum Number of Repetitions]</label>
                 <alert todo="true">[Incorrect value]</alert>
@@ -2235,7 +2179,9 @@
             <one todo="true">[One repetition]</one>
             <unlimited todo="true">[Unlimited]</unlimited>
             <no-minimum todo="true">[No minimum]</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Bekreft</label>
         </dialog-confirmation>
@@ -3038,10 +2984,10 @@
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Настройки раздела</label>
+        <dialog-container-details>
+            <label todo="true">Настройки раздела</label>
             <control-name>
-                <label>Название раздела</label>
+                <label todo="true">Название раздела</label>
                 <alert>Название уже используется или некорректно</alert>
                 <hint>Например: "address"</hint>
             </control-name>
@@ -3063,7 +3009,7 @@
                 <hint>Булево выражение XPath</hint>
             </readonly>
             <repeat>
-                <label todo="true">[Repeat Section Content]</label>
+                <label todo="true">[Repeat Content]</label>
             </repeat>
             <custom-iteration-name>
                 <label todo="true">[Enable Custom Iteration Name]</label>
@@ -3074,26 +3020,6 @@
                 <alert todo="true">[Name is already in use or incorrect]</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
-            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Редактировать настройки сетки</label>
-            <control-name>
-                <label>Название сетки</label>
-                <alert>Имя уже используется или некорректно</alert>
-                <hint>Например: "first-name"</hint>
-            </control-name>
-            <visibility>
-                <label>Настройки видимости</label>
-                <alert>Некорректное выражение XPath</alert>
-                <hint>Булево выражение XPath</hint>
-            </visibility>
-            <readonly>
-                <label>Только для чтения</label>
-                <alert>Некорректное выражение XPath</alert>
-                <hint>Булево выражение XPath</hint>
-            </readonly>
             <min>
                 <label>Минимальное количество повторений</label>
                 <alert>Некорректное значение</alert>
@@ -3108,7 +3034,9 @@
             <one todo="true">[One repetition]</one>
             <unlimited todo="true">[Unlimited]</unlimited>
             <no-minimum todo="true">[No minimum]</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
+            <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Подтвердить</label>
         </dialog-confirmation>
@@ -3912,10 +3840,10 @@
             <level><label>Livello</label></level>
             <use-html>Usa HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Impostazioni sezione</label>
+        <dialog-container-details>
+            <label>Impostazioni sezione/griglia</label>
             <control-name>
-                <label>Nome della sezione</label>
+                <label>Nome</label>
                 <alert>Il nome é già in uso o non è valido</alert>
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
@@ -3937,7 +3865,7 @@
                 <hint>Espressione XPath booleana</hint>
             </readonly>
             <repeat>
-                <label>Ripeti contenuto sezione</label>
+                <label>Ripeti contenuto</label>
             </repeat>
             <custom-iteration-name>
                 <label>Attiva nome iterazione personalizzato</label>
@@ -3948,26 +3876,6 @@
                 <alert>Il nome é già in uso o non è valido</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Impostazioni di base e formule</label></tab-base>
-            <tab-repeat><label>Contenuto ripetuto</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Impostazioni griglia</label>
-            <control-name>
-                <label>Nome della griglia</label>
-                <alert>Il nome é già in uso o non è valido</alert>
-                <hint>Ad esempio: "indirizzo"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibilità</label>
-                <alert>Espressione XPath non valida</alert>
-                <hint>Espressione XPath booleana</hint>
-            </visibility>
-            <readonly>
-                <label>Solo lettura</label>
-                <alert>Espressione XPath non valida</alert>
-                <hint>Espressione XPath booleana</hint>
-            </readonly>
             <min>
                 <label>Numero minimo di ripetizioni</label>
                 <alert>Valore invalido</alert>
@@ -3982,7 +3890,9 @@
             <one>Una ripetizione</one>
             <unlimited>Illimitato</unlimited>
             <no-minimum>Nessun minimo</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Impostazioni di base e formule</label></tab-base>
+            <tab-repeat><label>Contenuto ripetuto</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Conferma</label>
         </dialog-confirmation>
@@ -4778,10 +4688,10 @@
             <level><label>Level</label></level>
             <use-html>HTML verwenden</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Abschnittdetails</label>
+        <dialog-container-details>
+            <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
             <control-name>
-                <label>Abschnittsname</label>
+                <label>Name</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint>z.B.: "Kontaktdaten"</hint>
             </control-name>
@@ -4803,7 +4713,7 @@
                 <hint>Boolescher XPath-Ausdruck</hint>
             </readonly>
             <repeat>
-                <label>Abschnittsinhalt wiederholen</label>
+                <label>Inhalt wiederholen</label>
             </repeat>
             <custom-iteration-name>
                 <label>Benutzerdefinierte Namen der Wiederholung aktivieren</label>
@@ -4814,26 +4724,6 @@
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Grundeinstellungen und Formeln</label></tab-base>
-            <tab-repeat><label>Wiederholter Inhalt</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Tabelleneigenschaften</label>
-            <control-name>
-                <label>Name der Tabelle</label>
-                <alert>Name ist bereits vergeben oder ungültig</alert>
-                <hint>z.B.: "Vorname"</hint>
-            </control-name>
-            <visibility>
-                <label>Sichtbarkeit</label>
-                <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Boolescher XPath-Ausdruck</hint>
-            </visibility>
-            <readonly>
-                <label>Schreibgeschützt</label>
-                <alert>Ungültiger XPath-Ausdruck</alert>
-                <hint>Boolescher XPath-Ausdruck</hint>
-            </readonly>
             <min>
                 <label>Mindestanzahl an Wiederholungen</label>
                 <alert>Ungültiger Wert</alert>
@@ -4848,7 +4738,9 @@
             <one>Eine Wiederholung</one>
             <unlimited>Unbeschränkt</unlimited>
             <no-minimum>Kein Minimum</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Grundeinstellungen und Formeln</label></tab-base>
+            <tab-repeat><label>Wiederholter Inhalt</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Bestätigen</label>
         </dialog-confirmation>
@@ -5647,10 +5539,10 @@
             <level><label>Taso</label></level>
             <use-html>Käytä HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Lohkon yksityiskohdat</label>
+        <dialog-container-details>
+            <label todo="true">Lohkon yksityiskohdat</label>
             <control-name>
-                <label>Lohkon nimi</label>
+                <label todo="true">Lohkon nimi</label>
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
                 <hint>Esim.: "osoite"</hint>
             </control-name>
@@ -5671,7 +5563,7 @@
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
             </readonly>
-            <repeat>
+            <repeat todo="true">
                 <label>Toista osion sisältö</label>
             </repeat>
             <custom-iteration-name>
@@ -5683,26 +5575,6 @@
                 <alert>Nimi on jo käytössä tai se on virheellinen</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Perusasetukset ja lausekkeet</label></tab-base>
-            <tab-repeat><label>Toistettu sisältö</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Ruudukon yksityiskohdat</label>
-            <control-name>
-                <label>Ruudukon nimi</label>
-                <alert>Nimi on virheellinen tai se on jo käytössä</alert>
-                <hint>Esim.: "etunimi"</hint>
-            </control-name>
-            <visibility>
-                <label>Näkyvyys</label>
-                <alert>Virheellinen XPath-lauseke</alert>
-                <hint>Boolean XPath-lauseke</hint>
-            </visibility>
-            <readonly>
-                <label>Vain luku</label>
-                <alert>Virheellinen XPath-lauseke</alert>
-                <hint>Boolean XPath-lauseke</hint>
-            </readonly>
             <min>
                 <label>Toistojen vähimmäismäärä</label>
                 <alert>Virheellinen arvo</alert>
@@ -5717,7 +5589,9 @@
             <one>Yksi toisto</one>
             <unlimited>Rajaton</unlimited>
             <no-minimum>Ei vähimmäismäärää</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Perusasetukset ja lausekkeet</label></tab-base>
+            <tab-repeat><label>Toistettu sisältö</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Vahvista</label>
         </dialog-confirmation>
@@ -6514,10 +6388,10 @@
             <level><label>Nivel</label></level>
             <use-html>Usa HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Detalles de Sección</label>
+        <dialog-container-details>
+            <label>Detalles de Sección/Grilla</label>
             <control-name>
-                <label>Nombre de Sección</label>
+                <label>Nombre</label>
                 <alert>Nombre ya usado o incorrecto</alert>
                 <hint>Ej: "nombre"</hint>
             </control-name>
@@ -6539,7 +6413,7 @@
                 <hint>Expresión XPath booleana</hint>
             </readonly>
             <repeat>
-                <label>Repetir Contenido de Sección</label>
+                <label>Repetir Contenido</label>
             </repeat>
             <custom-iteration-name>
                 <label>Habilitar Nombre Customizado de Iteracción</label>
@@ -6550,26 +6424,6 @@
                 <alert>Nombre ya en uso o es incorrecto</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Configuración y Formulas Básicas</label></tab-base>
-            <tab-repeat><label>Repetir Contenido</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Detalles de Grilla</label>
-            <control-name>
-                <label>Nombre de la Grilla</label>
-                <alert>Nombre ya usando o incorrecto</alert>
-                <hint>Ej: "primer-nombre"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibilidad</label>
-                <alert>Expresión XPath incorrecta</alert>
-                <hint>Expresión XPath booleana</hint>
-            </visibility>
-            <readonly>
-                <label>Sólo-Lectura</label>
-                <alert>Expresión XPath incorrecta</alert>
-                <hint>Expresión XPath booleana</hint>
-            </readonly>
             <min>
                 <label>Número mínimo de Repeticiones</label>
                 <alert>Valor incorrecto</alert>
@@ -6584,7 +6438,9 @@
             <one>Una Repetición</one>
             <unlimited>Sin Límite</unlimited>
             <no-minimum>Sin mínimo</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Configuración y Formulas Básicas</label></tab-base>
+            <tab-repeat><label>Repetir Contenido</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Confirmar</label>
         </dialog-confirmation>
@@ -7388,10 +7244,10 @@
             <level><label>Nível</label></level>
             <use-html>Usar HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Configurações da Secção</label>
+        <dialog-container-details>
+            <label>Configurações da Secção/Grelha</label>
             <control-name>
-                <label>Nome da Secção</label>
+                <label>Nome</label>
                 <alert>O Nome é incorrecto ou já existe</alert>
                 <hint>Ex.: "morada"</hint>
             </control-name>
@@ -7413,7 +7269,7 @@
                 <hint>Expressão XPath do tipo Boolean</hint>
             </readonly>
             <repeat>
-                <label>Repetir conteúdo da secção</label>
+                <label>Repetir conteúdo</label>
             </repeat>
             <custom-iteration-name>
                 <label> Nome da Iteração Personalizado</label>
@@ -7424,26 +7280,6 @@
                 <alert>O nome é incorrecto ou já está a ser utilizado</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Configurações Básicas e Fórmulas</label></tab-base>
-            <tab-repeat><label>Conteúdo Repetido</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Configurações de Grelha</label>
-            <control-name>
-                <label>Nome da Grelha</label>
-                <alert>O nome é incorrecto ou já está a ser utilizado</alert>
-                <hint>Ex.: "primeiro-nome"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibilidade</label>
-                <alert>Expressão de XPath incorrecta</alert>
-                <hint>Expressão XPath do tipo Boolean</hint>
-            </visibility>
-            <readonly>
-                <label>Apenas Leitura</label>
-                <alert>Expressão de XPath incorrecta</alert>
-                <hint>Expressão XPath do tipo Boolean</hint>
-            </readonly>
             <min>
                 <label>Valor mínimo de repetições</label>
                 <alert>Valor Incorrecto</alert>
@@ -7458,7 +7294,9 @@
             <one>Uma repetição</one>
             <unlimited>Ilimitado</unlimited>
             <no-minimum>Sem mínimo</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Configurações Básicas e Fórmulas</label></tab-base>
+            <tab-repeat><label>Conteúdo Repetido</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Confirmar</label>
         </dialog-confirmation>
@@ -8261,8 +8099,8 @@
             <level><label>Nivå</label></level>
             <use-html>Använd HTML</use-html>
         </dialog-control-details>
-        <dialog-section-details>
-            <label>Sektionsinställningar</label>
+        <dialog-container-details>
+            <label todo="true">Sektionsinställningar</label>
             <control-name>
                 <label>Namn</label>
                 <alert>Namnet är felaktigt eller redan definierat</alert>
@@ -8286,7 +8124,7 @@
                 <hint>Booleskt XPath-uttryck</hint>
             </readonly>
             <repeat>
-                <label>Upprepa sektionen</label>
+                <label>Upprepa</label>
             </repeat>
             <custom-iteration-name>
                 <label>Namnge iterationen</label>
@@ -8297,26 +8135,6 @@
                 <alert>Namnet är felaktigt eller redan definierat</alert>
                 <hint/>
             </iteration-name>
-            <tab-base><label>Grundinställningar och formler</label></tab-base>
-            <tab-repeat><label>Upprepat innehåll</label></tab-repeat>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Inställningar för rutnät</label>
-            <control-name>
-                <label>Namn</label>
-                <alert>Namnet är felaktigt eller redan definierat</alert>
-                <hint>Exempel: "mitt-namn"</hint>
-            </control-name>
-            <visibility>
-                <label>Synlighet</label>
-                <alert>Felaktigt XPath-uttryck</alert>
-                <hint>Booleskt XPath-uttryck</hint>
-            </visibility>
-            <readonly>
-                <label>Skrivskydd</label>
-                <alert>Felaktigt XPath-uttryck</alert>
-                <hint>Booleskt XPath-uttryck</hint>
-            </readonly>
             <min>
                 <label>Minsta antal upprepningar</label>
                 <alert>Felaktigt värde</alert>
@@ -8331,7 +8149,9 @@
             <one>En upprepning</one>
             <unlimited>Obegränsat</unlimited>
             <no-minimum>Inget minsta antal</no-minimum>
-        </dialog-grid-details>
+            <tab-base><label>Grundinställningar och formler</label></tab-base>
+            <tab-repeat><label>Upprepat innehåll</label></tab-repeat>
+        </dialog-container-details>
         <dialog-confirmation>
             <label>Bekräfta</label>
         </dialog-confirmation>

@@ -64,7 +64,7 @@ trait FormRunnerBaseOps {
 
     // Get the body
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
-    def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (XF → "group") filter (_.attClasses("fb-body")) head
+    def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ GroupElementTest filter (_.attClasses("fb-body")) head
 
     // Get the form model
     def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, FormModel)) head

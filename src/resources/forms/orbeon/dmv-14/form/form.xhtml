@@ -865,9 +865,10 @@
                 <fr:section id="vehicles-section" bind="vehicles-bind">
                     <xf:label ref="$form-resources/vehicles/label"/>
                     <fr:grid ref="vehicle" id="vehicle-repeat"
+                             repeat="true"
                              min="1"
                              max="3"
-                             origin="instance('vehicle-template')">
+                             template="instance('vehicle-template')">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="plate-number-control" class="fr-width-7em" bind="plate-number-bind">

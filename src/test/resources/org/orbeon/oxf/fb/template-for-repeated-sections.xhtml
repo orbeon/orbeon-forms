@@ -21,7 +21,9 @@
                     <my-section>
                         <my-input/>
                         <my-grid>
-                            <my-textarea/>
+                            <my-grid-iteration>
+                                <my-textarea/>
+                            </my-grid-iteration>
                         </my-grid>
                     </my-section>
                     <other-section>
@@ -35,9 +37,10 @@
                 <xf:bind id="my-section-bind" name="my-section" ref="my-section">
                     <xf:bind id="my-input-bind" name="my-input" ref="my-input"/>
                     <xf:bind id="my-grid-bind" ref="my-grid" name="my-grid">
-                        <xf:bind id="my-textarea-bind" ref="my-textarea" name="my-textarea"/>
+                        <xf:bind id="my-grid-iteration-bind" ref="my-grid-iteration" name="my-grid-iteration">
+                            <xf:bind id="my-textarea-bind" ref="my-textarea" name="my-textarea"/>
+                        </xf:bind>
                     </xf:bind>
-                    
                 </xf:bind>
                 <xf:bind id="other-section-bind" ref="other-section" name="other-section">
                     <xf:bind id="other-input-bind" ref="other-input" name="other-input"/>
@@ -92,9 +95,9 @@
             </xf:instance>
 
             <xf:instance xxf:readonly="true" id="my-grid-template">
-                <my-grid>
+                <my-grid-iteration>
                     <my-textarea/>
-                </my-grid>
+                </my-grid-iteration>
             </xf:instance>
 
         </xf:model>
@@ -119,7 +122,7 @@
                             <xh:td/>
                         </xh:tr>
                     </fr:grid>
-                    <fr:grid id="my-grid-control" repeat="true" bind="my-grid-bind"
+                    <fr:grid id="my-grid-control" repeat="content" bind="my-grid-bind"
                              template="instance('my-grid-template')"
                              min="1">
                         <xh:tr>

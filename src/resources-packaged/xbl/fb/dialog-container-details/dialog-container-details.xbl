@@ -24,16 +24,17 @@
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
-    <xbl:binding id="fb-dialog-section-details" element="fb|dialog-section-details" xxbl:mode="binding">
+    <xbl:binding id="fb-dialog-container-details" element="fb|dialog-container-details" xxbl:mode="binding">
         <xbl:handlers>
             <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xf:var name="form" value="xxf:binding('fb-dialog-section-details')"/>
+                <xf:var name="form" value="xxf:binding('fb-dialog-container-details')"/>
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <xf:setvalue ref="original-control-name"             value="fbf:getContainerNameOrEmpty(event('section'))"/>
-                <xf:setvalue ref="control-name"                      value="$i/original-control-name"/>
+                <xf:setvalue ref="$i/container-type"                 value="local-name(event('container'))"/>
+                <xf:setvalue ref="$i/original-control-name"          value="fbf:getContainerNameOrEmpty(event('container'))"/>
+                <xf:setvalue ref="$i/control-name"                   value="$i/original-control-name"/>
 
                 <xf:setvalue ref="$i/was-repeat"                     value="fbf:isRepeat(fbf:findControlByNameOrEmpty($form, $i/control-name))"/>
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
@@ -52,10 +53,10 @@
 
                 <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
 
-                <xf:var name="control"   value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
-                <xf:var name="resources" value="frf:currentFormResources()"/>
+                <xf:var name="control"                               value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="resources"                             value="frf:currentFormResources()"/>
 
-                <xf:var name="standard-classes"                      value="$resources/dialog-section-details/options/item/value/string()"/>
+                <xf:var name="standard-classes"                      value="$resources/dialog-container-details/options/item/value/string()"/>
                 <xf:var name="control-classes"                       value="xxf:split($control/@class)"/>
 
                 <xf:setvalue ref="$i/standard-classes"               value="string-join($control-classes[. = $standard-classes], ' ')"/>
@@ -67,10 +68,14 @@
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <xxf:show dialog="dialog"/>
+
+                <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
+                     want them to win -->
+                <xf:setfocus ev:event="xforms-enabled" control="dialog"/>
             </xbl:handler>
             <!-- Save data upon close unless the sub-form is not valid -->
             <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and valid($i)" observer="dialog">
-                <xf:var name="form" value="xxf:binding('fb-dialog-section-details')"/>
+                <xf:var name="form" value="xxf:binding('fb-dialog-container-details')"/>
 
                 <!-- NOTE: We use string() to access string value of NCName -->
                 <xf:var name="old-name"       value="$i/original-control-name/string()"/>
@@ -121,6 +126,8 @@
 
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <local>
+                        <container-type/>
+
                         <original-control-name/>
                         <control-name/>
 
@@ -161,6 +168,10 @@
 
                 <xf:bind ref="was-repeat | is-repeat | was-custom-iteration-name | is-custom-iteration-name" type="xs:boolean" xxf:default="false()"/>
 
+                <!-- Don't yet allow changing grids back and forth -->
+                <xf:bind ref="is-repeat"
+                         readonly="$i/container-type = 'grid'"/>
+
                 <xf:bind ref="custom-iteration-name"
                          type="xf:NCName"
                          calculate="normalize-space()"
@@ -200,20 +211,20 @@
 
                 <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal">
-                    <xf:label ref="$resources/dialog-section-details/label"/>
+                    <xf:label ref="$resources/dialog-container-details/label"/>
 
                     <fr:tabbable>
                         <fr:tab id="base-tab">
-                            <fr:label ref="$resources/dialog-section-details/tab-base/label"/>
+                            <fr:label ref="$resources/dialog-container-details/tab-base/label"/>
 
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
                                         <!-- Section name -->
                                         <xf:input ref="control-name" incremental="true" id="fb-control-name-input">
-                                            <xf:label ref="$resources/dialog-section-details/control-name/label"/>
-                                            <xf:alert ref="$resources/dialog-section-details/control-name/alert"/>
-                                            <xf:hint  ref="$resources/dialog-section-details/control-name/hint"/>
+                                            <xf:label ref="$resources/dialog-container-details/control-name/label"/>
+                                            <xf:alert ref="$resources/dialog-container-details/control-name/alert"/>
+                                            <xf:hint  ref="$resources/dialog-container-details/control-name/hint"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
@@ -221,8 +232,8 @@
                                     <xh:td>
                                         <!-- Classes -->
                                         <xf:select ref="$i/standard-classes" appearance="full">
-                                            <xf:label ref="$resources/dialog-section-details/options/label"/>
-                                            <xf:itemset ref="$resources/dialog-section-details/options/item">
+                                            <xf:label ref="$resources/dialog-container-details/options/label"/>
+                                            <xf:itemset ref="$resources/dialog-container-details/options/item">
                                                 <xf:label ref="label"/>
                                                 <xf:value ref="value"/>
                                             </xf:itemset>
@@ -236,9 +247,9 @@
                                     <xh:td>
                                         <!-- Relevant -->
                                         <xf:input ref="relevant" incremental="true">
-                                            <xf:label ref="$resources/dialog-section-details/visibility/label"/>
-                                            <xf:alert ref="$resources/dialog-section-details/visibility/alert"/>
-                                            <xf:hint  ref="$resources/dialog-section-details/visibility/hint"/>
+                                            <xf:label ref="$resources/dialog-container-details/visibility/label"/>
+                                            <xf:alert ref="$resources/dialog-container-details/visibility/alert"/>
+                                            <xf:hint  ref="$resources/dialog-container-details/visibility/hint"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
@@ -246,24 +257,24 @@
                                     <xh:td>
                                         <!-- Readonly -->
                                         <xf:input ref="readonly" incremental="true">
-                                            <xf:label ref="$resources/dialog-section-details/readonly/label"/>
-                                            <xf:alert ref="$resources/dialog-section-details/readonly/alert"/>
-                                            <xf:hint  ref="$resources/dialog-section-details/readonly/hint"/>
+                                            <xf:label ref="$resources/dialog-container-details/readonly/label"/>
+                                            <xf:alert ref="$resources/dialog-container-details/readonly/alert"/>
+                                            <xf:hint  ref="$resources/dialog-container-details/readonly/hint"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>
                         <fr:tab id="repeat-tab">
-                            <fr:label ref="$resources/dialog-section-details/tab-repeat/label"/>
+                            <fr:label ref="$resources/dialog-container-details/tab-repeat/label"/>
 
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
                                         <!-- Repeat -->
                                         <xf:input ref="is-repeat">
-                                            <xf:label ref="$resources/dialog-section-details/repeat/label"/>
-                                            <xf:hint  ref="$resources/dialog-section-details/repeat/hint"/>
+                                            <xf:label ref="$resources/dialog-container-details/repeat/label"/>
+                                            <xf:hint  ref="$resources/dialog-container-details/repeat/hint"/>
 
                                             <!-- Reset dependent values upon value change -->
                                             <xf:action event="xforms-value-changed">
@@ -280,8 +291,8 @@
                                     <xh:tr>
                                         <xh:td>
                                             <xf:input ref="is-custom-iteration-name">
-                                                <xf:label ref="$resources/dialog-section-details/custom-iteration-name/label"/>
-                                                <xf:hint  ref="$resources/dialog-section-details/custom-iteration-name/hint"/>
+                                                <xf:label ref="$resources/dialog-container-details/custom-iteration-name/label"/>
+                                                <xf:hint  ref="$resources/dialog-container-details/custom-iteration-name/hint"/>
 
                                                 <!-- Reset dependent values upon value change -->
                                                 <xf:action event="xforms-value-changed">
@@ -291,9 +302,9 @@
                                         </xh:td>
                                         <xh:td>
                                             <xf:input ref="custom-iteration-name[$i/is-custom-iteration-name = true()]" incremental="true" >
-                                                <xf:label ref="$resources/dialog-section-details/iteration-name/label"/>
-                                                <xf:hint  ref="$resources/dialog-section-details/iteration-name/hint"/>
-                                                <xf:alert ref="$resources/dialog-section-details/iteration-name/alert"/>
+                                                <xf:label ref="$resources/dialog-container-details/iteration-name/label"/>
+                                                <xf:hint  ref="$resources/dialog-container-details/iteration-name/hint"/>
+                                                <xf:alert ref="$resources/dialog-container-details/iteration-name/alert"/>
                                             </xf:input>
                                         </xh:td>
                                     </xh:tr>
@@ -301,23 +312,23 @@
                                         <xh:td>
                                             <!-- Min -->
                                             <xf:select1 ref="$i/min-repeat" appearance="full">
-                                                <xf:label value="$resources/dialog-grid-details/min/label"/>
+                                                <xf:label value="$resources/dialog-container-details/min/label"/>
                                                 <xf:item>
-                                                    <xf:label value="$resources/dialog-grid-details/no-minimum"/>
+                                                    <xf:label value="$resources/dialog-container-details/no-minimum"/>
                                                     <xf:value>0</xf:value>
                                                 </xf:item>
                                                 <xf:item>
-                                                    <xf:label value="$resources/dialog-grid-details/one"/>
+                                                    <xf:label value="$resources/dialog-container-details/one"/>
                                                     <xf:value>1</xf:value>
                                                 </xf:item>
                                                 <xf:itemset ref=".">
-                                                    <xf:label value="$resources/dialog-grid-details/other"/>
+                                                    <xf:label value="$resources/dialog-container-details/other"/>
                                                     <xf:value value="if (string() = ('0', '1')) then '' else ."/>
                                                 </xf:itemset>
                                             </xf:select1>
                                             <xf:input ref="$i/min-repeat[not(string() = ('0', '1'))]" id="min-input">
-                                                <xf:alert ref="$resources/dialog-grid-details/min/alert"/>
-                                                <xf:hint ref="$resources/dialog-grid-details/min/hint"/>
+                                                <xf:alert ref="$resources/dialog-container-details/min/alert"/>
+                                                <xf:hint ref="$resources/dialog-container-details/min/hint"/>
 
                                                 <!-- Focus when enabled. Upon initial enabled, xxforms-dialog-open will override this -->
                                                 <xf:setfocus ev:event="xforms-enabled" control="min-input"/>
@@ -326,21 +337,21 @@
                                         <xh:td>
                                             <!-- Max -->
                                             <xf:select1 ref="$i/max-repeat" appearance="full">
-                                                <xf:label value="$resources/dialog-grid-details/max/label"/>
+                                                <xf:label value="$resources/dialog-container-details/max/label"/>
                                                 <xf:item>
-                                                    <xf:label value="$resources/dialog-grid-details/unlimited"/>
+                                                    <xf:label value="$resources/dialog-container-details/unlimited"/>
                                                     <xf:value/>
                                                 </xf:item>
                                                 <xf:itemset ref=".">
-                                                    <xf:label value="$resources/dialog-grid-details/other"/>
+                                                    <xf:label value="$resources/dialog-container-details/other"/>
                                                     <xf:value value="if (string() = '') then '1' else ."/>
                                                 </xf:itemset>
                                                 <!-- Focus on max-input when Other is selected -->
                                                 <xf:setfocus ev:event="xforms-select" if="event('xxf:item-value') = '1'" control="max-input"/>
                                             </xf:select1>
                                             <xf:input ref="$i/max-repeat[not(string() = '')]" id="max-input">
-                                                <xf:alert ref="$resources/dialog-grid-details/max/alert"/>
-                                                <xf:hint ref="$resources/dialog-grid-details/max/hint"/>
+                                                <xf:alert ref="$resources/dialog-container-details/max/alert"/>
+                                                <xf:hint ref="$resources/dialog-container-details/max/hint"/>
 
                                                 <!-- Focus when enabled. Upon initial enabled, xxforms-dialog-open will override this -->
                                                 <xf:setfocus ev:event="xforms-enabled" control="max-input"/>

@@ -32,12 +32,18 @@
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-                <xsl:variable name="model" select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xsl:variable name="model"    select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xsl:variable name="instance" select="$model/xf:instance[@id  = 'fr-form-instance']"/>
 
                 <!-- Whether we have "many" controls -->
                 <xsl:variable name="many-controls"
                               select="count(/*/xh:body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
 
+                <!-- For legacy grid migration -->
+                <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                              name="legacy-grid-elements"
+                              select="fbf:legacyGridBindsHoldersAndTemplates(.)/generate-id()"/>
+                
                 <!-- All unneeded help elements -->
                 <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
                               name="unneeded-elements"
@@ -54,18 +60,13 @@
                               name="new-validation-ids"
                               select="fbf:nextIds(/, 'validation', count($ids-of-binds-with-constraint-attribute-and-custom-alert))"/>
 
-                <xsl:template match="xf:help[generate-id() = $unneeded-elements]"/>
-
                 <!-- Temporarily mark read-only instances as read-write -->
-                <xsl:template match="xf:instance[@xxf:readonly = 'true']">
-                    <xsl:copy>
-                        <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
-                        <xsl:apply-templates select="@* except @xxf:readonly | node()"/>
-                    </xsl:copy>
+                <xsl:template match="xf:model/xf:instance/@xxf:readonly[. = 'true']" mode="within-model">
+                    <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
                 </xsl:template>
 
                 <!-- Update namespace on actions and services so that they don't run at design time -->
-                <xsl:template match="xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] | xf:model/xf:action[ends-with(@id, '-binding')]">
+                <xsl:template match="xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] | xf:model/xf:action[ends-with(@id, '-binding')]" mode="within-model">
                     <xsl:element name="fb:{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>
@@ -99,7 +100,7 @@
                         <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
 
                         <!-- Apply all the content -->
-                        <xsl:apply-templates select="node()"/>
+                        <xsl:apply-templates select="node()" mode="within-body"/>
 
                         <!-- Listen to activations on grid cells -->
                         <xf:action ev:event="DOMActivate" xxf:phantom="true" class="fb-annotation">
@@ -117,7 +118,7 @@
                 </xsl:template>
 
                 <!-- fr:section → fr:section/(@edit-ref, @xxf:update) -->
-                <xsl:template match="xh:body//fr:section">
+                <xsl:template match="fr:section" mode="within-body">
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
                         <xsl:attribute name="xxf:update" select="'full'"/>
@@ -127,26 +128,28 @@
                         <xsl:if test="$many-controls and preceding::fr:section">
                             <xsl:attribute name="open" select="'false'"/>
                         </xsl:if>
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 
                 <!-- fr:grid → fr:grid/@edit-ref -->
-                <xsl:template match="xh:body//fr:grid">
+                <xsl:template match="fr:grid" mode="within-body">
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 
                 <!-- Convert MIP names (attributes and nested elements) -->
-                <xsl:template match="xf:bind/@relevant | xf:bind/@readonly | xf:bind/@required | xf:bind/@constraint | xf:bind/@calculate | xf:bind/@xxf:default">
+                <xsl:template match="xf:bind/@relevant | xf:bind/@readonly | xf:bind/@required | xf:bind/@constraint | xf:bind/@calculate | xf:bind/@xxf:default"
+                              mode="within-model">
                     <!-- Below we only allow fb:required to be interpreted as a custom MIP -->
                     <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
-                <xsl:template match="xf:bind/xf:relevant | xf:bind/xf:readonly | xf:bind/xf:required | xf:bind/xf:constraint | xf:bind/xf:calculate | xf:bind/xxf:default">
+                <xsl:template match="xf:bind/xf:relevant | xf:bind/xf:readonly | xf:bind/xf:required | xf:bind/xf:constraint | xf:bind/xf:calculate | xf:bind/xxf:default"
+                              mode="within-model">
                     <xsl:element name="fb:{local-name()}">
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 
@@ -155,13 +158,13 @@
                     <xsl:copy>
                         <!-- Namespace for fb:required -->
                         <xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>
-                        <xsl:apply-templates select="@* except @xxf:custom-mips"/>
+                        <xsl:apply-templates select="@* except @xxf:custom-mips" mode="within-model"/>
                         <!-- Only let fb:required act as a custom MIP. All other non-standard bind attributes, including
                              @fb:relevant, are ignored. We don't need the result of these rewritten MIPs at design time,
                              and this helps with performance in case there is a large number of binds. -->
                         <xsl:attribute name="xxf:custom-mips" select="string-join((@xxf:custom-mips, 'fb:required'), ' ')"/>
 
-                        <xsl:apply-templates select="node()"/>
+                        <xsl:apply-templates select="node()" mode="within-model"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
                         <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">
@@ -190,6 +193,8 @@
                         <xsl:apply-templates select="node()"/>
                     </xf:group>
                 </xsl:template>
+                
+                <!-- ======== Upgrading form ========-->
 
                 <!--
                     Remove actions implementations as they are unneeded. See also:
@@ -197,68 +202,162 @@
                     - actions.xsl
                     - https://github.com/orbeon/orbeon-forms/issues/1019
                 -->
-                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
+                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]"
+                              mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@*"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
+                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]"
+                              mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@*"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]"/>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
+                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]"
+                              mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@*"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
+                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]"
+                              mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@*"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]"/>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]" mode="#current"/>
                         <!-- These two variables may be nested for forms generated with the inline implementation of the action -->
-                        <xsl:apply-templates select=".//(*:variable | *:var)[@name = ('item-label', 'item-value')]"/>
+                        <xsl:apply-templates select=".//(*:variable | *:var)[@name = ('item-label', 'item-value')]" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->
                 <xsl:template match="xh:head/meta[@http-equiv = 'Content-Type']"/>
 
-                <!-- ======== Upgrading form ========-->
+                <!-- Remove unneeded help elements -->
+                <xsl:template match="xf:help[generate-id() = $unneeded-elements]"
+                              mode="within-body"/>
 
-                <!-- Use ref instead of nodeset -->
+                <!-- nodeset → ref -->
                 <xsl:template match="xf:*/@nodeset">
                     <xsl:attribute name="ref" select="."/>
                 </xsl:template>
 
+                <!-- origin → template on fr:grid and fr:section -->
+                <xsl:template match="fr:grid/@origin | fr:section/@origin"
+                              mode="within-body">
+                    <xsl:attribute name="template" select="."/>
+                </xsl:template>
+
+                <!-- repeat="true" → repeat="content" on fr:grid and fr:section -->
+                <xsl:template match="fr:grid/@repeat[. = 'true'] | fr:section/@repeat[. = 'true']"
+                              mode="within-body">
+                    <xsl:attribute name="repeat" select="'content'"/>
+                </xsl:template>
+
+                <!-- minOccurs → min on fr:grid and fr:section -->
+                <xsl:template match="fr:grid/@minOccurs | fr:section/@minOccurs"
+                              mode="within-body">
+                    <xsl:attribute name="min" select="."/>
+                </xsl:template>
+
+                <!-- maxOccurs → max on fr:grid and fr:section -->
+                <xsl:template match="fr:grid/@maxOccurs | fr:section/@maxOccurs"
+                              mode="within-body">
+                    <xsl:attribute name="max" select="."/>
+                </xsl:template>
+
                 <!-- Convert minimal xf:select1 to fr:dropdown-select1 -->
-                <xsl:template match="xf:select1[@appearance = 'minimal']">
+                <xsl:template match="xf:select1[@appearance = 'minimal']"
+                              mode="within-body">
                     <fr:dropdown-select1>
-                        <xsl:apply-templates select="@* except @appearance | node() except xf:item[xf:value = '']"/>
+                        <xsl:apply-templates select="@* except @appearance | node() except xf:item[xf:value = '']" mode="#current"/>
                     </fr:dropdown-select1>
                 </xsl:template>
 
                 <!-- Convert constraint attributes to nested elements, see https://github.com/orbeon/orbeon-forms/issues/1829  -->
-                <xsl:template match="xf:bind[@constraint and @id = $ids-of-binds-with-constraint-attribute-and-custom-alert]">
+                <xsl:template match="xf:bind[@constraint and @id = $ids-of-binds-with-constraint-attribute-and-custom-alert]"
+                              mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@* except @constraint"/>
+                        <xsl:apply-templates select="@* except @constraint" mode="#current"/>
                         <xsl:variable name="bind-id" select="@id/string()"/>
                         <xsl:variable name="validation-id" select="$new-validation-ids[index-of($ids-of-binds-with-constraint-attribute-and-custom-alert, $bind-id)]"/>
                         <fb:constraint id="{$validation-id}" value="{@constraint}" level="error"/>
                     </xsl:copy>
                 </xsl:template>
-                <xsl:template match="xf:alert[@validation and @validation = $ids-of-binds-with-constraint-attribute-and-custom-alert]">
+                <xsl:template match="xf:alert[@validation and @validation = $ids-of-binds-with-constraint-attribute-and-custom-alert]"
+                              mode="within-body">
                     <xsl:copy>
-                        <xsl:apply-templates select="@* except @validation"/>
+                        <xsl:apply-templates select="@* except @validation" mode="#current"/>
                         <xsl:variable name="bind-id" select="@validation"/>
                         <xsl:attribute name="validation" select="$new-validation-ids[index-of($ids-of-binds-with-constraint-attribute-and-custom-alert, $bind-id)]"/>
                     </xsl:copy>
+                </xsl:template>
+
+                <!-- Migrate grid format -->
+
+                <!-- NOTE: This shouldn't intersect with xf:bind[@constraint ...] above -->
+                <xsl:template match="xf:bind[generate-id() = $legacy-grid-elements]"
+                              mode="within-model">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:element name="xf:bind" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+                            <xsl:variable  name="grid-name"      select="fbf:getBindNameOrEmpty(.)"/>
+                            <xsl:variable  name="iteration-name" select="fbf:defaultIterationName($grid-name)"/>
+
+                            <xsl:attribute name="id"             select="fbf:bindId($iteration-name)"/>
+                            <xsl:attribute name="ref"            select="$iteration-name"/>
+                            <xsl:attribute name="name"           select="$iteration-name"/>
+
+                            <xsl:apply-templates select="node()" mode="#current"/>
+                        </xsl:element>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Update template -->
+                <xsl:template match="xf:model/xf:instance[generate-id() = $legacy-grid-elements]"
+                              mode="within-model">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:variable name="iteration-name" select="fbf:defaultIterationName(fbf:controlNameFromId(@id))" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                        <xsl:element name="{$iteration-name}">
+                            <xsl:apply-templates select="*/(@* | node())" mode="#current"/>
+                        </xsl:element>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Update instance content-->
+                <xsl:template match="xf:model/xf:instance[generate-id() = generate-id($instance)]"
+                              mode="within-model">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:apply-templates select="node()" mode="within-instance"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template match="*[generate-id() = $legacy-grid-elements]"
+                              mode="within-instance">
+                    <xsl:variable name="node"       select="."/>
+                    <xsl:variable name="node-name"  select="node-name($node)"/>
+                    <xsl:variable name="local-name" select="local-name($node)"/>
+                    <xsl:if test="empty($node/preceding-sibling::*[node-name(.) = $node-name])">
+                        <!-- This is the first element with this name at this level. We process it, and skip the other
+                             ones at this level -->
+                        <xsl:copy>
+                            <xsl:apply-templates select="@*" mode="#current"/>
+                            <xsl:variable name="iteration-name" select="fbf:defaultIterationName($local-name)" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                            <xsl:for-each select="$node, $node/following-sibling::*[node-name(.) = $node-name]">
+                                <xsl:element name="{$iteration-name}">
+                                    <xsl:apply-templates select="@* | node()" mode="#current"/>
+                                </xsl:element>
+                            </xsl:for-each>
+                        </xsl:copy>
+                    </xsl:if>
                 </xsl:template>
 
             </xsl:stylesheet>

@@ -75,7 +75,7 @@ object SchemaGenerator {
         }
         object Bind {
             def unapply(bind: NodeInfo): Option[BindInfo] = {
-                val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter (_.attValue("repeat") == "true") toList
+                val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter FormRunner.isRepeat toList
 
                 Some(BindInfo(
                     elemName    = bind \@ ("ref" || "nodeset"),

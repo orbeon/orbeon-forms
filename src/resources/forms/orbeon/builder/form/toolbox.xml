@@ -108,7 +108,7 @@
                         <xf:output value="$form-resources/new-repeated-grid/label"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:insertNewRepeat($model)
+                        toolboxOps:insertNewRepeatedGrid($model)
                     </xf:action>
                 </xf:trigger>
             </xh:div>

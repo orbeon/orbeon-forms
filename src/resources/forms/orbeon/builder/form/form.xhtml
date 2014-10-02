@@ -345,11 +345,10 @@
                                 <!-- Other dialogs -->
                                 <xf:var name="form" value="."/>
 
-                                <fb:dialog-control-details     id="dialog-control-details" ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-grid-details        id="dialog-grid-details"    ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-section-details     id="dialog-section-details" ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-help                id="dialog-help"            form-ref="$form" resources-ref="$form-resources"/>
-                                <fb:dialog-itemsets            id="dialog-itemsets"                         resources-ref="$form-resources"/>
+                                <fb:dialog-control-details     id="dialog-control-details"   ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-container-details   id="dialog-container-details" ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-help                id="dialog-help"              form-ref="$form" resources-ref="$form-resources"/>
+                                <fb:dialog-itemsets            id="dialog-itemsets"                           resources-ref="$form-resources"/>
 
                                 <fr:alert-dialog id="dialog-confirmation">
                                     <fr:label ref="$form-resources/dialog-confirmation/label"/>
@@ -490,8 +489,8 @@
                                 <xf:trigger tabindex="-1" appearance="minimal">
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/section-details-icon/label}" title="{$fb-resources/section-details-icon/label}"/></xf:label>
                                     <!-- Show section details dialog -->
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-section-details">
-                                        <xf:property name="section" value="fbf:containerById(event('section-id'))"/>
+                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">
+                                        <xf:property name="container" value="fbf:containerById(event('section-id'))"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Edit help for section -->
@@ -538,6 +537,10 @@
                                 <!-- Delete grid -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger">
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-grid-icon/label}" title="{$fb-resources/delete-grid-icon/label}"/></xf:label>
+                                    <!--<xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>-->
+                                    <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">-->
+                                        <!--<xf:property name="container" value="fbf:containerById(event('grid-id'))"/>-->
+                                    <!--</xf:dispatch>-->
                                     <!-- Ask confirmation -->
                                     <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
                                         <xf:property name="message"
@@ -552,8 +555,8 @@
                                 <!-- Grid details -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-grid-details">
-                                        <xf:property name="grid" value="fbf:containerById(event('grid-id'))"/>
+                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">
+                                        <xf:property name="container" value="fbf:containerById(event('grid-id'))"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Insert column to the left -->

@@ -285,7 +285,7 @@
                                             <xsl:for-each select="/search/query[@path]">
                                                 <xsl:choose>
                                                     <xsl:when test="/search/provider = 'mysql'      ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
-                                                    <xsl:when test="/search/provider = 'postgresql' ">, (xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()', xml, ARRAY[ARRAY['xh', 'http://www.w3.org/1999/xhtml'], ARRAY['xf', 'http://www.w3.org/2002/xforms']]))[1]</xsl:when>
+                                                    <xsl:when test="/search/provider = 'postgresql' ">, (xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()', xml, <xsl:value-of select="f:postgresql-namespaces(f:namespaces(., @path))"/>))[1]</xsl:when>
                                                     <xsl:when test="/search/provider = 'oracle'     ">, extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>')</xsl:when>
                                                     <xsl:when test="/search/provider = 'db2'        ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
                                                     <!-- Even when there is just one value, SQL Server seems to want the (…)[1]; see http://stackoverflow.com/a/1302199/5295 -->

@@ -278,8 +278,8 @@ private object ConnectionState {
         if (AllScopes(scopeString)) scopeString else DefaultStateScope
     }
 
-    val DefaultStateScope = "session"
-    val HttpStateProperty = "oxf.http.state"
+    val DefaultStateScope        = "session"
+    val HttpStateProperty        = "oxf.http.state"
     val HttpCookieStoreAttribute = "oxf.http.cookie-store"
 
     val AllScopes = Set("none", "request", "session", "application")
@@ -567,10 +567,10 @@ object Connection extends Logging {
             // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
             def fromIncoming =
                 nativeRequestOption flatMap
-                (sessionCookieFromIncoming(externalContext, _, cookiesToForward, sessionCookieName))
+                (sessionCookieFromIncomingLower(externalContext, _, cookiesToForward, sessionCookieName))
 
             // 2. If there is no incoming session cookie, try to make our own cookie. This may fail with e.g. WebSphere.
-            def fromSession = sessionCookieFromGuess(externalContext, sessionCookieName)
+            def fromSession = sessionCookieFromGuessLower(externalContext, sessionCookieName)
 
             // Logging
             ifDebug {
@@ -608,7 +608,7 @@ object Connection extends Logging {
             None
     }
 
-    private def sessionCookieFromIncoming(
+    private def sessionCookieFromIncomingLower(
         externalContext  : ExternalContext,
         nativeRequest    : HttpServletRequest,
         cookiesToForward : Seq[String],
@@ -652,7 +652,7 @@ object Connection extends Logging {
             None
     }
 
-    private def sessionCookieFromGuess(
+    private def sessionCookieFromGuessLower(
         externalContext   : ExternalContext, 
         sessionCookieName : String
     ): Option[(String, List[String])] =

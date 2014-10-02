@@ -445,9 +445,8 @@ object Connection extends Logging {
     // Get a list of cookie names to forward from the configuration properties
     def getForwardCookies: List[String] = {
         val propertySet = Properties.instance.getPropertySet
-        val stringValue = propertySet.getString(HttpForwardCookiesProperty, "JSESSIONID JSESSIONIDSSO")
-
-        stringValue split """\s+""" toList
+        val maybeHeaderList = Option(propertySet.getString(HttpForwardCookiesProperty))
+        maybeHeaderList.map(_.split("""\s+""").toList).getOrElse(Nil)
     }
 
     /**

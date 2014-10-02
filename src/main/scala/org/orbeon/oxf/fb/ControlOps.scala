@@ -301,7 +301,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             val resourceHoldersMap = resourceHolders.toMap
             formResourcesRoot \ "resource" foreach (resource ⇒ {
                 val lang = (resource \@ "*:lang").stringValue
-                val holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
+                val holder = resourceHoldersMap.getOrElse(lang, resourceHolders(0)._2)
                 insert(into = resource, after = resource \ * filter (_.name == precedingControlName.getOrElse("")), origin = holder)
             })
         }

@@ -219,13 +219,13 @@ object ToolboxOps {
             </fr:grid>
 
         // Insert after current level 2 if found, otherwise into level 1
-        val newGrid = insert(into = into, after = after.toSeq, origin = gridTemplate)
+        val newGridElement = insert(into = into, after = after.toSeq, origin = gridTemplate).head
 
         // This can impact templates
         updateTemplates(inDoc)
 
         // Select first grid cell
-        selectTd(newGrid \\ "*:td" head)
+        selectTd(newGridElement \\ "*:td" head)
 
         debugDumpDocumentForGrids("insert new grid", inDoc)
     }

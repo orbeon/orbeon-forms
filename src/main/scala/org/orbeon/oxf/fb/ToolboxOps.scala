@@ -109,10 +109,10 @@ object ToolboxOps {
 
                 // Insert data and resource holders
                 insertHolders(
-                    newControlElement,
-                    dataHolder,
-                    resourceHolders,
-                    precedingControlNameInSectionForControl(newControlElement)
+                    controlElement       = newControlElement,
+                    dataHolder           = dataHolder,
+                    resourceHolders      = resourceHolders,
+                    precedingControlName = precedingControlNameInSectionForControl(newControlElement)
                 )
 
                 // Adjust bindings on newly inserted control, done after the control is added as
@@ -266,7 +266,12 @@ object ToolboxOps {
             elementInfo(newSectionName, elementContent)
         }
 
-        insertHolderForAllLang(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
+        insertHolderForAllLang(
+            controlElement       = newSectionElement,
+            dataHolder           = elementInfo(newSectionName),
+            resourceHolder       = resourceHolder,
+            precedingControlName = precedingSectionName
+        )
 
         // Insert the bind element
         ensureBinds(inDoc, findContainerNames(newSectionElement, includeSelf = true))

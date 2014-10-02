@@ -196,7 +196,14 @@ trait ContainerOps extends ControlOps {
     def isCustomIterationName(controlName: String, iterationName: String) =
         defaultIterationName(controlName) != iterationName
 
-    def setRepeatProperties(inDoc: NodeInfo, controlName: String, repeat: Boolean, min: String, max: String, iterationNameOrEmpty: String): Unit =
+    def setRepeatProperties(
+        inDoc                : NodeInfo,
+        controlName          : String,
+        repeat               : Boolean,
+        min                  : String,
+        max                  : String,
+        iterationNameOrEmpty : String
+    ): Unit =
         findControlByName(inDoc, controlName) foreach { control ⇒
 
             val wasRepeat = control.attValue("repeat") == "true"

@@ -109,7 +109,7 @@
         <xsl:variable name="nsarrays" as="xs:string*">
             <xsl:sequence select="for $n in $namespaces return concat('ARRAY[''', substring-before($n,'=&quot;'), ''',''', replace(substring-after($n,'=&quot;'), '&quot;$', ''), ''']')"/>
         </xsl:variable>
-        <xsl:sequence select="concat('ARRAY[', string-join($nsarrays, ', '), ']')"/>
+        <xsl:sequence select="concat('ARRAY[', string-join($nsarrays, ', '), ']::varchar[]')"/>
     </xsl:function>
 
 </xsl:stylesheet>

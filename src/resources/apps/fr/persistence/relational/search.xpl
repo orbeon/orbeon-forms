@@ -350,6 +350,9 @@
                                     <xsl:when test="$search/search/provider = 'mysql'">
                                         and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
+                                    <xsl:when test="$search/search/provider = 'postgresql'">
+                                        and (xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', xml, <xsl:value-of select="f:postgresql-namespaces(f:namespaces(., @path))"/>))[1]::text = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                    </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
                                         and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
@@ -366,6 +369,9 @@
                                 <xsl:choose>
                                     <xsl:when test="$search/search/provider = 'mysql'">
                                         and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                    </xsl:when>
+                                    <xsl:when test="$search/search/provider = 'postgresql'">
+                                        and lower((xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()', xml, <xsl:value-of select="f:postgresql-namespaces(f:namespaces(., @path))"/>))[1]::text) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
                                         and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
@@ -385,6 +391,9 @@
                         <xsl:choose>
                             <xsl:when test="$search/search/provider = 'mysql'">
                                 and xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
+                            </xsl:when>
+                            <xsl:when test="$search/search/provider = 'postgresql'">
+                                and xml::text ilike '<xsl:value-of select="f:escape-sql(concat('%', replace($search/search/query[not(@path)], '_', '\\_'), '%'))"/>'
                             </xsl:when>
                             <xsl:when test="$search/search/provider = 'oracle'">
                                 and contains(xml, '<xsl:value-of select="f:escape-sql(concat('%', replace($search/search/query[not(@path)], '_', '\\_'), '%'))"/>') > 0

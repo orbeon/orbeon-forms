@@ -634,7 +634,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             }
 
             final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
-                Connection.jBuildConnectionHeaders(absoluteResolvedURL.getScheme(), instance.credentialsOrNull(), null,
+                Connection.jBuildConnectionHeadersLowerIfNeeded(absoluteResolvedURL.getScheme(), instance.credentialsOrNull(), null,
                         containingDocument().getForwardSubmissionHeaders(), indentedLogger());
 
             final ConnectionResult connectionResult = Connection.jApply(

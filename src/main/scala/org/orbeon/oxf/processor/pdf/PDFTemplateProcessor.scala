@@ -282,13 +282,22 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     readInputAsSAX(context.pipelineContext, inputName, new BinaryTextXMLReceiver(os))
                     Image.getInstance(os.toByteArray)
                 case None ⇒
+
+                    val url = new URI(hrefAttribute)
+
                     val cxr =
                         Connection(
                             httpMethod  = "GET",
-                            url         = new URI(hrefAttribute),
+                            url         = url,
                             credentials = None,
                             content     = None,
-                            headers     = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))(context.logger),
+                            headers     = Connection.buildConnectionHeadersLowerIfNeeded(
+                                scheme           = url.getScheme,
+                                credentials      = None,
+                                customHeaders    = Map(),
+                                headersToForward = Option(Connection.getForwardHeaders))(
+                                logger           = context.logger
+                            ),
                             loadState   = true,
                             logBody     = false)(
                             logger      = context.logger

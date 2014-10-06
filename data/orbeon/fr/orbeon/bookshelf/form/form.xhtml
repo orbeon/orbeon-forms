@@ -515,7 +515,7 @@
                 <fr:section id="notes-section" bind="notes-bind">
                     <xf:label ref="$form-resources/notes/label"/>
                     <xf:help ref="$form-resources/notes/help"/>
-                    <fr:grid repeat="true" ref="note" id="book-repeat" origin="instance('note-template')">
+                    <fr:grid repeat="true" ref="note" id="book-repeat" template="instance('note-template')">
                         <xh:tr>
                             <xh:td>
                                 <xf:textarea id="note-control" ref="." appearance="xxf:autosize">

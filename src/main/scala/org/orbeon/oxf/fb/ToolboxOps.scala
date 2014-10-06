@@ -109,10 +109,10 @@ object ToolboxOps {
 
                 // Insert data and resource holders
                 insertHolders(
-                    newControlElement,
-                    dataHolder,
-                    resourceHolders,
-                    precedingControlNameInSectionForControl(newControlElement)
+                    controlElement       = newControlElement,
+                    dataHolder           = dataHolder,
+                    resourceHolders      = resourceHolders,
+                    precedingControlName = precedingControlNameInSectionForControl(newControlElement)
                 )
 
                 // Adjust bindings on newly inserted control, done after the control is added as
@@ -219,13 +219,13 @@ object ToolboxOps {
             </fr:grid>
 
         // Insert after current level 2 if found, otherwise into level 1
-        val newGrid = insert(into = into, after = after.toSeq, origin = gridTemplate)
+        val newGridElement = insert(into = into, after = after.toSeq, origin = gridTemplate).head
 
         // This can impact templates
         updateTemplates(inDoc)
 
         // Select first grid cell
-        selectTd(newGrid \\ "*:td" head)
+        selectTd(newGridElement \\ "*:td" head)
 
         debugDumpDocumentForGrids("insert new grid", inDoc)
     }
@@ -266,7 +266,12 @@ object ToolboxOps {
             elementInfo(newSectionName, elementContent)
         }
 
-        insertHolderForAllLang(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
+        insertHolderForAllLang(
+            controlElement       = newSectionElement,
+            dataHolder           = elementInfo(newSectionName),
+            resourceHolder       = resourceHolder,
+            precedingControlName = precedingSectionName
+        )
 
         // Insert the bind element
         ensureBinds(inDoc, findContainerNames(newSectionElement, includeSelf = true))
@@ -286,40 +291,16 @@ object ToolboxOps {
     }
 
     // Insert a new repeat
-    def insertNewRepeat(inDoc: NodeInfo) = {
+    def insertNewRepeatedGrid(inDoc: NodeInfo) = {
 
         val (into, after, grid) = findGridInsertionPoint(inDoc)
-
-        val newGridName = controlNameFromId(nextId(inDoc, "grid"))
-        val templateInstanceId = templateId(newGridName)
-
-        // Handle data template
-        ensureTemplateReplaceContent(inDoc, newGridName, <dummy/>.copy(label = newGridName))
-
-        val modelElement = findModelElement(inDoc)
-        modelElement \ "*:instance" find (hasIdValue(_, templateInstanceId)) match {
-            case Some(templateInstance) ⇒
-                // clear existing template instance content
-                delete(templateInstance \ *)
-                insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName): NodeInfo)
-
-            case None ⇒
-                // Insert template instance if not present
-                val template: NodeInfo = <xf:instance xmlns:xf="http://www.w3.org/2002/xforms"
-                                                          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                          id={templateInstanceId} fb:readonly="true">{<dummy/>.copy(label = newGridName)}</xf:instance>
-
-                insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
-        }
+        val newGridName         = controlNameFromId(nextId(inDoc, "grid"))
 
         // The grid template
         val gridTemplate: NodeInfo =
             <fr:grid edit-ref=""
                      id={gridId(newGridName)}
-                     repeat="true"
                      bind={bindId(newGridName)}
-                     template={makeInstanceExpression(templateInstanceId)}
-                     min="1"
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:tr>
@@ -332,17 +313,24 @@ object ToolboxOps {
 
         // Insert instance holder (but no resource holders)
         insertHolders(
-            newGridElement,
-            elementInfo(newGridName),
-            Seq.empty,
-            grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
+            controlElement       = newGridElement,
+            dataHolder           = elementInfo(newGridName),
+            resourceHolders      = Seq.empty,
+            precedingControlName = grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
         )
 
         // Make sure binds are created
         ensureBinds(inDoc, findContainerNames(newGridElement, includeSelf = true))
 
-        // This can impact templates
-        updateTemplates(inDoc)
+        // This takes care of all the repeat-related items
+        setRepeatProperties(
+            inDoc                = inDoc,
+            controlName          = newGridName,
+            repeat               = true,
+            min                  = "1",
+            max                  = "",
+            iterationNameOrEmpty = ""
+        )
 
         // Select new td
         selectTd(newGridElement \\ "*:td" head)

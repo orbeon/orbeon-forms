@@ -44,7 +44,7 @@ trait SectionOps extends ContainerOps {
         if (canMoveRight(container)) {
 
             val otherContainer = precedingSection(container).get
-            val destIsRepeat   = IsRepeat(otherContainer)
+            val destIsRepeat   = isRepeat(otherContainer)
             
             // If the destination is a repeat and is not the container itself (which doesn't have a nested iteration
             // element), move into the first child instead.

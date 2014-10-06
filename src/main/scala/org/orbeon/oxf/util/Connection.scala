@@ -278,8 +278,8 @@ private object ConnectionState {
         if (AllScopes(scopeString)) scopeString else DefaultStateScope
     }
 
-    val DefaultStateScope = "session"
-    val HttpStateProperty = "oxf.http.state"
+    val DefaultStateScope        = "session"
+    val HttpStateProperty        = "oxf.http.state"
     val HttpCookieStoreAttribute = "oxf.http.cookie-store"
 
     val AllScopes = Set("none", "request", "session", "application")
@@ -290,115 +290,7 @@ object Connection extends Logging {
     private val HttpInternalPathsProperty  = "oxf.http.internal-paths"
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
-
-    def isInternalPath(path: String) = {
-        val propertySet = Properties.instance.getPropertySet
-        val p = propertySet.getProperty(HttpInternalPathsProperty)
-        val r = p.associatedValue(_.value.toString.r)
-
-        r.pattern.matcher(path).matches()
-    }
-
-    // Whether the given method requires a request body
-    def requiresRequestBody(method: String) = Set("POST", "PUT")(method)
-
-    // Whether the given scheme requires setting headers
-    def requiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)
-
-    // Whether the scheme is http: or https:
-    def isHTTPOrHTTPS(scheme: String) = Set("http", "https")(scheme)
-
-    // Build all the connection headers
-    def buildConnectionHeaders(
-        scheme          : String,
-        credentials     : Option[Credentials],
-        headers         : Map[String, List[String]],
-        headersToForward: Option[String])(
-        logger          : IndentedLogger
-    ): Map[String, List[String]] =
-        if (requiresHeaders(scheme))
-            buildConnectionHeaders(credentials, headers, headersToForward)(logger)
-        else
-            EmptyHeaders
-
-    // For Java callers
-    def jBuildConnectionHeaders(
-            scheme           : String,
-            credentialsOrNull: Credentials,
-            headersOrNull    : JMap[String, Array[String]],
-            headersToForward : String,
-            logger           : IndentedLogger
-   ): Map[String, List[String]] =
-        buildConnectionHeaders(
-            scheme,
-            Option(credentialsOrNull),
-            Option(headersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
-            Option(headersToForward))(
-            logger
-        )
-
-    // For Java callers
-    def buildConnectionHeadersWithSOAP(
-        httpMethod       : String,
-        credentialsOrNull: Credentials,
-        mediatype        : String,
-        encodingForSOAP  : String,
-        headersOrNull    : Map[String, List[String]],
-        headersToForward : String,
-        logger           : IndentedLogger
-    ): Map[String, List[String]] = {
-
-        // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
-        // mediatype attribute"
-        val headersWithContentType = {
-
-            val headers = Option(headersOrNull) map (_.toMap) getOrElse EmptyHeaders
-
-            if (requiresRequestBody(httpMethod) && ! headers.contains(ContentTypeLower))
-                headers + (ContentTypeLower → List(mediatype ensuring (_ ne null)))
-            else
-                headers
-        }
-
-        // Also make sure that if a header element defines Content-Type, this overrides the mediatype attribute
-        def soapMediatypeWithContentType = headersWithContentType.getOrElse(ContentTypeLower, List(mediatype)) head
-
-        // NOTE: SOAP processing overrides Content-Type in the case of a POST
-        // So we have: @serialization → @mediatype →  xf:header → SOAP
-        buildConnectionHeaders(Option(credentialsOrNull), headersWithContentType, Option(headersToForward))(logger) ++
-            soapHeaders(httpMethod, soapMediatypeWithContentType, encodingForSOAP)(logger)
-    }
-
-    // For Java callers
-    def jApply(
-        httpMethod       : String,
-        url              : URI,
-        credentialsOrNull: Credentials,
-        messageBodyOrNull: Array[Byte],
-        headers          : Map[String, List[String]],
-        loadState        : Boolean,
-        logBody          : Boolean,
-        logger           : IndentedLogger
-    ): Connection = {
-
-        val messageBody: Option[Array[Byte]] =
-            if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
-
-        val content = messageBody map
-            (StreamedContent.fromBytes(_, Headers.firstHeaderIgnoreCase(headers, Headers.ContentType)))
-
-        apply(
-            httpMethod  = httpMethod,
-            url         = url,
-            credentials = Option(credentialsOrNull),
-            content     = content,
-            headers     = headers,
-            loadState   = loadState,
-            logBody     = logBody)(
-            logger      = logger
-        )
-    }
-
+    
     // Create a new Connection
     def apply(
         httpMethod  : String,
@@ -422,6 +314,127 @@ object Connection extends Logging {
 
         connection
     }
+    
+    // For Java callers
+    def jApply(
+        httpMethod        : String,
+        url               : URI,
+        credentialsOrNull : Credentials,
+        messageBodyOrNull : Array[Byte],
+        headers           : Map[String, List[String]],
+        loadState         : Boolean,
+        logBody           : Boolean,
+        logger            : IndentedLogger
+    ): Connection = {
+
+        val messageBody: Option[Array[Byte]] =
+            if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
+
+        val content = messageBody map
+            (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
+
+        apply(
+            httpMethod  = httpMethod,
+            url         = url,
+            credentials = Option(credentialsOrNull),
+            content     = content,
+            headers     = headers,
+            loadState   = loadState,
+            logBody     = logBody)(
+            logger      = logger
+        )
+    }
+
+    def isInternalPath(path: String) = {
+        val propertySet = Properties.instance.getPropertySet
+        val p = propertySet.getProperty(HttpInternalPathsProperty)
+        val r = p.associatedValue(_.value.toString.r)
+
+        r.pattern.matcher(path).matches()
+    }
+
+    // Whether the given method requires a request body
+    def requiresRequestBody(method: String) = Set("POST", "PUT")(method)
+
+    private def schemeRequiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)
+    private def isHTTPOrHTTPS(scheme: String)         = Set("http", "https")(scheme)
+
+    // Build all the connection headers
+    def buildConnectionHeadersLowerIfNeeded(
+        scheme           : String,
+        credentials      : Option[Credentials],
+        customHeaders    : Map[String, List[String]],
+        headersToForward : Option[String])(implicit
+        logger           : IndentedLogger
+    ): Map[String, List[String]] =
+        if (schemeRequiresHeaders(scheme))
+            buildConnectionHeadersLower(credentials, customHeaders, headersToForward)
+        else
+            EmptyHeaders
+
+    // For Java callers
+    def jBuildConnectionHeadersLowerIfNeeded(
+        scheme              : String,
+        credentialsOrNull   : Credentials,
+        customHeadersOrNull : JMap[String, Array[String]],
+        headersToForward    : String,
+        logger              : IndentedLogger
+   ): Map[String, List[String]] =
+        buildConnectionHeadersLowerIfNeeded(
+            scheme,
+            Option(credentialsOrNull),
+            Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
+            Option(headersToForward))(
+            logger
+        )
+
+    def buildConnectionHeadersLowerWithSOAPIfNeeded(
+        scheme            : String,
+        httpMethod        : String,
+        credentialsOrNull : Credentials,
+        mediatype         : String,
+        encodingForSOAP   : String,
+        customHeaders     : Map[String, List[String]],
+        headersToForward  : String)(implicit
+        logger            : IndentedLogger
+    ): Map[String, List[String]] =
+        if (schemeRequiresHeaders(scheme)) {
+
+            // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
+            // mediatype attribute"
+            val headersWithContentTypeIfNeeded = {
+
+                val headers = customHeaders.toMap
+
+                if (requiresRequestBody(httpMethod) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
+                    headers + (ContentType → List(mediatype ensuring (_ ne null)))
+                else
+                    headers
+            }
+
+            // Also make sure that if a header element defines Content-Type, this overrides the mediatype attribute
+            def soapMediatypeWithContentType =
+                firstHeaderIgnoreCase(headersWithContentTypeIfNeeded, ContentTypeLower) getOrElse mediatype
+
+            // NOTE: SOAP processing overrides Content-Type in the case of a POST
+            // So we have: @serialization → @mediatype →  xf:header → SOAP
+            val connectionHeadersLower =
+                buildConnectionHeadersLower(
+                    Option(credentialsOrNull),
+                    headersWithContentTypeIfNeeded,
+                    Option(headersToForward)
+                )
+
+            val soapHeadersLower =
+                buildSOAPHeadersLowerIfNeeded(
+                    httpMethod,
+                    soapMediatypeWithContentType,
+                    encodingForSOAP
+                )
+
+            connectionHeadersLower ++ soapHeadersLower
+        } else
+            EmptyHeaders
 
     // Get a space-separated list of header names to forward from the configuration properties
     def getForwardHeaders: String = {
@@ -447,28 +460,28 @@ object Connection extends Logging {
      *
      * NOTE: All header names returned are lowercase.
      */
-    def buildConnectionHeaders(
-        credentials     : Option[Credentials],
-        headers         : Map[String, List[String]],
-        headersToForward: Option[String])(implicit
-        logger          : IndentedLogger
+    private def buildConnectionHeadersLower(
+        credentials      : Option[Credentials],
+        customHeaders    : Map[String, List[String]],
+        headersToForward : Option[String])(implicit
+        logger           : IndentedLogger
     ): Map[String, List[String]] = {
 
         val externalContext = NetUtils.getExternalContext
 
         // 1. Caller-specified list of headers to forward based on a space-separated list of header names
-        val headersToForwardLowercase =
+        val headersToForwardLower =
             Option(externalContext.getRequest) match {
                 case Some(request) ⇒
 
-                    val forwardHeaderNamesLowercase = stringOptionToSet(headersToForward) map (_.toLowerCase)
+                    val forwardHeaderNamesLower = stringOptionToSet(headersToForward) map (_.toLowerCase)
 
                     // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ session cookies
                     val requestHeaderValuesMap = request.getHeaderValuesMap.asScala
 
-                    def canForwardHeader(name: String) = {
+                    def canForwardHeader(nameLower: String) = {
                         // Only forward Authorization header if there is no credentials provided
-                        val canForward = ! name.equalsIgnoreCase(Headers.Authorization) || credentials.isEmpty
+                        val canForward = nameLower != AuthorizationLower || credentials.isEmpty
 
                         if (! canForward)
                             debug("not forwarding Authorization header because credentials are present")
@@ -477,28 +490,28 @@ object Connection extends Logging {
                     }
 
                     for {
-                        nameLowercase ← forwardHeaderNamesLowercase.toList
-                        values ← requestHeaderValuesMap.get(nameLowercase)
-                        if canForwardHeader(nameLowercase)
+                        nameLower ← forwardHeaderNamesLower.toList
+                        values    ← requestHeaderValuesMap.get(nameLower)
+                        if canForwardHeader(nameLower)
                     } yield {
-                        debug("forwarding header", Seq("name" → nameLowercase, "value" → (values mkString " ")))
-                        nameLowercase → values.toList
+                        debug("forwarding header", Seq("name" → nameLower, "value" → (values mkString " ")))
+                        nameLower → values.toList
                     }
                 case None ⇒
                     Seq()
             }
 
         // 2. Explicit caller-specified header name/values
-        val explicitHeadersLowercase = headers map { case (k, v) ⇒ k.toLowerCase → v }
+        val explicitHeadersLower = customHeaders map { case (k, v) ⇒ k.toLowerCase → v }
 
         // 3. Forward cookies for session handling only if no credentials have been explicitly set
-        val newCookieHeader = credentials match {
-            case None    ⇒ sessionCookieHeader(externalContext)
+        val newCookieHeaderLower = credentials match {
+            case None    ⇒ sessionCookieHeaderLower(externalContext)
             case Some(_) ⇒ None
         }
 
         // 4. Authorization token
-        val tokenHeader = {
+        val tokenHeaderLower = {
 
             // Get token from web app scope
             val token =
@@ -509,10 +522,14 @@ object Connection extends Logging {
 
         // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
         // New cookie header, if present, overrides any existing cookies
-        headersToForwardLowercase.toMap ++ explicitHeadersLowercase ++ newCookieHeader ++ tokenHeader
+        headersToForwardLower.toMap ++ explicitHeadersLower ++ newCookieHeaderLower ++ tokenHeaderLower
     }
 
-    private def sessionCookieHeader(externalContext: ExternalContext)(implicit logger: IndentedLogger): Option[(String, List[String])] = {
+    private def sessionCookieHeaderLower(
+        externalContext : ExternalContext)(implicit 
+        logger          : IndentedLogger
+    ): Option[(String, List[String])] = {
+        
         // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
         val cookiesToForward = getForwardCookies
         if (cookiesToForward.nonEmpty) {
@@ -550,10 +567,10 @@ object Connection extends Logging {
             // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
             def fromIncoming =
                 nativeRequestOption flatMap
-                (sessionCookieFromIncoming(externalContext, _, cookiesToForward, sessionCookieName))
+                (sessionCookieFromIncomingLower(externalContext, _, cookiesToForward, sessionCookieName))
 
             // 2. If there is no incoming session cookie, try to make our own cookie. This may fail with e.g. WebSphere.
-            def fromSession = sessionCookieFromGuess(externalContext, sessionCookieName)
+            def fromSession = sessionCookieFromGuessLower(externalContext, sessionCookieName)
 
             // Logging
             ifDebug {
@@ -591,7 +608,7 @@ object Connection extends Logging {
             None
     }
 
-    private def sessionCookieFromIncoming(
+    private def sessionCookieFromIncomingLower(
         externalContext  : ExternalContext,
         nativeRequest    : HttpServletRequest,
         cookiesToForward : Seq[String],
@@ -635,17 +652,19 @@ object Connection extends Logging {
             None
     }
 
-    private def sessionCookieFromGuess(externalContext: ExternalContext, sessionCookieName: String): Option[(String, List[String])] =
+    private def sessionCookieFromGuessLower(
+        externalContext   : ExternalContext, 
+        sessionCookieName : String
+    ): Option[(String, List[String])] =
         Option(externalContext.getSession(false)) map
             { session ⇒ "cookie" →  List(sessionCookieName + "=" + session.getId) }
 
-    // Return SOAP-related headers if needed
-    def soapHeaders(
-        httpMethod               : String,
-        mediatypeMaybeWithCharset: String,
-        encoding                 : String)(implicit
-        logger                   : IndentedLogger
-    ): Seq[(String, List[String])] = {
+    private def buildSOAPHeadersLowerIfNeeded(
+        httpMethod                : String,
+        mediatypeMaybeWithCharset : String,
+        encoding                  : String)(implicit
+        logger                    : IndentedLogger
+    ): List[(String, List[String])] = {
 
         require(encoding ne null)
 
@@ -670,20 +689,20 @@ object Connection extends Logging {
                     val acceptHeader = APPLICATION_SOAP_XML + charsetSuffix(parameters)
 
                     // Accept header with optional charset
-                    Seq("accept" → List(acceptHeader))
+                    List("accept" → List(acceptHeader))
 
                 case "POST" if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
                     // Set Content-Type and optionally SOAPAction headers
 
-                    val parameters = getContentTypeParameters(mediatypeMaybeWithCharset).asScala
+                    val parameters            = getContentTypeParameters(mediatypeMaybeWithCharset).asScala
                     val overriddenContentType = "text/xml" + charsetSuffix(parameters)
-                    val actionParameter = parameters.get("action")
+                    val actionParameter       = parameters.get("action")
 
                     // Content-Type with optional charset and SOAPAction header if any
-                    Seq(ContentTypeLower → List(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → List(a)))
+                    List(ContentTypeLower → List(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → List(a)))
                 case _ ⇒
                     // Not a SOAP submission
-                    Seq()
+                    Nil
             }
 
         if (newHeaders.nonEmpty)

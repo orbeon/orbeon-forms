@@ -35,7 +35,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +126,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                         throw new OXFException(e);
                     }
                     final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
-                        Connection.jBuildConnectionHeaders(url.getScheme(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
+                        Connection.jBuildConnectionHeadersLowerIfNeeded(url.getScheme(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
 
                     final ConnectionResult cxr =
                         Connection.jApply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);

@@ -26,18 +26,37 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     def isFBBody(node: NodeInfo) = (node self GroupElementTest) && node.attClasses("fb-body")
 
+    val RepeatContentToken       = "content"
+    val LegacyRepeatContentToken = "true"
+
     // Predicates
     val IsGrid:    NodeInfo ⇒ Boolean = _ self GridElementTest
     val IsSection: NodeInfo ⇒ Boolean = _ self SectionElementTest
-    val IsRepeat:  NodeInfo ⇒ Boolean = node ⇒ (IsGrid(node) || IsSection(node)) && node.attValue("repeat") == "true"
 
-    def isRepeat(node: NodeInfo) = IsRepeat(node) // for Java/XSLT callers
+    def isRepeatable(node: NodeInfo) =
+        IsGrid(node) || IsSection(node)
+
+    def isContentRepeat(node: NodeInfo) =
+        isRepeatable(node) && node.attValue("repeat") == RepeatContentToken
+
+    def isLegacyRepeat(node: NodeInfo) =
+        ! isContentRepeat(node) &&
+        isRepeatable(node)      && (
+            node.attValue("repeat") == LegacyRepeatContentToken ||
+            node.att("minOccurs").nonEmpty                      ||
+            node.att("maxOccurs").nonEmpty                      ||
+            node.att("min").nonEmpty                            ||
+            node.att("max").nonEmpty
+        )
+
+    def isRepeat(node: NodeInfo) =
+        isContentRepeat(node) || isLegacyRepeat(node)
 
     val IsContainer: NodeInfo ⇒ Boolean =
         node ⇒ (node self ContainerElementTest) || isFBBody(node)
 
-    // NOTE: Later repeated grids should also support a nested iteration element
-    def controlRequiresNestedIterationElement(node: NodeInfo) = IsSection(node) && IsRepeat(node)
+    def controlRequiresNestedIterationElement(node: NodeInfo) =
+        isRepeat(node)
 
     // Namespace URL a section template component must match
     private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
@@ -82,7 +101,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     // Find all ancestor repeats from leaf to root
     def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter IsRepeat
+        findAncestorContainers(descendantOrSelf, includeSelf) filter isRepeat
 
     // Find all ancestor sections from leaf to root
     def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =

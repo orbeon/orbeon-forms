@@ -144,6 +144,8 @@
 
                                 <xf:group ref=".[response/headers/header]">
                                     <xf:label ref="$form-resources/dialog-http-services/headers/label"/>
+                                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                                         decide to remove support for legacy mode. -->
                                     <fr:grid ref="response/headers/header" id="fb-response-headers-repeat" readonly="true" repeat="true">
                                         <xh:tr>
                                             <xh:td class="fb-nowrap">

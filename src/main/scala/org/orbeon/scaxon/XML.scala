@@ -562,9 +562,11 @@ object XML {
 
     implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 
+    // UNSAFE
     def unwrapElement(nodeInfo: NodeInfo): Element =
         nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
 
+    // UNSAFE
     def unwrapDocument(nodeInfo: NodeInfo): Document =
         nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
 

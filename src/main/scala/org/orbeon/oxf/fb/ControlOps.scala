@@ -27,10 +27,10 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.mutable
 import org.orbeon.saxon.value.StringValue
 import org.apache.commons.lang3.StringUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import scala.collection.JavaConverters._
 
 /*
  * Form Builder: operations on controls.
@@ -43,6 +43,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     private val MIPsToRewrite = AllMIPs - Type
     private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
+    
+    val BindElementTest: Test = XF → "bind"
 
     private val topLevelBindTemplate: NodeInfo =
         <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
@@ -51,20 +53,25 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
     // Find data holders (there can be more than one with repeats)
-    // NOTE: We use XPath to find holders, but with the "new" custom XML data model, we might not need to do this and
-    // just use element names.
     def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
         findBindByName(inDoc, controlName) map { bind ⇒
             // From bind, infer path by looking at ancestor-or-self binds
-            val bindRefs = (bind ancestorOrSelf "*:bind" flatMap bindRefOrNodeset).reverse.tail
+            val bindRefs = (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail
 
             val path = bindRefs map ("(" + _ + ")") mkString "/"
 
-            // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
-            val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
+            // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
+            // overridden along the way!)
+            val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
 
             // Evaluate path from instance root element
-            eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat).asInstanceOf[Seq[NodeInfo]]
+            eval(
+                item       = formInstanceRoot(inDoc),
+                expr       = path,
+                namespaces = namespaces,
+                variables  = null,
+                reporter   = containingDocument.getRequestStats.addXPathStat
+            ).asInstanceOf[Seq[NodeInfo]]
         } getOrElse
             Seq.empty
 
@@ -88,7 +95,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
 
-        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq.empty) ++ (grid precedingSibling * filter IsContainer)
+        val precedingOrSelfContainers =
+            (if (includeSelf) Seq(grid) else Seq.empty) ++ (grid precedingSibling * filter IsContainer)
 
         // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
         // with a name (there might not be one).
@@ -108,15 +116,21 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         // Insert bind container if needed
         val model = findModelElement(inDoc)
         val topLevelBind = findTopLevelBind(inDoc).headOption match {
-            case Some(bind) ⇒ bind
-            case None ⇒ insert(into = model, after = model \ "*:instance" filter (hasIdValue(_, "fr-form-instance")), origin = topLevelBindTemplate).head
+            case Some(bind) ⇒
+                bind
+            case None ⇒
+                insert(
+                    into   = model,
+                    after  = model \ "*:instance" filter (hasIdValue(_, "fr-form-instance")),
+                    origin = topLevelBindTemplate
+                ).head
         }
 
         // Insert a bind into one level
         @tailrec def ensureBind(container: NodeInfo, names: Iterator[String]): NodeInfo = {
             if (names.hasNext) {
                 val bindName = names.next()
-                val bind =  container \ "*:bind" filter (isBindForName(_, bindName)) match {
+                val bind = container \ "*:bind" filter (isBindForName(_, bindName)) match {
                     case Seq(bind: NodeInfo, _*) ⇒ bind
                     case _ ⇒
 
@@ -186,7 +200,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         }
 
     // Rename a control's nested iteration if any
-    def renameControlIterationIfNeeded(inDoc: NodeInfo, oldControlName: String, newControlName: String, oldChildElementNameOrBlank: String, newChildElementNameOrBlank: String): Unit =
+    def renameControlIterationIfNeeded(
+        inDoc                      : NodeInfo,
+        oldControlName             : String,
+        newControlName             : String,
+        oldChildElementNameOrBlank : String,
+        newChildElementNameOrBlank : String
+    ): Unit =
         if (findControlByName(inDoc, oldControlName) exists controlRequiresNestedIterationElement) {
 
             val oldName = nonEmptyOrNone(oldChildElementNameOrBlank) getOrElse defaultIterationName(oldControlName)
@@ -200,7 +220,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         }
 
     def renameControl(inDoc: NodeInfo, oldName: String, newName: String): Unit =
-        findControlByName(inDoc, oldName) foreach (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
+        findControlByName(inDoc, oldName) foreach
+            (renameControlByElement(_, newName, resourceNamesInUseForControl(newName)))
 
     def resourceNamesInUseForControl(controlName: String) =
         currentResources.child(controlName).child(*).map(_.localname).to[Set]
@@ -262,7 +283,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                         parent \ * filter (_.name == holder.name) match {
                             case Seq() ⇒
                                 // No holder exists so insert one
-                                insert(into = parent, after = parent \ * filter (_.name == precedingHolderName.getOrElse("")), origin = holder)
+                                insert(
+                                    into   = parent,
+                                    after  = parent \ * filter (_.name == precedingHolderName.getOrElse("")),
+                                    origin = holder
+                                )
                             case existing ⇒
                                 // At least one holder exists (can be more than one for repeats)
                                 existing
@@ -277,7 +302,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Insert data and resource holders for all languages
-    def insertHolderForAllLang(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]): Unit = {
+    def insertHolderForAllLang(
+        controlElement       : NodeInfo,
+        dataHolder           : NodeInfo,
+        resourceHolder       : NodeInfo,
+        precedingControlName : Option[String]
+    ): Unit = {
 
         // Create one holder per existing language
         val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map (_.stringValue → resourceHolder)
@@ -285,15 +315,23 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     // Insert data and resource holders for all languages
-    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolders: Seq[(String, NodeInfo)], precedingControlName: Option[String]): Unit = {
+    def insertHolders(
+        controlElement       : NodeInfo,
+        dataHolder           : NodeInfo,
+        resourceHolders      : Seq[(String, NodeInfo)],
+        precedingControlName : Option[String]
+    ): Unit = {
         val doc = controlElement.getDocumentRoot
 
         // Insert hierarchy of data holders
-        // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
-        // In practice, the ancestor holders should already exist.
+        // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous
+        // names. In practice, the ancestor holders should already exist.
         locally {
             val containerNames = findContainerNames(controlElement)
-            ensureDataHolder(formInstanceRoot(doc), (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
+            ensureDataHolder(
+                formInstanceRoot(doc),
+                (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName)
+            )
         }
 
         // Insert resources placeholders for all languages
@@ -301,8 +339,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             val resourceHoldersMap = resourceHolders.toMap
             formResourcesRoot \ "resource" foreach (resource ⇒ {
                 val lang = (resource \@ "*:lang").stringValue
-                val holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
-                insert(into = resource, after = resource \ * filter (_.name == precedingControlName.getOrElse("")), origin = holder)
+                val holder = resourceHoldersMap.getOrElse(lang, resourceHolders(0)._2)
+                insert(
+                    into   = resource,
+                    after  = resource \ * filter (_.name == precedingControlName.getOrElse("")),
+                    origin = holder
+                )
             })
         }
     }
@@ -375,7 +417,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
     private def convertMIP(mipName: String) =
-        RewrittenMIPs.get(mipName) orElse (AllMIPsByName.get(mipName) map (_.aName)) getOrElse (throw new IllegalArgumentException)
+        RewrittenMIPs.get(mipName)                 orElse
+        (AllMIPsByName.get(mipName) map (_.aName)) getOrElse
+        (throw new IllegalArgumentException)
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
     def getMipOrEmpty(inDoc: NodeInfo, controlName: String, mipName: String) =
@@ -396,7 +440,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
     // For XPath callers
-    // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a Option → List function?
+    // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a
+    // Option → List function?
     def bindingOrEmpty(controlElement: NodeInfo) =
         FormBuilder.bindingForControlElement(controlElement, componentBindings).orNull
 
@@ -472,7 +517,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                 delete(lhhaElement \@ "mediatype")
         }
 
-    def ensureCleanLHHAElements(inDoc: NodeInfo, controlName: String, lhha: String, count: Int = 1, replace: Boolean = true): Seq[NodeInfo] = {
+    def ensureCleanLHHAElements(
+        inDoc       : NodeInfo,
+        controlName : String,
+        lhha        : String,
+        count       : Int     = 1,
+        replace     : Boolean = true
+    ): Seq[NodeInfo] = {
+
         val control  = findControlByName(inDoc, controlName).get
         val existing = getControlLHHA(inDoc, controlName, lhha)
 
@@ -537,7 +589,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse filterNot isFBBody
 
         val containerIds = ancestorContainers map (_.id)
-        val repeatDepth  = ancestorContainers count IsRepeat
+        val repeatDepth  = ancestorContainers count isRepeat
 
         def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_INDEX_SEPARATOR_STRING
         val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING

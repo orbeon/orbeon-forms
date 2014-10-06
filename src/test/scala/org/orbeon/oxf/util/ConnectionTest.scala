@@ -59,37 +59,40 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         // NOTE: Should instead use withExternalContext()
         PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
         val headers =
-            Connection.buildConnectionHeadersWithSOAP(
-                "GET",
-                null,
-                null,
-                "UTF-8",
-                customHeaderValuesMap,
-                "cookie authorization user-agent",
-                ResourceManagerTestBase.newIndentedLogger
+            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+                scheme            = "http",
+                httpMethod        = "GET",
+                credentialsOrNull = null,
+                mediatype         = null,
+                encodingForSOAP   = "UTF-8",
+                customHeaders     = customHeaderValuesMap,
+                headersToForward  = "cookie authorization user-agent")(
+                logger            = ResourceManagerTestBase.newIndentedLogger
             )
 
-        val request = new LocalRequest(
-            incomingRequest         = externalContext.getRequest,
-            contextPath             = "/orbeon",
-            pathQuery               = "/foo/bar",
-            method                  = "GET",
-            headersMaybeCapitalized = headers,
-            content                 = None
-        )
+        val request =
+            new LocalRequest(
+                incomingRequest         = externalContext.getRequest,
+                contextPath             = "/orbeon",
+                pathQuery               = "/foo/bar",
+                method                  = "GET",
+                headersMaybeCapitalized = headers,
+                content                 = None
+            )
 
         // Test standard headers received
         val headerValuesMap = request.getHeaderValuesMap.asScala
-        assert("Mozilla 12.1" === headerValuesMap("user-agent")(0))
-        assert("xsifj1skf3" === headerValuesMap("authorization")(0))
+
+        assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
+        assert("xsifj1skf3"                                  === headerValuesMap("authorization")(0))
         assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" === headerValuesMap("cookie")(0))
-        assert(None === headerValuesMap.get("host"))
-        assert(None === headerValuesMap.get("foobar"))
+        assert(None                                          === headerValuesMap.get("host"))
+        assert(None                                          === headerValuesMap.get("foobar"))
 
         // Test custom headers received
-        assert("my-value" === headerValuesMap("my-stuff")(0))
-        assert("your-value-1" === headerValuesMap("your-stuff")(0))
-        assert("your-value-2" === headerValuesMap("your-stuff")(1))
+        assert("my-value"                                    === headerValuesMap("my-stuff")(0))
+        assert("your-value-1"                                === headerValuesMap("your-stuff")(0))
+        assert("your-value-2"                                === headerValuesMap("your-stuff")(1))
     }
 
     @Test def combinedParameters(): Unit = {
@@ -103,14 +106,15 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
         val headers =
-            Connection.buildConnectionHeadersWithSOAP(
-                method,
-                null,
-                bodyMediaType,
-                "UTF-8",
-                explicitHeaders,
-                "",
-                ResourceManagerTestBase.newIndentedLogger
+            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+                scheme            = "http",
+                httpMethod        = method,
+                credentialsOrNull = null,
+                mediatype         = bodyMediaType,
+                encodingForSOAP   = "UTF-8",
+                customHeaders     = explicitHeaders,
+                headersToForward  = "")(
+                logger            = ResourceManagerTestBase.newIndentedLogger
             )
 
         val wrapper =

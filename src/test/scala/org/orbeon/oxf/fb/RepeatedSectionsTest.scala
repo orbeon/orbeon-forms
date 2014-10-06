@@ -37,7 +37,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                                 <my-section-iteration>
                                     <my-input/>
                                     <my-grid>
-                                        <my-textarea/>
+                                        <my-grid-iteration>
+                                            <my-textarea/>
+                                        </my-grid-iteration>
                                     </my-grid>
                                 </my-section-iteration>
                             </my-section>
@@ -62,7 +64,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                                 <foo-iteration>
                                     <my-input/>
                                     <my-grid>
-                                        <my-textarea/>
+                                        <my-grid-iteration>
+                                            <my-textarea/>
+                                        </my-grid-iteration>
                                     </my-grid>
                                 </foo-iteration>
                             </foo>
@@ -86,7 +90,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                                 <bar>
                                     <my-input/>
                                     <my-grid>
-                                        <my-textarea/>
+                                        <my-grid-iteration>
+                                            <my-textarea/>
+                                        </my-grid-iteration>
                                     </my-grid>
                                 </bar>
                             </foo>
@@ -136,7 +142,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                                 <bar>
                                     <my-input/>
                                     <my-grid>
-                                        <my-textarea/>
+                                        <my-grid-iteration>
+                                            <my-textarea/>
+                                        </my-grid-iteration>
                                     </my-grid>
                                     <other-section>
                                         <other-input/>
@@ -159,7 +167,9 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
                             <foo>
                                 <my-input/>
                                 <my-grid>
-                                    <my-textarea/>
+                                    <my-grid-iteration>
+                                        <my-textarea/>
+                                    </my-grid-iteration>
                                 </my-grid>
                                 <other-section>
                                     <other-input/>

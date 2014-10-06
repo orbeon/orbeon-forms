@@ -154,7 +154,14 @@ trait AlertsAndConstraintsOps extends ControlOps {
             setControlResourcesWithLang(controlName, "alert", messagesByLangForAllLangs)
 
             // Write alerts
-            val newAlertElements = ensureCleanLHHAElements(inDoc, controlName, "alert", count = alertsWithResources.size, replace = true)
+            val newAlertElements =
+                ensureCleanLHHAElements(
+                    inDoc       = inDoc,
+                    controlName = controlName,
+                    lhha        = "alert",
+                    count       = alertsWithResources.size,
+                    replace     = true
+                )
 
             // Insert constraint attribute as needed
             newAlertElements zip alertsWithResources foreach {

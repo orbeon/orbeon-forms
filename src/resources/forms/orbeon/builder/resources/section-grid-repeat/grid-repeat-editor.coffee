@@ -9,7 +9,7 @@ $ ->
             gridsCache.length = 0                                                                                       # Update gridsCache in-place, as references are kept by other functions
             _.each ($ '.fr-grid.fr-editable:visible'), (table) ->
                 table = $(table)
-                grid = table.parent()
+                grid = table.closest('.xbl-fr-grid')                                                                    # There might be an intermediate group <span>
                 gridInfo =
                     el: grid
                     offset: Builder.adjustedOffset grid
@@ -39,7 +39,7 @@ $ ->
         Builder.currentContainerChanged gridsCache,
             wasCurrent: -> _.each [deleteIcon, detailsIcon], (i) -> f$.hide i
             becomesCurrent: (grid) ->
-                table = f$.children '.fr-grid', grid.el
+                table = f$.find '.fr-grid', grid.el
                 if f$.is '.fb-can-delete-grid', table
                     f$.show deleteIcon
                     offset =
@@ -93,7 +93,7 @@ $ ->
             _.each icons, (icon) ->
                 canDo = (operation) ->
                     gridDiv = rowOrCol.grid.el
-                    gridTable = f$.children '.fr-grid', gridDiv
+                    gridTable = f$.find '.fr-grid', gridDiv
                     f$.is '.fb-can-' + operation, gridTable
                 operationRequires =
                     'delete-row': 'delete-row'

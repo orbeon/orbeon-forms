@@ -23,20 +23,14 @@ import collection.mutable
 import org.orbeon.oxf.util.XPathCache
 
 object SubmissionHeaders {
-    /**
-     * Evaluate children <xf:header> elements.
-     *
-     * @param contextStack      context stack set to enclosing <xf:*> element
-     * @param sourceEffectiveId effective id of the enclosing element
-     * @param enclosingElement  enclosing element
-     * @return map of headers or null if no header elements
-     */
+
+    // Evaluate children <xf:header> elements.
     def evaluateHeaders(
-        xblContainer     : XBLContainer,
-        contextStack     : XFormsContextStack,
-        sourceEffectiveId: String,
-        enclosingElement : Element,
-        initialHeaders   : Map[String, List[String]]
+        xblContainer      : XBLContainer,
+        contextStack      : XFormsContextStack,         // context stack set to enclosing <xf:*> element
+        sourceEffectiveId : String,                     // effective id of the enclosing <xf:*>element
+        enclosingElement  : Element,                    // enclosing <xf:*> element
+        initialHeaders    : Map[String, List[String]]   // initial headers or empty list of headers
    ): Map[String, List[String]] = {
 
         val fullPrefix = xblContainer.getFullPrefix

@@ -185,10 +185,11 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
-            val newRepeatNameOption = insertNewRepeat(doc)
+            val newRepeatNameOption = insertNewRepeatedGrid(doc)
 
             assert(newRepeatNameOption === Some("grid-3"))
-            val newRepeatName = newRepeatNameOption.get
+            val newRepeatName          = newRepeatNameOption.get
+            val newRepeatIterationName = defaultIterationName(newRepeatName)
 
             locally {
 
@@ -197,10 +198,10 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert((newlySelectedTd flatMap (_ parent * headOption) flatMap (_ parent * headOption) head) \@ "id" === gridId(newRepeatName))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
-                assert(containerNames === Seq("section-1", newRepeatName))
+                assert(containerNames === Seq("section-1", newRepeatName, newRepeatIterationName))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
-                val dataHolder = assertDataHolder(doc, containerNames.last)
+                val dataHolder = assertDataHolder(doc, containerNames.init.last)
                 assert((dataHolder.head precedingSibling * head).name === "control-1")
 
                 val controlBind = findBindByName(doc, newRepeatName).get
@@ -214,7 +215,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
             val newControlNameOption = insertNewControl(doc, binding)
 
-            assert(newControlNameOption === Some("control-4"))
+            assert(newControlNameOption === Some("control-5"))
             val newControlName = newControlNameOption.get
 
             // Test result
@@ -225,18 +226,18 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
-                assert(containerNames === Seq("section-1", newRepeatName))
+                assert(containerNames === Seq("section-1", newRepeatName, newRepeatIterationName))
 
                 assert(hasIdValue(findControlByName(doc, newControlName).get, controlId(newControlName)))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = assertDataHolder(doc, newControlName)
                 assert(dataHolder.head precedingSibling * isEmpty)
-                assert((dataHolder.head parent * head).name === newRepeatName)
+                assert((dataHolder.head parent * head).name === newRepeatIterationName)
 
                 val controlBind = findBindByName(doc, newControlName).get
                 assert(hasIdValue(controlBind, bindId(newControlName)))
-                assert(hasIdValue(controlBind parent * head, bindId(newRepeatName)))
+                assert(hasIdValue(controlBind parent * head, bindId(newRepeatIterationName)))
 
                 assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
 
@@ -244,7 +245,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
                 assert(templateHolder.isDefined)
                 assert(templateHolder.get precedingSibling * isEmpty)
-                assert((templateHolder.get parent * head).name === newRepeatName)
+                assert((templateHolder.get parent * head).name === newRepeatIterationName)
             }
         }
 
@@ -492,9 +493,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
 
             val expected = Map(
-                "|fb≡section-1-section≡tmp-11-tmp≡control-1-control|"                      → "control-1-control",
+                "|fb≡section-1-section≡tmp-13-tmp≡control-1-control|"                      → "control-1-control",
                 "|fb≡section-1-section≡grid-4-grid≡control-5-control⊙1|"                   → "control-5-control",
-                "|fb≡section-1-section≡section-3-section≡tmp-12-tmp≡control-6-control|"    → "control-6-control",
+                "|fb≡section-1-section≡section-3-section≡tmp-14-tmp≡control-6-control|"    → "control-6-control",
                 "|fb≡section-1-section≡section-3-section≡grid-7-grid≡control-8-control⊙1|" → "control-8-control"
             )
 

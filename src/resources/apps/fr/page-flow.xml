@@ -74,6 +74,37 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </service>
 
+    <!-- ==== Custom services and pages ============================================================================ -->
+
+    <!-- Custom persistence implementation provided by the application -->
+    <service path="/fr/service/custom/([^/^.]+)/crud/[^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+)"
+             model="/forms/${1}/service/crud.xpl">
+    </service>
+
+    <service path="/fr/service/custom/([^/^.]+)/search/[^/]+/[^/]+"
+             view="/forms/${1}/service/search.xpl"/>
+
+    <!-- Custom services provided by the application -->
+    <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)"
+             view="/forms/${1}/service/${2}.xpl"/>
+
+    <!-- Custom services provided by Form Builder -->
+    <!-- NOTE: This shouldn't be here, but this service uses its own serialization -->
+    <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)/toolbox"
+             model="/forms/${1}/${2}/service/toolbox.xpl"/>
+
+    <!-- Custom services provided by the form -->
+    <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)/([^/^.]+)"
+             view="/forms/${1}/${2}/service/${3}.xpl"/>
+
+    <!-- Custom pages provided by the application -->
+    <page path="/fr/page/custom/([^/^.]+)/([^/^.]+)"
+          view="/forms/${1}/page/${2}.xhtml"/>
+
+    <!-- Custom pages provided by the form -->
+    <page path="/fr/page/custom/([^/^.]+)/([^/^.]+)/([^/^.]+)"
+          view="/forms/${1}/${2}/page/${3}.xhtml"/>
+
     <!-- ==== Other services ======================================================================================= -->
 
     <!-- Email document -->
@@ -125,37 +156,6 @@
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(attachments)"
              model="request-parameters.xpl"
              view="services/attachments.xhtml"/>
-
-    <!-- ==== Custom services and pages ============================================================================ -->
-
-    <!-- Custom persistence implementation provided by the application -->
-    <service path="/fr/service/custom/([^/^.]+)/crud/[^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+)"
-             model="/forms/${1}/service/crud.xpl">
-    </service>
-
-    <service path="/fr/service/custom/([^/^.]+)/search/[^/]+/[^/]+"
-             view="/forms/${1}/service/search.xpl"/>
-
-    <!-- Custom services provided by the application -->
-    <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)"
-             view="/forms/${1}/service/${2}.xpl"/>
-
-    <!-- Custom services provided by Form Builder -->
-    <!-- NOTE: This shouldn't be here, but this service uses its own serialization -->
-    <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)/toolbox"
-             model="/forms/${1}/${2}/service/toolbox.xpl"/>
-
-    <!-- Custom services provided by the form -->
-    <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)/([^/^.]+)"
-             view="/forms/${1}/${2}/service/${3}.xpl"/>
-
-    <!-- Custom pages provided by the application -->
-    <page path="/fr/page/custom/([^/^.]+)/([^/^.]+)"
-          view="/forms/${1}/page/${2}.xhtml"/>
-
-    <!-- Custom pages provided by the form -->
-    <page path="/fr/page/custom/([^/^.]+)/([^/^.]+)/([^/^.]+)"
-          view="/forms/${1}/${2}/page/${3}.xhtml"/>
 
     <!-- ==== Pages ================================================================================================ -->
 

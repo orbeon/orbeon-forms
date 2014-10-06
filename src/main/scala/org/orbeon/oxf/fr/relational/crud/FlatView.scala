@@ -68,9 +68,10 @@ private object FlatView {
         val cols = {
             val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒
                 val extractFunction = req.provider match {
-                    case "oracle" ⇒ s"extractValue(d.xml, '/*/$path')"
-                    case "db2"    ⇒ s"XMLSERIALIZE(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
-                    case _        ⇒ ???
+                    case "oracle"     ⇒ s"extractValue(d.xml, '/*/$path')"
+                    case "db2"        ⇒ s"XMLSERIALIZE(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
+                    case "postgresql" ⇒ s"(xpath('/*/$path/text()', d.xml))[1]"
+                    case _            ⇒ ???
                 }
                 Col(extractFunction, col)
             }
@@ -81,7 +82,7 @@ private object FlatView {
         // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
         locally {
             val query =
-                s"""|CREATE  ${if (req.provider == "oracle") "OR REPLACE" else ""} VIEW $viewName AS
+                s"""|CREATE  ${if (Set("oracle", "postgresql")(req.provider)) "OR REPLACE" else ""} VIEW $viewName AS
                     |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
                     |  FROM  orbeon_form_data d,
                     |        (

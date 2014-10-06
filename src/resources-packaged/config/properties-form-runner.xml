@@ -29,6 +29,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.postgresql.uri"                          value="/fr/service/postgresql"/>
     <property as="xs:string"  name="oxf.fr.persistence.postgresql.datasource"                   value="postgresql"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.postgresql.create-flat-view"             value="false"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                 value="/fr/service/db2"/>
     <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                           value="/fr/service/sqlserver"/>

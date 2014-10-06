@@ -182,8 +182,6 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements)
 
         // Aggregate and serialize
-        // TODO: Add @operations="|admin" based on FB permissions. It is better if this is done in a centralized way.
-        // See https://github.com/orbeon/orbeon-forms/issues/1316
         val documentElement = elementInfo("forms")
         XFormsAPI.insert(into = documentElement, origin = filteredFormElements)
 

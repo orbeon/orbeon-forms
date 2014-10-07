@@ -446,6 +446,7 @@ object Connection extends Logging {
     def getForwardCookies: List[String] = {
         val propertySet = Properties.instance.getPropertySet
         val maybeHeaderList = Option(propertySet.getString(HttpForwardCookiesProperty))
+        
         maybeHeaderList.map(_.split("""\s+""").toList).getOrElse(Nil)
     }
 

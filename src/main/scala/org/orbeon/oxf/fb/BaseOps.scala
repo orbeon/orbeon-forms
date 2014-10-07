@@ -36,7 +36,21 @@ trait BaseOps extends Logging {
     def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
 
     // All xbl:binding elements available
-    def componentBindings = asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+    def componentBindings =
+        asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+
+    // All xbl:binding elements available for section templates
+    def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
+        componentBindings filter (_.attClasses("fr-section-component"))
+
+    // Find the binding's first URI qualified name
+    // For now takes the first CSS rule and assume the form foo|bar.
+    def bindingFirstURIQualifiedName(binding: NodeInfo) = {
+        val firstElementCSSName = (binding /@ "element" stringValue) split "," head
+        val elementQName        = firstElementCSSName.replace('|', ':')
+
+        binding.resolveURIQualifiedName(elementQName)
+    }
 
     // Return fb-form-instance
     def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get

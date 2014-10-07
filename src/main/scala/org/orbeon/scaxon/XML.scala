@@ -115,6 +115,7 @@ object XML {
     def asNodeInfoSeq(item: Item) = item.asInstanceOf[NodeInfo]
 
     // Convert a ns → name tuple to a QName, including separating prefix/local if needed
+    // TODO: Confusing that the name can be a local name?
     def toQName(qName: (String, String)) = {
         val prefixLocal = parseQName(qName._2)
         QName.get(prefixLocal._2, prefixLocal._1, qName._1)
@@ -330,6 +331,8 @@ object XML {
         def \(test: Test) = /(test)
         def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
+        def firstChild(test: Test) = /(test).headOption
+
         // Return an element's attributes
         // Q: Should functions taking a String match on no namespace only?
         def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
@@ -360,6 +363,7 @@ object XML {
         def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
         def id = attValue("id")
+        def hasId = att("id").nonEmpty && attValue("id").trim != ""
 
         def attValueOpt(attName: String) = /@(attName) match {
             case Seq() ⇒ None
@@ -422,17 +426,27 @@ object XML {
             if (uri eq null) "" else uri
         }
 
-        def resolveQName(lexicalQName: String): QName = {
+        private def resolveStructuredQName(lexicalQName: String): StructuredQName = {
 
             val checker = Name10Checker.getInstance
             val resolver = new InscopeNamespaceResolver(nodeInfo)
 
-            val structuredQName = StructuredQName.fromLexicalQName(lexicalQName, true, checker, resolver)
+            StructuredQName.fromLexicalQName(lexicalQName, true, checker, resolver)
+        }
+
+        def resolveURIQualifiedName(lexicalQName: String): (String, String) = {
+            val structuredQName = resolveStructuredQName(lexicalQName)
+            structuredQName.getNamespaceURI → structuredQName.getLocalName
+        }
+
+        def resolveQName(lexicalQName: String): QName = {
+            val structuredQName = resolveStructuredQName(lexicalQName)
             QName.get(lexicalQName, structuredQName.getNamespaceURI)
         }
 
         // Return a qualified name as a (namespace uri, local name) pair
-        def qname = (nodeInfo.getURI, nodeInfo.getLocalPart)
+        // NOTE: The "URI qualified name" terminology comes from XPath 3.
+        def uriQualifiedName = (nodeInfo.getURI, nodeInfo.getLocalPart)
 
         def stringValue = nodeInfo.getStringValue
 

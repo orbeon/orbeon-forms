@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.fr.XMLNames._
 
 trait ContainerOps extends ControlOps {
 
@@ -57,7 +58,7 @@ trait ContainerOps extends ControlOps {
 
     // A container can be removed if it's not the last one at that level
     def canDeleteContainer(container: NodeInfo): Boolean =
-        container sibling GridElementTest || SectionElementTest nonEmpty
+        container sibling FRContainerTest nonEmpty
     
     // Delete the entire container and contained controls
     def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
@@ -169,8 +170,11 @@ trait ContainerOps extends ControlOps {
     def canMoveInto(container: NodeInfo) =
         IsSection(container) && ! (container \ * exists IsSectionTemplateContent)
 
-    def sectionsWithTemplates(inDoc: NodeInfo) =
-        findFRBodyElement(inDoc) descendant * filter IsSection filter (_ \ * exists IsSectionTemplateContent)
+    def findSectionsWithTemplates(view: NodeInfo) =
+        view descendant * filter IsSection filter (_ \ * exists IsSectionTemplateContent)
+
+    def sectionTemplateBindingName(section: NodeInfo) =
+        section / * filter IsSectionTemplateContent map (_.uriQualifiedName) headOption
 
     // See: https://github.com/orbeon/orbeon-forms/issues/633
     def deleteSectionTemplateContentHolders(inDoc: NodeInfo) = {
@@ -178,7 +182,7 @@ trait ContainerOps extends ControlOps {
         // Find data holders for all section templates
         val holders =
             for {
-                section     ← sectionsWithTemplates(inDoc)
+                section     ← findSectionsWithTemplates(findFRBodyElement(inDoc))
                 controlName ← getControlNameOpt(section).toList
                 holder      ← findDataHolders(inDoc, controlName)
             } yield
@@ -320,7 +324,7 @@ trait ContainerOps extends ControlOps {
         for {
             controlElement ← findControlByName(inDoc, controlName)
             datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
-            binding        ← findCurrentBinding(controlElement.qname, datatype, bindings)
+            binding        ← findCurrentBinding(controlElement.uriQualifiedName, datatype, bindings)
         } yield
             binding
 
@@ -356,19 +360,4 @@ trait ContainerOps extends ControlOps {
         } locally {
             ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
         }
-    
-    def legacyGridBindsHoldersAndTemplates(inDoc: NodeInfo): Seq[NodeInfo] = {
-
-        def legacyGridRepeats =
-            inDoc.root descendant * filter IsGrid filter isLegacyRepeat
-
-        val legacyGrids = legacyGridRepeats
-        val names       = legacyGrids map getControlName
-        
-        val binds       = names flatMap (findBindByName(inDoc, _))
-        val holders     = names flatMap (findDataHolders(inDoc, _))
-        val templates   = names flatMap (findTemplateInstance(inDoc, _))
-        
-        binds ++ holders ++ templates
-    }
 }

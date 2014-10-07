@@ -90,11 +90,23 @@ trait FormBuilderSupport extends XFormsSupport {
 
                             <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
                             <xf:var name="temp" value="xxf:create-document()"/>
-                            <xf:insert context="$temp"
-                                       origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                                                ('data', 'bindings'),
-                                                                (instance('fr-form-instance'), instance('fb-components-instance')),
-                                                                'data')"/>
+
+                            <xf:insert
+                                context="$temp"
+                                origin="
+                                    xxf:call-xpl(
+                                        'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                        (
+                                            'data',
+                                            'bindings'
+                                        ),
+                                        (
+                                            instance('fr-form-instance'),
+                                            instance('fb-components-instance')
+                                        ),
+                                        'data'
+                                    )"
+                            />
 
                             <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
                                 fbf:initializeGrids($temp)

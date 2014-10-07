@@ -29,7 +29,6 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.XMLParsing;
 
 import java.util.Enumeration;
 import java.util.HashMap;

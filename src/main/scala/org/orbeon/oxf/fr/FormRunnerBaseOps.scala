@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import XMLNames._
 
 trait FormRunnerBaseOps {
 
@@ -59,15 +60,30 @@ trait FormRunnerBaseOps {
 
     def defaultIterationName(repeatName: String) = repeatName + "-iteration"
 
-    // Find an element by id
-    def byId(inDoc: NodeInfo, id: String) = Option(inDoc.getDocumentRoot.selectID(id))
+    // Find an element by id, using the index if possible, otherwise traversing the document
+    // NOTE: This should be done directly in the selectID implementation.
+    def byId(inDoc: NodeInfo, id: String) =
+        Option(inDoc.getDocumentRoot.selectID(id)) orElse (inDoc.root descendant * find (_.id == id))
 
     // Get the body
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
-    def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ GroupElementTest filter (_.attClasses("fb-body")) head
+    def findFRBodyElement(inDoc: NodeInfo) = {
+
+        def fromGroup    = inDoc.rootElement \ "*:body" \\ XFGroupTest find (_.attClasses("fb-body"))
+        def fromFRBody   = inDoc.rootElement \ "*:body" \\ FRBodyTest headOption
+        def fromTemplate = inDoc.rootElement \ XBLTemplateTest headOption
+
+        fromGroup orElse fromFRBody orElse fromTemplate get
+    }
 
     // Get the form model
-    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, FormModel)) head
+    def findModelElement(inDoc: NodeInfo) = {
+
+        def fromHead           = inDoc.rootElement \ "*:head" \ XFModelTest find (hasIdValue(_, FormModel))
+        def fromImplementation = inDoc.rootElement \ XBLImplementationTest \ XFModelTest headOption
+
+        fromHead orElse fromImplementation head
+    }
 
     // Find an xf:instance element
     def instanceElement(inDoc: NodeInfo, id: String) =
@@ -75,7 +91,7 @@ trait FormRunnerBaseOps {
 
     // Find an inline instance's root element
     def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =
-        instanceElement(inDoc, id).toSeq \ * headOption
+        instanceElement(inDoc, id).toList \ * headOption
 
     // Find all template instances
     def templateInstanceElements(inDoc: NodeInfo) =
@@ -90,8 +106,8 @@ trait FormRunnerBaseOps {
     def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
         findModelElement(inDoc) \ "*:bind" find {
             // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-            bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.id) ||
-                    bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
+            bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.id)             ||
+                bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
         }
 
     def properties = Properties.instance.getPropertySet
@@ -120,6 +136,8 @@ trait FormRunnerBaseOps {
 
     // Return specific Form Runner instances
     def formInstance         = topLevelInstance(FormModel,         "fr-form-instance")          get
+    def metadataInstance     = topLevelInstance(FormModel,         "fr-form-metadata")
+
     def parametersInstance   = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
     def errorSummaryInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
     def persistenceInstance  = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get

@@ -228,7 +228,7 @@
                     <xsl:copy-of select="$repeat-templates"/>
 
                     <!-- Section constraints -->
-                    <xf:bind>
+                    <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                         <xsl:apply-templates select="$section-bind/xf:bind"/>
                     </xf:bind>
 

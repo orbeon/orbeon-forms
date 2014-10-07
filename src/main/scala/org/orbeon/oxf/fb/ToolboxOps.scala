@@ -54,13 +54,17 @@ object ToolboxOps {
                             controlElement
                         case _ ⇒
                             // No specific, create simple element with LHHA
+                            val controlElement =
+                                insert(
+                                    into   = gridTd,
+                                    origin = elementInfo(bindingFirstURIQualifiedName(binding))
+                                ).head
 
-                            // Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar)
-                            val firstElementCSSName = (binding \@ "element" stringValue) split "," head
-                            val elementQName = firstElementCSSName.replace('|', ':')
+                            insert(
+                                into   = controlElement,
+                                origin = lhhaTemplate \ *
+                            )
 
-                            val controlElement = insert(into = gridTd, origin = elementInfo(binding.resolveQName(elementQName))).head
-                            insert(into = controlElement, origin = lhhaTemplate \ *)
                             controlElement
                     }
 

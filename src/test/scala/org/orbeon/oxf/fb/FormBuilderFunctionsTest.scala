@@ -45,7 +45,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
             assert((formInstanceRoot(doc) parent * head).name === "xf:instance")
 
-            assert(findFRBodyElement(doc).qname === (XF → "group"))
+            assert(findFRBodyElement(doc).uriQualifiedName === (XF → "group"))
         }
 
     @Test def nameAndId(): Unit =
@@ -56,7 +56,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(controlNameFromId(bindId(Control1)) === Control1)
 
             // Find control element
-            assert(findControlByName(doc, Control1).get.qname === (XF → "input"))
+            assert(findControlByName(doc, Control1).get.uriQualifiedName === (XF → "input"))
             assert(hasIdValue(findControlByName(doc, Control1).get, controlId(Control1)))
         }
 
@@ -64,7 +64,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Find bind element
-            assert(findBindByName(doc, Control1).get.qname === (XF → "bind"))
+            assert(findBindByName(doc, Control1).get.uriQualifiedName === (XF → "bind"))
             assert(hasIdValue(findBindByName(doc, Control1).get, bindId(Control1)))
 
             // Check content of value holder
@@ -85,12 +85,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(TemplateDoc) { doc ⇒
             ensureBinds(doc, Seq(Section1, Control2))
 
-            assert(findBindByName(doc, Control2).get.qname === (XF → "bind"))
+            assert(findBindByName(doc, Control2).get.uriQualifiedName === (XF → "bind"))
             assert(hasIdValue(findBindByName(doc, Control2).get, bindId(Control2)))
 
             ensureBinds(doc, Seq(Section2, "grid-1", Control3))
 
-            assert(findBindByName(doc, Control3).get.qname === (XF → "bind"))
+            assert(findBindByName(doc, Control3).get.uriQualifiedName === (XF → "bind"))
             assert(hasIdValue(findBindByName(doc, Control3).get, bindId(Control3)))
         }
 

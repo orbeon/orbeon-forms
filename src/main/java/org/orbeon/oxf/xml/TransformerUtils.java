@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -471,6 +472,10 @@ public class TransformerUtils {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    public static DocumentInfo extractAsMutableDocument(NodeInfo elementOrDocument) {
+        return new DocumentWrapper(tinyTreeToDom4j(elementOrDocument), null, XPath.GlobalConfiguration());
     }
 
     /**

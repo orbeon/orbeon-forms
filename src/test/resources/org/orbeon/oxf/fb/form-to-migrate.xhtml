@@ -1,0 +1,232 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <section-1>
+                        <control-1/>
+                    </section-1>
+                    <section-3>
+                        <section-3-iteration>
+                            <control-6/>
+                            <grid-4>
+                                <control-7/>
+                            </grid-4>
+                        </section-3-iteration>
+                        <section-3-iteration>
+                            <grid-4>
+                                <control-7/>
+                            </grid-4>
+                            <control-6/>
+                        </section-3-iteration>
+                    </section-3>
+                    <section-13>
+                        <!--<grid-6>-->
+                            <!--<grid-6-iteration>-->
+                                <!--<control-10/>-->
+                                <!--<control-11/>-->
+                                <!--<control-12/>-->
+                                <!--<control-13/>-->
+                            <!--</grid-6-iteration>-->
+                        <!--</grid-6>-->
+                        <!--<grid-14>-->
+                            <!--<grid-14-iteration>-->
+                                <!--<control-16/>-->
+                            <!--</grid-14-iteration>-->
+                        <!--</grid-14>-->
+                    </section-13>
+                    <section-8>
+                        <!--<control-1/>-->
+                        <!--<grid-3>-->
+                            <!--<grid-3-iteration>-->
+                                <!--<control-8/>-->
+                                <!--<control-9/>-->
+                            <!--</grid-3-iteration>-->
+                        <!--</grid-3>-->
+                    </section-8>
+                    <section-23>
+                        <!--<control-1/>-->
+                        <!--<grid-3>-->
+                            <!--<grid-3-iteration>-->
+                                <!--<control-8/>-->
+                                <!--<control-9/>-->
+                            <!--</grid-3-iteration>-->
+                        <!--</grid-3>-->
+                    </section-23>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                </xf:bind>
+                <xf:bind id="section-3-bind" ref="section-3" name="section-3">
+                    <xf:bind id="section-3-iteration-bind" ref="section-3-iteration"
+                             name="section-3-iteration">
+                        <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+                            <xf:bind id="control-7-bind" ref="control-7" name="control-7" type="xf:decimal"/>
+                        </xf:bind>
+                        <xf:bind id="control-6-bind" ref="control-6" name="control-6"/>
+                    </xf:bind>
+                    
+                    
+                </xf:bind>
+                <xf:bind id="section-13-bind" ref="section-13" name="section-13"/>
+                <xf:bind id="section-8-bind" ref="section-8" name="section-8"/>
+                <xf:bind id="section-23-bind" ref="section-23" name="section-23"/>
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>migration</application-name>
+                    <form-name>test1</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+            <xf:instance id="fr-form-resources" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-7>
+                            <label>Currency</label>
+                            <hint/>
+                        </control-7>
+                        <section-13>
+                            <label>S1</label>
+                            <help/>
+                        </section-13>
+                        <control-6>
+                            <label>A</label>
+                            <hint/>
+                        </control-6>
+                        <section-1>
+                            <label>Plain</label>
+                        </section-1>
+                        <section-3>
+                            <label>Top-level repeated grid</label>
+                            <help/>
+                        </section-3>
+                        <section-8>
+                            <label>S21</label>
+                            <help/>
+                        </section-8>
+                        <section-23>
+                            <label>S22</label>
+                            <help/>
+                        </section-23>
+                        <control-1>
+                            <label/>
+                            <hint/>
+                            <alert/>
+                        </control-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-4-template">
+                <grid-4>
+                    <control-7/>
+                </grid-4>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="section-3-template">
+                <section-3-iteration>
+                    <grid-4>
+                        <control-7/>
+                    </grid-4>
+                    <control-6/>
+                </section-3-iteration>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <fr:section id="section-1-control" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-1-control" bind="control-1-bind">
+                                    <xf:label ref="$form-resources/control-1/label"/>
+                                    <xf:hint ref="$form-resources/control-1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-3-control" bind="section-3-bind" repeat="true" min="1"
+                            template="instance('section-3-template')">
+                    <xf:label ref="$form-resources/section-3/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-6-control" bind="control-6-bind">
+                                    <xf:label ref="$form-resources/control-6/label"/>
+                                    <xf:hint ref="$form-resources/control-6/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid-4-grid" bind="grid-4-bind" repeat="true" min="1"
+                             template="instance('grid-4-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             id="control-7-control"
+                                             bind="control-7-bind">
+                                    <xf:label ref="$form-resources/control-7/label"/>
+                                    <xf:hint ref="$form-resources/control-7/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:currency>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-13-control" bind="section-13-bind">
+                    <xf:label ref="$form-resources/section-13/label"/>
+                    <component:section-5 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"
+                                         xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                </fr:section>
+                <fr:section id="section-8-control" bind="section-8-bind">
+                    <xf:label ref="$form-resources/section-8/label"/>
+                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"
+                                         xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                </fr:section>
+                <fr:section id="section-23-control" bind="section-23-bind">
+                    <xf:label ref="$form-resources/section-23/label"/>
+                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/migration/library"
+                                         xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

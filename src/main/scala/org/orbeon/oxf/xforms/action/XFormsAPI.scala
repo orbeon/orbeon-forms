@@ -100,8 +100,13 @@ object XFormsAPI {
 
     // xf:insert
     // @return the inserted nodes
-    def insert[T <: Item](origin: Seq[T], into: Seq[NodeInfo] = Seq(), after: Seq[NodeInfo] = Seq(), before: Seq[NodeInfo] = Seq(), doDispatch: Boolean = true): Seq[T] = {
-
+    def insert[T <: Item](
+        origin     : Seq[T],
+        into       : Seq[NodeInfo] = Nil,
+        after      : Seq[NodeInfo] = Nil,
+        before     : Seq[NodeInfo] = Nil,
+        doDispatch : Boolean       = true
+    ): Seq[T] =
         if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
             val action = actionInterpreterDyn.value
 
@@ -122,17 +127,28 @@ object XFormsAPI {
                 true, // doClone
                 doDispatch).asInstanceOf[JList[T]].asScala
         } else
-            Seq()
-    }
+            Nil
 
     // xf:delete
-    def delete(ref: Seq[NodeInfo], doDispatch: Boolean = true): Seq[NodeInfo] = {
+    def delete(
+        ref        : Seq[NodeInfo],
+        doDispatch : Boolean = true
+    ): Seq[NodeInfo] =
+        if (ref.nonEmpty) {
+            val action = actionInterpreterDyn.value
 
-        val action = actionInterpreterDyn.value
+            val deleteInfos =
+                XFormsDeleteAction.doDelete(
+                    action map (_.containingDocument) orNull,
+                    action map (_.indentedLogger) orNull,
+                    ref.asJava,
+                    -1,
+                    doDispatch
+                )
 
-        val deleteInfos = XFormsDeleteAction.doDelete(action map (_.containingDocument) orNull, action map (_.indentedLogger) orNull, ref.asJava, -1, doDispatch)
-        deleteInfos.asScala map (_.nodeInfo)
-    }
+            deleteInfos.asScala map (_.nodeInfo)
+        } else
+            Nil
 
     // Rename an element or attribute
     // - if the name hasn't changed, don't do anything
@@ -142,7 +158,7 @@ object XFormsAPI {
         require(nodeInfo ne null)
         require(Set(ELEMENT_NODE, ATTRIBUTE_NODE)(nodeInfo.getNodeKind.toShort))
 
-        val oldName: QName = nodeInfo.qname
+        val oldName: QName = nodeInfo.uriQualifiedName
         if (oldName != newName) {
             val newNodeInfo = nodeInfo.getNodeKind match {
                 case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))

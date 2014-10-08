@@ -48,26 +48,25 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#form-metadata"/>
         <p:input name="config">
-            <root xsl:version="2.0">
+            <auth-info xsl:version="2.0">
                 <xsl:variable name="permissions"                select="/forms/form/permissions"/>
                 <xsl:variable name="operations-from-role"       select="frf:authorizedOperationsBasedOnRoles($permissions)"/>
                 <xsl:variable name="search-operations"          select="('*', 'read', 'update', 'delete')"/>
-                <xsl:variable name="authorized-based-on-role"   select="$operations-from-role = $search-operations"/>
-                <xsl:if test="not($authorized-based-on-role)">
-                    <xsl:value-of select="frf:sendError(403)"/>
-                </xsl:if>
-            </root>
+                <xsl:variable name="search-permissions"         select="$permissions/permission[p:split(@operations) = $search-operations]"/>
+                <authorized-based-on-role  ><xsl:value-of select="$operations-from-role = $search-operations"/></authorized-based-on-role>
+                <authorized-if-owner       ><xsl:value-of select="exists($search-permissions[owner])"        /></authorized-if-owner>
+                <authorized-if-group-member><xsl:value-of select="exists($search-permissions[group-member])" /></authorized-if-group-member>
+            </auth-info>
         </p:input>
-        <p:output name="data" id="check-authorized"/>
-    </p:processor>
-    <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#check-authorized"/>
+        <p:output name="data" id="auth-info"/>
     </p:processor>
 
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
                 <include>/request/headers/header[name = 'orbeon-exist-uri']</include>
+                <include>/request/headers/header[name = 'orbeon-username']</include>
+                <include>/request/headers/header[name = 'orbeon-group']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -92,7 +91,8 @@
                                                        ),
                                                        ''
                                                    )
-                                            }&amp;lang={/*/lang}" replace="instance">
+                                            }&amp;lang={/*/lang}"
+                               replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xf:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
@@ -105,6 +105,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#search-input"/>
         <p:input name="query" href="search.xml"/>
+        <p:input name="auth-info" href="#auth-info"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -143,6 +144,17 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:for-each>
+                    <!-- If we're not just authorized to do something based on ur roles, only show data for which we're owner/group-member -->
+                    <xsl:variable name="auth-info" as="element()" select="doc('input:auth-info')/auth-info"/>
+                    <xsl:if test="$auth-info/authorized-based-on-role = 'false'">
+                        and
+                        (
+                            <!-- Using string() is necessary to get around a bug in eXist (at least with 1.4.1) -->
+                            <xsl:if test="$auth-info/authorized-if-owner = 'true'"      >$metadata/username/string() = $username  </xsl:if>
+                            <xsl:if test="$auth-info/authorized-if-owner = 'true' and $auth-info/authorized-if-group-member= 'true'"> or </xsl:if>
+                            <xsl:if test="$auth-info/authorized-if-group-member= 'true'">$metadata/groupname/string() = $groupname</xsl:if>
+                        )
+                    </xsl:if>
                 </xsl:template>
                 <!-- Dynamically build detail result -->
                 <xsl:template match="details">
@@ -161,7 +173,26 @@
     <p:processor name="oxf:xforms-submission">
         <p:input name="submission" href="#submission"/>
         <p:input name="request" href="#query"/>
-        <p:output name="response" ref="data"/>
+        <p:output name="response" id="xquery-output"/>
     </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#xquery-output"/>
+        <p:input name="form-metadata" href="#form-metadata"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:variable name="permissions" select="doc('input:form-metadata')/forms/form/permissions"/>
+                <xsl:template match="document">
+                    <xsl:copy>
+                        <xsl:attribute name="operations" select="string-join(frf:allAuthorizedOperations($permissions, string(@username), string(@groupname)), ' ')"/>
+                        <xsl:apply-templates select="(@* except (@username | @groupname)) | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" ref="data"/>
+    </p:processor>
+
 
 </p:config>

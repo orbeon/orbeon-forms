@@ -19,6 +19,9 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:exist="http://exist.sourceforge.net/NS/exist"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <p:param type="input" name="instance"/>
@@ -33,6 +36,8 @@
                 <include>/request/method</include>
                 <include>/request/body</include>
                 <include>/request/headers/header[name = 'orbeon-exist-uri']</include>
+                <include>/request/headers/header[name = 'orbeon-username']</include>
+                <include>/request/headers/header[name = 'orbeon-group']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -40,14 +45,14 @@
 
     <!-- Matches form definitions, form data and attachments -->
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))</config></p:input>
+        <p:input name="config"><config>/fr/service/exist/crud((/([^/]+)/([^/]+))/((form)/[^/]+|((data)/[^/]+)/[^/]+))</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
     <!-- Matches a form data collection (for DELETE) -->
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/data/)</config></p:input>
+        <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/(data)/)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="delete-matcher-groups"/>
     </p:processor>
@@ -58,14 +63,138 @@
         <p:input name="delete-matcher-groups" href="#delete-matcher-groups"/>
         <p:input name="config">
             <request-description xsl:version="2.0">
+                <xsl:variable name="matcher-groups" select="doc('input:matcher-groups')/*/group"/>
+                <xsl:variable name="delete-matcher-groups" select="doc('input:delete-matcher-groups')/*/group"/>
                 <xsl:copy-of select="/request/*"/>
                 <exist-uri><xsl:value-of select="/request/headers/header[name = 'orbeon-exist-uri']/value"/></exist-uri>
-                <xsl:copy-of select="doc('input:matcher-groups')/*/group"/>
-                <xsl:copy-of select="doc('input:delete-matcher-groups')/*/group"/>
+                <xsl:variable name="username" select="/request/headers/header[name = 'orbeon-username']/value/text()"/>
+                <xsl:if test="exists($username)">
+                    <username><xsl:value-of select="$username"/></username>
+                    <groupname><xsl:value-of select="/request/headers/header[name = 'orbeon-group']/value"/></groupname>
+                </xsl:if>
+                <xsl:if test="exists($matcher-groups)">
+                    <collection><xsl:value-of select="concat($matcher-groups[2], '/', $matcher-groups[7])"/></collection>
+                </xsl:if>
+                <path><xsl:value-of select="($matcher-groups[1], $delete-matcher-groups[1])[1]"/></path>
+                <for-data><xsl:value-of select="$matcher-groups[8] = 'data' or $delete-matcher-groups[2] = 'data'"/></for-data>
+                <app><xsl:value-of select="$matcher-groups[3]"/></app>
+                <form><xsl:value-of select="$matcher-groups[4]"/></form>
             </request-description>
         </p:input>
         <p:output name="data" id="request-description"/>
     </p:processor>
+
+    <!--
+        1. We only do what follows when this is an operation on form data (not form definition).
+        2. Run XQuery that:
+           1. Return `<data-exists>true|false</data-exists>` telling us if there is an existing `data.xml`
+              in the collection.
+           2. Store `metadata.xml` when all the following conditions are met:
+              a. We have a username/password to store (i.e. the user is authenticated).
+              b. We have a PUT.
+              c. The "current" directory is empty, i.e. this is the first time we store something there.
+           3. If we're not storing a `metadata.xml`, return the existing `metadata.xml` if there is one.
+    -->
+    <p:choose href="#request-description">
+        <p:when test="/*/for-data = 'true'">
+
+            <p:processor name="oxf:xforms-submission">
+                <p:input name="request" transform="oxf:xslt" href="#request-description">
+                    <request xsl:version="2.0">
+                        <xsl:copy-of select="/*/(exist-uri | collection | username | groupname | method)"/>
+                        <exist:query>
+                            <exist:text>
+
+                                declare variable $frPath     := request:get-path-info();
+                                declare variable $collection := request:get-parameter('collection', '');
+                                declare variable $username   := request:get-parameter('username'  , '');
+                                declare variable $groupname  := request:get-parameter('groupname' , '');
+                                declare variable $method     := request:get-parameter('method' , '');
+
+                                declare variable $path       := concat($frPath, $collection);
+                                declare function local:createPath($parts, $count) {
+                                    concat('/', string-join(subsequence($parts, 1, $count), '/'))
+                                };
+
+                                let $dataExists :=
+                                    let $dataURI := concat($path, '/data.xml')
+                                    return element data-exists { doc-available($dataURI) }
+
+                                let $existingMetadata :=
+
+                                    if ($username != '' and $method = 'PUT' and not(xmldb:collection-available($path))) then
+
+                                        (: Create the collection, since it doesn't exist :)
+                                        let $dummy :=
+                                            let $parts := tokenize($path, '/')[. != '']
+                                            return for $i in 2 to count($parts) return
+                                                let $partialPath := local:createPath($parts, $i)
+                                                return if (xmldb:collection-available($partialPath)) then () else
+                                                    xmldb:create-collection(local:createPath($parts, $i - 1), $parts[$i])
+
+                                        (: Store metadata.xml :)
+                                        let $metadata :=
+                                                element metadata {
+                                                    element username  { $username  },
+                                                    element groupname { $groupname }
+                                                }
+                                        let $dummy := xmldb:store($path, 'metadata.xml', $metadata)
+                                        return ()
+
+                                    else
+
+                                        (: Since we're not creating a metadata.xml, return it if it exists :)
+                                        let $metadataURI := concat($path, '/metadata.xml')
+                                        return if (doc-available($metadataURI)) then doc($metadataURI) else ()
+
+                                return ($dataExists, $existingMetadata)
+
+                            </exist:text>
+                        </exist:query>
+                    </request>
+                </p:input>
+                <p:input name="submission">
+                    <xf:submission method="post"
+                                   ref="/*/exist:query"
+                                   resource="{/*/exist-uri
+                                                }?collection={    /*/collection
+                                                }&amp;username={  /*/username
+                                                }&amp;groupname={ /*/groupname
+                                                }&amp;method={    /*/method
+                                                }">
+                        <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                    </xf:submission>
+                </p:input>
+                <p:output name="response" id="exist-result"/>
+            </p:processor>
+
+            <p:processor name="oxf:unsafe-xslt">
+                <p:input name="data"><dummy/></p:input>
+                <p:input name="exist-result" href="#exist-result"/>
+                <p:input name="request-description" href="#request-description"/>
+                <p:input name="config">
+                    <xsl:stylesheet version="2.0">
+                        <xsl:template match="/">
+                            <root>
+                                <xsl:variable name="request-description" select="doc('input:request-description')/request-description"/>
+                                <xsl:variable name="exist-result" select="doc('input:exist-result')/exist:result"/>
+                                <xsl:copy-of select="ep:checkPermissions($request-description/app,
+                                                                         $request-description/form,
+                                                                         $exist-result/metadata,
+                                                                         $exist-result/data-exists = 'true',
+                                                                         $request-description/method)"
+                                        xmlns:ep="org.orbeon.oxf.fr.existdb.Permissions"/>
+                            </root>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </p:input>
+                <p:output name="data" id="check-permissions-and-set-header"/>
+            </p:processor>
+            <p:processor name="oxf:null-serializer">
+                <p:input name="data" href="#check-permissions-and-set-header"/>
+            </p:processor>
+        </p:when>
+    </p:choose>
 
     <!-- Discriminate based on the HTTP method and content type -->
     <p:choose href="#request-description">
@@ -77,7 +206,7 @@
                 <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
                     <config xsl:version="2.0">
                         <url>
-                            <xsl:value-of select="xpl:rewriteServiceURI(concat(/*/exist-uri, '/', /*/group[1]), true())"/>
+                            <xsl:value-of select="xpl:rewriteServiceURI(concat(/*/exist-uri, '/', /*/path), true())"/>
                         </url>
                         <!-- Forward the same headers that the XForms engine forwards -->
                         <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
@@ -113,7 +242,7 @@
                             <!-- NOTE: The <body> element contains the xs:anyURI type -->
                             <xf:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
-                                    resource="{/*/exist-uri}/{/*/group[1]}">
+                                    resource="{/*/exist-uri}/{/*/path}">
                                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
@@ -128,7 +257,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xf:submission method="delete" replace="none" serialization="none"
-                                    resource="{/*/exist-uri}/{/*/group[1]}">
+                                    resource="{/*/exist-uri}/{/*/path}">
                                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
@@ -143,7 +272,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xf:submission ref="/*/*[1]" method="put" replace="none"
-                                    resource="{/root/request-description/exist-uri}/{/root/request-description/group[1]}">
+                                    resource="{/root/request-description/exist-uri}/{/root/request-description/path}">
                                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>

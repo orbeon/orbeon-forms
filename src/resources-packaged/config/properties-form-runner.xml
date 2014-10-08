@@ -41,6 +41,7 @@
 
     <!-- Whether providers support permissions -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.permissions"                           value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.exist.permissions"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.permissions"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.permissions"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.db2.permissions"                         value="true"/>

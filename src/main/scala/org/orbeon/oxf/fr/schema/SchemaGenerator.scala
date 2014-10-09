@@ -40,14 +40,33 @@ object SchemaGenerator {
         val resolve = containingDocument.getControls.getCurrentControlTree.getRoot.resolve(_: String)
         val rootXsElem = handleBind(formSource, resolve, rootBind)
 
-        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                   xmlns:xf="http://www.w3.org/2002/xforms"
-                   xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" vc:minVersion="1.1">
-            {val hasXFormsNamespace = rootXsElem.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
-        if (hasXFormsNamespace)
-                <xs:import namespace="http://www.w3.org/2002/xforms"
-                           schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>}{rootXsElem}
-        </xs:schema>
+        val schemaElem =
+            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                       xmlns:xf="http://www.w3.org/2002/xforms"
+                       xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning">
+                {
+                    val hasXFormsNamespace = rootXsElem.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
+                    if (hasXFormsNamespace)
+                            <xs:import namespace="http://www.w3.org/2002/xforms"
+                                       schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
+                }
+                {rootXsElem}
+            </xs:schema>
+
+
+        // On add the vc:minVersion="1.1" if we're using a 1.1 feature: the xs:all containing a repeated grid
+        val hasAllWithChildRepeatedGrid =
+            rootXsElem.descendant_or_self.exists { xsElem ⇒
+                def isXsAll              = xsElem.label == "all"
+                def hasRepeatedGridChild = xsElem.child.exists(_.attribute("minOccurs").isDefined)
+                isXsAll && hasRepeatedGridChild
+            }
+        if (hasAllWithChildRepeatedGrid) {
+            val minVersion = scala.xml.Attribute(Some("vc"), "minVersion", scala.xml.Text("1.1"), Null)
+            schemaElem % minVersion
+        } else {
+            schemaElem
+        }
     }
 
     // Recursive function generating an xs:element from an xf:bind
@@ -303,11 +322,10 @@ object SchemaGenerator {
         // Recurse on children if any
         childrenBinds flatMap (handleBind(formSource, newResolve, _)) match {
             case Nil ⇒ xsElem
-            case xsElems ⇒ xsElem.copy(child = <xs:complexType>
-                <xs:all>
-                    {xsElems}
-                </xs:all>
-            </xs:complexType>)
+            case xsElems ⇒
+                // With 1 child, use xs:sequence instead of xs:all, to give the schema a chance to be 1.0 compliant
+                val container = if (xsElems.length == 1) <xs:sequence/> else <xs:all/>
+                xsElem.copy(child = <xs:complexType> { container.copy(child = xsElems) } </xs:complexType>)
         }
     }
 }

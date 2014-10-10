@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.fr.relational
 
+import org.orbeon.oxf.fr.DataMigration
+import org.orbeon.oxf.util.ScalaUtils
+
 import collection.JavaConverters._
 import java.util.{List ⇒ JList}
 import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import java.sql.Connection
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fb.FormBuilder._
 
 object Index {
 
@@ -41,20 +44,34 @@ object Index {
 
         // Controls in the view, with the fr-summary or fr-search class
         val indexedControlElements =  {
-            val body = formDoc \ "*:html" \ "*:body"
-            val allControls = body \\ * filter (_ \@ "bind" nonEmpty)
+            val allControls = getAllControlsWithIds(formDoc) filter (_ \@ "bind" nonEmpty)
             allControls filter (_.attClasses & Set("fr-summary", "fr-search") nonEmpty)
         }
+
+        val migrationPaths =
+            metadataInstanceRoot(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
+            DataMigration.decodeMigrationsFromJSON map { case (path, iterationName) ⇒
+                ScalaUtils.split[List](path, "/")
+            }
 
         indexedControlElements map { control ⇒
             val controlName = getControlName(control)
             val bindForControl = findBindByName(formDoc, controlName).get
             val binds = (bindForControl ancestorOrSelf "*:bind").reverse.tail // skip root bind pointing to instance
+            val bindRefs = binds map (_.attValue("ref")) toList
+
+            // Adjust the search paths if data migration is present by dropping the repeated grid iteration element
+            val adjustedBindRefs =
+                if (migrationPaths exists (bindRefs.startsWith(_)))
+                    bindRefs.dropRight(2) ::: bindRefs.last :: Nil
+                else
+                    bindRefs
+
             IndexedControl(
                 name        = controlName,
                 inSearch    = control.attClasses("fr-search"),
                 inSummary   = control.attClasses("fr-summary"),
-                xpath       = binds map (_.attValue("ref") + "[1]") mkString "/",
+                xpath       = adjustedBindRefs map (_ + "[1]") mkString "/",
                 xsType      = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
                 control     = control.localname,
                 htmlLabel   = hasHTMLMediatype(control \ (XF → "label"))

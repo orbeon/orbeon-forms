@@ -87,10 +87,9 @@ trait FormRunnerActions {
             val migrationMapOpt =
                 for {
                     instance  ← metadataInstance
-                    migration ← instance.rootElement firstChild "migration"
-                    if migration.attValue("version") == "4.8.0"
+                    migration ← DataMigration.migrationMapFromMetadata(instance.rootElement)
                 } yield
-                    migration.getStringValue
+                    migration
 
             val dataMaybeMigrated =
                 migrationMapOpt match {

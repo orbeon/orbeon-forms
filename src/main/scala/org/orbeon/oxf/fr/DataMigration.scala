@@ -67,6 +67,9 @@ object DataMigration {
 
     import org.orbeon.oxf.xforms.action.XFormsAPI._
 
+    def migrationMapFromMetadata(rootElement: NodeInfo) =
+        rootElement firstChild "migration" filter (_.attValue("version") == "4.8.0") map (_.stringValue)
+
     def migrateDataTo(data: DocumentInfo, jsonMigrationMap: String): DocumentInfo = {
 
         val mutableData = TransformerUtils.extractAsMutableDocument(data)

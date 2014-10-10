@@ -73,6 +73,7 @@ BEGIN
         :new.xml_clob := NULL;
     END IF;
 END;
+/
 
 CREATE OR REPLACE TRIGGER orbeon_form_definition_xml
          BEFORE INSERT ON orbeon_form_definition
@@ -83,3 +84,4 @@ BEGIN
         :new.xml_clob := NULL;
     END IF;
 END;
+/

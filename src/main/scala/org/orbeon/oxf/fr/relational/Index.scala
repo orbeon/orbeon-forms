@@ -13,20 +13,24 @@
  */
 package org.orbeon.oxf.fr.relational
 
+import java.sql.Connection
+
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.util.ScalaUtils
-
-import collection.JavaConverters._
-import java.util.{List ⇒ JList}
-import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
-import java.sql.Connection
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fb.FormBuilder._
 
 object Index {
 
-    def updateIndex(connection: Connection, appName: String, formName: String, documentId: String, formDoc: DocumentInfo, dataDoc: DocumentInfo): Unit = {
-
+    def updateIndex(
+        connection : Connection,
+        appName    : String,
+        formName   : String,
+        documentId : String,
+        formDoc    : DocumentInfo,
+        dataDoc    : DocumentInfo
+    ): Unit = {
         // Remove any existing data we might have in the index about this document
         val cleanStatement = connection.prepareStatement("""delete from orbeon_i_control_text where document_id = ?""")
         cleanStatement.setString(1, documentId)
@@ -55,10 +59,11 @@ object Index {
             }
 
         indexedControlElements map { control ⇒
-            val controlName = getControlName(control)
+
+            val controlName    = getControlName(control)
             val bindForControl = findBindByName(formDoc, controlName).get
-            val binds = (bindForControl ancestorOrSelf "*:bind").reverse.tail // skip root bind pointing to instance
-            val bindRefs = binds map (_.attValue("ref")) toList
+            val binds          = (bindForControl ancestorOrSelf "*:bind").reverse.tail // skip instance root bind
+            val bindRefs       = binds map (_.attValue("ref")) toList
 
             // Adjust the search paths if data migration is present by dropping the repeated grid iteration element
             val adjustedBindRefs =
@@ -68,20 +73,35 @@ object Index {
                     bindRefs
 
             IndexedControl(
-                name        = controlName,
-                inSearch    = control.attClasses("fr-search"),
-                inSummary   = control.attClasses("fr-summary"),
-                xpath       = adjustedBindRefs map (_ + "[1]") mkString "/",
-                xsType      = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
-                control     = control.localname,
-                htmlLabel   = hasHTMLMediatype(control \ (XF → "label"))
+                name      = controlName,
+                inSearch  = control.attClasses("fr-search"),
+                inSummary = control.attClasses("fr-summary"),
+                xpath     = adjustedBindRefs map (_ + "[1]") mkString "/",
+                xsType    = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
+                control   = control.localname,
+                htmlLabel = hasHTMLMediatype(control \ (XF → "label"))
              )
         }
     }
 
-    case class IndexedControl(name: String, inSearch: Boolean, inSummary: Boolean, xpath: String, xsType: String, control: String, htmlLabel: Boolean) {
+    case class IndexedControl(
+        name      : String,
+        inSearch  : Boolean,
+        inSummary : Boolean,
+        xpath     : String,
+        xsType    : String,
+        control   : String,
+        htmlLabel : Boolean
+    ) {
         def toXML: NodeInfo =
-            <query name={name} path={xpath} type={xsType} control={control} search-field={inSearch.toString}
-                   summary-field={inSummary.toString} match="substring" html-label={htmlLabel.toString}/>
+            <query
+                name={name}
+                path={xpath}
+                type={xsType}
+                control={control}
+                search-field={inSearch.toString}
+                summary-field={inSummary.toString}
+                match="substring"
+                html-label={htmlLabel.toString}/>
     }
 }

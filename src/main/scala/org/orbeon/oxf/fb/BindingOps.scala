@@ -50,7 +50,7 @@ trait BindingOps {
     def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
         val metadata = bindingMetadata(binding)
         val typeFromDatatype = ("", "type") → ((metadata / "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
-        val bindAttributes = metadata / "*:templates" / "*:bind" /@ @* map (att ⇒ att.qname →  att.stringValue)
+        val bindAttributes = metadata / "*:templates" / "*:bind" /@ @* map (att ⇒ att.uriQualifiedName →  att.stringValue)
 
         typeFromDatatype +: bindAttributes filterNot
             { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
@@ -63,7 +63,7 @@ trait BindingOps {
         bindings find (b ⇒
             findViewTemplate(b) match {
                 case Some(viewTemplate) ⇒
-                    viewTemplate.qname                         == controlElement.qname &&
+                    viewTemplate.uriQualifiedName                         == controlElement.uriQualifiedName &&
                     viewTemplate.att("appearance").stringValue == controlElement.att("appearance").stringValue
                 case _ ⇒ false
             })

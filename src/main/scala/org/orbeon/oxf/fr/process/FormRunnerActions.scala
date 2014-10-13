@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import SimpleProcess._
 import FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
 import org.apache.commons.lang3.StringUtils
@@ -84,9 +84,23 @@ trait FormRunnerActions {
             val modeElement = parametersInstance.rootElement \ "mode"
             val isNew       = modeElement.stringValue == "new"
 
+            val migrationMapOpt =
+                for {
+                    instance  ← metadataInstance
+                    migration ← instance.rootElement firstChild "migration"
+                    if migration.attValue("version") == "4.8.0"
+                } yield
+                    migration.getStringValue
+
+            val dataMaybeMigrated =
+                migrationMapOpt match {
+                    case Some(map) ⇒ DataMigration.migrateDataFrom(formInstance.root, map)
+                    case None      ⇒ formInstance.root
+                }
+
             // Save
             val (beforeURLs, afterURLs, _) = putWithAttachments(
-                data              = formInstance.root,
+                data              = dataMaybeMigrated,
                 toBaseURI         = "", // local save
                 fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
                 toBasePath        = createFormDataBasePath(app, form,   isDraft, document),

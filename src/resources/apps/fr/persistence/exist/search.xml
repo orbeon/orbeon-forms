@@ -38,6 +38,8 @@
         let $value := request:get-parameter('value', '')
         (: Special language variable used for now by Form Builder :)
         let $fb-lang := request:get-parameter('lang', 'en')
+        let $username  := request:get-header('Orbeon-Username')
+        let $groupname := request:get-header('Orbeon-Group')
 
         (: Get all query results, independently from paging :)
         let $search-results :=
@@ -47,12 +49,14 @@
                 let $collection-name := string-join(tokenize($resource-uri, '/')[position() lt last()], '/')
                 let $resource-name := tokenize($resource-uri, '/')[last()]
                 let $last-modified := xmldb:last-modified($collection-name, $resource-name)
+                let $metadata-uri := concat($collection-name, '/metadata.xml')
+                let $metadata := if (doc-available($metadata-uri)) then doc($metadata-uri)/metadata else ()
             where $resource-name = 'data.xml' ]]><where/><![CDATA[
             order by $last-modified descending
             return $d
 
         (: Count all data.xml documents in this and descendant collections :)
-        let $total := count(for $d in collection() where ends-with(document-uri($d), 'data.xml') return 1)
+        let $total := count(for $d in collection() where ends-with(document-uri($d), '/data.xml') return 1)
 
         (: Return actual results :)
         return
@@ -65,8 +69,14 @@
                         let $resource-name := tokenize($resource-uri, '/')[last()]
                         let $resource-id := tokenize($resource-uri, '/')[last() - 1]
                         let $last-modified := xmldb:last-modified($collection-name, $resource-name)
+                        let $metadata-uri := concat($collection-name, '/metadata.xml')
+                        let $metadata := if (doc-available($metadata-uri)) then doc($metadata-uri)/metadata else ()
                     return
-                        <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}">
+                        <document created="{xmldb:created($collection-name, $resource-name)}"
+                                  last-modified="{$last-modified}"
+                                  name="{$resource-id}"
+                                  username="{$metadata/username}"
+                                  groupname="{$metadata/groupname}">
                             <details>
                                 ]]><details/><![CDATA[
                             </details>

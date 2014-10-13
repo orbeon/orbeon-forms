@@ -54,7 +54,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Find data holders (there can be more than one with repeats)
     def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
-        findBindByName(inDoc, controlName) map { bind ⇒
+        findDataHoldersPathStatically(inDoc, controlName) map { case (bind, path) ⇒
             // From bind, infer path by looking at ancestor-or-self binds
             val bindRefs = (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail
 
@@ -74,6 +74,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             ).asInstanceOf[Seq[NodeInfo]]
         } getOrElse
             Seq.empty
+
+    def findDataHoldersPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, String)] = {
+        findBindByName(inDoc, controlName) map { bind ⇒
+
+            val bindRefsFromRootExcluded =
+                (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail
+
+            (bind, bindRefsFromRootExcluded mkString "/")
+        }
+    }
 
     def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 

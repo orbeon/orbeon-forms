@@ -151,6 +151,7 @@ object XPath {
     def newConfiguration =
         new Configuration {
             setNamePool(GlobalNamePool)
+            setDocumentNumberAllocator(GlobalConfiguration.getDocumentNumberAllocator)
             registerExternalObjectModel(GlobalDataConverter)
         }
 

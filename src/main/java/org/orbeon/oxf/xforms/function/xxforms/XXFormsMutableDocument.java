@@ -13,10 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.dom4j.Document;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
@@ -36,15 +34,10 @@ public class XXFormsMutableDocument extends XFormsFunction {
         final Expression itemExpression = argument[0];
         final Item item = itemExpression.evaluateItem(xpathContext);
 
-        // Make sure it is a NodeInfo
-        if (!(item instanceof NodeInfo)) {
+        if (item instanceof NodeInfo) {
+            return TransformerUtils.extractAsMutableDocument((NodeInfo) item);
+        } else {
             return null;
         }
-
-        // Convert and return
-        final NodeInfo nodeInfo = (NodeInfo) item;
-        final Document document = TransformerUtils.tinyTreeToDom4j(nodeInfo);
-
-        return new DocumentWrapper(document, null, xpathContext.getConfiguration());
     }
 }

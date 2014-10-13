@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.saxon.om.NodeInfo
@@ -114,6 +114,10 @@ trait FormRunnerMetadata {
                         for ((lang, resourcesRoot) ← iterateResources(resourcesInstance))
                         yield
                             <resources lang={lang}>{resourcesForControl(staticControl, lang, resourcesRoot, controlName)}</resources>
+                    }{
+                        for (valueControl ← collectByErasedType[XFormsValueControl](control).toList)
+                        yield
+                            <value>{valueControl.getValue}</value>
                     }</control>
 
         import scala.{xml ⇒ sxml}

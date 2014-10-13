@@ -218,16 +218,17 @@ trait FormRunnerPersistence {
     ).unzip3
 
     def putWithAttachments(
-            data: DocumentInfo,
-            toBaseURI: String,
-            fromBasePath: String,
-            toBasePath: String,
-            filename: String,
-            commonQueryString: String,
-            forceAttachments: Boolean,
-            username: Option[String] = None,
-            password: Option[String] = None,
-            formVersion: Option[String] = None) = {
+        data              : DocumentInfo,
+        toBaseURI         : String,
+        fromBasePath      : String,
+        toBasePath        : String,
+        filename          : String,
+        commonQueryString : String,
+        forceAttachments  : Boolean,
+        username          : Option[String] = None,
+        password          : Option[String] = None,
+        formVersion       : Option[String] = None
+    ) = {
 
         // Find all instance nodes containing file URLs we need to upload
         val (uploadHolders, beforeURLs, afterURLs) =

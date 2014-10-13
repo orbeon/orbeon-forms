@@ -15,24 +15,32 @@ package org.orbeon.oxf.test
 
 import org.dom4j.{Document ⇒ JDocument, Element ⇒ JElement}
 import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.om.DocumentInfo
 import org.scalatest.junit.AssertionsForJUnit
 
 trait TestSupport extends AssertionsForJUnit {
-    def assertXMLDocumentsIgnoreNamespacesInScope(left: JDocument, right: JDocument) = {
+
+    def assertXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Unit =
+        assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
+
+    def assertXMLDocumentsIgnoreNamespacesInScope(left: JDocument, right: JDocument): Unit = {
+
         val result = Dom4j.compareDocumentsIgnoreNamespacesInScope(left, right)
 
-        // So that we get a nicer message
+        // Produce a nicer message
         if (! result) {
             assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
             assert(condition = false)
         }
     }
 
-    def assertXMLElementsIgnoreNamespacesInScopeCollapse(left: JElement, right: JElement) = {
+    def assertXMLElementsIgnoreNamespacesInScopeCollapse(left: JElement, right: JElement): Unit = {
+
         val result = Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
 
-        // So that we get a nicer message
+        // Produce a nicer message
         if (! result) {
             assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
             assert(condition = false)

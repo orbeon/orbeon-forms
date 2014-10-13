@@ -136,11 +136,18 @@
                                 <xf:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/>
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
-                                <xf:action if="$is-section-component" type="xpath">toolboxOps:insertNewSectionTemplate($model, $binding)</xf:action>
+                                <xf:action if="$is-section-component" type="xpath">
+                                    toolboxOps:insertNewSectionTemplate($model, $binding)
+                                </xf:action>
                                 <xf:action if="not($is-section-component)">
-                                    <xf:action type="xpath">toolboxOps:insertNewControl($model, $binding)</xf:action>
-                                    <xf:var name="effective-id" value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
-                                    <xf:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
+                                    <xf:action type="xpath">
+                                        toolboxOps:insertNewControl($model, $binding)
+                                    </xf:action>
+                                    <xf:var
+                                        name="effective-id"
+                                        value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                    <xf:load
+                                        resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
                                 </xf:action>
                             </xf:action>
                         </xf:trigger>

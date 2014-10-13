@@ -25,6 +25,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
+import scala.collection.generic.SeqFactory
 import scala.util.control.NonFatal
 
 trait FormRunnerPermissions {
@@ -163,28 +164,29 @@ trait FormRunnerPermissions {
         assert(dataUsername != null)
         assert(dataGroupname != null)
 
-        def operations(header: String, dataUserInfo: String, condition: String): Seq[String] = {
+        def operations(headerWithUsernameOrGroupname: String, dataUsernameOrGroupname: String, condition: String): Seq[String] = {
             val request = NetUtils.getExternalContext.getRequest
-            val headerValue = request.getHeaderValuesMap.asScala.get(header).toSeq.flatten.headOption
-            headerValue
-                    // Does the user info from the header match the user info on the data
-                    .filter(_ == dataUserInfo)
-                    // If it does, return the operation the owner or group-member can perform
-                    .map(_ ⇒ (permissionsElement \ "permission")
-                    .filter(p ⇒ p \ * forall (_.localname == condition))
-                    .flatMap(permissionOperations))
-                    .getOrElse(Seq.empty)
+            val maybeCurrentUsernameOrGroupname = request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).toSeq.flatten.headOption
+            maybeCurrentUsernameOrGroupname match {
+                case None ⇒ Seq.empty
+                case Some(currentUsernameOrGroupname) ⇒
+                    if (currentUsernameOrGroupname != dataUsernameOrGroupname) {
+                        Seq.empty
+                    } else {
+                        val allPermissions = permissionsElement \ "permission"
+                        val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
+                        permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
+                    }
+            }
         }
 
         val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
         rolesOperations match {
-            case Seq("*") ⇒ rolesOperations
+            case Seq("*") ⇒ Seq("*")
             case _ ⇒
-                val dataOperations =
-                    Seq((OrbeonUsernameHeaderName, dataUsername,  "owner"),
-                        (OrbeonGroupHeaderName,    dataGroupname, "group-member"))
-                            .flatMap(Function.tupled(operations _))
-                (rolesOperations ++ dataOperations).distinct
+                val ownerOperations       = operations(OrbeonUsernameHeaderName, dataUsername,  "owner")
+                val groupMemberOperations = operations(OrbeonGroupHeaderName,    dataGroupname, "group-member")
+                (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
         }
     }
 

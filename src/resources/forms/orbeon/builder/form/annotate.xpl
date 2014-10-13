@@ -20,15 +20,16 @@
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#data"/>
+        <p:input name="bindings" href="#bindings"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0"
-                            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                            xmlns:xh="http://www.w3.org/1999/xhtml"
-                            xmlns:xf="http://www.w3.org/2002/xforms"
-                            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                xmlns:xh="http://www.w3.org/1999/xhtml"
+                xmlns:xf="http://www.w3.org/2002/xforms"
+                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -40,10 +41,10 @@
                               select="count(/*/xh:body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
 
                 <!-- For legacy grid migration -->
-                <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                              name="legacy-grid-elements"
-                              select="fbf:legacyGridBindsHoldersAndTemplates(.)/generate-id()"/>
-                
+                <xsl:variable xmlns:migration="java:org.orbeon.oxf.fb.MigrationOps"
+                              name="legacy-grid-binds-templates"
+                              select="migration:findLegacyGridBindsAndTemplates(/)/generate-id()"/>
+
                 <!-- All unneeded help elements -->
                 <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
                               name="unneeded-elements"
@@ -89,15 +90,31 @@
                     <xf:group class="fb-body">
                         <xsl:copy-of select="namespace::*"/>
                         <!-- Scope $lang which is the language of the form being edited -->
-                        <xf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
+                        <xf:var
+                            name="lang"
+                            value="xxf:get-variable('fr-form-model', 'fb-lang')"
+                            as="element()"
+                            class="fb-annotation"/>
                         <!-- Scope $form-resources: resources of the form being edited.
-                             Use the same logic as in resources-model. In the builder, we don't have a resources-model running
-                             for the form being edited, so we duplicate this here. -->
-                        <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
+                             Use the same logic as in resources-model. In the builder, we don't have a resources-model
+                             running for the form being edited, so we duplicate this here. -->
+                        <xf:var
+                            name="form-resources"
+                            value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]"
+                            as="element(resource)?"
+                            class="fb-annotation"/>
                         <!-- Scope $fr-resources for Form Runner resources -->
-                        <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>
+                        <xf:var
+                            name="fr-resources"
+                            value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"
+                            as="element(resource)?"
+                            class="fb-annotation"/>
                         <!-- Scope $fb-resources for Form Builder resources -->
-                        <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
+                        <xf:var
+                            name="fb-resources"
+                            value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"
+                            as="element(resource)?"
+                            class="fb-annotation"/>
 
                         <!-- Apply all the content -->
                         <xsl:apply-templates select="node()" mode="within-body"/>
@@ -155,6 +172,7 @@
 
                 <!-- Add model actions -->
                 <xsl:template match="xf:model[generate-id() = generate-id($model)]">
+
                     <xsl:copy>
                         <!-- Namespace for fb:required -->
                         <xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>
@@ -302,7 +320,7 @@
                 <!-- Migrate grid format -->
 
                 <!-- NOTE: This shouldn't intersect with xf:bind[@constraint ...] above -->
-                <xsl:template match="xf:bind[generate-id() = $legacy-grid-elements]"
+                <xsl:template match="xf:bind[generate-id() = $legacy-grid-binds-templates]"
                               mode="within-model">
                     <xsl:copy>
                         <xsl:apply-templates select="@*" mode="#current"/>
@@ -320,11 +338,14 @@
                 </xsl:template>
 
                 <!-- Update template -->
-                <xsl:template match="xf:model/xf:instance[generate-id() = $legacy-grid-elements]"
+                <xsl:template match="xf:model/xf:instance[generate-id() = $legacy-grid-binds-templates]"
                               mode="within-model">
                     <xsl:copy>
                         <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:variable name="iteration-name" select="fbf:defaultIterationName(fbf:controlNameFromId(@id))" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                        <xsl:variable
+                            name="iteration-name"
+                            select="fbf:defaultIterationName(fbf:controlNameFromId(@id))"
+                            xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
                         <xsl:element name="{$iteration-name}">
                             <xsl:apply-templates select="*/(@* | node())" mode="#current"/>
                         </xsl:element>
@@ -336,28 +357,30 @@
                               mode="within-model">
                     <xsl:copy>
                         <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:apply-templates select="node()" mode="within-instance"/>
-                    </xsl:copy>
-                </xsl:template>
 
-                <xsl:template match="*[generate-id() = $legacy-grid-elements]"
-                              mode="within-instance">
-                    <xsl:variable name="node"       select="."/>
-                    <xsl:variable name="node-name"  select="node-name($node)"/>
-                    <xsl:variable name="local-name" select="local-name($node)"/>
-                    <xsl:if test="empty($node/preceding-sibling::*[node-name(.) = $node-name])">
-                        <!-- This is the first element with this name at this level. We process it, and skip the other
-                             ones at this level -->
-                        <xsl:copy>
-                            <xsl:apply-templates select="@*" mode="#current"/>
-                            <xsl:variable name="iteration-name" select="fbf:defaultIterationName($local-name)" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
-                            <xsl:for-each select="$node, $node/following-sibling::*[node-name(.) = $node-name]">
-                                <xsl:element name="{$iteration-name}">
-                                    <xsl:apply-templates select="@* | node()" mode="#current"/>
-                                </xsl:element>
-                            </xsl:for-each>
-                        </xsl:copy>
-                    </xsl:if>
+                        <xsl:variable
+                            name="migration"
+                            select="migration:buildGridMigrationMap(/, (), true())"
+                            xmlns:migration="java:org.orbeon.oxf.fb.MigrationOps"/>
+
+                        <xsl:choose>
+                            <xsl:when test="normalize-space($migration)">
+                                <!-- Update inline instance using migration map -->
+                                <xsl:variable name="instance" as="document-node()">
+                                    <xsl:document>
+                                        <xsl:copy-of select="*[1]"/>
+                                    </xsl:document>
+                                </xsl:variable>
+                                <xsl:copy-of
+                                    select="migration:migrateDataTo($instance, $migration)/*"
+                                    xmlns:migration="java:org.orbeon.oxf.fr.DataMigration"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- Leave inline instance unchanged -->
+                                <xsl:apply-templates select="node()" mode="#current"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:copy>
                 </xsl:template>
 
             </xsl:stylesheet>
@@ -367,10 +390,10 @@
 
     <!-- Make sure XBL bindings for section templates are present -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="add-template-bindings.xpl"/>
-        <p:input name="data" href="#annotated"/>
-        <p:input name="bindings" href="#bindings"/>
-        <p:output name="data" ref="data"/>
+        <p:input  name="config"   href="add-template-bindings.xpl"/>
+        <p:input  name="data"     href="#annotated"/>
+        <p:input  name="bindings" href="#bindings"/>
+        <p:output name="data"     ref="data"/>
     </p:processor>
 
 </p:config>

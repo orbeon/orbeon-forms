@@ -102,7 +102,8 @@ trait FormRunnerActions {
             )
 
             // If we were in new mode, now we must be in edit mode
-            if (isNew && ! isDraft) setvalue(modeElement, "edit")
+            if (isNew && ! isDraft && supportsUpdate)
+                setvalue(modeElement, "edit")
 
             // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
             // before calling the submission

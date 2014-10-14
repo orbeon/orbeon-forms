@@ -47,8 +47,11 @@ object Index {
     def findIndexedControls(formDoc: DocumentInfo): Seq[IndexedControl] = {
 
         // Controls in the view, with the fr-summary or fr-search class
-        val indexedControlElements =  {
-            val allControls = getAllControlsWithIds(formDoc) filter (_ \@ "bind" nonEmpty)
+        val indexedControlElements = {
+            // NOTE: Can't use getAllControlsWithIds() because Form Builder's form.xhtml doesn't follow the same body
+            // pattern.
+            val body = formDoc \ "*:html" \ "*:body"
+            val allControls = body \\ * filter (_ \@ "bind" nonEmpty)
             allControls filter (_.attClasses & Set("fr-summary", "fr-search") nonEmpty)
         }
 

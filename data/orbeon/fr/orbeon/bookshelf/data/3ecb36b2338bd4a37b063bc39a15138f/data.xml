@@ -11,6 +11,10 @@
         <image filename="JiaXu.jpg" mediatype="image/jpeg" size="26371">/fr/service/persistence/crud/orbeon/bookshelf/data/3ecb36b2338bd4a37b063bc39a15138f/f78695d61455878dcbb4e9b2880117ec.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

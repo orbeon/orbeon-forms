@@ -10,6 +10,10 @@
         <image filename="TeamOfRivals.jpg" mediatype="image/jpeg" size="22870">/fr/service/persistence/crud/orbeon/bookshelf/data/24565d3894e9d156042d60f9a70f3d74/6513539ce181e43c31ca42accd47b6ac.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

@@ -637,9 +637,7 @@
                                        else if ($button-name = 'wizard-next')
                                        then xxf:binding('fr-wizard-next')
                                        else xxf:instance('fr-triggers-instance')/*[name() = (
-                                            if ($button-name = ('edit', 'workflow-edit'))
-                                            then 'can-update'
-                                            else if ($button-name = 'summary')
+                                            if ($button-name = 'summary')
                                             then 'can-access-summary'
                                             else if ($button-name = 'refresh')
                                             then 'noscript'

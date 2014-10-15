@@ -74,15 +74,55 @@
                     <xsl:choose>
                         <xsl:when test="$classes = 'xbl-component'">
                             <!-- XBL component -->
-                            <xsl:variable name="component-name" select="for $c in $classes return if (starts-with($c, 'xbl-') and $c != 'xbl-component') then substring-after($c, 'xbl-') else ()"/>
-                            <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
-                            <xsl:copy-of select="frf:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                            <xsl:variable
+                                name="component-name"
+                                select="
+                                    for $c in $classes[starts-with(., 'xbl-') and not(. = ('xbl-component', 'xbl-focusable'))][1]
+                                        return substring-after($c, 'xbl-')"/>
+
+                            <xsl:variable
+                                name="type"
+                                select="
+                                    (
+                                        for $c in $classes[starts-with(., 'xforms-type-')]
+                                            return substring-after($c, 'xforms-type-'),
+                                        'string'
+                                    )[1]"/>
+
+                            <xsl:copy-of
+                                select="
+                                    frf:getPDFFormatExpression(
+                                        $pdfFormats,
+                                        $parameters/app,
+                                        $parameters/form,
+                                        $component-name,
+                                        $type
+                                    )"/>
                         </xsl:when>
                         <xsl:when test="$classes = $control-classes">
                             <!-- Built-in controls -->
-                            <xsl:variable name="component-name" select="$control-classes[. = $classes][1]"/>
-                            <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
-                            <xsl:copy-of select="frf:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                            <xsl:variable
+                                name="component-name"
+                                select="$control-classes[. = $classes][1]"/>
+
+                            <xsl:variable
+                                name="type"
+                                select="
+                                    (
+                                        for $c in $classes[starts-with(., 'xforms-type-')]
+                                            return substring-after($c, 'xforms-type-'),
+                                        'string'
+                                    )[1]"/>
+
+                            <xsl:copy-of
+                                select="
+                                    frf:getPDFFormatExpression(
+                                        $pdfFormats,
+                                        $parameters/app,
+                                        $parameters/form,
+                                        $component-name,
+                                        $type
+                                    )"/>
                         </xsl:when>
                     </xsl:choose>
                 </xsl:variable>

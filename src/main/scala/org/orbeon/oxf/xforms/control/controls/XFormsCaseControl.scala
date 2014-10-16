@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.CaseControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -25,6 +26,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  */
 class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
+
+    override type Control <: CaseControl
 
     require(parent.isInstanceOf[XFormsSwitchControl])
 
@@ -47,7 +50,6 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
         //
         // Ideally, XPath dependencies should make this smarter.
         //
-        containingDocument.requireRefresh()
         getSwitch.setSelectedCase(this)
     }
 

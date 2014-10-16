@@ -88,11 +88,41 @@ object ControlAnalysisFactory {
         override protected val allowedExtensionAttributes = Set(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
     }
 
+    class SwitchControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis],
+        preceding          : Option[ElementAnalysis],
+        scope              : Scope
+    ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+         with OptionalSingleNode
+         with StaticLHHASupport
+         with ChildrenBuilderTrait
+         with AppearanceTrait {
+
+        val caseref = Option(element.attributeValue(CASEREF_QNAME))
+
+        lazy val caseControls = children collect { case c: CaseControl ⇒ c }
+        lazy val caseIds      = caseControls map (_.staticId) toSet
+    }
+
+    class CaseControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis],
+        preceding          : Option[ElementAnalysis],
+        scope              : Scope
+    ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+         with OptionalSingleNode
+         with StaticLHHASupport
+         with ChildrenBuilderTrait {
+
+        val selected = Option(element.attributeValue(SELECTED_QNAME))
+    }
+
     private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _) with ChildrenActionsTrait
     private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _)
     private val ValueControlFactory   : ControlFactory = new InputValueControl(_, _, _, _, _)
-    private val SwitchControlFactory  : ControlFactory = new ContainerControl(_, _, _, _, _) with OptionalSingleNode with StaticLHHASupport with ChildrenBuilderTrait with AppearanceTrait
-    private val CaseControlFactory    : ControlFactory = new ContainerControl(_, _, _, _, _) with OptionalSingleNode with StaticLHHASupport with ChildrenBuilderTrait
 
     class GroupControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends ContainerControl(staticStateContext, element, parent, preceding, scope)
@@ -142,8 +172,8 @@ object ControlAnalysisFactory {
         XXFORMS_ATTRIBUTE_QNAME       → (new AttributeControl(_, _, _, _, _)),
         // Container controls
         XFORMS_GROUP_QNAME            → (new GroupControl(_, _, _, _, _)),
-        XFORMS_SWITCH_QNAME           → SwitchControlFactory,
-        XFORMS_CASE_QNAME             → CaseControlFactory,
+        XFORMS_SWITCH_QNAME           → (new SwitchControl(_, _, _, _, _)),
+        XFORMS_CASE_QNAME             → (new CaseControl(_, _, _, _, _)),
         XXFORMS_DIALOG_QNAME          → DialogControlFactory,
         // Dynamic control
         XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _) with RequiredSingleNode),

@@ -14,17 +14,22 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.{util ⇒ ju}
+
 import org.dom4j.Element
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, SwitchControl}
 import org.orbeon.oxf.xforms.control.{ControlLocalSupport, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
-import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
+import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.saxon.om.Item
 import org.xml.sax.helpers.AttributesImpl
 
 /**
@@ -35,12 +40,18 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
+    override type Control <: SwitchControl
+
     // Initial local state
     setLocal(new XFormsSwitchControlLocal)
+
+    private var _caserefBinding: Option[Item] = None
 
     // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
     override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
         super.onCreate(restoreState, state)
+
+        _caserefBinding = evaluateCaseRefBinding
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
         state match {
@@ -49,28 +60,80 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
             case None if restoreState ⇒
                 // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
                 // particular control might not be found.
-                setLocal(new XFormsSwitchControlLocal(findDefaultSelectedCaseId))
+                setLocal(new XFormsSwitchControlLocal(findInitialSelectedCaseId))
             case None ⇒
                 val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
-                local.selectedCaseControlId = findDefaultSelectedCaseId
+                local.selectedCaseControlId = findInitialSelectedCaseId
+                // TODO: deferred event dispatch for xforms-select/deselect???
         }
     }
 
-    private def findDefaultSelectedCaseId: String = {
+    override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
+        super.onBindingUpdate(oldBinding, newBinding)
 
-        // At this point, the children cases are not created yet
+        _caserefBinding = evaluateCaseRefBinding
 
-        // TODO: Use ElementAnalysis instead when possible
-        val caseElements = Dom4j.elements(element, XFORMS_CASE_QNAME)
+        if (staticControl.caseref.isDefined) {
+            val newCaseId = caseIdFromCaseRefBinding getOrElse firstCaseId
+            val local     = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
 
-        def isDefaultSelected(element: Element) =
-            Option(element.attributeValue("selected")) exists evaluateBooleanAvt
+//            val previouslySelectedCaseControl = selectedCase.get
+            local.selectedCaseControlId = newCaseId
+        }
 
-        caseElements find
-            isDefaultSelected map
-            XFormsUtils.getElementId getOrElse
-            XFormsUtils.getElementId(caseElements(0))
+        // TODO: deferred event dispatch for xforms-select/deselect
     }
+
+    private def evaluateCaseRefBinding: Option[Item] =
+        staticControl.caseref flatMap { caseref ⇒
+
+            val caserefItem =
+                Option(
+                    XPathCache.evaluateSingleKeepItems(
+                        contextItems       = bindingContext.childContext,
+                        contextPosition    = bindingContext.position,
+                        xpathString        = caseref,
+                        namespaceMapping   = staticControl.namespaceMapping,
+                        variableToValueMap = bindingContext.getInScopeVariables,
+                        functionLibrary    = XFormsContainingDocument.getFunctionLibrary,
+                        functionContext    = XFormsFunction.Context(container, bindingContext, effectiveId, bindingContext.model, null),
+                        baseURI            = null,
+                        locationData       = staticControl.locationData,
+                        reporter           = containingDocument.getRequestStats.getReporter
+                    )
+                )
+
+            caserefItem collect {
+                case item if DataModel.isAllowedValueBoundItem(item) ⇒ item
+            }
+
+            // TODO: deferred event dispatch for xforms-binding-error EXCEPT upon restoring state???
+        }
+
+    // "If the caseref attribute is specified, then it takes precedence over the selected attributes of the case
+    // elements"
+    private def findInitialSelectedCaseId =
+        if (staticControl.caseref.isDefined)
+            caseIdFromCaseRefBinding getOrElse firstCaseId
+        else
+            caseIdFromSelected getOrElse firstCaseId
+
+    private def caseIdFromCaseRefBinding: Option[String] =
+        _caserefBinding flatMap { item ⇒
+            Some(item.getStringValue) filter staticControl.caseIds
+        }
+
+    private def caseIdFromSelected: Option[String] = {
+
+        def isSelected(c: CaseControl) =
+            c.selected exists evaluateBooleanAvt
+
+        staticControl.caseControls find isSelected map (_.staticId)
+    }
+
+    // NOTE: This assumes there is at least one child case element.
+    private def firstCaseId =
+        staticControl.caseControls.head.staticId
 
     // Filter because XXFormsVariableControl can also be a child
     def getChildrenCases =
@@ -81,12 +144,35 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
         require(caseControlToSelect.parent eq this, s"xf:case '${caseControlToSelect.effectiveId}' is not child of current xf:switch")
 
-        val localForUpdate = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
         val previouslySelectedCaseControl = selectedCase.get
-        val isChanging = previouslySelectedCaseControl.getId != caseControlToSelect.getId
 
-        localForUpdate.selectedCaseControlId = caseControlToSelect.getId
-        if (isChanging) {
+        if (staticControl.caseref.isDefined) {
+            // "by performing a setvalue action if the caseref attribute is specified and indicates a node. If the
+            // node is readonly or if the toggle action does not indicate a case in the switch, then no value change
+            // occurs and therefore no change of the selected case occurs"
+            _caserefBinding flatMap (item ⇒ DataModel.isWritableItem(item).left.toOption) foreach { writableNode ⇒
+
+                val newValue = caseControlToSelect.getId
+
+                DataModel.setValueIfChanged(
+                    writableNode,
+                    newValue,
+                    DataModel.logAndNotifyValueChange(
+                        containingDocument,
+                        "toggle", writableNode,
+                        _,
+                        newValue,
+                        isCalculate = false
+                    )
+                )
+            }
+        } else if (previouslySelectedCaseControl.getId != caseControlToSelect.getId) {
+
+            containingDocument.requireRefresh()
+
+            val localForUpdate = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
+            localForUpdate.selectedCaseControlId = caseControlToSelect.getId
+
             // "This action adjusts all selected attributes on the affected cases to reflect the new state, and then
             // performs the following:"
 

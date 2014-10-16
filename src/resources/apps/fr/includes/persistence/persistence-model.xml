@@ -153,7 +153,7 @@
                 <xf:var name="draft-requested" value="xxf:get-request-parameter('draft') = 'true'"/>
                 <xf:action if="$draft-requested">
                     <xf:send submission="fr-get-document-submission">
-                        <xxf:context name="data-or-draft" value="'draft'"/>
+                        <xf:property name="data-or-draft" value="'draft'"/>
                     </xf:send>
                 </xf:action>
                 <xf:action if="not($draft-requested)">
@@ -169,7 +169,7 @@
 
                     <!-- Otherwise just load the data -->
                     <xf:send if="not($draft-found)" submission="fr-get-document-submission">
-                        <xxf:context name="data-or-draft" value="'data'"/>
+                        <xf:property name="data-or-draft" value="'data'"/>
                     </xf:send>
                 </xf:action>
             </xf:action>

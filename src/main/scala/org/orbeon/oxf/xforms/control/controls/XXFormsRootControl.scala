@@ -28,7 +28,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
     extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     // If we are really at the root, register to ControlTree. This so that the tree is made available during
-    // construction to XPath functions like index() or xxf:case()
+    // construction to XPath functions like index() or case()
     override def addChild(control: XFormsControl ) {
         super.addChild(control)
 

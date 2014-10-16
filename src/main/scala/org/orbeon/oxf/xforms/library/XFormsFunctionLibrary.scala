@@ -30,7 +30,7 @@ object XFormsFunctionLibrary extends {
     // Namespace the functions (we wish we had trait constructors!)
     val XFormsIndependentFunctionsNS  = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
     val XFormsEnvFunctionsNS          = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
-    val XFormsXXFormsEnvFunctionsNS   = Seq(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
+    val XFormsXXFormsEnvFunctionsNS   = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
     val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
     val XXFormsIndependentFunctionsNS = Seq(XXFORMS_NAMESPACE_URI)
     val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)

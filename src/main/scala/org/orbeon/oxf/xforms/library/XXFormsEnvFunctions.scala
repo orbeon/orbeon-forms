@@ -35,10 +35,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("event", classOf[Event], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
-        Fun("case", classOf[XXFormsCase], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
 
         Fun("cases", classOf[XXFormsCases], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)

@@ -103,7 +103,7 @@
 
                                 <xf:var
                                     name="case-index"
-                                    value="index-of($relevant-cases, xxf:case('switch'))"/>
+                                    value="index-of($relevant-cases, case('switch'))"/>
 
                                 <xf:var
                                     name="prev-cases"
@@ -185,7 +185,7 @@
                             select="concat((ancestor-or-self::fr:section/@id)[1], '-case')"/>
                         <!-- NOTE: Only make active top-level sections -->
                         <xf:var name="active"
-                                value="xxf:case('switch') = '{concat(@id, '-case')}'"/>
+                                value="case('switch') = '{concat(@id, '-case')}'"/>
                         <xh:li class="{{if ($active) then 'active' else (),
                                         if (xxf:visited('{$top-level-section-case-id}') and not(valid(context()))) then 'invalid' else ()}}">
 

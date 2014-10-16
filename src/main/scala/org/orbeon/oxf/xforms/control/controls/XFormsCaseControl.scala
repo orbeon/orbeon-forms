@@ -45,7 +45,7 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
     def toggle(): Unit = {
         // There are dependencies on toggled cases for:
         //
-        // - xxf:case()
+        // - case()
         // - case content relevance when XForms 1.1-behavior is enabled
         //
         // Ideally, XPath dependencies should make this smarter.

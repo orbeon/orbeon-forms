@@ -17,13 +17,13 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.value.StringValue
 
 /**
  * Extension xxf:case($switch-id as xs:string) as xs:string? function.
  */
 class XXFormsCase extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): Item =
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
         for {
             control      ← relevantControl(0)(xpathContext)
             switch       ← collectByErasedType[XFormsSwitchControl](control)

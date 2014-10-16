@@ -263,8 +263,8 @@ object XFormsControl {
     // TODO: don't like pattern matching here and revisit hierarchy
     def isAllowedBoundItem(control: XFormsControl, item: Item) = control.staticControl match {
         case singleNode: SingleNodeTrait ⇒ singleNode.isAllowedBoundItem(item)
-        case repeat: RepeatControl ⇒ DataModel.isAllowedBoundItem(item)
-        case _ ⇒ false
+        case repeat: RepeatControl       ⇒ DataModel.isAllowedBoundItem(item)
+        case _                           ⇒ false
     }
 
     // Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.

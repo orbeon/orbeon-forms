@@ -51,10 +51,10 @@ object DataModel {
      * particular, writing an empty value to a text node causes the control to become non-relevant.
      */
     def isAllowedValueBoundItem(item: Item) = item match {
-        case _: AtomicValue ⇒ true
+        case _: AtomicValue                                                                        ⇒ true
         case node: NodeInfo if isAttribute(node) || isElement(node) && supportsSimpleContent(node) ⇒ true
-        case node: NodeInfo if node self (Text || PI || Comment) ⇒ true
-        case _ ⇒ false
+        case node: NodeInfo if node self (Text || PI || Comment)                                   ⇒ true
+        case _                                                                                     ⇒ false
     }
 
     /**
@@ -68,11 +68,11 @@ object DataModel {
      * - items not backed by a mutable node (which are read-only)
      */
     def isWritableItem(item: Item): VirtualNode Either Reason = item match {
-        case _: AtomicValue ⇒ Right(ReadonlyNodeReason)
-        case _: DocumentInfo ⇒ Right(DisallowedNodeReason)
+        case _: AtomicValue                             ⇒ Right(ReadonlyNodeReason)
+        case _: DocumentInfo                            ⇒ Right(DisallowedNodeReason)
         case node: VirtualNode if hasChildElement(node) ⇒ Right(DisallowedNodeReason)
-        case node: VirtualNode  ⇒ Left(node)
-        case _ ⇒ Right(ReadonlyNodeReason)
+        case node: VirtualNode                          ⇒ Left(node)
+        case _                                          ⇒ Right(ReadonlyNodeReason)
     }
 
     /**
@@ -99,10 +99,11 @@ object DataModel {
      * Return true if the value was set.
      */
     def setValue(
-            nodeInfo: NodeInfo,
-            newValue: String,
-            onSuccess: () ⇒ Unit = () ⇒ (),
-            onError: Reason ⇒ Unit = _ ⇒ ()) = {
+        nodeInfo  : NodeInfo,
+        newValue  : String,
+        onSuccess : () ⇒ Unit     = () ⇒ (),
+        onError   : Reason ⇒ Unit = _ ⇒ ()
+    ) = {
 
         assert(nodeInfo ne null)
         assert(newValue ne null)
@@ -124,10 +125,11 @@ object DataModel {
      * Return true if the value was changed.
      */
     def setValueIfChanged(
-            nodeInfo: NodeInfo,
-            newValue: String,
-            onSuccess: String ⇒ Unit = _ ⇒ (),
-            onError: Reason ⇒ Unit = _ ⇒ ()) = {
+        nodeInfo  : NodeInfo,
+        newValue  : String,
+        onSuccess : String ⇒ Unit = _ ⇒ (),
+        onError   : Reason ⇒ Unit = _ ⇒ ()
+    ) = {
         
         assert(nodeInfo ne null)
         assert(newValue ne null)
@@ -150,13 +152,15 @@ object DataModel {
      * TODO: Move to use setValueIfChanged once callers are all in Scala.
      */
     def jSetValueIfChanged(
-            containingDocument: XFormsContainingDocument,
-            eventTarget: XFormsEventTarget,
-            locationData: LocationData,
-            nodeInfo: NodeInfo,
-            valueToSet: String,
-            source: String,
-            isCalculate: Boolean)(implicit logger: IndentedLogger) = {
+        containingDocument : XFormsContainingDocument,
+        eventTarget        : XFormsEventTarget,
+        locationData       : LocationData,
+        nodeInfo           : NodeInfo,
+        valueToSet         : String,
+        source             : String,
+        isCalculate        : Boolean)(implicit
+        logger             : IndentedLogger
+    ) = {
 
         assert(containingDocument ne null)
         assert(logger ne null)

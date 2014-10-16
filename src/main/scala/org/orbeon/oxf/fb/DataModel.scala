@@ -125,7 +125,7 @@ object DataModel {
     // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
     def isAllowedBoundItem(controlName: String, itemOption: Option[Item]) = {
         for {
-            item ← itemOption
+            item    ← itemOption
             control ← findStaticControlByName(controlName)
             if control.isInstanceOf[SingleNodeTrait]
             singleNodeTrait = control.asInstanceOf[SingleNodeTrait]

@@ -76,7 +76,10 @@
                                 <xsl:for-each select="fr:section">
                                     <xf:case id="{@id}-case">
                                         <xsl:if test="/*/@sectionref">
-                                            <xsl:attribute name="value" select="concat('''', @id, '''')"/>
+                                            <xsl:attribute
+                                                name="value"
+                                                select="concat('''', frf:controlNameFromId(@id), '''')"
+                                                xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                                         </xsl:if>
                                         <xxf:setvisited
                                             ev:event="xforms-deselect" ev:target="#observer"

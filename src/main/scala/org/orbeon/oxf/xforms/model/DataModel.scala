@@ -174,8 +174,15 @@ object DataModel {
     }
 
     // Standard success behavior: log and notify
-    def logAndNotifyValueChange(containingDocument: XFormsContainingDocument, source: String,
-                                nodeInfo: NodeInfo, oldValue: String, newValue: String, isCalculate: Boolean)(implicit logger: IndentedLogger) = {
+    def logAndNotifyValueChange(
+        containingDocument : XFormsContainingDocument,
+        source             : String,
+        nodeInfo           : NodeInfo,
+        oldValue           : String,
+        newValue           : String,
+        isCalculate        : Boolean)(implicit
+        logger             : IndentedLogger
+    ) = {
         logValueChange(logger, source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
         notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate)
     }

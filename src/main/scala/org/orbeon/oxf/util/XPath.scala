@@ -156,7 +156,14 @@ object XPath {
         }
 
     // Create and compile an expression
-    def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean)(implicit logger: IndentedLogger): CompiledExpression = {
+    def compileExpression(
+        xpathString      : String,
+        namespaceMapping : NamespaceMapping,
+        locationData     : LocationData,
+        functionLibrary  : FunctionLibrary,
+        avt              : Boolean)(implicit
+        logger           : IndentedLogger
+    ): CompiledExpression = {
         val staticContext = new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary)
         CompiledExpression(compileExpressionWithStaticContext(staticContext, xpathString, avt), xpathString, locationData)
     }

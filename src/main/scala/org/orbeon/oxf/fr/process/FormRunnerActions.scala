@@ -191,13 +191,13 @@ trait FormRunnerActions {
 
     // Defaults except for `uri` and `serialization`
     private val DefaultSendParameters = Map(
-        "method"        → "post",
-        "prune"         → "true",
-        "annotate"      → "",
-        "replace"       → "none",
-        "content"       → "xml",
-        "data-version"  → "4.0.0",
-        "parameters"    → "app form form-version document valid language process data-version"
+        "method"              → "post",
+        "prune"               → "true",
+        "annotate"            → "",
+        "replace"             → "none",
+        "content"             → "xml",
+        "data-format-version" → "4.0.0",
+        "parameters"          → "app form form-version document valid language process data-format-version"
     )
 
     private val SendParameterKeys = List("uri", "serialization") ++ DefaultSendParameters.keys
@@ -220,21 +220,21 @@ trait FormRunnerActions {
 
             // This is used both as URL parameter and as submission parameter
             val dataVersion =
-                findParamValue("data-version") map evaluateValueTemplate get
+                findParamValue("data-format-version") map evaluateValueTemplate get
 
             val paramsToAppend =
                 stringOptionToSet(findParamValue("parameters")).to[List]
 
             val paramValuesToAppend = paramsToAppend collect {
-                case name @ "process"      ⇒ name → runningProcessId.get
-                case name @ "app"          ⇒ name → app
-                case name @ "form"         ⇒ name → form
-                case name @ "form-version" ⇒ name → formVersion
-                case name @ "document"     ⇒ name → document.get
-                case name @ "valid"        ⇒ name → dataValid.toString
-                case name @ "language"     ⇒ name → currentLang.stringValue
-                case name @ "noscript"     ⇒ name → isNoscript.toString
-                case name @ "data-version" ⇒ name → dataVersion
+                case name @ "process"             ⇒ name → runningProcessId.get
+                case name @ "app"                 ⇒ name → app
+                case name @ "form"                ⇒ name → form
+                case name @ "form-version"        ⇒ name → formVersion
+                case name @ "document"            ⇒ name → document.get
+                case name @ "valid"               ⇒ name → dataValid.toString
+                case name @ "language"            ⇒ name → currentLang.stringValue
+                case name @ "noscript"            ⇒ name → isNoscript.toString
+                case name @ "data-format-version" ⇒ name → dataVersion
             }
 
             val propertiesAsPairs =
@@ -325,13 +325,13 @@ trait FormRunnerActions {
     private def tryChangeMode(path: String): Try[Any] =
         Try {
             Map[Option[String], String](
-                Some("uri")          → prependUserParameters(prependCommonFormRunnerParameters(path)),
-                Some("method")       → "post",
-                Some("prune")        → "false",
-                Some("replace")      → "all",
-                Some("content")      → "xml",
-                Some("data-version") → "edge",
-                Some("parameters")   → "form-version data-version"
+                Some("uri")                 → prependUserParameters(prependCommonFormRunnerParameters(path)),
+                Some("method")              → "post",
+                Some("prune")               → "false",
+                Some("replace")             → "all",
+                Some("content")             → "xml",
+                Some("data-format-version") → "edge",
+                Some("parameters")          → "form-version data-format-version"
             )
         } flatMap
             trySend

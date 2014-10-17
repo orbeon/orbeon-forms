@@ -35,7 +35,7 @@
                 frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
              else
                 (
-                    if (instance('fr-send-submission-params')/@data-version != 'edge')
+                    if (instance('fr-send-submission-params')/@data-format-version != 'edge')
                     then
                         migration:dataMaybeMigratedFrom(
                             xxf:instance('fr-form-instance')/root(),
@@ -63,7 +63,7 @@
                 frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
              else
                 (
-                    if (instance('fr-send-submission-params')/@data-version != 'edge')
+                    if (instance('fr-send-submission-params')/@data-format-version != 'edge')
                     then
                         migration:dataMaybeMigratedFrom(
                             xxf:instance('fr-form-instance')/root(),
@@ -77,7 +77,7 @@
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
-        <params uri="" prune="" annotate="" method="" content="" serialization="" data-version=""/>
+        <params uri="" prune="" annotate="" method="" content="" serialization="" data-format-version=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
         <xf:setvalue

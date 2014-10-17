@@ -92,7 +92,7 @@
                 $is-xml-submit: <xf:output value="$is-xml-submit"/>
                 $is-submit: <xf:output value="$is-submit"/>
                 $new-from-service: <xf:output value="$new-from-service"/>
-                $data-version: <xf:output value="xxf:get-request-parameter('data-version')"/>
+                $data-format-version: <xf:output value="xxf:get-request-parameter('data-format-version')"/>
             </xf:message>
 
             <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
@@ -125,7 +125,7 @@
                     context="xxf:instance('fr-form-instance')/root()"
                     origin="
                         (
-                            if (xxf:get-request-parameter('data-version') != 'edge')
+                            if (xxf:get-request-parameter('data-format-version') != 'edge')
                             then migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
                             else (),
                             $form-data
@@ -464,7 +464,7 @@
 
     <!-- Call email service -->
     <xf:submission id="fr-email-service-submission"
-        resource="/fr/service/{$app}/{$form}/email/{$document}?data-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/service/{$app}/{$form}/email/{$document}?data-format-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
         relevant="false"
         validate="false"
         method="post"
@@ -473,7 +473,7 @@
 
     <!-- Call PDF service -->
     <xf:submission id="fr-pdf-service-submission"
-        resource="/fr/service/{$app}/{$form}/pdf/{$document}?data-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/service/{$app}/{$form}/pdf/{$document}?data-format-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
         relevant="false"
         validate="false"
         method="post"

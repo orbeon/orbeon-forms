@@ -19,7 +19,7 @@ import org.dom4j.Document
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.relational.{ForDocument, Next, Specific, Unspecified}
-import org.orbeon.oxf.test.{ResourceManagerTestBase, TestSupport}
+import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.orbeon.oxf.xml.Dom4j
@@ -37,7 +37,7 @@ import scala.xml.Elem
  *      - Permissions
  *      - Large XML documents and binary attachments
  */
-class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with TestSupport with Logging {
+class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true, "")
     val AllOperations = Set("create", "read", "update", "delete")

@@ -20,7 +20,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.scalatest.junit.AssertionsForJUnit
 
-trait TestSupport extends AssertionsForJUnit {
+trait XMLSupport extends AssertionsForJUnit {
 
     def assertXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Unit =
         assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))

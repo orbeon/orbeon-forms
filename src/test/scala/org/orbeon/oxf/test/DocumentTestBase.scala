@@ -19,7 +19,7 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}
 
-abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with TestSupport {
+abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
 
     private var _document: XFormsContainingDocument = _
     def document = _document

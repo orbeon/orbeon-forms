@@ -15,14 +15,11 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 import org.orbeon.oxf.fr.relational.Version
-import org.orbeon.oxf.test.TestSupport
+import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.{IndentedLogger, ScalaUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
-/**
- *
- */
-private object HttpAssert extends TestSupport {
+private object HttpAssert extends XMLSupport {
 
     sealed trait Expected
     case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected

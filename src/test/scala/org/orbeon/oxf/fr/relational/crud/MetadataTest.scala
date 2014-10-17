@@ -14,14 +14,14 @@
 package org.orbeon.oxf.fr.relational.crud
 
 import org.junit.Test
-import org.orbeon.oxf.test.{TestSupport, ResourceManagerTestBase}
+import org.orbeon.oxf.test.{XMLSupport, ResourceManagerTestBase}
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.xml.Dom4j._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.Document
 
-class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with TestSupport {
+class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 
     @Test def extractMetadata(): Unit = {
 

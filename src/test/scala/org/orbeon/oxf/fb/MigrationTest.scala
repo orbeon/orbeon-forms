@@ -16,14 +16,14 @@ package org.orbeon.oxf.fb
 import org.junit.Test
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.test.{TestSupport, DocumentTestBase}
+import org.orbeon.oxf.test.{XMLSupport, DocumentTestBase}
 import org.orbeon.oxf.util.{ScalaUtils, XPath}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.scaxon.XML._
 
-class MigrationTest extends DocumentTestBase with FormBuilderSupport with TestSupport with AssertionsForJUnit {
+class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSupport with AssertionsForJUnit {
 
     val MigrationJSON =
         """

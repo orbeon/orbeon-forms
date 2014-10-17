@@ -13,15 +13,18 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.analysis.controls._
 import model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.saxon.expr.StringLiteral
 
 object ControlAnalysisFactory {
 
@@ -117,7 +120,23 @@ object ControlAnalysisFactory {
          with StaticLHHASupport
          with ChildrenBuilderTrait {
 
-        val selected = Option(element.attributeValue(SELECTED_QNAME))
+        val selected        = Option(element.attributeValue(SELECTED_QNAME))
+        val valueExpression = Option(element.attributeValue(VALUE_QNAME))
+        val valueLiteral    = valueExpression flatMap { valueExpr ⇒
+
+            val literal =
+                XPath.evaluateAsLiteralIfPossible(
+                    xpathString      = XPath.makeStringExpression(valueExpr), 
+                    namespaceMapping = namespaceMapping, 
+                    locationData     = locationData, 
+                    functionLibrary  = XFormsFunctionLibrary, 
+                    avt              = false
+                )
+
+            literal collect {
+                case literal: StringLiteral ⇒ literal.getStringValue
+            }
+        }
     }
 
     private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _) with ChildrenActionsTrait

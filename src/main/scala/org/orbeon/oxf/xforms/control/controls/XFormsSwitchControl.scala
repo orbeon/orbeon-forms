@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, Switc
 import org.orbeon.oxf.xforms.control.{ControlLocalSupport, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -96,7 +95,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
                         namespaceMapping   = staticControl.namespaceMapping,
                         variableToValueMap = bindingContext.getInScopeVariables,
                         functionLibrary    = XFormsContainingDocument.getFunctionLibrary,
-                        functionContext    = XFormsFunction.Context(container, bindingContext, effectiveId, bindingContext.model, null),
+                        functionContext    = newFunctionContext,
                         baseURI            = null,
                         locationData       = staticControl.locationData,
                         reporter           = containingDocument.getRequestStats.getReporter
@@ -120,11 +119,51 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
     private def caseIdFromCaseRefBinding: Option[String] =
         _caserefBinding flatMap { item ⇒
-            Some(item.getStringValue) filter staticControl.caseIds
+            Some(item.getStringValue) flatMap caseForValue map (_.staticId)
         }
+
+    // The value associated with a given xf:case can come from:
+    //
+    // - a literal string specified with @value (this is an optimization)
+    // - a dynamic expression specified with @value
+    // - the case id
+    //
+    // NOTE: A nested xf:value element should also be supported for consistency with xf:item.
+    //
+    private def caseValue(c: CaseControl) = {
+
+        def fromLiteral(c: CaseControl) =
+            c.valueLiteral
+
+        // FIXME: The expression is evaluated in the context of xf:switch, when in fact it should be evaluated in the
+        // context of the xf:case, including variables and FunctionContext.
+        def fromExpression(c: CaseControl) = c.valueExpression flatMap { expr ⇒
+            Option(
+                XPathCache.evaluateAsString(
+                    contextItems       = bindingContext.childContext,
+                    contextPosition    = bindingContext.position,
+                    xpathString        = expr,
+                    namespaceMapping   = c.namespaceMapping,
+                    variableToValueMap = bindingContext.getInScopeVariables,
+                    functionLibrary    = XFormsContainingDocument.getFunctionLibrary,
+                    functionContext    = newFunctionContext,
+                    baseURI            = null,
+                    locationData       = c.locationData,
+                    reporter           = containingDocument.getRequestStats.getReporter
+                )
+            )
+        }
+
+        fromLiteral(c) orElse fromExpression(c) getOrElse c.staticId
+    }
+
+    private def caseForValue(value: String) =
+        staticControl.caseControls find (caseValue(_) == value)
 
     private def caseIdFromSelected: Option[String] = {
 
+        // FIXME: The AVT is evaluated in the context of xf:switch, when in fact it should be evaluated in the  context
+        // of the xf:case, including namespaces, variables and FunctionContext.
         def isSelected(c: CaseControl) =
             c.selected exists evaluateBooleanAvt
 
@@ -152,17 +191,18 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
             // occurs and therefore no change of the selected case occurs"
             _caserefBinding flatMap (item ⇒ DataModel.isWritableItem(item).left.toOption) foreach { writableNode ⇒
 
-                val newValue = caseControlToSelect.getId
+                val newValue = caseValue(caseControlToSelect.staticControl)
 
                 DataModel.setValueIfChanged(
-                    writableNode,
-                    newValue,
-                    DataModel.logAndNotifyValueChange(
-                        containingDocument,
-                        "toggle", writableNode,
-                        _,
-                        newValue,
-                        isCalculate = false
+                    nodeInfo  = writableNode,
+                    newValue  = newValue,
+                    onSuccess = oldValue ⇒ DataModel.logAndNotifyValueChange(
+                        containingDocument = containingDocument,
+                        source             = "toggle",
+                        nodeInfo           = writableNode,
+                        oldValue           = oldValue,
+                        newValue           = newValue,
+                        isCalculate        = false
                     )
                 )
             }

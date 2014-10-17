@@ -1305,28 +1305,28 @@
                         <xf:instance id="instance" xxf:exclude-result-prefixes="#all">
                             <form>
                                 <value/>
-                                <case1>case1-3</case1>
+                                <case>case1-3</case>
                             </form>
                         </xf:instance>
 
                         <xf:action event="xforms-ready">
                             <!-- Test initial value -->
-                            <xf:message value="concat(case('my-switch-1'), ' - ', case1)"/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
 
                             <!-- Test change via caseref -->
-                            <xf:setvalue ref="case1" value="'case1-2'"/>
+                            <xf:setvalue ref="case" value="'case1-2'"/>
                             <xf:refresh/>
-                            <xf:message value="concat(case('my-switch-1'), ' - ', case1)"/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
 
                             <!-- Test default to first case -->
-                            <xf:setvalue ref="case1" value="'WRONG'"/>
+                            <xf:setvalue ref="case" value="'WRONG'"/>
                             <xf:refresh/>
-                            <xf:message value="concat(case('my-switch-1'), ' - ', case1)"/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
 
                             <!-- Test toggle -->
                             <xf:toggle case="case1-3"/>
                             <xf:refresh/>
-                            <xf:message value="concat(case('my-switch-1'), ' - ', case1)"/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
 
                             <!-- Test toggle of controls with unbound caseref -->
                             <xf:toggle case="case2-3"/>
@@ -1345,7 +1345,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:switch id="my-switch-1" ref="value" caseref="../case1">
+                    <xf:switch id="my-switch-1" ref="value" caseref="../case">
                         <xf:case id="case1-1">1</xf:case>
                         <xf:case id="case1-2" selected="true">2</xf:case>
                         <xf:case id="case1-3">3</xf:case>
@@ -1373,7 +1373,7 @@
                             <instance id="instance" model-id="model">
                                 <form>
                                     <value/>
-                                    <case1>case1-3</case1>
+                                    <case>case1-3</case>
                                 </form>
                             </instance>
                         </instances>
@@ -1403,6 +1403,82 @@
                     <xxf:message level="modal">case2-1</xxf:message>
                     <xxf:message level="modal">case3-3</xxf:message>
                     <xxf:message level="modal">case3-3</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="#1089: XForms 2.0 caseref support: value support" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance" xxf:exclude-result-prefixes="#all">
+                            <form>
+                                <case>case3</case>
+                                <case3-value>case3</case3-value>
+                            </form>
+                        </xf:instance>
+
+                        <xf:action event="xforms-ready">
+                            <!-- Test initial value -->
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
+
+                            <!-- Test change via caseref -->
+                            <xf:setvalue ref="case" value="'case2'"/>
+                            <xf:refresh/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
+
+                            <!-- Test default to first case -->
+                            <xf:setvalue ref="case" value="'WRONG'"/>
+                            <xf:refresh/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
+
+                            <!-- Test toggle -->
+                            <xf:toggle case="case1-3"/>
+                            <xf:refresh/>
+                            <xf:message value="concat(case('my-switch-1'), ' - ', case)"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:switch id="my-switch-1" caseref="case">
+                        <xf:case id="case1-1" value="'case1'">1</xf:case>
+                        <xf:case id="case1-2" value="'case2'" selected="true">2</xf:case>
+                        <xf:case id="case1-3" value="case3-value">3</xf:case>
+                    </xf:switch>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <form>
+                                    <case>case3</case>
+                                    <case3-value>case3</case3-value>
+                                </form>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-switch-1" case-id="case1-3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="case1-3" visibility="visible"/>
+                        <xxf:div id="case1-1" visibility="hidden"/>
+                        <xxf:div id="case1-2" visibility="hidden"/>
+                    </xxf:control-values>
+                    <xxf:message level="modal">case1-3 - case3</xxf:message>
+                    <xxf:message level="modal">case1-2 - case2</xxf:message>
+                    <xxf:message level="modal">case1-1 - WRONG</xxf:message>
+                    <xxf:message level="modal">case1-3 - case3</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

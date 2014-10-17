@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.NamespaceMapping
 import java.util.{Map ⇒ JMap}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
@@ -53,14 +54,19 @@ trait ControlXPathSupport {
             if (contextNodeset.size == 0)
                 null // TODO: in the future we should be able to try evaluating anyway
             else {
-                // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-                // Reason is that XPath functions might use the context stack to get the current model, etc.
-                getContextStack.setBinding(bc)
-                // Evaluate
                 try
-                    XPathCache.evaluateAsAvt(contextNodeset, bc.position, attributeValue, getNamespaceMappings,
-                        bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
-                        containingDocument.getRequestStats.addXPathStat)
+                    XPathCache.evaluateAsAvt(
+                        contextNodeset, 
+                        bc.position, 
+                        attributeValue, 
+                        getNamespaceMappings,
+                        bc.getInScopeVariables, 
+                        XFormsContainingDocument.getFunctionLibrary, 
+                        newFunctionContext,
+                        null, 
+                        getLocationData,
+                        containingDocument.getRequestStats.addXPathStat
+                    )
                 catch {
                     case NonFatal(t) ⇒
                         XFormsError.handleNonFatalXPathError(container, t)
@@ -71,7 +77,13 @@ trait ControlXPathSupport {
     }
 
     // Evaluate an XPath expression as a string in the context of this control.
-    def evaluateAsString(xpathString: String, contextItems: Seq[Item], contextPosition: Int): Option[String] = {
+    // TODO: Remove duplication between this and following method. Check callers.
+    // 3 usages
+    def evaluateAsString(
+        xpathString     : String,
+        contextItems    : Seq[Item],
+        contextPosition : Int
+    ): Option[String] = {
 
         assert(isRelevant)
 
@@ -81,12 +93,21 @@ trait ControlXPathSupport {
         else {
             // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
             // Reason is that XPath functions might use the context stack to get the current model, etc.
-            val bc = bindingContext
-            getContextStack.setBinding(bc)
             try
-                Option(XPathCache.evaluateAsString(contextItems.asJava, contextPosition, xpathString, getNamespaceMappings,
-                    bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
-                    containingDocument.getRequestStats.addXPathStat))
+                Option(
+                    XPathCache.evaluateAsString(
+                        contextItems.asJava,
+                        contextPosition,
+                        xpathString,
+                        getNamespaceMappings,
+                        bindingContext.getInScopeVariables,
+                        XFormsContainingDocument.getFunctionLibrary,
+                        newFunctionContext,
+                        null,
+                        getLocationData,
+                        containingDocument.getRequestStats.addXPathStat
+                    )
+                )
             catch {
                 case NonFatal(t) ⇒
                     XFormsError.handleNonFatalXPathError(container, t)
@@ -96,17 +117,30 @@ trait ControlXPathSupport {
     }
 
     // Evaluate an XPath expression as a string in the context of this control.
-    def evaluateAsString(xpathString: String, contextItem: Option[Item], namespaceMapping: NamespaceMapping, variableToValueMap: JMap[String, ValueRepresentation]): Option[String] =
+    // 2 usages
+    def evaluateAsString(
+        xpathString        : String,
+        contextItem        : Option[Item],
+        namespaceMapping   : NamespaceMapping,
+        variableToValueMap : JMap[String, ValueRepresentation]
+    ): Option[String] =
         contextItem match {
             case None ⇒ None
             case Some(contextItem) ⇒
-                // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-                // Reason is that XPath functions might use the context stack to get the current model, etc.
-                getContextStack.setBinding(bindingContext)
                 try
-                    Option(XPathCache.evaluateAsString(contextItem, xpathString, namespaceMapping, variableToValueMap,
-                        XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
-                        containingDocument.getRequestStats.addXPathStat _))
+                    Option(
+                        XPathCache.evaluateAsString(
+                            contextItem,
+                            xpathString,
+                            namespaceMapping,
+                            variableToValueMap,
+                            XFormsContainingDocument.getFunctionLibrary,
+                            newFunctionContext,
+                            null,
+                            getLocationData,
+                            containingDocument.getRequestStats.addXPathStat
+                        )
+                    )
                 catch {
                     case NonFatal(t) ⇒
                         XFormsError.handleNonFatalXPathError(container, t)
@@ -115,6 +149,6 @@ trait ControlXPathSupport {
         }
 
     // Return an XPath function context having this control as source control.
-    private def getFunctionContext =
-        getContextStack.getFunctionContext(getEffectiveId)
+    def newFunctionContext =
+        XFormsFunction.Context(container, bindingContext, effectiveId, bindingContext.model, null)
 }

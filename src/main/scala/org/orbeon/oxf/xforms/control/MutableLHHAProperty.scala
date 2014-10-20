@@ -122,7 +122,16 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
                 // LHHA is direct child of control, evaluate within context
                 contextStack.setBinding(control.bindingContext)
                 contextStack.pushBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope)
-                val result = Option(XFormsUtils.getElementValue(control.lhhaContainer, contextStack, control.effectiveId, lhhaElement, supportsHTML, lhhaAnalysis.defaultToHTML, tempContainsHTML))
+                val result = Option(
+                    XFormsUtils.getElementValue(
+                        control.lhhaContainer,
+                        contextStack,
+                        control.effectiveId,
+                        lhhaElement,
+                        supportsHTML,
+                        lhhaAnalysis.defaultToHTML,
+                        tempContainsHTML)
+                )
                 contextStack.popBinding()
                 result
             } else {
@@ -135,24 +144,35 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
                 val contextElement = lhhaElement.getParent
                 val contextStaticId = XFormsUtils.getElementId(contextElement)
                 val contextEffectiveId =
-                    if (contextStaticId == null || contextStaticId == "#document") {
+                    if ((contextStaticId eq null) || contextStaticId == "#document") {
                         // Assume we are at the top-level
                         contextStack.resetBindingContext()
                         control.container.getFirstControlEffectiveId
                     } else {
                         // Not at top-level, find containing object
-                        val ancestorContextControl = findAncestorContextControl(contextStaticId, XFormsUtils.getElementId(lhhaElement))
-                        if (ancestorContextControl != null) {
+                        val ancestorContextControl =
+                            findAncestorContextControl(contextStaticId, XFormsUtils.getElementId(lhhaElement))
+                        if (ancestorContextControl ne null) {
                             contextStack.setBinding(ancestorContextControl.bindingContext)
                             ancestorContextControl.effectiveId
                         } else
                             null
                     }
 
-                if (contextEffectiveId != null) {
+                if (contextEffectiveId ne null) {
                     // Push binding relative to context established above and evaluate
                     contextStack.pushBinding(lhhaElement, contextEffectiveId, lhhaAnalysis.scope)
-                    val result = Option(XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, lhhaAnalysis.defaultToHTML, tempContainsHTML))
+                    val result = Option(
+                        XFormsUtils.getElementValue(
+                            control.container,
+                            contextStack,
+                            control.effectiveId,
+                            lhhaElement,
+                            supportsHTML,
+                            lhhaAnalysis.defaultToHTML,
+                            tempContainsHTML
+                        )
+                    )
                     contextStack.popBinding()
                     result
                 } else

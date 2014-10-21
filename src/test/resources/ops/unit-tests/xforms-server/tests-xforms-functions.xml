@@ -2012,7 +2012,7 @@
         </output>
     </test>
 
-    <test description="#457: xxf:case() not re-evaluated after xf:toggle" name="oxf:pipeline">
+    <test description="#457: case() not re-evaluated after xf:toggle" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -2026,7 +2026,7 @@
                         <xf:case id="my-case-1"/>
                         <xf:case id="my-case-2"/>
                     </xf:switch>
-                    <xf:output id="my-output" value="xxf:case('my-switch')"/>
+                    <xf:output id="my-output" value="case('my-switch')"/>
                 </xh:body>
             </xh:html>
         </input>

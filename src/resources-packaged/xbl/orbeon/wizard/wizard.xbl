@@ -56,7 +56,7 @@
                 <xsl:template match="/*">
                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
                         <xh:div class="fr-wizard-body">
-                            <xf:switch id="switch">
+                            <xf:switch id="switch" xbl:attr="caseref=sectionref">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <xxf:script ev:event="fr-section-scroll" ev:target="#observer">
@@ -75,6 +75,12 @@
                                 <!-- Wrap each top-level fr:section within each own case -->
                                 <xsl:for-each select="fr:section">
                                     <xf:case id="{@id}-case">
+                                        <xsl:if test="/*/@sectionref">
+                                            <xsl:attribute
+                                                name="value"
+                                                select="concat('''', frf:controlNameFromId(@id), '''')"
+                                                xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
+                                        </xsl:if>
                                         <xxf:setvisited
                                             ev:event="xforms-deselect" ev:target="#observer"
                                             control="{{event('xxf:targetid')}}" visited="true" recurse="true"/>
@@ -103,7 +109,7 @@
 
                                 <xf:var
                                     name="case-index"
-                                    value="index-of($relevant-cases, xxf:case('switch'))"/>
+                                    value="index-of($relevant-cases, case('switch'))"/>
 
                                 <xf:var
                                     name="prev-cases"
@@ -185,7 +191,7 @@
                             select="concat((ancestor-or-self::fr:section/@id)[1], '-case')"/>
                         <!-- NOTE: Only make active top-level sections -->
                         <xf:var name="active"
-                                value="xxf:case('switch') = '{concat(@id, '-case')}'"/>
+                                value="case('switch') = '{concat(@id, '-case')}'"/>
                         <xh:li class="{{if ($active) then 'active' else (),
                                         if (xxf:visited('{$top-level-section-case-id}') and not(valid(context()))) then 'invalid' else ()}}">
 

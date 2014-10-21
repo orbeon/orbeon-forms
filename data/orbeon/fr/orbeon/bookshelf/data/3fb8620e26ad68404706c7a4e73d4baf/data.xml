@@ -10,6 +10,10 @@
         <image filename="Werther.jpg" mediatype="image/jpeg" size="15794">/fr/service/persistence/crud/orbeon/bookshelf/data/3fb8620e26ad68404706c7a4e73d4baf/d9435fa641d7ccd32431894401727865.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

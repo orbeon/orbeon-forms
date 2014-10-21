@@ -130,7 +130,7 @@ public class XFormsControls implements XFormsObjectResolver {
         if (containingDocument.getStaticState().topLevelPart().hasControls()) {
 
             // Create new controls tree
-            // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxf:case()
+            // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or case()
             currentControlTree = initialControlTree = new ControlTree(indentedLogger);
 
             // Set this here so that while initialize() runs below, refresh events will find the flag set

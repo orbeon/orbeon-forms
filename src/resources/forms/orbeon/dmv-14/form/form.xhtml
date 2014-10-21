@@ -66,9 +66,11 @@
                     </mailing-address>
                     <vehicles>
                         <vehicle>
-                            <plate-number/>
-                            <vin/>
-                            <leased/>
+                            <vehicle-iteration>
+                                <plate-number/>
+                                <vin/>
+                                <leased/>
+                            </vehicle-iteration>
                         </vehicle>
                         <leasing-company-name/>
                     </vehicles>
@@ -168,18 +170,20 @@
                     <xf:bind id="mailing-apt-bind" ref="mailing-apt" name="mailing-apt" type="dmv:apt"/>
                 </xf:bind>
                 <xf:bind id="vehicles-bind" ref="vehicles" name="vehicles">
-                    <xf:bind ref="vehicle">
-                        <xf:bind id="leased-bind" ref="leased" name="leased" type="xf:boolean"/>
-                        <xf:bind id="plate-number-bind" ref="plate-number" name="plate-number"
-                                     type="dmv:plate-number"
-                                     required="true()"
+                    <xf:bind id="vehicle-bind" ref="vehicle" name="vehicle">
+                        <xf:bind ref="vehicle-iteration" name="vehicle-iteration">
+                            <xf:bind id="leased-bind" ref="leased" name="leased" type="xf:boolean"/>
+                            <xf:bind id="plate-number-bind" ref="plate-number" name="plate-number"
+                                         type="dmv:plate-number"
+                                         required="true()"
 
-                                     readonly="false()"
-                                     calculate="upper-case(.)"/>
-                        <xf:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
+                                         readonly="false()"
+                                         calculate="upper-case(.)"/>
+                            <xf:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
 
-                                     readonly="false()"
-                                     calculate="upper-case(.)"/>
+                                         readonly="false()"
+                                         calculate="upper-case(.)"/>
+                        </xf:bind>
                     </xf:bind>
                     <xf:bind id="leasing-company-name-bind" ref="leasing-company-name"
                                  name="leasing-company-name"
@@ -440,11 +444,11 @@
             </xf:instance>
 
             <xf:instance id="vehicle-template">
-                <vehicle>
+                <vehicle-iteration>
                     <plate-number/>
                     <vin/>
                     <leased/>
-                </vehicle>
+                </vehicle-iteration>
             </xf:instance>
             <xs:schema targetNamespace="http://orbeon.org/oxf/examples/dmv"
                        elementFormDefault="qualified"
@@ -864,8 +868,8 @@
                 </fr:section>
                 <fr:section id="vehicles-section" bind="vehicles-bind">
                     <xf:label ref="$form-resources/vehicles/label"/>
-                    <fr:grid ref="vehicle" id="vehicle-repeat"
-                             repeat="true"
+                    <fr:grid bind="vehicle-bind" id="vehicle-repeat"
+                             repeat="content"
                              min="1"
                              max="3"
                              template="instance('vehicle-template')">

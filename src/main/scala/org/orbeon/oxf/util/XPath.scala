@@ -62,6 +62,9 @@ object XPath {
     // Compiled expression with source information
     case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
+    def makeStringExpression(expression: String)  =  "string((" + expression + ")[1])"
+    def makeBooleanExpression(expression: String) =  "boolean(" + expression + ")"
+
     private val GlobalNamePool = new NamePool
 
     // HACK: We can't register new converters directly, so we register an external object model, even though this is
@@ -155,8 +158,39 @@ object XPath {
             registerExternalObjectModel(GlobalDataConverter)
         }
 
+    // Compile the expression and return a literal value if possible
+    def evaluateAsLiteralIfPossible(
+        xpathString      : String,
+        namespaceMapping : NamespaceMapping,
+        locationData     : LocationData,
+        functionLibrary  : FunctionLibrary,
+        avt              : Boolean)(implicit
+        logger           : IndentedLogger
+    ): Option[Literal] = {
+        val compiled =
+            compileExpression(
+                xpathString,
+                namespaceMapping,
+                locationData,
+                functionLibrary,
+                avt
+            )
+
+        compiled.expression.getInternalExpression match {
+            case literal: Literal ⇒ Some(literal)
+            case _                ⇒ None
+        }
+    }
+
     // Create and compile an expression
-    def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean)(implicit logger: IndentedLogger): CompiledExpression = {
+    def compileExpression(
+        xpathString      : String,
+        namespaceMapping : NamespaceMapping,
+        locationData     : LocationData,
+        functionLibrary  : FunctionLibrary,
+        avt              : Boolean)(implicit
+        logger           : IndentedLogger
+    ): CompiledExpression = {
         val staticContext = new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary)
         CompiledExpression(compileExpressionWithStaticContext(staticContext, xpathString, avt), xpathString, locationData)
     }

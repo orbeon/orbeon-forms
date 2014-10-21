@@ -51,6 +51,13 @@
                                            and $mode = ('new', 'edit')
                                            and not($is-fb)"/>
 
+    <!-- NOTE: This value is only valid during form initialization, because the request attribute won't be present in
+         subsequent updates. -->
+    <xf:var
+        name="is-submit"
+        value="exists(xxf:get-request-attribute('fr-form-data')) or
+               exists(xxf:get-request-parameter('fr-form-data'))"/>
+
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
@@ -65,9 +72,8 @@
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
         <xf:action if="$mode = ('new', 'test', 'edit', 'view', 'pdf', 'email', 'controls')">
 
-            <xf:var name="is-new-id"     value="normalize-space($document) = ''"/>
-            <xf:var name="is-xml-submit" value="exists(xxf:get-request-attribute('fr-form-data'))"/>
-            <xf:var name="is-submit"     value="$is-xml-submit or exists(xxf:get-request-parameter('fr-form-data'))"/>
+            <xf:var name="is-new-id" value="normalize-space($document) = ''"/>
+            <xf:var name="is-xml-submit" value="$is-submit and exists(xxf:get-request-attribute('fr-form-data'))"/>
 
             <!-- Create random document id if none is provided. This is the default for 'new', but a missing id is also
                  allowed for 'edit', 'view', etc., when data is posted to the page. -->
@@ -86,6 +92,7 @@
                 $is-xml-submit: <xf:output value="$is-xml-submit"/>
                 $is-submit: <xf:output value="$is-submit"/>
                 $new-from-service: <xf:output value="$new-from-service"/>
+                $data-version: <xf:output value="xxf:get-request-parameter('data-version')"/>
             </xf:message>
 
             <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
@@ -97,22 +104,33 @@
 
             <xf:action if="$is-submit">
 
-                <!-- Do we have data posted to this form as a parameter? -->
-                <xf:action if="not($is-xml-submit)">
-                    <xf:var name="form-data" value="xxf:get-request-parameter('fr-form-data')"/>
-                    <xf:action if="$form-data">
-                        <xf:message level="xxf:log-debug">Loading data submitted to the page as parameter</xf:message>
-                        <xf:var name="xml-data" value="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
-                        <xf:insert ref="xxf:instance('fr-form-instance')" origin="$xml-data"/>
-                    </xf:action>
-                </xf:action>
+                <xf:var
+                    name="form-data"
+                    value="
+                        if ($is-xml-submit)
+                        then
+                            xxf:get-request-attribute('fr-form-data')
+                        else
+                            saxon:parse(
+                                saxon:base64Binary-to-string(
+                                    xs:base64Binary(xxf:get-request-parameter('fr-form-data')),
+                                    'UTF-8'
+                                )
+                            )
+                    "/>
 
-                <!-- Do we have data posted to this form as XML? -->
-                <xf:action if="$is-xml-submit">
-                    <xf:message level="xxf:log-debug">Loading data submitted to the page as XML</xf:message>
-                    <xf:var name="form-data" value="xxf:get-request-attribute('fr-form-data')" as="document-node()?"/>
-                    <xf:insert ref="xxf:instance('fr-form-instance')" origin="$form-data"/>
-                </xf:action>
+                <xf:message level="xxf:log-debug">Loading data submitted to the page</xf:message>
+
+                <xf:insert
+                    context="xxf:instance('fr-form-instance')/root()"
+                    origin="
+                        (
+                            if (xxf:get-request-parameter('data-version') != 'edge')
+                            then migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
+                            else (),
+                            $form-data
+                        )[1]"
+                    />
 
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
@@ -135,7 +153,7 @@
                 <xf:var name="draft-requested" value="xxf:get-request-parameter('draft') = 'true'"/>
                 <xf:action if="$draft-requested">
                     <xf:send submission="fr-get-document-submission">
-                        <xxf:context name="data-or-draft" value="'draft'"/>
+                        <xf:property name="data-or-draft" value="'draft'"/>
                     </xf:send>
                 </xf:action>
                 <xf:action if="not($draft-requested)">
@@ -151,7 +169,7 @@
 
                     <!-- Otherwise just load the data -->
                     <xf:send if="not($draft-found)" submission="fr-get-document-submission">
-                        <xxf:context name="data-or-draft" value="'data'"/>
+                        <xf:property name="data-or-draft" value="'data'"/>
                     </xf:send>
                 </xf:action>
             </xf:action>
@@ -216,11 +234,18 @@
 
             <!-- If user can't perform the required operations, deny access to this page -->
             <!-- 'schema' doesn't require any authorized permission as it is simply protected as a service -->
+            <!-- When POSTing data to the page, this is generally considered a "mode change" and doesn't require the
+                 same permissions, especially since the POST is protected by other means. For example, a user with
+                 `create` permission only is allowed to navigate to the `view` page and `edit` page back. This does not
+                 imply that the user need `read` or `update` permissions. Because the current use case is that the user
+                 has at least the `create` permission, we currently require that permision, although this restriction
+                 could be removed in the future if need be. -->
             <xf:var name="unauthorized-access" value="
-                ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create')))           or
-                ($mode = 'edit'                                and not($ops = ('*', 'update')))           or
-                ($mode = ('view', 'pdf', 'controls')           and not($ops = ('*', 'read'))  )           or
-                ($mode = ('email')                             and not($ops = ('*', 'create', 'read'))  ) or
+                ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create')))            or
+                ($mode = 'edit'                                and not($ops = ('*', 'update')
+                                                                       or $is-submit and $ops = 'create')) or
+                ($mode = ('view', 'pdf', 'controls', 'email')  and not($ops = ('*', 'read')
+                                                                       or $is-submit and $ops = 'create')) or
                 not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'controls', 'email', 'schema'))"/>
 
             <!-- Send an "Unauthorized" error if the user is unauthorized -->
@@ -310,17 +335,32 @@
                 if="exists($operations-header)"
                 context="instance('fr-authorized-operations')"
                 origin="xxf:attribute('from-persistence', $operations-header/string())"/>
-            <!-- Migrate data if needed
-                 NOTE: Ideally this would just a be a transformation *before* the submission replaces the node in
-                 fr-form-instance. Here, replacement takes place, and then we replace again with the udpated data. -->
-            <xf:action iterate="xxf:instance('fr-form-metadata')/migration[@version = '4.8.0'][1]">
-                <xf:var name="migration" value="string(.)"/>
-                <xf:insert
-                    context="xxf:instance('fr-form-instance')/root()"
-                    origin="migration:migrateDataTo(root(), $migration)"/>
-            </xf:action>
         </xf:action>
     </xf:submission>
+
+    <xf:instance id="fr-service-parameters">
+        <parameters/>
+    </xf:instance>
+
+    <!-- Calls a service to get the initial instance -->
+    <xf:submission id="fr-get-instance-from-service"
+        method="get"
+        separator="&amp;"
+        ref="instance('fr-service-parameters')"
+        resource="{xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))}"
+        replace="instance"
+        xxf:instance="fr-form-instance"/>
+
+    <!-- Migrate data if needed when loading instance from a service.
+
+         NOTE: Ideally this would just a be a transformation *before* the submission replaces the node in
+         fr-form-instance. Here, replacement takes place, and then we replace again with the updated data.
+     -->
+    <xf:action event="xforms-submit-done" observer="fr-get-document-submission fr-get-instance-from-service">
+        <xf:insert
+            context="xxf:instance('fr-form-instance')/root()"
+            origin="migration:dataMaybeMigratedTo(root(), xxf:instance('fr-form-metadata')/root())"/>
+    </xf:action>
 
     <!-- Initial instance (to support clear) -->
     <xf:instance id="fr-initial-instance" xxf:readonly="false"><!-- Set to false so that xf:insert works -->
@@ -331,19 +371,6 @@
     <xf:instance id="fr-authorized-operations">
         <operations/>
     </xf:instance>
-
-    <xf:instance id="fr-service-parameters">
-        <parameters/>
-    </xf:instance>
-
-    <!-- Calls a service to get the initial instance -->
-    <xf:submission id="fr-get-instance-from-service"
-            method="get"
-            separator="&amp;"
-            ref="instance('fr-service-parameters')"
-            resource="{xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))}"
-            replace="instance"
-            xxf:instance="fr-form-instance"/>
 
     <xf:instance id="fr-persistence-instance">
         <save xmlns="">
@@ -398,7 +425,6 @@
     <xf:instance id="fr-triggers-instance">
         <triggers xmlns="">
             <strict-submit/>
-            <can-update/>
             <can-access-summary/>
             <pdf/>
             <noscript/>
@@ -417,9 +443,6 @@
                  readonly="not(property('xxf:noscript'))
                            and (xxf:instance('fr-error-summary-instance')/valid = false() or xxf:pending-uploads() > 0)"/>
 
-        <!-- Conditions for disabling buttons -->
-        <xf:bind ref="can-update"
-                 relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'update')"/>
         <!-- Show summary button if users have the read permission (obviously), but also if they are logged in, as in
              that case they might be able to see data based on ownership -->
         <xf:bind ref="can-access-summary"
@@ -441,12 +464,16 @@
 
     <!-- Call email service -->
     <xf:submission id="fr-email-service-submission"
-        resource="/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
-        relevant="false" validate="false" method="post" ref="xxf:instance('fr-form-instance')" replace="none"/>
+        resource="/fr/service/{$app}/{$form}/email/{$document}?data-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+        relevant="false"
+        validate="false"
+        method="post"
+        ref="xxf:instance('fr-form-instance')"
+        replace="none"/>
 
     <!-- Call PDF service -->
     <xf:submission id="fr-pdf-service-submission"
-        resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/service/{$app}/{$form}/pdf/{$document}?data-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
         relevant="false"
         validate="false"
         method="post"

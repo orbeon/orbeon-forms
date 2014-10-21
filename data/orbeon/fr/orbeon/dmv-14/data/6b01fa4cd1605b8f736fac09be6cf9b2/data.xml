@@ -31,19 +31,21 @@
     </mailing-address>
     <vehicles>
         <vehicle>
-            <plate-number>GOLD</plate-number>
-            <vin>53585987654321031</vin>
-            <leased>true</leased>
-        </vehicle>
-        <vehicle>
-            <plate-number>OCEAN</plate-number>
-            <vin>53585987654321032</vin>
-            <leased/>
-        </vehicle>
-        <vehicle>
-            <plate-number>TAHOE</plate-number>
-            <vin>53585987654321033</vin>
-            <leased/>
+            <vehicle-iteration>
+                <plate-number>GOLD</plate-number>
+                <vin>53585987654321031</vin>
+                <leased>true</leased>
+            </vehicle-iteration>
+            <vehicle-iteration>
+                <plate-number>OCEAN</plate-number>
+                <vin>53585987654321032</vin>
+                <leased/>
+            </vehicle-iteration>
+            <vehicle-iteration>
+                <plate-number>TAHOE</plate-number>
+                <vin>53585987654321033</vin>
+                <leased/>
+            </vehicle-iteration>
         </vehicle>
         <leasing-company-name>Acme Leasing Co.</leasing-company-name>
     </vehicles>

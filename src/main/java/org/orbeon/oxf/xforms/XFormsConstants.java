@@ -380,6 +380,9 @@ public class XFormsConstants {
 
     public static final QName STATIC_STATE_PROPERTIES_QNAME = new QName("properties");
 
+    public static final QName SELECTED_QNAME = new QName("selected");
+    public static final QName CASEREF_QNAME  = new QName("caseref");
+
     private XFormsConstants() {
         // Disallow construction
     }

@@ -38,7 +38,7 @@
                     name="metadata-root-id"
                     select="$model/xf:instance[@id = 'fr-form-metadata']/metadata[1]/generate-id()"/>
 
-                <!-- Add 4.8.0 migration information -->
+                <!-- Add migration information -->
                 <xsl:template match="metadata[generate-id() = $metadata-root-id]">
                     <xsl:copy>
                         <xsl:apply-templates select="@* | node()"/>
@@ -57,8 +57,8 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Remove existing 4.8.0 migration information -->
-                <xsl:template  match="metadata[generate-id() = $metadata-root-id]/migration[@version = '4.8.0']"/>
+                <!-- Remove existing migration information -->
+                <xsl:template match="metadata[generate-id() = $metadata-root-id]/migration[@version = '4.8.0']"/>
 
             </xsl:stylesheet>
         </p:input>

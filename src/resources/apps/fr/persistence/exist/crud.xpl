@@ -100,7 +100,7 @@
 
             <p:processor name="oxf:xforms-submission">
                 <p:input name="request" transform="oxf:xslt" href="#request-description">
-                    <request xsl:version="2.0">
+                    <request xsl:version="2.0" xsl:exclude-result-prefixes="#all">
                         <xsl:copy-of select="/*/(exist-uri | collection | username | groupname | method)"/>
                         <exist:query>
                             <exist:text>

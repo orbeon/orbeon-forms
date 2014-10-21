@@ -80,10 +80,10 @@
 
                                     <!-- Open/close button -->
                                     <xf:group appearance="xxf:internal">
-                                        <!-- A bit tricky: the switch is further below, and xxf:case('switch') can
+                                        <!-- A bit tricky: the switch is further below, and case('switch') can
                                              return () if the switch is not yet initialized. In that case, it means we
                                              are just becoming relevant, so use the value of $initially-open. -->
-                                        <xf:var name="open" value="(for $switch in xxf:case('switch') return $switch = 'case-open', $initially-open)[1]"/>
+                                        <xf:var name="open" value="(for $switch in case('switch') return $switch = 'case-open', $initially-open)[1]"/>
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
                                             <xf:toggle ev:event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>

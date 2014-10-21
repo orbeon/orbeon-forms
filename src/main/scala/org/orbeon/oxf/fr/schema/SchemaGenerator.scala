@@ -109,8 +109,8 @@ object SchemaGenerator {
         }
 
         // Build xs:element for this bind
-        val xsElem = bind match {
-            case RootBind() ⇒ <xs:element name="form"/>
+        val (repeated, xsElem) = bind match {
+            case RootBind() ⇒ (false, <xs:element name="form"/>)
             case Bind(BindInfo(elemName, required, hasRelevant, elemTypeOpt, repeated, min, max)) ⇒
 
                 // Optional type attribute
@@ -159,86 +159,90 @@ object SchemaGenerator {
                 object Selection  extends SchemaGenerationCase
                 object MaybeTyped extends SchemaGenerationCase
 
-                val controlType = if (repeated)                   Repeated
-                             else if (itemsetOpt.isDefined)       Selection
-                             else if (isBindForAttachmentControl) Attachment
-                             else                                 MaybeTyped
+                val controlType =
+                    if (repeated)                        Repeated
+                    else if (itemsetOpt.isDefined)       Selection
+                    else if (isBindForAttachmentControl) Attachment
+                    else                                 MaybeTyped
 
-                controlType match {
+                val element =
+                    controlType match {
 
-                    case Repeated ⇒
-                        val minAttr    = attrDefault(min, "minOccurs", "0")
-                        val maxAttr    = attrDefault(max, "maxOccurs", "unbounded")
-                        val attributes = (minAttr ++ maxAttr).toList
-                        xsElement(attributes, None, None)
+                        case Repeated ⇒
+                            val minAttr    = attrDefault(min, "minOccurs", "0")
+                            val maxAttr    = attrDefault(max, "maxOccurs", "unbounded")
+                            val attributes = (minAttr ++ maxAttr).toList
+                            xsElement(attributes, None, None)
 
-                    case Attachment ⇒
-                        val content =
-                            <xs:complexType>
-                                <xs:simpleContent>
-                                    <xs:extension base="xs:anyURI">
-                                        <xs:attribute name="filename" type="xs:string"/>
-                                        <xs:attribute name="mediatype" type="xs:string"/>
-                                        <xs:attribute name="size" type="xf:integer"/>
-                                    </xs:extension>
-                                </xs:simpleContent>
-                            </xs:complexType>
-                        xsElement(Nil, None, Some(content))
+                        case Attachment ⇒
+                            val content =
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:anyURI">
+                                            <xs:attribute name="filename" type="xs:string"/>
+                                            <xs:attribute name="mediatype" type="xs:string"/>
+                                            <xs:attribute name="size" type="xf:integer"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            xsElement(Nil, None, Some(content))
 
-                    case Selection ⇒
-                        val itemset = itemsetOpt.get
-                        def oneValueSimpleType(allowEmpty: Boolean): Elem = {
-                            val values = if (allowEmpty) "" :: itemset.values else itemset.values
-                            <xs:simpleType>
-                                <xs:restriction base="xs:string">
-                                    {values map (value ⇒ <xs:enumeration value={value}/>)}
-                                </xs:restriction>
-                            </xs:simpleType>
-                        }
-                        def listSimpleType: Elem =
+                        case Selection ⇒
+                            val itemset = itemsetOpt.get
+                            def oneValueSimpleType(allowEmpty: Boolean): Elem = {
+                                val values = if (allowEmpty) "" :: itemset.values else itemset.values
                                 <xs:simpleType>
-                                    <xs:list>
-                                        {oneValueSimpleType(allowEmpty = false)}
-                                    </xs:list>
+                                    <xs:restriction base="xs:string">
+                                        {values map (value ⇒ <xs:enumeration value={value}/>)}
+                                    </xs:restriction>
                                 </xs:simpleType>
-                        def listMinLengthOneSimpleType: Elem =
-                            <xs:simpleType>
-                                <xs:restriction>
-                                    {listSimpleType}
-                                    <xs:minLength value="1"/>
-                                </xs:restriction>
-                            </xs:simpleType>
-
-                        val allowEmpty = ! required || hasRelevant
-                        val content =
-                            if (itemset.isSelect)
-                                if (allowEmpty) listSimpleType else listMinLengthOneSimpleType
-                            else
-                                oneValueSimpleType(allowEmpty)
-                        xsElement(Nil, None, Some(content))
-
-                    case MaybeTyped ⇒
-
-                        val (attributes, namespaceBinding) =
-                            if (hasRelevant) {
-                                // Don't check type if the control might not be shown to users
-                                (Nil, None)
-                            } else {
-                                val typeQNameOpt = elemTypeOpt.map(_.getQualifiedName)
-                                val typeAttrOpt = typeQNameOpt.map(attr("type", _))
-                                // Create namespace binding for type, filtering the already declared XSD namespace
-                                val typeNamespaceBindingOpt = elemTypeOpt flatMap (qname ⇒
-                                    (qname.getNamespacePrefix, qname.getNamespaceURI) match {
-                                        case (XSD_PREFIX, XSD_URI) ⇒ None
-                                        case (XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
-                                        case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
-                                        case (XFORMS_SHORT_PREFIX, _) ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
-                                        case (prefix, uri) ⇒ Some(prefix → uri)
-                                    })
-                                (typeAttrOpt.toList, typeNamespaceBindingOpt)
                             }
-                        xsElement(attributes, namespaceBinding, None)
-                }
+                            def listSimpleType: Elem =
+                                    <xs:simpleType>
+                                        <xs:list>
+                                            {oneValueSimpleType(allowEmpty = false)}
+                                        </xs:list>
+                                    </xs:simpleType>
+                            def listMinLengthOneSimpleType: Elem =
+                                <xs:simpleType>
+                                    <xs:restriction>
+                                        {listSimpleType}
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+
+                            val allowEmpty = ! required || hasRelevant
+                            val content =
+                                if (itemset.isSelect)
+                                    if (allowEmpty) listSimpleType else listMinLengthOneSimpleType
+                                else
+                                    oneValueSimpleType(allowEmpty)
+                            xsElement(Nil, None, Some(content))
+
+                        case MaybeTyped ⇒
+
+                            val (attributes, namespaceBinding) =
+                                if (hasRelevant) {
+                                    // Don't check type if the control might not be shown to users
+                                    (Nil, None)
+                                } else {
+                                    val typeQNameOpt = elemTypeOpt.map(_.getQualifiedName)
+                                    val typeAttrOpt = typeQNameOpt.map(attr("type", _))
+                                    // Create namespace binding for type, filtering the already declared XSD namespace
+                                    val typeNamespaceBindingOpt = elemTypeOpt flatMap (qname ⇒
+                                        (qname.getNamespacePrefix, qname.getNamespaceURI) match {
+                                            case (XSD_PREFIX, XSD_URI) ⇒ None
+                                            case (XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
+                                            case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
+                                            case (XFORMS_SHORT_PREFIX, _) ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
+                                            case (prefix, uri) ⇒ Some(prefix → uri)
+                                        })
+                                    (typeAttrOpt.toList, typeNamespaceBindingOpt)
+                                }
+                            xsElement(attributes, namespaceBinding, None)
+                    }
+
+                (repeated, element)
         }
 
         // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from
@@ -315,6 +319,10 @@ object SchemaGenerator {
 
                 findSectionTemplateBindsAndResolver getOrElse(Nil, resolve)
 
+            case iterationBinds if repeated ⇒
+                // If repeated, skip nested iteration bind so that the schema validates the old data format
+                // NOTE: This could be made configurable in the future.
+                (iterationBinds \ *, resolve)
             case children ⇒
                 (children, resolve)
         }

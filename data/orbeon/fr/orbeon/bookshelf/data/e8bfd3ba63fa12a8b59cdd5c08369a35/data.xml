@@ -39,6 +39,10 @@
         <image filename="TheTerror.jpg" mediatype="image/jpeg" size="19122">/fr/service/persistence/crud/orbeon/bookshelf/data/e8bfd3ba63fa12a8b59cdd5c08369a35/487920b9fefb9c16db7fbc09ea3faff4.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

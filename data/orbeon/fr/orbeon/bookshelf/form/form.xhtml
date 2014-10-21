@@ -18,9 +18,6 @@
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <xh:head>
-        <xh:style type="text/css">
-            .fr-mode-view .fr-grid-content { padding: 0 }
-        </xh:style>
         <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:noscript-support="false" xxf:xpath-analysis="true">
             <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
@@ -31,7 +28,7 @@
                             <xs:element name="details" type="details"/>
                             <xs:element name="notes" type="notes"/>
                         </xs:sequence>
-                        </xs:complexType>
+                    </xs:complexType>
                 </xs:element>
 
                 <xs:complexType name="details">
@@ -48,8 +45,20 @@
                 </xs:complexType>
 
                 <xs:complexType name="notes">
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="note" type="xs:string"/>
+                    <xs:sequence>
+                        <xs:element name="note">
+                            <xs:complexType>
+                                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="note-iteration" type="note-iteration"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:complexType name="note-iteration">
+                    <xs:sequence>
+                        <xs:element name="note-text" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
 
@@ -131,24 +140,32 @@
                         <image filename="" mediatype="" size=""/>
                     </details>
                     <notes>
-                        <note/>
+                        <note>
+                            <note-iteration>
+                                <note-text/>
+                            </note-iteration>
+                        </note>
                     </notes>
                 </form>
             </xf:instance>
 
             <xf:bind id="fr-form-binds" ref=".">
                 <xf:bind id="details-bind" ref="details">
-                    <xf:bind id="title-bind" ref="title" required="true()"/>
-                    <xf:bind id="author-bind" ref="author" required="true()"/>
-                    <xf:bind id="language-bind" ref="language"/>
-                    <xf:bind id="link-bind" ref="link"/>
-                    <xf:bind id="rating-bind" ref="rating"/>
-                    <xf:bind id="publication-year-bind" ref="publication-year"/>
-                    <xf:bind id="review-bind" ref="review"/>
-                    <xf:bind id="image-bind" ref="image" type="xs:anyURI"/>
+                    <xf:bind id="title-bind" name="title" ref="title" required="true()"/>
+                    <xf:bind id="author-bind" name="author" ref="author" required="true()"/>
+                    <xf:bind id="language-bind" name="language" ref="language"/>
+                    <xf:bind id="link-bind" name="link" ref="link"/>
+                    <xf:bind id="rating-bind" name="rating" ref="rating"/>
+                    <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year"/>
+                    <xf:bind id="review-bind" name="review" ref="review"/>
+                    <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
                 </xf:bind>
-                <xf:bind id="notes-bind" ref="notes">
-                    <xf:bind id="note-bind" ref="note"/>
+                <xf:bind id="notes-bind" name="notes" ref="notes">
+                    <xf:bind id="note-bind" name="note" ref="note">
+                        <xf:bind id="note-iteration-bind" name="note-iteration" ref="note-iteration">
+                            <xf:bind id="note-text-bind" name="note-text" ref="note-text"/>
+                        </xf:bind>
+                    </xf:bind>
                 </xf:bind>
             </xf:bind>
 
@@ -284,12 +301,12 @@
                             <help>This is an optional book cover image.</help>
                             <alert>The book cover image is invalid</alert>
                         </image>
-                        <note>
+                        <note-text>
                             <label>Note</label>
                             <hint>Notes about this book</hint>
                             <help>These notes contain your own comments about the book. For example...</help>
                             <alert>The notes are invalid</alert>
-                        </note>
+                        </note-text>
                     </resource>
                     <resource xml:lang="fr">
                         <details>
@@ -398,18 +415,20 @@
                             <help>Ce champ contient une image de couverture optionnelle.</help>
                             <alert>L'image de couverture est invalide</alert>
                         </image>
-                        <note>
+                        <note-text>
                             <label>Note</label>
                             <hint>Notes au sujet de ce livre</hint>
                             <help>Ce champ de texte contient vos propres commentaires au sujet du livre, par exemple...</help>
                             <alert>Cette note n'est pas valide</alert>
-                        </note>
+                        </note-text>
                     </resource>
                 </resources>
             </xf:instance>
 
             <xf:instance id="note-template">
-                <note xmlns=""/>
+                <note-iteration xmlns="">
+                    <note-text/>
+                </note-iteration>
             </xf:instance>
 
         </xf:model>
@@ -515,14 +534,14 @@
                 <fr:section id="notes-section" bind="notes-bind">
                     <xf:label ref="$form-resources/notes/label"/>
                     <xf:help ref="$form-resources/notes/help"/>
-                    <fr:grid repeat="true" ref="note" id="book-repeat" template="instance('note-template')">
+                    <fr:grid repeat="content" bind="note-bind" id="note-grid" template="instance('note-template')" min="0">
                         <xh:tr>
                             <xh:td>
-                                <xf:textarea id="note-control" ref="." appearance="xxf:autosize">
-                                    <xf:label ref="$form-resources/note/label"/>
-                                    <xf:hint ref="$form-resources/note/hint"/>
-                                    <xf:help ref="$form-resources/note/help"/>
-                                    <xf:alert ref="$form-resources/note/alert"/>
+                                <xf:textarea id="note-text-control" bind="note-text-bind" appearance="xxf:autosize">
+                                    <xf:label ref="$form-resources/note-text/label"/>
+                                    <xf:hint ref="$form-resources/note-text/hint"/>
+                                    <xf:help ref="$form-resources/note-text/help"/>
+                                    <xf:alert ref="$form-resources/note-text/alert"/>
                                 </xf:textarea>
                             </xh:td>
                         </xh:tr>

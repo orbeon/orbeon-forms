@@ -84,19 +84,10 @@ trait FormRunnerActions {
             val modeElement = parametersInstance.rootElement \ "mode"
             val isNew       = modeElement.stringValue == "new"
 
-            val migrationMapOpt =
-                for {
-                    instance  ← metadataInstance
-                    migration ← instance.rootElement firstChild "migration"
-                    if migration.attValue("version") == "4.8.0"
-                } yield
-                    migration.getStringValue
+            import DataMigration._
 
             val dataMaybeMigrated =
-                migrationMapOpt match {
-                    case Some(map) ⇒ DataMigration.migrateDataFrom(formInstance.root, map)
-                    case None      ⇒ formInstance.root
-                }
+                dataMaybeMigratedFrom(formInstance.root, metadataInstance map (_.root)) getOrElse formInstance.root
 
             // Save
             val (beforeURLs, afterURLs, _) = putWithAttachments(
@@ -111,7 +102,8 @@ trait FormRunnerActions {
             )
 
             // If we were in new mode, now we must be in edit mode
-            if (isNew && ! isDraft) setvalue(modeElement, "edit")
+            if (isNew && ! isDraft && supportsUpdate)
+                setvalue(modeElement, "edit")
 
             // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
             // before calling the submission
@@ -197,14 +189,15 @@ trait FormRunnerActions {
             sendThrowOnError("fr-email-service-submission")
         }
 
-    // Defaults except for "uri"
+    // Defaults except for `uri` and `serialization`
     private val DefaultSendParameters = Map(
         "method"        → "post",
         "prune"         → "true",
         "annotate"      → "",
         "replace"       → "none",
         "content"       → "xml",
-        "parameters"    → "app form form-version document valid language process"
+        "data-version"  → "4.0.0",
+        "parameters"    → "app form form-version document valid language process data-version"
     )
 
     private val SendParameterKeys = List("uri", "serialization") ++ DefaultSendParameters.keys
@@ -225,8 +218,9 @@ trait FormRunnerActions {
                 fromParam orElse fromProperty orElse fromDefault
             }
 
-            val propertiesAsPairs =
-                SendParameterKeys map (key ⇒ key → findParamValue(key))
+            // This is used both as URL parameter and as submission parameter
+            val dataVersion =
+                findParamValue("data-version") map evaluateValueTemplate get
 
             val paramsToAppend =
                 stringOptionToSet(findParamValue("parameters")).to[List]
@@ -240,7 +234,11 @@ trait FormRunnerActions {
                 case name @ "valid"        ⇒ name → dataValid.toString
                 case name @ "language"     ⇒ name → currentLang.stringValue
                 case name @ "noscript"     ⇒ name → isNoscript.toString
+                case name @ "data-version" ⇒ name → dataVersion
             }
+
+            val propertiesAsPairs =
+                SendParameterKeys map (key ⇒ key → findParamValue(key))
 
             // Append query parameters to the URL and evaluate XVTs
             val evaluatedPropertiesAsMap =
@@ -327,12 +325,13 @@ trait FormRunnerActions {
     private def tryChangeMode(path: String): Try[Any] =
         Try {
             Map[Option[String], String](
-                Some("uri")        → prependUserParameters(prependCommonFormRunnerParameters(path)),
-                Some("method")     → "post",
-                Some("prune")      → "false",
-                Some("replace")    → "all",
-                Some("content")    → "xml",
-                Some("parameters") → "form-version"
+                Some("uri")          → prependUserParameters(prependCommonFormRunnerParameters(path)),
+                Some("method")       → "post",
+                Some("prune")        → "false",
+                Some("replace")      → "all",
+                Some("content")      → "xml",
+                Some("data-version") → "edge",
+                Some("parameters")   → "form-version data-version"
             )
         } flatMap
             trySend

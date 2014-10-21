@@ -10,6 +10,10 @@
         <image filename="WarAndPeace.jpg" mediatype="image/jpeg" size="23669">/fr/service/persistence/crud/orbeon/bookshelf/data/fd5dfce7a236758e72910d333bf832f8/4a95e912b8ce50ff7dc7a5c70652d133.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

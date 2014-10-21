@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML
@@ -37,7 +38,10 @@ object DataMigration {
                 case JsArray(migrations) ⇒
                     migrations.iterator collect {
                         case JsObject(fields) ⇒
-                            fields("path").asInstanceOf[JsString].value → fields("iteration-name").asInstanceOf[JsString].value
+                            (
+                                fields("path").asInstanceOf[JsString].value,
+                                fields("iteration-name").asInstanceOf[JsString].value
+                            )
                     }
             }
 
@@ -66,6 +70,26 @@ object DataMigration {
         }
 
     import org.orbeon.oxf.xforms.action.XFormsAPI._
+
+    def dataMaybeMigratedFrom(data: DocumentInfo, metadata: Option[DocumentInfo]) =
+        dataMaybeMigratedFromTo(data, metadata, migrateDataFrom)
+
+    def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]) =
+        dataMaybeMigratedFromTo(data, metadata, migrateDataTo)
+
+    private def dataMaybeMigratedFromTo(
+        data     : DocumentInfo,
+        metadata : Option[DocumentInfo],
+        migrate  : (DocumentInfo, String) ⇒ DocumentInfo
+    ) =
+        for {
+            metadata  ← metadata
+            migration ← migrationMapFromMetadata(metadata.rootElement)
+        } yield
+            migrate(data, migration)
+
+    def migrationMapFromMetadata(metadataRootElement: NodeInfo) =
+        metadataRootElement firstChild "migration" filter (_.attValue("version") == "4.8.0") map (_.stringValue)
 
     def migrateDataTo(data: DocumentInfo, jsonMigrationMap: String): DocumentInfo = {
 

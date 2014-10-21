@@ -126,7 +126,15 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
         val translatedValue = translateExternalValue(externalValue)
 
-        DataModel.jSetValueIfChanged(containingDocument, this, getLocationData, boundItem.asInstanceOf[NodeInfo], translatedValue, "client", isCalculate = false)
+        DataModel.jSetValueIfChanged(
+            containingDocument = containingDocument,
+            eventTarget        = this,
+            locationData       = getLocationData,
+            nodeInfo           = boundItem.asInstanceOf[NodeInfo],
+            valueToSet         = translatedValue,
+            source             = "client",
+            isCalculate        = false
+        )
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.
@@ -153,7 +161,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
                format,
                Option(StringValue.makeStringValue(getValue)),
                FormatNamespaceMapping,
-               getContextStack.getCurrentBindingContext.getInScopeVariables
+               bindingContext.getInScopeVariables
            )
 
         for {

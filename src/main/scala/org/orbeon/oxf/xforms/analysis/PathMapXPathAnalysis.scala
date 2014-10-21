@@ -35,14 +35,15 @@ import xbl.Scope
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import scala.util.control.NonFatal
 
-class PathMapXPathAnalysis(val xpathString: String,
-                           var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
-                           val figuredOutDependencies: Boolean,
-                           val valueDependentPaths: MapSet[String, String],
-                           val returnablePaths: MapSet[String, String],
-                           val dependentModels: collection.Set[String],
-                           val dependentInstances: collection.Set[String])
-        extends XPathAnalysis {
+class PathMapXPathAnalysis(
+    val xpathString            : String,
+    var pathmap                : Option[PathMap], // this is used when used as variables and context and can be freed afterwards
+    val figuredOutDependencies : Boolean,
+    val valueDependentPaths    : MapSet[String, String],
+    val returnablePaths        : MapSet[String, String],
+    val dependentModels        : collection.Set[String],
+    val dependentInstances     : collection.Set[String]
+)  extends XPathAnalysis {
 
     // If `values` is false, the other analysis just adds to the dependencies of the current analysis, but no new
     // returnable values are added.
@@ -81,7 +82,8 @@ class PathMapXPathAnalysis(val xpathString: String,
             valueDependentPaths combine returnablePaths,
             MapSet.empty[String, String],
             dependentModels,
-            dependentInstances)
+            dependentInstances
+        )
 
     def toXML(helper: XMLReceiverHelper) {
 
@@ -96,7 +98,8 @@ class PathMapXPathAnalysis(val xpathString: String,
             }
         }
 
-        def mapSetToSet(mapSet: MapSet[String, String]) = mapSet map (entry ⇒ PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
+        def mapSetToSet(mapSet: MapSet[String, String]) =
+            mapSet map (entry ⇒ PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
 
         toXML(mapSetToSet(valueDependentPaths), "value-dependent", "path")
         toXML(mapSetToSet(returnablePaths), "returnable", "path")
@@ -116,22 +119,55 @@ object PathMapXPathAnalysis {
     /**
      * Create a new XPathAnalysis based on an initial XPath expression.
      */
-    def apply(partAnalysis: PartAnalysis, xpathString: String, namespaceMapping: NamespaceMapping,
-              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
-              pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
-              locationData: LocationData, element: Element, avt: Boolean)(implicit logger: IndentedLogger): XPathAnalysis = {
+    def apply(
+        partAnalysis              : PartAnalysis,
+        xpathString               : String,
+        namespaceMapping          : NamespaceMapping,
+        baseAnalysis              : Option[XPathAnalysis],
+        inScopeVariables          : Map[String, VariableTrait],
+        pathMapContext            : AnyRef,
+        scope                     : Scope,
+        defaultInstancePrefixedId : Option[String],
+        locationData              : LocationData,
+        element                   : Element,
+        avt                       : Boolean)(implicit
+        logger                    : IndentedLogger
+    ): XPathAnalysis = {
 
-        val compiledExpression = XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt)
-        apply(partAnalysis, compiledExpression, baseAnalysis, inScopeVariables, pathMapContext, scope, defaultInstancePrefixedId, element)
+        val compiledExpression =
+            XPath.compileExpression(
+                xpathString      = xpathString,
+                namespaceMapping = namespaceMapping,
+                locationData     = locationData,
+                functionLibrary  = XFormsContainingDocument.getFunctionLibrary,
+                avt              = avt
+            )
+
+        apply(
+            partAnalysis,
+            compiledExpression,
+            baseAnalysis,
+            inScopeVariables,
+            pathMapContext,
+            scope,
+            defaultInstancePrefixedId,
+            element
+        )
     }
 
     /**
      * Create a new XPathAnalysis based on an initial XPath expression.
      */
-    def apply(partAnalysis: PartAnalysis, compiledExpression: CompiledExpression,
-              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
-              pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
-              element: Element): XPathAnalysis = {
+    def apply(
+        partAnalysis              : PartAnalysis,
+        compiledExpression        : CompiledExpression,
+        baseAnalysis              : Option[XPathAnalysis],
+        inScopeVariables          : Map[String, VariableTrait],
+        pathMapContext            : AnyRef,
+        scope                     : Scope,
+        defaultInstancePrefixedId : Option[String],
+        element                   : Element
+    ): XPathAnalysis = {
 
         val xpathString = compiledExpression.string
 
@@ -277,7 +313,15 @@ object PathMapXPathAnalysis {
 
                     if (processPaths())
                         // Success
-                        new PathMapXPathAnalysis(xpathString, Some(pathmap), true, valueDependentPaths, returnablePaths, dependentModels, dependentInstances)
+                        new PathMapXPathAnalysis(
+                            xpathString,
+                            Some(pathmap),
+                            true,
+                            valueDependentPaths,
+                            returnablePaths,
+                            dependentModels,
+                            dependentInstances
+                        )
                     else
                         // Failure
                         NegativeAnalysis(xpathString)
@@ -314,7 +358,11 @@ object PathMapXPathAnalysis {
                     defaultInstancePrefixedId match {
                         case Some(defaultInstancePrefixedId) ⇒
                             // Rewrite expression to add/replace its argument with a prefixed instance id
-                            instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(XFormsUtils.getStaticIdFromId(defaultInstancePrefixedId), defaultInstancePrefixedId)))
+                            instanceExpression.setArguments(
+                                Array(
+                                    new PrefixedIdStringLiteral(XFormsUtils.getStaticIdFromId(defaultInstancePrefixedId), defaultInstancePrefixedId)
+                                )
+                            )
 
                             Right(Some(defaultInstancePrefixedId))
                         case None ⇒
@@ -329,7 +377,8 @@ object PathMapXPathAnalysis {
                             val originalInstanceId = stringLiteral.getStringValue
                             val searchAncestors = expression.isInstanceOf[XXFormsInstance]
 
-                            // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an instance() StringLiteral parameter twice
+                            // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an
+                            // instance() StringLiteral parameter twice
                             val alreadyRewritten = instanceNameExpression.isInstanceOf[PrefixedIdStringLiteral]
 
                             val prefixedInstanceId =

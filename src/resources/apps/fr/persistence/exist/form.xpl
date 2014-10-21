@@ -27,9 +27,11 @@
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
-    <p:processor name="oxf:xforms-submission">
-        <p:input name="request">
-            <exist:query max="0"><exist:text>
+    <!-- Using separate XSLT to avoid useless namespace declarations in XML document sent to eXist-db -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="config">
+            <exist:query max="0" xsl:version="2.0" xsl:exclude-result-prefixes="#all"><exist:text>
                 declare namespace xh="http://www.w3.org/1999/xhtml";
                 declare namespace xf="http://www.w3.org/2002/xforms";
 
@@ -56,6 +58,11 @@
                 else ()
             </exist:text></exist:query>
         </p:input>
+        <p:output name="data" id="query"/>
+    </p:processor>
+
+    <p:processor name="oxf:xforms-submission">
+        <p:input name="request" href="#query"/>
         <p:input name="submission" transform="oxf:xslt" href="#instance">
             <xf:submission xsl:version="2.0" method="post" replace="instance"
                                resource="{{xxf:get-request-header('orbeon-exist-uri')}}?app={encode-for-uri(/request/app)}&amp;form={encode-for-uri(/request/form)}">

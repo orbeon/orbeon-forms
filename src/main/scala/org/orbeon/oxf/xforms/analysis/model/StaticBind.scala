@@ -61,7 +61,10 @@ class StaticBind(
         // Compile the expression right away
         val compiledExpression = {
             val booleanOrStringExpression =
-                if (BooleanXPathMIPNames(name)) "boolean(" + expression + ")" else "string((" + expression + ")[1])"
+                if (BooleanXPathMIPNames(name))
+                    OrbeonXPath.makeBooleanExpression(expression)
+                else
+                    OrbeonXPath.makeStringExpression(expression)
 
             OrbeonXPath.compileExpression(booleanOrStringExpression, staticBind.namespaceMapping, staticBind.locationData, XFormsFunctionLibrary, avt = false)
         }

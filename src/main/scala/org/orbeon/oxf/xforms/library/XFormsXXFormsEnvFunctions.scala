@@ -38,5 +38,9 @@ trait XFormsXXFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(ANY_ATOMIC, EXACTLY_ONE),
             Arg(ANY_ATOMIC, EXACTLY_ONE)
         )
+
+        Fun("case", classOf[XFormsCase], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
     }
 }

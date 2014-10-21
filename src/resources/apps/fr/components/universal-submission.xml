@@ -14,7 +14,8 @@
 <xf:model
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:migration="java:org.orbeon.oxf.fr.DataMigration">
 
     <!-- ==== Form Runner send submissions ========================================================================= -->
 
@@ -27,10 +28,23 @@
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
         ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url')
-             then xxf:instance('fr-pdf-url-instance')
+             then
+                xxf:instance('fr-pdf-url-instance')
              else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata')
-             then frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
-             else xxf:instance('fr-form-instance')"
+             then
+                frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+             else
+                (
+                    if (instance('fr-send-submission-params')/@data-version != 'edge')
+                    then
+                        migration:dataMaybeMigratedFrom(
+                            xxf:instance('fr-form-instance')/root(),
+                            xxf:instance('fr-form-metadata')/root()
+                        )
+                    else
+                        (),
+                    xxf:instance('fr-form-instance')/root()
+                )[1]"
         replace="all">
     </xf:submission>
 
@@ -42,15 +56,28 @@
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
         ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url')
-             then xxf:instance('fr-pdf-url-instance')
+             then
+                xxf:instance('fr-pdf-url-instance')
              else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata')
-             then frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
-             else xxf:instance('fr-form-instance')"
+             then
+                frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+             else
+                (
+                    if (instance('fr-send-submission-params')/@data-version != 'edge')
+                    then
+                        migration:dataMaybeMigratedFrom(
+                            xxf:instance('fr-form-instance')/root(),
+                            xxf:instance('fr-form-metadata')/root()
+                        )
+                    else
+                        (),
+                    xxf:instance('fr-form-instance')/root()
+                )[1]"
         replace="none"/>
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
-        <params uri="" prune="" annotate="" method="" content="" serialization=""/>
+        <params uri="" prune="" annotate="" method="" content="" serialization="" data-version=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
         <xf:setvalue

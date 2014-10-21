@@ -19,10 +19,15 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 
-class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-    extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-    with ChildrenBuilderTrait
-    with AppearanceTrait {      // for separator appearance
+class RepeatControl(
+    staticStateContext : StaticStateContext,
+    element            : Element,
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
+    scope              : Scope
+) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+     with ChildrenBuilderTrait
+     with AppearanceTrait {      // for separator appearance
 
     val iterationElement = element.element(XFORMS_REPEAT_ITERATION_QNAME)
     require(iterationElement ne null)

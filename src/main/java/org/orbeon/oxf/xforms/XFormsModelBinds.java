@@ -261,7 +261,16 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and handle this error
             final NodeInfo currentNodeInfo = bindNode.node();
-            DataModel.jSetValueIfChanged(containingDocument, model, bindNode.locationData(), currentNodeInfo, stringResult, "default", true, indentedLogger);
+            DataModel.jSetValueIfChanged(
+                containingDocument,
+                model,
+                bindNode.locationData(),
+                currentNodeInfo,
+                stringResult,
+                "default",
+                true,
+                indentedLogger
+            );
         }
     }
 
@@ -270,7 +279,16 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and handle this error
             final NodeInfo currentNodeInfo = bindNode.node();
-            DataModel.jSetValueIfChanged(containingDocument, model, bindNode.locationData(), currentNodeInfo, stringResult, "calculate", true, indentedLogger);
+            DataModel.jSetValueIfChanged(
+                containingDocument,
+                model,
+                bindNode.locationData(),
+                currentNodeInfo,
+                stringResult,
+                "calculate",
+                true,
+                indentedLogger
+            );
         }
     }
 

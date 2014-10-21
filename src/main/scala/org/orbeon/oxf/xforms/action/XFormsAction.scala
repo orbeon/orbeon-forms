@@ -98,7 +98,7 @@ abstract class XFormsAction extends Logging {
 
 object XFormsAction {
     /**
-     * Obtain context attributes based on nested xxf:context elements.
+     * Obtain context attributes based on nested xf:property elements.
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param actionElement     action element

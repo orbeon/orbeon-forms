@@ -69,37 +69,62 @@
 
                 <xsl:variable name="classes" select="p:classes(.)"/>
 
-                <!-- Get the expression to evaluate on the control from the configuration properties -->
-                <xsl:variable name="expression" as="xs:string?">
+                <!-- Get the component name if any -->
+                <xsl:variable name="component-name" as="xs:string?">
                     <xsl:choose>
                         <xsl:when test="$classes = 'xbl-component'">
                             <!-- XBL component -->
-                            <xsl:variable name="component-name" select="for $c in $classes return if (starts-with($c, 'xbl-') and $c != 'xbl-component') then substring-after($c, 'xbl-') else ()"/>
-                            <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
-                            <xsl:copy-of select="frf:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                            <xsl:copy-of
+                                select="
+                                    for $c in $classes[starts-with(., 'xbl-') and not(. = ('xbl-component', 'xbl-focusable'))][1]
+                                        return substring-after($c, 'xbl-')"/>
                         </xsl:when>
                         <xsl:when test="$classes = $control-classes">
                             <!-- Built-in controls -->
-                            <xsl:variable name="component-name" select="$control-classes[. = $classes][1]"/>
-                            <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
-                            <xsl:copy-of select="frf:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                            <xsl:copy-of
+                                select="$control-classes[. = $classes][1]"/>
                         </xsl:when>
                     </xsl:choose>
                 </xsl:variable>
 
-                <!-- If an expression was found, evaluate it to produce the value of the field -->
-                <xsl:if test="$expression">
-                    <xsl:variable name="value" select="$control/saxon:evaluate(string($expression))"/>
-                    <xsl:if test="$value">
-                        <xsl:choose>
-                            <xsl:when test="$classes = $image-attachment-classes">
-                                <!-- Handle URL rewriting for image attachments -->
-                                <image acro-field-name="'{$pdf-field-name}'" href="{xpl:rewriteResourceURI($value, true())}"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                <xsl:if test="$component-name">
+
+                    <xsl:variable
+                        name="type"
+                        as="xs:string?"
+                        select="
+                            (
+                                for $c in $classes[starts-with(., 'xforms-type-')]
+                                    return substring-after($c, 'xforms-type-'),
+                                'string'
+                            )[1]"/>
+
+                    <!-- Get the expression to evaluate on the control from the configuration properties -->
+                    <xsl:variable
+                        name="expression"
+                        as="xs:string?"
+                        select="
+                            frf:getPDFFormatExpression(
+                                $pdfFormats,
+                                $parameters/app,
+                                $parameters/form,
+                                $component-name,
+                                $type
+                            )"/>
+
+                    <xsl:if test="$expression">
+                        <xsl:variable name="value" select="$control/saxon:evaluate($expression)"/>
+                        <xsl:if test="$value">
+                            <xsl:choose>
+                                <xsl:when test="$classes = $image-attachment-classes">
+                                    <!-- Handle URL rewriting for image attachments -->
+                                    <image acro-field-name="'{$pdf-field-name}'" href="{xpl:rewriteResourceURI($value, true())}"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:if>
                     </xsl:if>
                 </xsl:if>
 

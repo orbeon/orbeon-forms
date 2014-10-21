@@ -964,8 +964,8 @@
         <xsd:complexType>
             <xsd:sequence maxOccurs="unbounded">
                 <xsd:element ref="xforms:case"/>
-
             </xsd:sequence>
+            <xsd:attribute name="caseref" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>

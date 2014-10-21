@@ -99,7 +99,7 @@ trait FormRunnerBaseOps {
 
     // Get the root element of instances
     def formInstanceRoot(inDoc: NodeInfo)      = inlineInstanceRootElement(inDoc, "fr-form-instance").get
-    def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata").get
+    def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata")
     def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
     // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
@@ -135,12 +135,19 @@ trait FormRunnerBaseOps {
     def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)
 
     // Return specific Form Runner instances
-    def formInstance         = topLevelInstance(FormModel,         "fr-form-instance")          get
-    def metadataInstance     = topLevelInstance(FormModel,         "fr-form-metadata")
+    def formInstance                 = topLevelInstance(FormModel,         "fr-form-instance")          get
+    def metadataInstance             = topLevelInstance(FormModel,         "fr-form-metadata")
 
-    def parametersInstance   = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
-    def errorSummaryInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
-    def persistenceInstance  = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
+    def parametersInstance           = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
+    def errorSummaryInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
+    def persistenceInstance          = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
+    def authorizedOperationsInstance = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
+
+    // See also FormRunnerHome
+    private val UpdateOps    = Set("*", "update")
+
+    def authorizedOperations = split[Set](authorizedOperationsInstance.rootElement.stringValue)
+    def supportsUpdate       = authorizedOperations intersect UpdateOps nonEmpty
 
     // Whether the form has a captcha
     def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")

@@ -10,6 +10,10 @@
         <image filename="DivineComedy.jpg" mediatype="image/jpeg" size="24525">/fr/service/persistence/crud/orbeon/bookshelf/data/5bba537614484bd9e33c97bfc7649889/ed5257e984f3311da8e1092f69a00a1c.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import collection.JavaConverters._
-import collection.{mutable ⇒ m}
-import java.{util ⇒ ju}
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.saxon.om.Item
+
+import scala.collection.JavaConverters._
+import scala.collection.{mutable ⇒ m}
 
 class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parentIteration: BindIteration, isSingleNodeContext: Boolean) extends XFormsObject {
 
@@ -33,17 +32,9 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
 
         // NOTE: This should probably go into XFormsContextStack
         val bindingContext = contextStack.getCurrentBindingContext
-        val items: ju.List[Item] =
-            if (bindingContext.newBind)
-                // Case where a @ref attribute is present -> a current nodeset is therefore available
-                bindingContext.nodeset
-            else {
-                // Case where of missing @ref attribute (it is optional in XForms 1.1 and defaults to the context item)
-                val contextItem = bindingContext.contextItem
-                if (contextItem eq null) ju.Collections.emptyList() else ju.Collections.singletonList(contextItem)
-            }
 
-        assert(items ne null)
+        // @ref can be missing and defaults to the context item
+        val items = bindingContext.childContext ensuring (_ ne null)
 
         val binds = model.getBinds
 

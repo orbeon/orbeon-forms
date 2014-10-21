@@ -10,6 +10,10 @@
         <image filename="LittlePrince.jpg" mediatype="image/jpeg" size="21013">/fr/service/persistence/crud/orbeon/bookshelf/data/9531a191c77b75c417e9874427fa21f7/45212d1d929cb8567962a6cc946019df.jpg</image>
     </details>
     <notes>
-        <note/>
+        <note>
+            <note-iteration>
+                <note-text/>
+            </note-iteration>
+        </note>
     </notes>
 </form>

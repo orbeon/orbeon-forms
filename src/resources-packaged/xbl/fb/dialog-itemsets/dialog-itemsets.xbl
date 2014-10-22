@@ -122,7 +122,6 @@
                         <!-- Put default language first, then other languages -->
                         <xf:var
                             name="available-languages"
-                            model="fr-resources-model"
                             value="fbf:allLangs(fbf:resourcesRoot())"/>
 
                         <!-- Don't display language selector if there is only one language -->

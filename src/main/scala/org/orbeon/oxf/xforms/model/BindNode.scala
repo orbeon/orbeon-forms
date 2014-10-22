@@ -27,6 +27,8 @@ import org.w3c.dom.Node.ELEMENT_NODE
 import org.dom4j.Node
 import org.orbeon.oxf.util.ScalaUtils._
 
+import scala.collection.mutable
+
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.
 class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
@@ -40,6 +42,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
             case node: NodeInfo ⇒
                 val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && XML.hasChildElement(node)
                 InstanceData.addBindNode(node, this)
+                // The last type wins
                 staticBind.dataType foreach (InstanceData.setBindType(node, _))
                 (node, hasChildrenElements)
             case _ ⇒
@@ -66,7 +69,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
             // Add type/required if needed
             (! typeValid     list invalidTypeValidation)     :::
             (! requiredValid list invalidRequiredValidation) :::
-            failedConstraints.get(level).getOrElse(Nil)
+            failedConstraints.getOrElse(level, Nil)
         case level ⇒
             // Cannot be type/required as those only have ErrorLevel
             failedConstraints(level)
@@ -147,7 +150,11 @@ object BindNode {
         failedValidationsForAllLevels(node) map prioritizeRequired
 
     def failedValidationsForAllLevels(node: Node): Validations =
-        collectFailedValidationsForAllLevels(Option(InstanceData.getLocalInstanceData(node)) map (_.getBindNodes.asScala) getOrElse Nil)
+        collectFailedValidationsForAllLevels(
+            Option(InstanceData.getLocalInstanceData(node))
+            map (_.getBindNodes.asScala)
+            getOrElse Nil
+        )
 
     private def collectFailedValidationsForAllLevels(bindNodes: Seq[BindNode]): Validations =
         if (bindNodes.isEmpty)
@@ -156,7 +163,8 @@ object BindNode {
             bindNodes(0).failedValidationsForAllLevels
         else {
             // This is rather inefficient but hopefully rare
-            val buildersByLevel = collection.mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
+            val buildersByLevel =
+                mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
 
             for {
                 level       ← LevelsByPriority
@@ -181,12 +189,21 @@ object BindNode {
         failedValidationsForHighestLevel(nodeInfo) map prioritizeRequired
 
     def failedValidationsForHighestLevel(nodeInfo: NodeInfo) =
-        collectFailedValidationsForHighestLevel(Option(InstanceData.getLocalInstanceData(nodeInfo, false)) map (_.getBindNodes.asScala) getOrElse Nil)
+        collectFailedValidationsForHighestLevel(
+            Option(InstanceData.getLocalInstanceData(nodeInfo, false))
+            map (_.getBindNodes.asScala)
+            getOrElse Nil
+        )
 
-    private def collectFailedValidationsForHighestLevel(bindNodes: Seq[BindNode]): Option[(ValidationLevel, List[StaticBind#MIP])] =
+    private def collectFailedValidationsForHighestLevel(
+        bindNodes : Seq[BindNode]
+    ): Option[(ValidationLevel, List[StaticBind#MIP])] =
         collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
     
-    private def collectFailedValidationsForLevel(bindNodes: Seq[BindNode], findLevel: BindNode ⇒ Option[ValidationLevel]): Option[(ValidationLevel, List[StaticBind#MIP])] =
+    private def collectFailedValidationsForLevel(
+        bindNodes : Seq[BindNode],
+        findLevel : BindNode ⇒ Option[ValidationLevel]
+    ): Option[(ValidationLevel, List[StaticBind#MIP])] =
         if (bindNodes.isEmpty)
             None
         else {
@@ -207,8 +224,13 @@ object BindNode {
 }
 
 // Bind node that also contains nested binds
-class BindIteration(parentBind: RuntimeBind, position: Int, item: Item, childrenBindsHaveSingleNodeContext: Boolean, childrenStaticBinds: Seq[StaticBind])
-    extends BindNode(parentBind, position, item) {
+class BindIteration(
+    parentBind                         : RuntimeBind,
+    position                           : Int,
+    item                               : Item,
+    childrenBindsHaveSingleNodeContext : Boolean,
+    childrenStaticBinds                : Seq[StaticBind]
+) extends BindNode(parentBind, position, item) {
 
     require(childrenStaticBinds.size > 0)
 

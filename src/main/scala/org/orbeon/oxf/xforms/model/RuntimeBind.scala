@@ -64,7 +64,15 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
                         contextStack.pushIteration(currentPosition)
 
                         // Create iteration and remember it
-                        val currentBindIteration = new BindIteration(this, currentPosition, item, childrenBindsHaveSingleNodeContext, childrenStaticBinds)
+                        val currentBindIteration =
+                            new BindIteration(
+                                this,
+                                currentPosition,
+                                item,
+                                childrenBindsHaveSingleNodeContext,
+                                childrenStaticBinds
+                            )
+
                         result += currentBindIteration
 
                         // Create mapping context item → iteration

@@ -64,7 +64,7 @@
 
                     <!-- Constructor -->
                     <xf:group xxbl:scope="inner">
-                        <xxf:script id="xf-en" ev:event="xforms-enabled">ORBEON.widget.MapEvents.mapContainerXFormsEnabled.call(this, event.target);</xxf:script>
+                        <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Map.instance(this).init();</xxf:script>
                     </xf:group>
 
                     <!-- Variables for attributes on the control -->
@@ -79,17 +79,15 @@
                 <!-- XForms controls to expose XForms values to JavaScript -->
                 <xf:output class="fb-map-address" xbl:attr="context model ref=address-ref bind=address-bind" style="display: none">
                     <!-- React to change of address -->
-                    <xxf:script id="xf-vc" ev:event="xforms-value-changed">ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this, event.target);</xxf:script>
+                    <xxf:script id="xf-vc" ev:event="xforms-value-changed">YAHOO.xbl.fr.Map.instance(this).updateMarkerFromAddress();</xxf:script>
                 </xf:output>
                 <xf:input class="fb-map-longitude" xbl:attr="context model ref=longitude-ref bind=longitude-bind" style="display: none"/>
                 <xf:input class="fb-map-latitude" xbl:attr="context model ref=latitude-ref bind=latitude-bind" style="display: none"/>
             </xf:group>
             <!-- Load script depending on configuration properties -->
-            <xh:script src="http{if (xxf:property('oxf.xforms.xbl.fr.map.ssl')) then 's://maps-api-ssl' else '://maps'}.google.com/maps?file=api&amp;v=2&amp;{
-                                        if (normalize-space(xxf:property('oxf.xforms.xbl.fr.map.clientid')))
-                                        then concat('client=gme-', xxf:property('oxf.xforms.xbl.fr.map.clientid'))
-                                        else concat('key=', xxf:property('oxf.xforms.xbl.fr.map.key'))
-                                    }&amp;sensor=false" type="text/javascript"/>
+            <xh:script src="https://maps.googleapis.com/maps/api/js?key={xxf:property('oxf.xforms.xbl.fr.map.key')}"
+                       type="text/javascript" />
+
         </xbl:template>
     </xbl:binding>
 

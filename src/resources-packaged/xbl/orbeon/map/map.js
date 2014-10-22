@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2014 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -12,115 +12,90 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 (function() {
-    var Dom = YAHOO.util.Dom,
-        Event = YAHOO.util.Event,
-        Lang = YAHOO.lang,
-        Document = ORBEON.xforms.Document;
+    var Document = ORBEON.xforms.Document;
 
-    /**
-     * Singleton with information about about each map, indexed by ID of the component.
-     */
-    var maps = {};
+    YAHOO.namespace("xbl.fr");
+    YAHOO.xbl.fr.Map= function() {};
+    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Map, "xbl-fr-map");
+    YAHOO.xbl.fr.Map.prototype = {
 
-    /**
-     * Map object constructor
-     */
-    var Map = function(element) { this.init(element); }
-    Map.prototype = {
+        map              : null,
+        geoCoder         : null,
+        keyOutputID      : null,
+        addressOutputID  : null,
+        longitudeInputID : null,
+        latitudeInputID  : null,
+        marker           : null,
 
-        /**
-         * Attributes
-         */
-        element: null,
-        gmapDiv: null,
-        gmap: null,
-        geocoder: null,
-        keyOutputID: null,
-        addressOutputID: null,
-        longitudeInputID: null,
-        latitudeInputID: null,
-        marker: null,
-
-        /**
-         * Constructor
-         */
-        init: function(element) {
-            var map = this;
+        init: function() {
+            var me = this;
 
             // Init object attributes
-            map.gmapDiv = Dom.getElementsByClassName("fb-map-gmap-div", null, element)[0];
-            map.element = element;
-            map.addressOutputID = Dom.getElementsByClassName("fb-map-address", null, element)[0].id;
-            map.longitudeInputID = Dom.getElementsByClassName("fb-map-longitude", null, element)[0].id;
-            map.latitudeInputID = Dom.getElementsByClassName("fb-map-latitude", null, element)[0].id;
+            var mapDiv          = $(this.container).find('.fb-map-gmap-div' )[0];
+            me.addressOutputID  = $(this.container).find('.fb-map-address'  )[0].id;
+            me.longitudeInputID = $(this.container).find('.fb-map-longitude')[0].id;
+            me.latitudeInputID  = $(this.container).find('.fb-map-latitude' )[0].id;
+
+            // By default load the map zoomed out, and we'll then update it if we have a lat/lng or address
+            var mapOptions = {
+                center: { lat: 0, lng: 0},
+                zoom: 1,
+                scaleControl: true,
+                zoomControl: true
+            };
 
             // Create map with its controls
-            map.gmap = new GMap2(map.gmapDiv);
-            map.gmap.addControl(new GSmallZoomControl3D());
-            map.gmap.addControl(new GScaleControl());
-            map.gmap.addControl(new GOverviewMapControl());
-            map.geocoder = new GClientGeocoder();
+            me.map = new google.maps.Map(mapDiv, mapOptions);
+            me.geoCoder = new google.maps.Geocoder();
 
             // Set location
-            var initialLatitude = Document.getValue(map.latitudeInputID);
-            var initialLongitude = Document.getValue(map.longitudeInputID);
+            var initialLatitude  = Document.getValue(me.latitudeInputID);
+            var initialLongitude = Document.getValue(me.longitudeInputID);
             if (initialLatitude != "" && initialLongitude != "") {
-                var latLng = new GLatLng(new Number(initialLatitude), new Number(initialLongitude));
-                map.updateMarkerFromLatLng(latLng);
+                var latLng = new google.maps.LatLng(Number(initialLatitude), Number(initialLongitude));
+                me.updateMarkerFromLatLng(latLng);
+                return latLng;
             } else {
-                map.updateMarkerFromAddress();
+                me.updateMarkerFromAddress();
             }
         },
 
         updateMarkerFromAddress: function() {
-            var map = this;
-            var address = Document.getValue(map.addressOutputID);
-            this.geocoder.getLatLng(address, function(latLng) {
-                if (latLng != null) {
-                    map.updateMarkerFromLatLng(latLng);
-                }
+            var me = this;
+            var address = Document.getValue(me.addressOutputID);
+            me.geoCoder.geocode({ 'address': address}, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK)
+                    me.updateMarkerFromLatLng(results[0].geometry.location);
             });
         },
 
         updateMarkerFromLatLng: function(latLng) {
-            var map = this;
-            map.gmap.setCenter(latLng, 13);
-            if (map.marker == null) {
-                map.marker = new GMarker(latLng, {draggable: true});
-                map.gmap.addOverlay(map.marker);
-                GEvent.addListener(map.marker, "dragend", function(latLng) { map._updateLongLat(latLng); });
-            } else{
-                map.marker.setLatLng(latLng);
+            var me = this;
+
+            // Create marker and listen to user moving it, if we haven't done so already
+            if (me.marker == null) {
+                me.marker = new google.maps.Marker({
+                    map       : me.map,
+                    draggable : true
+                });
+                google.maps.event.addListener(me.marker, 'dragend', function() {
+                    me._updateLongLat(me.marker.getPosition());
+                });
             }
+
+            // Center map and set the position of the marker
+            me.map.setCenter(latLng);
+            me.marker.setPosition(latLng);
+
+
+            // If we are still showing the whole earth, now is the time to zoom in
+            if (me.map.getZoom() == 1)
+                me.map.setZoom(14);
         },
 
         _updateLongLat: function(longLat) {
             Document.setValue(this.longitudeInputID, longLat.lng());
-            Document.setValue(this.latitudeInputID, longLat.lat());
+            Document.setValue(this.latitudeInputID,  longLat.lat());
         }
     };
-
-    ORBEON.widget.MapEvents = {
-
-        /**
-         * Called when the group containing the map becomes enabled.
-         */
-        mapContainerXFormsEnabled: function(target) {
-            var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-map");
-            var mapID =  container.id;
-            if (!Lang.isObject(maps[mapID])) {
-                maps[mapID] = new Map(container);
-            }
-        },
-
-        /**
-         * Called when the address provided to the component changes.
-         */
-        addressXFormsValueChanged: function(target) {
-            var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-map");
-            var mapID =  container.id;
-            maps[mapID].updateMarkerFromAddress();
-        }
-    };
-
 })();

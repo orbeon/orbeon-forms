@@ -57,6 +57,10 @@
             </templates>
         </metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/map/map.css"/>
+        </xbl:resources>
+
         <xbl:template>
             <xf:group xxbl:scope="outer">
 

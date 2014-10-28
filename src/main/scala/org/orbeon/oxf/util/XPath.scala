@@ -96,6 +96,12 @@ object XPath {
 
         val SaxonToScalaConverter = new PJConverter {
 
+            // NOTE: Because of Java erasure, we cannot statically know whether we have e.g. Option[DocumentInfo] or
+            // Option[dom4j.Document]. So we have to decide whether to leave the contained nodes wrapped or not. We
+            // decide to leave them unwrapped, so that a Scala method can be defined as:
+            //
+            //  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo])
+            //
             private def itemToAny(item: Item, context: XPathContext) = item match {
                 case v: AtomicValue ⇒
                     val config = context.getConfiguration
@@ -103,7 +109,6 @@ object XPath {
 
                     val pj = PJConverter.allocate(config, v.getItemType(th), StaticProperty.EXACTLY_ONE, classOf[AnyRef])
                     pj.convert(v, classOf[AnyRef], context)
-                case v: VirtualNode ⇒ v.getUnderlyingNode // ???
                 case v              ⇒ v
             }
 

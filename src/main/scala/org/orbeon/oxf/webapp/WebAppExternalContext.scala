@@ -46,12 +46,12 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
 
         private var sessionAttributesMap: JMap[String, AnyRef] = _
 
-        def getCreationTime = httpSession.getCreationTime
-        def getId = httpSession.getId
-        def getLastAccessedTime = httpSession.getLastAccessedTime
-        def getMaxInactiveInterval = httpSession.getMaxInactiveInterval
-        def invalidate() = httpSession.invalidate()
-        def isNew = httpSession.isNew
+        def getCreationTime                       = httpSession.getCreationTime
+        def getId                                 = httpSession.getId
+        def getLastAccessedTime                   = httpSession.getLastAccessedTime
+        def getMaxInactiveInterval                = httpSession.getMaxInactiveInterval
+        def invalidate()                          = httpSession.invalidate()
+        def isNew                                 = httpSession.isNew
         def setMaxInactiveInterval(interval: Int) = httpSession.setMaxInactiveInterval(interval)
 
         def getAttributesMap = {

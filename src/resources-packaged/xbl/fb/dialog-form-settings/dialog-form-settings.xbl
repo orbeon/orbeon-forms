@@ -132,7 +132,6 @@
                             <xf:group ref=".[$app-chooser = 'select1']">
                                 <fr:dropdown-select1 ref="app">
                                     <xf:label ref="$resources/application-name/label"/>
-                                    <xf:alert ref="$resources/application-name/alert"/>
                                     <xf:itemset ref="xxf:instance('fb-permissions')/app">
                                         <xf:label ref="@name"/>
                                         <xf:value ref="@name"/>

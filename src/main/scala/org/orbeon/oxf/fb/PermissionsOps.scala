@@ -47,17 +47,19 @@ trait PermissionsOps {
         matchesApp("*") || (matchesApp(app) && (matchesForm(findAppElement(app).get, "*") || matchesForm(findAppElement(app).get, form)))
     }
 
+    private def findConfiguredRoles(formBuilderRoles: NodeInfo) =
+        formBuilderRoles.root \ * \ "role"
+
     // For XForms callers
+    // Result document contains a tree structure of apps and forms if roles are configured
     def formBuilderPermissionsAsXML(formBuilderRoles: NodeInfo): NodeInfo = {
         // NOTE: Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
-        val appForms = formBuilderPermissions(formBuilderRoles, orbeonRoles)
 
-        if (appForms.isEmpty)
+        if (findConfiguredRoles(formBuilderRoles).isEmpty)
             <apps has-roles="false"/>
         else
-            // Result document contains a tree structure of apps and forms
             <apps has-roles="true">{
-                appForms.to[List].sortBy(_._1) map { case (app, forms) ⇒
+                formBuilderPermissions(formBuilderRoles, orbeonRoles).to[List].sortBy(_._1) map { case (app, forms) ⇒
                     <app name={app}>{ forms.to[List].sorted map { form ⇒ <form name={form}/> } }</app>
                 }
             }</apps>
@@ -65,7 +67,7 @@ trait PermissionsOps {
 
     def formBuilderPermissions(formBuilderRoles: NodeInfo, incomingRoleNames: Set[String]): Map[String, Set[String]] = {
 
-        val configuredRoles = formBuilderRoles.root \ * \ "role"
+        val configuredRoles = findConfiguredRoles(formBuilderRoles)
         if (configuredRoles.isEmpty) {
             // No role configured
             Map()

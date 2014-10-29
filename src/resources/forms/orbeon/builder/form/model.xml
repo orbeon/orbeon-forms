@@ -178,8 +178,15 @@
             <xf:action if="$mode = 'new'">
                 <!-- New form -->
                 <xf:action if="not($permissions/app/@name = '*')">
+
+                    <xf:var name="initial-app-value" value="$permissions/app[1]/@name[normalize-space() != '']"/>
+
+                    <xf:action if="empty($initial-app-value)" type="xpath">
+                        frf:sendError(403)
+                    </xf:action>
+
                     <!-- Set default value for app if we only support specific app names -->
-                    <xf:setvalue ref="$metadata-app" value="$permissions/app[1]/@name"/>
+                    <xf:setvalue ref="$metadata-app" value="$initial-app-value"/>
 
                     <xf:action if="not($permissions/app[1]/form/@name = '*')">
                         <!-- Set default value for form if we only support specific form names -->
@@ -192,7 +199,8 @@
 
                 <!-- If roles don't match then access is unauthorized. See similar logic in FR. -->
                 <xf:action if="not(   exists($permissions/app[@name = '*'])
-                                   or exists($permissions/app[@name = $metadata-app]/form[@name = ('*', $metadata-form)]))">
+                                   or exists($permissions/app[@name = $metadata-app]/form[@name = ('*', $metadata-form)]))"
+                           type="xpath">
                     frf:sendError(403)
                 </xf:action>
             </xf:action>

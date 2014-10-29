@@ -297,6 +297,13 @@
 
             </xf:action>
 
+            <!-- 4. If roles are enabled but no role applies, the page is unauthorized.
+                NOTE: Do this upon `xforms-ready` because `fb-permissions` instance is not ready upon
+                `xforms-model-construct-done`. -->
+            <xf:action ev:event="xforms-ready" if="$has-fb-roles and empty($initial-app-value)" type="xpath">
+                frf:sendError(403)
+            </xf:action>
+
             <!-- Reset search selection and navigation -->
             <xf:action ev:event="fr-reset-search">
 

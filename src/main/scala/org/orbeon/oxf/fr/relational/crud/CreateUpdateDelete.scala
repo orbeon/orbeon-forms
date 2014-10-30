@@ -183,6 +183,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         // Do insert
         locally {
             val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
+            val xmlVal = if (req.provider == "postgresql") "XMLPARSE( DOCUMENT ? )" else "?"
             val isFormDefinition = req.forForm && ! req.forAttachment
             val now = new Timestamp(System.currentTimeMillis())
 
@@ -195,36 +196,36 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 }
 
             val possibleCols = List(
-                true                  → "created"            → param(_.setTimestamp, existingRow.map(_.created).getOrElse(now)),
-                true                  → "last_modified_time" → param(_.setTimestamp, now),
-                true                  → "last_modified_by"   → param(_.setString   , requestUsername.orNull),
-                true                  → "app"                → param(_.setString   , req.app),
-                true                  → "form"               → param(_.setString   , req.form),
-                true                  → "form_version"       → param(_.setInt      , versionToSet),
-                req.forData           → "document_id"        → param(_.setString   , req.dataPart.get.documentId),
-                true                  → "deleted"            → param(_.setString   , if (delete) "Y" else "N"),
-                req.forData           → "draft"              → param(_.setString   , if (req.dataPart.get.isDraft) "Y" else "N"),
-                req.forAttachment     → "file_name"          → param(_.setString   , req.filename.get),
-                req.forAttachment     → "file_content"       → param(_.setBytes    , RequestReader.bytes()),
-                isFormDefinition      → "form_metadata"      → param(_.setString   , metadataOpt.orNull),
-                req.forData           → "username"           → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.orNull)),
-                req.forData           → "groupname"          → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup.orNull)),
-                ! req.forAttachment   → xmlCol               → param(_.setString   , xmlOpt.orNull)
+                true                  → "created"            → "?"    → param(_.setTimestamp, existingRow.map(_.created).getOrElse(now)),
+                true                  → "last_modified_time" → "?"    → param(_.setTimestamp, now),
+                true                  → "last_modified_by"   → "?"    → param(_.setString   , requestUsername.orNull),
+                true                  → "app"                → "?"    → param(_.setString   , req.app),
+                true                  → "form"               → "?"    → param(_.setString   , req.form),
+                true                  → "form_version"       → "?"    → param(_.setInt      , versionToSet),
+                req.forData           → "document_id"        → "?"    → param(_.setString   , req.dataPart.get.documentId),
+                true                  → "deleted"            → "?"    → param(_.setString   , if (delete) "Y" else "N"),
+                req.forData           → "draft"              → "?"    → param(_.setString   , if (req.dataPart.get.isDraft) "Y" else "N"),
+                req.forAttachment     → "file_name"          → "?"    → param(_.setString   , req.filename.get),
+                req.forAttachment     → "file_content"       → "?"    → param(_.setBytes    , RequestReader.bytes()),
+                isFormDefinition      → "form_metadata"      → "?"    → param(_.setString   , metadataOpt.orNull),
+                req.forData           → "username"           → "?"    → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.orNull)),
+                req.forData           → "groupname"          → "?"    → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup   .orNull)),
+                ! req.forAttachment   → xmlCol               → xmlVal → param(_.setString   , xmlOpt.orNull)
             )
 
             val includedCols =
                 for {
-                    ((included, col), param) ← possibleCols
+                    (((included, col), placeholder), param) ← possibleCols
                     if included
-                } yield col → param
+                } yield col → placeholder → param
 
             val ps = connection.prepareStatement(
                 s"""|INSERT INTO $table
-                    |            ( ${includedCols.map(_._1   ).mkString(", ")} )
-                    |     VALUES ( ${includedCols.map(_ ⇒ "?").mkString(", ")} )
+                    |            ( ${includedCols.map(_._1._1).mkString(", ")} )
+                    |     VALUES ( ${includedCols.map(_._1._2).mkString(", ")} )
                     |""".stripMargin)
 
-            for (((_, param), i) ← includedCols.zipWithIndex)
+            for ((((_, _), param), i) ← includedCols.zipWithIndex)
                 param(ps, i + 1)
             ps.executeUpdate()
         }
@@ -412,7 +413,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 deleteDraft(connection, req)
 
             // Create flat view if needed
-            if (requestFlatView && Set("oracle", "db2")(req.provider) && req.forForm && ! delete && req.form != "library")
+            if (requestFlatView && Set("oracle", "db2", "postgresql")(req.provider) && req.forForm && ! delete && req.form != "library")
                 FlatView.createFlatView(req, connection)
 
             // Inform caller of the form definition version used

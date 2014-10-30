@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import java.io.OutputStreamWriter
+import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.relational.{Next, Unspecified, RelationalUtils}
 import org.orbeon.oxf.http.Headers
@@ -41,9 +41,10 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 val table  = tableName(req)
                 val idCols = idColumns(req)
                 val xmlCol = req.provider match {
-                    case "oracle" ⇒ "t.xml.getClobVal()"
-                    case "db2"    ⇒ "xml2clob(t.xml)"
-                    case _        ⇒ "t.xml"
+                    case "oracle"     ⇒ "t.xml.getClobVal()"
+                    case "db2"        ⇒ "xml2clob(t.xml)"
+                    case "postgresql" ⇒ "t.xml as"
+                    case _            ⇒ "t.xml"
                 }
                 val ps = connection.prepareStatement(
                     s"""|SELECT  t.last_modified_time
@@ -105,13 +106,19 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
                 // Write content (XML / file)
                 if (req.forAttachment) {
-                    val blob = resultSet.getBlob("file_content")
-                    NetUtils.copyStream(blob.getBinaryStream, httpResponse.getOutputStream)
+                    val stream = req.provider match {
+                        case "postgresql" ⇒ new ByteArrayInputStream(resultSet.getBytes("file_content"))
+                        case _            ⇒ resultSet.getBlob("file_content").getBinaryStream
+                    }
+                    NetUtils.copyStream(stream, httpResponse.getOutputStream)
                 } else {
-                    val clob = resultSet.getClob("xml")
+                    val stream = req.provider match {
+                        case "postgresql" ⇒ new StringReader(resultSet.getString("xml"))
+                        case _            ⇒ resultSet.getClob("xml").getCharacterStream
+                    }
                     httpResponse.setHeader(Headers.ContentType, "application/xml")
                     val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
-                    NetUtils.copyStream(clob.getCharacterStream, writer)
+                    NetUtils.copyStream(stream, writer)
                     writer.close()
                 }
 

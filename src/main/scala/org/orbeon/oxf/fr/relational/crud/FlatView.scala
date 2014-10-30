@@ -45,16 +45,27 @@ private object FlatView {
         }
 
         // Delete view if it exists
-        // - Only for DB2; on Oracle we can use "OR REPLACE" when creating the view.
-        if (req.provider == "db2") {
+        // - Only for DB2 and postgresql; on Oracle we can use "OR REPLACE" when creating the view.
+        if (Set("db2", "postgresql")(req.provider)) {
             val viewExists = {
-                val query =
-                    s"""|SELECT *
-                        |  FROM SYSIBM.SYSVIEWS
-                        | WHERE      creator =  (SELECT current_schema
-                        |                          FROM SYSIBM.SYSDUMMY1)
-                        |       AND  name    = ?
-                        |""".stripMargin
+                val query = req.provider match{
+                    case "db2"        ⇒ s"""|SELECT *
+                                        |  FROM SYSIBM.SYSVIEWS
+                                        | WHERE      creator =  (SELECT current_schema
+                                        |                          FROM SYSIBM.SYSDUMMY1)
+                                        |       AND  name    = ?
+                                        |""".stripMargin
+                    case "postgresql" ⇒ s"""|SELECT *
+                                        |  FROM      pg_catalog.pg_class c
+                                        |       JOIN pg_catalog.pg_namespace n
+                                        |         ON n.oid = c.relnamespace
+                                        | WHERE      n.nspname = current_schema
+                                        |       AND  c.relkind = 'v'
+                                        |       AND  upper(c.relname) = ?
+                                        |""".stripMargin
+                    case _            ⇒ ???
+                }
+
                 val ps = connection.prepareStatement(query)
                 ps.setString(1, viewName)
                 val rs = ps.executeQuery()
@@ -68,9 +79,10 @@ private object FlatView {
         val cols = {
             val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒
                 val extractFunction = req.provider match {
-                    case "oracle" ⇒ s"extractValue(d.xml, '/*/$path')"
-                    case "db2"    ⇒ s"XMLSERIALIZE(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
-                    case _        ⇒ ???
+                    case "oracle"     ⇒ s"extractValue(d.xml, '/*/$path')"
+                    case "db2"        ⇒ s"XMLSERIALIZE(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
+                    case "postgresql" ⇒ s"(xpath('/*/$path/text()', d.xml))[1]"
+                    case _            ⇒ ???
                 }
                 Col(extractFunction, col)
             }
@@ -81,7 +93,7 @@ private object FlatView {
         // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
         locally {
             val query =
-                s"""|CREATE  ${if (req.provider == "oracle") "OR REPLACE" else ""} VIEW $viewName AS
+                s"""|CREATE  ${if (Set("oracle", "postgresql")(req.provider)) "OR REPLACE" else ""} VIEW $viewName AS
                     |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
                     |  FROM  orbeon_form_data d,
                     |        (

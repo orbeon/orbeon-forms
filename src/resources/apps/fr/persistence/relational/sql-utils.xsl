@@ -104,4 +104,12 @@
         <xsl:sequence select="string-join(for $n in $namespaces return concat('declare namespace ', $n, ';'), ' ')"/>
     </xsl:function>
 
+    <xsl:function name="f:postgresql-namespaces" as="xs:string">
+        <xsl:param name="namespaces" as="xs:string*"/>
+        <xsl:variable name="nsarrays" as="xs:string*">
+            <xsl:sequence select="for $n in $namespaces return concat('ARRAY[''', substring-before($n,'=&quot;'), ''',''', replace(substring-after($n,'=&quot;'), '&quot;$', ''), ''']')"/>
+        </xsl:variable>
+        <xsl:sequence select="concat('ARRAY[', string-join($nsarrays, ', '), ']::varchar[]')"/>
+    </xsl:function>
+
 </xsl:stylesheet>

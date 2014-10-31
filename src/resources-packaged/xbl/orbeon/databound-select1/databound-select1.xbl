@@ -100,8 +100,10 @@
             <xf:model id="xbl-model">
                 <!-- Contains the data from which the itemset is populated -->
                 <xf:instance id="itemset"><dummy/></xf:instance>
+                <xf:instance id="submission-ran"><count>0</count></xf:instance>
                 <!-- What do when doing a refresh -->
                 <xf:submission id="get-itemset" method="get" resource="{event('resource')}" replace="instance" serialization="none">
+                    <xf:setvalue ev:event="xforms-submit-done" ref="instance('submission-ran')" value=". + 1"/>
                     <xf:action ev:event="xforms-submit-error">
                         <xf:insert ref="instance('itemset')" origin="xxf:element('dummy')"/>
                     </xf:action>
@@ -116,16 +118,9 @@
                 <xxf:value value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
-                    <xf:send if="normalize-space($resource)" submission="get-itemset">
+                    <xf:send if="string-length(normalize-space($resource)) > 0" submission="get-itemset">
                         <xf:property name="resource" value="$resource"/>
                     </xf:send>
-                    <!-- Get sequence of values in the new itemset -->
-                    <xf:var name="new-values" value="xxf:itemset('select1', 'xml', false())//value/string()"/>
-                    <!-- If the current value is not in the new itemset, set it to blank -->
-                    <xf:setvalue if="not($binding = ($new-values, ''))" ref="$binding"/>
-                    <!-- Inform the outside world on whether the itemset is empty -->
-                    <xf:insert context="$binding" if="empty(@itemset-empty)" origin="xf:attribute('itemset-empty')"/>
-                    <xf:setvalue ref="$binding/@itemset-empty" value="count($new-values) = 1"/>
                 </xf:action>
             </xf:var>
 
@@ -145,6 +140,23 @@
                     <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices" xxbl:scope="inner"/>
                 </xf:choices>
             </xf:select1>
+
+            <!-- Runs when the itemset changes
+                 - Ideally, this would be done on an xxforms-itemset-changed (NYI, see #1520)
+                 - So instead, every time we run the service, we increment a counter, and here react to that
+                 - We need to "be in the view" when running this, as we're using xxf:itemset() -->
+            <xf:var name="submission-ran" value="instance('submission-ran')/string()">
+                <xf:action ev:event="xforms-value-changed">
+                    <!-- Get sequence of values in the new itemset -->
+                    <xf:var name="new-values" value="xxf:itemset('select1', 'xml', false())//value/string()"/>
+                    <!-- If the current value is not in the new itemset, set it to blank -->
+                    <xf:setvalue if="not($binding = ($new-values, ''))" ref="$binding"/>
+                    <!-- Inform the outside world on whether the itemset is empty -->
+                    <xf:insert context="$binding" if="empty(@itemset-empty)" origin="xf:attribute('itemset-empty')"/>
+                    <xf:setvalue ref="$binding/@itemset-empty" value="count($new-values) = 1"/>
+                </xf:action>
+            </xf:var>
+
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

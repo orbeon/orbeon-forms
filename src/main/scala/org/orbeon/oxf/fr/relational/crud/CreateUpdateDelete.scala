@@ -80,6 +80,7 @@ object RequestReader {
         def newIdentityReceiver(writer: Writer) = (
             TransformerUtils.getIdentityTransformerHandler
             |!> (_.getTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
+            |!> (_.getTransformer.setOutputProperty(OutputKeys.INDENT, "no"))
             |!> (_.setResult(new StreamResult(writer)))
         )
 

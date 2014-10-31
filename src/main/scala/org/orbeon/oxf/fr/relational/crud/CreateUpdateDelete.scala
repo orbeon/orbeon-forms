@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Whitespace, XPath, StringBuilderWriter, NetUtils}
 import org.orbeon.oxf.xml._
 import org.xml.sax.InputSource
+import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.orbeon.oxf.fr.FormRunner.{XH, XF}
@@ -80,6 +81,8 @@ object RequestReader {
         def newIdentityReceiver(writer: Writer) = (
             TransformerUtils.getIdentityTransformerHandler
             |!> (_.getTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
+            |!> (_.getTransformer.setOutputProperty(OutputKeys.INDENT, "no"))
+            |!> (_.getTransformer.setOutputProperty(SaxonOutputKeys.INCLUDE_CONTENT_TYPE, "no"))
             |!> (_.setResult(new StreamResult(writer)))
         )
 

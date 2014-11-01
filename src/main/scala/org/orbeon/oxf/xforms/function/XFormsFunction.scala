@@ -124,14 +124,14 @@ abstract class XFormsFunction extends SystemFunction {
         val inScopeVariables = bindingContext.getInScopeVariables
         val variableDeclarations =
             for {
-                (name, _) ← inScopeVariables.asScala
+                (name, _) ← inScopeVariables.asScala.toList
                 variable = staticContext.declareVariable("", name)
             } yield
                 name → variable
 
         // Create expression
         val pooledXPathExpression =
-            XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations.asJava)
+            XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations)
 
         // Set context items and position for use at runtime
         pooledXPathExpression.setContextItem(initialXPathContext.getContextItem, initialXPathContext.getContextPosition)

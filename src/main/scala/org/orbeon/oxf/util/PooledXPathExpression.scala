@@ -32,7 +32,7 @@ import XPath._
 import scala.util.control.NonFatal
 import org.orbeon.oxf.common.OXFException
 
-class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[PooledXPathExpression], variables: ju.Map[String, XPathVariable]) {
+class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[PooledXPathExpression], variables: List[(String, XPathVariable)]) {
 
     // FIXME: This shouldn't be mutable state
     private var variableToValueMap: ju.Map[String, ValueRepresentation] = null
@@ -186,7 +186,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
     // Called from exf:sort(), indirectly from xxf:evaluate-avt(), and evaluate()
     def prepareDynamicContext(xpathContext: XPathContextMajor): Unit =
         if (variableToValueMap ne null) {
-            for ((name, variable) ← variables.asScala) {
+            for ((name, variable) ← variables) {
                 val value = variableToValueMap.get(name)
                 if (value ne null) // FIXME: this should never happen, right?
                     xpathContext.setLocalVariable(variable.getLocalSlotNumber, value)

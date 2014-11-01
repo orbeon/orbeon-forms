@@ -461,12 +461,17 @@ object XPathCache {
     }
 
     def createPoolableXPathExpression(
-            independentContext: IndependentContext,
-            xpathString: String,
-            isAVT: Boolean,
-            pool: ObjectPool[PooledXPathExpression],
-            variables: JMap[String, XPathVariable]): PooledXPathExpression =
-        new PooledXPathExpression(compileExpressionWithStaticContext(independentContext, xpathString, isAVT), pool, variables)
+        independentContext : IndependentContext,
+        xpathString        : String,
+        isAVT              : Boolean,
+        pool               : ObjectPool[PooledXPathExpression],
+        variables          : List[(String, XPathVariable)]
+    ): PooledXPathExpression =
+        new PooledXPathExpression(
+            compileExpressionWithStaticContext(independentContext, xpathString, isAVT),
+            pool,
+            variables
+        )
 
     // Not sure if/when configuration can be null, but it shouldn't be
     private def configurationOrDefault(configuration: Configuration) =
@@ -509,7 +514,7 @@ object XPathCache {
             val variables =
                 if (variableNames ne null)
                     for {
-                        name ← variableNames.toIterable
+                        name ← variableNames
                         variable = independentContext.declareVariable("", name)
                     } yield
                         name → variable
@@ -520,7 +525,7 @@ object XPathCache {
             if (functionLibrary ne null)
                 independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
             
-            createPoolableXPathExpression(independentContext, xpathString, isAVT, pool, variables.toMap.asJava)
+            createPoolableXPathExpression(independentContext, xpathString, isAVT, pool, variables)
         }
 
         override def destroyObject(o: PooledXPathExpression): Unit = ()

@@ -161,6 +161,53 @@
                 </xsl:with-param>
             </xsl:call-template>
 
+            <xsl:comment>Security filter for eXist</xsl:comment>
+            <filter>
+                <filter-name>orbeon-exist-filter</filter-name>
+                <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
+            </filter>
+            <filter-mapping>
+                <filter-name>orbeon-exist-filter</filter-name>
+                <url-pattern>/exist/*</url-pattern>
+                <dispatcher>REQUEST</dispatcher>
+                <dispatcher>FORWARD</dispatcher>
+            </filter-mapping>
+
+            <xsl:comment>Limit concurrent access to Form Runner</xsl:comment>
+            <filter>
+                <filter-name>orbeon-limiter-filter</filter-name>
+                <filter-class>org.orbeon.oxf.servlet.LimiterFilter</filter-class>
+                <xsl:comment>Include Form Runner pages and XForms Ajax requests</xsl:comment>
+                <init-param>
+                    <param-name>include</param-name>
+                    <param-value>(/fr/.*)|(/xforms-server)</param-value>
+                </init-param>
+                <xsl:comment>Exclude resources not produced by services</xsl:comment>
+                <init-param>
+                    <param-name>exclude</param-name>
+                    <param-value>(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|coffee|map|png|jpg|xsd|htc|ico|swf|html|htm|txt)</param-value>
+                </init-param>
+                <xsl:comment>Minimum, requested, and maximum number of concurrent threads allowed</xsl:comment>
+                <xsl:comment>The `x` prefix specifies a multiple of the number of CPU cores reported by the JVM</xsl:comment>
+                <init-param>
+                    <param-name>min-threads</param-name>
+                    <param-value>1</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>num-threads</param-name>
+                    <param-value>x1</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>max-threads</param-name>
+                    <param-value>x1</param-value>
+                </init-param>
+            </filter>
+            <filter-mapping>
+                <filter-name>orbeon-limiter-filter</filter-name>
+                <url-pattern>/*</url-pattern>
+                <dispatcher>REQUEST</dispatcher>
+            </filter-mapping>
+
             <xsl:comment>All JSP files under /xforms-jsp go through the XForms filter</xsl:comment>
             <filter>
                 <filter-name>orbeon-xforms-filter</filter-name>
@@ -187,24 +234,6 @@
                 <dispatcher>REQUEST</dispatcher>
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
-
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'eXist security filter'"/>
-                <xsl:with-param name="commented" select="$target = 'devel'"/>
-                <xsl:with-param name="content">
-                    <filter>
-                        <filter-name>orbeon-exist-filter</filter-name>
-                        <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
-                    </filter>
-                    <filter-mapping>
-                        <filter-name>orbeon-exist-filter</filter-name>
-                        <url-pattern>/exist/*</url-pattern>
-                        <xsl:comment>Security filter for eXist</xsl:comment>
-                        <dispatcher>REQUEST</dispatcher>
-                        <dispatcher>FORWARD</dispatcher>
-                    </filter-mapping>
-                </xsl:with-param>
-            </xsl:call-template>
 
             <xsl:comment>Orbeon context listener</xsl:comment>
             <listener>

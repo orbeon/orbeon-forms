@@ -58,6 +58,10 @@
 
     <!-- To enable logging for any of the sub-systems below, copy that section outside of the comment block -->
     <!--
+    <category name="org.orbeon.filter.limiter">
+        <priority value="debug"/>
+    </category>
+
     <category name="org.orbeon.oxf.properties.Properties">
         <priority value="debug"/>
     </category>

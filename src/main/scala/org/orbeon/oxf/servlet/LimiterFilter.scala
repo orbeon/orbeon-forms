@@ -23,9 +23,23 @@ import org.slf4j.LoggerFactory
 
 import scala.util.matching.Regex
 
+// Servlet filter to limit the number of concurrent threads entering the filter chain
+//
+// Features:
+//
+// - paths to include/exclude can be configured with regular expressions
+// - the minimum, requested, and maximum number of concurrent threads allowed can be configured
+//
+// By default, the filter sets a limit to the number of CPU cores returned by the JVM. This includes hyper-threading,
+// see: http://stackoverflow.com/questions/11738133/is-it-possible-to-check-in-java-if-the-cpu-is-hyper-threading
+//
+// The threads configuration can be set to multiples of the number of available cores with the `x` prefix, for example:
+//
+// - x0.5
+// - x1.25
 class LimiterFilter extends Filter {
 
-    import LimiterFilter._
+    import LimiterFilter.Logger._
 
     private case class FilterSettings(semaphore: Semaphore, include: Regex, exclude: Regex)
 
@@ -35,7 +49,7 @@ class LimiterFilter extends Filter {
 
         val limit = desiredParallelism(config.getInitParameter)
 
-        Logger.info("initializing limiter filter")
+        info("initializing limiter filter")
 
         val settings =
             FilterSettings(
@@ -44,13 +58,13 @@ class LimiterFilter extends Filter {
                 (nonEmptyOrNone(config.getInitParameter("exclude")) getOrElse "$.").r
             )
 
-        Logger.info(s"limiter filter configuration: $settings")
+        info(s"limiter filter configuration: $settings")
 
         settingsOpt = Some(settings)
     }
 
     override def destroy() = {
-        Logger.info(s"destroying limiter filter")
+        info(s"destroying limiter filter")
         settingsOpt = None
     }
 
@@ -61,16 +75,16 @@ class LimiterFilter extends Filter {
 
             NetUtils.getRequestPathInfo(httpReq) match {
                 case path if include.pattern.matcher(path).matches && ! exclude.pattern.matcher(path).matches ⇒
-                    Logger.debug(s"before acquiring semaphore for '$path'")
-                    val timestamp = if (Logger.isDebugEnabled) System.nanoTime else -1
+                    debug(s"semaphore: before acquiring for '$path'")
+                    val timestamp = if (isDebugEnabled) System.nanoTime else -1
                     semaphore.acquire()
                     try {
-                        Logger.debug(s"after acquiring semaphore for '$path' (waited ${(System.nanoTime - timestamp) / 1000000} ms)")
+                        debug(s"semaphore: acquired for '$path' in ${(System.nanoTime - timestamp) / 1000000} ms")
                         chain.doFilter(req, res)
                     }  finally
                         semaphore.release()
                 case path ⇒
-                    Logger.debug(s"skipping semaphore for '$path'")
+                    debug(s"semaphore: skipping for '$path'")
                     chain.doFilter(req, res)
             }
         }

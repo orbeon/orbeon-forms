@@ -90,11 +90,11 @@
         <priority value="debug"/>
     </category>
 
-    <category name="org.orbeon.oxf.webapp.OPSSessionListener">
+    <category name="org.orbeon.oxf.webapp.OrbeonSessionListener">
         <priority value="info"/>
     </category>
 
-    <category name="org.orbeon.oxf.webapp.OPSServletContextListener">
+    <category name="org.orbeon.oxf.webapp.OrbeonServletContextListener">
         <priority value="info"/>
     </category>
     -->

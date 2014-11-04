@@ -231,7 +231,7 @@ trait FormRunnerActions {
             // Append query parameters to the URL and evaluate XVTs
             val evaluatedPropertiesAsMap =
                 propertiesAsPairs map {
-                    case ("uri", some @ Some(_)) ⇒ "uri" → (some map (recombineQuery(_, paramValuesToAppend)))
+                    case ("uri", some @ Some(_)) ⇒ "uri" → (some map evaluateValueTemplate map (recombineQuery(_, paramValuesToAppend)))
                     case (name,  some @ Some(_)) ⇒ name  → (some map evaluateValueTemplate)
                     case other                   ⇒ other
                 } toMap

@@ -37,9 +37,11 @@ private[persistence] object SQL extends Logging {
             writer.toString
         }
 
+        // Split in lines, removing lines with just /, which are there for SQL*Plus
+        val lines = fileContentAsString.split("\n").toList.filter(_ != "/")
+
         // Group each line with its next line
         val linesWithNext = {
-            val lines = fileContentAsString.split("\n").toList
             val next = lines.tail.map(Some(_)) :+ None
             lines.zip(next)
         }

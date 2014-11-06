@@ -119,9 +119,6 @@ abstract public class XFormsToSomething extends ProcessorImpl {
         public Stage1CacheableState stage1CacheableState;
     }
 
-    private static final boolean DO_TEST_STATE = false;
-    private static Stage2CacheableState TEST_STATE;
-
     private void doIt(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
@@ -150,11 +147,9 @@ abstract public class XFormsToSomething extends ProcessorImpl {
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
         final boolean[] cachedStatus = new boolean[] { false } ;
 
-        final Stage2CacheableState stage2CacheableState;
-        if (TEST_STATE == null) {
-
-            // Read and try to cache the complete XForms+XHTML document with annotations
-            stage2CacheableState = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT),
+        // Read and try to cache the complete XForms+XHTML document with annotations
+        final Stage2CacheableState stage2CacheableState =
+            readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT),
                 new CacheableInputReader<Stage2CacheableState>() {
                     public Stage2CacheableState read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
@@ -194,12 +189,6 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         cachedStatus[0] = true;
                     }
                 });
-
-            TEST_STATE = DO_TEST_STATE ? stage2CacheableState : null;
-
-        } else {
-            stage2CacheableState = TEST_STATE;
-        }
 
         try {
             // Create containing document if not done yet

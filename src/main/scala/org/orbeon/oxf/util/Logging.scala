@@ -54,7 +54,7 @@ trait Logging {
         }
 
     // Run the given block only in debug mode
-    def ifDebug(body: ⇒ Any)(implicit logger: IndentedLogger): Unit =
+    def ifDebug[T](body: ⇒ T)(implicit logger: IndentedLogger): Unit =
         if (logger.isDebugEnabled)
             body
 

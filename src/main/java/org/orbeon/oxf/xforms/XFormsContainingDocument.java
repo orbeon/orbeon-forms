@@ -129,10 +129,8 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         this.uuid = SecureUtils.randomHexId();
 
         // Initialize request information
-        {
-            initializeRequestInformation();
-            initializePathMatchers();
-        }
+        initializeRequestInformation();
+        initializePathMatchers();
 
         indentedLogger().startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
         {

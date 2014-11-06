@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state
 
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import net.sf.ehcache.{Element ⇒ EhElement }
 import org.orbeon.oxf.xforms._
@@ -31,6 +32,9 @@ object EhcacheStateStore extends XFormsStateStore {
 
         assert(document.getStaticState.isServerStateHandling)
 
+        if (! isInitialState)
+            LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" → document.getUUID))
+
         if (isDebugEnabled)
             debug("store size before storing: " + getCurrentSize + " entries.")
 
@@ -45,41 +49,42 @@ object EhcacheStateStore extends XFormsStateStore {
         addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
         // Static and dynamic states
-        addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState)
+        addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
         addOrReplaceOne(dynamicStateKey, DynamicState(document))
     }
 
-    def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState = {
+    def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState =
+        LifecycleLogger.withEventAssumingRequest("xforms", "restore state", List("uuid" → documentUUID, "backOrReload" → isInitialState.toString)) {
 
-        if (isDebugEnabled)
-            debug("store size before finding: " + getCurrentSize + " entries.")
+            if (isDebugEnabled)
+                debug("store size before finding: " + getCurrentSize + " entries.")
 
-        def findOne(key: String) = stateCache.get(key) match {
-            case element: EhElement ⇒ element.getObjectValue
-            case _ ⇒ null
+            def findOne(key: String) = stateCache.get(key) match {
+                case element: EhElement ⇒ element.getObjectValue
+                case _ ⇒ null
+            }
+
+            findOne(documentUUID) match {
+                case keyString: String ⇒
+                    // Found the keys, split into parts
+                    val parts = keyString split ':'
+
+                    assert(parts.size == 2)
+                    assert(parts(0).length == SecureUtils.HexIdLength)   // static state key is an hex hash
+
+                    // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
+                    val dynamicStateKey = if (isInitialState) getDynamicStateKey(documentUUID, true) else parts(1)
+
+                    // Gather values from cache for both keys and return state only if both are non-null
+                    Stream(parts(0), dynamicStateKey) map findOne filter (_ ne null) match {
+                        case Stream(staticState: String, dynamicState: DynamicState) ⇒
+                            XFormsState(Some(parts(0)), staticState, dynamicState)
+                        case _ ⇒ null
+                    }
+
+                case _ ⇒ null
+            }
         }
-
-        findOne(documentUUID) match {
-            case keyString: String ⇒
-                // Found the keys, split into parts
-                val parts = keyString split ':'
-
-                assert(parts.size == 2)
-                assert(parts(0).length == SecureUtils.HexIdLength)   // static state key is an hex hash
-
-                // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
-                val dynamicStateKey = if (isInitialState) getDynamicStateKey(documentUUID, true) else parts(1)
-
-                // Gather values from cache for both keys and return state only if both are non-null
-                Stream(parts(0), dynamicStateKey) map findOne filter (_ ne null) match {
-                    case Stream(staticState: String, dynamicState: DynamicState) ⇒
-                        XFormsState(Some(parts(0)), staticState, dynamicState)
-                    case _ ⇒ null
-                }
-
-            case _ ⇒ null
-        }
-    }
 
     def getMaxSize = stateCache.getCacheConfiguration.getMaxEntriesLocalHeap
     def getCurrentSize = stateCache.getMemoryStoreSize

@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
@@ -225,12 +226,15 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 indentedLogger.logDebug(LOG_TYPE, "Storing initial document state.");
                 storeDocumentState(containingDocument, isInitialState);
             }
-
         } else if (containingDocument.getStaticState().isServerStateHandling()) {
             // Directly store the document state
             indentedLogger.logDebug(LOG_TYPE, "Document cache disabled. Storing initial document state.");
             storeDocumentState(containingDocument, isInitialState);
         }
+        LifecycleLogger.eventAssumingRequestJava("xforms", "after cacheOrStore", new String[] {
+                "document cache current size", Integer.toString(XFormsDocumentCache.instance().getCurrentSize()),
+                "document cache max size", Integer.toString(XFormsDocumentCache.instance().getMaxSize())
+        });
     }
 
     /**

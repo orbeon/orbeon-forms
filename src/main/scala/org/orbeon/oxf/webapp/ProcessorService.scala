@@ -16,6 +16,7 @@ package org.orbeon.oxf.webapp
 import ProcessorService._
 import javax.naming.InitialContext
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -32,25 +33,30 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
     val errorProcessor = errorProcessorDefinition map InitUtils.createProcessor
 
     // Run
-    def service(pipelineContext: PipelineContext, externalContext: ExternalContext) {
+    def service(pipelineContext: PipelineContext, externalContext: ExternalContext): Unit = {
 
-        // NOTE: Should this just be available from the ExternalContext?
-        pipelineContext.setAttribute(JNDIContext, jndiContext)
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
 
-        try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, Logger)
-        catch {
-            case NonFatal(t) ⇒
-                // Log first
-                Logger.error(OrbeonFormatter.format(t))
+        LifecycleLogger.withEventAssumingRequest("service", "handle", Nil) {
 
-                // Try to start the error pipeline if the response has not been committed yet
-                Option(externalContext.getResponse) foreach  { response ⇒
-                    if (! response.isCommitted) {
-                        response.reset()
-                        serviceError(externalContext, t)
-                    } else
-                        serviceStaticError(externalContext, t)
-                }
+            // NOTE: Should this just be available from the ExternalContext?
+            pipelineContext.setAttribute(JNDIContext, jndiContext)
+
+            try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, Logger)
+            catch {
+                case NonFatal(t) ⇒
+                    // Log first
+                    Logger.error(OrbeonFormatter.format(t))
+
+                    // Try to start the error pipeline if the response has not been committed yet
+                    Option(externalContext.getResponse) foreach  { response ⇒
+                        if (! response.isCommitted) {
+                            response.reset()
+                            serviceError(externalContext, t)
+                        } else
+                            serviceStaticError(externalContext, t)
+                    }
+            }
         }
     }
 

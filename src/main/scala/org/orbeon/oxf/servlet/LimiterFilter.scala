@@ -17,7 +17,7 @@ import java.util.concurrent.Semaphore
 import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.logging.{MinimalRequest, LifecycleLogger}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.slf4j.LoggerFactory
 
@@ -49,7 +49,7 @@ class LimiterFilter extends Filter {
 
         val limit = desiredParallelism(config.getInitParameter)
 
-        info("initializing limiter filter")
+        info("initializing")
 
         val settings =
             FilterSettings(
@@ -58,40 +58,45 @@ class LimiterFilter extends Filter {
                 (nonEmptyOrNone(config.getInitParameter("exclude")) getOrElse "$.").r
             )
 
-        info(s"limiter filter configuration: $settings")
+        info(s"configuring: $settings")
 
         settingsOpt = Some(settings)
     }
 
     override def destroy() = {
-        info(s"destroying limiter filter")
+        info(s"destroying")
         settingsOpt = None
     }
 
     override def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
         settingsOpt foreach { case FilterSettings(semaphore, include, exclude) ⇒
 
-            val httpReq = req.asInstanceOf[HttpServletRequest]
+            val httpReq = MinimalRequest(req.asInstanceOf[HttpServletRequest])
 
-            NetUtils.getRequestPathInfo(httpReq) match {
+            httpReq.getRequestPath match {
                 case path if include.pattern.matcher(path).matches && ! exclude.pattern.matcher(path).matches ⇒
-                    debug(s"semaphore: before acquiring for '$path'")
-                    val timestamp = if (isDebugEnabled) System.nanoTime else -1
-                    semaphore.acquire()
-                    try {
-                        debug(s"semaphore: acquired for '$path' in ${(System.nanoTime - timestamp) / 1000000} ms")
-                        chain.doFilter(req, res)
-                    }  finally
-                        semaphore.release()
+                    LifecycleLogger.withEvent(httpReq, "limiter", "filter", Nil) {
+                        val timestamp = System.currentTimeMillis
+                        semaphore.acquire()
+                        try {
+                            // Log request details again in case wait takes a while
+                            val logParams = LifecycleLogger.basicRequestDetails(httpReq) ::: List("wait" → LifecycleLogger.formatDelay(timestamp))
+                            LifecycleLogger.withEvent(httpReq, "limiter", "chain", logParams) {
+                                chain.doFilter(req, res)
+                            }
+                        } finally
+                            semaphore.release()
+                    }
                 case path ⇒
-                    debug(s"semaphore: skipping for '$path'")
-                    chain.doFilter(req, res)
+                    LifecycleLogger.withEvent(httpReq, "limiter", "nofilter", Nil) {
+                        chain.doFilter(req, res)
+                    }
             }
         }
 
     // Inspired from Scala code so under Scala license http://www.scala-lang.org/license.html
     // https://github.com/scala/scala/blob/2.11.x/src/library/scala/concurrent/impl/ExecutionContextImpl.scala
-    def desiredParallelism(param: String ⇒ String) = {
+    private def desiredParallelism(param: String ⇒ String) = {
 
         def stringParamWithDefault(name: String, default: String) =
             nonEmptyOrNone(param(name)) getOrElse default
@@ -114,5 +119,6 @@ class LimiterFilter extends Filter {
 }
 
 private object LimiterFilter {
-    val Logger = LoggerFactory.getLogger("org.orbeon.filter.limiter")
+    val LoggerName = "org.orbeon.filter.limiter"
+    val Logger     = LoggerFactory.getLogger(LoggerName)
 }

@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, GroupNode, _}
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
@@ -38,6 +39,7 @@ trait ProcessInterpreter extends Logging {
     val EmptyActionParams: ActionParams = Map.empty
 
     // Must be overridden by implementation
+    def currentXFormsDocumentId: String
     def findProcessByName(scope: String, name: String): Option[String]
     def processError(t: Throwable): Unit
     def xpathContext: Item
@@ -217,7 +219,9 @@ trait ProcessInterpreter extends Logging {
 
     // Main entry point for starting a process associated with a named button
     def runProcessByName(scope: String, name: String): Unit =
-        runProcess(scope, rawProcessByName(scope, name))
+        LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" → currentXFormsDocumentId, "scope" → scope, "name" → name)) {
+            runProcess(scope, rawProcessByName(scope, name))
+        }
 
     // Main entry point for starting a literal process
     def runProcess(scope: String, process: String): Try[Any] = {

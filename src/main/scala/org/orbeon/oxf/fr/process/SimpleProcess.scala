@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.FormRunner.{recombineQuery ⇒ _, _}
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.scaxon.XML._
@@ -36,6 +37,8 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     implicit val logger = containingDocument.getIndentedLogger("process")
 
     override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
+
+    def currentXFormsDocumentId = XFormsAPI.containingDocument.getUUID
 
     // All XPath runs in the context of the main form instance's root element
     def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull

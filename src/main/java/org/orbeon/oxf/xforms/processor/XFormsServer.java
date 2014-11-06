@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.webapp.SessionExpiredException;
@@ -88,6 +89,7 @@ public class XFormsServer extends ProcessorImpl {
                 try {
                     doIt(pipelineContext, xmlReceiver);
                 } catch (SessionExpiredException e) {
+                    LifecycleLogger.eventAssumingRequestJava("xforms", e.message(), new String[] {});
                     // Don't log whole exception
                     logger.info(e.message());
                     ClientEvents.errorDocument(e.message(), e.code(), xmlReceiver);
@@ -181,13 +183,27 @@ public class XFormsServer extends ProcessorImpl {
         // Find an output stream for xf:submission[@replace = 'all']
         final ExternalContext.Response response = PipelineResponse.getResponse(xmlReceiver, externalContext);
 
+        // The following throws if the session has expired
         final XFormsStateLifecycle.RequestParameters parameters = XFormsStateManager.instance().extractParameters(requestDocument, false);
         Callable<SubmissionResult> replaceAllCallable = null;
 
         // IMPORTANT: We now have a lock associated with the document
+        LifecycleLogger.eventAssumingRequestJava("xforms", "before document lock", new String[] { "uuid", parameters.getUUID() });
+        final long timestamp = System.currentTimeMillis();
+        // The following trows if the lock is not found either the UUID is not in the session OR the session doesn't exist
         final Lock lock = XFormsStateManager.instance().acquireDocumentLock(parameters);
         if (lock != null) {
             try {
+                LifecycleLogger.eventAssumingRequest(
+                    "xforms",
+                    "got document lock",
+                    LifecycleLogger.basicRequestDetailsAssumingRequestJava(
+                        new String[] {
+                            "uuid", parameters.getUUID(),
+                            "wait", LifecycleLogger.formatDelay(timestamp)
+                        }
+                    )
+                );
                 // Get containing document from the incoming request
                 final XFormsContainingDocument containingDocument = XFormsStateManager.instance().beforeUpdate(parameters);
                 boolean keepDocument = false;
@@ -374,6 +390,7 @@ public class XFormsServer extends ProcessorImpl {
 
                         assert containingDocument.getLastAjaxResponse() != null;
 
+                        LifecycleLogger.eventAssumingRequestJava("xforms", "replay response", new String[] { "uuid", parameters.getUUID() });
                         indentedLogger.startHandleOperation("retry", "replaying previous Ajax response");
                         boolean replaySuccess = false;
                         try {
@@ -412,6 +429,7 @@ public class XFormsServer extends ProcessorImpl {
             // - No need to output a null document here, xmlReceiver is null anyway.
             XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
         } else {
+            LifecycleLogger.eventAssumingRequestJava("xforms", "document lock timeout", new String[] { "uuid", parameters.getUUID() });
             indentedLogger.logInfo("", "Ajax update lock timeout exceeded, returning");
             throw new OXFException("Ajax update lock timeout exceeded");
         }

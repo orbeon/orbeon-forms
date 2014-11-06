@@ -25,6 +25,7 @@ public interface Cache {
     Iterator<CacheKey> iterateCacheKeys();
     Iterator<Object> iterateCacheObjects();
     int getCurrentSize();
+    int getMaxSize();
     void setMaxSize(int maxSize);
     CacheStatistics getStatistics();
 }

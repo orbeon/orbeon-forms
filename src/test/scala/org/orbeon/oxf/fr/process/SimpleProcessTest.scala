@@ -32,6 +32,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
 
         implicit val logger = new IndentedLogger(LoggerFactory.createLogger(classOf[TestProcessInterpreter]), true, "test")
 
+        override def currentXFormsDocumentId = ""
         def findProcessByName(scope: String, name: String): Option[String] = None
         def processError(t: Throwable) = ()
         var xpathContext: Item = null

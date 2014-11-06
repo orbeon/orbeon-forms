@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
@@ -137,6 +138,9 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             // Remember static state
             this.staticState = staticState;
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
+
+            if (! isNoUpdatesStatic())  // attempt to ignore oxf:xforms-submission
+                LifecycleLogger.eventAssumingRequestJava("xforms", "new form session", new String[] { "uuid", uuid });
 
             // NOTE: template is not stored right away, as it depends on the evaluation of the noscript property.
 

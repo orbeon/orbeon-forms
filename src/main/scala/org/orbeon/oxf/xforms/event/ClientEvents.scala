@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import events._
 import org.orbeon.oxf.webapp.SessionExpiredException
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -392,12 +393,18 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             true
         }
 
+        def logEvent(message: String) =
+            LifecycleLogger.eventAssumingRequest("xforms", message, List("uuid" → XFormsStateManager.getRequestUUID(requestDocument)))
+
         if (hasOther(clientEvents)) {
             // Return other events
+            logEvent("ajax with update events")
             clientEvents filterNot isHeartbeat filterNot isUploadProgress
         } else if (hasUploadProgress(clientEvents)) {
             // Directly output progress information for all controls found
             eventResponse("ajax response", "handling quick upload progress Ajax response") { helper ⇒
+
+                logEvent("ajax upload progress")
 
                 val uploadProgressEvents = clientEvents filter isUploadProgress
                 val ids                  = uploadProgressEvents map (_.targetEffectiveId)
@@ -429,12 +436,12 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             Nil
         } else if (hasHeartBeat(clientEvents)) {
             // Output empty Ajax response
-
+            logEvent("ajax heartbeat")
             eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
-
             Nil
         } else {
             // No events to process
+            logEvent("ajax empty")
             eventResponse("ajax response", "handling quick empty response")(helper ⇒ ())
             Nil
         }

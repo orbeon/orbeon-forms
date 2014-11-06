@@ -93,4 +93,8 @@ public class XFormsDocumentCache {
     public int getCurrentSize() {
         return cache.getCurrentSize();
     }
+
+    public int getMaxSize() {
+        return cache.getMaxSize();
+    }
 }

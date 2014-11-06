@@ -1,11 +1,5 @@
 <component name="libraryTable">
-  <library name="scala-sdk" type="Scala">
-    <properties>
-      <compiler-classpath>
-        <root url="file://$PROJECT_DIR$/l" />
-        <root url="file://$PROJECT_DIR$/lib/orac" />
-      </compiler-classpath>
-    </properties>
+  <library name="scala-sdk">
     <CLASSES />
     <JAVADOC />
     <SOURCES />

@@ -44,9 +44,43 @@
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
             <xf:var name="has-fb-roles" value="$is-fb and not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
-            <xf:var name="app-query"         value="if ($has-fb-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xf:var name="form-query"        value="if ($app-query)    then instance('fr-search-instance')/query[contains(@path, 'form-name')        and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xf:var name="initial-app-value" value="if ($app-query)    then xxf:instance('fb-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
+            <xf:var
+                name="app-query"
+                as="element(query)?"
+                value="
+                    if ($has-fb-roles)
+                    then
+                        instance('fr-search-instance')/query[
+                            contains(@path, 'application-name')
+                            and @search-field = 'true'
+                        ]
+                    else
+                        ()"/>
+
+            <xf:var
+                name="form-query"
+                as="element(query)?"
+                value="
+                    if ($app-query)
+                    then
+                        instance('fr-search-instance')/query[
+                            contains(@path, 'form-name')
+                            and @search-field = 'true'
+                        ]
+                    else
+                        ()"/>
+
+            <xf:var
+                name="has-fb-roles-for-all-apps"
+                value="$has-fb-roles and exists(xxf:instance('fb-permissions')/app[@name = '*'])"/>
+
+            <xf:var
+                name="initial-app-value"
+                as="xs:string?"
+                value="
+                    if ($app-query)
+                    then xxf:instance('fb-permissions')/app[1][not(@name = '*')]/@name
+                    else ()"/>
 
             <xf:var name="selection-is-one-document" value="count(xxf:split(instance('fr-selection-instance'))) = 1"/>
             <xf:var name="selection-data-or-draft"   value="if ($selection-is-one-document) then substring-before(instance('fr-selection-instance'), '/') else ()"/>
@@ -298,7 +332,10 @@
             <!-- 4. If roles are enabled but no role applies, the page is unauthorized.
                 NOTE: Do this upon `xforms-ready` because `fb-permissions` instance is not ready upon
                 `xforms-model-construct-done`. -->
-            <xf:action ev:event="xforms-ready" if="$has-fb-roles and empty($initial-app-value)" type="xpath">
+            <xf:action
+                ev:event="xforms-ready"
+                if="$has-fb-roles and not($has-fb-roles-for-all-apps) and empty($initial-app-value)"
+                type="xpath">
                 frf:sendError(403)
             </xf:action>
 
@@ -423,7 +460,7 @@
                                     <xf:group ref="$app-query[$has-fb-roles]" class="fr-summary-search-item">
                                         <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
                                         <!-- Use an input if app name is a wildcard -->
-                                        <xf:var name="is-input" value="xxf:instance('fb-permissions')/app[@name = '*']" as="xs:boolean"/>
+                                        <xf:var name="is-input" value="$has-fb-roles-for-all-apps"/>
                                         <xf:input ref=".[$is-input]">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>
@@ -451,7 +488,7 @@
                                         <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
                                         <xf:var name="current-app" value="xxf:instance('fb-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
-                                        <xf:var name="is-input" value="xxf:instance('fb-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
+                                        <xf:var name="is-input" value="$has-fb-roles-for-all-apps or $current-app/form[@name = '*']"/>
                                         <xf:input ref=".[$is-input]">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>

@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ScalacSettings">
-    <option name="COMPILER_LIBRARY_NAME" value="Orbeon Forms" />
-    <option name="COMPILER_LIBRARY_LEVEL" value="Project" />
-    <option name="FSC_OPTIONS" value="-Xfatal-warnings" />
+  <component name="ScalaCompilerConfiguration">
+    <option name="deprecationWarnings" value="true" />
+    <option name="uncheckedWarnings" value="true" />
+    <parameters>
+      <parameter value="-feature" />
+      <parameter value="-language:postfixOps" />
+      <parameter value="-language:reflectiveCalls" />
+      <parameter value="-language:implicitConversions" />
+      <parameter value="-language:higherKinds" />
+      <parameter value="-language:existentials" />
+    </parameters>
   </component>
 </project>
-

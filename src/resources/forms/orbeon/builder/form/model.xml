@@ -391,7 +391,7 @@
             )"
         method="post"
         replace="all"
-        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test"
+        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test?{xxf:get-query-string()}"
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />

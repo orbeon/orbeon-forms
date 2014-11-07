@@ -53,6 +53,9 @@ abstract class Converter(targetURI: String) extends ProcessorImpl {
                     var level = 0
                     var inXHTMLNamespace = false
 
+                    // Consider elements in no namespace to be HTML, see #1981
+                    def isHTMLElement(uri: String) = uri == HtmlURI || uri == ""
+
                     override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
 
                         // http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer SHOULD output
@@ -67,7 +70,7 @@ abstract class Converter(targetURI: String) extends ProcessorImpl {
                             super.startPrefixMapping("", HtmlURI)
                         }
 
-                        if (uri == HtmlURI)
+                        if (isHTMLElement(uri))
                             super.startElement(if (inXHTMLNamespace) targetURI else "", localname, localname, filterAttributes(attributes))
 
                         level += 1
@@ -77,7 +80,7 @@ abstract class Converter(targetURI: String) extends ProcessorImpl {
 
                         level -= 1
 
-                        if (uri == HtmlURI)
+                        if (isHTMLElement(uri))
                             super.endElement(if (inXHTMLNamespace) targetURI else "", localname, localname)
 
                         if (level == 0 && inXHTMLNamespace)

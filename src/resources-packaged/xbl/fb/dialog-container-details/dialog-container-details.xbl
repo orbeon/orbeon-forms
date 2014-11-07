@@ -213,7 +213,7 @@
                 <xxf:dialog id="dialog" appearance="full" level="modal">
                     <xf:label ref="$resources/dialog-container-details/label"/>
 
-                    <fr:tabbable>
+                    <fr:tabbable id="tabs">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-container-details/tab-base/label"/>
 
@@ -268,7 +268,7 @@
                         <fr:tab id="repeat-tab">
                             <fr:label ref="$resources/dialog-container-details/tab-repeat/label"/>
 
-                            <fr:grid>
+                            <fr:grid id="repeat-tab-grid">
                                 <xh:tr>
                                     <xh:td>
                                         <!-- Repeat -->
@@ -311,7 +311,7 @@
                                     <xh:tr>
                                         <xh:td>
                                             <!-- Min -->
-                                            <xf:select1 ref="$i/min-repeat" appearance="full">
+                                            <xf:select1 ref="$i/min-repeat" appearance="full" id="min-repeat">
                                                 <xf:label value="$resources/dialog-container-details/min/label"/>
                                                 <xf:item>
                                                     <xf:label value="$resources/dialog-container-details/no-minimum"/>
@@ -336,7 +336,7 @@
                                         </xh:td>
                                         <xh:td>
                                             <!-- Max -->
-                                            <xf:select1 ref="$i/max-repeat" appearance="full">
+                                            <xf:select1 ref="$i/max-repeat" appearance="full" id="max-repeat">
                                                 <xf:label value="$resources/dialog-container-details/max/label"/>
                                                 <xf:item>
                                                     <xf:label value="$resources/dialog-container-details/unlimited"/>

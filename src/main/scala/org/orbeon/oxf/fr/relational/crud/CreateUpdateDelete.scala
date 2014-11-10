@@ -208,7 +208,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 req.forAttachment     → "file_name"          → "?"    → param(_.setString   , req.filename.get),
                 req.forAttachment     → "file_content"       → "?"    → param(_.setBytes    , RequestReader.bytes()),
                 isFormDefinition      → "form_metadata"      → "?"    → param(_.setString   , metadataOpt.orNull),
-                req.forData           → "username"           → "?"    → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.orNull)),.
+                req.forData           → "username"           → "?"    → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.orNull)),
                 req.forData           → "groupname"          → "?"    → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup   .orNull)),
                 ! req.forAttachment   → xmlCol               → xmlVal → param(_.setString   , xmlOpt.orNull)
             )

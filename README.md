@@ -88,7 +88,7 @@ Compiling Orbeon Forms
 ----------------------
 
 You usually don't have to compile Orbeon Forms yourself. But if you want to, see
-[Java development and IDE settings](http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development).
+[Building Orbeon Forms](https://github.com/orbeon/orbeon-forms/wiki/Contributors-~-Building-Orbeon-Forms).
 The source code is available on [github](https://github.com/orbeon/orbeon-forms/).
 
 Orbeon Forms is written mainly using the following languages and technologies:

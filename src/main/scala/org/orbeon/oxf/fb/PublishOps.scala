@@ -34,7 +34,7 @@ trait PublishOps {
                     fromBasePath      = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
                     toBasePath        = createFormDefinitionBasePath(app, form),
                     filename          = "form.xhtml",
-                    commonQueryString = s"document=$document",
+                    commonQueryString = encodeSimpleQuery(List("document" → document)),
                     forceAttachments  = false,
                     // Using "next" for attachments works as attachments are saved first, and the persistence layer
                     // uses the latest version of the published forms (not attachments) to figure what the next

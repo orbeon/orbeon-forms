@@ -23,10 +23,10 @@ import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DynamicResourcesPath
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
-        retrievePathMatchers: ⇒ ju.List[URLRewriterUtils.PathMatcher],
-        request: ExternalContext.Request,
-        wsrpEncodeResources: Boolean)
-    extends URLRewriter {
+    retrievePathMatchers : ⇒ ju.List[URLRewriterUtils.PathMatcher],
+    request              : ExternalContext.Request,
+    wsrpEncodeResources  : Boolean
+) extends URLRewriter {
     
     import WSRPURLRewriter._
 
@@ -36,8 +36,15 @@ class WSRPURLRewriter(
     private var pathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
 
     // For Java callers, use Callable
-    def this(getPathMatchers: Callable[ju.List[URLRewriterUtils.PathMatcher]], request: ExternalContext.Request, wsrpEncodeResources: Boolean) =
-        this(getPathMatchers.call, request, wsrpEncodeResources)
+    def this(
+        getPathMatchers     : Callable[ju.List[URLRewriterUtils.PathMatcher]],
+        request             : ExternalContext.Request,
+        wsrpEncodeResources : Boolean
+    ) = this(
+        getPathMatchers.call,
+        request,
+        wsrpEncodeResources
+    )
 
     private def getPathMatchers = {
         if (pathMatchers eq null)
@@ -102,13 +109,24 @@ class WSRPURLRewriter(
         // Always encode dynamic resources
         if (wsrpEncodeResources || urlString == "/xforms-server" || urlString.startsWith(DynamicResourcesPath)) {
             // First rewrite path to support versioned resources
-            val rewrittenPath = URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers, REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
+            val rewrittenPath =
+                URLRewriterUtils.rewriteResourceURL(
+                    request,
+                    urlString,
+                    getPathMatchers,
+                    REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+                )
 
             // Then do the WSRP encoding
             rewritePortletURL(rewrittenPath, URLTypeResource, null, null)
         } else
             // Generate resource served by the servlet
-            URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers, REWRITE_MODE_ABSOLUTE_PATH)
+            URLRewriterUtils.rewriteResourceURL(
+                request,
+                urlString,
+                getPathMatchers,
+                REWRITE_MODE_ABSOLUTE_PATH
+            )
     }
 }
 
@@ -120,9 +138,24 @@ object WSRPURLRewriter {
     private val URLTypeRender         = 2
     private val URLTypeResource       = 3
 
-    val URLTypeBlockingActionString = "blockingAction"
-    val URLTypeRenderString         = "render"
-    val URLTypeResourceString       = "resource"
+    val URLTypeBlockingActionString   = "blockingAction"
+    val URLTypeRenderString           = "render"
+    val URLTypeResourceString         = "resource"
+
+    val BaseTag                       = "wsrp_rewrite"
+    val StartTag                      = BaseTag + '?'
+    val EndTag                        = '/' + BaseTag
+    val PrefixTag                     = BaseTag + '_'
+
+    val URLTypeParam                  = "wsrp-urlType"
+    val ModeParam                     = "wsrp-mode"
+    val WindowStateParam              = "wsrp-windowState"
+    val NavigationalStateParam        = "wsrp-navigationalState"
+
+    val BaseTagLength                 = BaseTag.length
+    val StartTagLength                = StartTag.length
+    val EndTagLength                  = EndTag.length
+    val PrefixTagLength               = PrefixTag.length
 
     private val URLTypes = Map(
         URLTypeBlockingAction → URLTypeBlockingActionString,
@@ -130,27 +163,19 @@ object WSRPURLRewriter {
         URLTypeResource       → URLTypeResourceString
     )
 
-    val BaseTag     = "wsrp_rewrite"
-    val StartTag    = BaseTag + '?'
-    val EndTag      = '/' + BaseTag
-    val PrefixTag   = BaseTag + '_'
-
-    val URLTypeParam = "wsrp-urlType"
-    val ModeParam = "wsrp-mode"
-    val WindowStateParam = "wsrp-windowState"
-    val NavigationalStateParam = "wsrp-navigationalState"
-
-    val BaseTagLength   = BaseTag.length
-    val StartTagLength  = StartTag.length
-    val EndTagLength    = EndTag.length
-    val PrefixTagLength = PrefixTag.length
-
     /**
      * Encode an URL into a WSRP pattern including the string "wsrp_rewrite".
      *
      * This does not call the portlet API. Used by Portlet2URLRewriter.
      */
-    def encodeURL(urlType: Int, navigationalState: String, mode: String, windowState: String, fragmentId: String, secure: Boolean): String = {
+    def encodeURL(
+        urlType           : Int,
+        navigationalState : String,
+        mode              : String,
+        windowState       : String,
+        fragmentId        : String,
+        secure            : Boolean
+    ): String = {
 
         val sb = new StringBuilder(StartTag)
 
@@ -192,7 +217,12 @@ object WSRPURLRewriter {
     type CreateResourceURL = String ⇒ String
     type CreatePortletURL  = (Option[String], Option[String], ju.Map[String, Array[String]]) ⇒ String
 
-    def decodeURL(encodedURL: String, createResourceURL: CreateResourceURL, createActionURL: CreatePortletURL, createRenderURL: CreatePortletURL): String = {
+    def decodeURL(
+        encodedURL        : String,
+        createResourceURL : CreateResourceURL,
+        createActionURL   : CreatePortletURL,
+        createRenderURL   : CreatePortletURL
+    ): String = {
 
         import StringConversions.getFirstValueFromStringArray
 

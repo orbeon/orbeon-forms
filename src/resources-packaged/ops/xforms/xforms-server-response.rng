@@ -17,389 +17,397 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
     <start>
-        <element name="xxf:event-response">
-            <optional>
-                <element name="xxf:static-state">
-                    <attribute name="container-type">
-                        <choice>
-                            <value>servlet</value>
-                            <value>portlet</value>
-                        </choice>
-                    </attribute>
-                    <data type="string"/>
-                </element>
-            </optional>
-            <optional>
+        <choice>
+            <element name="xxf:event-response">
                 <optional>
-                    <element name="xxf:dynamic-state">
+                    <element name="xxf:static-state">
+                        <attribute name="container-type">
+                            <choice>
+                                <value>servlet</value>
+                                <value>portlet</value>
+                            </choice>
+                        </attribute>
                         <data type="string"/>
                     </element>
                 </optional>
-                <element name="xxf:action">
+                <optional>
                     <optional>
-                        <element name="xxf:control-values">
-                            <zeroOrMore>
-                                <choice>
-                                    <element name="xxf:control">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <!-- Optional attributes for all controls -->
-                                        <optional>
-                                            <attribute name="visited">
-                                                <choice>
-                                                    <value>true</value>
-                                                    <value>false</value>
-                                                </choice>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="hint"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="alert"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="label"/>
-                                        </optional>
-                                        <optional>
-                                            <attribute name="help"/>
-                                        </optional>
-                                        <optional>
-                                            <!-- Space-separated list of attributes names prefixed with either '-' or an optional '+' -->
-                                            <attribute name="class"/>
-                                        </optional>
-                                        <!-- NOTE: style attribute is output via xxf:attribute -->
-                                        <choice>
-                                            <!-- Optional attributes for xf:output -->
-                                            <group>
-                                                <optional>
-                                                    <attribute name="mediatype"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="filename"/>
-                                                </optional>
-                                            </group>
-                                            <!-- Optional attributes for xf:upload -->
-                                            <group>
-                                                <optional>
-                                                    <attribute name="mediatype"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="state">
-                                                        <choice>
-                                                            <value>empty</value>
-                                                            <value>file</value>
-                                                        </choice>
-                                                    </attribute>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="size"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="filename"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="accept"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="progress-received"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="progress-expected"/>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="progress-state"/>
-                                                </optional>
-                                            </group>
-                                            <!-- Optional attributes for xf:input -->
-                                            <group>
-                                                <optional>
-                                                    <attribute name="size">
-                                                        <optional>
-                                                            <data type="nonNegativeInteger"/>
-                                                        </optional>
-                                                    </attribute>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="maxlength">
-                                                        <optional>
-                                                            <data type="nonNegativeInteger"/>
-                                                        </optional>
-                                                    </attribute>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="autocomplete">
-                                                        <choice>
-                                                            <value>on</value>
-                                                            <value>off</value>
-                                                        </choice>
-                                                    </attribute>
-                                                </optional>
-                                            </group>
-                                            <!-- Optional attributes for xf:textarea -->
-                                            <group>
-                                                <optional>
-                                                    <attribute name="maxlength">
-                                                        <optional>
-                                                            <data type="nonNegativeInteger"/>
-                                                        </optional>
-                                                    </attribute>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="cols">
-                                                        <optional>
-                                                            <data type="nonNegativeInteger"/>
-                                                        </optional>
-                                                    </attribute>
-                                                </optional>
-                                                <optional>
-                                                    <attribute name="rows">
-                                                        <optional>
-                                                            <data type="nonNegativeInteger"/>
-                                                        </optional>
-                                                    </attribute>
-                                                </optional>
-                                            </group>
-                                            <!-- Other controls -->
-                                            <empty/>
-                                        </choice>
-                                        <ref name="model-item-properties"/>
-                                        <optional>
-                                            <attribute name="static">
-                                                <choice>
-                                                    <value>true</value>
-                                                    <value>false</value>
-                                                </choice>
-                                            </attribute>
-                                        </optional>
-                                        <optional>
-                                            <data type="string"/>
-                                        </optional>
-                                    </element>
-                                    <!-- For selection controls only -->
-                                    <element name="xxf:itemset">
-                                        <attribute name="id"/>
-                                        <data type="string"/>
-                                    </element>
-                                    <!-- For switch/case and dialog only -->
-                                    <element name="xxf:div">
-                                        <attribute name="id"/>
-                                        <attribute name="visibility">
-                                            <choice>
-                                                <value>hidden</value>
-                                                <value>visible</value>
-                                            </choice>
-                                        </attribute>
-                                        <!-- For dialog positioning -->
-                                        <optional>
-                                            <attribute name="neighbor"/>
-                                        </optional>
-                                        <!-- For dialog constraining to viewport -->
-                                        <optional>
-                                            <attribute name="constrain">
-                                                <choice>
-                                                    <value>true</value>
-                                                    <value>false</value>
-                                                </choice>
-                                            </attribute>
-                                        </optional>
-                                    </element>
-                                    <element name="xxf:attribute">
-                                        <attribute name="name"/>
-                                        <attribute name="for"/>
-                                        <optional>
-                                            <data type="string"/>
-                                        </optional>
-                                    </element>
-                                    <element name="xxf:text">
-                                        <attribute name="id"/>
-                                        <attribute name="for"/>
-                                        <optional>
-                                            <data type="string"/>
-                                        </optional>
-                                    </element>
-                                    <element name="xxf:copy-repeat-template">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="parent-indexes">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <choice>
-                                            <attribute name="id-suffix">
-                                                <data type="string"/>
-                                            </attribute>
-                                            <group>
-                                                <attribute name="start-suffix">
-                                                    <data type="string"/>
-                                                </attribute>
-                                                <attribute name="end-suffix">
-                                                    <data type="string"/>
-                                                </attribute>
-                                            </group>
-                                        </choice>
-                                    </element>
-                                    <element name="xxf:delete-repeat-elements">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="parent-indexes">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="count">
-                                            <data type="positiveInteger"/>
-                                        </attribute>
-                                    </element>
-                                    <!-- For repeat iterations only -->
-                                    <element name="xxf:repeat-iteration">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <attribute name="iteration">
-                                            <data type="positiveInteger"/>
-                                        </attribute>
-                                        <ref name="model-item-properties"/>
-                                    </element>
-                                    <!-- Inner HTML for an entire control -->
-                                    <element name="xxf:inner-html">
-                                        <attribute name="id">
-                                            <data type="string"/>
-                                        </attribute>
-                                        <data type="string"/>
-                                    </element>
-                                </choice>
-                            </zeroOrMore>
+                        <element name="xxf:dynamic-state">
+                            <data type="string"/>
                         </element>
                     </optional>
-                    <optional>
-                        <element name="xxf:repeat-indexes">
-                            <zeroOrMore>
-                                <element name="xxf:repeat-index">
-                                    <attribute name="id"/>
-                                    <attribute name="new-index">
-                                        <data type="nonNegativeInteger"/>
+                    <element name="xxf:action">
+                        <optional>
+                            <element name="xxf:control-values">
+                                <zeroOrMore>
+                                    <choice>
+                                        <element name="xxf:control">
+                                            <attribute name="id">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <!-- Optional attributes for all controls -->
+                                            <optional>
+                                                <attribute name="visited">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </attribute>
+                                            </optional>
+                                            <optional>
+                                                <attribute name="hint"/>
+                                            </optional>
+                                            <optional>
+                                                <attribute name="alert"/>
+                                            </optional>
+                                            <optional>
+                                                <attribute name="label"/>
+                                            </optional>
+                                            <optional>
+                                                <attribute name="help"/>
+                                            </optional>
+                                            <optional>
+                                                <!-- Space-separated list of attributes names prefixed with either '-' or an optional '+' -->
+                                                <attribute name="class"/>
+                                            </optional>
+                                            <!-- NOTE: style attribute is output via xxf:attribute -->
+                                            <choice>
+                                                <!-- Optional attributes for xf:output -->
+                                                <group>
+                                                    <optional>
+                                                        <attribute name="mediatype"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="filename"/>
+                                                    </optional>
+                                                </group>
+                                                <!-- Optional attributes for xf:upload -->
+                                                <group>
+                                                    <optional>
+                                                        <attribute name="mediatype"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="state">
+                                                            <choice>
+                                                                <value>empty</value>
+                                                                <value>file</value>
+                                                            </choice>
+                                                        </attribute>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="size"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="filename"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="accept"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="progress-received"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="progress-expected"/>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="progress-state"/>
+                                                    </optional>
+                                                </group>
+                                                <!-- Optional attributes for xf:input -->
+                                                <group>
+                                                    <optional>
+                                                        <attribute name="size">
+                                                            <optional>
+                                                                <data type="nonNegativeInteger"/>
+                                                            </optional>
+                                                        </attribute>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="maxlength">
+                                                            <optional>
+                                                                <data type="nonNegativeInteger"/>
+                                                            </optional>
+                                                        </attribute>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="autocomplete">
+                                                            <choice>
+                                                                <value>on</value>
+                                                                <value>off</value>
+                                                            </choice>
+                                                        </attribute>
+                                                    </optional>
+                                                </group>
+                                                <!-- Optional attributes for xf:textarea -->
+                                                <group>
+                                                    <optional>
+                                                        <attribute name="maxlength">
+                                                            <optional>
+                                                                <data type="nonNegativeInteger"/>
+                                                            </optional>
+                                                        </attribute>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="cols">
+                                                            <optional>
+                                                                <data type="nonNegativeInteger"/>
+                                                            </optional>
+                                                        </attribute>
+                                                    </optional>
+                                                    <optional>
+                                                        <attribute name="rows">
+                                                            <optional>
+                                                                <data type="nonNegativeInteger"/>
+                                                            </optional>
+                                                        </attribute>
+                                                    </optional>
+                                                </group>
+                                                <!-- Other controls -->
+                                                <empty/>
+                                            </choice>
+                                            <ref name="model-item-properties"/>
+                                            <optional>
+                                                <attribute name="static">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </attribute>
+                                            </optional>
+                                            <optional>
+                                                <data type="string"/>
+                                            </optional>
+                                        </element>
+                                        <!-- For selection controls only -->
+                                        <element name="xxf:itemset">
+                                            <attribute name="id"/>
+                                            <data type="string"/>
+                                        </element>
+                                        <!-- For switch/case and dialog only -->
+                                        <element name="xxf:div">
+                                            <attribute name="id"/>
+                                            <attribute name="visibility">
+                                                <choice>
+                                                    <value>hidden</value>
+                                                    <value>visible</value>
+                                                </choice>
+                                            </attribute>
+                                            <!-- For dialog positioning -->
+                                            <optional>
+                                                <attribute name="neighbor"/>
+                                            </optional>
+                                            <!-- For dialog constraining to viewport -->
+                                            <optional>
+                                                <attribute name="constrain">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </attribute>
+                                            </optional>
+                                        </element>
+                                        <element name="xxf:attribute">
+                                            <attribute name="name"/>
+                                            <attribute name="for"/>
+                                            <optional>
+                                                <data type="string"/>
+                                            </optional>
+                                        </element>
+                                        <element name="xxf:text">
+                                            <attribute name="id"/>
+                                            <attribute name="for"/>
+                                            <optional>
+                                                <data type="string"/>
+                                            </optional>
+                                        </element>
+                                        <element name="xxf:copy-repeat-template">
+                                            <attribute name="id">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <attribute name="parent-indexes">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <choice>
+                                                <attribute name="id-suffix">
+                                                    <data type="string"/>
+                                                </attribute>
+                                                <group>
+                                                    <attribute name="start-suffix">
+                                                        <data type="string"/>
+                                                    </attribute>
+                                                    <attribute name="end-suffix">
+                                                        <data type="string"/>
+                                                    </attribute>
+                                                </group>
+                                            </choice>
+                                        </element>
+                                        <element name="xxf:delete-repeat-elements">
+                                            <attribute name="id">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <attribute name="parent-indexes">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <attribute name="count">
+                                                <data type="positiveInteger"/>
+                                            </attribute>
+                                        </element>
+                                        <!-- For repeat iterations only -->
+                                        <element name="xxf:repeat-iteration">
+                                            <attribute name="id">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <attribute name="iteration">
+                                                <data type="positiveInteger"/>
+                                            </attribute>
+                                            <ref name="model-item-properties"/>
+                                        </element>
+                                        <!-- Inner HTML for an entire control -->
+                                        <element name="xxf:inner-html">
+                                            <attribute name="id">
+                                                <data type="string"/>
+                                            </attribute>
+                                            <data type="string"/>
+                                        </element>
+                                    </choice>
+                                </zeroOrMore>
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="xxf:repeat-indexes">
+                                <zeroOrMore>
+                                    <element name="xxf:repeat-index">
+                                        <attribute name="id"/>
+                                        <attribute name="new-index">
+                                            <data type="nonNegativeInteger"/>
+                                        </attribute>
+                                    </element>
+                                </zeroOrMore>
+                            </element>
+                        </optional>
+                        <!-- Allow for zero or more in case there are multiple delays -->
+                        <zeroOrMore>
+                            <element name="xxf:server-events">
+                                <!-- Optional delay after which the client must send the event -->
+                                <optional>
+                                    <attribute name="delay"/>
+                                </optional>
+                                <!-- If discardable="true", the client can discard the event if another Ajax request is sent before the delay expires -->
+                                <optional>
+                                    <attribute name="discardable">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
                                     </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="show-progress">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                    <optional>
+                                        <attribute name="progress-message"/>
+                                    </optional>
+                                </optional>
+                                <!-- Encoded server event(s) -->
+                                <data type="string"/>
+                            </element>
+                        </zeroOrMore>
+                        <optional>
+                            <element name="xxf:submission">
+                                <optional>
+                                    <attribute name="action"/>
+                                </optional>
+                                <attribute name="method"/>
+                                <optional>
+                                    <attribute name="show-progress">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="target"/>
+                                </optional>
+                            </element>
+                        </optional>
+                        <zeroOrMore>
+                            <element name="xxf:message">
+                                <attribute name="level"/>
+                                <data type="string"/>
+                            </element>
+                        </zeroOrMore>
+                        <zeroOrMore>
+                            <element name="xxf:load">
+                                <attribute name="resource"/>
+                                <attribute name="show">
+                                    <choice>
+                                        <value>replace</value>
+                                        <value>new</value>
+                                    </choice>
+                                </attribute>
+                                <optional>
+                                    <attribute name="target"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="show-progress">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                            </element>
+                        </zeroOrMore>
+                        <zeroOrMore>
+                            <element name="xxf:script">
+                                <attribute name="name"/>
+                                <attribute name="target-id"/>
+                                <attribute name="observer-id"/>
+                            </element>
+                        </zeroOrMore>
+                        <optional>
+                            <choice>
+                                <element name="xxf:focus">
+                                    <attribute name="control-id"/>
+                                </element>
+                                <element name="xxf:blur">
+                                    <attribute name="control-id"/>
+                                </element>
+                            </choice>
+                        </optional>
+                        <optional>
+                            <element name="xxf:help">
+                                <attribute name="control-id"/>
+                            </element>
+                        </optional>
+                    </element>
+                    <optional>
+                        <element name="xxf:errors">
+                            <zeroOrMore>
+                                <element name="xxf:error">
+                                    <optional><attribute name="exception"/></optional>
+                                    <optional><attribute name="file"/></optional>
+                                    <optional><attribute name="line"/></optional>
+                                    <optional><attribute name="column"/></optional>
+                                    <data type="string"/>
                                 </element>
                             </zeroOrMore>
                         </element>
                     </optional>
-                    <!-- Allow for zero or more in case there are multiple delays -->
-                    <zeroOrMore>
-                        <element name="xxf:server-events">
-                            <!-- Optional delay after which the client must send the event -->
-                            <optional>
-                                <attribute name="delay"/>
-                            </optional>
-                            <!-- If discardable="true", the client can discard the event if another Ajax request is sent before the delay expires -->
-                            <optional>
-                                <attribute name="discardable">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
-                                </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="show-progress">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
-                                </attribute>
-                                <optional>
-                                    <attribute name="progress-message"/>
-                                </optional>
-                            </optional>
-                            <!-- Encoded server event(s) -->
-                            <data type="string"/>
-                        </element>
-                    </zeroOrMore>
-                    <optional>
-                        <element name="xxf:submission">
-                            <optional>
-                                <attribute name="action"/>
-                            </optional>
-                            <attribute name="method"/>
-                            <optional>
-                                <attribute name="show-progress">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
-                                </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="target"/>
-                            </optional>
-                        </element>
-                    </optional>
-                    <zeroOrMore>
-                        <element name="xxf:message">
-                            <attribute name="level"/>
-                            <data type="string"/>
-                        </element>
-                    </zeroOrMore>
-                    <zeroOrMore>
-                        <element name="xxf:load">
-                            <attribute name="resource"/>
-                            <attribute name="show">
-                                <choice>
-                                    <value>replace</value>
-                                    <value>new</value>
-                                </choice>
-                            </attribute>
-                            <optional>
-                                <attribute name="target"/>
-                            </optional>
-                            <optional>
-                                <attribute name="show-progress">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
-                                </attribute>
-                            </optional>
-                        </element>
-                    </zeroOrMore>
-                    <zeroOrMore>
-                        <element name="xxf:script">
-                            <attribute name="name"/>
-                            <attribute name="target-id"/>
-                            <attribute name="observer-id"/>
-                        </element>
-                    </zeroOrMore>
-                    <optional>
-                        <choice>
-                            <element name="xxf:focus">
-                                <attribute name="control-id"/>
-                            </element>
-                            <element name="xxf:blur">
-                                <attribute name="control-id"/>
-                            </element>
-                        </choice>
-                    </optional>
-                    <optional>
-                        <element name="xxf:help">
-                            <attribute name="control-id"/>
-                        </element>
-                    </optional>
-                </element>
-                <optional>
-                    <element name="xxf:errors">
-                        <zeroOrMore>
-                            <element name="xxf:error">
-                                <optional><attribute name="exception"/></optional>
-                                <optional><attribute name="file"/></optional>
-                                <optional><attribute name="line"/></optional>
-                                <optional><attribute name="column"/></optional>
-                                <data type="string"/>
-                            </element>
-                        </zeroOrMore>
-                    </element>
                 </optional>
-            </optional>
-        </element>
+            </element>
+            <element name="error">
+                <element name="title"><data type="string"/></element>
+                <optional>
+                    <element name="body"><data type="string"/></element>
+                </optional>
+            </element>
+        </choice>
     </start>
 
     <define name="model-item-properties">

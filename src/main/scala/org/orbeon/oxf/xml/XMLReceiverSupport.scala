@@ -62,6 +62,13 @@ trait XMLReceiverSupport {
                     attributesImpl.addAttribute("", name, name, "CDATA", value)
         }
 
+    // NOTE: Encode attributes as space-separated XML attribute-like pairs
+    def processingInstruction(name: String, atts: Seq[(String, String)] = Nil)(implicit receiver: XMLReceiver): Unit =
+        receiver.processingInstruction(
+            name,
+            atts map { case (name, value) ⇒ s"""$name="${XMLUtils.escapeXMLForAttribute(value)}"""" } mkString " "
+        )
+
     implicit def pairsToAttributes(atts: Seq[(String, String)]): Attributes = {
         val saxAtts = new AttributesImpl
         addAttributes(saxAtts, atts)

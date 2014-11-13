@@ -122,6 +122,12 @@ public class XMLUtils {
         return str;
     }
 
+    public static String escapeXMLForAttribute(String str) {
+        str = escapeXMLMinimal(str);
+        str = StringUtils.replace(str, "\"", "&quot;");
+        return str;
+    }
+
     /**
      * Return whether the given mediatype is considered as XML.
      *

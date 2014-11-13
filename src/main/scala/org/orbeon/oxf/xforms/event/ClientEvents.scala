@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import events._
+import org.orbeon.oxf.webapp.SessionExpiredException
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -25,14 +26,14 @@ import dom4j.{LocationSAXContentHandler, Dom4jUtils}
 import org.orbeon.oxf.pipeline.api._
 import org.dom4j.{Document, Element}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.util.{IndentedLogger, Multipart, Logging}
+import org.orbeon.oxf.util.{NetUtils, IndentedLogger, Multipart, Logging}
 import XFormsEvents._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 // Process events sent by the client, including sorting, filtering, and security
-object ClientEvents extends Logging {
+object ClientEvents extends Logging with XMLReceiverSupport {
 
     // Only a few events specify custom properties that can be set by the client
     private val AllStandardProperties =
@@ -319,6 +320,19 @@ object ClientEvents extends Logging {
                 event.cancelable)
         }
     }
+
+    // Send an error document
+    def errorDocument(message: String, code: Int)(implicit receiver: XMLReceiver): Unit =
+        withDocument {
+            processingInstruction("orbeon-serializer", List("status-code" → code.toString))
+            withElement("error") {
+                element("title", text = message)
+            }
+        }
+
+    def assertSessionExists() =
+        if (NetUtils.getSession(false) eq null)
+            throw new SessionExpiredException("Session has expired. Unable to process incoming request.")
 
     private val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
 

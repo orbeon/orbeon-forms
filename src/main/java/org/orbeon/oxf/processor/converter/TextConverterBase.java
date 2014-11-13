@@ -138,7 +138,7 @@ public abstract class TextConverterBase extends ConverterBase {
             // element. Note that this is a rather arbitrary choice! we could do any of the following:
             //
             // 1. Just let the transformer serialize the PI
-            // 2. Place serializer PIs as attribues the root element of the resulting <document> (e.g. <document status-code="404">)
+            // 2. Place serializer PIs as attributes the root element of the resulting <document> (e.g. <document status-code="404">)
             // 3. Forward those PIs as we do here
             //
             // This could even be configurable. For now, we choose option #3 for ease of implementation.

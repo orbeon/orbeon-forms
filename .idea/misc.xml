@@ -12,6 +12,10 @@
       </facet-type>
     </autodetection-disabled>
   </component>
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
+    <type id="Osmorc" />
+  </component>
   <component name="IdProvider" IDEtalkID="11F1F6BCFCEF250CF8C992303A792A29" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
@@ -45,4 +49,3 @@
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
 </project>
-

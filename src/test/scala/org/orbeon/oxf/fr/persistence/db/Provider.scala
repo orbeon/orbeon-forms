@@ -19,7 +19,8 @@ object Provider {
     val ProvidersTestedAutomatically: List[Provider] = List(Oracle, MySQL, SQLServer)
 }
 
-private[persistence] case object Oracle    extends Provider("oracle")
-private[persistence] case object MySQL     extends Provider("mysql")
-private[persistence] case object SQLServer extends Provider("sqlserver")
-private[persistence] case object DB2       extends Provider("db2")
+private[persistence] case object Oracle     extends Provider("oracle")
+private[persistence] case object MySQL      extends Provider("mysql")
+private[persistence] case object SQLServer  extends Provider("sqlserver")
+private[persistence] case object PostgreSQL extends Provider("postgresql")
+private[persistence] case object DB2        extends Provider("db2")

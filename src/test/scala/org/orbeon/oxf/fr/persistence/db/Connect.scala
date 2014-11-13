@@ -25,18 +25,18 @@ private[persistence] object Connect {
 
     private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
         val url = provider match {
-            case Oracle    ⇒ System.getenv("ORACLE_URL")
-            case MySQL     ⇒ System.getenv("MYSQL_URL")     + user.map("/" + _).getOrElse("")
-            case SQLServer ⇒ System.getenv("SQLSERVER_URL") + user.map(";databaseName=" + _).getOrElse("")
-            case DB2       ⇒ System.getenv("DB2_URL")
+            case Oracle     ⇒ System.getenv("ORACLE_URL")
+            case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
+            case SQLServer  ⇒ System.getenv("SQLSERVER_URL")  + user.map(";databaseName=" + _).getOrElse("")
+            case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("")
+            case DB2        ⇒ System.getenv("DB2_URL")
         }
         val userName = provider match {
-            case Oracle    ⇒ user.getOrElse("orbeon")
-            case MySQL     ⇒ "orbeon"
-            case SQLServer ⇒ "orbeon"
-            case DB2       ⇒ ???
+            case Oracle ⇒ user.getOrElse("orbeon")
+            case _      ⇒ "orbeon"
         }
         val password = System.getenv("RDS_PASSWORD")
+        val driver = (provider == PostgreSQL).option(Class.forName("org.postgresql.Driver"))
         useAndClose(DriverManager.getConnection(url, userName, password))(block)
     }
 
@@ -47,7 +47,7 @@ private[persistence] object Connect {
                   |  FROM all_tables
                   | WHERE table_name LIKE 'ORBEON%'
                   |       AND owner = sys_context('USERENV', 'CURRENT_USER')"""
-            case MySQL ⇒
+            case MySQL | PostgreSQL ⇒
                 """SELECT table_name
                   |  FROM information_schema.tables
                   | WHERE table_name LIKE 'orbeon%'
@@ -56,7 +56,6 @@ private[persistence] object Connect {
                 """SELECT table_name
                   |  FROM information_schema.tables
                   | WHERE table_name LIKE 'orbeon%'"""
-            case DB2 ⇒ ???
         }
         val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
         val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList

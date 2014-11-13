@@ -14,13 +14,13 @@
 package org.orbeon.oxf.fr.persistence.ddl
 
 import java.sql.Connection
+
 import org.junit.Test
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{Logging, LoggerFactory, IndentedLogger}
-import org.apache.log4j.Level
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
+import org.scalatest.junit.AssertionsForJUnit
 
 /**
  * Test the DDL we provide to create and update databases.
@@ -32,20 +32,16 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
     private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
         val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"
         val createUserAndDatabase = provider match {
-            case Oracle    ⇒ Seq(s"CREATE USER $schema IDENTIFIED BY ${System.getenv("RDS_PASSWORD")}",
+            case Oracle     ⇒ Seq(s"CREATE USER $schema IDENTIFIED BY ${System.getenv("RDS_PASSWORD")}",
                                  s"ALTER  USER $schema QUOTA UNLIMITED ON users",
                                  s"GRANT  CREATE SESSION TO $schema",
                                  s"GRANT  CREATE TABLE   TO $schema",
                                  s"GRANT  CREATE TRIGGER TO $schema")
-            case MySQL     ⇒ Seq(s"CREATE DATABASE $schema")
-            case SQLServer ⇒ Seq(s"CREATE DATABASE $schema")
-            case _         ⇒ ???
+            case _          ⇒ Seq(s"CREATE DATABASE $schema")
         }
         val dropUserAndDatabase = provider match {
-            case Oracle    ⇒ Seq(s"DROP USER $schema CASCADE")
-            case MySQL     ⇒ Seq(s"DROP DATABASE $schema")
-            case SQLServer ⇒ Seq(s"DROP DATABASE $schema")
-            case _         ⇒ ???
+            case Oracle     ⇒ Seq(s"DROP USER $schema CASCADE")
+            case _          ⇒ Seq(s"DROP DATABASE $schema")
         }
         try {
             Connect.asRoot(provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
@@ -118,9 +114,8 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
                 assertSameTable(MySQL,  "4_3", "4_4")
                 assertSameTable(MySQL,  "4_4", "4_5")
                 assertSameTable(MySQL,  "4_5", "4_6")
-            case SQLServer ⇒
-                // No assertions for now (we don't have upgrades yet), but at least test that DDL runs
-                sqlToTableInfo(SQLServer, SQL.read("sqlserver-4_6.sql"))
+            case SQLServer  ⇒ sqlToTableInfo(SQLServer , SQL.read("sqlserver-4_6.sql" ))
+            case PostgreSQL ⇒ sqlToTableInfo(PostgreSQL, SQL.read("postgresql-4_8.sql"))
             case DB2 ⇒
                 assertSameTable(MySQL,  "4_3", "4_4")
                 assertSameTable(MySQL,  "4_4", "4_6")

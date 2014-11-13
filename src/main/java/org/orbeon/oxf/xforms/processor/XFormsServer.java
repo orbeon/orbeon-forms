@@ -16,9 +16,11 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.webapp.SessionExpiredException;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -46,6 +48,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
 import scala.Tuple3;
+import scala.util.control.NonFatal;
 
 import java.io.IOException;
 import java.util.*;
@@ -82,7 +85,21 @@ public class XFormsServer extends ProcessorImpl {
     public ProcessorOutput createOutput(final String outputName) {
         final ProcessorOutput output = new ProcessorOutputImpl(XFormsServer.this, outputName) {
             public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                doIt(pipelineContext, xmlReceiver);
+                try {
+                    doIt(pipelineContext, xmlReceiver);
+                } catch (SessionExpiredException e) {
+                    // Don't log whole exception
+                    logger.info(e.message());
+                    ClientEvents.errorDocument(e.message(), e.code(), xmlReceiver);
+                } catch (Throwable t) {
+                    if (NonFatal.apply(t)) {
+                        logger.error(OrbeonFormatter.format(t));
+                        ClientEvents.errorDocument(OrbeonFormatter.message(t), 500, xmlReceiver);
+                    } else {
+                        // TODO: Do this in Scala so we don't have to wrap.
+                        throw new OXFException(t);
+                    }
+                }
             }
         };
         addOutput(outputName, output);

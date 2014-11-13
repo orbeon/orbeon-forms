@@ -21,10 +21,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.webapp.SessionExpiredException;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.event.ClientEvents;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -293,7 +295,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         // which is not desirable. Further, we now have a lock stored in the session.
         final Lock lock = getDocumentLock(parameters.getUUID());
         if (lock == null)
-            throw new OXFException("Document session has expired. Unable to process incoming request.");
+            throw new SessionExpiredException("Unknown form document requested.");
 
         // Lock document for at most the max retry delay plus an increment
         try {
@@ -403,9 +405,8 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         assert (encodedStaticState != null && encodedDynamicState != null) || (encodedStaticState == null && encodedDynamicState == null);
 
         // Session must be present if state is not coming with the request
-        if (NetUtils.getSession(false) == null && encodedStaticState == null) {
-            throw new OXFException("Session has expired. Unable to process incoming request.");
-        }
+        if (encodedStaticState == null)
+            ClientEvents.assertSessionExists();
 
         return new RequestParametersImpl(uuid, encodedStaticState, encodedDynamicState);
     }
@@ -454,6 +455,8 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         final XFormsState xformsState;
         if (isServerState) {
+            ClientEvents.assertSessionExists();
+
             // State must be found by UUID in the store
             final ExternalContext externalContext = NetUtils.getExternalContext();
             final XFormsStateStore stateStore = XFormsStateStoreFactory.instance(externalContext);
@@ -470,23 +473,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             xformsState = stateStore.findState(session, parameters.getUUID(), isInitialState);
 
             if (xformsState == null) {
-                // Oops, we couldn't find the state in the store
-
-                final String UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE = "Unable to retrieve XForms engine state.";
-                final String PLEASE_RELOAD_PAGE_MESSAGE = "Please reload the current page. Note that you will lose any unsaved changes.";
-
-                // Produce exception
-                final ExternalContext.Session currentSession =  externalContext.getRequest().getSession(false);
-                final String message;
-                if (currentSession == null || currentSession.isNew()) {
-                    // This means that no session is currently existing, or a session exists but it is newly created
-                    message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE;
-                } else {
-                    // There is a session and it is still known by the client
-                    message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
-                }
-                indentedLogger.logError("", message);
-                throw new OXFException(message);
+                // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
+                // document, yet we didn't find it. This means that somehow state was not placed into or expired from
+                // the state store.
+                throw new SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.");
             }
         } else {
             // State comes directly with request

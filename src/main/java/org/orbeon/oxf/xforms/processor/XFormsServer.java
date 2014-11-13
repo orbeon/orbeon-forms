@@ -116,11 +116,18 @@ public class XFormsServer extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
+        // Use request input provided by client
+        final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+
         final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Request request = externalContext.getRequest();
 
-        // Use request input provided by client
-        final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+        // It's not possible to handle a form update without an existing session. We depend on this to check the UUID,
+        // to get the lock, and (except for client state) to retrieve form state.
+        //
+        // NOTE: We should test this at the beginning of this method, but calling readInputAsDOM4J() in unit tests
+        // can cause the side effect to create the session, so doing so without changing some tests doesn't work.
+        ClientEvents.assertSessionExists();
 
         // Request retry details
         final boolean isRetries = true;
@@ -144,9 +151,6 @@ public class XFormsServer extends ProcessorImpl {
         // Get files if any (those come from xforms-server-submit.xpl upon submission)
         final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
-        // Hit session if it exists (it's probably not even necessary to do so)
-        final ExternalContext.Session session = request.getSession(false);
-
         // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
         // NOTE: If we don't have a receiver, this means that we are in the second pass of a submission with
         // replace="all". In this case, only server events are provided.
@@ -161,7 +165,6 @@ public class XFormsServer extends ProcessorImpl {
                     requestDocument,
                     logRequestResponse,
                     ClientEvents.extractLocalEvents(actionElement),
-                    session,
                     indentedLogger
                 );
 

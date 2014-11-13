@@ -330,9 +330,9 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             }
         }
 
-    def assertSessionExists() =
-        if (NetUtils.getSession(false) eq null)
-            throw new SessionExpiredException("Session has expired. Unable to process incoming request.")
+    def assertSessionExists(): Unit =
+        Option(NetUtils.getSession(false)) getOrElse
+            (throw new SessionExpiredException("Session has expired. Unable to process incoming request."))
 
     private val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
 
@@ -345,8 +345,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             request:            ExternalContext.Request,
             requestDocument:    Document,
             logRequestResponse: Boolean,
-            clientEvents:       List[LocalEvent],
-            session:            ExternalContext.Session)(implicit indentedLogger: IndentedLogger): List[LocalEvent] = {
+            clientEvents:       List[LocalEvent])(implicit indentedLogger: IndentedLogger): List[LocalEvent] = {
 
         def isHeartbeat(event: LocalEvent)      = event.name == XXFORMS_SESSION_HEARTBEAT
         def isUploadProgress(event: LocalEvent) = event.name == XXFORMS_UPLOAD_PROGRESS
@@ -430,13 +429,6 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             Nil
         } else if (hasHeartBeat(clientEvents)) {
             // Output empty Ajax response
-
-            if (indentedLogger.isDebugEnabled) {
-                if (session != null)
-                    indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId)
-                else
-                    indentedLogger.logDebug("heartbeat", "received heartbeat from client (no session available).")
-            }
 
             eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
 

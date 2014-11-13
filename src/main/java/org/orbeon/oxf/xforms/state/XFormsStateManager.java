@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.event.ClientEvents;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -128,8 +127,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     private void addCacheSessionListener(final String uuid) {
 
         final ExternalContext.Session session = NetUtils.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
-
-        assert session != null;
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
         final String listenerSessionKey = getListenerSessionKey(uuid);
@@ -404,10 +401,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         assert (encodedStaticState != null && encodedDynamicState != null) || (encodedStaticState == null && encodedDynamicState == null);
 
-        // Session must be present if state is not coming with the request
-        if (encodedStaticState == null)
-            ClientEvents.assertSessionExists();
-
         return new RequestParametersImpl(uuid, encodedStaticState, encodedDynamicState);
     }
 
@@ -455,7 +448,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         final XFormsState xformsState;
         if (isServerState) {
-            ClientEvents.assertSessionExists();
 
             // State must be found by UUID in the store
             final ExternalContext externalContext = NetUtils.getExternalContext();

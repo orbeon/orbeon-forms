@@ -204,18 +204,18 @@ object XFormsResourceServer {
     val DynamicResourcesPath       = "/xforms-server/dynamic/"
     val NamespaceParameter         = "ns"
 
-    implicit def indentedLogger = Loggers.getIndentedLogger("resources")
+    implicit def indentedLogger: IndentedLogger = Loggers.getIndentedLogger("resources")
 
     // Transform an URI accessible from the server into a URI accessible from the client.
     // The mapping expires with the session.
     def proxyURI(
-        uri             : String,
-        filename        : Option[String],
-        contentType     : Option[String],
-        lastModified    : Long,
-        customHeaders   : Map[String, List[String]],
-        headersToForward: Option[String])(implicit
-        logger          : IndentedLogger
+        uri              : String,
+        filename         : Option[String],
+        contentType      : Option[String],
+        lastModified     : Long,
+        customHeaders    : Map[String, List[String]],
+        headersToForward : Option[String])(implicit
+        logger           : IndentedLogger
     ): String = {
 
         // Create a digest, so that for a given URI we always get the same key

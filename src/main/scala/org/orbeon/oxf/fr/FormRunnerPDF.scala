@@ -43,16 +43,17 @@ trait FormRunnerPDF {
 
     // Return the PDF formatting expression for the given parameters
     def getPDFFormatExpression(pdfFormats: JMap[String, String], app: String, form: String, name: String, dataType: String) = {
-        val propertyName = Seq("oxf.fr.pdf.map", app, form, name) ++ Option(dataType).toSeq mkString "."
 
-        val expressionOption =
+        val propertyName = List("oxf.fr.pdf.map", app, form, name) ::: Option(dataType).toList mkString "."
+
+        val expressionOpt =
             for {
-                format ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
+                format     ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
                 expression ← Option(pdfFormats.get(format))
             } yield
                 expression
 
-        expressionOption.orNull
+        expressionOpt.orNull
     }
 
     // Build a PDF control id from the given HTML control
@@ -63,20 +64,19 @@ trait FormRunnerPDF {
             classes("xbl-fr-section") || (classes("xbl-fr-grid") && (e \\ "table" exists (_.attClasses("fr-repeat"))))
         }
 
-        def getStaticId(e: NodeInfo) =
-            getStaticIdFromId(e.id)
+        def findControlName(e: NodeInfo) =
+            nonEmptyOrNone(getStaticIdFromId(e.id)) flatMap FormRunner.controlNameFromIdOpt
 
         def ancestorContainers(e: NodeInfo) =
             control ancestor * filter isContainer reverse
 
-        def nameParts(e: NodeInfo) =
-            ancestorContainers(e) :+ e map getStaticId map FormRunner.controlNameFromId
+        def suffixAsList(id: String) =
+            nonEmptyOrNone(getEffectiveIdSuffix(id)).toList
 
-        def suffixAsSeq(e: NodeInfo) =
-            nonEmptyOrNone(getEffectiveIdSuffix(e.id)).toList
-
-        // Join everything with "$" for PDF
-        nameParts(control) ++ suffixAsSeq(control) mkString "$"
+        // This only makes sense if we are passed a control with a name
+        findControlName(control) map { controlName ⇒
+            ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString "$"
+         } orNull
     }
 
     import URLFinder._

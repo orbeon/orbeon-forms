@@ -102,6 +102,9 @@
                 <attribute name="value">
                     <data type="string"/>
                 </attribute>
+                <attribute name="export-value">
+                    <data type="string"/>
+                </attribute>
                 <attribute name="ref">
                     <data type="string"/>
                 </attribute>

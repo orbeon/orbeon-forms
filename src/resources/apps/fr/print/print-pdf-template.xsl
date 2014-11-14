@@ -67,82 +67,90 @@
                     name="pdf-field-name"
                     select="frf:buildPDFFieldNameFromHTML($control)"/>
 
-                <xsl:variable name="classes" select="p:classes(.)"/>
+                <xsl:if test="$pdf-field-name">
 
-                <!-- Get the component name if any -->
-                <xsl:variable name="component-name" as="xs:string?">
-                    <xsl:choose>
-                        <xsl:when test="$classes = 'xbl-component'">
-                            <!-- XBL component -->
-                            <xsl:copy-of
-                                select="
-                                    for $c in $classes[starts-with(., 'xbl-') and not(. = ('xbl-component', 'xbl-focusable'))][1]
-                                        return substring-after($c, 'xbl-')"/>
-                        </xsl:when>
-                        <xsl:when test="$classes = $control-classes">
-                            <!-- Built-in controls -->
-                            <xsl:copy-of
-                                select="$control-classes[. = $classes][1]"/>
-                        </xsl:when>
-                    </xsl:choose>
-                </xsl:variable>
+                    <xsl:variable name="classes" select="p:classes(.)"/>
 
-                <xsl:if test="$component-name">
+                    <!-- Get the component name if any -->
+                    <xsl:variable name="component-name" as="xs:string?">
+                        <xsl:choose>
+                            <xsl:when test="$classes = 'xbl-component'">
+                                <!-- XBL component -->
+                                <xsl:copy-of
+                                    select="
+                                        for $c in $classes[starts-with(., 'xbl-') and not(. = ('xbl-component', 'xbl-focusable'))][1]
+                                            return substring-after($c, 'xbl-')"/>
+                            </xsl:when>
+                            <xsl:when test="$classes = $control-classes">
+                                <!-- Built-in controls -->
+                                <xsl:copy-of
+                                    select="$control-classes[. = $classes][1]"/>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xsl:variable>
 
-                    <xsl:variable
-                        name="type"
-                        as="xs:string?"
-                        select="
-                            (
-                                for $c in $classes[starts-with(., 'xforms-type-')]
-                                    return substring-after($c, 'xforms-type-'),
-                                'string'
-                            )[1]"/>
+                    <xsl:if test="$component-name">
 
-                    <!-- Get the expression to evaluate on the control from the configuration properties -->
-                    <xsl:variable
-                        name="expression"
-                        as="xs:string?"
-                        select="
-                            frf:getPDFFormatExpression(
-                                $pdfFormats,
-                                $parameters/app,
-                                $parameters/form,
-                                $component-name,
-                                $type
-                            )"/>
+                        <xsl:variable
+                            name="type"
+                            as="xs:string?"
+                            select="
+                                (
+                                    for $c in $classes[starts-with(., 'xforms-type-')]
+                                        return substring-after($c, 'xforms-type-'),
+                                    'string'
+                                )[1]"/>
 
-                    <xsl:if test="$expression">
-                        <xsl:variable name="value" select="$control/saxon:evaluate($expression)"/>
-                        <xsl:if test="$value">
-                            <xsl:choose>
-                                <xsl:when test="$classes = $image-attachment-classes">
-                                    <!-- Handle URL rewriting for image attachments -->
-                                    <image acro-field-name="'{$pdf-field-name}'" href="{xpl:rewriteResourceURI($value, true())}"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                        <!-- Get the expression to evaluate on the control from the configuration properties -->
+                        <xsl:variable
+                            name="expression"
+                            as="xs:string?"
+                            select="
+                                frf:getPDFFormatExpression(
+                                    $pdfFormats,
+                                    $parameters/app,
+                                    $parameters/form,
+                                    $component-name,
+                                    $type
+                                )"/>
+
+                        <xsl:if test="$expression">
+                            <xsl:variable name="value" select="$control/saxon:evaluate($expression)"/>
+                            <xsl:if test="$value">
+                                <xsl:choose>
+                                    <xsl:when test="$classes = $image-attachment-classes">
+                                        <!-- Handle URL rewriting for image attachments -->
+                                        <image acro-field-name="'{$pdf-field-name}'" href="{xpl:rewriteResourceURI($value, true())}"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:if>
                         </xsl:if>
                     </xsl:if>
-                </xsl:if>
 
-                <!-- Also provide a mapping for select where disjoint values are output as separate acrobat fields -->
-                <xsl:if test="$classes = 'xforms-select'">
-                    <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
-                    <xsl:if test="$expression">
-                        <xsl:for-each select="$control/saxon:evaluate(string($expression))">
-                            <xsl:variable name="item-value" as="xs:string" select="."/>
-                            <xsl:if test="$item-value">
-                                <field acro-field-name="'{$pdf-field-name}${$item-value}'" value="'true'"/>
-                            </xsl:if>
-                        </xsl:for-each>
+                    <!-- Selection controls: also produce export values -->
+                    <xsl:if test="$classes = ('xforms-select', 'xforms-select1')">
+                        <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
+                        <xsl:if test="$expression">
+                            <xsl:for-each select="$control/saxon:evaluate(string($expression))">
+                                <xsl:variable name="item-value" as="xs:string" select="."/>
+                                <xsl:choose>
+                                    <xsl:when test="$classes = 'xforms-select'">
+                                        <field acro-field-name="'{$pdf-field-name}${$item-value}'" export-value="'true'"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <field acro-field-name="'{$pdf-field-name}'" export-value="'{replace($item-value, '''', '''''')}'"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+
+                            </xsl:for-each>
+                        </xsl:if>
                     </xsl:if>
                 </xsl:if>
             </xsl:for-each>
         </config>
     </xsl:template>
-
 
 </xsl:transform>

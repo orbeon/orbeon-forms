@@ -36,6 +36,9 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             case _ ⇒ null
         }
 
+    def controlNameFromIdOpt(controlOrBindId: String) =
+        Option(controlNameFromId(controlOrBindId))
+
     // Whether the given id is for a control (given its reserved suffix)
     def isIdForControl(controlOrBindId: String) = controlNameFromId(controlOrBindId) ne null
 

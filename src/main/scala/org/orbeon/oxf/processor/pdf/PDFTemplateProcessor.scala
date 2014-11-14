@@ -210,45 +210,70 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         }
     }
 
-    def handleField(context: ElementContext): Unit =  {
-        // Handle field
-        val fieldNameStr = context.att("acro-field-name")
-        if (fieldNameStr ne null) {
-            // Acrobat field
-            val value = Option(context.att("value")) getOrElse context.att("ref")
+    private val FieldTypesWithValues = Set(
+        AcroFields.FIELD_TYPE_RADIOBUTTON,
+        AcroFields.FIELD_TYPE_LIST,
+        AcroFields.FIELD_TYPE_COMBO
+    )
 
-            val text = context.evaluateAsString(value)
-            val fieldName = context.evaluateAsString(fieldNameStr)
+    def handleField(context: ElementContext): Unit =
+        Option(context.att("acro-field-name")) match {
+            case Some(fieldNameExpr) ⇒
+                // Acrobat field
+                val fieldName = context.evaluateAsString(fieldNameExpr)
 
-            context.acroFields.setField(fieldName, text)
-        } else {
-            // Overlay text
-            val leftPosition   = context.resolveAVT("left", "left-position")
-            val topPosition    = context.resolveAVT("top", "top-position")
-            val size           = context.resolveAVT("size")
-            val value          = Option(context.att("value")) getOrElse context.att("ref")
-            val fontAttributes = context.getFontAttributes
+                Option(context.acroFields.getFieldItem(fieldName)) foreach { item ⇒
+                    // Field exists
+                    val exportValue = Option(context.att("export-value"))
+                    val valueExpr   = exportValue orElse Option(context.att("value")) getOrElse context.att("ref")
+                    val value       = context.evaluateAsString(valueExpr)
 
-            val baseFont = createFont(fontAttributes.fontFamily, fontAttributes.embed)
+                    val fieldType = context.acroFields.getFieldType(fieldName)
+                    exportValue match {
+                        case Some(_) if FieldTypesWithValues(fieldType) ⇒
+                            // NOTE: We can obtain the list of allowed values with:
+                            //
+                            //   context.acroFields.getAppearanceStates(fieldName)
+                            //
+                            // This also returns (sometimes? always?) an "Off" value.
+                            context.acroFields.setField(fieldName, value)
+                        case Some(_) if fieldType == AcroFields.FIELD_TYPE_CHECKBOX ⇒
+                            // Export value specified and field is checkbox
+                            context.acroFields.setField(fieldName, value)
+                        case None if ! FieldTypesWithValues(fieldType) ⇒
+                            // Regular value specified and field doesn't support values
+                            context.acroFields.setField(fieldName, value)
+                        case _ ⇒
+                            // Ignore
+                    }
+                }
+            case None ⇒
+                // Overlay text
+                val leftPosition   = context.resolveAVT("left", "left-position")
+                val topPosition    = context.resolveAVT("top", "top-position")
+                val size           = context.resolveAVT("size")
+                val value          = Option(context.att("value")) getOrElse context.att("ref")
+                val fontAttributes = context.getFontAttributes
 
-            // Write value
-            context.contentByte.beginText()
+                val baseFont = createFont(fontAttributes.fontFamily, fontAttributes.embed)
 
-            context.contentByte.setFontAndSize(baseFont, fontAttributes.fontSize)
-            val xPosition = leftPosition.toFloat + context.offsetX
-            val yPosition = context.pageHeight - (topPosition.toFloat + context.offsetY)
+                // Write value
+                context.contentByte.beginText()
 
-            // Get value from instance
-            Option(context.evaluateAsString(value)) foreach { text ⇒
-                // Iterate over characters and print them
-                val len = math.min(text.length, Option(size) map (_.toInt) getOrElse Integer.MAX_VALUE)
-                for (j ←  0 to len - 1)
-                    context.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + j.toFloat * fontAttributes.fontPitch, yPosition, 0)
-            }
+                context.contentByte.setFontAndSize(baseFont, fontAttributes.fontSize)
+                val xPosition = leftPosition.toFloat + context.offsetX
+                val yPosition = context.pageHeight - (topPosition.toFloat + context.offsetY)
 
-            context.contentByte.endText()
+                // Get value from instance
+                Option(context.evaluateAsString(value)) foreach { text ⇒
+                    // Iterate over characters and print them
+                    val len = math.min(text.length, Option(size) map (_.toInt) getOrElse Integer.MAX_VALUE)
+                    for (j ←  0 to len - 1)
+                        context.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + j.toFloat * fontAttributes.fontPitch, yPosition, 0)
+                }
+
+                context.contentByte.endText()
         }
-    }
 
     def handleBarcode(context: ElementContext): Unit =  {
         val value          = Option(context.att("value")) getOrElse context.att("ref")

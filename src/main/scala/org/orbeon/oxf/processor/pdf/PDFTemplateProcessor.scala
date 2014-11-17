@@ -213,7 +213,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     private val FieldTypesWithValues = Set(
         AcroFields.FIELD_TYPE_RADIOBUTTON,
         AcroFields.FIELD_TYPE_LIST,
-        AcroFields.FIELD_TYPE_COMBO
+        AcroFields.FIELD_TYPE_COMBO,
+        AcroFields.FIELD_TYPE_CHECKBOX // NOTE: Checkboxes are not linked.
     )
 
     def handleField(context: ElementContext): Unit =
@@ -228,24 +229,18 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     val valueExpr   = exportValue orElse Option(context.att("value")) getOrElse context.att("ref")
                     val value       = context.evaluateAsString(valueExpr)
 
+                    // NOTE: We can obtain the list of allowed values with:
+                    //
+                    //   context.acroFields.getAppearanceStates(fieldName)
+                    //
+                    // This also returns (sometimes? always?) an "Off" value.
+
                     val fieldType = context.acroFields.getFieldType(fieldName)
-                    exportValue match {
-                        case Some(_) if FieldTypesWithValues(fieldType) ⇒
-                            // NOTE: We can obtain the list of allowed values with:
-                            //
-                            //   context.acroFields.getAppearanceStates(fieldName)
-                            //
-                            // This also returns (sometimes? always?) an "Off" value.
-                            context.acroFields.setField(fieldName, value)
-                        case Some(_) if fieldType == AcroFields.FIELD_TYPE_CHECKBOX ⇒
-                            // Export value specified and field is checkbox
-                            context.acroFields.setField(fieldName, value)
-                        case None if ! FieldTypesWithValues(fieldType) ⇒
-                            // Regular value specified and field doesn't support values
-                            context.acroFields.setField(fieldName, value)
-                        case _ ⇒
-                            // Ignore
-                    }
+
+                    // export-value → set field types with values
+                    // value        → set field types without values
+                    if (exportValue.isDefined == FieldTypesWithValues(fieldType))
+                        context.acroFields.setField(fieldName, value)
                 }
             case None ⇒
                 // Overlay text

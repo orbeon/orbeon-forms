@@ -21,8 +21,8 @@
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/oracle-4_5-to-4_6.sql" dialect="Oracle" />
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/oracle-4_5.sql" dialect="Oracle" />
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/oracle-4_6.sql" dialect="Oracle" />
+    <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/postgresql-4_8.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/sqlserver-4_6.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/src/test/scala/org/orbeon/oxf/fr/persistence/ddl/DDLTest.scala" dialect="MySQL" />
   </component>
 </project>
-

@@ -28,7 +28,7 @@ private[persistence] object Connect {
             case Oracle     ⇒ System.getenv("ORACLE_URL")
             case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
             case SQLServer  ⇒ System.getenv("SQLSERVER_URL")  + user.map(";databaseName=" + _).getOrElse("")
-            case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("")
+            case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("/")
             case DB2        ⇒ System.getenv("DB2_URL")
         }
         val userName = provider match {
@@ -47,12 +47,12 @@ private[persistence] object Connect {
                   |  FROM all_tables
                   | WHERE table_name LIKE 'ORBEON%'
                   |       AND owner = sys_context('USERENV', 'CURRENT_USER')"""
-            case MySQL | PostgreSQL ⇒
+            case MySQL ⇒
                 """SELECT table_name
                   |  FROM information_schema.tables
                   | WHERE table_name LIKE 'orbeon%'
                   |       AND table_schema = DATABASE()"""
-            case SQLServer ⇒
+            case SQLServer | PostgreSQL ⇒
                 """SELECT table_name
                   |  FROM information_schema.tables
                   | WHERE table_name LIKE 'orbeon%'"""

@@ -65,15 +65,23 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
             SQL.executeStatements(provider, statement, sql)
             val query = provider match {
                 // On Oracle, column order is "non-relevant", so we order by column name instead of position
-                case Oracle ⇒ """  SELECT *
-                                 |    FROM all_tab_cols
-                                 |   WHERE table_name = ?
-                                 |         AND NOT column_name LIKE 'SYS%'
-                                 |ORDER BY column_name"""
-                case _      ⇒ """   SELECT *
-                                 |    FROM information_schema.columns
-                                 |   WHERE table_name = ?
-                                 |ORDER BY ordinal_position"""
+                case Oracle ⇒
+                    """  SELECT *
+                      |    FROM all_tab_cols
+                      |   WHERE table_name = ?
+                      |         AND NOT column_name LIKE 'SYS%'
+                      |ORDER BY column_name"""
+                case MySQL ⇒
+                    """   SELECT *
+                      |     FROM information_schema.columns
+                      |    WHERE table_name = ?
+                      |          AND table_schema = DATABASE()
+                      | ORDER BY ordinal_position"""
+                case SQLServer | PostgreSQL ⇒
+                    """   SELECT *
+                      |     FROM information_schema.columns
+                      |    WHERE table_name = ?
+                      | ORDER BY ordinal_position"""
             }
             Connect.getTableNames(provider, connection).map { tableName ⇒
                 val tableInfoResultSet = {

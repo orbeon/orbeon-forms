@@ -22,7 +22,7 @@ import org.orbeon.errorified._
 object OrbeonFormatter extends Formatter {
 
     val Width = 120
-    val MaxStackLength = 200
+    val MaxStackLength = 80
 
     override def getThrowableMessage(throwable: Throwable): Option[String] =
         throwable match {

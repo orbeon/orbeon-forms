@@ -16,6 +16,6 @@ env:
     # SQLSERVER_URL
     - secure: "L/Pra2kMGn3AZ1sJb8nvOgxRnpK9/LWY0a4FuYHoQnA6KkjOQfujABHFQRjht8gcc0n0cQttWKsRWT3phTIPGD6YmB25/KT/CI5uKXnbBCMpM1JxhweKRz0P5uOJFO5pVAlkmYq6DwMxP3U/AMs7r4R/9CRyNYEnGEsbr30qphU="
     # POSTGRESQL_URL
-    - secure: "eB1wWeYUNcpfYq9/W8n6Ii3wjtdO0pHvTb+3GSJaiyN3EAMJBpRF3bqtp9gHIwciWxeY3vM/HU671C8MAy5QVZB5h1NL+bxP2UF9EyQAaJrV70T592S0i70n1Czscj1uq5/mUHc/IoNhZQoZTb9Gs7Fcf15ZvHoC5k3WVkjc32M="
+    - secure: "oddq5H6A4CIOps7nZsDHWVNhjKoAZ7hbdIXHCgh1IS9dV5cb7kZFwnmRNTO1ZaTwrwpwzIZoQqfAfH7jdGVmSFiVlbT3iHjb9nfpTo8CcA5oVnIfGdkx4c55lA04yPP6AY7HGzPDdlH4STWPNz0W6ZPuaPK8cI84V/Z8UXfR0Qg="
 before_script:
   - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash

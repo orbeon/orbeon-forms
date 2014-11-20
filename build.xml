@@ -857,12 +857,14 @@
         <property name="tomcat-version" value="6.0.36"/>
         <parallel failonany="true">
 
-            <property name="oracle.driver"    value="oracle.jdbc.OracleDriver"/>
-            <property name="oracle.jar"       value="lib/oracle/ojdbc6_g.jar"/>
-            <property name="mysql.driver"     value="com.mysql.jdbc.Driver"/>
-            <property name="mysql.jar"        value="lib/mysql-connector-java-5.1.26-bin.jar"/>
-            <property name="sqlserver.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-            <property name="sqlserver.jar"    value="lib/sqljdbc4.jar"/>
+            <property name="oracle.driver"     value="oracle.jdbc.OracleDriver"/>
+            <property name="oracle.jar"        value="lib/oracle/ojdbc6_g.jar"/>
+            <property name="mysql.driver"      value="com.mysql.jdbc.Driver"/>
+            <property name="mysql.jar"         value="lib/mysql-connector-java-5.1.26-bin.jar"/>
+            <property name="sqlserver.driver"  value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+            <property name="sqlserver.jar"     value="lib/sqljdbc4.jar"/>
+            <property name="postgresql.driver" value="org.postgresql.Driver"/>
+            <property name="postgresql.jar"    value="lib/postgresql-9.3-1102.jdbc4.jar"/>
 
             <!-- Run Tomcat -->
             <sequential>
@@ -885,6 +887,10 @@
                         </sql>
                         <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
                             <classpath><pathelement location="${sqlserver.jar}"/></classpath>
+                            CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                        </sql>
+                        <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                            <classpath><pathelement location="${postgresql.jar}"/></classpath>
                             CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
 
@@ -1007,6 +1013,10 @@
                         </sql>
                         <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
                             <classpath><pathelement location="${sqlserver.jar}"/></classpath>
+                            DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                        </sql>
+                        <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                            <classpath><pathelement location="${postgresql.jar}"/></classpath>
                             DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
                     </then>

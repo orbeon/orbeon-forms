@@ -889,7 +889,7 @@
                             <classpath><pathelement location="${sqlserver.jar}"/></classpath>
                             CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
-                        <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                        <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}/orbeon" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true" autocommit="true">
                             <classpath><pathelement location="${postgresql.jar}"/></classpath>
                             CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
@@ -1015,7 +1015,7 @@
                             <classpath><pathelement location="${sqlserver.jar}"/></classpath>
                             DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
-                        <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                        <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true" autocommit="true">
                             <classpath><pathelement location="${postgresql.jar}"/></classpath>
                             DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>

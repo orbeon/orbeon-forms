@@ -51,6 +51,15 @@
                         username="orbeon"
                         password="@RDS_PASSWORD@"
                         url="@SQLSERVER_URL@;databaseName=orbeon_@TRAVIS_BUILD_NUMBER@_tomcat"/>
+                    <Resource name="jdbc/postgresql_tomcat" auth="Container" type="javax.sql.DataSource"
+                          initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"
+                          driverClassName="org.postgresql.Driver"
+                          validationQuery="select 1"
+                          testOnBorrow="true"
+                          poolPreparedStatements="true"
+                          username="orbeon"
+                          password="@RDS_PASSWORD@"
+                          url="@POSTGRESQL_URL@/orbeon_@TRAVIS_BUILD_NUMBER@_tomcat"/>
                 </Context>
             </Host>
         </Engine>

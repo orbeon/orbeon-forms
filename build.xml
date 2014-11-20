@@ -901,9 +901,10 @@
                         </if>
 
                         <!-- Put database driver in Tomcat's lib -->
-                        <copy file="${mysql.jar}"     todir="build/apache-tomcat-${tomcat-version}/lib"/>
-                        <copy file="${oracle.jar}"    todir="build/apache-tomcat-${tomcat-version}/lib"/>
-                        <copy file="${sqlserver.jar}" todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${mysql.jar}"      todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${oracle.jar}"     todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${sqlserver.jar}"  todir="build/apache-tomcat-${tomcat-version}/lib"/>
+                        <copy file="${postgresql.jar}" todir="build/apache-tomcat-${tomcat-version}/lib"/>
 
                         <!-- Put URL and passwords in Tomcat's server.xml -->
                         <replace file="test/catalina_base/conf/server.xml">

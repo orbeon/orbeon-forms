@@ -28,21 +28,26 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
     // Define in early definition of subclass
     val XXFormsIndependentFunctionsNS: Seq[String]
 
+    // Some functions are independent but support checking the XForms document first. This configures this behavior.
+    val tryXFormsDocument: Boolean
+
     Namespace(XXFormsIndependentFunctionsNS) {
+
+        val tryXFormsDocumentOp = if (tryXFormsDocument) 1 else 0
 
         Fun("get-request-method", classOf[XXFormsGetRequestMethod], 0, 0, STRING, ALLOWS_ONE)
 
         Fun("get-portlet-mode", classOf[XXFormsGetPortletMode], 0, 0, STRING, ALLOWS_ONE)
 
         Fun("get-window-state", classOf[XXFormsGetWindowState], 0, 0, STRING, ALLOWS_ONE)
-    
-        Fun("get-request-path", classOf[XXFormsGetRequestPath], 0, 0, STRING, ALLOWS_ONE)
-    
-        Fun("get-request-header", classOf[XXFormsGetRequestHeader], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
+
+        Fun("get-request-path", classOf[XXFormsGetRequestPath], op = tryXFormsDocumentOp, 0, STRING, ALLOWS_ONE)
+
+        Fun("get-request-header", classOf[XXFormsGetRequestHeader], op = tryXFormsDocumentOp, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
-        Fun("get-request-parameter", classOf[XXFormsGetRequestParameter], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
+
+        Fun("get-request-parameter", classOf[XXFormsGetRequestParameter], op = tryXFormsDocumentOp, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     

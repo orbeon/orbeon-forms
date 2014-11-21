@@ -47,7 +47,7 @@
     <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>
 
     <!-- HTTP client -->
-    <property as="xs:string"  name="oxf.http.internal-paths"                         value="/fr/.*"/>
+    <property as="xs:string"  name="oxf.http.internal-paths"                         value="(?!/exist/)/.*"/>
     <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <property as="xs:string"  name="oxf.http.forward-headers"                        value="Orbeon-Client"/>
     <property as="xs:string"  name="oxf.http.forward-cookies"                        value="JSESSIONID JSESSIONIDSSO"/> <!-- forward JSESSIONIDSSO for JBoss -->

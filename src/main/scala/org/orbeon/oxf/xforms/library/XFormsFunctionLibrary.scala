@@ -36,6 +36,7 @@ object XFormsFunctionLibrary extends {
     val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
     val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
     val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
+    val tryXFormsDocument             = true
 }
     with OrbeonFunctionLibrary
     with XFormsIndependentFunctions

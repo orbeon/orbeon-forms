@@ -42,6 +42,7 @@ class PipelineFunctionLibrary extends {
     val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
     val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
     val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
+    val tryXFormsDocument             = false
 }
     with OrbeonFunctionLibrary
     with XFormsIndependentFunctions

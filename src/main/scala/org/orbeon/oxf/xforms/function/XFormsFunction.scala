@@ -40,6 +40,7 @@ abstract class XFormsFunction extends SystemFunction {
 
     // Public accessor for Scala traits
     def arguments: Seq[Expression] = argument
+    def functionOperation: Int = operation
 
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing

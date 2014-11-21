@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.oxf.util.ScalaUtils._
 
 // xxf:get-request-method() as xs:string
 class XXFormsGetRequestMethod extends XFormsFunction with FunctionSupport {
@@ -68,9 +69,11 @@ trait RequestFunction extends XFormsFunction with FunctionSupport {
 
         val name = stringArgument(0)(xpathContext)
 
-        // Ask XForms document if present, request otherwise
+        // Ask XForms document if supported and present, request otherwise
+        val containingDocument = functionOperation == 1 option getContainingDocument(xpathContext)
+
         val values =
-            Option(getContainingDocument(xpathContext)) map
+            containingDocument map
             (fromDocument(_, name)) getOrElse
             fromRequest(NetUtils.getExternalContext.getRequest, name)
 

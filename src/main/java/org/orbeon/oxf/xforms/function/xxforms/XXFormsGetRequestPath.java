@@ -29,7 +29,9 @@ public class XXFormsGetRequestPath extends XXFormsGetScopeAttribute {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
+        final XFormsContainingDocument containingDocument =
+            (operation == 1) ? getContainingDocument(xpathContext) : null;
+        
         if (containingDocument == null) // support null for use outside of XForms
             return StringValue.makeStringValue(NetUtils.getExternalContext().getRequest().getRequestPath());
         else

@@ -13,32 +13,31 @@
  */
 package org.orbeon.oxf.common
 
+import java.io.{File, FileInputStream}
+import java.security.SignatureException
+
 import org.dom4j.Document
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
-import org.orbeon.oxf.processor.DOMSerializer
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
-import org.orbeon.oxf.processor.SignatureVerifierProcessor
+import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.processor.generator.DOMGenerator
-import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.resources.ResourceNotFoundException
+import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundException}
 import org.orbeon.oxf.util.DateUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
-import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import java.io.{FileInputStream, File}
+import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PathMapXPathDependencies}
 import org.orbeon.oxf.xml.XMLParsing
-import util.Try
-import java.security.SignatureException
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+
+import scala.util.Try
 import scala.util.control.NonFatal
 
 class PEVersion extends Version {
 
-    import PEVersion._
-    import Version._
+    import org.orbeon.oxf.common.PEVersion._
+    import org.orbeon.oxf.common.Version._
 
     // Check license file during construction
     // If the license doesn't pass, throw an exception so that processing is interrupted
@@ -95,7 +94,7 @@ class PEVersion extends Version {
 
 private object PEVersion {
 
-    import Version._
+    import org.orbeon.oxf.common.Version._
 
     val LicensePath        = "/config/license.xml"
     val LicenseURL         = "oxf:" + LicensePath

@@ -913,6 +913,7 @@
                             <replacefilter token="@ORACLE_URL@"           value="${env.ORACLE_URL}"/>
                             <replacefilter token="@MYSQL_URL@"            value="${env.MYSQL_URL}"/>
                             <replacefilter token="@SQLSERVER_URL@"        value="${env.SQLSERVER_URL}"/>
+                            <replacefilter token="@POSTGRESQL_URL@"       value="${env.POSTGRESQL_URL}"/>
                         </replace>
 
                         <!-- Run -->

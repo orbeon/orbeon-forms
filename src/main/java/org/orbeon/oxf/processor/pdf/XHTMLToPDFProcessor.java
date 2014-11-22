@@ -148,10 +148,28 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     return is;
                 }
 
+                // See https://github.com/orbeon/orbeon-forms/issues/1996
+                //
+                // Use our own local cache (NaiveUserAgent has one too) so that we can cache against the absolute URL
+                // yet pass a local URL to super.getImageResource().
+                //
+                // This doesn't live beyond the production of this PDF as the ITextUserAgent is created each time.
+                private HashMap<String, ImageResource> localImageCache = new HashMap<String, ImageResource>();
+
                 public ImageResource getImageResource(String uri) {
-                    final InputStream is = resolveAndOpenStream(uri);
-                    final String localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger);
-                    return super.getImageResource(localURI);
+                    final String resolvedURI = resolveURI(uri);
+                    final ImageResource cachedImageResource = localImageCache.get(resolvedURI);
+
+                    if (cachedImageResource != null) {
+                        return cachedImageResource;
+                    } else {
+                        final InputStream is = resolveAndOpenStream(resolvedURI);
+                        final String localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger);
+
+                        final ImageResource retrievedImageResource = super.getImageResource(localURI);
+                        localImageCache.put(resolvedURI, retrievedImageResource);
+                        return retrievedImageResource;
+                    }
                 }
             };
             callback.setSharedContext(renderer.getSharedContext());

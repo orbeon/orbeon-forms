@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunner
-import FormRunner.{recombineQuery ⇒ _, _}
-import collection.mutable.ListBuffer
+import org.orbeon.oxf.fr.FormRunner.{recombineQuery ⇒ _, _}
+import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{XPath, Logging}
+import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.scaxon.XML._
-import util.Try
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import ProcessParser.{RecoverCombinator, ThenCombinator}
+import org.orbeon.scaxon.XML._
+
+import scala.collection.mutable.ListBuffer
+import scala.util.Try
 
 // Implementation of simple processes
 //

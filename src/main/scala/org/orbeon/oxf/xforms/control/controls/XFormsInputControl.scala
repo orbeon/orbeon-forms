@@ -13,25 +13,23 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import XFormsInputControl._
-import org.orbeon.oxf.util.ScalaUtils._
-import collection.JavaConverters._
-import java.util.{GregorianCalendar, Calendar}
+import java.util.{Calendar, GregorianCalendar}
+
 import org.dom4j.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.ValueRepresentation
-import org.orbeon.saxon.value.CalendarValue
-import org.orbeon.saxon.value.DateValue
-import org.orbeon.saxon.value.StringValue
-import org.orbeon.saxon.value.TimeValue
-import util.matching.Regex
+import org.orbeon.saxon.value.{CalendarValue, DateValue, StringValue, TimeValue}
 import org.xml.sax.helpers.AttributesImpl
+
+import scala.collection.JavaConverters._
+import scala.util.matching.Regex
 
 /**
  * xf:input control

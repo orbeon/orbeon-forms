@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import actions._
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.util.LoggerFactory
 import org.dom4j.{Element, QName}
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
+import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.analysis.{ChildrenActionsAndVariablesTrait, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
 
 object XFormsActions {
     val LOGGING_CATEGORY = "action"

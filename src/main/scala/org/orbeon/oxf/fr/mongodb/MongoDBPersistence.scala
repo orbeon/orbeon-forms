@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.fr.mongodb
 
-import com.mongodb.casbah.Imports._
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
-import java.io.{OutputStreamWriter, InputStream}
+import java.io.{InputStream, OutputStreamWriter}
+import java.util.Date
 import javax.servlet.ServletException
+import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
+
+import com.mongodb.casbah.Imports._
+import com.mongodb.casbah.gridfs.GridFS
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.value.DateTimeValue
-import java.util.Date
-import com.mongodb.casbah.gridfs.GridFS
-import xml.NodeSeq._
-import xml.{NodeSeq, Node, XML}
+
+import scala.xml.NodeSeq._
+import scala.xml.{Node, NodeSeq, XML}
 
 /*!# Experimental: Form Runner MongoDB persistence layer implementation.
 

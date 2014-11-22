@@ -13,28 +13,28 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.orbeon.oxf.xforms.action.actions._
-import collection.JavaConverters._
-import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
-import org.orbeon.scaxon.XML._
-import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
 
-import org.orbeon.oxf.util.DynamicVariable
-import org.orbeon.oxf.xforms.model.DataModel
 import org.dom4j.QName
-
-import org.orbeon.oxf.xforms.{XFormsModel, XFormsContainingDocument}
-import org.orbeon.oxf.xforms.event.{XFormsEventTarget, Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
-import util.Try
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
+import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
+import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel}
+import org.orbeon.saxon.om._
+import org.orbeon.scaxon.XML._
+import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
+
+import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
+import scala.util.Try
 
 object XFormsAPI {
 

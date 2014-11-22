@@ -13,27 +13,29 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.saxon.expr._
+import java.io.ByteArrayOutputStream
+import java.util.{Map ⇒ JMap}
+
 import org.dom4j.Element
+import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
+import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util.{IndentedLogger, XPath}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper, NamespaceMapping}
-import org.orbeon.saxon.om.Axis
-import java.util.{Map ⇒ JMap}
-import org.orbeon.oxf.common.{OrbeonLocationException, OXFException}
-import collection.mutable.{LinkedHashSet, Stack}
-import org.orbeon.saxon.trace.ExpressionPresenter
-import java.io.ByteArrayOutputStream
-import org.orbeon.saxon.expr.PathMap.{PathMapNode, PathMapArc}
-import xml._
+import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j._
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper, XMLUtils}
 import org.orbeon.saxon.Configuration
-import collection.JavaConversions._
-import org.orbeon.oxf.xforms._
-import xbl.Scope
-import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
+import org.orbeon.saxon.expr._
+import org.orbeon.saxon.om.Axis
+import org.orbeon.saxon.trace.ExpressionPresenter
+
+import scala.collection.JavaConversions._
+import scala.collection.mutable.{LinkedHashSet, Stack}
 import scala.util.control.NonFatal
+import scala.xml._
 
 class PathMapXPathAnalysis(
     val xpathString            : String,

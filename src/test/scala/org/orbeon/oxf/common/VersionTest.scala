@@ -14,6 +14,7 @@
 package org.orbeon.oxf.common
 
 import java.security.SignatureException
+
 import junit.framework.Assert._
 import org.dom4j.Document
 import org.junit.Test
@@ -24,7 +25,8 @@ import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.scalatest.junit.AssertionsForJUnit
-import util.Try
+
+import scala.util.Try
 
 class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
 

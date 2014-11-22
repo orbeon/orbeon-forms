@@ -13,21 +13,22 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ValueTrait, RepeatControl}
-import model.Model
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
-import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
-import org.dom4j.{QName, Element}
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.dom4j.{Element, QName}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
-import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Target, Capture, Phase}
-import org.orbeon.oxf.xforms.event.EventHandler
-import collection.mutable
-import util.control.Breaks
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
+import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+
+import scala.collection.mutable
+import scala.util.control.Breaks
 
 // xml:lang reference
 sealed abstract class LangRef
@@ -236,7 +237,7 @@ trait ElementEventHandlers {
     element: ElementAnalysis ⇒
 
     import ElementAnalysis._
-    import propagateBreaks.{break, breakable}
+    import ElementAnalysis.propagateBreaks.{break, breakable}
 
     // Event handler information as a tuple:
     // - whether the default action needs to run

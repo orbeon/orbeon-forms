@@ -13,29 +13,30 @@
  */
 package org.orbeon.scaxon
 
-import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.value.StringValue
-import xml.Elem
-import org.orbeon.oxf.util.XPathCache._
-import org.orbeon.oxf.util.XPath._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsInstance}
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{XMLReceiver, XMLParsing, TransformerUtils, NamespaceMapping}
-import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.{XPath ⇒ _, _}
-import org.orbeon.saxon.pattern._
-import org.orbeon.saxon.expr.{Token, ExpressionTool}
-import org.orbeon.saxon.om._
-import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.saxon.tinytree.TinyTree
-import annotation.tailrec
-import collection._
-import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.XPath._
+import org.orbeon.oxf.util.XPathCache._
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.{XFormsInstance, XFormsUtils}
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLParsing, XMLReceiver}
+import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.expr.{ExpressionTool, Token}
+import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om._
+import org.orbeon.saxon.pattern._
+import org.orbeon.saxon.tinytree.TinyTree
+import org.orbeon.saxon.value.StringValue
+import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
+import scala.collection._
+import scala.xml.Elem
 
 object XML {
 

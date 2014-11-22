@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
+import org.orbeon.oxf.fr.FormRunner.{recombineQuery ⇒ _, splitQueryDecodeParams ⇒ _, _}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML
-import util.Try
-import XML._
+import org.orbeon.scaxon.XML._
+
+import scala.util.Try
 
 trait XFormsActions {
 

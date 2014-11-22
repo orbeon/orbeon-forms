@@ -13,23 +13,21 @@
  */
 package org.orbeon.oxf.fr.process
 
-import ProcessParser._
-import annotation.tailrec
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.fr.process.ProcessParser.ActionNode
-import org.orbeon.oxf.fr.process.ProcessParser.ConditionNode
-import org.orbeon.oxf.fr.process.ProcessParser.GroupNode
+import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, GroupNode, _}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.{SecureUtils, IndentedLogger, Logging}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XML._
-import scala.util.control.{NonFatal, ControlThrowable, Breaks}
-import util.{Success, Try}
-import org.orbeon.oxf.xforms.XFormsUtils
+
+import scala.annotation.tailrec
+import scala.util.control.{Breaks, ControlThrowable, NonFatal}
+import scala.util.{Success, Try}
 
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {

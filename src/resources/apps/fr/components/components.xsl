@@ -196,7 +196,7 @@
                     return if ($mode = 'controls') then 'xml' else 'xhtml'}}"
                 xxf:no-updates="{{
                     for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                    return if ($mode = 'controls') then 'true' else 'false'}}"
+                    return if ($mode = ('controls', 'pdf')) then 'true' else 'false'}}"
 
                 xxf:noscript-support="{$is-noscript-support}"
                 xxf:external-events="{@xxf:external-events} fr-open-pdf"

@@ -209,7 +209,7 @@
             </xsl:if>
             <!-- Override if specified -->
             <xsl:copy-of select="@xxf:xpath-analysis"/>
-            <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests -->
+            <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests, import, validate -->
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

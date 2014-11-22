@@ -33,7 +33,7 @@
         <p:input name="config" href="apply.xpl"/>
         <p:input name="xforms-model">
             <!-- XForms model that gets inserted into Form Runner to perform import upon initialization -->
-            <xf:model id="fr-batch-validation-model" xxf:xpath-analysis="true">
+            <xf:model id="fr-batch-validation-model" xxf:xpath-analysis="true" xxf:no-updates="true">
 
                 <xf:instance src="input:data" id="fr-batch-data" xxf:readonly="true"/>
                 <xf:instance id="fr-empty-data"><dummy/></xf:instance>

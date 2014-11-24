@@ -604,7 +604,7 @@
 
                     <xf:var
                         name="buttons-property"
-                        value="if (normalize-space($buttons-property-override))
+                        value="if (normalize-space($buttons-property-override) != '')
                                then $buttons-property-override
                                else if ($fr-mode = 'view')
                                then 'oxf.fr.detail.buttons.view'
@@ -612,9 +612,9 @@
 
                     <xf:var
                         name="buttons-names"
-                        value="if ($fr-mode = 'pdf')
+                        value="if (normalize-space($buttons-property-override) = '' and $fr-mode = 'pdf')
                                then ()
-                               else if ($fr-mode = 'test')
+                               else if (normalize-space($buttons-property-override) = '' and $fr-mode = 'test')
                                then 'validate'
                                else xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.')))"/>
 

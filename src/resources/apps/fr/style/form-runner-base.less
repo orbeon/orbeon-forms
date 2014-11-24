@@ -624,7 +624,6 @@
 
     .fr-footer-title {
         position: running(footer-title);
-        font-size: 14px;
     }
 }
 
@@ -653,16 +652,22 @@
         content: element(footer-title);
         border-top: 1px solid gray;
         padding-top: 10px;
+        margin-top: 0;
         vertical-align: top;
+        font-size: 14px;
+        padding-right: 10px;
+        line-height: 26px;
     }
-
     @bottom-center {
         content: counter(page) " / " counter(pages);
         border-top: 1px solid gray;
         padding-top: 10px;
+        margin-top: 0;
         vertical-align: top;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: 14px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        line-height: 26px;
+        white-space: nowrap;
     }
 
     @bottom-right {

@@ -57,7 +57,7 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config">
             <xsl:transform version="2.0">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:variable name="app" select="doc('input:parameters')/*/app/string()"/>
                 <xsl:variable name="form" select="doc('input:parameters')/*/form/string()"/>
@@ -95,45 +95,63 @@
 
                             [1] http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-a-element
                          -->
-                        <xsl:apply-templates select="@* except (@href[not($hyperlinks)], @shape, @target, @download, @ping, @rel, @hreflang, @type) | node()"/>
+                        <xsl:apply-templates
+                            select="@* except (@href[not($hyperlinks)], @shape, @target, @download, @ping, @rel, @hreflang, @type) | node()"
+                            mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 
                 <!-- Hyperlink URLs in fields -->
                 <xsl:template match="*:pre[p:has-class('xforms-textarea', ..)] | *:span[p:has-class('xforms-field') and p:has-class('xforms-input', ..)]">
                     <xsl:element name="{local-name()}">
-                        <xsl:apply-templates select="@*"/>
-                        <xsl:apply-templates select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))"/>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:apply-templates select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 
-                <!-- These are unneeded and can make iText choke (values too long) -->
-                <xsl:template match="*:input[@type = 'hidden']"/>
+                <!-- Start grid content -->
+                <xsl:template match="*:div[p:has-class('xbl-fr-grid')]">
+                    <xsl:element name="{local-name()}">
+                        <xsl:apply-templates select="@* | node()" mode="in-grid"/>
+                    </xsl:element>
+                </xsl:template>
+
+                <!-- Hide grid rows without visible controls -->
+                <xsl:template match="*:tr[empty(*:td/*:div[p:has-class('fr-grid-content')]/*[(p:has-class('xforms-control') or p:has-class('xbl-component')) and not(p:has-class('xforms-disabled'))])]" mode="in-grid">
+                    <xsl:element name="{local-name()}">
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:attribute name="class" select="'xforms-hidden'"/>
+                        <xsl:apply-templates select="node()" mode="#current"/>
+                    </xsl:element>
+                </xsl:template>
+
+                 <!-- These are unneeded and can make iText choke (values too long) -->
+                 <xsl:template match="*:input[@type = 'hidden']"/>
 
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
                 <xsl:template match="*:form">
-                    <xsl:copy>
+                    <xsl:element name="{local-name()}">
                         <xsl:attribute name="class" select="string-join(p:classes()[. != 'xforms-initially-hidden'], ' ')"/>
-                        <xsl:apply-templates select="@* except @class | node()"/>
-                    </xsl:copy>
+                        <xsl:apply-templates select="@* except @class | node()" mode="#current"/>
+                    </xsl:element>
                 </xsl:template>
 
                 <!-- Remove all prefixes because Flying Saucer doesn't like them -->
                 <xsl:template match="*">
                     <xsl:element name="{local-name()}">
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 
                 <!-- Make a copy of useful information so it can be moved, via CSS, to headers and footers -->
                 <xsl:template match="*:body">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@*"/>
+                    <xsl:element name="{local-name()}">
+                        <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:variable name="title" select="/*/*:head/*:title/string()"/>
                         <span class="fr-header-title xforms-hidden"><xsl:value-of select="$title"/></span>
                         <span class="fr-footer-title xforms-hidden"><xsl:value-of select="$title"/></span>
-                        <xsl:apply-templates select="node()"/>
-                    </xsl:copy>
+                        <xsl:apply-templates select="node()" mode="#current"/>
+                    </xsl:element>
                 </xsl:template>
             </xsl:transform>
         </p:input>

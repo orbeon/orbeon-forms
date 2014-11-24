@@ -618,12 +618,18 @@
 
     .fr-header-title {
         position: running(header-title);
-        display: inline;
-        font-size: 14px;
     }
 
     .fr-footer-title {
         position: running(footer-title);
+    }
+
+    .fr-header-title, .fr-footer-title {
+        div {
+            max-height: 26px;
+            overflow: hidden;
+            text-overflow: ellipsis // not supported by Flying Saucer yet but would be nice
+        }
     }
 }
 

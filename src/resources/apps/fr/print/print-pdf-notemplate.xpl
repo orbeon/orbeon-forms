@@ -148,8 +148,8 @@
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:variable name="title" select="/*/*:head/*:title/string()"/>
-                        <span class="fr-header-title xforms-hidden"><xsl:value-of select="$title"/></span>
-                        <span class="fr-footer-title xforms-hidden"><xsl:value-of select="$title"/></span>
+                        <div class="fr-header-title xforms-hidden"><div><xsl:value-of select="$title"/></div></div>
+                        <div class="fr-footer-title xforms-hidden"><div><xsl:value-of select="$title"/></div></div>
                         <xsl:apply-templates select="node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>

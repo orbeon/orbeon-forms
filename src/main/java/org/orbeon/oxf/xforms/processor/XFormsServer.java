@@ -429,6 +429,8 @@ public class XFormsServer extends ProcessorImpl {
             // - No need to output a null document here, xmlReceiver is null anyway.
             XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
         } else {
+            // This is most likely the case of a retry if the initial request was long-running
+            // See https://github.com/orbeon/orbeon-forms/issues/1984
             LifecycleLogger.eventAssumingRequestJava("xforms", "document lock timeout", new String[] { "uuid", parameters.getUUID() });
             indentedLogger.logInfo("", "Ajax update lock timeout exceeded, returning");
             throw new OXFException("Ajax update lock timeout exceeded");

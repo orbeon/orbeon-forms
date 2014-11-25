@@ -300,7 +300,9 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         // Lock document for at most the max retry delay plus an increment
         try {
-            final boolean acquired = lock.tryLock(XFormsProperties.getAjaxTimeout() + XFormsProperties.getRetryDelayIncrement(), TimeUnit.MILLISECONDS);
+            // Don't wait at all if the lock cannot be obtained
+            // See https://github.com/orbeon/orbeon-forms/issues/1984
+            final boolean acquired = lock.tryLock(0L, TimeUnit.MILLISECONDS);
             if (acquired)
                 return lock;
             else

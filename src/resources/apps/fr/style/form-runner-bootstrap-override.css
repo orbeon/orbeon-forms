@@ -82,8 +82,6 @@ body.orbeon {
   cursor: not-allowed;
   overflow: hidden;
   white-space: nowrap;
-  *height: 24px;
-  *line-height: 24px;
 }
 .orbeon select,
 .orbeon textarea,
@@ -110,8 +108,6 @@ body.orbeon {
   box-sizing: border-box;
   height: 28px;
   background-image: none;
-  *height: 24px;
-  *line-height: 24px;
 }
 .orbeon .xforms-output label {
   cursor: default;
@@ -145,7 +141,6 @@ body.orbeon {
 .orbeon label.radio input[type="checkbox"],
 .orbeon label.checkbox input[type="checkbox"] {
   margin-top: 3px;
-  *margin-top: 0;
   margin-top: 0px\9;
 }
 .orbeon select[multiple],
@@ -174,8 +169,6 @@ body.orbeon {
 .orbeon .input-append .add-on,
 .orbeon .input-prepend .add-on {
   height: 18px;
-  *margin-top: 1px;
-  *height: 20px;
 }
 .orbeon .input-append,
 .orbeon .input-prepend {

@@ -123,8 +123,6 @@
   border: none;
   background: transparent;
   cursor: hand;
-  *width: auto;
-  *overflow: visible;
 }
 .orbeon button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner,
 .orbeon .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner {
@@ -287,8 +285,6 @@
 }
 .orbeon .xforms-upload .xforms-upload-progress .yui-pb {
   display: inline-block;
-  *display: inline;
-  *zoom: 1;
 }
 .orbeon .xforms-upload.xforms-readonly .xforms-upload-remove,
 .orbeon .xforms-upload.xforms-readonly .xforms-upload-select {
@@ -407,7 +403,6 @@
   position: absolute;
   -moz-opacity: 0.5;
   opacity: 0.5;
-  *filter: alpha(opacity=50);
   border: 1px solid red;
   font-size: 11px;
 }

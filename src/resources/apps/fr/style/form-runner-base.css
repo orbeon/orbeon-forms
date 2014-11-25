@@ -37,8 +37,6 @@
 }
 .orbeon .orbeon-portlet-body {
   font: 13px/1.231 arial, helvetica, clean, sans-serif;
-  *font-size: small;
-  *font: x-small;
 }
 .orbeon .xforms-noscript .xforms-help {
   display: block;
@@ -47,7 +45,6 @@
 .orbeon .xforms-noscript .fr-section-title .fr-section-label button.btn-link {
   color: #555555;
   font-size: inherit;
-  *font-size: 20px;
 }
 .orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help {
   display: inline;
@@ -172,7 +169,6 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
-  *width: 97.5%;
 }
 .orbeon .xbl-fr-error-summary .fr-error-list {
   padding-top: 10px;
@@ -196,7 +192,6 @@
 .orbeon .fr-buttons .xforms-trigger button,
 .orbeon .fr-buttons .xforms-trigger input {
   width: 9.5em;
-  *width: 9em;
 }
 .orbeon .fr-buttons .fr-collapse-all-button.xforms-trigger button,
 .orbeon .fr-buttons .fr-expand-all-button.xforms-trigger button,
@@ -237,9 +232,6 @@
   margin: 0;
   display: block;
   margin: auto;
-}
-.orbeon .fr-repeat-table .fr-repeat-column-trigger span i {
-  *margin-left: 0px;
 }
 .orbeon .fr-repeat-table .fr-repeat-column-trigger button {
   display: block;
@@ -380,7 +372,6 @@
   margin-top: 2px;
   margin-bottom: 4px;
   overflow: hidden;
-  zoom: 1;
 }
 .orbeon .fr-grid select,
 .orbeon .fr-grid textarea,
@@ -400,15 +391,12 @@
 .orbeon .fr-grid input[type="color"],
 .orbeon .fr-grid .uneditable-input {
   width: 100%;
-  *padding: 2px;
-  *width: 98%;
 }
 .orbeon .fr-grid .xforms-textarea textarea {
   width: 100%;
 }
 .orbeon .fr-grid input[type="file"] {
   width: auto;
-  *width: 98%;
 }
 .orbeon .fr-grid .xbl-fr-autocomplete .xforms-input input {
   width: 140px;
@@ -418,7 +406,6 @@
 }
 .orbeon .fr-grid .xbl-fr-inplace-input input {
   width: 100%;
-  *width: 98%;
 }
 .orbeon .fr-grid .xforms-mediatype-text-html textarea {
   height: 10.1em;
@@ -435,10 +422,6 @@
   overflow: auto;
   display: block;
 }
-.orbeon .fr-grid .xforms-mediatype-image {
-  *padding-bottom: 17px;
-  *overflow-y: hidden;
-}
 .orbeon .fr-grid .xforms-mediatype-image img {
   display: block;
 }
@@ -452,8 +435,6 @@
 }
 .orbeon .fr-grid .fr-grid-content {
   padding: 4px;
-  *padding-right: 6px;
-  *zoom: 1;
 }
 .orbeon .fr-repeat-table .fr-grid-content {
   padding-top: 0;
@@ -461,16 +442,6 @@
 }
 .orbeon #fr-view {
   margin-bottom: 10px;
-}
-.orbeon #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
-  *width: 13em;
-}
-.orbeon #fr-view .fr-grid td .fr-grid-content img.xforms-input-input {
-  *width: auto;
-}
-.orbeon #fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-date,
-.orbeon #fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-time {
-  *width: 6.3em;
 }
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em input.xforms-input-input,
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em select {
@@ -524,7 +495,6 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
-  *white-space: normal;
   word-break: break-all;
   word-wrap: break-word;
 }

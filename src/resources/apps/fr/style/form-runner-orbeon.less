@@ -133,11 +133,6 @@ body.orbeon { background-color: @frBackground }
             float: left;
         }
 
-        // IE7: https://github.com/orbeon/orbeon-forms/issues/1042
-        .fr-status-icons {
-            *margin-top: (@navbarHeight - @frIconHeight) / 2;
-        }
-
         &.navbar-inverse {
             .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
                 color: @frNavBarTextColor;
@@ -189,10 +184,6 @@ body.orbeon { background-color: @frBackground }
             color: white;
             .border-top-left-radius(4px);
             .border-top-right-radius(4px);
-
-            // Slightly less ugly with IE7
-            *padding: 0 5px;
-            *margin: 0;
         }
 
         // Multiple levels can be mixed so make sure the strongest wins

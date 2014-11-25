@@ -86,10 +86,6 @@ body.orbeon {
 
         overflow: hidden; // prevent text from wrapping, but still cut it off like an input does
         white-space: nowrap;
-
-        // IE7: due to missing box-sizing support
-        *height: @controlsHeight - 2 * 2px;
-        *line-height: @controlsHeight - 2 * 2px;
     }
 
     select,
@@ -115,10 +111,6 @@ body.orbeon {
         .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap
         height: @controlsHeight;
         background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
-
-        // IE7: due to missing box-sizing support
-        *height: @controlsHeight - 2 * 2px;
-        *line-height: @controlsHeight - 2 * 2px;
     }
 
     .xforms-output label {
@@ -156,7 +148,6 @@ body.orbeon {
         input[type="radio"],
         input[type="checkbox"] {
             margin-top: 3px;    // override Bootstrap
-            *margin-top: 0;     // IE7
             margin-top: 0px\9;  // IE8-9
         }
     }
@@ -188,9 +179,6 @@ body.orbeon {
 
     .input-append .add-on, .input-prepend .add-on {
         height: @baseLineHeight - 2px;
-        // IE7: align with input field
-        *margin-top: 1px;
-        *height: @baseLineHeight;
     }
 
     .input-append, .input-prepend {

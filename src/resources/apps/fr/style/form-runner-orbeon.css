@@ -123,9 +123,6 @@ body.orbeon {
 .orbeon .navbar .fr-goto-content {
   float: left;
 }
-.orbeon .navbar .fr-status-icons {
-  *margin-top: 13px;
-}
 .orbeon .navbar.navbar-inverse .fr-language-choice,
 .orbeon .navbar.navbar-inverse .fr-noscript-choice,
 .orbeon .navbar.navbar-inverse .fr-goto-content {
@@ -187,8 +184,6 @@ body.orbeon {
   -webkit-border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
   border-top-right-radius: 4px;
-  *padding: 0 5px;
-  *margin: 0;
 }
 .orbeon .fr-view .xbl-fr-error-summary .fr-level-info .fr-error-title {
   background-color: #333333;

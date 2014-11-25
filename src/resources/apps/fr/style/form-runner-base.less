@@ -10,8 +10,6 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-// NOTE: IE em factor: 0.9759
-
 @import (reference) "form-runner-common";
 
 .orbeon {
@@ -46,10 +44,6 @@
     // From YUI font.css, but applied to portlet body only
     .orbeon-portlet-body {
         font: 13px/1.231 arial,helvetica,clean,sans-serif;
-        // for IE6/7
-        *font-size: small;
-        // for IE Quirks Mode
-        *font: x-small;
     }
 
     // ***** XForms Controls *******************************************************************************************
@@ -66,7 +60,6 @@
             button.btn-link {
                 color: @frHeaderColor;
                 font-size: inherit;
-                *font-size: @baseLineHeight; // actual font size for IE7
             }
 
             .xforms-help {
@@ -196,7 +189,7 @@
     // Error summary
     .xbl-fr-error-summary {
         .fr-error-summary-body { padding: 0 10px }
-        .fr-error-title { margin: 0; .box-sizing(border-box); width: 100%; *width: 97.5% }
+        .fr-error-title { margin: 0; .box-sizing(border-box); width: 100% }
         .fr-error-list { padding-top: 10px; margin-top: 0  }
     }
 
@@ -218,7 +211,7 @@
         .xforms-trigger button img { margin-right: 10px }
 
         .xforms-trigger button, .xforms-trigger input {
-            width: 9.5em; *width: 9em
+            width: 9.5em
         }
 
         // Special sizing for expand/collapse/refresh buttons
@@ -266,7 +259,6 @@
             text-align: left;
 
             i { margin: 0; display: block; margin: auto }       // For the Bootstrap icon
-            span i { *margin-left: 0px }                        // IE buttons depress; is there a way to remove their 1px 3px padding?
             button { display: block; margin: auto }
 
             .dropdown-menu i {
@@ -414,7 +406,6 @@
             margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
                                                         // than above the control to make the CSS more generally applicable to XBL components)
             overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
-            zoom: 1;                                    // For the overflow: hidden to have an effect on IE6
         }
 
         // Controls
@@ -436,8 +427,6 @@
         input[type="color"],
         .uneditable-input {
             width: 100%;
-            *padding: 2px;              // IE7: due to missing box-sizing support
-            *width: 98%;
         }
 
         .xforms-textarea textarea {
@@ -446,7 +435,6 @@
 
         input[type="file"] {
             width: auto;
-            *width: 98%;                // IE7: due to missing box-sizing support
         }
 
         // Override previous rule for autocomplete input, which can't be sized with width: 100%
@@ -457,7 +445,6 @@
             width: 100%;
             input {
                 width: 100%;
-                *width: 98%;
             }
         }
 
@@ -465,7 +452,6 @@
         .xforms-mediatype-text-html textarea { height: 10.1em } // NOTE: with Firefox, 10em makes bottom line disappear
 
         // Set this again as default is 100% above
-        // NOTE: This doesn't work well with IE 6/7
         .xforms-input input {
             &.xforms-type-date, &.xforms-type-time {
                 width: 7.5em;
@@ -479,7 +465,6 @@
 
         // Image output
         .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
-        .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }// IE HACK
         .xforms-mediatype-image img { display: block }
 
         //  Buttons
@@ -491,8 +476,6 @@
         // Cell content
         .fr-grid-content {
             padding: @frGridCellPadding;                // Add some space around control
-            *padding-right: 6px;                        // IE7: help move back controls within .fr-grid-content
-            *zoom: 1;                                   // IE7: fix handling of padding
         }
     }
 
@@ -508,18 +491,7 @@
 
         margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
 
-        // Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-        // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely
-         .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
-            { *width: 13em }
-
         .fr-grid td .fr-grid-content {
-
-            img.xforms-input-input { *width: auto } // Undo effect of previous rule for image in minimal date picker
-
-            .xforms-input input.xforms-type-date,
-            .xforms-input input.xforms-type-time
-                { *width: 6.3em }
 
             // Custom control widths
             .fr-width-2em     input.xforms-input-input, .fr-width-2em select      { width: 2em }
@@ -551,7 +523,6 @@
         font-family: @sansFontFamily;   // use regular font, not monospaced font
         white-space: -moz-pre-wrap;
         white-space: pre-wrap;
-        *white-space: normal;
 
         word-break: break-all; // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
         word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)

@@ -67,7 +67,6 @@
                     box-sizing: border-box;
                     -moz-box-sizing: border-box;
                     width: 100%;
-                    *width: 96%;/* for IE7, due to missing box-sizing support */
                 }
                 .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
                     display: block;
@@ -78,7 +77,6 @@
                     width: 100%;
                     overflow-y: scroll;
                     background-color: white;
-                    *height: 70px;/* for IE7, due to missing box-sizing support */
                 }
             </xbl:style>
         </xbl:resources>

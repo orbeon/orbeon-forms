@@ -13,8 +13,6 @@
 }
 .xbl-fr-autocomplete .yui-ac {
   display: inline-block;
-  *zoom: 1;
-  *display: inline;
   vertical-align: middle;
 }
 .xbl-fr-autocomplete .yui-ac {
@@ -23,7 +21,6 @@
 .xbl-fr-autocomplete .xbl-fr-select1-button {
   vertical-align: middle;
   display: inline-block;
-  *display: inline;
 }
 .xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button {
   vertical-align: middle;
@@ -36,7 +33,4 @@
   margin-left: 3px;
   padding-top: 0;
   padding-bottom: 0;
-}
-.xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button img {
-  *max-width: none;
 }

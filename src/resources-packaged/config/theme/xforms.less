@@ -181,7 +181,6 @@
         border: none;
         background: transparent;
         cursor: hand;
-        *width: auto;  *overflow: visible; // IE 6/7 HACK: remove funny variable padding within button
     }
 
     // Special rule for Firefox to remove extra padding inside noscript buttons working as links
@@ -322,7 +321,7 @@
         .xforms-upload-progress {
             .yui-pb, .xforms-upload-cancel { vertical-align: middle }
             .xforms-upload-cancel { padding-left: .5em }
-            .yui-pb { display: inline-block; *display: inline; *zoom: 1 }
+            .yui-pb { display: inline-block; }
         }
 
         &.xforms-readonly {
@@ -455,7 +454,6 @@
         position: absolute;
         -moz-opacity: 0.5;
         opacity: 0.5;
-        *filter: alpha(opacity=50);
         border: 1px solid red;
         font-size: 11px;
     }

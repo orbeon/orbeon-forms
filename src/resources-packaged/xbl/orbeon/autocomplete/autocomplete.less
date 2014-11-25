@@ -37,8 +37,6 @@
     // http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-Inline-block
     .yui-ac {
         display: inline-block;
-        *zoom: 1;
-        *display: inline;
         vertical-align: middle;
     }
 
@@ -46,7 +44,7 @@
     .yui-ac { white-space: nowrap }
 
     // Button inline, next to the text field
-    .xbl-fr-select1-button { vertical-align: middle; display: inline-block; *display: inline }
+    .xbl-fr-select1-button { vertical-align: middle; display: inline-block }
 
     // Get the input field vertically aligned on the button
     .xbl-fr-select1-button .yui-menu-button { vertical-align: middle }
@@ -56,6 +54,5 @@
         height: 28px;                           // TODO: @baseLineHeight + 8px or better, as done in form-runner-bootstrap-override.less
         margin-left: 3px;                       // Get the button to show as if it was merged with the text field (well, almost)
         padding-top: 0; padding-bottom: 0;      // Remove top padding so the bottom shows vertically centered
-        img { *max-width: none }                // Override the max-width: 100% in Bootstrap to get IE7 to display the image
     }
 }

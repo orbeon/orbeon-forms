@@ -141,7 +141,7 @@
                                         <xf:property name="form"        value="bind('form-name-bind')"/>
                                         <xf:property name="title"       value="bind('title-bind')"/>
                                         <xf:property name="description" value="bind('description-bind')"/>
-                                        <xf:property name="logo"        value="bind('logo-bind')"/>
+                                        <xf:property name="singleton"   value="bind('singleton-bind')"/>
                                         <xf:property name="mode"        value="'edit'"/>
                                     </xxf:show>
                                 </xf:action>
@@ -306,6 +306,7 @@
                                     <xf:action ev:event="fb-update-metadata">
                                         <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                                         <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
+                                        <xf:setvalue ref="bind('singleton-bind')"   value="event('singleton')"/>
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action

@@ -377,10 +377,10 @@
         <xsl:apply-templates select=".//fr:dialogs//xxf:dialog"/>
 
         <!-- Misc standard dialogs -->
-        <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml"      xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/apps/fr/includes/draft-dialogs.xhtml"     xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/apps/fr/includes/validation-dialog.xhtml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml"            xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/draft-singleton-dialogs.xhtml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml"       xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/validation-dialog.xhtml"       xxi:omit-xml-base="true"/>
 
         <!-- Error dialog -->
         <fr:alert-dialog id="fr-error-dialog" close="true">

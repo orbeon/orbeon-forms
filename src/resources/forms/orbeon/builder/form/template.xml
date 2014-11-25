@@ -52,6 +52,7 @@
                     <form-name/>
                     <title xml:lang=""/>
                     <description xml:lang=""/>
+                    <singleton/>
                 </metadata>
             </xf:instance>
 

@@ -53,7 +53,7 @@
                 <!-- Migrate constraints, see https://github.com/orbeon/orbeon-forms/issues/1829 -->
                 <xsl:variable name="ids-of-alert-validations"
                               select="//xf:alert/@validation/string()"/>
-                
+
                 <xsl:variable name="ids-of-binds-with-constraint-attribute-and-custom-alert"
                               select="$model//xf:bind[@constraint and @id = $ids-of-alert-validations]/@id/string()"/>
 
@@ -211,7 +211,7 @@
                         <xsl:apply-templates select="node()"/>
                     </xf:group>
                 </xsl:template>
-                
+
                 <!-- ======== Upgrading form ========-->
 
                 <!--
@@ -380,6 +380,15 @@
                                 <xsl:apply-templates select="node()" mode="#current"/>
                             </xsl:otherwise>
                         </xsl:choose>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Add singleton element to fr-form-metadata -->
+                <xsl:template match="xf:model/xf:instance[@id = 'fr-form-metadata']/metadata[empty(singleton)]"
+                              mode="within-model">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:element name="singleton">false</xsl:element>
                     </xsl:copy>
                 </xsl:template>
 

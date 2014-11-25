@@ -66,7 +66,7 @@
             <!-- Warning dialog -->
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Continue</validation-dialog-continue>
-            
+
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
 
@@ -192,7 +192,7 @@
                 <upload-error>There was an error during the upload. Please try again.</upload-error>
                 <upload-error-size>The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.</upload-error-size>
             </messages>
-            <drafts>
+            <draft-singleton>
                 <found-draft>Found draft</found-draft>
                 <found-drafts>Found drafts</found-drafts>
                 <found-draft-for-document>After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?</found-draft-for-document>
@@ -202,7 +202,10 @@
                 <open-draft>Open auto-saved draft</open-draft>
                 <view-drafts>View auto-saved drafts</view-drafts>
                 <start-new>Start from scratch</start-new>
-            </drafts>
+                <multiple-docs-title>Existing form data found</multiple-docs-title>
+                <multiple-docs-explanation>You cannot create new data for this form definition, however you might be able to edit existing form data.</multiple-docs-explanation>
+                <multiple-docs-view-data>View existing form data</multiple-docs-view-data>
+            </draft-singleton>
             <labels>
                 <language-choice>Language</language-choice>
                 <errors>Summary of errors</errors>
@@ -352,7 +355,7 @@
             <!-- Warning dialog -->
             <validation-dialog-review>Revoir</validation-dialog-review>
             <validation-dialog-continue>Continuer</validation-dialog-continue>
-            
+
             <test>&lt;i class="icon-cog"/&gt; Tester</test>
             <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
 
@@ -491,6 +494,9 @@
                 <open-draft>Ouvrir le brouillon auto-enregistrés</open-draft>
                 <view-drafts>Voir les brouillons automatiquement enregistrés</view-drafts>
                 <start-new>Recommencer à zéro</start-new>
+                <multiple-docs-title>Données de formulaire existantes</multiple-docs-title>
+                <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données _ _, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
+                <multiple-docs-view-data>Voir les données de formulaire existantes</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Langue</language-choice>
@@ -769,6 +775,9 @@
                 <open-draft>Abrir borrador auto-guardado</open-draft>
                 <view-drafts>Ver borrador auto-guardado</view-drafts>
                 <start-new>Empezar con un formulario en blanco</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice todo="true">[Language]</language-choice>
@@ -918,7 +927,7 @@
             <!-- Warning dialog -->
             <validation-dialog-review todo="true">[Review]</validation-dialog-review>
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
-            
+
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Publiser…</publish>
 
@@ -1192,7 +1201,7 @@
             <!-- Warning dialog -->
             <validation-dialog-review todo="true">[Review]</validation-dialog-review>
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
-            
+
             <test>&lt;i class="icon-cog"/&gt; Тестировать</test>
             <publish>&lt;i class="icon-globe"/&gt; Публиковать</publish>
 
@@ -1464,7 +1473,7 @@
             <!-- Warning dialog -->
             <validation-dialog-review>Recensione</validation-dialog-review>
             <validation-dialog-continue>Continua</validation-dialog-continue>
-            
+
             <test>&lt;i class="icon-cog"/&gt; Prova</test>
             <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
 
@@ -1600,6 +1609,9 @@
                 <open-draft>Apri bozza auto-salvata</open-draft>
                 <view-drafts>Visualizza le bozze auto-salvate</view-drafts>
                 <start-new>Riparti da zero</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Lingua</language-choice>
@@ -1885,6 +1897,9 @@
                 <open-draft>Automatisch gespeicherten Entwurf öffnen</open-draft>
                 <view-drafts>Automatisch gespeicherte Entwürfe ansehen</view-drafts>
                 <start-new>Von vorne beginnen</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Sprache</language-choice>
@@ -2170,6 +2185,9 @@
                 <open-draft>Avaa automaattisesti tallennettu luonnos</open-draft>
                 <view-drafts>Näytä automaattisesti tallennetut luonnokset</view-drafts>
                 <start-new>Aloita tyhjästä</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Kieli</language-choice>
@@ -2455,6 +2473,9 @@
                 <open-draft>Öppna automatiskt sparat utkast</open-draft>
                 <view-drafts>Visa automatiskt sparat utkast</view-drafts>
                 <start-new>Börja från början</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Språk</language-choice>
@@ -2740,6 +2761,9 @@
                 <open-draft>Open auto-bewaard concept</open-draft>
                 <view-drafts>Toon auto-bewaarde concepten</view-drafts>
                 <start-new>Start opnieuw</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Taal</language-choice>
@@ -3025,6 +3049,9 @@
                 <open-draft>Abrir rascunho guardado automaticamente</open-draft>
                 <view-drafts>Ver rascunhos guardados automaticamente</view-drafts>
                 <start-new>Começar do zero</start-new>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
             </drafts>
             <labels>
                 <language-choice>Idioma</language-choice>

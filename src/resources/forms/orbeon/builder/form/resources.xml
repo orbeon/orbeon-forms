@@ -33,6 +33,10 @@
             <label>Form Description</label>
             <hint>Form description in the current language</hint>
         </description>
+        <singleton>
+            <label>Singleton form</label>
+            <hint>Prevent users from creating additional form data if they have access an existing form data for this form definition</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>The logo appears at the top of your form</hint>
@@ -887,6 +891,10 @@
             <label>Description du formulaire</label>
             <hint>cliquer pour entrer une description du formulaire</hint>
         </description>
+        <singleton>
+            <label>Formulaire singleton</label>
+            <hint>Empêche les utilisateurs de créer des données de formulaire supplémentaires s'ils ont, pour ce formulaire, déjà accès à des données de formulaire existantes.</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Le logo apparaît au sommet de votre formulaire</hint>
@@ -1743,6 +1751,10 @@
             <label>Skjemainnstillinger</label>
             <hint>Klikk for å skrive inn skjemainnstillinger</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Logoen synes på toppen av skjemaene</hint>
@@ -2599,6 +2611,10 @@
             <label>Описание формы</label>
             <hint>Нажмите чтобы ввести описание (не обязательно)</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Логотип</label>
             <hint>Логотип отображается в верхней части формы</hint>
@@ -3455,6 +3471,10 @@
             <label>Descrizione del modulo</label>
             <hint>Descrizione del modulo nella lingua attualmente usata</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Il logo appare nella testa del modulo</hint>
@@ -4303,6 +4323,10 @@
             <label>Formularbeschreibung</label>
             <hint>Formularbeschreibung in der zur Zeit verwendeten Sprache</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Das Logo erscheint oberhalb des Formulars</hint>
@@ -5153,6 +5177,10 @@
             <label>Lomakkeen kuvaus</label>
             <hint>Lomakkeen kuvaus nykyisellä kielellä</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Logo näkyy lomakkeesi yläosassa</hint>
@@ -6003,6 +6031,10 @@
             <label>Descripción del Formulario</label>
             <hint>Descripción del Formulario en el idioma configurado</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logo</label>
             <hint>El logo se desplega en la parte superior del formulario</hint>
@@ -6859,6 +6891,10 @@
             <label>Descrição do Formulário</label>
             <hint>Descrição do formulário na língua actual</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logotipo</label>
             <hint>O logotipo que aparece to topo do formulário</hint>
@@ -7714,6 +7750,10 @@
             <label>Beskrivning</label>
             <hint>Beskrivning av formuläret på aktuellt språk</hint>
         </description>
+        <singleton>
+            <label todo="true">[Singleton form]</label>
+            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+        </singleton>
         <logo>
             <label>Logotyp</label>
             <hint>Bild som visas överst på formuläret</hint>

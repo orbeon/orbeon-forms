@@ -278,7 +278,7 @@
                     <xf:bind id="form-name-bind"        ref="form-name"/>
                     <xf:bind id="title-bind"            ref="title[@xml:lang = $fb-lang]"/>
                     <xf:bind id="description-bind"      ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="logo-bind"             ref="logo"/>
+                    <xf:bind id="singleton-bind"        ref="singleton"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*">

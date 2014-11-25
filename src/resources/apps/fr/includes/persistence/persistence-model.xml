@@ -157,9 +157,12 @@
                     </xf:send>
                 </xf:action>
                 <xf:action if="not($draft-requested)">
-                    <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-document-id', $document)"/>
-                    <xf:send if="$autosave-enabled" submission="fr-search-drafts-submission"/>
-                    <xf:var name="draft-found" value="exists(instance('fr-search-drafts-response')/document)"/>
+                    <xf:action context="instance('fr-search-request')/drafts">
+                        <xf:insert   context="." origin="xxf:attribute('for-document-id', $document)"/>
+                        <xf:setvalue context="." value="'only'"/>
+                    </xf:action>
+                    <xf:send if="$autosave-enabled" submission="fr-search-submission"/>
+                    <xf:var name="draft-found" value="exists(instance('fr-search-response')/document)"/>
 
                     <!-- Remember to show the dialog upon xforms-ready -->
                     <xf:setvalue
@@ -176,15 +179,45 @@
 
             <!-- For new documents, see if we have drafts -->
             <xf:action if="$mode = 'new'">
-                <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-never-saved-document', 'true')"/>
-                <xf:send if="$autosave-enabled" submission="fr-search-drafts-submission"/>
-                <xf:var name="drafts-found" value="count(instance('fr-search-drafts-response')/document)"/>
 
-                <!-- Remember to show the dialog upon xforms-ready -->
-                <xf:setvalue
-                    if="$drafts-found > 0"
-                    ref="instance('fr-persistence-instance')/initial-dialog-to-show"
-                    value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
+                <xf:var name="is-singleton" value="xxf:instance('fr-form-metadata')/singleton = 'true'"/>
+
+                <xf:action if="$is-singleton">
+
+                    <!-- Is there any data for this form that the user can edit? -->
+                    <xf:setvalue context="instance('fr-search-request')/drafts" value="'include'"/>
+                    <xf:send submission="fr-search-submission"/>
+                    <xf:var name="existing-docs" value="instance('fr-search-response')/document"/>
+
+                    <xf:action if="count($existing-docs) = 1">
+                        <xf:load resource="edit/{$existing-docs/@name}"/>
+                    </xf:action>
+                    <xf:action if="count($existing-docs) > 1">
+                        <xf:setvalue
+                            ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                            value="'found-multiple-docs-for-singleton'"/>
+                    </xf:action>
+
+                </xf:action>
+
+                <xf:action if="not($is-singleton)">
+
+                    <!-- Do we have drafts for documents that were never saved? -->
+                    <xf:action context="instance('fr-search-request')/drafts">
+                        <xf:insert   context="." origin="xxf:attribute('for-never-saved-document', 'true')"/>
+                        <xf:setvalue context="." value="'only'"/>
+                    </xf:action>
+                    <xf:send if="$autosave-enabled" submission="fr-search-submission"/>
+                    <xf:var name="drafts-found" value="count(instance('fr-search-response')/document)"/>
+
+                    <!-- Remember to show the dialog upon xforms-ready -->
+                    <xf:setvalue
+                        if="$drafts-found > 0"
+                        ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                        value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
+
+                </xf:action>
+
             </xf:action>
 
             <!-- Don't allow if we didn't get a submit and we don't have the proper id depending on the mode
@@ -300,24 +333,24 @@
             replace="none"/>
 
     <!-- Search for drafts, to possibly warn users there is a newer draft -->
-    <xf:submission id="fr-search-drafts-submission"
+    <xf:submission id="fr-search-submission"
             method="post"
             resource="/fr/service/persistence/search/{$app}/{$form}"
-            ref="instance('fr-search-drafts-request')"
+            ref="instance('fr-search-request')"
             replace="instance"
-            instance="fr-search-drafts-response">
+            instance="fr-search-response">
         <!-- Remove documents we can't update (search might still return them if we can only ready them) -->
-        <xf:delete event="xforms-submit-done" ref="instance('fr-search-drafts-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
+        <xf:delete event="xforms-submit-done" ref="instance('fr-search-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
     </xf:submission>
-    <xf:instance id="fr-search-drafts-request">
+    <xf:instance id="fr-search-request">
         <search>
-            <drafts>only</drafts>
+            <drafts/>
             <page-size>10</page-size>
             <page-number>1</page-number>
             <lang>en</lang>
         </search>
     </xf:instance>
-    <xf:instance id="fr-search-drafts-response"><dummy/></xf:instance>
+    <xf:instance id="fr-search-response"><dummy/></xf:instance>
 
     <!-- Get document -->
     <xf:submission id="fr-get-document-submission"

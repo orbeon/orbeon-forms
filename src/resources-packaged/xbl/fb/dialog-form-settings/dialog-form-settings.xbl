@@ -33,7 +33,7 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/>
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
-                    iterate="'app', 'form', 'title', 'description', 'mode'"
+                    iterate="'app', 'form', 'title', 'description', 'singleton', 'mode'"
                     ref="instance()/*[name() = context()]" value="event(context())"/>
 
                 <!-- FIXME: Have caller pass the info instead? -->
@@ -49,6 +49,7 @@
                         <form/>
                         <title/>
                         <description/>
+                        <singleton/>
                         <mode/>
                     </instance>
                 </xf:instance>
@@ -65,6 +66,11 @@
                     constraint="matches(., '^[A-Z|a-z|0-9\-_]+$')"
                     calculate="normalize-space()"
                     readonly="false()"/>
+                <xf:bind
+                    ref="singleton"
+                    calculate="if (string() = '') then 'false' else ."
+                    readonly="false()"
+                    type="xs:boolean"/>
                 <xf:bind
                     ref="mode"
                     constraint=". = ('new', 'edit', 'save-as')"/>
@@ -170,6 +176,12 @@
                                 <xf:alert ref="$resources/description/alert"/>
                             </xf:textarea>
 
+                            <!-- Is singleton? -->
+                            <xf:input ref="singleton[$is-form-settings]" id="fb-singleton-input">
+                                <xf:label ref="$resources/singleton/label"/>
+                                <xf:hint ref="$resources/singleton/hint"/>
+                            </xf:input>
+
                         </xh:div>
 
                         <xh:div>
@@ -231,7 +243,7 @@
                             <xf:property name="form"        value="instance()/form"/>
                             <xf:property name="title"       value="instance()/title"/>
                             <xf:property name="description" value="instance()/description"/>
-                            <xf:property name="logo" value="instance()/logo"/>
+                            <xf:property name="singleton"   value="instance()/singleton"/>
                             <xf:property name="mode"        value="instance()/mode"/>
                         </xf:dispatch>
 

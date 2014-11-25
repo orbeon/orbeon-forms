@@ -525,7 +525,8 @@
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
   *white-space: normal;
-  word-break: normal;
+  word-break: break-all;
+  word-wrap: break-word;
 }
 .orbeon .xforms-form .fr-mode-view .xforms-hint,
 .orbeon .xforms-form .fr-mode-pdf .xforms-hint,

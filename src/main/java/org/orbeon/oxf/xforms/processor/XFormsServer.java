@@ -132,7 +132,6 @@ public class XFormsServer extends ProcessorImpl {
         ClientEvents.assertSessionExists();
 
         // Request retry details
-        final boolean isRetries = true;
         final long requestSequenceNumber = XFormsStateManager.getRequestSequence(requestDocument);
 
         final boolean isAjaxRequest =
@@ -190,7 +189,7 @@ public class XFormsServer extends ProcessorImpl {
         // IMPORTANT: We now have a lock associated with the document
         LifecycleLogger.eventAssumingRequestJava("xforms", "before document lock", new String[] { "uuid", parameters.getUUID() });
         final long timestamp = System.currentTimeMillis();
-        // The following trows if the lock is not found either the UUID is not in the session OR the session doesn't exist
+        // The following throws if the lock is not found either the UUID is not in the session OR the session doesn't exist
         final Lock lock = XFormsStateManager.instance().acquireDocumentLock(parameters);
         if (lock != null) {
             try {
@@ -303,19 +302,13 @@ public class XFormsServer extends ProcessorImpl {
                                         // Hook-up debug content handler if we must log the response document
                                         final XMLReceiver responseReceiver;
                                         final LocationSAXContentHandler debugContentHandler;
-                                        final SAXStore responseStore;
+
+                                        // Buffer for retries
+                                        final SAXStore responseStore = new SAXStore();
 
                                         // Two receivers possible
                                         final List<XMLReceiver> receivers = new ArrayList<XMLReceiver>();
-
-                                        // Buffer for retries
-                                        if (isRetries) {
-                                            responseStore = new SAXStore();
-                                            receivers.add(responseStore);
-                                        } else {
-                                            responseStore = null;
-                                            receivers.add(xmlReceiver);
-                                        }
+                                        receivers.add(responseStore);
 
                                         // Debug output
                                         if (logRequestResponse) {

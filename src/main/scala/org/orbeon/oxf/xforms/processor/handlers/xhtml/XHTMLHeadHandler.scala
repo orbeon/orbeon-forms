@@ -353,6 +353,8 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                 sb.append("\"paths\":{")
                 sb.append("\"xforms-server\": \"")
                 sb.append(handlerContext.getExternalContext.getResponse.rewriteResourceURL("/xforms-server", URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE))
+                sb.append("\",\"xforms-server-upload\": \"")
+                sb.append(handlerContext.getExternalContext.getResponse.rewriteResourceURL("/xforms-server/upload", URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE))
 
                 // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
                 // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten

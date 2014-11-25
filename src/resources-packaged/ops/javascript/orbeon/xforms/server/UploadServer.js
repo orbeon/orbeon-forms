@@ -108,7 +108,7 @@
         }, this);
         // Trigger actual upload through a form POST and start asking server for progress
         Connect.setForm(this.processingEvent.form, true, true);
-        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id], {
+        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerUploadURL[this.processingEvent.form.id], {
             upload: _.bind(this.uploadSuccess, this),
             // Failure isn't called; instead we detect if an upload is interrupted through the progress-state="interrupted" in the Ajax response
             failure: _.identity,

@@ -3827,6 +3827,7 @@ ORBEON.xforms.Init = {
              */
             ns: {},                              // Namespace of ids (for portlets)
             xformsServerURL: {},                 // XForms Server URL
+            xformsServerUploadURL: {},           // XForms Server upload URL
             calendarImageURL: {},                // calendar.png image URL (should be ideally handled by a template)
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
@@ -4256,8 +4257,9 @@ ORBEON.xforms.Init = {
     },
 
     _setBasePaths: function(formID, scripts, versioned) {
-        var xformsServerURL = null;
-        var calendarImageURL = null;
+        var xformsServerURL       = null;
+        var xformsServerUploadURL = null;
+        var calendarImageURL      = null;
 
         if (!(window.orbeonInitData === undefined)) {
             // NOTE: We switched back and forth between trusting the client or the server on this. Starting 2010-08-27
@@ -4267,14 +4269,15 @@ ORBEON.xforms.Init = {
             // server values it is.
             var formInitData = window.orbeonInitData[formID];
             if (formInitData && formInitData["paths"]) {
-                xformsServerURL = formInitData["paths"]["xforms-server"];
-                calendarImageURL = formInitData["paths"]["calendar-image"];
+                xformsServerURL       = formInitData["paths"]["xforms-server"];
+                xformsServerUploadURL = formInitData["paths"]["xforms-server-upload"];
+                calendarImageURL      = formInitData["paths"]["calendar-image"];
             }
         }
 
-
-        ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
-        ORBEON.xforms.Globals.calendarImageURL[formID] = calendarImageURL;
+        ORBEON.xforms.Globals.xformsServerURL[formID]       = xformsServerURL;
+        ORBEON.xforms.Globals.xformsServerUploadURL[formID] = xformsServerUploadURL;
+        ORBEON.xforms.Globals.calendarImageURL[formID]      = calendarImageURL;
     },
 
     _widetextArea: function(textarea) {

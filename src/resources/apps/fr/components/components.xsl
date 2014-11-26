@@ -309,6 +309,13 @@
                 <xsl:attribute name="id" select="'fr-form-model'"/>
             </xsl:if>
 
+            <!-- Focus on the first control supporting input on load. Place this before custom model content. Form
+                 Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to
+                 understand that if a modal dialog is currently visible, setting focus to a control outside that dialog
+                 should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
+            <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
+
+            <!-- Custom model content -->
             <xsl:apply-templates select="node()"/>
 
             <!-- Variable exposing all the user roles -->
@@ -321,9 +328,6 @@
 
             <!-- Bind to set the form instance read-only when necessary -->
             <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
-
-            <!-- Focus to the first control supporting input on load -->
-            <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
 
             <!-- Custom XForms model content to include -->
             <xsl:if test="normalize-space($custom-model)">

@@ -68,12 +68,12 @@
                     retrieved by oxf:xhtml-to-pdf doesn't know about the namespace. Not doing so, the CSS won't apply
                     and also this can cause a ClassCastException in Flying Saucer.
                  -->
-                <xsl:template match="@id | @for">
+                <xsl:template match="@id | @for" mode="#all">
                     <xsl:attribute name="{name()}" select="substring-after(., doc('input:request')/*/container-namespace)"/>
                 </xsl:template>
 
                 <!-- While we are at it filter out scripts as they won't be used -->
-                <xsl:template match="*:script | *:noscript"/>
+                <xsl:template match="*:script | *:noscript" mode="#all"/>
 
                 <!--
                     Hyperlinks, see:
@@ -83,7 +83,7 @@
                     https://github.com/orbeon/orbeon-forms/issues/1515
                     https://github.com/orbeon/orbeon-forms/issues/264
                  -->
-                <xsl:template match="*:a">
+                <xsl:template match="*:a" mode="#all">
                     <xsl:element name="{local-name()}">
                         <!--
                             Filter all attributes specific to <a> as per HTML 5 except @href unless excluded.
@@ -102,7 +102,7 @@
                 </xsl:template>
 
                 <!-- Hyperlink URLs in fields -->
-                <xsl:template match="*:pre[p:has-class('xforms-textarea', ..)] | *:span[p:has-class('xforms-field') and p:has-class('xforms-input', ..)]">
+                <xsl:template match="*:pre[p:has-class('xforms-textarea', ..)] | *:span[p:has-class('xforms-field') and p:has-class('xforms-input', ..)]" mode="#all">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:apply-templates select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))" mode="#current"/>
@@ -110,7 +110,7 @@
                 </xsl:template>
 
                 <!-- Start grid content -->
-                <xsl:template match="*:div[p:has-class('xbl-fr-grid')]">
+                <xsl:template match="*:div[p:has-class('xbl-fr-grid')]" mode="#all">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@* | node()" mode="in-grid"/>
                     </xsl:element>
@@ -126,10 +126,10 @@
                 </xsl:template>
 
                  <!-- These are unneeded and can make iText choke (values too long) -->
-                 <xsl:template match="*:input[@type = 'hidden']"/>
+                 <xsl:template match="*:input[@type = 'hidden']" mode="#all"/>
 
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
-                <xsl:template match="*:form">
+                <xsl:template match="*:form" mode="#all">
                     <xsl:element name="{local-name()}">
                         <xsl:attribute name="class" select="string-join(p:classes()[. != 'xforms-initially-hidden'], ' ')"/>
                         <xsl:apply-templates select="@* except @class | node()" mode="#current"/>
@@ -137,14 +137,14 @@
                 </xsl:template>
 
                 <!-- Remove all prefixes because Flying Saucer doesn't like them -->
-                <xsl:template match="*">
+                <xsl:template match="*" mode="#all">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 
                 <!-- Make a copy of useful information so it can be moved, via CSS, to headers and footers -->
-                <xsl:template match="*:body">
+                <xsl:template match="*:body" mode="#all">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:variable name="title" select="/*/*:head/*:title/string()"/>

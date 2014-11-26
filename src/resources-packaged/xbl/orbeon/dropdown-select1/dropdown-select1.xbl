@@ -32,6 +32,7 @@
             <display-name lang="it">Menu a tendina</display-name>
             <display-name lang="nl">Uitklapmenu</display-name>
             <display-name lang="pt">Menu Lista de Opções</display-name>
+            <display-name lang="sv">Rullgardinsmeny</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
@@ -67,6 +68,7 @@
                         <resource xml:lang="fi"><select>Valitse:</select></resource>
                         <resource xml:lang="nl"><select>Selecteren:</select></resource>
                         <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
+                        <resource xml:lang="sv"><select>Välj:</select></resource>
                     </resources>
                 </xf:instance>
             </xf:model>

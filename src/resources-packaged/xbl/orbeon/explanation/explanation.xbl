@@ -37,6 +37,7 @@
             <fb:display-name lang="de">Erklärung</fb:display-name>
             <fb:display-name lang="it">Spiegazione</fb:display-name>
             <fb:display-name lang="nl">Uitleg</fb:display-name>
+            <fb:display-name lang="sv">Förklaring</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/apps/fr/style/images/silk/layout.png</fb:small-icon>
                 <fb:large-icon>/apps/fr/style/images/silk/layout.png</fb:large-icon>

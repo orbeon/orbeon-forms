@@ -214,7 +214,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         AcroFields.FIELD_TYPE_RADIOBUTTON,
         AcroFields.FIELD_TYPE_LIST,
         AcroFields.FIELD_TYPE_COMBO,
-        AcroFields.FIELD_TYPE_CHECKBOX // NOTE: Checkboxes are not linked.
+        AcroFields.FIELD_TYPE_CHECKBOX // NOTE: Checkboxes are not linked: each checkbox is its own control.
     )
 
     def handleField(context: ElementContext): Unit =

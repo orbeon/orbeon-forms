@@ -128,24 +128,38 @@
                                 </xsl:choose>
                             </xsl:if>
                         </xsl:if>
-                    </xsl:if>
 
-                    <!-- Selection controls: also produce export values -->
-                    <xsl:if test="$classes = ('xforms-select', 'xforms-select1')">
-                        <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
-                        <xsl:if test="$expression">
-                            <xsl:for-each select="$control/saxon:evaluate(string($expression))">
-                                <xsl:variable name="item-value" as="xs:string" select="."/>
-                                <xsl:choose>
-                                    <xsl:when test="$classes = 'xforms-select'">
-                                        <field acro-field-name="'{$pdf-field-name}${$item-value}'" export-value="'true'"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <field acro-field-name="'{$pdf-field-name}'" export-value="'{replace($item-value, '''', '''''')}'"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                        <!-- Selection controls: also produce export values -->
+                        <xsl:if test="$classes = ('xforms-select', 'xforms-select1')">
+                            <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
+                            <xsl:if test="$expression">
+                                <xsl:for-each select="$control/saxon:evaluate(string($expression))">
+                                    <xsl:variable name="item-value" as="xs:string" select="."/>
+                                    <xsl:choose>
+                                        <xsl:when test="$classes = 'xforms-select'">
+                                            <field acro-field-name="'{$pdf-field-name}${$item-value}'" export-value="'true'"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <field acro-field-name="'{$pdf-field-name}'" export-value="'{replace($item-value, '''', '''''')}'"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:for-each>
+                            </xsl:if>
+                        </xsl:if>
 
-                            </xsl:for-each>
+                        <!-- For boolean section controls or input: also produce export value so that the control name
+                             can be used without suffixing with $true -->
+                        <xsl:if test="$classes = ('xforms-select', 'xforms-select1', 'xforms-input') and $type = 'boolean'">
+                            <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
+                            <xsl:if test="$expression">
+                                <!-- NOTE: The control might be bound to a boolean datatype yet have an itemset which
+                                     contains invalid values ('foo', 'bar'). Here we normalize to true/false. -->
+                                <xsl:variable
+                                    name="item-value"
+                                    as="xs:string"
+                                    select="string($control/saxon:evaluate(string($expression)) = 'true')"/>
+                                <field acro-field-name="'{$pdf-field-name}'" export-value="'{replace($item-value, '''', '''''')}'"/>
+                            </xsl:if>
                         </xsl:if>
                     </xsl:if>
                 </xsl:if>

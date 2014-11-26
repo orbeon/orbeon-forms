@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.ExpressionTool
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
 
 class XXFormsItemset extends XFormsFunction with FunctionSupport {
@@ -24,23 +25,34 @@ class XXFormsItemset extends XFormsFunction with FunctionSupport {
 
         implicit val ctx = xpathContext
 
+        def fromSelectionControl(control: XFormsSelect1Control): Item = {
+
+            val format   = stringArgument(1)
+            val selected = argument.lift(2) exists (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
+
+            val itemset = control.getItemset
+            val controlValueForSelection = if (selected) control.getValue else null
+
+            if (format == "json")
+                // Return a string
+                itemset.getJSONTreeInfo(controlValueForSelection, control.mustEncodeValues, control.getLocationData)
+            else
+                // Return an XML document
+                itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, control.getLocationData)
+        }
+
+        // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
+        def fromComponentControl(control: XFormsComponentControl): Item = (
+            ControlsIterator(control, includeSelf = false)
+            collectFirst { case c: XFormsSelect1Control ⇒ c }
+            map fromSelectionControl
+            orNull
+        )
+
         relevantControl(0) match {
-            case Some(select1Control: XFormsSelect1Control) ⇒
-
-                val format   = stringArgument(1)
-                val selected = argument.lift(2) exists (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
-
-                val itemset = select1Control.getItemset
-                val controlValueForSelection = if (selected) select1Control.getValue else null
-
-                if (format == "json")
-                    // Return a string
-                    itemset.getJSONTreeInfo(controlValueForSelection, select1Control.mustEncodeValues, select1Control.getLocationData)
-                else
-                    // Return an XML document
-                    itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, select1Control.getLocationData)
-
-            case _ ⇒ null
+            case Some(control: XFormsSelect1Control)   ⇒ fromSelectionControl(control)
+            case Some(control: XFormsComponentControl) ⇒ fromComponentControl(control)
+            case _                                     ⇒ null
         }
     }
 }

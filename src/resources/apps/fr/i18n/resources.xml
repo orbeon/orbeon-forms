@@ -1045,7 +1045,7 @@
                 <upload-error todo="true">[There was an error during the upload. Please try again.]</upload-error>
                 <upload-error-size todo="true">[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
             </messages>
-            <drafts>
+             <draft-singleton>
                 <found-draft todo="true">[Found draft]</found-draft>
                 <found-drafts todo="true">[Found drafts]</found-drafts>
                 <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
@@ -1055,7 +1055,10 @@
                 <open-draft todo="true">[Open auto-saved draft]</open-draft>
                 <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
                 <start-new todo="true">[Start from scratch]</start-new>
-            </drafts>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
+            </draft-singleton>
             <labels>
                 <language-choice>Språk</language-choice>
                 <errors>Oppsummering av feil</errors>
@@ -1318,7 +1321,7 @@
                 <upload-error todo="true">[There was an error during the upload. Please try again.]</upload-error>
                 <upload-error-size todo="true">[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
             </messages>
-            <drafts>
+             <draft-singleton>
                 <found-draft todo="true">[Found draft]</found-draft>
                 <found-drafts todo="true">[Found drafts]</found-drafts>
                 <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
@@ -1328,7 +1331,10 @@
                 <open-draft todo="true">[Open auto-saved draft]</open-draft>
                 <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
                 <start-new todo="true">[Start from scratch]</start-new>
-            </drafts>
+                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
+                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
+                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
+            </draft-singleton>
             <labels>
                 <language-choice>Язык</language-choice>
                 <errors>Ошибки</errors>

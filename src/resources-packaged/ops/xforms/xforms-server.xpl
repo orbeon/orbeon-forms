@@ -53,7 +53,7 @@
                     </config>
                 </p:input>
                 <!-- Do schema validation here -->
-                <p:input name="data" href="#xforms-response" schema-href="xforms-server-response.rng" />
+                <p:input name="data" href="#xforms-response" schema-href="xforms-server-response.rng"/>
                 <p:output name="data" id="converted"/>
             </p:processor>
             <p:processor name="oxf:http-serializer">

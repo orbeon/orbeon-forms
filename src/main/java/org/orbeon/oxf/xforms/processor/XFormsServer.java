@@ -425,8 +425,9 @@ public class XFormsServer extends ProcessorImpl {
             // This is most likely the case of a retry if the initial request was long-running
             // See https://github.com/orbeon/orbeon-forms/issues/1984
             LifecycleLogger.eventAssumingRequestJava("xforms", "document lock timeout", new String[] { "uuid", parameters.getUUID() });
-            indentedLogger.logInfo("", "Ajax update lock timeout exceeded, returning");
-            throw new OXFException("Ajax update lock timeout exceeded");
+            indentedLogger.logInfo("", "Ajax update lock timeout exceeded, returning error to client");
+            // Using 503 based on http://stackoverflow.com/questions/17862015/http-statuscode-to-retry-same-request
+            ClientEvents.errorResponse(503, xmlReceiver);
         }
     }
 

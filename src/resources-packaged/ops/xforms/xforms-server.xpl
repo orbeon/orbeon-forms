@@ -41,78 +41,31 @@
             <p:processor name="oxf:xforms-server">
                 <p:input name="request" href="#xforms-request" schema-href="xforms-server-request.rng"/>
                 <p:output name="response" id="xforms-response"/>
-                <!--<p:input name="request" href="#xforms-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>-->
-                <!--<p:output name="response" id="xforms-response" debug="xxxresponse"/>-->
             </p:processor>
 
-            <!-- Generate response -->
-            <p:choose href="#xforms-response">
-                <p:when test="/document[starts-with(@content-type, 'text/html')]">
-                    <!-- HTML response for Ajax portlets -->
-                    <p:processor name="oxf:http-serializer">
-                        <p:input name="config">
-                            <config>
-                                <cache-control>
-                                    <use-local-cache>false</use-local-cache>
-                                </cache-control>
-                            </config>
-                        </p:input>
-                        <p:input name="data" href="#xforms-response"/>
-                    </p:processor>
-                </p:when>
-                <p:when test="/document[not(starts-with(@content-type, 'text/html'))]">
-                    <!-- Other non-XML response (unsupported) -->
-                    <p:processor name="oxf:html-converter">
-                        <p:input name="config">
-                            <config>
-                                <encoding>utf-8</encoding>
-                                <indent>false</indent>
-                            </config>
-                        </p:input>
-                        <p:input name="data">
-                            <!-- TODO: using a hardcoded inline response is not the best way -->
-                            <div>
-                                <p>Invalid portlet response!</p>
-                            </div>
-                        </p:input>
-                        <p:output name="data" id="converted"/>
-                    </p:processor>
-                    <p:processor name="oxf:http-serializer">
-                        <p:input name="config">
-                            <config>
-                                <cache-control>
-                                    <use-local-cache>false</use-local-cache>
-                                </cache-control>
-                            </config>
-                        </p:input>
-                        <p:input name="data" href="#converted"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <!-- Regular Ajax response -->
-                    <p:processor name="oxf:xml-converter">
-                        <p:input name="config">
-                            <config>
-                                <encoding>utf-8</encoding>
-                                <indent>false</indent>
-                            </config>
-                        </p:input>
-                        <!-- Do schema validation here -->
-                        <p:input name="data" href="#xforms-response" schema-href="xforms-server-response.rng" />
-                        <p:output name="data" id="converted"/>
-                    </p:processor>
-                    <p:processor name="oxf:http-serializer">
-                        <p:input name="config">
-                            <config>
-                                <cache-control>
-                                    <use-local-cache>false</use-local-cache>
-                                </cache-control>
-                            </config>
-                        </p:input>
-                        <p:input name="data" href="#converted"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
+            <p:processor name="oxf:xml-converter">
+                <p:input name="config">
+                    <config>
+                        <!-- Unneeded, and also we don't want to have one if we return an empty document -->
+                        <omit-xml-declaration>true</omit-xml-declaration>
+                        <encoding>utf-8</encoding>
+                        <indent>false</indent>
+                    </config>
+                </p:input>
+                <!-- Do schema validation here -->
+                <p:input name="data" href="#xforms-response" schema-href="xforms-server-response.rng" />
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <cache-control>
+                            <use-local-cache>false</use-local-cache>
+                        </cache-control>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#converted"/>
+            </p:processor>
         </p:when>
         <p:when test="p:get-request-method() = 'GET'">
             <!-- Handle combined resources -->
@@ -139,10 +92,8 @@
                             </html>
                         </xsl:template>
                     </xsl:stylesheet>
-
                 </p:input>
                 <p:output name="data" id="html-response"/>
-                <!--<p:output name="data" id="html-response" debug="xxxhtml-response"/>-->
             </p:processor>
 
             <!-- Send HTML response -->

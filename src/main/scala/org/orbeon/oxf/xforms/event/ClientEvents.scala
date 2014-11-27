@@ -331,6 +331,12 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             }
         }
 
+    // Send an error response consisting of just a status code
+    def errorResponse(code: Int)(implicit receiver: XMLReceiver): Unit =
+        withDocument {
+            processingInstruction("orbeon-serializer", List("status-code" → code.toString))
+        }
+
     def assertSessionExists(): Unit =
         Option(NetUtils.getSession(false)) getOrElse
             (throw new SessionExpiredException("Session has expired. Unable to process incoming request."))

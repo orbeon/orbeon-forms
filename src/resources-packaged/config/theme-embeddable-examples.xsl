@@ -32,8 +32,6 @@
             <xsl:variable name="classes-to-copy" select="p:split(/xh:html/xh:body/@class)[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
             <xsl:attribute name="class" select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
             <!-- Styles -->
-            <xh:link rel="stylesheet" href="/fr/style/bootstrap/css/bootstrap.css" type="text/css"/>
-            <xh:link rel="stylesheet" href="/fr/style/form-runner-bootstrap-override.css" type="text/css"/>
             <xh:link rel="stylesheet" href="/config/theme/examples.css" type="text/css" media="all"/>
             <!-- Handle head elements except scripts -->
             <xsl:for-each select="/xh:html/xh:head/(xh:meta | xh:link | xh:style)">

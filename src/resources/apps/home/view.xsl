@@ -26,7 +26,9 @@
         <xh:html>
             <xh:head>
                 <xh:title><xsl:value-of select="@title"/></xh:title>
-                <xh:link rel="stylesheet" href="/home/home.css" type="text/css"/>
+                <xh:link rel="stylesheet" type="text/css" href="/fr/style/bootstrap/css/bootstrap.css"/>
+                <xh:link rel="stylesheet" type="text/css" href="/fr/style/form-runner-bootstrap-override.css"/>
+                <xh:link rel="stylesheet" type="text/css" href="/home/home.css"/>
                 <xh:script type="text/javascript" src="/ops/jquery/jquery-1.11.0.min.js"/>
                 <xh:script type="text/javascript" src="/ops/jquery/jquery-migrate-1.2.1.min.js"/>
             </xh:head>

@@ -39,7 +39,7 @@
            diskSpoolBufferSizeMB="10"
            eternal="false"
            timeToLiveSeconds="0"
-           timeToIdleSeconds="1800"
+           timeToIdleSeconds="18000"
            diskPersistent="false"
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>

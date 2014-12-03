@@ -51,13 +51,6 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
-        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
-        if (appearanceTrait != null && appearanceTrait.isTree())
-            classes.append(" xforms-initially-hidden");
-    }
-
-    @Override
     protected boolean isDefaultIncremental() {
         // Incremental mode is the default
         return true;
@@ -112,184 +105,71 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             // Full appearance, also in static readonly mode
             outputFull(uri, localname, attributes, effectiveId, control, itemset, isMultiple, isBooleanInput, isStaticReadonly, encode);
         } else  if (! isStaticReadonly) {
-            if (appearanceTrait != null && appearanceTrait.isTree()) {
-                // xxf:tree appearance
+            // Create xhtml:select
+            final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
+            containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);// necessary for noscript mode
 
-                // Create xhtml:div with tree info
-                final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
+            if (appearanceTrait != null && appearanceTrait.isCompact())
+                containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple");
 
-                if (isHTMLDisabled(xformsControl))
-                    outputDisabledAttribute(containerAttributes);
-                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
-                if (itemset != null) { // can be null if the control is non-relevant
-                    outputJSONTreeInfo(control, itemset, encode, xmlReceiver);
-                }
-                xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+            // Handle accessibility attributes
+            handleAccessibilityAttributes(attributes, containerAttributes);
 
-            } else if (appearanceTrait != null && appearanceTrait.isMenu()) {
-                // xxf:menu appearance
+            if (isHTMLDisabled(xformsControl))
+                outputDisabledAttribute(containerAttributes);
+            xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
+            {
+                final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
+                final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
-                // Create enclosing xhtml:div
-                final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
-                final String ulQName = XMLUtils.buildQName(xhtmlPrefix, "ul");
-                final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
-                final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+                if (itemset != null) {
 
-                if (isHTMLDisabled(xformsControl))
-                    outputDisabledAttribute(containerAttributes);
-                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
-                if (itemset != null) { // can be null if the control is non-relevant
-                    // Create xhtml:div with initial menu entries
-                    {
-                        itemset.visit(xmlReceiver, new ItemsetListener<ContentHandler>() {
+                    itemset.visit(xmlReceiver, new ItemsetListener<ContentHandler>() {
 
-                            private boolean groupJustStarted = false;
+                        private boolean inOptgroup = false; // nesting opgroups is not allowed, avoid it
 
-                            public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {
+                        public void startLevel(ContentHandler contentHandler, Item item) {}
 
-                                final boolean isTopLevel = item == null;
-
-                                reusableAttributes.clear();
-                                final String divClasses = isTopLevel ? "yuimenubar" : "yuimenu";
-                                reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, divClasses);
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-
-                                reusableAttributes.clear();
-                                reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "bd");
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-
-                                reusableAttributes.clear();
-                                // NOTE: We just decide to put item classes on <ul>
-                                final String classes = isTopLevel ? "first-of-type" : getItemClasses(item, "first-of-type");
-                                reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes);
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
-
-                                groupJustStarted = true;
+                        public void endLevel(ContentHandler contentHandler) throws SAXException {
+                            if (inOptgroup) {
+                                // End xhtml:optgroup
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
+                                inOptgroup = false;
                             }
+                        }
 
-                            public void endLevel(ContentHandler contentHandler) throws SAXException {
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                        public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
 
-                                groupJustStarted = false;
-                            }
+                            assert !item.label().isHTML();
+                            final String label = item.label().label();
+                            final String value = item.value();
 
-                            public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
+                            if (value == null) {
+                                assert item.hasChildren();
+                                final String itemClasses = getItemClasses(item, null);
+                                final AttributesImpl optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+                                if (label != null)
+                                    optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label);
 
-                                final String liClasses;
-                                {
-                                    final StringBuilder sb = new StringBuilder(item.isTopLevel() ? "yuimenubaritem" : "yuimenuitem");
-                                    if (groupJustStarted)
-                                        sb.append(" first-of-type");
-                                    liClasses = getItemClasses(item, sb.toString());
-                                }
-                                reusableAttributes.clear();
-                                reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, liClasses);
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
-
-                                reusableAttributes.clear();
-                                reusableAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#");
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
-
-                                assert !item.label().isHTML();
-                                final String text = item.label().label();
-                                contentHandler.characters(text.toCharArray(), 0, text.length());
-
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
-
-                                groupJustStarted = false;
-                            }
-
-
-                            public void endItem(ContentHandler contentHandler, Item item) throws SAXException {
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
-
-                                groupJustStarted = false;
-                            }
-                        });
-
-                    }
-
-                    // Create xhtml:div with tree info
-                    reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-initially-hidden");
-
-                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                    if (itemset != null) { // can be null if the control is non-relevant
-                        outputJSONTreeInfo(control, itemset, encode, xmlReceiver);
-                    }
-                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-                }
-                xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-
-            } else {
-                // Create xhtml:select
-                final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
-                containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);// necessary for noscript mode
-
-                if (appearanceTrait != null && appearanceTrait.isCompact())
-                    containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple");
-
-                // Handle accessibility attributes
-                handleAccessibilityAttributes(attributes, containerAttributes);
-
-                if (isHTMLDisabled(xformsControl))
-                    outputDisabledAttribute(containerAttributes);
-                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
-                {
-                    final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                    final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
-
-                    if (itemset != null) {
-
-                        itemset.visit(xmlReceiver, new ItemsetListener<ContentHandler>() {
-
-                            private boolean inOptgroup = false; // nesting opgroups is not allowed, avoid it
-
-                            public void startLevel(ContentHandler contentHandler, Item item) {}
-
-                            public void endLevel(ContentHandler contentHandler) throws SAXException {
-                                if (inOptgroup) {
-                                    // End xhtml:optgroup
+                                // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
+                                // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
+                                // the indentation himself, it will still look right.
+                                if (inOptgroup)
                                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
-                                    inOptgroup = false;
-                                }
+
+                                // Start xhtml:optgroup
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
+                                inOptgroup = true;
+                            } else {
+                                handleItemCompact(contentHandler, optionQName, control, isMultiple, item, encode);
                             }
+                        }
 
-                            public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
-
-                                assert !item.label().isHTML();
-                                final String label = item.label().label();
-                                final String value = item.value();
-
-                                if (value == null) {
-                                    assert item.hasChildren();
-                                    final String itemClasses = getItemClasses(item, null);
-                                    final AttributesImpl optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null);
-                                    if (label != null)
-                                        optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label);
-
-                                    // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
-                                    // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
-                                    // the indentation himself, it will still look right.
-                                    if (inOptgroup)
-                                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
-
-                                    // Start xhtml:optgroup
-                                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
-                                    inOptgroup = true;
-                                } else {
-                                    handleItemCompact(contentHandler, optionQName, control, isMultiple, item, encode);
-                                }
-                            }
-
-                            public void endItem(ContentHandler contentHandler, Item item) {}
-                        });
-                    }
+                        public void endItem(ContentHandler contentHandler, Item item) {}
+                    });
                 }
-                xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
             }
+            xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
         } else {
             // Output static read-only value
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");

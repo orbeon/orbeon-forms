@@ -45,6 +45,4 @@ trait SelectAppearanceTrait extends AppearanceTrait {
 
     val isFull    = appearances(XFORMS_FULL_APPEARANCE_QNAME)
     val isCompact = appearances(XFORMS_COMPACT_APPEARANCE_QNAME)
-    val isTree    = appearances(XXFORMS_TREE_APPEARANCE_QNAME)
-    val isMenu    = appearances(XXFORMS_MENU_APPEARANCE_QNAME)
 }

@@ -992,13 +992,7 @@
                                     var documentElementClasses = documentElement.className.split(" ");
                                     controlsWithUpdatedItemsets[controlId] = true;
 
-                                    if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")
-                                            || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-tree")) {
-                                        ORBEON.xforms.Page.getControl(documentElement).setItemset(itemsetTree);
-                                    } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-menu")
-                                            || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-menu")) {
-                                        // NOP: We don't do anything for menus, as an update of the menu after the page is loaded isn't supported at this point
-                                    } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
+                                    if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
 

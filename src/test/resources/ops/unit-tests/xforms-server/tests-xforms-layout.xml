@@ -1044,52 +1044,6 @@
         </output>
     </test>
 
-    <test description="New layout for hierarchical xf:select[@appearance = 'xxf:tree'] with classes" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xh:head>
-                    <xf:model id="model" xxf:encrypt-item-values="false">
-                        <xf:instance id="selection">
-                            <value/>
-                        </xf:instance>
-
-                        <xf:instance id="itemset-1">
-                            <items>
-                                <item id="1"/>
-                                <item id="2">
-                                    <item id="2.1"/>
-                                    <item id="2.2">
-                                        <item id="2.2.1"/>
-                                        <item id="2.2.2">
-                                            <item id="2.2.2.1"/>
-                                            <item id="2.2.2.2"/>
-                                        </item>
-                                    </item>
-                                </item>
-                            </items>
-                        </xf:instance>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:select id="select-1" ref="." appearance="xxf:tree">
-                        <xf:itemset ref="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
-                            <xf:label ref="@id"/>
-                            <xf:value ref="@id"/>
-                        </xf:itemset>
-                    </xf:select>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xh="http://www.w3.org/1999/xhtml">
-                <xh:span id="select-1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-xxforms-tree xforms-initially-hidden">
-                    <xh:div id="select-1≡≡c">[{"label":"1","value":"1","attributes":{"class":"my-leaf"}},{"label":"2","value":"2","attributes":{"class":"my-folder"},"children":[{"label":"2.1","value":"2.1","attributes":{"class":"my-leaf"}},{"label":"2.2","value":"2.2","attributes":{"class":"my-folder"},"children":[{"label":"2.2.1","value":"2.2.1","attributes":{"class":"my-leaf"}},{"label":"2.2.2","value":"2.2.2","attributes":{"class":"my-folder"},"children":[{"label":"2.2.2.1","value":"2.2.2.1","attributes":{"class":"my-leaf"}},{"label":"2.2.2.2","value":"2.2.2.2","attributes":{"class":"my-leaf"}}]}]}]}]</xh:div>
-                </xh:span>
-            </controls>
-        </output>
-    </test>
-
     <test description="Non-relevant xf:output with image mediatype outputs link to default image" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">

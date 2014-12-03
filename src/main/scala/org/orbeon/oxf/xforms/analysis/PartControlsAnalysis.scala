@@ -32,10 +32,6 @@ trait PartControlsAnalysis extends TransientState {
     // Special handling of attributes
     private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
 
-    // Special handling of input placeholder
-    private[PartControlsAnalysis] var _hasInputPlaceholder = false
-    def hasInputPlaceholder = _hasInputPlaceholder
-
     protected def indexNewControl(
             elementAnalysis: ElementAnalysis,
             lhhas: Buffer[LHHAAnalysis],
@@ -76,16 +72,8 @@ trait PartControlsAnalysis extends TransientState {
         }
     }
 
-    protected def analyzeCustomControls(attributes: Buffer[AttributeControl]) {
-        // Check whether input controls have "placeholder/minimal" label/hint
-        _hasInputPlaceholder =
-            controlTypes.get("input") match {
-               case Some(map) ⇒ map.values exists (inputControl ⇒ LHHAAnalysis.hasLabelOrHintPlaceholder(inputControl))
-               case None ⇒ false
-           }
-
-        // Index attribute controls
-        if (attributes.nonEmpty) {
+    protected def analyzeCustomControls(attributes: Buffer[AttributeControl]): Unit =
+        if (attributes.nonEmpty) { // index attribute controls
             case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)
 
             val triples =
@@ -103,11 +91,10 @@ trait PartControlsAnalysis extends TransientState {
             // NOTE: mapValues above ok, since we accumulate the values below into new immutable Maps.
             _attributeControls = newAttributes.foldLeft(_attributeControls) {
                 case (existingMap, (forId, newAttributes)) ⇒
-                    val existingAttributes = existingMap.get(forId) getOrElse Map[String, AttributeControl]()
+                    val existingAttributes = existingMap.getOrElse(forId, Map[String, AttributeControl]())
                     existingMap + (forId → (existingAttributes ++ newAttributes))
             }
         }
-    }
 
     protected def analyzeControlsXPath() =
         for (control ← controlAnalysisMap.values)

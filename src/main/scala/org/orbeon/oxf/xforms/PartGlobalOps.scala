@@ -40,7 +40,6 @@ trait PartGlobalOps {
     def hasControlByName(controlName: String): Boolean
     def controlsByName(controlName: String): Traversable[ElementAnalysis]
     def hasControlAppearance(controlName: String, appearance: QName): Boolean
-    def hasInputPlaceholder: Boolean
 
     // Events
     def hasHandlerForEvent(eventName: String): Boolean

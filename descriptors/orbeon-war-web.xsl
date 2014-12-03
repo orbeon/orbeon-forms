@@ -493,8 +493,8 @@
             </xsl:call-template>
 
             <session-config>
-                <!-- 12 * 60 = 12 hours -->
-                <session-timeout>720</session-timeout>
+                <!-- 1 * 60 = 1 hour -->
+                <session-timeout>60</session-timeout>
             </session-config>
 
         </web-app>

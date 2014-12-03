@@ -1536,10 +1536,6 @@ ORBEON.xforms.Controls = {
                 var spanWithValue = control.getElementsByTagName("span")[0];
                 return ORBEON.util.Dom.getStringValue(spanWithValue);
             }
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
-                || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
-            // Select/Select tree
-            return ORBEON.xforms.Page.getControl(control).getValue();
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-range")) {
             var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
             return value.toString();
@@ -1757,9 +1753,6 @@ ORBEON.xforms.Controls = {
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
             ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
-                || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
-            return ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
         } else if (typeof(control.value) == "string") {
             // Textarea, password
             control.value = newControlValue;
@@ -2326,20 +2319,6 @@ ORBEON.xforms.Controls = {
         iframe.className = textarea.className;
     },
 
-    treeOpenSelectedVisible: function(yuiTree, values) {
-        for (var nodeIndex in yuiTree._nodes) {
-            var node = yuiTree._nodes[nodeIndex];
-            if (xformsArrayContains(values, node.data.value)) {
-                var nodeParent = node.parent;
-                while (nodeParent != null) {
-                    nodeParent.expand();
-                    nodeParent = nodeParent.parent;
-                }
-            }
-        }
-
-    },
-
     showDialog: function(controlId, neighbor) {
         var divElement = ORBEON.util.Dom.get(controlId);
         var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
@@ -2743,15 +2722,12 @@ ORBEON.xforms.Events = {
 
                 // Handle special value changes upon losing focus
 
-                // HTML area and trees does not throw value change event, so we send the value change to the server
+                // HTML area does not throw value change event, so we send the value change to the server
                 // when we get the focus on the next control
                 var changeValue = false;
                 if (currentFocusControlElement != null) { // Can be null on first focus
                     if (YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
                             && YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
-                        changeValue = true;
-                    } else if (YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-select1-appearance-xxforms-tree")
-                            || YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-select-appearance-xxforms-tree")) {
                         changeValue = true;
                     }
                     // Send value change if needed
@@ -3120,47 +3096,6 @@ ORBEON.xforms.Events = {
             // Click on remove icon in upload control
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, "", "xxforms-value");
             ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-        } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
-            // Click on menu item
-
-            // Find what is the position in the hierarchy of the item
-            var positions = [];
-            var currentParent = originalTarget;
-            while (true) {
-                if (currentParent.tagName.toLowerCase() == "li") {
-                    // Get the position of this li, and add it to positions
-                    var liPosition = 0;
-                    while (true) {
-                        var previousSibling = currentParent.previousSibling;
-                        if (previousSibling == null) break;
-                        currentParent = previousSibling;
-                        if (currentParent.nodeType == ELEMENT_TYPE && currentParent.tagName.toLowerCase() == "li") liPosition++;
-                    }
-                    positions.push(liPosition);
-                } else if (currentParent.tagName.toLowerCase() == "div" && YAHOO.util.Dom.hasClass(currentParent, "yuimenubar")) {
-                    // Got to the top of the tree
-                    break;
-                }
-                currentParent = currentParent.parentNode;
-            }
-
-            // We might have clicked in the menu area, but not on a menu item
-            if (positions.length != 0) {
-                positions = positions.reverse();
-
-                // Find value for this item
-                var currentChildren = ORBEON.xforms.Globals.menuItemsets[target.id];
-                var nodeInfo = null;
-                for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
-                    var position = positions[positionIndex];
-                    nodeInfo = currentChildren[position];
-                    currentChildren = nodeInfo.children;
-                }
-
-                // Send value change to server
-                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, nodeInfo.value, "xxforms-value");
-                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-            }
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help")) {
             // Help image
 
@@ -3267,16 +3202,6 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * Called by the YUI menu library when a click happens a menu entry.
-     */
-    menuClick: function (eventType, arguments, userObject) {
-        var menu = userObject["menu"];
-        var value = userObject["value"];
-        var event = new ORBEON.xforms.server.AjaxServer.Event(null, menu.id, value, "xxforms-value");
-        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-    },
-
-    /**
      * Event listener on dialogs called by YUI when the dialog is closed. If the dialog was closed by the user (not
      * because the server told use to close the dialog), then we want to notify the server that this happened.
      */
@@ -3331,88 +3256,6 @@ ORBEON.xforms.Events = {
         // Fixes cursor Firefox issue; more on this in dialog init code
         var formHelpPanel = ORBEON.xforms.Globals.formHelpPanel[formID];
         formHelpPanel.element.style.display = "none";
-    },
-
-    /**
-     * What we need to do when there is a click on a tree (select and select1)
-     */
-    treeClickFocus: function(control) {
-        var isIncremental = YAHOO.util.Dom.hasClass(control, "xforms-incremental");
-        if (ORBEON.xforms.Globals.currentFocusControlId != control.id) {// not sure we need to do this test here since focus() may do it anyway
-            // We are coming from another control, simulate a focus on this control
-            var focusEvent = { target: control };
-            ORBEON.xforms.Events.focus(focusEvent);
-        }
-        // Preemptively store current control in currentFocusControlId, so when another control gets
-        // the focus it will send the value of this control to the server
-        ORBEON.xforms.Globals.currentFocusControlId = control.id;
-        ORBEON.xforms.Globals.currentFocusControlElement = control;
-    },
-
-    treeClickValueUpdated: function(control) {
-        // If we are in incremental mode, send value to the server on every click
-        if (YAHOO.util.Dom.hasClass(control, "xforms-incremental")) {
-            var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value");
-            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-        }
-    },
-
-    /**
-     * xf:select tree: handle click on check box
-     */
-    treeCheckClick: function() {
-        var tree = this.tree;
-        var control = tree.getEl();
-        if (! YAHOO.util.Dom.hasClass(control, "xforms-control")) control = control.parentNode;
-        ORBEON.xforms.Events.treeClickFocus(control);
-        control.value = "";
-        for (var nodeIndex in tree._nodes) {
-            var node = tree._nodes[nodeIndex];
-            if (node.checkState == 2) {
-                if (control.value != "") control.value += " ";
-                control.value += node.data.value;
-            }
-        }
-        ORBEON.xforms.Events.treeClickValueUpdated(control);
-    },
-
-    /**
-     * xf:select and xf:select tree: handle click on label
-     */
-    treeLabelClick: function(object) {
-
-        // Depending who calls this listeners, we either get the node directly (for the enterKeyPressed
-        // and labelClick events) or we get an object which contains the node (for clickEvent).
-        var node = ! _.isUndefined(object._type) && (object._type == "TextNode" || object._type == "TaskNode")
-            ? object : object.node;
-
-        var yuiTree = this;
-        var control = document.getElementById(yuiTree.id).parentNode;
-        var allowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select");
-        if (allowMultipleSelection) {
-            // If checked uncheck, if unchecked check
-            if (node.checked) {
-                node.uncheck();
-            } else {
-                node.check();
-            }
-            // Call listener on check event
-            node.onCheckClick();
-        } else {
-            // Deselect the old node and select the new node
-            var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
-            var oldNode = yuiTree.getNodeByProperty("value", currentValue);
-            if (oldNode != null)
-                YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
-            if (node != null)
-                YAHOO.util.Dom.addClass(node.getLabelEl(), "xforms-tree-label-selected");
-            // Make we know this control has the focus
-            ORBEON.xforms.Events.treeClickFocus(control);
-            // Store the new value for this control
-            control.value = node.data.value;
-            // Send new value to server
-            ORBEON.xforms.Events.treeClickValueUpdated(control);
-        }
     },
 
     /**
@@ -3762,16 +3605,12 @@ ORBEON.xforms.Init = {
             ORBEON.xforms.Page.getControl(container);
         }
 
-        var tree = new ORBEON.xforms.control.Tree();
         ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
             "select1": {
-                "compact" : ORBEON.xforms.Init._list,
-                "{http://orbeon.org/oxf/xml/xforms}menu": ORBEON.xforms.Init._menu,
-                "{http://orbeon.org/oxf/xml/xforms}tree": genericInit
+                "compact" : ORBEON.xforms.Init._list
             },
             "select": {
-                "compact" : ORBEON.xforms.Init._list,
-                "{http://orbeon.org/oxf/xml/xforms}tree": genericInit
+                "compact" : ORBEON.xforms.Init._list
             },
             "range": { "": ORBEON.xforms.Init._range },
             "textarea": {
@@ -3861,9 +3700,6 @@ ORBEON.xforms.Init = {
             debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
             lastEventSentTime: new Date().getTime(), // Timestamp when the last event was sent to server
             pageLoadedRegistered: true,          // If the page loaded listener has been registered already, to avoid running it more than once
-            menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
-            menuYui: {},                         // Maps menu id to the YUI object for that menu
-            treeYui: {},                         // Maps tree id to the YUI object for that tree
             sliderYui: {},                       // Maps slider id to the YUI object for that slider
             isReloading: false,                  // Whether the form is being reloaded from the server
             lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
@@ -4298,68 +4134,6 @@ ORBEON.xforms.Init = {
         var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
         ORBEON.xforms.Globals.sliderYui[range.id] = slider;
-    },
-
-
-
-    /**
-     * Create a sub-menu attached to the given menu item. In the nameValueArray we
-     * ignore the first 3 items that correspond to the menuItem.
-     */
-    _addToMenuItem: function (menu, nameValueArray, menuItem) {
-        // Assign id to menu item
-        if (menuItem.element.id == "")
-            YAHOO.util.Dom.generateId(menuItem.element);
-        // Handle click on menu item
-        menuItem.clickEvent.subscribe(ORBEON.xforms.Events.menuClick,
-        {"menu": menu, "value": nameValueArray[1]});
-        // Create sub-menu if necessary
-        if (nameValueArray.length > 3) {
-            // Create submenu
-            var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
-            // Add menu items to submenu
-            for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
-                // Extract information from the first 3 position in the array
-                var childArray = nameValueArray[arrayIndex];
-                var name = childArray[0];
-                var value = childArray[1];
-                var selected = childArray[2];
-                // Create menu item and add to menu
-                var subMenuItem = new YAHOO.widget.MenuItem(name);
-                subMenu.addItem(subMenuItem);
-                // Add sub-sub menu
-                ORBEON.xforms.Init._addToMenuItem(menu, childArray, subMenuItem);
-            }
-            menuItem.cfg.setProperty("submenu", subMenu);
-        }
-    },
-
-    _menu: function (menu) {
-        // Find the divs for the YUI menu and for the values inside the control
-        var yuiMenuDiv = YAHOO.util.Dom.getElementsByClassName("yuimenubar", null, menu)[0];
-        var valuesDiv = YAHOO.util.Dom.getElementsByClassName("xforms-initially-hidden", null, menu)[0];
-
-        // Extract menu hierarchy from HTML
-        var menuString = ORBEON.util.Dom.getStringValue(valuesDiv);
-        ORBEON.xforms.Globals.menuItemsets[menu.id] = ORBEON.util.String.eval(menuString);
-
-        // Initialize tree
-        YAHOO.util.Dom.generateId(yuiMenuDiv);
-        var yuiMenu = new YAHOO.widget.MenuBar(yuiMenuDiv.id, {
-            autosubmenudisplay: true,
-            hidedelay: 750,
-            lazyload: true
-        });
-        yuiMenu.render();
-        ORBEON.xforms.Globals.menuYui[menu.id] = yuiMenu;
-
-        // For iOS, on touch outside of the menu, close it
-        // NOTE: This unfortunately also closes the menu on scroll, zoom, and other gestures. http://goo.gl/V3CEZ
-        YAHOO.util.Event.addListener(document.body, "touchstart", function(event) {
-            var target = YAHOO.util.Event.getTarget(event);
-            var menu = YAHOO.util.Dom.getAncestorByClassName(target, "xforms-select1-appearance-xxforms-menu");
-            if (menu == null) yuiMenu.clearActiveItem();
-        });
     },
 
     /**

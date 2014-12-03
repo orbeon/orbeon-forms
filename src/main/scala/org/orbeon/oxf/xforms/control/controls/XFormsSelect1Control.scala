@@ -230,8 +230,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
 object XFormsSelect1Control {
 
-    private val AppearancesWithInitialization =
-        Set(XXFORMS_TREE_APPEARANCE_QNAME, XXFORMS_MENU_APPEARANCE_QNAME, XFORMS_COMPACT_APPEARANCE_QNAME)
+    private val AppearancesWithInitialization = Set(XFORMS_COMPACT_APPEARANCE_QNAME)
 
     // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
     // lookup by id takes place and the control must have a static itemset or otherwise null is returned.

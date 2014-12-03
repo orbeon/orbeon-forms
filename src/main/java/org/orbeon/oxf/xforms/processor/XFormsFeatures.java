@@ -28,22 +28,6 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/progressbar/assets/skins/sam/progressbar.css", null),
             // Calendar CSS
             new ResourceConfig("/ops/yui/calendar/assets/skins/sam/calendar.css", null),
-            // Yahoo! UI Library
-            new ResourceConfig("/ops/yui/treeview/assets/skins/sam/treeview.css", null) {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isTreeInUse(staticStateGlobalOps);
-                }
-            },
-            new ResourceConfig("/ops/yui/examples/treeview/assets/css/check/tree.css", null) {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isTreeInUse(staticStateGlobalOps);
-                }
-            },
-            new ResourceConfig("/ops/yui/menu/assets/skins/sam/menu.css", null) {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isMenuInUse(staticStateGlobalOps) || isYUIRTEInUse(staticStateGlobalOps);
-                }
-            },
             // HTML area
             new ResourceConfig("/ops/yui/editor/assets/skins/sam/editor.css", null) {
                 public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
@@ -84,21 +68,6 @@ public class XFormsFeatures {
                     return isRangeInUse(staticStateGlobalOps);
                 }
             },
-            new ResourceConfig("/ops/yui/treeview/treeview.js", "/ops/yui/treeview/treeview-min.js") {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isTreeInUse(staticStateGlobalOps);
-                }
-            },
-            new ResourceConfig("/ops/yui/examples/treeview/assets/js/TaskNode.js", "/ops/yui/examples/treeview/assets/js/TaskNode-min.js") {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isTreeInUse(staticStateGlobalOps);
-                }
-            },
-            new ResourceConfig("/ops/yui/menu/menu.js", "/ops/yui/menu/menu-min.js") {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isMenuInUse(staticStateGlobalOps) || isYUIRTEInUse(staticStateGlobalOps);
-                }
-            },
             // HTML area
             new ResourceConfig("/ops/yui/button/button.js", "/ops/yui/button/button-min.js") {
                 public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
@@ -133,7 +102,6 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Upload.js",                       "/ops/javascript/orbeon/xforms/control/Upload-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTEConfig.js",                    "/ops/javascript/orbeon/xforms/control/RTEConfig-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTE.js",                          "/ops/javascript/orbeon/xforms/control/RTE-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js",                         "/ops/javascript/orbeon/xforms/control/Tree-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",                       "/ops/javascript/orbeon/xforms/action/Message-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",                  "/ops/javascript/orbeon/xforms/control/Placeholder-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Placement.js",                   "/ops/javascript/orbeon/xforms/controls/Placement-min.js"),
@@ -170,14 +138,6 @@ public class XFormsFeatures {
 
         protected boolean isRangeInUse(StaticStateGlobalOps staticStateGlobalOps) {
             return isInUse(staticStateGlobalOps, "range");
-        }
-
-        protected boolean isTreeInUse(StaticStateGlobalOps staticStateGlobalOps) {
-            return isInUse(staticStateGlobalOps, "select1", XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME) || isInUse(staticStateGlobalOps, "select", XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
-        }
-
-        protected boolean isMenuInUse(StaticStateGlobalOps staticStateGlobalOps) {
-            return isInUse(staticStateGlobalOps, "select1", XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME) || isInUse(staticStateGlobalOps, "select", XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
         }
 
         private boolean isHtmlAreaInUse(StaticStateGlobalOps staticStateGlobalOps) {

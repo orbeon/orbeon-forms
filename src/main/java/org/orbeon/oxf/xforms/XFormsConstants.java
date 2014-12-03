@@ -299,8 +299,6 @@ public class XFormsConstants {
     // This appearance is designed to be used internally when a text/html mediatype is encountered on <textarea>
     public static final QName XXFORMS_RICH_TEXT_APPEARANCE_QNAME = new QName("richtext", XXFORMS_NAMESPACE);
 
-    public static final QName XXFORMS_TREE_APPEARANCE_QNAME = new QName("tree", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_MENU_APPEARANCE_QNAME = new QName("menu", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOSIZE_APPEARANCE_QNAME = new QName("autosize", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_FIELDSET_APPEARANCE_QNAME = new QName("fieldset", XXFORMS_NAMESPACE);

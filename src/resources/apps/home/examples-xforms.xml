@@ -28,10 +28,6 @@
         href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial">XForms tutorial</xh:a>.
         It shows simple XRX-style database access, repeats, and more.
     </example>
-    <example title="XForms Todo" href="/xforms-todo/" img="/home/images/xforms-todo-small.jpg" size="4"
-             source="http://www.flickr.com/photos/childofwar/3097124543/">
-        A todo-list example is a must-have for any web technology. And unmistakably, here is one, in XForms.
-    </example>
     <example title="Flickr Resize" href="/xforms-flickr-resize/" img="/home/images/xforms-flickr-resize-small.jpg" size="4"
              source="http://www.flickr.com/photos/seanmolin/5638588326/">
         Use an XForms submission to do a search on Flickr through their REST API, and uses a slider to dynamically

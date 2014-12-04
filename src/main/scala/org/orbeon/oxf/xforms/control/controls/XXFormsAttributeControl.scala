@@ -93,6 +93,8 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
             case "src" if forName == "img" ⇒
                 // Return rewritten URL of dummy image URL
                 resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, REWRITE_MODE_ABSOLUTE_PATH)
+            case "src" if forName == "script" ⇒
+                DUMMY_SCRIPT_URI
             case _ ⇒
                 super.getNonRelevantEscapedExternalValue
         }
@@ -157,18 +159,15 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
 object XXFormsAttributeControl {
 
     private def getExternalValueHandleSrc(controlValue: String, attributeName: String, forName: String): String =
-        if (attributeName == "src") {
-            // Special case of xhtml:img/@src
-            if (forName == "img" && StringUtils.isBlank(controlValue))
-                DUMMY_IMAGE_URI
-            else
-                controlValue
-        } else if (controlValue eq null)
-            // No usable value
-            ""
-        else
-            // Use value as is
+        if (StringUtils.isBlank(controlValue)) {
+            attributeName match {
+                case "src" if forName == "img"    ⇒ DUMMY_IMAGE_URI
+                case "src" if forName == "script" ⇒ DUMMY_SCRIPT_URI // IE8 ignores it; IE9+ loads JS properly
+                case _                            ⇒ ""
+            }
+        } else {
             controlValue
+        }
 
     def getExternalValueHandleSrc(concreteControl: XXFormsAttributeControl, attributeControl: AttributeControl): String =
         getExternalValueHandleSrc(Option(concreteControl) map (_.getValue) orNull, attributeControl.attributeName, attributeControl.forName)

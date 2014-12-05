@@ -20,7 +20,10 @@ Builder.resourceEditorCurrentControl = null
 Builder.resourceEditorCurrentLabelHint = null
 
 # Read/write class telling us if the label/hint is in HTML, set in grid.xml
-lhha = -> if Builder.resourceEditorCurrentLabelHint.is('.xforms-label') then 'label' else 'hint'
+lhha = ->
+    if Builder.resourceEditorCurrentLabelHint.is('.xforms-label') then 'label'
+    else if Builder.resourceEditorCurrentLabelHint.is('.xforms-text') then 'text'
+    else 'hint'
 htmlClass = -> 'fb-' + lhha() + '-is-html'
 isLabelHintHtml = -> Builder.resourceEditorCurrentControl.is('.' + htmlClass())
 setLabelHintHtml = (isHtml) -> Builder.resourceEditorCurrentControl.toggleClass(htmlClass(), isHtml)

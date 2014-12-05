@@ -14,7 +14,7 @@ The full text of the license is available at http://www.gnu.org/copyleft/lesser.
 
 Builder = ORBEON.Builder
 
-LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text'
+LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text .xforms-output-output'
 ControlSelector = '.xforms-control, .xbl-component'
 
 # Heuristic to close the editor based on click and focus events
@@ -57,6 +57,6 @@ $ ->
         Builder.resourceEditorCurrentLabelHint =
             if   repeat.is('*') \
             then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
-            else container.find('.xforms-label')
+            else container.find('.xforms-label, .xforms-text .xforms-output-output')
         if (Builder.resourceEditorCurrentLabelHint.is('*'))
             Builder.resourceEditorStartEdit()

@@ -143,17 +143,17 @@
                             <xh:tr>
                                 <xh:td>
                                     <xf:input ref="label[@lang = $i/lang]" id="fb-itemset-label-input" class="fb-itemset-label-input">
-                                        <xf:label ref="$resources/dialog-itemsets/label/label"/>
+                                        <xf:label ref="$resources/dialog-itemsets/label-header/label"/>
                                     </xf:input>
                                 </xh:td>
                                 <xh:td>
                                     <xf:input ref="value" id="fb-itemset-value-input" class="fb-itemset-value-input">
-                                        <xf:label ref="$resources/dialog-itemsets/value/label"/>
+                                        <xf:label ref="$resources/dialog-itemsets/value-header/label"/>
                                     </xf:input>
                                 </xh:td>
                                 <xh:td class="fb-itemset-hint-cell {if (not(exists($i/items/item/hint))) then 'xforms-hidden' else ()}">
                                     <xf:input ref="hint[@lang = $i/lang]" id="fb-itemset-hint-input" class="fb-itemset-hint-input">
-                                        <xf:label ref="$resources/dialog-itemsets/hint/label"/>
+                                        <xf:label ref="$resources/dialog-itemsets/hint-header/label"/>
                                     </xf:input>
                                 </xh:td>
                             </xh:tr>

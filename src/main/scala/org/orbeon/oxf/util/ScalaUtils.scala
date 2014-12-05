@@ -116,6 +116,17 @@ object ScalaUtils extends PathOps {
         result map { case (k, v) ⇒ k → v.result } toList
     }
 
+    def findDuplicates(t: Traversable[String]): List[String] = {
+        val result = mutable.LinkedHashSet[String]()
+        val seen   = mutable.HashSet[String]()
+        for (x ← t) {
+            if (seen(x))
+                result += x
+            seen += x
+        }
+        result.to[List]
+    }
+
     // If the string is null or empty, return None, otherwise return Some(trimmed value)
     def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
 

@@ -116,13 +116,16 @@ object ScalaUtils extends PathOps {
         result map { case (k, v) ⇒ k → v.result } toList
     }
 
-    def findDuplicates(t: Traversable[String]): List[String] = {
-        val result = mutable.LinkedHashSet[String]()
-        val seen   = mutable.HashSet[String]()
+    // Return duplicate values in the order in which they appear
+    // A duplicate value is returned only once
+    def findDuplicates[T](t: Traversable[T]): List[T] = {
+        val result = mutable.LinkedHashSet[T]()
+        val seen   = mutable.HashSet[T]()
         for (x ← t) {
             if (seen(x))
                 result += x
-            seen += x
+            else
+                seen += x
         }
         result.to[List]
     }

@@ -194,9 +194,9 @@
                                 </fr:dropdown-select1>
                             </xh:td>
                             <xh:td>
-                                <xf:input ref="(*:variable | *:var)[@name = 'control-value']/(@value | @select)[1]" incremental="true">
+                                <xf:textarea ref="(*:variable | *:var)[@name = 'control-value']/(@value | @select)[1]" incremental="true">
                                     <xf:label ref="$form-resources/dialog-actions/source-xpath/label"/>
-                                </xf:input>
+                                </xf:textarea>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>

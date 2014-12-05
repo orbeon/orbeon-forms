@@ -135,15 +135,15 @@
         <enter-hint>
             <label>Click to add a hint</label>
         </enter-hint>
-        <enter-text>
-            <label>Type your text here</label>
-        </enter-text>
         <type-hint>
             <label>Type your hint here</label>
         </type-hint>
         <enter-text>
             <label>Click to enter text</label>
         </enter-text>
+        <type-text>
+            <label>Type your text here</label>
+        </type-text>
         <click-cell>
             <label>Click to select this cell</label>
         </click-cell>
@@ -575,15 +575,15 @@
             <resources-language>
                 <label>Resources Language</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Label</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Value</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Hint</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>
@@ -785,14 +785,14 @@
                 <label>Items</label>
                 <hint>XPath expression returning one node for each item</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Label</label>
                 <hint>XPath expression relative to an item node</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Value</label>
                 <hint>XPath expression relative to an item node</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Save</label>
             </save>
@@ -993,15 +993,15 @@
         <enter-hint>
             <label>Cliquez pour entrer une suggestion optionnelle</label>
         </enter-hint>
-        <enter-text>
-            <label>Saisissez le texte ici</label>
-        </enter-text>
         <type-hint>
             <label>Saisissez la suggestion ici</label>
         </type-hint>
         <enter-text>
             <label>cliquez pour entrer un texte</label>
         </enter-text>
+        <type-text>
+            <label>Saisissez le texte ici</label>
+        </type-text>
         <click-cell>
             <label>cliquez pour sélectionner cette cellule</label>
         </click-cell>
@@ -1434,15 +1434,15 @@
             <resources-language>
                 <label>Langue des ressources</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Libellé</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Valeur</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Suggestion</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editeur de services HTTP</label>
@@ -1644,14 +1644,14 @@
                 <label>Noeuds</label>
                 <hint>Expression XPath retournant un noeud pour chaque choix</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Libellé</label>
                 <hint>Expression XPath relative à un noeud</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Valeur</label>
                 <hint>Expression XPath relative à un noeud</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Sauvegarder</label>
             </save>
@@ -1853,15 +1853,15 @@
         <enter-hint>
             <label>klikk for å skrive inn et valgfritt hint</label>
         </enter-hint>
-        <enter-text>
-            <label todo="true">[Type your text here]</label>
-        </enter-text>
         <type-hint>
             <label todo="true">[Type your hint here]</label>
         </type-hint>
         <enter-text>
             <label>klikk for å skrive inn tekst</label>
         </enter-text>
+        <type-text>
+            <label todo="true">[Type your text here]</label>
+        </type-text>
         <click-cell>
             <label>klikk for å velge celle</label>
         </click-cell>
@@ -2294,15 +2294,15 @@
             <resources-language>
                 <label todo="true">[Resources Language]</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Label</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Verdi</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label todo="true">[Hint]</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjenesteredigering</label>
@@ -2504,14 +2504,14 @@
                 <label>Items</label>
                 <hint>XPath expression returning one node for each item</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Label</label>
                 <hint>XPath expression relative to an item node</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Verdi</label>
                 <hint>XPath expression relative to an item node</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Lagre</label>
             </save>
@@ -2713,15 +2713,15 @@
         <enter-hint>
             <label>Нажмите чтобы ввести подсказку</label>
         </enter-hint>
-        <enter-text>
-            <label todo="true">[Type your text here]</label>
-        </enter-text>
         <type-hint>
             <label todo="true">[Type your hint here]</label>
         </type-hint>
         <enter-text>
             <label>Нажмите чтобы ввести текст</label>
         </enter-text>
+        <type-text>
+            <label todo="true">[Type your text here]</label>
+        </type-text>
         <click-cell>
             <label>Нажмите чтобы выбрать ячейку</label>
         </click-cell>
@@ -3153,15 +3153,15 @@
             <resources-language>
                 <label>Язык</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Видно пользователю</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Системное значение</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label todo="true">[Hint]</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Редактор HTTP-сервисов</label>
@@ -3363,14 +3363,14 @@
                 <label>Элементы</label>
                 <hint>Выражение XPath, возвращает один узел для каждого элемента.</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Название</label>
                 <hint>Выражение XPath, возвращает значение.</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Значение</label>
                 <hint>Выражение XPath, возвращает значение.</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Сохранить</label>
             </save>
@@ -3573,15 +3573,15 @@
         <enter-hint>
             <label>Clicca per inserire un suggerimento</label>
         </enter-hint>
-        <enter-text>
-            <label>Scrivi il tuo test qui</label>
-        </enter-text>
         <type-hint>
             <label>Scrivi il tuo suggerimento qui</label>
         </type-hint>
         <enter-text>
             <label>Clicca per inserire un testo</label>
         </enter-text>
+        <type-text>
+            <label>Scrivi il tuo test qui</label>
+        </type-text>
         <click-cell>
             <label>Clicca per selezionare questa cella</label>
         </click-cell>
@@ -4005,15 +4005,15 @@
             <resources-language>
                 <label>Lingua della risorsa</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Etichetta</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Valore</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Suggerimento</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore servizi HTTP</label>
@@ -4215,14 +4215,14 @@
                 <label>Elementi</label>
                 <hint>Espressione XPath che ritorna un nodo per ogni elemento</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Etichetta</label>
                 <hint>Espressione XPath relativa a un elemento nodo</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Valore</label>
                 <hint>Espressione XPath relativa a un elemento nodo</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Salva</label>
             </save>
@@ -4425,15 +4425,15 @@
         <enter-hint>
             <label>Klicken, um einen Hinweis hinzuzufügen</label>
         </enter-hint>
-        <enter-text>
-            <label>Text hier eingeben</label>
-        </enter-text>
         <type-hint>
             <label>Geben Sie den Text des Hinweises hier ein</label>
         </type-hint>
         <enter-text>
             <label>Klicken, um einen Text einzugeben</label>
         </enter-text>
+        <type-text>
+            <label>Text hier eingeben</label>
+        </type-text>
         <click-cell>
             <label>Klicken, um diese Zelle auszuwählen</label>
         </click-cell>
@@ -4858,15 +4858,15 @@
             <resources-language>
                 <label>Sprache der Ressourcen</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Beschriftung</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Wert</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Hinweis</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
@@ -5068,14 +5068,14 @@
                 <label>Element</label>
                 <hint>XPath-Ausdruck, der eine Knoten für des Element zurückgibt</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Beschriftung</label>
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Wert</label>
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Speichern</label>
             </save>
@@ -5280,15 +5280,15 @@
         <enter-hint>
             <label>Klikkaa lisätäksesi vihje</label>
         </enter-hint>
-        <enter-text>
-            <label>Kirjoita tekstisi tähän</label>
-        </enter-text>
         <type-hint>
             <label>Kirjoita vihjeesi tähän</label>
         </type-hint>
         <enter-text>
             <label>Klikkaa syötääksesi tekstiä</label>
         </enter-text>
+        <type-text>
+            <label>Kirjoita tekstisi tähän</label>
+        </type-text>
         <click-cell>
             <label>Klikkaa valitaksesi tämän solun</label>
         </click-cell>
@@ -5713,15 +5713,15 @@
             <resources-language>
                 <label>Resurssi-kieli</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Nimike</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Arvo</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Vihje</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>
@@ -5923,14 +5923,14 @@
                 <label>Osaset</label>
                 <hint>XPath-lauseke palauttaa yhden solmun jokaiselle osaselle</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Nimike</label>
                 <hint>XPath-lauseke, joka liittyy osasen solmuun</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Arvo</label>
                 <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Tallenna</label>
             </save>
@@ -6133,15 +6133,15 @@
         <enter-hint>
             <label>Hacer Click para agregar ayuda</label>
         </enter-hint>
-        <enter-text>
-            <label>Escriba texto aquí</label>
-        </enter-text>
         <type-hint>
             <label>Escriba la ayuda aquí</label>
         </type-hint>
         <enter-text>
             <label>Hacer Click para ingresar texto</label>
         </enter-text>
+        <type-text>
+            <label>Escriba texto aquí</label>
+        </type-text>
         <click-cell>
             <label>Hacer Click para seleccionar celda</label>
         </click-cell>
@@ -6573,15 +6573,15 @@
             <resources-language>
                 <label>Recursos de Idioma</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Etiqueta</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Valor</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Ayuda</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor de Servicios HTTP</label>
@@ -6783,14 +6783,14 @@
                 <label>Items</label>
                 <hint>Expresión XPath que retorna un nodo por cada item</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Etiqueta</label>
                 <hint>Expresión XPath relativa al nodo-item</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Valor</label>
                 <hint>Expresión XPath relativa al nodo-item</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Guardar</label>
             </save>
@@ -6993,15 +6993,15 @@
         <enter-hint>
             <label>Clique para introduzir uma pista</label>
         </enter-hint>
-        <enter-text>
-            <label>Escreva aqui o seu texto</label>
-        </enter-text>
         <type-hint>
             <label>Escreva aqui a sua pista</label>
         </type-hint>
         <enter-text>
             <label>Clique para introduzir texto</label>
         </enter-text>
+        <type-text>
+            <label>Escreva aqui o seu texto</label>
+        </type-text>
         <click-cell>
             <label>Clique para seleccionar esta célula</label>
         </click-cell>
@@ -7432,15 +7432,15 @@
             <resources-language>
                 <label>Línguas dos Recursos</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Label</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Valor</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Pista</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor do serviço HTTP</label>
@@ -7642,14 +7642,14 @@
                 <label>Items</label>
                 <hint>Expressão XPath que retorna um nodo para cada item</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Label</label>
                 <hint>Expressão XPath relativa a um item de um nodo</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Valor</label>
                 <hint>Expressão XPath relativa a um item de um nodo</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Guardar</label>
             </save>
@@ -7852,15 +7852,15 @@
         <enter-hint>
             <label>Klicka för att skriva en anvisning</label>
         </enter-hint>
-        <enter-text>
-            <label>Skriv texten här</label>
-        </enter-text>
         <type-hint>
             <label>Skriv anvisningen här</label>
         </type-hint>
         <enter-text>
             <label>Klicka för att skriva in text</label>
         </enter-text>
+        <type-text>
+            <label>Skriv texten här</label>
+        </type-text>
         <click-cell>
             <label>Klicka för att välja denna cell</label>
         </click-cell>
@@ -8292,15 +8292,15 @@
             <resources-language>
                 <label>Resursspråk</label>
             </resources-language>
-            <label>
+            <label-header>
                 <label>Etikett</label>
-            </label>
-            <value>
+            </label-header>
+            <value-header>
                 <label>Värde</label>
-            </value>
-            <hint>
+            </value-header>
+            <hint-header>
                 <label>Anvisning</label>
-            </hint>
+            </hint-header>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjänster</label>
@@ -8502,14 +8502,14 @@
                 <label>Items</label>
                 <hint>XPath-uttryck som returnerar en nod per item</hint>
             </items>
-            <label>
+            <item-label>
                 <label>Label</label>
                 <hint>XPath-uttryck relativt en nod</hint>
-            </label>
-            <value>
+            </item-label>
+            <item-value>
                 <label>Värde</label>
                 <hint>XPath-uttryck relativt en nod</hint>
-            </value>
+            </item-value>
             <save>
                 <label>Spara</label>
             </save>

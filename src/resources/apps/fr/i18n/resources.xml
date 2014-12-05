@@ -33,7 +33,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Save</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Save</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
@@ -322,7 +321,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Valider</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
@@ -615,7 +613,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Ver</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
@@ -894,7 +891,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Vis</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
             <email>&lt;i class="icon-envelope"/&gt; Epost</email>
@@ -1171,7 +1167,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Сохранить</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
@@ -1446,7 +1441,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Salva</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Salva</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Salva</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Esamina</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
@@ -1734,7 +1728,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Speichern</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Senden</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>
@@ -2022,7 +2015,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Tallenna</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Tallenna</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
             <email>&lt;i class="icon-envelope"/&gt; Sähköposti</email>
@@ -2310,7 +2302,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Spara</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Spara</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Spara</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Granska</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Redigera</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Skicka</send>
             <email>&lt;i class="icon-envelope"/&gt; Mejla</email>
@@ -2598,7 +2589,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Opslaan</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Opslaan</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Opslaan</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Bewerken</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Sturen</send>
             <email>&lt;i class="icon-envelope"/&gt; E-mail</email>
@@ -2886,7 +2876,6 @@
             <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
             <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
             <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
-            <review>&lt;i class="icon-arrow-right"/&gt; Rever</review>
             <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
             <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
             <email>&lt;i class="icon-envelope"/&gt; Email</email>

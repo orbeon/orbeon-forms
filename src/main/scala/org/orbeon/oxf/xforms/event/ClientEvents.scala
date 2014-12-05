@@ -70,9 +70,10 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     // Entry point called by the server: process a sequence of incoming client events.
     def processEvents(
-            doc:                  XFormsContainingDocument,
-            clientEvents:         List[LocalEvent],
-            serverEventsElements: List[Element]): (Boolean, ju.Set[String], Option[String]) = {
+        doc                  : XFormsContainingDocument,
+        clientEvents         : List[LocalEvent],
+        serverEventsElements : List[Element]
+    ): (Boolean, ju.Set[String], Option[String]) = {
 
         val allClientAndServerEvents = {
 
@@ -348,11 +349,13 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     // Check for and handle events that don't need access to the document but can return an Ajax response rapidly
     def handleQuickReturnEvents(
-            xmlReceiver:        XMLReceiver,
-            request:            ExternalContext.Request,
-            requestDocument:    Document,
-            logRequestResponse: Boolean,
-            clientEvents:       List[LocalEvent])(implicit indentedLogger: IndentedLogger): List[LocalEvent] = {
+        xmlReceiver         : XMLReceiver,
+        request             : ExternalContext.Request,
+        requestDocument     : Document,
+        logRequestResponse  : Boolean,
+        clientEvents        : List[LocalEvent])(implicit
+        indentedLogger      : IndentedLogger
+    ): List[LocalEvent] = {
 
         def isHeartbeat(event: LocalEvent)      = event.name == XXFORMS_SESSION_HEARTBEAT
         def isUploadProgress(event: LocalEvent) = event.name == XXFORMS_UPLOAD_PROGRESS
@@ -509,7 +512,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
                 case (control: XFormsSingleNodeControl, _) if control.isReadonly ⇒
                     warn("read-only control")
 
-                // Disallow focus/blur if the control is no focusable
+                // Disallow focus/blur if the control is not focusable
                 // Relevance and read-only above are already caught. This catches hidden controls, which must not be
                 // focusable from the client.
                 case (control: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! (control.isFocusable && ! Focus.isHidden(control)) ⇒

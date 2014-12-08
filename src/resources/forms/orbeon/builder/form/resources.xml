@@ -135,9 +135,9 @@
         <enter-hint>
             <label>Click to add a hint</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Type your text here</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Type your hint here</label>
         </type-hint>
@@ -993,9 +993,9 @@
         <enter-hint>
             <label>Cliquez pour entrer une suggestion optionnelle</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Saisissez le texte ici</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Saisissez la suggestion ici</label>
         </type-hint>
@@ -1853,9 +1853,9 @@
         <enter-hint>
             <label>klikk for å skrive inn et valgfritt hint</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label todo="true">[Type your text here]</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label todo="true">[Type your hint here]</label>
         </type-hint>
@@ -2713,9 +2713,9 @@
         <enter-hint>
             <label>Нажмите чтобы ввести подсказку</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label todo="true">[Type your text here]</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label todo="true">[Type your hint here]</label>
         </type-hint>
@@ -3573,9 +3573,9 @@
         <enter-hint>
             <label>Clicca per inserire un suggerimento</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Scrivi il tuo test qui</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Scrivi il tuo suggerimento qui</label>
         </type-hint>
@@ -4425,9 +4425,9 @@
         <enter-hint>
             <label>Klicken, um einen Hinweis hinzuzufügen</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Text hier eingeben</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Geben Sie den Text des Hinweises hier ein</label>
         </type-hint>
@@ -5280,9 +5280,9 @@
         <enter-hint>
             <label>Klikkaa lisätäksesi vihje</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Kirjoita tekstisi tähän</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Kirjoita vihjeesi tähän</label>
         </type-hint>
@@ -6133,9 +6133,9 @@
         <enter-hint>
             <label>Hacer Click para agregar ayuda</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Escriba texto aquí</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Escriba la ayuda aquí</label>
         </type-hint>
@@ -6993,9 +6993,9 @@
         <enter-hint>
             <label>Clique para introduzir uma pista</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Escreva aqui o seu texto</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Escreva aqui a sua pista</label>
         </type-hint>
@@ -7852,9 +7852,9 @@
         <enter-hint>
             <label>Klicka för att skriva en anvisning</label>
         </enter-hint>
-        <type-text>
+        <enter-text>
             <label>Skriv texten här</label>
-        </type-text>
+        </enter-text>
         <type-hint>
             <label>Skriv anvisningen här</label>
         </type-hint>

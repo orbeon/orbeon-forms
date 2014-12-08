@@ -16,7 +16,7 @@ Builder = ORBEON.Builder
 
 LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text .xforms-output-output'
 ControlSelector = '.xforms-control, .xbl-component'
-ComponentSelector = '.xbl-component'
+ExplanationSelector = '.xbl-component.xbl-fr-explanation'
 
 # Heuristic to close the editor based on click and focus events
 clickOrFocus = ({target}) ->
@@ -47,8 +47,9 @@ $ ->
                 tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
                 tdWithControl.find(ControlSelector)
             else
-                parents = Builder.resourceEditorCurrentLabelHint.parents(ComponentSelector)
-                parents.add(Builder.resourceEditorCurrentLabelHint.parents(ControlSelector))
+                explanation = Builder.resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
+                controls = Builder.resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
+                parents = $($.merge(explanation, controls))
                 parents.first()
         Builder.resourceEditorStartEdit()
 

@@ -483,7 +483,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Find a control's LHHA (there can be more than one for alerts)
     def getControlLHHA(inDoc: NodeInfo, controlName: String, lhha: String) =
-        findControlByName(inDoc, controlName).toList child (XF → lhha)
+        findControlByName(inDoc, controlName).toList child ((if(lhha=="text") FR else XF) → lhha)
 
     // Set the control help and add/remove help element and placeholders as needed
     def setControlHelp(controlName: String,  value: String) = {
@@ -569,7 +569,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val control = findControlByName(inDoc, controlName).get
 
         val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha))
-        val removedLHHA    = delete(control child (XF → lhha))
+        val removedLHHA    = delete(control child ((if(lhha=="text") FR else XF) → lhha))
 
         removedHolders ++ removedLHHA
     }
@@ -611,7 +611,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String) = {
 
         val allHelpElements =
-            inDoc.root \\ (XF → lhha) map
+            inDoc.root \\ ((if(lhha=="text") FR else XF) → lhha) map
             (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
             { case (lhhaElement, HelpRefMatcher(controlName)) ⇒ lhhaElement → controlName }
 

@@ -233,12 +233,12 @@
                                             <xf:hint ref="$form-resources/dialog-actions/items/hint"/>
                                         </xf:input>
                                         <xf:input ref=".//(*:variable | *:var)[@name = 'item-label']/(@value | @select)[1]" id="fb-actions-label" incremental="true">
-                                            <xf:label ref="$form-resources/dialog-actions/label/label"/>
-                                            <xf:hint ref="$form-resources/dialog-actions/label/hint"/>
+                                            <xf:label ref="$form-resources/dialog-actions/item-label/label"/>
+                                            <xf:hint ref="$form-resources/dialog-actions/item-label/hint"/>
                                         </xf:input>
                                         <xf:input ref=".//(*:variable | *:var)[@name = 'item-value']/(@value | @select)[1]" id="fb-actions-value" incremental="true">
-                                            <xf:label ref="$form-resources/dialog-actions/value/label"/>
-                                            <xf:hint ref="$form-resources/dialog-actions/value/hint"/>
+                                            <xf:label ref="$form-resources/dialog-actions/item-value/label"/>
+                                            <xf:hint ref="$form-resources/dialog-actions/item-value/hint"/>
                                         </xf:input>
                                     </xh:div>
                                 </xf:group>

@@ -14,15 +14,16 @@
 package org.orbeon.oxf.fr
 
 import org.dom4j._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.junit.Test
 import org.orbeon.oxf.properties.PropertyStore
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.util.{ScalaUtils, XPath}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.scalatest.junit.AssertionsForJUnit
 
 class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -107,10 +108,14 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
             "oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
         )
 
+        // - allow "item" and "choices" because we use this for itemsets
+        // - allow "type" because it's used for the FB list of types
+        val AllowedDuplicateNames = Set("item", "choices", "type")
+
         for (url ← urls) {
 
             val doc =
-                ScalaUtils.useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+                useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
                     TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
                 }
 
@@ -124,14 +129,23 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
                     compareElements(left.rootElement, right.rootElement, lang)
                 case (left: NodeInfo, right: NodeInfo) if isElement(left) ⇒
 
-                    assert(left.name === right.name, s"different names for url=$url and lang=$lang")
+                    def commonMessageSuffix = s" (url=$url and lang=$lang)"
+
+                    assert(left.name === right.name, s"different names$commonMessageSuffix")
 
                     // Ignore children of "div" because it can contain XHTML which is different per language
                     left.name == right.name && (left.name == "div" || {
                         val leftChildren  = left  / *
                         val rightChildren = right / *
 
-                        assert(leftChildren.size === rightChildren.size, s"different sizes for url=$url and lang=$lang")
+                        val duplicates = findDuplicates(leftChildren map (_.name)) filterNot AllowedDuplicateNames
+
+                        assert(
+                            duplicates.isEmpty,
+                            s"duplicate names under `${left.name}`: ${duplicates mkString ", "}$commonMessageSuffix"
+                        )
+
+                        assert(leftChildren.size === rightChildren.size, s"different sizes$commonMessageSuffix")
 
                         leftChildren.size == rightChildren.size && {
                             (leftChildren zip rightChildren) forall {

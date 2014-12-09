@@ -73,13 +73,13 @@ object SchemaGenerator {
     private def handleBind(formSource: DocumentInfo, resolve: String ⇒ Option[XFormsObject], bind: NodeInfo): Elem = {
 
         case class BindInfo(
-            elemName   : String,
-            required   : Boolean,
-            hasRelevant: Boolean,
-            elemType   : Option[QName],
-            repeated   : Boolean,
-            min        : Option[String],
-            max        : Option[String]
+            elemName      : String,
+            maybeRequired : Boolean,
+            hasRelevant   : Boolean,
+            elemType      : Option[QName],
+            repeated      : Boolean,
+            min           : Option[String],
+            max           : Option[String]
         )
 
         // Returns control corresponding to a bind, with a given name (e.g. *:grid)
@@ -92,18 +92,32 @@ object SchemaGenerator {
         object RootBind {
             def unapply(bind: NodeInfo): Boolean = bind parent "*:model" nonEmpty
         }
+
         object Bind {
             def unapply(bind: NodeInfo): Option[BindInfo] = {
                 val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter FormRunner.isRepeat toList
 
+                // Also support nested xf:validation elements
+                val bindAndValidations = bind +: (bind / XFORMS_VALIDATION_QNAME)
+
+                val maybeRequired =
+                    bindAndValidations map (_ /@ "required") exists (_.stringValue != "false()")
+
+                val elemType = (
+                    (bindAndValidations /@ "type" headOption)
+                    map (_.stringValue)
+                    map bind.resolveQName
+                    filterNot Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)
+                )
+
                 Some(BindInfo(
-                    elemName    = bind \@ ("ref" || "nodeset"),
-                    required    = bind.attValue("required") == "true()",
-                    hasRelevant = bind.att("has-relevant").nonEmpty,
-                    elemType    = bind.att("type").headOption.map(_.stringValue).map(bind.resolveQName).filterNot(Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)),
-                    repeated    = repeatGridNode nonEmpty,
-                    min         = repeatGridNode \@ "min",
-                    max         = repeatGridNode \@ "max"
+                    elemName      = bind /@ ("ref" || "nodeset"),
+                    maybeRequired = maybeRequired,
+                    hasRelevant   = bindAndValidations /@ "has-relevant" nonEmpty,
+                    elemType      = elemType,
+                    repeated      = repeatGridNode nonEmpty,
+                    min           = repeatGridNode /@ "min",
+                    max           = repeatGridNode /@ "max"
                 ))
             }
         }
@@ -111,7 +125,7 @@ object SchemaGenerator {
         // Build xs:element for this bind
         val (repeated, xsElem) = bind match {
             case RootBind() ⇒ (false, <xs:element name="form"/>)
-            case Bind(BindInfo(elemName, required, hasRelevant, elemTypeOpt, repeated, min, max)) ⇒
+            case Bind(BindInfo(elemName, maybeRequired, hasRelevant, elemTypeOpt, repeated, min, max)) ⇒
 
                 // Optional type attribute
                 def attr(name: String, value: String) = scala.xml.Attribute(None, name, scala.xml.Text(value), Null)
@@ -211,7 +225,7 @@ object SchemaGenerator {
                                     </xs:restriction>
                                 </xs:simpleType>
 
-                            val allowEmpty = ! required || hasRelevant
+                            val allowEmpty = ! maybeRequired || hasRelevant
                             val content =
                                 if (itemset.isSelect)
                                     if (allowEmpty) listSimpleType else listMinLengthOneSimpleType

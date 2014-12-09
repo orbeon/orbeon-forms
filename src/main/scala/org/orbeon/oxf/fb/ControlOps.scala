@@ -364,7 +364,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def updateMip(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String): Unit = {
 
         require(Model.AllMIPNames(mipName))
-        val mipQName = convertMIP(mipName)
+        val mipQName = mipNameToFBMIPQname(mipName)
 
         findControlByName(inDoc, controlName) foreach { control ⇒
 
@@ -421,12 +421,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Get the value of a MIP attribute if present
     def getMip(inDoc: NodeInfo, controlName: String, mipName: String) = {
         require(Model.AllMIPNames(mipName))
-        val mipQName = convertMIP(mipName)
+        val mipQName = mipNameToFBMIPQname(mipName)
 
         findBindByName(inDoc, controlName) flatMap (_ attValueOpt mipQName)
     }
 
-    private def convertMIP(mipName: String) =
+    def mipNameToFBMIPQname(mipName: String) =
         RewrittenMIPs.get(mipName)                 orElse
         (AllMIPsByName.get(mipName) map (_.aName)) getOrElse
         (throw new IllegalArgumentException)

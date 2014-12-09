@@ -158,16 +158,21 @@
                 </xsl:template>
 
                 <!-- Convert MIP names (attributes and nested elements) -->
-                <xsl:template match="xf:bind/@relevant | xf:bind/@readonly | xf:bind/@required | xf:bind/@constraint | xf:bind/@calculate | xf:bind/@xxf:default"
+                <xsl:template match="xf:bind/@relevant
+                                   | xf:bind/@readonly
+                                   | xf:bind/@required
+                                   | xf:bind/@constraint
+                                   | xf:bind/@calculate
+                                   | xf:bind/@xxf:default
+                                   | xf:validation/@relevant
+                                   | xf:validation/@readonly
+                                   | xf:validation/@required
+                                   | xf:validation/@constraint
+                                   | xf:validation/@calculate
+                                   | xf:validation/@xxf:default"
                               mode="within-model">
-                    <!-- Below we only allow fb:required to be interpreted as a custom MIP -->
+                    <!-- Further below we only allow fb:required to be interpreted as a custom MIP -->
                     <xsl:attribute name="fb:{local-name()}" select="."/>
-                </xsl:template>
-                <xsl:template match="xf:bind/xf:relevant | xf:bind/xf:readonly | xf:bind/xf:required | xf:bind/xf:constraint | xf:bind/xf:calculate | xf:bind/xxf:default"
-                              mode="within-model">
-                    <xsl:element name="fb:{local-name()}">
-                        <xsl:apply-templates select="@* | node()" mode="#current"/>
-                    </xsl:element>
                 </xsl:template>
 
                 <!-- Add model actions -->
@@ -387,9 +392,25 @@
                 <xsl:template match="xf:model/xf:instance[@id = 'fr-form-metadata']/metadata[empty(singleton)]"
                               mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                         <xsl:element name="singleton">false</xsl:element>
                     </xsl:copy>
+                </xsl:template>
+
+                <!-- Convert xf:constraint/@value to xf:validation/@fb:constraint, etc. -->
+                <xsl:template match="xf:bind/xf:relevant
+                                   | xf:bind/xf:readonly
+                                   | xf:bind/xf:required
+                                   | xf:bind/xf:constraint
+                                   | xf:bind/xf:calculate
+                                   | xf:bind/xxf:default"
+                              mode="within-model">
+                    <xsl:element name="xf:validation">
+                        <xsl:if test="@value">
+                            <xsl:attribute name="fb:{local-name()}" select="@value"/>
+                        </xsl:if>
+                        <xsl:apply-templates select="(@* except @value) | node()" mode="#current"/>
+                    </xsl:element>
                 </xsl:template>
 
             </xsl:stylesheet>

@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import collection.mutable
-import org.orbeon.oxf.xforms._
-import analysis.controls._
-import org.w3c.dom.Node._
-import org.orbeon.oxf.common.OXFException
 import java.util.{Map ⇒ JMap}
-import java.lang.String
-import collection.immutable.Nil
-import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.w3c.dom.Node._
+
+import scala.collection.mutable
 
 class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument)
         extends XPathDependencies
@@ -475,7 +475,8 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         // Get constraints by the level specified
         val mips = mipName match {
             case Model.Constraint.name ⇒ bind.constraintsByLevel.getOrElse(level, Nil)
-            case _                     ⇒ bind.getMIPs(mipName)
+            case Model.Type.name       ⇒ bind.typeMIPOpt.toList
+            case _                     ⇒ bind.getXPathMIPs(mipName)
         }
 
         val modelState = getModelState(model.prefixedId)
@@ -488,11 +489,11 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                 // Check MIP dependencies for XPath and type MIPs
 
                 // Special case for type which is not an XPath expression
-                // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
+                // We don't check whether we need to update the type MIP, since it is constant, but we check whether
                 // the value to type check has changed.
                 val valueAnalysis = mip match {
                     case xpathMIP: StaticBind#XPathMIP ⇒ Some(xpathMIP.analysis)
-                    case typeMIP: StaticBind#TypeMIP   ⇒ bind.getValueAnalysis
+                    case _: StaticBind#TypeMIP         ⇒ bind.getValueAnalysis
                     case _                             ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
                 }
 

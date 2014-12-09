@@ -232,24 +232,21 @@
                 <xsd:choice>
                     <xsd:element ref="xforms:bind"/>
                     <xsd:element ref="xforms:constraint"/>
+                    <xsd:element ref="xforms:validation"/>
                     <xsd:any namespace="##other" processContents="lax"/>
                 </xsd:choice>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <!-- XForms 2.0 deprecates @nodeset -->
-            <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
-            <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
-            <xsd:attribute name="name" type="xsd:QName" use="optional"/>
-            <xsd:attribute name="type" type="xsd:QName" use="optional"/>
-            <xsd:attribute name="readonly" type="xforms:XPathExpression" use="optional"/>
-            <xsd:attribute name="required" type="xforms:XPathExpression" use="optional"/>
-            <xsd:attribute name="relevant" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="ref"        type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="nodeset"    type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="name"       type="xsd:QName"              use="optional"/>
+            <xsd:attribute name="type"       type="xsd:QName"              use="optional"/>
+            <xsd:attribute name="readonly"   type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="required"   type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="relevant"   type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="constraint" type="xforms:XPathExpression" use="optional"/>
-            <xsd:attribute name="calculate" type="xforms:XPathExpression" use="optional"/>
-
-            <xsd:attribute name="maxOccurs" type="xforms:XPathExpression" use="optional" default="INF"/>
-            <xsd:attribute name="minOccurs" type="xforms:XPathExpression" use="optional" default="0"/>
-            <xsd:attribute name="p3ptype" type="xsd:string" use="optional"/>
+            <xsd:attribute name="calculate"  type="xforms:XPathExpression" use="optional"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="constraint">
@@ -257,6 +254,26 @@
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="value" type="xforms:XPathExpression" use="required"/>
             <xsd:attribute name="level" use="optional">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="error"/>
+                        <xsd:enumeration value="warning"/>
+                        <xsd:enumeration value="info"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="validation">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+            <xsd:attribute name="type"       type="xsd:QName"              use="optional"/>
+            <xsd:attribute name="readonly"   type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="required"   type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="relevant"   type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="constraint" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="calculate"  type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="level"                                    use="optional">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="error"/>

@@ -323,7 +323,7 @@ trait ContainerOps extends ControlOps {
     def findCurrentBindingByName(inDoc: NodeInfo, controlName: String, bindings: Seq[NodeInfo]) =
         for {
             controlElement ← findControlByName(inDoc, controlName)
-            datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
+            datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
             binding        ← findCurrentBinding(controlElement.uriQualifiedName, datatype, bindings)
         } yield
             binding

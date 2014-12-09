@@ -33,10 +33,9 @@ import scala.util.control.NonFatal
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
-    type StaticMIP                = StaticBind#MIP
-    type StaticXPathMIP           = StaticBind#XPathMIP
-    type StaticConstraintXPathMIP = StaticBind#ConstraintXPathMIP
-    type StaticTypeMIP            = StaticBind#TypeMIP
+    type StaticMIP      = StaticBind#MIP
+    type StaticXPathMIP = StaticBind#XPathMIP
+    type StaticTypeMIP  = StaticBind#TypeMIP
 
     private val containingDocument = model.containingDocument
     private val dependencies = containingDocument.getXPathDependencies
@@ -178,7 +177,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 ! Model.DEFAULT_VALID
         }
 
-    protected def failedConstraintMIPs(level: ValidationLevel, bindNode: BindNode): List[StaticConstraintXPathMIP] =
+    protected def failedConstraintMIPs(level: ValidationLevel, bindNode: BindNode): List[StaticXPathMIP] =
         for {
             mips   ← bindNode.staticBind.constraintsByLevel.get(level).toList
             mip    ← mips

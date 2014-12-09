@@ -470,10 +470,10 @@
                                     </xf:select1>
                                 </xh:td>
                                 <xh:td>
-                                    <xf:textarea ref="if (@type = 'constraint' and @default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
+                                    <xf:textarea ref="if (@type = ('required', 'datatype', 'constraint') and @default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
                                         <xf:label ref="$resources/dialog-control-details/alert/label"/>
                                     </xf:textarea>
-                                    <xf:input ref=".[@type = 'constraint' and @level = 'error']/@default-alert">
+                                    <xf:input ref=".[@type = ('required', 'datatype', 'constraint') and @level = 'error']/@default-alert">
                                         <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
                                     </xf:input>
                                 </xh:td>

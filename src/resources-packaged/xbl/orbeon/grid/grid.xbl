@@ -111,11 +111,16 @@
                             <xf:var name="grid" value="{$edit-ref}"/>
                         </xsl:if>
 
-                        <xf:var name="repeat-context">
-                            <xxf:value value="{if ($is-content-repeat) then $repeat-expression else '.'}" xxbl:scope="outer"/>
-                        </xf:var>
-
                         <xsl:if test="$is-repeat">
+
+                            <xf:var
+                                name="repeat-context-outer"
+                                value="{if ($is-content-repeat) then $repeat-expression else '.'}"
+                                xxbl:scope="outer"/>
+
+                            <xf:var name="repeat-context">
+                                <xxf:value value="$repeat-context-outer" xxbl:scope="outer"/>
+                            </xf:var>
 
                             <xsl:choose>
                                 <xsl:when test="$is-content-repeat">
@@ -145,16 +150,12 @@
 
                             <xf:var name="min-avt" xxbl:scope="outer"><xsl:value-of select="($root/@min, $root/@minOccurs, 0)[1]"/></xf:var>
                             <xf:var name="min">
-                                <xxf:value value="xxf:evaluate-avt($min-avt)" xxbl:scope="outer"/>
-                                <!-- Don't add those yet as the context becomes empty once the iteration count falls to 0. -->
-                                <!-- xbl:attr="model context ref bind" -->
+                                <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($min-avt)" xxbl:scope="outer"/>
                             </xf:var>
 
                             <xf:var name="max-avt" xxbl:scope="outer"><xsl:value-of select="($root/@max, $root/@maxOccurs, 'none')[1]"/></xf:var>
                             <xf:var name="max">
-                                <xxf:value value="xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
-                                <!-- Don't add those yet as the context becomes empty once the iteration count falls to 0. -->
-                                <!-- xbl:attr="model context ref bind" -->
+                                <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
                             </xf:var>
                         </xsl:if>
 

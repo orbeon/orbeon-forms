@@ -391,8 +391,13 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * Use W3C DOM API to get the content of an element.
              */
             getStringValue: function(element) {
-                if (element.innerText == null) {
-                    // Use W3C DOM API
+                if (element.textContent) {
+                    return element.textContent;
+                } else if (element.innerText) {
+                    // This is probably only called on IE8 as of 2014-12-10
+                    return element.innerText;
+                } else {
+                    // For XML DOM
                     var result = "";
                     for (var i = 0; i < element.childNodes.length; i++) {
                         var child = element.childNodes[i];
@@ -400,9 +405,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             result += child.nodeValue;
                     }
                     return result;
-                } else {
-                    // Use IE's innerText, which is faster on IE
-                    return element.innerText;
                 }
             },
 

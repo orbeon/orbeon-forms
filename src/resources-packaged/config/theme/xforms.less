@@ -140,10 +140,9 @@
         }
 
         .popover-content {
-            // So we have scrollbars when necessary
-            overflow: auto;
-            // So the height we set in JS is correct
-            box-sizing: border-box;
+            overflow: auto;         // scrollbars when necessary
+            box-sizing: border-box; // so that height we set in JS is correct
+            white-space: pre-wrap;  // newlines wrap, see https://github.com/orbeon/orbeon-forms/issues/1618
         }
     }
 

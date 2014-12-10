@@ -1,9 +1,9 @@
 YAHOO.xbl.fr.Tinymce.DefaultConfig = {
-	mode:		                            "exact",
+    mode:		                            "exact",
     language:                               "en",
     theme:		                            "advanced",
     skin:                                   "thebigreason",
-	plugins:                                "spellchecker,style,table,save,iespell,paste,visualchars,nonbreaking,xhtmlxtras,template",
+    plugins:                                "spellchecker,style,table,save,iespell,paste,visualchars,nonbreaking,xhtmlxtras,template",
     theme_advanced_buttons1:                "bold,italic,|,bullist,numlist,|,outdent,indent",
     theme_advanced_buttons2:                "",
     theme_advanced_buttons3:                "",

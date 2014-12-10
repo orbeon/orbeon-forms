@@ -13,26 +13,24 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import java.io.{Writer, InputStream, ByteArrayOutputStream}
+import java.io.{ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array ⇒ _, _}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
-import org.orbeon.oxf.fr.relational._
+
+import org.orbeon.oxf.fr.FormRunner.{XF, XH}
+import org.orbeon.oxf.fr.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{Whitespace, XPath, StringBuilderWriter, NetUtils}
-import org.orbeon.oxf.xml._
-import org.xml.sax.InputSource
+import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
-import org.orbeon.oxf.fr.FormRunner.{XH, XF}
-import org.orbeon.oxf.xml.JXQName
-import org.orbeon.oxf.fr.relational.Specific
-import org.orbeon.oxf.fr.relational.ForDocument
-import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.xml.sax.InputSource
 
 object RequestReader {
 

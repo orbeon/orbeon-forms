@@ -130,7 +130,7 @@
                         <!-- The class is added so unit tests can find the trigger more easily -->
                         <xf:trigger id="fb-add-component-trigger"
                                     ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
-                                    class="fb-add-{$binding/@id}">
+                                    class="fb-add-{$binding/@id} {if ($is-section-component) then 'fb-add-template' else 'fb-add-control'}">
                             <xf:label>
                                 <xh:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                 <xf:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/>

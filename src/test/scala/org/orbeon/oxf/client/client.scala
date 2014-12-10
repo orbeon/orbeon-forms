@@ -239,6 +239,12 @@ trait FormBuilderOps extends FormRunnerOps {
                    |    }
                    |})""".stripMargin)
 
+        def insertNewSection() =
+            clickOn(cssSelector("#insert-new-section-trigger"))
+
+        def insertNewGrid() =
+            clickOn(cssSelector("#insert-new-grid-trigger"))
+
         def insertNewRepeatedGrid() =
             clickOn(cssSelector("#insert-new-repeated-grid-trigger"))
     }

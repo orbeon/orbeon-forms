@@ -60,7 +60,7 @@ $ ->
         repeat = container.parents('.fr-repeat').first()
         Builder.resourceEditorCurrentLabelHint =
             if   repeat.is('*') \
-            then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
+            then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label, tbody tr td:nth-child(' + (container.index() + 1) + ') .xforms-text .xforms-output-output')
             else container.find('.xforms-label, .xforms-text .xforms-output-output')
         if (Builder.resourceEditorCurrentLabelHint.is('*'))
             Builder.resourceEditorStartEdit()

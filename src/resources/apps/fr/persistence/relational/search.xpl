@@ -443,7 +443,7 @@
                               last-modified="{last-modified}"
                               draft="{if (draft = 'Y') then 'true' else if (draft = 'N') then 'false' else ''}"
                               name="{document-id}"
-                              operations="{frf:allAuthorizedOperations($permissions, string(username), string(groupname))}">
+                              operations="{frf:xpathAllAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

@@ -102,16 +102,13 @@ trait Common extends RequestResponse with FormRunnerPersistence {
 
     // Given a user/group name coming from the data, tells us what operations we can do in this data, assuming that
     // it is for the current request app/form
-    def authorizedOperations(formMetadata: DocumentInfo, dataUserGroup: Option[(String, String)]): Set[String] = {
+    def authorizedOperations(formMetadata: DocumentInfo, dataUserGroup: (Option[String], Option[String])): Set[String] = {
         val permissions = (formMetadata / "forms" / "form" / "permissions").headOption
         permissions match {
             case None                ⇒ Set("create", "read", "update", "delete")
             case Some(permissionsEl) ⇒
-                if (dataUserGroup.isDefined) {
-                    val (username, groupname) = dataUserGroup.get
-                    FormRunner.allAuthorizedOperations(permissionsEl, username, groupname).toSet
-                } else
-                    FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet
+                val (username, groupname) = dataUserGroup
+                FormRunner.allAuthorizedOperations(permissionsEl, username, groupname).toSet
         }
     }
 }

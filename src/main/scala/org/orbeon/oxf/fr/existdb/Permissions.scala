@@ -21,9 +21,13 @@ object Permissions {
                 case None ⇒ Set("create", "read", "update", "delete")
                 case Some(permissionsEl) ⇒
                     if (metadataFromDB != null) {
-                        val username = metadataFromDB.child("username").stringValue
-                        val groupname = metadataFromDB.child("groupname").stringValue
-                        FormRunner.allAuthorizedOperations(permissionsEl, username, groupname).toSet
+                        def dataUserGroupName(elName: String): Option[String] = {
+                            val elStringValue = metadataFromDB.child(elName) .stringValue
+                            if (elStringValue == "") None else Some(elStringValue)
+                        }
+                        val dataUsername  = dataUserGroupName("username")
+                        val dataGroupname = dataUserGroupName("groupname")
+                        FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname).toSet
                     } else {
                         FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet
                     }

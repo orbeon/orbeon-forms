@@ -346,14 +346,13 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                             // Check we're allowed to update or delete this resource
                             val username      = existing.get.username
                             val groupname     = existing.get.group
-                            val dataUserGroup = if (username.isEmpty || groupname.isEmpty) None else Some(username.get, groupname.get)
-                            val authorizedOps = authorizedOperations(formMetadata.get, dataUserGroup)
+                            val authorizedOps = authorizedOperations(formMetadata.get, username → groupname)
                             val requiredOp    = if (delete) "delete" else "update"
                             authorizedOps.contains(requiredOp)
                         } else {
                             // For deletes, if there is no data to delete, it is a 403 if could not read, update,
                             // or delete if it existed (otherwise code later will return a 404)
-                            val authorizedOps = authorizedOperations(formMetadata.get, None)
+                            val authorizedOps = authorizedOperations(formMetadata.get, None → None)
                             val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
                             authorizedOps.intersect(requiredOps).nonEmpty
                         }

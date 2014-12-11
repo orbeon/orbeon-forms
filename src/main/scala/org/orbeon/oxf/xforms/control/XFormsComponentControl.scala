@@ -190,8 +190,11 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Unit = {
 
         // NOTE: Must be called after xforms-model-construct so that instances are present
-        def findMirrorInstance =
-            nestedContainer.models.iterator flatMap (_.getInstances.asScala) find (i ⇒ i.instance.element.attributeValue("mirror") == "true")
+        def findMirrorInstance = (
+            nestedContainer.models.iterator
+            flatMap (_.getInstances.asScala)
+            find    (_.instance.element.attributeValue("mirror") == "true")
+        )
 
         // Process mirror instance if any
         findMirrorInstance foreach { mirrorInstance ⇒
@@ -206,11 +209,12 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
             // Create new doc rooted at reference node
             val doc =
                 Instance.extractDocument(
-                    unwrapElement(referenceNode.get),
+                    element               = unwrapElement(referenceNode.get),
                     excludeResultPrefixes = Set(),
                     readonly              = false,
                     exposeXPathTypes      = mirrorInstance.exposeXPathTypes,
-                    removeInstanceData    = true)
+                    removeInstanceData    = true
+                )
 
             // Update initial instance
             mirrorInstance.replace(doc, dispatch)
@@ -248,13 +252,22 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     }
 
     // Simply delegate but switch the container
-    override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
-        Controls.buildChildren(this, staticControl.children, (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix), idSuffix)
+    override def buildChildren(
+        buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
+        idSuffix: Seq[Int]
+    ): Unit =
+        Controls.buildChildren(
+            control   = this,
+            children  = staticControl.children,
+            buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix),
+            idSuffix  = idSuffix
+        )
 
     // Get the control at the root of the inner scope of the component
     def innerRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get
 
-    private lazy val handleLHHA = staticControl.binding.abstractBinding.modeLHHA && ! staticControl.binding.abstractBinding.modeLHHACustom
+    private lazy val handleLHHA =
+        staticControl.binding.abstractBinding.modeLHHA && ! staticControl.binding.abstractBinding.modeLHHACustom
 
     // Don't add Ajax LHHA for custom-lhha mode
     override def addAjaxLHHA(other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) =

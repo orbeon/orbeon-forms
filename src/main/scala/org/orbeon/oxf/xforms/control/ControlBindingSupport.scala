@@ -55,10 +55,10 @@ trait ControlBindingSupport {
 
     // Evaluate the control's binding and value either during create or update
     final def evaluateBindingAndValues(
-        parentContext: BindingContext,
-        update       : Boolean,
-        restoreState : Boolean,
-        state        : Option[ControlState]
+        parentContext : BindingContext,
+        update        : Boolean,
+        restoreState  : Boolean,
+        state         : Option[ControlState]
     ): Unit = {
         // Evaluate and set binding context as needed
         val pr = parentContentRelevant

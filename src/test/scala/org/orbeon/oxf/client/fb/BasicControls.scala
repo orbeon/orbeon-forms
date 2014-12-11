@@ -22,11 +22,17 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
 
     @Test def addGridsSectionsControls(): Unit = {
 
+        val ControlsCount = 29
+
         def countAllToolboxControlButtons =
             cssSelector(".fb-tool > .fb-add-control").findAllElements.size
 
-        def clickOnAllToolboxControlButtons() =
-            executeScript("$('.fb-tool > .fb-add-control > button').click();")
+        def clickOnToolboxControlButtons(from: Int, to: Int) =
+            executeScript(
+                "$('.fb-tool > .fb-add-control > button').slice(arguments[0], arguments[1] + 1).click();",
+                new java.lang.Integer(from),
+                new java.lang.Integer(to)
+            )
 
         def countCurrentGridRows =
             executeScript("return $('.fb-selected').closest('.fr-grid').find('.fb-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
@@ -34,16 +40,24 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
         def countRepeatedGrids =
             executeScript("return $('.xbl-fr-section .xbl-fr-grid .fr-repeat').size()").asInstanceOf[Long]
 
+        def clickOnToolboxButtonsAndCheck2(from: Int, to: Int) =
+            for {
+                _ ← clickOnToolboxControlButtons(from, to)
+                - ← assert(countCurrentGridRows == (to + 1))
+            }()
+
+        // Insert controls step by step as inserting all of them at once can take more than the allowed timeout
+        def clickOnAllToolboxButtonsAndCheck(step: Int) =
+            0 until ControlsCount sliding (step, step) map (r ⇒ r.head → r.last) foreach (clickOnToolboxButtonsAndCheck2 _).tupled
+
         Builder.onNewForm {
             for {
                 _ ← Builder.insertNewGrid()
-                _ ← assert(countAllToolboxControlButtons == 29)
-                _ ← clickOnAllToolboxControlButtons()
-                - ← assert(countCurrentGridRows == 29)
+                _ ← assert(countAllToolboxControlButtons == ControlsCount)
+                _ ← clickOnAllToolboxButtonsAndCheck(5)
                 _ ← Builder.insertNewRepeatedGrid()
                 - ← assert(countRepeatedGrids == 1)
-                _ ← clickOnAllToolboxControlButtons() // NOTE: this can take > 10 s
-                - ← assert((countCurrentGridRows |!> println) == 29)
+                _ ← clickOnAllToolboxButtonsAndCheck(5)
             }()
         }
     }

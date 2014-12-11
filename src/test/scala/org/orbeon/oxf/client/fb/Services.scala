@@ -47,13 +47,13 @@ trait Services extends FormBuilderOps with XFormsOps {
             Builder.onNewForm {
                 for {
                     // Add dropdown, and open its control details
-                    _ ← clickOn(cssSelector(".fb-add-fr-dropdown-select1 button"))
+                    _ ← Builder.insertControl("fr-dropdown-select1")
                     _ ← cssSelector(".fb-body .xbl-fr-dropdown-select1 select").element.moveToElement()
-                    _ ← clickOn(cssSelector("#fb-edit-details-trigger a").element.ensuring(_.isDisplayed))
+                    _ ← Builder.openControlSettings()
 
                     // Set dropdown name to "my-dropdown"
-                    _ ← textField(cssSelector("#dialog-control-details≡fb-tabbable≡fb-base-tab-grid≡control-name-input input")).ensuring(_.isDisplayed).value = "my-dropdown"
-                    _ ← clickOn(cssSelector("#dialog-control-details≡save-button"))
+                    _ ← Builder.ControlSettings.setControlName("my-dropdown")
+                    _ ← Builder.ControlSettings.applySettings()
 
                     // Fill service dialog
                     _ ← clickOn(cssSelector("#fb-add-service button"))

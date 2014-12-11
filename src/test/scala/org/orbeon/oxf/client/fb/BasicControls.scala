@@ -22,10 +22,9 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
 
     @Test def addGridsSectionsControls(): Unit = {
 
-        val ControlsCount = 29
+        import Builder._
 
-        def countAllToolboxControlButtons =
-            cssSelector(".fb-tool > .fb-add-control").findAllElements.size
+        val ControlsCount = 29 // change when we add/remove controls to toolbox (ideally would be known from source)
 
         def clickOnToolboxControlButtons(from: Int, to: Int) =
             executeScript(
@@ -34,30 +33,53 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
                 new java.lang.Integer(to)
             )
 
-        def countCurrentGridRows =
-            executeScript("return $('.fb-selected').closest('.fr-grid').find('.fb-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
-
-        def countRepeatedGrids =
-            executeScript("return $('.xbl-fr-section .xbl-fr-grid .fr-repeat').size()").asInstanceOf[Long]
-
-        def clickOnToolboxButtonsAndCheck2(from: Int, to: Int) =
+        def clickOnToolboxButtonsAndCheck(from: Int, to: Int) =
             for {
                 _ ← clickOnToolboxControlButtons(from, to)
                 - ← assert(countCurrentGridRows == (to + 1))
             }()
 
         // Insert controls step by step as inserting all of them at once can take more than the allowed timeout
-        def clickOnAllToolboxButtonsAndCheck(step: Int) =
-            0 until ControlsCount sliding (step, step) map (r ⇒ r.head → r.last) foreach (clickOnToolboxButtonsAndCheck2 _).tupled
+        def clickOnAllToolboxButtonsAndCheck(step: Int) = (
+            0 until ControlsCount
+            sliding (step, step)
+            map     (r ⇒ r.head → r.last)
+            foreach (clickOnToolboxButtonsAndCheck _).tupled
+        )
 
-        Builder.onNewForm {
+        def setAndCheckNameOfControlInCell(from: Int, to: Int, controlName: String) =
             for {
-                _ ← Builder.insertNewGrid()
+                _ ← moveOverCellInCurrentGrid(from, to)
+                _ ← openControlSettings()
+                _ ← ControlSettings.setControlName(controlName)
+                _ ← ControlSettings.applySettings()
+                _ ← moveOverCellInCurrentGrid(from, to)
+                _ ← openControlSettings()
+                _ ← assert(controlName == ControlSettings.getControlName)
+                _ ← ControlSettings.cancelSettings()
+            }()
+
+        onNewForm {
+            for {
+                - ← assert(countSections == 1) // the form has an initial section
+                - ← assert(countGrids == 1)    // the form has an initial grid
                 _ ← assert(countAllToolboxControlButtons == ControlsCount)
+
+                _ ← insertNewGrid()
+                - ← assert(countGrids == 2)
                 _ ← clickOnAllToolboxButtonsAndCheck(5)
-                _ ← Builder.insertNewRepeatedGrid()
+
+                _ ← setAndCheckNameOfControlInCell(1, 1, "my-input")
+
+                _ ← insertNewRepeatedGrid()
                 - ← assert(countRepeatedGrids == 1)
+                - ← assert(countGrids == 3)
                 _ ← clickOnAllToolboxButtonsAndCheck(5)
+
+                _ ← setAndCheckNameOfControlInCell(1 + 2 * 1, 1 + 1, "my-input-in-repeated-grid") // adjust row/col in repeated grid
+
+                _ ← insertNewSection()
+                - ← assert(countSections == 2)
             }()
         }
     }

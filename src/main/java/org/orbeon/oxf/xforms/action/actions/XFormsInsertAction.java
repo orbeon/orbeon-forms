@@ -452,7 +452,15 @@ public class XFormsInsertAction extends XFormsAction {
             }
 
             Dispatch.dispatchEvent(
-                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, adjustedInsertLocationNodeInfo, adjustedBeforeAfterInto, insertLocationIndexWithinParentBeforeUpdate));
+                new XFormsInsertEvent(
+                    modifiedInstance,
+                    insertedNodeInfos,
+                    originItems,
+                    adjustedInsertLocationNodeInfo,
+                    adjustedBeforeAfterInto,
+                    insertLocationIndexWithinParentBeforeUpdate
+                )
+            );
         }
 
         return insertedNodeInfos;

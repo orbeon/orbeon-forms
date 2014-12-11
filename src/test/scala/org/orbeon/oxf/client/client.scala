@@ -58,7 +58,7 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
         }
 
     def waitForAjaxResponse() = eventually {
-        assert(true == executeScript("return ! ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0"))
+        assert(executeScript("return ! ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0").asInstanceOf[Boolean])
     }
 
     def withAjaxAction[T](wait: Boolean = true)(body: ⇒ T) = {
@@ -111,7 +111,7 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
         id(clientId(staticId)).element
 
     def isCaseSelected(clientIdNoCasePrefix: String) =
-        executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
+        executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')").asInstanceOf[Boolean]
 
     def assertJSExpression(expression: String): Unit = {
         val result = executeScript(s"return $expression")

@@ -264,7 +264,10 @@ trait FormBuilderOps extends FormRunnerOps {
             )
 
         def moveOverCellInCurrentGrid(row: Int, col: Int) =
-            findCell(row, col) foreach moveToWebElement
+            findCell(row, col) foreach { e ⇒
+                executeScript("arguments[0].scrollIntoView(true);", e)
+                moveToWebElement(e)
+            }
 
         def openControlSettings() =
             clickOn(cssSelector("#fb-edit-details-trigger a").element.ensuring(_.isDisplayed))

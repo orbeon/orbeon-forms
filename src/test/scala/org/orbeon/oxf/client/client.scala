@@ -58,7 +58,7 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
         }
 
     def waitForAjaxResponse() = eventually {
-        assert(true == executeScript("return ! ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0"))
+        assert(executeScript("return ! ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0").asInstanceOf[Boolean])
     }
 
     def withAjaxAction[T](wait: Boolean = true)(body: ⇒ T) = {
@@ -111,7 +111,7 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
         id(clientId(staticId)).element
 
     def isCaseSelected(clientIdNoCasePrefix: String) =
-        executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
+        executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')").asInstanceOf[Boolean]
 
     def assertJSExpression(expression: String): Unit = {
         val result = executeScript(s"return $expression")
@@ -163,8 +163,11 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
             xpath(s"//*[@id = '$clientId']//*[local-name() = 'input' or local-name() = 'textarea' or local-name() = 'select' or local-name() = 'button']").element
 
         def moveToElement(): Unit =
-            new Actions(webDriver).moveToElement(e.underlying).build().perform()
+            moveToWebElement(e.underlying)
     }
+
+    def moveToWebElement(e: WebElement) =
+        new Actions(webDriver).moveToElement(e).build().perform()
 
     implicit class TextfieldOps(val textfield: TextField) {
         def enter(): Unit = textfield.underlying.sendKeys(Keys.ENTER)
@@ -239,8 +242,72 @@ trait FormBuilderOps extends FormRunnerOps {
                    |    }
                    |})""".stripMargin)
 
+        def insertNewSection() =
+            clickOn(cssSelector("#insert-new-section-trigger"))
+
+        def insertNewGrid() =
+            clickOn(cssSelector("#insert-new-grid-trigger"))
+
         def insertNewRepeatedGrid() =
             clickOn(cssSelector("#insert-new-repeated-grid-trigger"))
+
+        def insertControl(bindingId: String) =
+            clickOn(cssSelector(s".fb-add-$bindingId button"))
+
+        def findCell(row: Int, col: Int) =
+            Option(
+                executeScript(
+                    "return $('.fb-selected').closest('tbody').find('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')')[0]",
+                    new java.lang.Integer(row),
+                    new java.lang.Integer(col)
+                ).asInstanceOf[WebElement]
+            )
+
+        def moveOverCellInCurrentGrid(row: Int, col: Int) =
+            findCell(row, col) foreach { e ⇒
+                executeScript("arguments[0].scrollIntoView(true);", e)
+                moveToWebElement(e)
+                assert(cssSelector("#fb-edit-details-trigger a").element.isDisplayed)
+            }
+
+        def openControlSettings() =
+            clickOn(cssSelector("#fb-edit-details-trigger a").element.ensuring(_.isDisplayed))
+
+        object ControlSettings {
+
+            def setControlName(value: String) =
+                setFieldValue("control-name-input", value)
+
+            def getControlName =
+                getFieldValue("control-name-input")
+
+            def applySettings() =
+                clickOn(cssSelector("#dialog-control-details≡save-button"))
+
+            def cancelSettings() =
+                clickOn(cssSelector("#dialog-control-details≡cancel-button"))
+
+            private def setFieldValue(controlId: String, value: String) =
+                textField(cssSelector(s"#dialog-control-details≡fb-tabbable≡fb-base-tab-grid≡$controlId input")).ensuring(_.isDisplayed).value = value
+
+            private def getFieldValue(controlId: String) =
+                cssSelector(s"#dialog-control-details≡fb-tabbable≡fb-base-tab-grid≡$controlId").element.fieldText
+        } 
+
+        def countAllToolboxControlButtons =
+            cssSelector(".fb-tool > .fb-add-control").findAllElements.size
+
+        def countCurrentGridRows =
+            executeScript("return $('.fb-selected').closest('.fr-grid').find('.fb-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
+
+        def countSections =
+            executeScript("return $('.xbl-fr-section').size()").asInstanceOf[Long]
+
+        def countGrids =
+            executeScript("return $('.xbl-fr-section .xbl-fr-grid').size()").asInstanceOf[Long]
+
+        def countRepeatedGrids =
+            executeScript("return $('.xbl-fr-section .xbl-fr-grid .fr-repeat').size()").asInstanceOf[Long]
     }
 }
 
@@ -271,6 +338,7 @@ object OrbeonClientBase {
                 val capabilities = (
                     DesiredCapabilities.firefox()
                     |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
+                    |!> (_.setCapability("screen-resolution", "1440x900"))
                     |!> (_.setCapability("name", "Orbeon Forms unit tests"))
                     |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
                     |!> (_.setCapability("version", "28"))

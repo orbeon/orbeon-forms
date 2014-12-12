@@ -43,7 +43,7 @@
     <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
                                            and $autosave-delay gt 0
                                            and normalize-space(xxf:get-request-header('orbeon-username')) != ''
-                                           and frf:allAuthorizedOperations(
+                                           and frf:xpathAllAuthorizedOperations(
                                                     xxf:instance('fr-form-metadata')/permissions,
                                                     xxf:get-request-header('orbeon-username'),
                                                     xxf:get-request-header('orbeon-group')

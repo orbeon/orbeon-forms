@@ -93,6 +93,7 @@
 .orbeon .popover.xforms-help-popover .popover-content {
   overflow: auto;
   box-sizing: border-box;
+  white-space: pre-wrap;
 }
 .orbeon .xforms-alert {
   display: none;

@@ -56,7 +56,8 @@ object InstanceMirror {
 
     // Factory function to create listeners which check whether they called as the result of an action caused by another
     // listener. If a cycle is detected, we interrupt it and just say that we have processed the event.
-    class ListenerCycleDetector(implicit logger: IndentedLogger) extends ((XFormsContainingDocument, NodeMatcher) ⇒ MirrorEventListener) {
+    class ListenerCycleDetector(implicit logger: IndentedLogger)
+        extends ((XFormsContainingDocument, NodeMatcher) ⇒ MirrorEventListener) {
 
         private var inListener = false
 
@@ -88,12 +89,23 @@ object InstanceMirror {
 
     // Find outer instance details when the change occurs within an instance containing an XHTML+XForms document. This
     // is used by xxf:dynamic.
-    def findOuterInstanceDetailsDynamic(container: XBLContainer, outerNode: NodeInfo, into: Boolean): Option[InstanceDetails] = {
+    def findOuterInstanceDetailsDynamic(
+        container : XBLContainer,
+        outerNode : NodeInfo,
+        into      : Boolean
+    ): Option[InstanceDetails] = {
         // In "into" mode, use ancestor-or-self because outerNode passed is the containing node (node into which other
         // nodes are inserted, node from which other nodes are removed, or node which text value changes), which in the
         // case of a root element is the xf:instance element. The exception is when you insert a node before or
         // after an xf:instance element, in which case the change is not in the instance.
-        val axis = if (! into) "ancestor" else if (outerNode.getNodeKind == ATTRIBUTE_NODE) "../ancestor" else "ancestor-or-self"
+        val axis =
+            if (! into)
+                "ancestor"
+            else if (outerNode.getNodeKind == ATTRIBUTE_NODE)
+                "../ancestor"
+            else
+                "ancestor-or-self"
+
         val findInstanceExpr = "(" + axis + "::xf:instance)[1]"
 
         Option(evalOne(outerNode, findInstanceExpr)) collect {
@@ -113,11 +125,12 @@ object InstanceMirror {
 
     // Find outer instance details when the change occurs in a single instance. This is used by XBL.
     def findOuterInstanceDetailsXBL(
-            innerInstance: XFormsInstance,
-            referenceNode: VirtualNode)(
-            container: XBLContainer,
-            outerNode: NodeInfo,
-            into: Boolean): Option[InstanceDetails] = {
+        innerInstance : XFormsInstance,
+        referenceNode : VirtualNode)(
+        container     : XBLContainer,
+        outerNode     : NodeInfo,
+        into          : Boolean
+    ): Option[InstanceDetails] = {
 
         // Only changes to nodes "under" the binding node correspond to changes to the inner instance
         val ancestors =
@@ -137,10 +150,11 @@ object InstanceMirror {
 
     // Find the inner instance node from a node in an outer instance
     def toInnerInstanceNode(
-            outerDoc: DocumentInfo,
-            partAnalysis: PartAnalysis,
-            container: XBLContainer,
-            findOuterInstanceDetails: (XBLContainer, NodeInfo, Boolean) ⇒ Option[InstanceDetails]): NodeMatcher = {
+        outerDoc                 : DocumentInfo,
+        partAnalysis             : PartAnalysis,
+        container                : XBLContainer,
+        findOuterInstanceDetails : (XBLContainer, NodeInfo, Boolean) ⇒ Option[InstanceDetails]
+    ): NodeMatcher = {
 
         (_, outerNode, siblingIndexOpt) ⇒
 
@@ -151,7 +165,7 @@ object InstanceMirror {
                     // Find path rooted at wrapper
                     val innerPath = {
                         val pathToWrapper   = Navigator.getPath(referenceNode)
-                        val pathToOuterNode = Navigator.getPath(outerNode)
+                        val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
 
                         assert(pathToOuterNode.startsWith(pathToWrapper))
 
@@ -178,6 +192,16 @@ object InstanceMirror {
             }
     }
 
+    // Get the path of the node given an optional node position within its parent
+    private def getNodePath(node: NodeInfo, siblingIndexOpt: Option[Int]) = {
+        siblingIndexOpt match {
+            case Some(siblingIndex) if node.getNodeKind != ATTRIBUTE_NODE ⇒
+                Navigator.getPath(node.getParent) + s"/node()[${siblingIndex + 1}]"
+            case _ ⇒
+                Navigator.getPath(node)
+        }
+    }
+
     // Find the outer node in an inline instance from a node in an inner instance
     def toOuterInstanceNodeDynamic(
             outerInstance: XFormsInstance,
@@ -187,7 +211,8 @@ object InstanceMirror {
         (innerInstance, innerNode, siblingIndexOpt) ⇒
 
             // Find instance in original doc
-            evalOne(outerDoc, "//xf:instance[@id = $sourceId]", // could write:(id($sourceId)[self::xf:instance], //xf:instance[@id = $sourceId])[1]
+            // could write:(id($sourceId)[self::xf:instance], //xf:instance[@id = $sourceId])[1]
+            evalOne(outerDoc, "//xf:instance[@id = $sourceId]",
                     variables = Map("sourceId" → StringValue.makeStringValue(innerInstance.getId))) match {
                 case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
                     // Outer xf:instance found
@@ -198,17 +223,16 @@ object InstanceMirror {
                         case _ ⇒
                             // All other cases
 
-                            val path = siblingIndexOpt match {
-                                case Some(siblingIndex) ⇒
-                                    dropStartingSlash(Navigator.getPath(innerNode.getParent)) + s"/node()[${siblingIndex + 1}]"
-                                case None ⇒
-                                    dropStartingSlash(Navigator.getPath(innerNode))
-                            }
+                            val path = dropStartingSlash(getNodePath(innerNode, siblingIndexOpt))
 
                             // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
-                            // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
-                            // mappings.
-                            val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
+                            // xf:instance. This is not general enough. It stems from the use of getPath, which loses
+                            // namespace mappings.
+                            val namespaces =
+                                partAnalysis.getNamespaceMapping(
+                                    partAnalysis.startScope.fullPrefix,
+                                    instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
+                                )
 
                             // Find destination node in inline instance in original doc
                             evalOne(instanceWrapper, path, namespaces) match {
@@ -227,9 +251,10 @@ object InstanceMirror {
 
         (_, innerNode, siblingIndexOpt) ⇒
 
-            // The path to the inner node looks like /a/b/c, where "a" is the root element. The outer element is allowed to
-            // have another name. So we create a relative path starting at /a, which can be applied to the outer element.
-            val relativePath  = Navigator.getPath(innerNode) split '/' drop 2 mkString "/"
+            // The path to the inner node looks like /a/b[i1]/c[i2], where "a" is the root element. The outer element is
+            // allowed to have another name. So we create a relative path starting at /a, which can be applied to the
+            // outer element.
+            val relativePath  = getNodePath(innerNode, siblingIndexOpt) split '/' drop 2 mkString "/"
 
             if (relativePath.isEmpty)
                 // The root element
@@ -248,7 +273,11 @@ object InstanceMirror {
     }
 
     // Listener that mirrors changes from one document to the other
-    def mirrorListener(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher)(implicit logger: IndentedLogger): MirrorEventListener = {
+    def mirrorListener(
+        containingDocument : XFormsContainingDocument,
+        findMatchingNode   : NodeMatcher)(implicit
+        logger             : IndentedLogger
+    ): MirrorEventListener = {
 
         case valueChanged: XXFormsValueChangedEvent ⇒
             findMatchingNode(valueChanged.targetInstance, valueChanged.node, None) match {
@@ -256,7 +285,14 @@ object InstanceMirror {
                     DataModel.setValueIfChanged(
                         matchingNode,
                         valueChanged.newValue,
-                        DataModel.logAndNotifyValueChange(containingDocument, "mirror", matchingNode, _, valueChanged.newValue, isCalculate = false),
+                        DataModel.logAndNotifyValueChange(
+                            containingDocument,
+                            "mirror",
+                            matchingNode,
+                            _,
+                            valueChanged.newValue,
+                            isCalculate = false
+                        ),
                         reason ⇒ throw new OXFException(reason.message)
                     )
                     true
@@ -266,7 +302,11 @@ object InstanceMirror {
 
         case insert: XFormsInsertEvent if ! insert.isRootElementReplacement ⇒
             // Insert except root element replacement
-            findMatchingNode(insert.targetInstance, insert.insertLocationNode, insert.position != "into" option insert.insertLocationIndex) match {
+            findMatchingNode(
+                insert.targetInstance,
+                insert.insertLocationNode,
+                insert.position != "into" option insert.insertLocationIndex
+            ) match {
                 case Some((matchingInstance, matchingInsertLocation)) ⇒
                     insert.position match {
                         case "into"   ⇒ XFormsAPI.insert(insert.originItems, into   = matchingInsertLocation)
@@ -288,8 +328,8 @@ object InstanceMirror {
                     val removedNodeInfo  = deleteInfo.nodeInfo
                     val removedNodeIndex = deleteInfo.index
 
-                    // Find the corresponding parent of the removed node and run the body on it. The body returns Some(Node)
-                    // if that node can be removed.
+                    // Find the corresponding parent of the removed node and run the body on it. The body returns
+                    // Some(Node) if that node can be removed.
                     def withNewParent(body: Node ⇒ (Option[Node], Boolean)) = {
 
                         // If parent is available, find matching node and call body
@@ -323,7 +363,9 @@ object InstanceMirror {
                             withNewParent {
                                 case newParentElement: Element ⇒
                                     // Find the attribute  by name (as attributes are unique for a given QName)
-                                    val removedAttribute = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
+                                    val removedAttribute =
+                                        XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
+
                                     newParentElement.attribute(removedAttribute.getQName) match {
                                         case newAttribute: Attribute ⇒ (Some(newAttribute), true)
                                         case _ ⇒ (None, false) // out of sync, so probably safer
@@ -345,14 +387,17 @@ object InstanceMirror {
 
                                 case newParentElement: Element ⇒
                                     // Element removed had a parent element
-                                    val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
+                                    val removedElement =
+                                        XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
 
                                     // If we can identify the position
                                     val content = newParentElement.content.asInstanceOf[JList[Node]]
                                     if (content.size > removedNodeIndex) {
                                         content.get(removedNodeIndex) match {
-                                            case newElement: Element if newElement.getQName == removedElement.getQName ⇒ (Some(newElement), true)
-                                            case _ ⇒ (None, false) // out of sync, so probably safer
+                                            case newElement: Element if newElement.getQName == removedElement.getQName ⇒
+                                                (Some(newElement), true)
+                                            case _ ⇒
+                                                (None, false) // out of sync, so probably safer
                                         }
                                     } else
                                         (None, false) // out of sync, so probably safer

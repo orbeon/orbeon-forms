@@ -185,7 +185,7 @@
                 <xsl:variable name="permissions" select="doc('input:form-metadata')/forms/form/permissions"/>
                 <xsl:template match="document">
                     <xsl:copy>
-                        <xsl:attribute name="operations" select="string-join(frf:allAuthorizedOperations($permissions, string(@username), string(@groupname)), ' ')"/>
+                        <xsl:attribute name="operations" select="string-join(frf:xpathAllAuthorizedOperations($permissions, string(@username), string(@groupname)), ' ')"/>
                         <xsl:apply-templates select="(@* except (@username | @groupname)) | node()"/>
                     </xsl:copy>
                 </xsl:template>

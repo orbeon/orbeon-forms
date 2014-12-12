@@ -27,10 +27,14 @@ import org.orbeon.oxf.util.ScalaUtils._
 object Controls {
 
     // Create the entire tree of control from the root
-    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex, state: Option[Map[String, ControlState]]) = {
+    def createTree(
+        containingDocument : XFormsContainingDocument,
+        controlIndex       : ControlIndex,
+        state              : Option[Map[String, ControlState]]
+    ) = {
 
         val bindingContext = containingDocument.getContextStack.resetBindingContext()
-        val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
+        val rootControl    = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
         buildTree(
             controlIndex,
@@ -46,10 +50,11 @@ object Controls {
 
     // Create a new repeat iteration for insertion into the current tree of controls
     def createRepeatIterationTree(
-            containingDocument: XFormsContainingDocument,
-            controlIndex: ControlIndex,
-            repeatControl: XFormsRepeatControl,
-            iterationIndex: Int) = {
+        containingDocument : XFormsContainingDocument,
+        controlIndex       : ControlIndex,
+        repeatControl      : XFormsRepeatControl,
+        iterationIndex     : Int
+    ) = {
 
         val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(repeatControl.getEffectiveId).toSeq :+ iterationIndex
 
@@ -77,16 +82,17 @@ object Controls {
             ) |!>
                 logTreeIfNeeded("after building repeat iteration tree")
 
-            controlOpt.get.asInstanceOf[XFormsRepeatIterationControl] // we "know" this, right?
+        controlOpt.get.asInstanceOf[XFormsRepeatIterationControl] // we "know" this, right?
     }
 
     // Create a new subtree of controls (used by xxf:dynamic)
     def createSubTree(
-            container: XBLContainer,
-            controlIndex: ControlIndex,
-            containerControl: XFormsContainerControl,
-            rootAnalysis: ElementAnalysis,
-            state: Option[Map[String, ControlState]]) = {
+        container        : XBLContainer,
+        controlIndex     : ControlIndex,
+        containerControl : XFormsContainerControl,
+        rootAnalysis     : ElementAnalysis,
+        state            : Option[Map[String, ControlState]]
+    ) = {
 
         val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
         val bindingContext = containerControl.bindingContextForChild
@@ -105,13 +111,14 @@ object Controls {
 
     // Build a component subtree
     private def buildTree(
-            controlIndex: ControlIndex,
-            state: Option[Map[String, ControlState]],
-            container: XBLContainer,
-            bindingContext: BindingContext,
-            parentOption: Option[XFormsControl],
-            staticElement: ElementAnalysis,
-            idSuffix: Seq[Int]): Option[XFormsControl] = {
+        controlIndex    : ControlIndex,
+        state           : Option[Map[String, ControlState]],
+        container       : XBLContainer,
+        bindingContext  : BindingContext,
+        parentOption    : Option[XFormsControl],
+        staticElement   : ElementAnalysis,
+        idSuffix        : Seq[Int]
+    ): Option[XFormsControl] = {
 
         // Determine effective id
         val effectiveId =
@@ -132,7 +139,12 @@ object Controls {
                 controlIndex.indexControl(control)
 
                 // Determine binding
-                control.evaluateBindingAndValues(bindingContext, update = false, restoreState = state.isDefined, state = state flatMap (_.get(effectiveId)))
+                control.evaluateBindingAndValues(
+                    parentContext = bindingContext,
+                    update        = false,
+                    restoreState  = state.isDefined,
+                    state         = state flatMap (_.get(effectiveId))
+                )
 
                 // Build the control's children if any
                 control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _), idSuffix)
@@ -143,10 +155,11 @@ object Controls {
 
     // Build children controls if any, delegating the actual construction to the given `buildTree` function
     def buildChildren(
-            control: XFormsControl,
-            children: ⇒ Iterable[ElementAnalysis],
-            buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
-            idSuffix: Seq[Int]) {
+        control   : XFormsControl,
+        children  : ⇒ Iterable[ElementAnalysis],
+        buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
+        idSuffix  : Seq[Int]
+    ): Unit = {
         // Start with the context within the current control
         var newBindingContext = control.bindingContextForChild
         // Build each child
@@ -158,11 +171,20 @@ object Controls {
         }
     }
 
-    def findRepeatedControlsForTarget(containingDocument: XFormsContainingDocument, sourceControlEffectiveId: String, targetStaticId: String) =
-        resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId).toIterator flatMap
-            XFormsRepeatControl.findAllRepeatedControls
+    def findRepeatedControlsForTarget(
+        containingDocument       : XFormsContainingDocument,
+        sourceControlEffectiveId : String,
+        targetStaticId           : String
+    ) = (
+        resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId).toIterator
+        flatMap XFormsRepeatControl.findAllRepeatedControls
+    )
 
-    def resolveObjectById(containingDocument: XFormsContainingDocument, sourceControlEffectiveId: String, targetStaticId: String): Option[XFormsControl] = {
+    def resolveObjectById(
+        containingDocument       : XFormsContainingDocument,
+        sourceControlEffectiveId : String,
+        targetStaticId           : String
+    ): Option[XFormsControl] = {
 
         val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId)
         val scope            = containingDocument.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
@@ -181,8 +203,15 @@ object Controls {
         effectiveControlId map containingDocument.getControls.getObjectByEffectiveId
     }
 
-    def resolveObjectByIdJava(containingDocument: XFormsContainingDocument, sourceControlEffectiveId: String, targetStaticId: String) =
-        resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId).orNull
+    def resolveObjectByIdJava(
+        containingDocument       : XFormsContainingDocument,
+        sourceControlEffectiveId : String,
+        targetStaticId           : String
+    ) = resolveObjectById(
+            containingDocument,
+            sourceControlEffectiveId,
+            targetStaticId
+        ).orNull
 
     /**
      * Find an effective control id based on a source and a control static id, following XBL scoping and the repeat
@@ -192,7 +221,12 @@ object Controls {
      * @param targetPrefixedId   reference to target control, e.g. "list$xf-10"
      * @return effective control id, or null if not found
      */
-    def findEffectiveControlId(ops: StaticStateGlobalOps, tree: ControlTree, sourceEffectiveId: String, targetPrefixedId: String): String = {
+    def findEffectiveControlId(
+        ops               : StaticStateGlobalOps,
+        tree              : ControlTree,
+        sourceEffectiveId : String,
+        targetPrefixedId  : String
+    ): String = {
         
         // Don't do anything if there are no controls
         if (tree.getChildren.isEmpty)
@@ -246,7 +280,8 @@ object Controls {
 
         // Follow repeat indexes towards target
         for (repeatPrefixedId ← targetAncestorRepeats) {
-            val repeatControl = tree.getControl(repeatPrefixedId + targetIndexBuilder.toString).asInstanceOf[XFormsRepeatControl]
+            val repeatControl =
+                tree.getControl(repeatPrefixedId + targetIndexBuilder.toString).asInstanceOf[XFormsRepeatControl]
             // Control might not exist
             if (repeatControl eq null)
                 return null
@@ -280,12 +315,16 @@ object Controls {
         val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext())
         visitAllControls(containingDocument, updater)
 
-        Option(containingDocument.getControls.getCurrentControlTree.getRoot) foreach logTreeIfNeeded("after full tree update")
+        Option(containingDocument.getControls.getCurrentControlTree.getRoot) foreach
+            logTreeIfNeeded("after full tree update")
 
         updater
     }
 
-    class BindingUpdater(val containingDocument: XFormsContainingDocument, val startBindingContext: BindingContext) extends XFormsControlVisitorListener {
+    class BindingUpdater(
+        val containingDocument  : XFormsContainingDocument,
+        val startBindingContext : BindingContext
+    ) extends XFormsControlVisitorListener {
 
         private var newIterationsIds = Set.empty[String]
 
@@ -336,21 +375,39 @@ object Controls {
                     case repeatControl: XFormsRepeatControl ⇒
                         // Update iterations
                         val oldRepeatSeq = control.bindingContext.nodeset.asScala
-                        control.evaluateBindingAndValues(bindingContext, update = true, restoreState = false, state = None)
-                        val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
+
+                        control.evaluateBindingAndValues(
+                            parentContext = bindingContext,
+                            update        = true,
+                            restoreState  = false,
+                            state         = None
+                        )
+
+                        val (newIterations, partialFocusRepeatOption) =
+                            repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
 
                         // Remember partial focus out of repeat if needed
                         if (this._partialFocusRepeatOption.isEmpty && partialFocusRepeatOption.isDefined)
                             this._partialFocusRepeatOption = partialFocusRepeatOption
 
                         // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
-                        // - It is not needed to recurse into them because their bindings are up to date since they have just been created
-                        // - However they have not yet been evaluated. They will be evaluated at the same time the other controls are evaluated
-                        // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates controls and dispatches events
+                        //
+                        // - It is not needed to recurse into them because their bindings are up to date since they have
+                        //   just been created
+                        // - However they have not yet been evaluated. They will be evaluated at the same time the other
+                        //   controls are evaluated
+                        //
+                        // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates
+                        // controls and dispatches events
                         this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
                     case control ⇒
                         // Simply set new binding
-                        control.evaluateBindingAndValues(bindingContext, update = true, restoreState = false, state = None)
+                        control.evaluateBindingAndValues(
+                            parentContext = bindingContext,
+                            update        = true,
+                            restoreState  = false,
+                            state         = None
+                        )
                 }
                 _updatedCount += 1
             } else {
@@ -418,7 +475,10 @@ object Controls {
         visitSiblings(listener, tree.getChildren.asScala)
 
     // Iterator over the given control and its descendants
-    case class ControlsIterator(private val start: XFormsControl, private val includeSelf: Boolean) extends Iterator[XFormsControl] {
+    case class ControlsIterator( // Q: Should this be a case class? Probably not.
+        private val start       : XFormsControl,
+        private val includeSelf : Boolean
+    ) extends Iterator[XFormsControl] {
 
         private val children = start match {
             case containerControl: XFormsContainerControl ⇒ containerControl.children.iterator

@@ -158,13 +158,13 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             // At first, the tooltip isn't initialized
             _ ← assertJSExpression(s"_.isUndefined($InputTooltip)")
             // After a mouseover, we set it to null, since the message is empty
-            _ ← new Actions(webDriver).moveToElement(input).build().perform()
+            _ ← moveToWebElement(input)
             _ ← assertJSExpression(s"_.isNull($InputTooltip)")
             // Enter "a"
             _ ← new Actions(webDriver).click().sendKeys("a").moveToElement(body).click().build().perform()
             _ ← assert(output.getText == "a")
             // On mouseover, the tooltip with "a" shows
-            _ ← new Actions(webDriver).moveToElement(input).build().perform()
+            _ ← moveToWebElement(input)
             _ ← assertJSExpression(s"_.isObject($Tooltips['my-input'])")
             _ ← assertJSExpression(s"$$($Tooltips['my-input'].element).css('visibility') == 'visible'")
         }()

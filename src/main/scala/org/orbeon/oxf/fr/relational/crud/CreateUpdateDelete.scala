@@ -13,25 +13,24 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
-import java.io.{Writer, InputStream, ByteArrayOutputStream}
+import java.io.{ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array ⇒ _, _}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
-import org.orbeon.oxf.fr.relational._
+
+import org.orbeon.oxf.fr.FormRunner.{XF, XH}
+import org.orbeon.oxf.fr.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{Whitespace, XPath, StringBuilderWriter, NetUtils}
-import org.orbeon.oxf.xml._
-import org.xml.sax.InputSource
+import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.xml.{JXQName, _}
+import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
-import org.orbeon.oxf.fr.FormRunner.{XH, XF}
-import org.orbeon.oxf.xml.JXQName
-import org.orbeon.oxf.fr.relational.Specific
-import org.orbeon.oxf.fr.relational.ForDocument
-import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.xml.sax.InputSource
 
 object RequestReader {
 
@@ -80,6 +79,8 @@ object RequestReader {
         def newIdentityReceiver(writer: Writer) = (
             TransformerUtils.getIdentityTransformerHandler
             |!> (_.getTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
+            |!> (_.getTransformer.setOutputProperty(OutputKeys.INDENT, "no"))
+            |!> (_.getTransformer.setOutputProperty(SaxonOutputKeys.INCLUDE_CONTENT_TYPE, "no"))
             |!> (_.setResult(new StreamResult(writer)))
         )
 
@@ -345,14 +346,13 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                             // Check we're allowed to update or delete this resource
                             val username      = existing.get.username
                             val groupname     = existing.get.group
-                            val dataUserGroup = if (username.isEmpty || groupname.isEmpty) None else Some(username.get, groupname.get)
-                            val authorizedOps = authorizedOperations(formMetadata.get, dataUserGroup)
+                            val authorizedOps = authorizedOperations(formMetadata.get, username → groupname)
                             val requiredOp    = if (delete) "delete" else "update"
                             authorizedOps.contains(requiredOp)
                         } else {
                             // For deletes, if there is no data to delete, it is a 403 if could not read, update,
                             // or delete if it existed (otherwise code later will return a 404)
-                            val authorizedOps = authorizedOperations(formMetadata.get, None)
+                            val authorizedOps = authorizedOperations(formMetadata.get, None → None)
                             val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
                             authorizedOps.intersect(requiredOps).nonEmpty
                         }

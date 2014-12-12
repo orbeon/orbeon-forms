@@ -88,3 +88,21 @@ $ ->
         Events.clickEvent.subscribe ({control}) ->
             if control in cellEditorTriggers
                 Builder.triggerClickEvent.fire {trigger: control}
+
+    # Unset radio buttons
+    $('.fb-main').on 'click', 'label.radio', (event) ->
+        target = $(event.currentTarget)
+        target.focus()
+        if target.parents('.xforms-selected').is('*')
+            repeat = target.parents('.fr-repeat').first()
+            index = 1
+            if repeat.is('*')
+                tr = target.parents('.fb-grid-tr').first()
+                index += repeat.find('.fb-grid-tr').index(tr)
+            name = target.find('input[type="radio"]').attr('name')
+            $('[name="'+name+'"]').val([]);
+            ORBEON.xforms.Document.dispatchEvent
+                targetId: name
+                eventName: 'fb-unset-select1'
+                properties: index: index.toString()
+            event.preventDefault()

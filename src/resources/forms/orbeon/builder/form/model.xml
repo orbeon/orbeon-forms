@@ -28,7 +28,7 @@
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
-      xxf:external-events="fb-show-test-dialog fb-update-control-lhha"
+      xxf:external-events="fb-show-test-dialog fb-update-control-lhha fb-unset-select1"
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
       xxf:expose-xpath-types="true"
@@ -442,6 +442,11 @@
         <!-- Sum calculate and validate MIP error counts -->
         <xf:bind ref="xpath-errors" calculate="../calculate-errors + ../validate-errors"/>
     </xf:bind>
+
+    <!-- allow form builder to unset radio buttons -->
+    <xf:action ev:observer="fb" ev:event="fb-unset-select1" xxf:phantom="true">
+        <xf:setvalue ref="($model/xf:instance[@id = 'fr-form-instance']//*[name() = fbf:controlNameFromId(event('xxf:targetid'))])[number(event('index'))]"/>
+    </xf:action>
 
     <!-- These actions track MIP XPath errors in the edited form's model. We keep track of XPath errors occurring on
          revalidate and recalculate independently, which should be reliable given that the edit form doesn't enable

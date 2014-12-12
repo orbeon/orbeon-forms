@@ -152,7 +152,7 @@ object InstanceMirror {
                     // Find path rooted at wrapper
                     val innerPath = {
                         val pathToWrapper   = Navigator.getPath(referenceNode)
-                        val pathToOuterNode = Navigator.getPath(outerNode)
+                        val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
 
                         assert(pathToOuterNode.startsWith(pathToWrapper))
 
@@ -179,6 +179,16 @@ object InstanceMirror {
             }
     }
 
+    // Get the path of the node given an optional node position within its parent
+    private def getNodePath(node: NodeInfo, siblingIndexOpt: Option[Int]) = {
+        siblingIndexOpt match {
+            case Some(siblingIndex) if node.getNodeKind != ATTRIBUTE_NODE ⇒
+                Navigator.getPath(node.getParent) + s"/node()[${siblingIndex + 1}]"
+            case _ ⇒
+                Navigator.getPath(node)
+        }
+    }
+
     // Find the outer node in an inline instance from a node in an inner instance
     def toOuterInstanceNodeDynamic(
             outerInstance: XFormsInstance,
@@ -199,12 +209,7 @@ object InstanceMirror {
                         case _ ⇒
                             // All other cases
 
-                            val path = siblingIndexOpt match {
-                                case Some(siblingIndex) ⇒
-                                    dropStartingSlash(Navigator.getPath(innerNode.getParent)) + s"/node()[${siblingIndex + 1}]"
-                                case None ⇒
-                                    dropStartingSlash(Navigator.getPath(innerNode))
-                            }
+                            val path = dropStartingSlash(getNodePath(innerNode, siblingIndexOpt))
 
                             // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
                             // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
@@ -228,9 +233,9 @@ object InstanceMirror {
 
         (_, innerNode, siblingIndexOpt) ⇒
 
-            // The path to the inner node looks like /a/b/c, where "a" is the root element. The outer element is allowed to
+            // The path to the inner node looks like /a/b[i1]/c[i2], where "a" is the root element. The outer element is allowed to
             // have another name. So we create a relative path starting at /a, which can be applied to the outer element.
-            val relativePath  = Navigator.getPath(innerNode) split '/' drop 2 mkString "/"
+            val relativePath  = getNodePath(innerNode, siblingIndexOpt) split '/' drop 2 mkString "/"
 
             if (relativePath.isEmpty)
                 // The root element

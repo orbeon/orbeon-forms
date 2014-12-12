@@ -267,6 +267,7 @@ trait FormBuilderOps extends FormRunnerOps {
             findCell(row, col) foreach { e ⇒
                 executeScript("arguments[0].scrollIntoView(true);", e)
                 moveToWebElement(e)
+                assert(cssSelector("#fb-edit-details-trigger a").element.isDisplayed)
             }
 
         def openControlSettings() =
@@ -337,6 +338,7 @@ object OrbeonClientBase {
                 val capabilities = (
                     DesiredCapabilities.firefox()
                     |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))
+                    |!> (_.setCapability("screen-resolution", "1440x900"))
                     |!> (_.setCapability("name", "Orbeon Forms unit tests"))
                     |!> (_.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER")))
                     |!> (_.setCapability("version", "28"))

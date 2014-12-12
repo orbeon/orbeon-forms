@@ -81,7 +81,15 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             }
 
             val outerMirrorListener =
-                mirrorListener(document, toInnerInstanceNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document, findOuterInstanceDetailsDynamic))
+                mirrorListener(
+                    document,
+                    toInnerInstanceNode(
+                        outerInstance.documentInfo,
+                        document.getStaticState.topLevelPart,
+                        document,
+                        findOuterInstanceDetailsDynamic
+                    )
+                )
 
             toEventListener(composeListeners(Seq(outerMirrorListener, unknownChange)))
         }
@@ -130,15 +138,16 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                             <instance/>
                         </xf:instance>
 
-                        <xf:insert   ev:event="update1" context="instance()"   origin="xf:element('first', 'Arthur')"/>
-                        <xf:insert   ev:event="update2" ref="instance()/first" origin="xf:element('last', 'Clark')"    position="after"/>
-                        <xf:insert   ev:event="update3" ref="instance()/last"  origin="xf:element('middle', 'C.')"     position="before"/>
-                        <xf:setvalue ev:event="update4" ref="instance()/last">Clarke</xf:setvalue>
-                        <xf:delete   ev:event="update5" ref="instance()/*"/>
-                        <xf:insert   ev:event="update6" context="instance()"   origin="xf:attribute('first', 'Arthur')"/>
-                        <xf:insert   ev:event="update7" ref="instance()/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
-                        <xf:setvalue ev:event="update8" ref="instance()/@last">Conan Doyle</xf:setvalue>
-                        <xf:delete   ev:event="update9" ref="instance()/@*"/>
+                        <xf:insert   ev:event="update1"  context="instance()"   origin="xf:element('first', 'Arthur')"/>
+                        <xf:insert   ev:event="update2"  ref="instance()/first" origin="xf:element('last', 'Clark')"    position="after"/>
+                        <xf:insert   ev:event="update3"  ref="instance()/last"  origin="xf:element('middle', 'C.')"     position="before"/>
+                        <xf:setvalue ev:event="update4"  ref="instance()/last">Clarke</xf:setvalue>
+                        <xf:insert   ev:event="update5"  ref="instance()/last"  origin="xf:element('last', 'Clarke!')"  position="before"/>
+                        <xf:delete   ev:event="update6"  ref="instance()/*"/>
+                        <xf:insert   ev:event="update7"  context="instance()"   origin="xf:attribute('first', 'Arthur')"/>
+                        <xf:insert   ev:event="update8"  ref="instance()/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
+                        <xf:setvalue ev:event="update9"  ref="instance()/@last">Conan Doyle</xf:setvalue>
+                        <xf:delete   ev:event="update10" ref="instance()/@*"/>
 
                     </xf:model>
                     <xbl:xbl>
@@ -149,15 +158,16 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                                         <empty/>
                                     </xf:instance>
 
-                                    <xf:insert   ev:event="update1" context="instance()"   origin="xf:element('first', 'Arthur')"/>
-                                    <xf:insert   ev:event="update2" ref="instance()/first" origin="xf:element('last', 'Clark')"    position="after"/>
-                                    <xf:insert   ev:event="update3" ref="instance()/last"  origin="xf:element('middle', 'C.')"     position="before"/>
-                                    <xf:setvalue ev:event="update4" ref="instance()/last">Clarke</xf:setvalue>
-                                    <xf:delete   ev:event="update5" ref="instance()/*"/>
-                                    <xf:insert   ev:event="update6" context="instance()"   origin="xf:attribute('first', 'Arthur')"/>
-                                    <xf:insert   ev:event="update7" ref="instance()/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
-                                    <xf:setvalue ev:event="update8" ref="instance()/@last">Conan Doyle</xf:setvalue>
-                                    <xf:delete   ev:event="update9" ref="instance()/@*"/>
+                                    <xf:insert   ev:event="update1"  context="instance()"   origin="xf:element('first', 'Arthur')"/>
+                                    <xf:insert   ev:event="update2"  ref="instance()/first" origin="xf:element('last', 'Clark')"    position="after"/>
+                                    <xf:insert   ev:event="update3"  ref="instance()/last"  origin="xf:element('middle', 'C.')"     position="before"/>
+                                    <xf:setvalue ev:event="update4"  ref="instance()/last">Clarke</xf:setvalue>
+                                    <xf:insert   ev:event="update5"  ref="instance()/last"  origin="xf:element('last', 'Clarke!')"  position="before"/>
+                                    <xf:delete   ev:event="update6"  ref="instance()/*"/>
+                                    <xf:insert   ev:event="update7"  context="instance()"   origin="xf:attribute('first', 'Arthur')"/>
+                                    <xf:insert   ev:event="update8"  ref="instance()/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
+                                    <xf:setvalue ev:event="update9"  ref="instance()/@last">Conan Doyle</xf:setvalue>
+                                    <xf:delete   ev:event="update10" ref="instance()/@*"/>
                                 </xf:model>
                             </xbl:template>
                         </xbl:binding>
@@ -177,6 +187,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             """<instance><first>Arthur</first><last>Clark</last></instance>""",
             """<instance><first>Arthur</first><middle>C.</middle><last>Clark</last></instance>""",
             """<instance><first>Arthur</first><middle>C.</middle><last>Clarke</last></instance>""",
+            """<instance><first>Arthur</first><middle>C.</middle><last>Clarke!</last><last>Clarke</last></instance>""",
             """<instance/>""",
             """<instance first="Arthur"/>""",
             """<instance first="Arthur" last="Clarke"/>""",
@@ -186,12 +197,15 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
         var updates = 0
 
+        val OuterModelId  = "model"
+        val NestedModelId = "my-gaga" + COMPONENT_SEPARATOR + "gaga-model"
+
         // First update outer instance and check inner instance, then do the reverse
-        for ((targetPrefixedId, mirroredInstance) ← Seq("model" → innerInstance, ("my-gaga" + COMPONENT_SEPARATOR + "gaga-model") → outerInstance))
+        for ((targetPrefixedId, mirroredInstance) ← Seq(OuterModelId → innerInstance, NestedModelId → outerInstance))
             expected.zipWithIndex foreach {
                 case (expectedInstanceValue, index) ⇒
                     // Dispatch event and assert result
-                    dispatch("update" + (index + 1), targetPrefixedId)
+                    dispatch(s"update${index + 1}", targetPrefixedId)
                     assert(instanceToString(mirroredInstance) === expectedInstanceValue)
                     updates += 1
             }

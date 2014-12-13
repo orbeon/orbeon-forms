@@ -68,16 +68,23 @@ class Connection(
         val scheme    = url.getScheme
 
         try {
-            if (httpMethod == "GET" && Set("file", "oxf")(scheme)) {
-                // GET with file: or oxf:
+            if (httpMethod == "GET" && SupportedNonHttpReadonlySchemes(scheme)) {
+                // GET for supported but non-http: or https: schemes
 
                 // Create URL connection object
                 val urlConnection = URLFactory.createURL(urlString).openConnection
                 urlConnection.connect()
 
-                // Try to get a reasonable mediatype based on the extension
+                // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
+                // "data:" only as urlConnection.getContentType returns funny results e.g. for "file:".
+                def contentTypeFromConnection =
+                    if (scheme == "data") Option(urlConnection.getContentType) else None
+
+                def contentTypeFromPath =
+                    Option(url.getPath) flatMap Mediatypes.getMimeType
+
                 def contentTypeHeader =
-                    Mediatypes.getMimeType(url.getPath) map (ct ⇒ ContentType → List(ct))
+                    contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
 
                 val headers =
                     urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
@@ -286,6 +293,8 @@ private object ConnectionState {
 }
 
 object Connection extends Logging {
+
+    private val SupportedNonHttpReadonlySchemes = Set("file", "oxf", "data")
 
     private val HttpInternalPathsProperty  = "oxf.http.internal-paths"
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"

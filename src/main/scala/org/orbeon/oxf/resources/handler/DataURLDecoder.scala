@@ -49,7 +49,7 @@ object DataURLDecoder {
             else
                 URLCodec.decodeUrl(data)
 
-        new DecodedDataURL(decodedData, mediatype, charset)
+        DecodedDataURL(decodedData, mediatype, charset)
     }
 
     // Support missing attribute values so we can collect ";base64" as well
@@ -64,7 +64,7 @@ object DataURLDecoder {
     }
 }
 
-class DecodedDataURL(val bytes: Array[Byte], val mediatype: String, val charset: Option[String]) {
+case class DecodedDataURL(bytes: Array[Byte], mediatype: String, charset: Option[String]) {
     def contentType = mediatype + (charset map (";" + _) getOrElse "")
     def asString    = charset map (new String(bytes, _))
 }

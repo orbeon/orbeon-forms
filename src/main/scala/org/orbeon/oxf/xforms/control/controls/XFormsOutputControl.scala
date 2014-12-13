@@ -123,8 +123,8 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: Option[String], mediatype: Option[String]): String =
         try {
             // If the value is a file:, we make sure it is signed before returning it
-            def hmacValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
-                if (initial.startsWith("file:/") && ! XFormsUploadControl.verifyMAC(initial))
+            def verifiedValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
+                if ("file".equals(NetUtils.getProtocol(initial)) && ! XFormsUploadControl.verifyMAC(initial))
                     default
                 else
                     value
@@ -139,17 +139,30 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                     // xs:anyURI type (the default)
                     if (! urlNorewrite) {
                         // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                        val rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, element, internalValue)
+
+                        // NOTE: We also proxy data: URLs, even though we could send them to the client directly in many
+                        // cases. One drawback is that they are are limited to 32 KB with IE8 (although IE8 support will
+                        // go away soon hopefully, and IE 8 doesn't support the image annotation component which was the
+                        // driver for data: URL support here), and in general make more sense for relatively short
+                        // values. So for now we keep the proxying for data: URLs.
+
+                        val rebasedURI      = XFormsUtils.resolveXMLBase(containingDocument, element, internalValue)
                         val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
-                        val resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
-                        val lastModified = NetUtils.getLastModifiedIfFast(resolvedURI)
-                        hmacValueOrDefault(
+                        val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
+                        val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
+
+                        verifiedValueOrDefault(
                             resolvedURI,
                             doProxyURI(resolvedURI, lastModified),
-                            defaultValue)
+                            defaultValue
+                        )
                     } else
                         // Otherwise we leave the value as is
-                        hmacValueOrDefault(internalValue, internalValue, defaultValue)
+                        verifiedValueOrDefault(
+                            internalValue,
+                            internalValue,
+                            defaultValue
+                        )
                 } else if (typeName == "base64Binary") {
                     // xs:base64Binary type
                     // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
@@ -164,7 +177,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             case NonFatal(t) ⇒
                 // We don't want to fail if there is an issue proxying, for example if the resource is not found.
                 // Ideally, this would indicate some condition on the control (not found? out of range?).
-                warn("exception while proxing value", Seq(
+                warn("exception while proxying value", Seq(
                     "value"     → internalValue,
                     "throwable" → OrbeonFormatter.format(t)))
 

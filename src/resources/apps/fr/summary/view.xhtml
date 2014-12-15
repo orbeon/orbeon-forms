@@ -581,7 +581,7 @@
                         <div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
-                            <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
                             <xf:var name="positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 

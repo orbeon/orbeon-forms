@@ -27,7 +27,9 @@
 
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+
+         xmlns:control="java:org.orbeon.oxf.xforms.control.XFormsSingleNodeControl">
 
     <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
          such as xh:, xf:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->

@@ -21,7 +21,8 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:control="java:org.orbeon.oxf.xforms.control.XFormsSingleNodeControl">
 
     <xbl:script src="/xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
     <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
@@ -55,6 +56,14 @@
             <!-- Close dialog upon click on save/cancel -->
             <xbl:handler event="DOMActivate" observer="save-trigger cancel-trigger">
                 <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <!-- Clear Value -->
+            <xbl:handler event="DOMActivate" observer="clear-value-trigger">
+                <xf:var
+                    name="control-binding"
+                    value="control:boundNode(fbf:findConcreteControlByName($i/control-name))"/>
+                <xf:setvalue ref="$control-binding" />
             </xbl:handler>
 
             <!-- Save on click on save -->
@@ -156,11 +165,41 @@
                                         <xf:label ref="$resources/dialog-itemsets/hint-header/label"/>
                                     </xf:input>
                                 </xh:td>
+                                <xh:td>
+                                    <xf:group ref=".">
+                                        <xf:var name="item" value="."/>
+                                        <fr:databound-switch ref="concat('value-',$i/control-type)">
+                                            <xf:case id="value-select">
+                                                <xf:select
+                                                    ref="control:boundNode(fbf:findConcreteControlByName($i/control-name))"
+                                                    appearance="full">
+                                                    <xf:item>
+                                                        <xf:label ref="''"/>
+                                                        <xf:value ref="$item/value"/>
+                                                    </xf:item>
+                                                </xf:select>
+                                            </xf:case>
+                                            <xf:case  id="value-select1">
+                                                <xf:select1
+                                                    ref="control:boundNode(fbf:findConcreteControlByName($i/control-name))"
+                                                    appearance="full">
+                                                    <xf:item>
+                                                        <xf:label ref="''"/>
+                                                        <xf:value ref="$item/value"/>
+                                                    </xf:item>
+                                                </xf:select1>
+                                            </xf:case>
+                                        </fr:databound-switch>
+                                    </xf:group>
+                                </xh:td>
                             </xh:tr>
                         </fr:grid>
                     </xf:group>
 
                     <xh:div class="fr-dialog-buttons">
+                        <xf:trigger id="clear-value-trigger">
+                            <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
+                        </xf:trigger>
                         <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
                             <xf:label ref="$resources/apply/label"/>
                         </xf:trigger>

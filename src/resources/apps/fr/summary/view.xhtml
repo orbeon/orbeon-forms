@@ -713,9 +713,9 @@
                                                                             if ($control = 'textarea') then
                                                                                 if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
                                                                             else if (frf:isMultipleSelectionControl($control)) then
-                                                                                string-join(for $v in xxf:split() return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                                                string-join(for $v in xxf:split() return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1], ', ')
                                                                             else if (frf:isSingleSelectionControl($control)) then
-                                                                                for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
+                                                                                for $v in . return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1]
                                                                             else
                                                                                 for $type in substring-after($query/@type, ':') return
                                                                                     if ($type = 'date') then

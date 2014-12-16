@@ -581,7 +581,7 @@
                         <div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
-                            <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
                             <xf:var name="positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
@@ -713,9 +713,9 @@
                                                                             if ($control = 'textarea') then
                                                                                 if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
                                                                             else if (frf:isMultipleSelectionControl($control)) then
-                                                                                string-join(for $v in xxf:split() return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                                                string-join(for $v in xxf:split() return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1], ', ')
                                                                             else if (frf:isSingleSelectionControl($control)) then
-                                                                                for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
+                                                                                for $v in . return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1]
                                                                             else
                                                                                 for $type in substring-after($query/@type, ':') return
                                                                                     if ($type = 'date') then

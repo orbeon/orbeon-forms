@@ -30,23 +30,6 @@ object DataModel {
     private def childrenBindsWithNames(bind: NodeInfo) =
         bind \ (XF → "bind") collect bindWithName
 
-    // Create a new data model from the binds
-    def dataModelFromBinds(inDoc: NodeInfo): NodeInfo = {
-
-        def insertChildren(holder: NodeInfo, bind: NodeInfo): NodeInfo = {
-
-            val newChildren =
-                childrenBindsWithNames(bind) map
-                    (bind ⇒ insertChildren(elementInfo(bind attValue "name" ), bind))
-
-            insert(into = holder, origin = newChildren)
-
-            holder
-        }
-
-        findTopLevelBind(inDoc).headOption map (insertChildren(elementInfo("form"), _)) orNull
-    }
-
     private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any) {
         def update(bind: NodeInfo) {
             childrenBindsWithNames(bind) foreach { child ⇒
@@ -64,48 +47,6 @@ object DataModel {
             delete(child \@ "nodeset")
             ensureAttribute(child, "ref", child attValue "name")
         }
-
-    // Update binds for custom mode
-    def updateBindsForCustom(inDoc: NodeInfo) = {
-        // NOTE: We used to remove xf:bind/@ref for container controls, but we shouldn't do this until we properly
-        // support sections without bindings (and possibly other controls like triggers) to nodes. Also, if we do this,
-        // we must modify insertNewSection and dialog-section-details.xml.
-
-//        def ancestorOrSelfBindsWithNames(bind: NodeInfo) =
-//            bind ancestorOrSelf (XF → "bind") collect bindWithName
-//
-//        val allContainerNames = getAllContainerControlsWithIds(inDoc) map (e ⇒ controlName(e.id)) toSet
-//
-//        foreachBindWithName(inDoc) { child ⇒
-//            def path = (ancestorOrSelfBindsWithNames(child) map (_ attValue "name") reverse) mkString "/"
-//
-//            delete(child \@ "nodeset")
-//            if (allContainerNames(child attValue "name"))
-//                delete(child \@ "ref")
-//            else
-//                ensureAttribute(child, "ref", path)
-//        }
-    }
-
-    // Find a bind ref by name
-    def getBindRef(inDoc: NodeInfo, name: String) =
-        findBindByName(inDoc, name) flatMap
-            bindRefOrNodeset
-
-    // Set a bind ref by name (annotate the expression if needed)
-    def setBindRef(inDoc: NodeInfo, name: String, ref: String) =
-        findBindByName(inDoc, name) foreach { bind ⇒
-            delete(bind \@ "nodeset")
-            ensureAttribute(bind, "ref", ref)
-        }
-
-    // XForms callers
-    def getBindRefOrEmpty(inDoc: NodeInfo, name: String) = getBindRef(inDoc, name).orNull
-
-    // For a given value control name and XPath expression, whether the resulting bound item is acceptable
-    // Called from control details dialog
-    def isAllowedValueBindingExpression(controlName: String, expr: String): Boolean =
-        findConcreteControlByName(controlName) exists (isAllowedBindingExpression(_, expr))
 
     // Leave public for unit tests
     def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import Model._
 import org.orbeon.oxf.xml.NamespaceMapping
 
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsControl}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -471,7 +471,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             control
     }
 
-    // Find a given concrete control by name
+    // Find the control by name (resolved from the top-level form model `fr-form-model`)
     def findConcreteControlByName(controlName: String) = {
         val model = getFormModel
         for {
@@ -480,6 +480,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         } yield
             control
     }
+
+    // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
+    def findControlBoundNodeByName(controlName: String) = (
+        findConcreteControlByName(controlName)
+        collect { case c: XFormsSingleNodeControl ⇒ c }
+        flatMap (_.boundNode)
+    )
 
     // Find a control's LHHA (there can be more than one for alerts)
     def getControlLHHA(inDoc: NodeInfo, controlName: String, lhha: String) =

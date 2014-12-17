@@ -81,6 +81,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         } else {
             // Control is not relevant
             isExternalValueEvaluated = true
+            externalValue = null
             _value = null
         }
 

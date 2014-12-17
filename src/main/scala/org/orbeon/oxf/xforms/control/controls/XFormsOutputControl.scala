@@ -239,7 +239,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
 object XFormsOutputControl {
 
     def getExternalValueOrDefault(control: XFormsOutputControl, mediatypeValue: String) =
-        if (control ne null)
+        if ((control ne null) && control.isRelevant)
             // Ask control
             control.getExternalValue
         else if ((mediatypeValue ne null) && mediatypeValue.startsWith("image/"))

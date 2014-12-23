@@ -142,7 +142,7 @@
         <p:input name="fr-resources" href="#fr-resources"/>
         <p:input name="attachments" href="#attachments"/>
         <p:input name="config">
-            <message xsl:version="2.0">
+            <message xsl:version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
                 <xsl:variable name="data" select="/*" as="element()"/>
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xh:html)"/>

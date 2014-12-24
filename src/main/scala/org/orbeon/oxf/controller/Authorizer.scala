@@ -121,13 +121,13 @@ object Authorizer extends Logging {
 
                 val connection =
                     Connection(
-                        httpMethod  = method,
-                        url         = newURL,
-                        credentials = None,
-                        content     = content,
-                        headers     = headers.toMap mapValues (_.toList),
-                        loadState   = true,
-                        logBody     = false
+                        httpMethodUpper = method,
+                        url             = newURL,
+                        credentials     = None,
+                        content         = content,
+                        headers         = headers.toMap mapValues (_.toList),
+                        loadState       = true,
+                        logBody         = false
                     )
 
                 // TODO: state must be saved in session, not anywhere else; why is this configurable globally?

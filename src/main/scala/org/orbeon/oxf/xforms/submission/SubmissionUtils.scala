@@ -55,18 +55,18 @@ object SubmissionUtils {
         val url = new URI(resolvedURL)
 
         Connection(
-            httpMethod  = "GET",
-            url         = url,
-            credentials = None,
-            content     = None,
-            headers     = Connection.buildConnectionHeadersLowerIfNeeded(
+            httpMethodUpper = "GET",
+            url             = url,
+            credentials     = None,
+            content         = None,
+            headers         = Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = url.getScheme,
                 credentials      = None,
                 customHeaders    = Map(),
                 headersToForward = getHeadersToForward(model.containingDocument)
             ) mapValues (_.toList),
-            loadState   = true,
-            logBody     = BaseSubmission.isLogBody
+            loadState       = true,
+            logBody         = BaseSubmission.isLogBody
         ).connect(
             saveState = true
         )

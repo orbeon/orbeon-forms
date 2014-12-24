@@ -84,13 +84,13 @@ private object HttpRequest {
             (StreamedContent.fromBytes(_, contentType))
 
         Connection(
-            httpMethod  = method,
-            url         = documentURL,
-            credentials = None,
-            content     = content,
-            headers     = headers,
-            loadState   = true,
-            logBody     = false
+            httpMethodUpper = method,
+            url             = documentURL,
+            credentials     = None,
+            content         = content,
+            headers         = headers,
+            loadState       = true,
+            logBody         = false
         ).connect(
             saveState = true
         )

@@ -125,14 +125,14 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             }
 
         Connection(
-            httpMethod  = method,
-            url         = new URI(outgoingURL),
-            credentials = None,
-            content     = requestContent,
-            headers     = persistenceHeaders ++ proxiedHeaders,
-            loadState   = true,
-            logBody     = false)(
-            logger      = new IndentedLogger(ProcessorImpl.logger, "")
+            httpMethodUpper = method,
+            url             = new URI(outgoingURL),
+            credentials     = None,
+            content         = requestContent,
+            headers         = persistenceHeaders ++ proxiedHeaders,
+            loadState       = true,
+            logBody         = false)(
+            logger          = new IndentedLogger(ProcessorImpl.logger, "")
         ).connect(
             saveState = true
         )

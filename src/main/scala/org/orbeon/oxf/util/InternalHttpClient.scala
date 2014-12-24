@@ -52,7 +52,7 @@ object InternalHttpClient extends HttpClient{
                 incomingRequest         = incomingRequest,
                 contextPath             = incomingRequest.getContextPath,
                 pathQuery               = url,
-                method                  = method,
+                methodUpper             = method,
                 headersMaybeCapitalized = headers,
                 content                 = content
             )

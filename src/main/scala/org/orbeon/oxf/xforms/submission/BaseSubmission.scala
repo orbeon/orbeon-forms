@@ -123,7 +123,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         if (! resource.startsWith("/"))
             throw new OXFException("Action does not start with a '/': " + resource)
 
-        val httpMethod = p.actualHttpMethod
+        val httpMethodUpper = p.actualHttpMethod
 
         // handle case of empty body
         val messageBody = Option(messageBodyOrNull)
@@ -141,7 +141,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         val requestHeaders =
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 scheme            = "http",
-                httpMethod        = httpMethod,
+                httpMethodUpper   = httpMethodUpper,
                 credentialsOrNull = null,
                 mediatype         = actualRequestMediatype,
                 encodingForSOAP   = encoding,
@@ -173,7 +173,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
         val content =
             messageBody map { bytes ⇒
-                if (Connection.requiresRequestBody(httpMethod) && indentedLogger.isDebugEnabled && isLogBody)
+                if (Connection.requiresRequestBody(httpMethodUpper) && indentedLogger.isDebugEnabled && isLogBody)
                     Connection.logRequestBody(actualRequestMediatype, bytes)(indentedLogger)
 
                 StreamedContent.fromBytes(bytes, Headers.firstHeaderIgnoreCase(requestHeaders, Headers.ContentType))
@@ -184,7 +184,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
                 incomingRequest         = incomingRequest,
                 contextPath             = destinationContextPath,
                 pathQuery               = rootAdjustedResourceURI,
-                method                  = httpMethod,
+                methodUpper             = httpMethodUpper,
                 headersMaybeCapitalized = requestHeaders,
                 content                 = content
             )
@@ -193,7 +193,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
             indentedLogger.logDebug(
                 "",
                 "dispatching request",
-                "method", httpMethod,
+                "method", httpMethodUpper,
                 "mediatype", actualRequestMediatype,
                 "context path", destinationContextPath,
                 "effective resource URI (original)", effectiveResourceURI,

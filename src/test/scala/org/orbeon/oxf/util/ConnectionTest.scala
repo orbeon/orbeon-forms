@@ -61,7 +61,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         val headers =
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 scheme            = "http",
-                httpMethod        = "GET",
+                httpMethodUpper   = "GET",
                 credentialsOrNull = null,
                 mediatype         = null,
                 encodingForSOAP   = "UTF-8",
@@ -75,7 +75,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
                 incomingRequest         = externalContext.getRequest,
                 contextPath             = "/orbeon",
                 pathQuery               = "/foo/bar",
-                method                  = "GET",
+                methodUpper             = "GET",
                 headersMaybeCapitalized = headers,
                 content                 = None
             )
@@ -108,7 +108,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         val headers =
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 scheme            = "http",
-                httpMethod        = method,
+                httpMethodUpper   = method,
                 credentialsOrNull = null,
                 mediatype         = bodyMediaType,
                 encodingForSOAP   = "UTF-8",
@@ -122,7 +122,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
                 incomingRequest         = NetUtils.getExternalContext.getRequest,
                 contextPath             = "/orbeon",
                 pathQuery               = s"/foobar?$queryString",
-                method                  = method,
+                methodUpper             = method,
                 headersMaybeCapitalized = headers,
                 content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
             )

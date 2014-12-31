@@ -20,6 +20,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;

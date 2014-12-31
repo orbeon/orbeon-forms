@@ -29,4 +29,18 @@
         <xf:action type="xpath">frf:sendError((event('response-status-code'), 500)[1])</xf:action>
     </xf:action>
 
+    <xf:header>
+        <xf:name>Orbeon-Username</xf:name>
+        <xf:value value="xxf:get-request-header('Orbeon-Username')"/>
+    </xf:header>
+    <xf:header>
+        <xf:name>Orbeon-Group</xf:name>
+        <xf:value value="xxf:get-request-header('Orbeon-Group')"/>
+    </xf:header>
+    <!-- TODO: Check whether only the first role is set -->
+    <xf:header>
+        <xf:name>Orbeon-Roles</xf:name>
+        <xf:value value="xxf:get-request-header('Orbeon-Roles')"/>
+    </xf:header>
+
 </root>

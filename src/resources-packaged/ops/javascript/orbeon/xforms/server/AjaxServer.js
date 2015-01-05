@@ -1111,20 +1111,22 @@
 
                                             var templateClone = template.cloneNode(true);
 
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement.label);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement.value);
+                                            // TODO parse label to sequence of nodes
+                                            var parsedLabel = $.parseHTML(itemElement.label);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-label$", parsedLabel, true);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-value$", itemElement.value, false);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
-                                            ORBEON.util.Utils.stringReplace(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-name$", controlId);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId, false);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-item-name$", controlId, false);
 
                                             if (itemElement.help && itemElement.help != "") {
-                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-help$", itemElement.help);
+                                                ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-help$", itemElement.help, false);
                                             } else {
                                                 $(templateClone).find('.xforms-help').remove();
                                             }
 
                                             if (itemElement.hint && itemElement.hint != "") {
-                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-hint$", itemElement.hint);
+                                                ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-hint$", itemElement.hint, false);
                                             } else {
                                                 $(templateClone).find('.xforms-hint-region').removeAttr("class");
                                                 $(templateClone).find('.xforms-hint').remove();
@@ -1373,10 +1375,10 @@
 
                                                     // Replace placeholders
                                                     insertIntoDocument([booleanTemplateClone]);
-                                                    ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
-                                                    var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e0");
-                                                    ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId);
-                                                    ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-name$", controlId);
+                                                    ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-template-value$", "true", false);
+                                                    var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e0", false);
+                                                    ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId, false);
+                                                    ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-item-name$", controlId, false);
 
                                                     // Update classes
                                                     YAHOO.util.Dom.addClass(documentElement, "xforms-type-boolean");

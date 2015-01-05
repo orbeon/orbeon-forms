@@ -1134,33 +1134,82 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 return "xforms-repeat-selected-item-" + depth;
             },
 
-            // Replace in a tree a placeholder by some other string in text nodes and attribute values
-            stringReplace: function(node, placeholder, replacement) {
+            /**
+             * In a string `stack`, finds all occurrences of `needle`, replaces them by `replacement`,
+             * applies `builder` to the text between the needles, and returns the resulting sequence.
+             *
+             * @param  stack        : String
+             * @param  needle       : String
+             * @param  replacements : [T]
+             * @param  builder      : String -> T
+             * @return                [T]
+             */
+            replaceInText: function(stack, needle, replacements, builder) {
+                var parts = stack.split(needle);
+                var firstPart = _.first(parts);
+                var replaced = _.flatten(_.map(_.rest(parts), function (part) {
+                    return (part === "") ?
+                            replacements :
+                            _.flatten([replacements, [builder(part)]]);
+                }), true);
+                return _.flatten([[builder(firstPart)], replaced], true);
+            },
 
-                function stringReplaceWorker(node, placeholderRegExp, replacement) {
+
+            /**
+             * Replaces in a tree (DOM) a placeholder (needle) by some other content (a string or sequence of nodes),
+             * this in both text nodes and attribute values.
+             *
+             * @param  element      : Element
+             * @param  needle       : String
+             * @param  replacements : String | [Node]
+             * @param  isHTML       : Boolean
+             */
+            replaceInDOM: function(element, needle, replacements, isHTML) {
+
+                var createTextNode = _.bind(document.createTextNode, document);
+                var replacementNodes = isHTML ? replacements : [createTextNode(replacements)];
+                var replaceInText  = ORBEON.util.Utils.replaceInText;
+
+                function worker(node) {
                     switch (node.nodeType) {
-                        case ELEMENT_TYPE:
-                            for (var i = 0; i < node.attributes.length; i++) {
-                                var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
-                                if (newValue != node.attributes[i].value)
-                                    ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
+
+                        case Node.ELEMENT_NODE:
+
+                            // Do replacements in attributes if we're doing a text replacement
+                            if (!isHTML) {
+                                _.each(node.attributes, function (attribute) {
+                                    var newValue = replaceInText(attribute.value, needle, replacements, _.identity).join("");
+                                    if (newValue != attribute.value)
+                                        $(node).attr(attribute.name, newValue);
+                                });
                             }
-                            for (var i = 0; i < node.childNodes.length; i++)
-                                stringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
+                            // Recurse on children
+                            _.each(node.childNodes, worker);
+
                             break;
-                        case TEXT_TYPE:
-                            var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
-                            if (newValue != node.nodeValue)
-                                node.nodeValue = newValue;
+
+                        case Node.TEXT_NODE:
+
+                            var newNodes = replaceInText(String(node.nodeValue),
+                                    needle,
+                                    replacementNodes,
+                                    createTextNode);
+                            var changed = newNodes.length > 1 ||
+                                    newNodes[0].nodeType != Node.TEXT_NODE ||
+                                    newNodes[0].nodeValue != node.nodeValue;
+
+                            if (changed) {
+                                // Clone, as if multiple replacements occurred, the sequence
+                                // will have multiple copies of the same object
+                                $(newNodes).clone().insertBefore(node);
+                                $(node).detach();
+                            }
                             break;
                     }
                 }
 
-                // Escape $ in replacement as it has a special meaning
-                replacement = replacement.replace(new RegExp("\\$", "g"), "$$$$");
-
-                var placeholderRegExp = new RegExp(ORBEON.util.Utils.escapeRegex(placeholder), "g");
-                stringReplaceWorker(node, placeholderRegExp, replacement);
+                worker(element);
             },
 
             // Escape a literal search string so it can be used in String.replace()

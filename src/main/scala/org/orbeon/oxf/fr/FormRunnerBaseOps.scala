@@ -58,11 +58,20 @@ trait FormRunnerBaseOps {
     def templateId(gridName: String)   = gridName    + TemplateSuffix
 
     def defaultIterationName(repeatName: String) = repeatName + "-iteration"
+    
+    // Find a view element by id, using the index if possible, otherwise traversing the document
+    // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
+    def findInViewTryIndex(inDoc: NodeInfo, id: String) = {
 
-    // Find an element by id
-    def byId(inDoc: NodeInfo, id: String) = Option(inDoc.getDocumentRoot.selectID(id))
+        val bodyElement = findFRBodyElement(inDoc)
 
-    // Get the body
+        def isUnderView(node: NodeInfo) =
+            node ancestor * contains bodyElement
+
+        Option(inDoc.getDocumentRoot.selectID(id)) filter isUnderView orElse (bodyElement descendant * find (_.id == id))
+    }
+
+    // Get the body element assuming the structure of an XHTML document, annotated or not, OR the structure of xbl:xbl.
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
     def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (XF → "group") filter (_.attClasses("fb-body")) head
 

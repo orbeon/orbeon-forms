@@ -326,7 +326,7 @@ trait GridOps extends ContainerOps {
 
     // Find the currently selected grid td if any
     def findSelectedTd(inDoc: NodeInfo) =
-        byId(inDoc, selectedCellVar.stringValue)
+        findInViewTryIndex(inDoc, selectedCellVar.stringValue)
 
     // Make the given grid td selected
     def selectTd(newTd: NodeInfo): Unit =

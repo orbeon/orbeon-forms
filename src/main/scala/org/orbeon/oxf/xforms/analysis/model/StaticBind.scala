@@ -4,6 +4,7 @@ import org.dom4j._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
@@ -230,6 +231,13 @@ class StaticBind(
     val hasValidateMIPs          = typeMIPOpt.nonEmpty || (mipNameToXPathMIP exists { case (_, mips) ⇒ mips exists (_.isValidateMIP) })
     val hasCustomMIPs            = customMIPNameToXPathMIP.nonEmpty
     val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs
+
+    def iterateNestedIds =
+        for {
+            elem ← Dom4j.elements(element).iterator
+            id   ← Option(XFormsUtils.getElementId(elem))
+        } yield
+            id
 
     // Create children binds
     private var _children: Seq[StaticBind] = Dom4j.elements(element, XFORMS_BIND_QNAME) map (new StaticBind(bindTree, _, staticBind, None))// NOTE: preceding not handled for now

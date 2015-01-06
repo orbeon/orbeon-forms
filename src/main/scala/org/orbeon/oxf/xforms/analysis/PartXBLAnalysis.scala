@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.dom4j.{Element, QName}
@@ -74,6 +75,11 @@ trait PartXBLAnalysis extends TransientState {
             case attribute: AttributeControl ⇒
                 control.scope -= attribute.forStaticId
                 prefixedIdToXBLScopeMap -= attribute.forPrefixedId
+            case bind: StaticBind ⇒
+                bind.iterateNestedIds foreach { mipId ⇒
+                    control.scope -= mipId
+                    prefixedIdToXBLScopeMap -= XFormsUtils.getRelatedEffectiveId(control.prefixedId, mipId)
+                }
             case _ ⇒
         }
         control.scope -= control.staticId

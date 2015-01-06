@@ -57,10 +57,10 @@ class StaticBind(
 
     // Represent an XPath MIP
     class XPathMIP(
-        val id: String,
-        val name: String,
-        val level: ValidationLevel,
-        expression: String
+        val id     : String,
+        val name   : String,
+        val level  : ValidationLevel,
+        expression : String
     ) extends MIP {
 
         // Compile the expression right away

@@ -124,10 +124,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
 
     private def writeValidations(
-        inDoc        : NodeInfo,
-        controlName  : String,
-        mipName      : String,
-        validations  : List[Validation]
+        inDoc       : NodeInfo,
+        controlName : String,
+        mipName     : String,
+        validations : List[Validation]
     ): Unit = {
 
         val bind = findBindByName(inDoc, controlName).get

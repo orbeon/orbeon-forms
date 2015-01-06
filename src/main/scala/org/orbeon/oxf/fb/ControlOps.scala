@@ -589,7 +589,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         buildFormBuilderControlEffectiveId(inDoc, staticId).orNull
 
     private def buildFormBuilderControlEffectiveId(inDoc: NodeInfo, staticId: String) =
-        byId(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
+        findInViewTryIndex(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
 
     // Build an effective id for a given static id
     //

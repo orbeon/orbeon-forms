@@ -722,7 +722,7 @@ public class ServletExternalContext implements ExternalContext  {
 
             // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
             // the headers map is generated internally as in that case it might be lowercase already.
-            final String override = NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client");
+            final String override = NetUtils.getHeader(request.getHeaderValuesMap(), Headers.OrbeonClientLower());
             if ("embedded".equals(override) || "portlet".equals(override)) {
                 // Always set wsrpEncodeResources to true if the client is a remote portlet
                 response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), true));

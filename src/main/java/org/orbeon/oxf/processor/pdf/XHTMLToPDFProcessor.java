@@ -17,6 +17,7 @@ import com.lowagie.text.pdf.BaseFont;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -115,7 +116,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // a browser retrieving resources directly, not like a portlet. This is the case also if we are
                     // called by the proxy portlet or if we are directly within a portlet.
                     final Map<String, String[]> explicitHeaders = new HashMap<String, String[]>();
-                    explicitHeaders.put("Orbeon-Client", new String[] { "servlet" });
+                    explicitHeaders.put(Headers.OrbeonClient(), new String[] { "servlet" });
 
                     final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
 

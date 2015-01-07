@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
@@ -71,7 +72,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         final boolean isEmbeddedClient; {
             final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
-            final String client = NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client");
+            final String client = NetUtils.getHeader(request.getHeaderValuesMap(), Headers.OrbeonClientLower());
             isEmbeddedClient = "embedded".equals(client) || "portlet".equals(client);
         }
 

@@ -28,12 +28,12 @@ import org.orbeon.oxf.servlet.OrbeonServlet
 object InternalHttpClient extends HttpClient{
 
     def connect(
-        url        : String,
-        credentials: Option[Credentials], // ignored
-        cookieStore: CookieStore,         // ignored
-        method     : String,
-        headers    : Map[String, List[String]],
-        content    : Option[StreamedContent]
+        url         : String,
+        credentials : Option[Credentials], // ignored
+        cookieStore : CookieStore,         // ignored
+        method      : String,
+        headers     : Map[String, List[String]],
+        content     : Option[StreamedContent]
     ): HttpResponse = {
 
         require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
@@ -58,7 +58,7 @@ object InternalHttpClient extends HttpClient{
         
         // Honor Orbeon-Client header (see also ServletExternalContext)
         val urlRewriter =
-            Headers.firstHeaderIgnoreCase(headers, "Orbeon-Client") match {
+            Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
                 case Some(client) if EmbeddedClientValues(client) ⇒
                     new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
                 case Some(client) ⇒

@@ -54,8 +54,6 @@ public class ServletExternalContext implements ExternalContext  {
 
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
 
-    private final static String REWRITING_STRATEGY_DEFAULT = "servlet";
-
     private static RequestFilter requestFilter;
     static {
         try {
@@ -726,18 +724,8 @@ public class ServletExternalContext implements ExternalContext  {
             if ("embedded".equals(override) || "portlet".equals(override)) {
                 // Always set wsrpEncodeResources to true if the client is a remote portlet
                 response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), true));
-            } else if ("servlet".equals(override)) {
-                response.setURLRewriter(new ServletURLRewriter(getRequest()));
             } else {
-                // No known override
-                if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
-                            "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
-                    // Configuration asks to use portlet2/wsrp
-                    response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
-                } else {
-                    // Default
-                    response.setURLRewriter(new ServletURLRewriter(getRequest()));
-                }
+                response.setURLRewriter(new ServletURLRewriter(getRequest()));
             }
         }
         return response;

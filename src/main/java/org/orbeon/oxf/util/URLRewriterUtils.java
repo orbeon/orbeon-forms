@@ -45,7 +45,6 @@ public class URLRewriterUtils {
     private static final String REWRITING_PLATFORM_PATHS_PROPERTY = "oxf.url-rewriting.platform-paths";
     private static final String REWRITING_APP_PATHS_PROPERTY = "oxf.url-rewriting.app-paths";
     private static final String REWRITING_APP_PREFIX_PROPERTY = "oxf.url-rewriting.app-prefix";
-    private static final String REWRITING_STRATEGY_PROPERTY_PREFIX = "oxf.url-rewriting.strategy.";
     private static final String REWRITING_CONTEXT_PROPERTY_PREFIX = "oxf.url-rewriting.";
     private static final String REWRITING_CONTEXT_PROPERTY_SUFFIX = ".context";
     private static final String REWRITING_WSRP_ENCODE_RESOURCES_PROPERTY = "oxf.url-rewriting.wsrp.encode-resources";
@@ -370,10 +369,6 @@ public class URLRewriterUtils {
     public static boolean isResourcesVersioned() {
         final boolean requested = Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT);
         return Version.instance().isPEFeatureEnabled(requested, RESOURCES_VERSIONED_PROPERTY);
-    }
-
-    public static String getRewritingStrategy(String containerType, String defaultStrategy) {
-        return Properties.instance().getPropertySet().getString(REWRITING_STRATEGY_PROPERTY_PREFIX + containerType, defaultStrategy);
     }
 
     public static String getRewritingContext(String rewritingStrategy, String defaultContext) {

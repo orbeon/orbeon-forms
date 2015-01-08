@@ -526,9 +526,18 @@ body {
 }
 .orbeon .fb-label-editor {
   position: absolute;
+  display: flex;
+  display: -webkit-flex;
+}
+.orbeon .fb-label-editor input[type='text'] {
+  flex-flow: column;
+  -webkit-flex-flow: column;
+  width: 100%;
 }
 .orbeon .fb-label-editor input[type='checkbox'] {
   margin-left: 5px;
+  flex-flow: column;
+  -webkit-flex-flow: column;
 }
 .orbeon .fb-label-editor.fb-label-editor-for-hint input {
   font-size: smaller;

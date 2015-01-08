@@ -31,7 +31,7 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
                 // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
                 // the one used on the binds.
                 val qName = getQNameFromExpression(xpathContext, argument(1))
-                val name = Model.buildCustomMIPName(qName.getQualifiedName)
+                val name  = Model.buildCustomMIPName(qName.getQualifiedName)
 
                 // Return the value or null
                 Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap

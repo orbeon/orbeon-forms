@@ -1172,7 +1172,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 function worker(node) {
                     switch (node.nodeType) {
 
-                        case Node.ELEMENT_NODE:
+                        case ELEMENT_TYPE:
 
                             // Do replacements in attributes if we're doing a text replacement
                             if (!isHTML) {
@@ -1187,14 +1187,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
                             break;
 
-                        case Node.TEXT_NODE:
+                        case TEXT_TYPE:
 
                             var newNodes = replaceInText(String(node.nodeValue),
                                     needle,
                                     replacementNodes,
                                     createTextNode);
                             var changed = newNodes.length > 1 ||
-                                    newNodes[0].nodeType != Node.TEXT_NODE ||
+                                    newNodes[0].nodeType != TEXT_TYPE ||
                                     newNodes[0].nodeValue != node.nodeValue;
 
                             if (changed) {

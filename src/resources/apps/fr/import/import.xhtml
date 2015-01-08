@@ -64,25 +64,25 @@
             </xf:bind>
 
             <!-- Validation and import status -->
-            <xf:var name="validation-done" context="instance('fr-validation-result')" value="exists(*)"/>
-            <xf:var name="validation-canceled" context="instance('fr-validation-result')" value="$validation-done and total != processed"/>
+            <xf:var name="validation-done" context="instance('import-validation-result')" value="exists(*)"/>
+            <xf:var name="validation-canceled" context="instance('import-validation-result')" value="$validation-done and total != processed"/>
 
-            <xf:var name="import-done" context="instance('fr-import-result')" value="exists(*)"/>
-            <xf:var name="import-canceled" context="instance('fr-import-result')" value="$import-done and total != processed"/>
+            <xf:var name="import-done" context="instance('import-result')" value="exists(*)"/>
+            <xf:var name="import-canceled" context="instance('import-result')" value="$import-done and total != processed"/>
 
-            <xf:instance id="fr-validation-result">
+            <xf:instance id="import-validation-result">
                 <dummy/>
             </xf:instance>
 
-            <xf:instance id="fr-import-result">
+            <xf:instance id="import-result">
                 <dummy/>
             </xf:instance>
 
             <!-- Validate data to import -->
-            <xf:submission id="fr-import-validate-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
-                           action="/fr/service/{$app}/{$form}/validate" replace="instance" instance="fr-validation-result">
+            <xf:submission id="import-validate-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
+                           action="/fr/service/{$app}/{$form}/validate" replace="instance" instance="import-validation-result">
                 <!-- Reset stats -->
-                <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
+                <xf:action ev:event="xforms-submit" context="instance('import-batch-stats')">
                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
                     <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                 </xf:action>
@@ -92,14 +92,14 @@
                 <xf:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="instance()/upload/validating">false</xf:setvalue>
                 <xf:message ev:event="xforms-submit-error">An error occurred while validating the data.</xf:message>
 
-                <xf:send ev:event="xforms-submit-done" context="instance('fr-validation-result')" if="total = processed" submission="search-submission"/>
+                <xf:send ev:event="xforms-submit-done" context="instance('import-validation-result')" if="total = processed" submission="search-submission"/>
             </xf:submission>
 
             <!-- Import data -->
-            <xf:submission id="fr-import-import-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
-                           action="/fr/service/{$app}/{$form}/import" replace="instance" instance="fr-import-result">
+            <xf:submission id="import-import-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
+                           action="/fr/service/{$app}/{$form}/import" replace="instance" instance="import-result">
                 <!-- Reset stats -->
-                <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
+                <xf:action ev:event="xforms-submit" context="instance('import-batch-stats')">
                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
                     <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                 </xf:action>
@@ -113,7 +113,7 @@
             </xf:submission>
 
             <!-- Delete all data in the given form -->
-            <xf:submission id="fr-import-delete-data-submission" method="delete" serialization="none"
+            <xf:submission id="import-delete-data-submission" method="delete" serialization="none"
                            action="/fr/service/persistence/crud/{$app}/{$form}/data/" replace="none">
 
                 <!-- Flag indicating we are importing -->
@@ -121,12 +121,12 @@
             </xf:submission>
 
             <!-- Start import once data is deleted -->
-            <xf:action ev:event="xforms-submit-done" ev:observer="fr-import-delete-data-submission">
-                <xf:send submission="fr-import-import-submission"/>
+            <xf:action ev:event="xforms-submit-done" ev:observer="import-delete-data-submission">
+                <xf:send submission="import-import-submission"/>
             </xf:action>
 
             <!-- Statistics gathered upon polling event -->
-            <xf:instance id="fr-batch-stats">
+            <xf:instance id="import-batch-stats">
                 <stats>
                     <total>0</total>
                     <processed>0</processed>
@@ -137,7 +137,7 @@
                 </stats>
             </xf:instance>
 
-            <xf:bind ref="instance('fr-batch-stats')">
+            <xf:bind ref="instance('import-batch-stats')">
                 <xf:bind ref="progress" calculate="if (../total != 0) then xs:decimal(../processed) div xs:decimal(../total) else 0"/>
                 <xf:bind ref="start-time" calculate="if (. = '' and ../total != 0) then current-dateTime() else ."/>
                 <xf:bind ref="eta" calculate="if (../start-time != '' and ../processed != 0 and xs:decimal(../progress) != 0) then
@@ -145,7 +145,7 @@
             </xf:bind>
 
             <!-- Update progress upon poll event -->
-            <xf:action context="instance('fr-batch-stats')"
+            <xf:action context="instance('import-batch-stats')"
                        if="xs:boolean(instance()/upload/validating) or xs:boolean(instance()/import/importing)"
                        ev:event="xxforms-poll" ev:observer="#document">
                 <xf:setvalue ref="total" value="(xxf:get-session-attribute('org.orbeon.fr.import.total'), 0)[1]"/>
@@ -154,7 +154,7 @@
             </xf:action>
 
             <!-- Search request -->
-            <xf:instance id="fr-search-request">
+            <xf:instance id="import-search-request">
                 <search>
                     <!-- Free text search query -->
                     <query/>
@@ -167,13 +167,13 @@
             </xf:instance>
 
             <!-- Search response -->
-            <xf:instance id="fr-search-response"><dummy/></xf:instance>
+            <xf:instance id="import-search-response"><dummy/></xf:instance>
 
             <!-- Search submission -->
             <xf:submission id="search-submission"
-                    ref="instance('fr-search-request')" validate="false"
+                    ref="instance('import-search-request')" validate="false"
                     method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
-                    replace="instance" instance="fr-search-response">
+                    replace="instance" instance="import-search-response">
                 <!-- Set language upon submitting -->
                 <xf:action ev:event="xforms-submit">
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
@@ -246,7 +246,7 @@
                                         <xxf:size ref="@size"/>
 
                                         <!-- Start validation once the file is uploaded -->
-                                        <xf:send ev:event="xxforms-upload-done" submission="fr-import-validate-submission"/>
+                                        <xf:send ev:event="xxforms-upload-done" submission="import-validate-submission"/>
 
                                     </xf:upload>
 
@@ -277,12 +277,12 @@
                                     <xf:group>
                                         <xf:label>Validating:</xf:label>
                                         <xh:div class="progress progress-striped">
-                                            <xh:div class="bar" style="width: {format-number(instance('fr-batch-stats')/progress, '###%')}"/>
+                                            <xh:div class="bar" style="width: {format-number(instance('import-batch-stats')/progress, '###%')}"/>
                                         </xh:div>
                                     </xf:group>
                                 </xh:td>
                                 <xh:td>
-                                    <xf:output value="for $ds in instance('fr-batch-stats')/eta return
+                                    <xf:output value="for $ds in instance('import-batch-stats')/eta return
                                                       if ($ds castable as xs:dayTimeDuration)
                                                         then for $d in xs:dayTimeDuration($ds) return
                                                           xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
@@ -305,7 +305,7 @@
                         </xf:group>
 
                         <!-- Validation results when available -->
-                        <xf:group context="instance('fr-validation-result')" ref=".[$validation-done]">
+                        <xf:group context="instance('import-validation-result')" ref=".[$validation-done]">
                             <!-- Validation results -->
 
                             <xf:var name="invalid" value="xs:integer(processed) - succeeded"/>
@@ -348,7 +348,7 @@
                                             <xf:label>Start Over</xf:label>
                                             <xf:action ev:event="DOMActivate">
                                                 <!-- Clear stats -->
-                                                <xf:action context="instance('fr-batch-stats')">
+                                                <xf:action context="instance('import-batch-stats')">
                                                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
                                                     <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                                                 </xf:action>
@@ -370,12 +370,12 @@
 
                         <xf:var name="tab" value="."/>
 
-                        <xf:var name="searched" context="instance('fr-search-response')" value="exists(self::documents)"/>
+                        <xf:var name="searched" context="instance('import-search-response')" value="exists(self::documents)"/>
                         <xf:var name="importing" value="xs:boolean($tab/importing)"/>
 
                         <xf:group ref=".[$searched]">
 
-                            <xf:var name="existing" value="xs:integer(instance('fr-search-response')/@total)"/>
+                            <xf:var name="existing" value="xs:integer(instance('import-search-response')/@total)"/>
 
                             <xf:group ref=".[not($importing or $import-done)]">
                                 <xf:group ref=".[$existing gt 0]">
@@ -395,12 +395,12 @@
                                             <xf:trigger>
                                                 <xf:label>Add</xf:label>
                                                 <!-- Start import -->
-                                                <xf:send ev:event="DOMActivate" submission="fr-import-import-submission"/>
+                                                <xf:send ev:event="DOMActivate" submission="import-import-submission"/>
                                             </xf:trigger>
                                             <xf:trigger>
                                                 <xf:label>Delete</xf:label>
                                                 <!-- Delete data first -->
-                                                <xf:send ev:event="DOMActivate" submission="fr-import-delete-data-submission"/>
+                                                <xf:send ev:event="DOMActivate" submission="import-delete-data-submission"/>
                                             </xf:trigger>
                                         </xh:td>
                                     </xh:tr>
@@ -411,7 +411,7 @@
                                             <xf:trigger>
                                                 <xf:label>Import</xf:label>
                                                 <xf:action ev:event="DOMActivate">
-                                                    <xf:send submission="fr-import-import-submission"/>
+                                                    <xf:send submission="import-import-submission"/>
                                                 </xf:action>
                                             </xf:trigger>
                                         </xh:td>
@@ -426,14 +426,14 @@
                                         <xf:group>
                                             <xf:label>Importing:</xf:label>
                                             <xh:div class="progress progress-striped">
-                                                <xh:div class="bar" style="width: {format-number(if (instance('fr-batch-stats')/total != 0)
-                                                                                                 then xs:decimal(instance('fr-batch-stats')/processed) div xs:decimal(instance('fr-batch-stats')/total)
+                                                <xh:div class="bar" style="width: {format-number(if (instance('import-batch-stats')/total != 0)
+                                                                                                 then xs:decimal(instance('import-batch-stats')/processed) div xs:decimal(instance('import-batch-stats')/total)
                                                                                                  else 0, '###%')}"/>
                                             </xh:div>
                                         </xf:group>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:output value="for $ds in instance('fr-batch-stats')/eta return
+                                        <xf:output value="for $ds in instance('import-batch-stats')/eta return
                                                           if ($ds castable as xs:dayTimeDuration)
                                                             then for $d in xs:dayTimeDuration($ds) return
                                                               xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
@@ -455,7 +455,7 @@
                             </xf:group>
 
                             <!-- Import results when available -->
-                            <xf:group context="instance('fr-import-result')" ref=".[$import-done]">
+                            <xf:group context="instance('import-result')" ref=".[$import-done]">
                                 <!-- Validation results -->
 
                                 <xf:var name="skipped" value="xs:integer(processed) - succeeded"/>
@@ -484,7 +484,7 @@
                                                 <xf:label>Start Over</xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <!-- Clear stats -->
-                                                    <xf:action context="instance('fr-batch-stats')">
+                                                    <xf:action context="instance('import-batch-stats')">
                                                         <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
                                                         <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                                                     </xf:action>

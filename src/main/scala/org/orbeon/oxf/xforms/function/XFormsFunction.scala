@@ -210,34 +210,28 @@ object XFormsFunction {
             case ExtractQNameButNotNCName(prefix, local) ⇒
                 // QName-but-not-NCName
 
-                val namespaceMappingOpt =
-                    context.data match {
-                        case Some(bindNode: BindNode) ⇒
-                            // Function was called from a bind
-                            Some(bindNode.parentBind.staticBind.namespaceMapping)
-                        case _ if bindingContext.controlElement ne null ⇒
-                            // Function was called from a control
-                            // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
-                            Some(context.container.getNamespaceMappings(bindingContext.controlElement))
-                        case _ ⇒
-                            // Unclear which cases reach here!
-                            // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
-                            None
-                    }
-
                 def prefixNotInScope() =
                     throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
 
-                namespaceMappingOpt match {
-                    case Some(namespaceMapping) ⇒
-                        val qNameURI = namespaceMapping.mapping.get(prefix)
-                        if (qNameURI eq null)
-                            prefixNotInScope()
-
-                        new QName(local, new Namespace(prefix, qNameURI))
-                    case None ⇒
+                val namespaceMapping = context.data match {
+                    case Some(bindNode: BindNode) ⇒
+                        // Function was called from a bind
+                        bindNode.parentBind.staticBind.namespaceMapping
+                    case _ if bindingContext.controlElement ne null ⇒
+                        // Function was called from a control
+                        // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
+                        context.container.getNamespaceMappings(bindingContext.controlElement)
+                    case _ ⇒
+                        // Unclear which cases reach here!
+                        // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
                         prefixNotInScope()
                 }
+
+                val qNameURI = namespaceMapping.mapping.get(prefix)
+                if (qNameURI eq null)
+                    prefixNotInScope()
+
+                new QName(local, new Namespace(prefix, qNameURI))
             case ExtractNCName(local) ⇒
                 // NCName (this assumes that if there is no prefix, the QName is in no namespace)
                 new QName(local)

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function
 
 import java.util.{Iterator ⇒ JIterator}
 
-import org.dom4j.{Namespace, QName}
+import org.dom4j.{Namespace, QName ⇒ Dom4jQName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
@@ -73,7 +73,7 @@ abstract class XFormsFunction extends SystemFunction {
     def getContainingDocument(implicit xpathContext: XPathContext) =
         Option(context) map (_.container.getContainingDocument) orNull
 
-    protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): QName = {
+    protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
 
         val evaluatedExpression =
             qNameExpression.evaluateItem(xpathContext)
@@ -185,30 +185,26 @@ object XFormsFunction {
     def context =
         XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
 
-    object ExtractQNameButNotNCName {
-        def unapply(value: String) = {
-            val (prefixOpt, local) = XML.parseQNameOpt(value)
-            prefixOpt map (_ → local)
-        }
-    }
+    // This ADT or something like it should be defined somewhere else
+    sealed trait QNameType
+    case   class UnprefixedName(local: String) extends QNameType
+    case   class PrefixedName(prefix: String, local: String) extends QNameType
 
-    object ExtractNCName {
-        def unapply(value: String) = {
-            val (prefixOpt, local) = XML.parseQNameOpt(value)
-            if (prefixOpt.isEmpty) Some(local) else None
+    def parseQName(lexicalQName: String): QNameType =
+        XML.parseQName(lexicalQName) match {
+            case ("", local)     ⇒ UnprefixedName(local)
+            case (prefix, local) ⇒ PrefixedName(prefix, local)
         }
-    }
 
-    def qNameFromQNameValue(value: QNameValue): QName =
-        value.getStringValue match {
-            case ExtractQNameButNotNCName(prefix, local) ⇒ new QName(local, new Namespace(prefix, value.getNamespaceURI))
-            case ExtractNCName(local)                    ⇒ new QName(local)
+    def qNameFromQNameValue(value: QNameValue): Dom4jQName =
+        parseQName(value.getStringValue) match {
+            case PrefixedName(prefix, local) ⇒ new Dom4jQName(local, new Namespace(prefix, value.getNamespaceURI))
+            case UnprefixedName(local)       ⇒ new Dom4jQName(local)
         }
-    
-    def qNameFromStringValue(value: String, bindingContext: BindingContext): QName =
-        value match {
-            case ExtractQNameButNotNCName(prefix, local) ⇒
-                // QName-but-not-NCName
+
+    def qNameFromStringValue(value: String, bindingContext: BindingContext): Dom4jQName =
+        parseQName(value) match {
+            case PrefixedName(prefix, local) ⇒
 
                 def prefixNotInScope() =
                     throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
@@ -231,9 +227,8 @@ object XFormsFunction {
                 if (qNameURI eq null)
                     prefixNotInScope()
 
-                new QName(local, new Namespace(prefix, qNameURI))
-            case ExtractNCName(local) ⇒
-                // NCName (this assumes that if there is no prefix, the QName is in no namespace)
-                new QName(local)
+                new Dom4jQName(local, new Namespace(prefix, qNameURI))
+            case UnprefixedName(local) ⇒
+                new Dom4jQName(local)
         }
 }

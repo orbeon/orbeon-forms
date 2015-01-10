@@ -148,13 +148,6 @@ object XML {
         (parts(0), parts(1))
     }
 
-    // Same as above but prefix is an option
-    def parseQNameOpt(lexicalQName: String): (Option[String], String) = {
-        val parts  = parseQName(lexicalQName)
-
-        (parts._1 != "" option parts._1, parts._2)
-    }
-
     // Useful predicates
     val hasChildren: NodeInfo ⇒ Boolean = element ⇒ element / * nonEmpty
     val hasId: (NodeInfo) ⇒ Boolean = (element) ⇒ element /@ "id" nonEmpty

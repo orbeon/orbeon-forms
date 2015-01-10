@@ -371,19 +371,24 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             // Get or create the bind element
             val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
-            val valueRequiresNamespaceMapping =
-                mipName == "type" && valueNamespaceMappingScopeIfNeeded(bind, mipValue).isDefined
-
             // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
             // expressions and types could use it. So for now the mapping is never garbage collected.
-            val isStringType =
-                valueRequiresNamespaceMapping &&
-                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(mipValue))
+            def isTypeString(value: String) =
+                mipName == Type.name &&
+                valueNamespaceMappingScopeIfNeeded(bind, value).isDefined &&
+                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(value))
 
-            // Create/update or remove attribute
+            def isRequiredFalse(value: String) =
+                mipName == Required.name && value == "false()"
+
+            def mustRemoveAttribute(value: String) =
+                isTypeString(value) || isRequiredFalse(value)
+
             nonEmptyOrNone(mipValue) match {
-                case Some(value) if ! isStringType ⇒ ensureAttribute(bind, mipQName, value)
-                case _                             ⇒ delete(bind \@ mipQName)
+                case Some(normalizedMipValue) if ! mustRemoveAttribute(normalizedMipValue) ⇒
+                    ensureAttribute(bind, mipQName, normalizedMipValue)
+                case _ ⇒
+                    delete(bind /@ mipQName)
             }
         }
     }

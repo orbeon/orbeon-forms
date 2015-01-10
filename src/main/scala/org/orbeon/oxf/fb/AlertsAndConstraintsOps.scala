@@ -142,31 +142,37 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 delete(existingAttributeValidations ++ existingElementValidations)
             case List(Validation(_, ErrorLevel, value, None)) ⇒
 
-                // Single error validation without custom alert: set @fb:mipAttName and remove all nested elements
+                // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
                 // See also: https://github.com/orbeon/orbeon-forms/issues/1829
                 // NOTE: We could optimize further by taking this branch if there is no type or required validation.
                 updateMip(inDoc, controlName, mipName, value)
                 delete(existingElementValidations)
             case _ ⇒
                 val nestedValidations =
-                    validations map { case Validation(idOpt, level, value, _) ⇒
+                    validations flatMap { case Validation(idOpt, level, value, _) ⇒
 
-                        val validationElem =
-                            <xf:validation
-                                id={idOpt.orNull}
-                                level={if (level != ErrorLevel) level.name else null}
-                                xmlns:xf={XF}
-                                xmlns:fb={FB}/>
+                        nonEmptyOrNone(value) match {
+                            case Some(nonEmptyValue) ⇒
 
-                        val mipAtt =
-                            sx.Attribute(
-                                mipAttQName.getNamespacePrefix,
-                                mipAttQName.getName,
-                                sx.Text(value),
-                                sx.Null
-                            )
+                                val validationElem =
+                                    <xf:validation
+                                        id={idOpt.orNull}
+                                        level={if (level != ErrorLevel) level.name else null}
+                                        xmlns:xf={XF}
+                                        xmlns:fb={FB}/>
 
-                        validationElem % mipAtt: NodeInfo
+                                val mipAtt =
+                                    sx.Attribute(
+                                        mipAttQName.getNamespacePrefix,
+                                        mipAttQName.getName,
+                                        sx.Text(nonEmptyValue),
+                                        sx.Null
+                                    )
+
+                                List(validationElem % mipAtt: NodeInfo)
+                            case None ⇒
+                                Nil
+                        }
                     }
 
                 delete(existingAttributeValidations ++ existingElementValidations)
@@ -271,11 +277,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
         import RequiredValidation._
 
         def level       = ErrorLevel
-        def stringValue = eitherToXPath(required, keepFalse = false)
+        def stringValue = eitherToXPath(required)
 
         def toXML(forLang: String): sx.Elem =
             <validation type={Required.name} level={level.name} default-alert={alert.isEmpty.toString}>
-                <required>{eitherToXPath(required, keepFalse = true)}</required>
+                <required>{eitherToXPath(required)}</required>
                 {alertOrPlaceholder(alert, forLang)}
             </validation>
     }
@@ -316,12 +322,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 case Some(xpath)            ⇒ Right(xpath)
             }
 
-        private def eitherToXPath(required: Either[Boolean, String], keepFalse: Boolean) =
+        private def eitherToXPath(required: Either[Boolean, String]) =
             required match {
-                case Left(true)                  ⇒ "true()"
-                case Left(false) if keepFalse    ⇒ "false()"
-                case Left(false) if ! keepFalse  ⇒ ""        // empty value causes MIP to be removed
-                case Right(xpath)                ⇒ xpath
+                case Left(true)   ⇒ "true()"
+                case Left(false)  ⇒ "false()"
+                case Right(xpath) ⇒ xpath
             }
     }
 

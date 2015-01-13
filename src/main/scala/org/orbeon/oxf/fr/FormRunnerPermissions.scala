@@ -35,12 +35,13 @@ trait FormRunnerPermissions {
 
     val PropertyPrefix = "oxf.fr.authentication."
 
-    val MethodPropertyName                  = PropertyPrefix + "method"
-    val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
-    val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
-    val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
-    val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
-    val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
+    val MethodPropertyName                       = PropertyPrefix + "method"
+    val ContainerRolesPropertyName               = PropertyPrefix + "container.roles"
+    val ContainerRolesDelimiterRegexPropertyName = PropertyPrefix + "container.roles.delimiter-regex"
+    val HeaderUsernamePropertyName               = PropertyPrefix + "header.username"
+    val HeaderRolesPropertyName                  = PropertyPrefix + "header.roles"
+    val HeaderGroupPropertyName                  = PropertyPrefix + "header.group"
+    val HeaderRolesPropertyNamePropertyName      = PropertyPrefix + "header.roles.property-name"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
@@ -70,9 +71,10 @@ trait FormRunnerPermissions {
                         try userRoles.isUserInRole(role)
                         catch { case NonFatal(_) ⇒ false}
 
+                    val delimiterRegex = propertySet.getString(ContainerRolesDelimiterRegexPropertyName, """,|\s+""")
                     val rolesArray =
                         for {
-                            role ← rolesString.split(""",|\s+""")
+                            role ← rolesString.split(delimiterRegex)
                             if isUserInRole(role)
                         } yield
                             role

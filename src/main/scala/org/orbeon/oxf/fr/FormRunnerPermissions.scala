@@ -35,13 +35,13 @@ trait FormRunnerPermissions {
 
     val PropertyPrefix = "oxf.fr.authentication."
 
-    val MethodPropertyName                       = PropertyPrefix + "method"
-    val ContainerRolesPropertyName               = PropertyPrefix + "container.roles"
-    val ContainerRolesDelimiterRegexPropertyName = PropertyPrefix + "container.roles.delimiter-regex"
-    val HeaderUsernamePropertyName               = PropertyPrefix + "header.username"
-    val HeaderRolesPropertyName                  = PropertyPrefix + "header.roles"
-    val HeaderGroupPropertyName                  = PropertyPrefix + "header.group"
-    val HeaderRolesPropertyNamePropertyName      = PropertyPrefix + "header.roles.property-name"
+    val MethodPropertyName                  = PropertyPrefix + "method"
+    val ContainerRolesSplitPropertyName     = PropertyPrefix + "roles.split"
+    val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
+    val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
+    val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
+    val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
+    val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
@@ -56,6 +56,7 @@ trait FormRunnerPermissions {
     def getUserGroupRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[String], Option[Array[String]]) = {
 
         val propertySet = properties
+        val rolesSplit = propertySet.getString(ContainerRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
         propertySet.getString(MethodPropertyName, "container") match {
             case "container" ⇒
 
@@ -71,10 +72,9 @@ trait FormRunnerPermissions {
                         try userRoles.isUserInRole(role)
                         catch { case NonFatal(_) ⇒ false}
 
-                    val delimiterRegex = propertySet.getString(ContainerRolesDelimiterRegexPropertyName, """,|\s+""")
                     val rolesArray =
                         for {
-                            role ← rolesString.split(delimiterRegex)
+                            role ← rolesString.split(rolesSplit)
                             if isUserInRole(role)
                         } yield
                             role
@@ -97,7 +97,7 @@ trait FormRunnerPermissions {
                 def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
 
                 // Headers can be separated by comma or pipe
-                def split1(value: String) = value split """(\s*[,\|]\s*)+"""
+                def split1(value: String) = value split rolesSplit
                 // Then, if configured, a header can have the form name=value, where name is specified in a property
                 def split2(value: String) = headerPropertyName match {
                     case Some(propertyName) ⇒

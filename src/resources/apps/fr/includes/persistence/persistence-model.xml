@@ -253,9 +253,14 @@
 
             <!-- Compute authorized operations -->
             <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
-            <xf:var name="ops" value="if (exists($from-persistence))
-                                      then xxf:split($from-persistence)
-                                      else frf:authorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
+            <xf:var name="ops" value="
+                    if (exists($from-persistence)) then
+                       xxf:split($from-persistence)
+                    else if ($mode = 'new') then
+                       frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions)
+                    else
+                       frf:authorizedOperationsBasedOnRoles               (xxf:instance('fr-form-metadata')/permissions)
+                "/>
 
             <xf:setvalue
                 ref="instance('fr-authorized-operations')"

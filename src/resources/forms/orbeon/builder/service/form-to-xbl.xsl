@@ -212,7 +212,7 @@
             <xbl:implementation>
                 <xf:model id="{$model-id}">
                     <!-- Copy schema attribute if present -->
-                    <xsl:copy-of select="$fr-form-model/@schema"/>
+                    <xsl:copy-of select="$fr-form-model/(@schema | @xxf:custom-mips)"/>
 
                     <!-- Section data model -->
                     <xf:instance id="fr-form-instance" xxbl:mirror="true">

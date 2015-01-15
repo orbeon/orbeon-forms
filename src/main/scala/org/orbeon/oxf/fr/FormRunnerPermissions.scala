@@ -36,10 +36,11 @@ trait FormRunnerPermissions {
     val PropertyPrefix = "oxf.fr.authentication."
 
     val MethodPropertyName                  = PropertyPrefix + "method"
-    val ContainerRolesSplitPropertyName     = PropertyPrefix + "roles.split"
     val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
+    val ContainerRolesSplitPropertyName     = PropertyPrefix + "container.roles.split"
     val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
     val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
+    val HeaderRolesSplitPropertyName        = PropertyPrefix + "header.roles.split"
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
 
@@ -56,12 +57,12 @@ trait FormRunnerPermissions {
     def getUserGroupRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[String], Option[Array[String]]) = {
 
         val propertySet = properties
-        val rolesSplit = propertySet.getString(ContainerRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
         propertySet.getString(MethodPropertyName, "container") match {
             case "container" ⇒
 
                 val username    = Option(userRoles.getRemoteUser)
                 val rolesString = propertySet.getString(ContainerRolesPropertyName)
+                val rolesSplit  = propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
                 if (rolesString eq null) {
                     (username, None, None)
@@ -96,7 +97,8 @@ trait FormRunnerPermissions {
 
                 def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
 
-                // Headers can be separated by comma or pipe
+                // By default headers can be separated by comma or pipe
+                val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
                 def split1(value: String) = value split rolesSplit
                 // Then, if configured, a header can have the form name=value, where name is specified in a property
                 def split2(value: String) = headerPropertyName match {

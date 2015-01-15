@@ -37,8 +37,10 @@ trait FormRunnerPermissions {
 
     val MethodPropertyName                  = PropertyPrefix + "method"
     val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
+    val ContainerRolesSplitPropertyName     = PropertyPrefix + "container.roles.split"
     val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
     val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
+    val HeaderRolesSplitPropertyName        = PropertyPrefix + "header.roles.split"
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
 
@@ -60,6 +62,7 @@ trait FormRunnerPermissions {
 
                 val username    = Option(userRoles.getRemoteUser)
                 val rolesString = propertySet.getString(ContainerRolesPropertyName)
+                val rolesSplit  = propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
                 if (rolesString eq null) {
                     (username, None, None)
@@ -72,7 +75,7 @@ trait FormRunnerPermissions {
 
                     val rolesArray =
                         for {
-                            role ← rolesString.split(""",|\s+""")
+                            role ← rolesString.split(rolesSplit)
                             if isUserInRole(role)
                         } yield
                             role
@@ -94,8 +97,9 @@ trait FormRunnerPermissions {
 
                 def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
 
-                // Headers can be separated by comma or pipe
-                def split1(value: String) = value split """(\s*[,\|]\s*)+"""
+                // By default headers can be separated by comma or pipe
+                val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
+                def split1(value: String) = value split rolesSplit
                 // Then, if configured, a header can have the form name=value, where name is specified in a property
                 def split2(value: String) = headerPropertyName match {
                     case Some(propertyName) ⇒

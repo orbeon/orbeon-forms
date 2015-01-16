@@ -42,11 +42,9 @@
             <xf:model>
                 <xf:instance id="local">
                     <local>
-                        <readonly/>
                         <readwrite/>
                     </local>
                 </xf:instance>
-                <xf:bind ref="readonly" readonly="true()"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -119,8 +117,8 @@
                                     name="next-cases"
                                     value="$relevant-cases[position() gt $case-index]"/>
 
-                                <xf:var name="prev-button-ref" value="xxf:instance('local')/(if (exists($prev-cases)) then readwrite else readonly)"/>
-                                <xf:var name="next-button-ref" value="xxf:instance('local')/(if (exists($next-cases)) then readwrite else readonly)"/>
+                                <xf:var name="prev-button-ref" value="if (exists($prev-cases)) then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="next-button-ref" value="if (exists($next-cases)) then xxf:instance('local')/readwrite else ''"/>
 
                                 <!-- Make sure the first relevant case is shown initially -->
                                 <!-- NOTE: Ideally, we should also handle the case where the fr:section in the
@@ -135,7 +133,7 @@
 
                                 <xh:div class="pagination pagination-centered">
                                     <xh:ul>
-                                        <xh:li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
+                                        <xh:li class="{{if ($prev-button-ref instance of xs:string) then 'disabled' else ''}}">
                                             <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
                                                 <!-- https://github.com/orbeon/orbeon-forms/issues/723
                                                      https://github.com/orbeon/orbeon-forms/issues/1042 -->
@@ -155,7 +153,7 @@
                                                 <xf:output value="count($relevant-cases)"/>
                                             </xh:span>
                                         </xh:li>
-                                        <xh:li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
+                                        <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
                                             <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
                                                 <xf:label>
                                                     <xh:i class="icon-chevron-right"/>&#x200b;

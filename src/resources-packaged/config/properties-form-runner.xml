@@ -452,4 +452,7 @@
     -->
     <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
 
+    <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                     value="false"/>
+    <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"               value="true"/>
+
 </properties>

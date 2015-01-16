@@ -122,7 +122,7 @@
 
                 <!-- Template for error information -->
                 <xf:instance id="fr-error-template" xxf:readonly="true">
-                    <error xmlns="" absolute-id="" position="" label="" alert="" level=""/>
+                    <error xmlns="" absolute-id="" position="" label="" alert="" level="" section-name=""/>
                 </xf:instance>
 
                 <!-- Reusable method to insert an error in the right place in the summary -->
@@ -151,11 +151,12 @@ Inserting error information into error list:
                     <xf:insert context="." ref="error[$insert-position]" origin="instance('fr-error-template')"/>
                     <!-- Set all the attributes -->
                     <xf:action context="error[$insert-position + 1]">
-                        <xf:setvalue ref="@absolute-id" value="$absolute-id"/>
-                        <xf:setvalue ref="@position"    value="$control-position"/>
-                        <xf:setvalue ref="@level"       value="$level"/>
-                        <xf:setvalue ref="@alert"       value="$alert"/>
-                        <xf:setvalue ref="@label"       value="$label"/>
+                        <xf:setvalue ref="@absolute-id"  value="$absolute-id"/>
+                        <xf:setvalue ref="@position"     value="$control-position"/>
+                        <xf:setvalue ref="@level"        value="$level"/>
+                        <xf:setvalue ref="@alert"        value="$alert"/>
+                        <xf:setvalue ref="@label"        value="$label"/>
+                        <xf:setvalue ref="@section-name" value="frf:sectionNameForControlId($absolute-id)"/>
                     </xf:action>
 
                 </xf:action>

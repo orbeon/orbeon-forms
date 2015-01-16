@@ -143,7 +143,17 @@ object ScalaUtils extends PathOps {
 
     // Extensions on Iterator[T]
     implicit class IteratorWrapper[T](val i: Iterator[T]) extends AnyVal {
-        def nextOption = i.hasNext option i.next()
+        def nextOption(): Option[T] = i.hasNext option i.next()
+        def lastOption(): Option[T] = {
+            var n = nextOption()
+            while (n.isDefined) {
+                val nextN = nextOption()
+                if (nextN.isEmpty)
+                    return n
+                n = nextN
+            }
+            None
+        }
     }
 
     // Extensions on Iterator object

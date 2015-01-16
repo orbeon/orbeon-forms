@@ -1111,8 +1111,8 @@
 
                                             var templateClone = template.cloneNode(true);
 
-                                            // TODO parse label to sequence of nodes
-                                            var parsedLabel = $.parseHTML(itemElement.label);
+                                            // Handle empty string explicitly as otherwise $.parseHTML("") returns null
+                                            var parsedLabel = itemElement.label == "" ? [] : $.parseHTML(itemElement.label);
                                             ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-label$", parsedLabel, true);
                                             ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-value$", itemElement.value, false);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
@@ -1979,10 +1979,10 @@
                 ORBEON.xforms.Page.getForm(formID).getLoadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
-        } catch (e) {
-            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            AjaxServer.exceptionWhenTalkingToServer(e, formID);
-            // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
+        //} catch (e) {
+        //    // Show dialog with error to the user, as they won't be able to continue using the UI anyway
+        //    AjaxServer.exceptionWhenTalkingToServer(e, formID);
+        //    // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
         } finally {
             // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
             if (! isResponseToBackgroundUpload)

@@ -584,6 +584,9 @@
             <hint-header>
                 <label>Hint</label>
             </hint-header>
+            <clear-value>
+                <label>Clear Value</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>
@@ -1443,6 +1446,9 @@
             <hint-header>
                 <label>Suggestion</label>
             </hint-header>
+            <clear-value>
+                <label>Supprimer la valeur</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editeur de services HTTP</label>
@@ -2303,6 +2309,9 @@
             <hint-header>
                 <label todo="true">[Hint]</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjenesteredigering</label>
@@ -3162,6 +3171,9 @@
             <hint-header>
                 <label todo="true">[Hint]</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Редактор HTTP-сервисов</label>
@@ -4014,6 +4026,9 @@
             <hint-header>
                 <label>Suggerimento</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore servizi HTTP</label>
@@ -4867,6 +4882,9 @@
             <hint-header>
                 <label>Hinweis</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
@@ -5722,6 +5740,9 @@
             <hint-header>
                 <label>Vihje</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>
@@ -6582,6 +6603,9 @@
             <hint-header>
                 <label>Ayuda</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor de Servicios HTTP</label>
@@ -7441,6 +7465,9 @@
             <hint-header>
                 <label>Pista</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor do serviço HTTP</label>
@@ -8301,6 +8328,9 @@
             <hint-header>
                 <label>Anvisning</label>
             </hint-header>
+            <clear-value>
+                <label todo="true">[Clear Value]</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjänster</label>

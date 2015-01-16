@@ -584,6 +584,9 @@
             <hint-header>
                 <label>Hint</label>
             </hint-header>
+            <clear-value>
+                <label>Clear Value</label>
+            </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>

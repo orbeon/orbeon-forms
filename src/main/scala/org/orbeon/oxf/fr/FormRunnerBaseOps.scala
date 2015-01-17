@@ -156,7 +156,7 @@ trait FormRunnerBaseOps {
     def authorizedOperations = split[Set](authorizedOperationsInstance.rootElement.stringValue)
     def supportsUpdate       = authorizedOperations intersect UpdateOps nonEmpty
 
-    // Whether the form has a captcha
+    // Captcha support
     def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
     def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
     def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript

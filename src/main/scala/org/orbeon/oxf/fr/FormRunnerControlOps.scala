@@ -33,7 +33,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     def controlNameFromId(controlOrBindId: String) =
         getStaticIdFromId(controlOrBindId) match {
             case ControlName(name, _) ⇒ name
-            case _ ⇒ null
+            case _                    ⇒ null
         }
 
     def controlNameFromIdOpt(controlOrBindId: String) =

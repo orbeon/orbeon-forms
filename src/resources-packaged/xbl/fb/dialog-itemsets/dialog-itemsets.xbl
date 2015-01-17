@@ -170,26 +170,26 @@
                                 <xh:td>
                                     <xf:var name="item" value="."/>
                                     <xf:var name="is-single-selection" value="frf:isSingleSelectionControl($i/control-type)"/>
-                                    <xf:group ref=".[not($is-single-selection)]">
-                                        <xf:select
-                                            ref="$i/control-value"
-                                            appearance="full">
-                                            <xf:item>
-                                                <xf:label ref="''"/>
-                                                <xf:value ref="$item/value"/>
-                                            </xf:item>
-                                        </xf:select>
-                                    </xf:group>
-                                    <xf:group ref=".[$is-single-selection]">
-                                        <xf:select1
-                                            ref="$i/control-value"
-                                            appearance="full">
-                                            <xf:item>
-                                                <xf:label ref="''"/>
-                                                <xf:value ref="$item/value"/>
-                                            </xf:item>
-                                        </xf:select1>
-                                    </xf:group>
+                                    <xf:switch caseref="frf:isSingleSelectionControl($i/control-type)">
+                                        <xf:case value="false()">
+                                            <xf:select ref="$i/control-value"
+                                                       appearance="full">
+                                                <xf:item>
+                                                    <xf:label ref="''"/>
+                                                    <xf:value ref="$item/value"/>
+                                                </xf:item>
+                                            </xf:select>
+                                        </xf:case>
+                                        <xf:case value="true()">
+                                            <xf:select1 ref="$i/control-value"
+                                                        appearance="full">
+                                                <xf:item>
+                                                    <xf:label ref="''"/>
+                                                    <xf:value ref="$item/value"/>
+                                                </xf:item>
+                                            </xf:select1>
+                                        </xf:case>
+                                    </xf:switch>
                                 </xh:td>
                             </xh:tr>
                         </fr:grid>

@@ -279,15 +279,15 @@ object XPathCache {
     // Evaluate an XPath expression on the document as an attribute value template, and return its string value
     // 1 external usage
     def evaluateAsAvt(
-            contextItem         : Item,
-            xpathString         : String,
-            namespaceMapping    : NamespaceMapping,
-            variableToValueMap  : JMap[String, ValueRepresentation],
-            functionLibrary     : FunctionLibrary,
-            functionContext     : FunctionContext,
-            baseURI             : String,
-            locationData        : LocationData,
-            reporter: Reporter
+        contextItem         : Item,
+        xpathString         : String,
+        namespaceMapping    : NamespaceMapping,
+        variableToValueMap  : JMap[String, ValueRepresentation],
+        functionLibrary     : FunctionLibrary,
+        functionContext     : FunctionContext,
+        baseURI             : String,
+        locationData        : LocationData,
+        reporter: Reporter
     ): String =
         evaluateAsAvt(
             Seq(contextItem).asJava,
@@ -305,16 +305,16 @@ object XPathCache {
     // Evaluate an XPath expression on the document as an attribute value template, and return its string value
     // 3 external usages
     def evaluateAsAvt(
-            contextItems       : JList[Item],
-            contextPosition    : Int,
-            xpathString        : String,
-            namespaceMapping   : NamespaceMapping,
-            variableToValueMap : JMap[String, ValueRepresentation],
-            functionLibrary    : FunctionLibrary,
-            functionContext    : FunctionContext,
-            baseURI            : String,
-            locationData       : LocationData,
-            reporter: Reporter
+        contextItems       : JList[Item],
+        contextPosition    : Int,
+        xpathString        : String,
+        namespaceMapping   : NamespaceMapping,
+        variableToValueMap : JMap[String, ValueRepresentation],
+        functionLibrary    : FunctionLibrary,
+        functionContext    : FunctionContext,
+        baseURI            : String,
+        locationData       : LocationData,
+        reporter: Reporter
     ) : String = {
 
         val xpathExpression =
@@ -331,15 +331,15 @@ object XPathCache {
     // Evaluate an XPath expression and return its string value
     // 3 external usages
     def evaluateAsString(
-            contextItem        : Item,
-            xpathString        : String,
-            namespaceMapping   : NamespaceMapping,
-            variableToValueMap : JMap[String, ValueRepresentation],
-            functionLibrary    : FunctionLibrary,
-            functionContext    : FunctionContext,
-            baseURI            : String,
-            locationData       : LocationData,
-            reporter           : Reporter
+        contextItem        : Item,
+        xpathString        : String,
+        namespaceMapping   : NamespaceMapping,
+        variableToValueMap : JMap[String, ValueRepresentation],
+        functionLibrary    : FunctionLibrary,
+        functionContext    : FunctionContext,
+        baseURI            : String,
+        locationData       : LocationData,
+        reporter           : Reporter
     ): String =
         evaluateAsString(
             Seq(contextItem).asJava,
@@ -399,23 +399,24 @@ object XPathCache {
 
     // No call from XForms
     def getXPathExpression(
-            configuration    : Configuration,
-            contextItem      : Item,
-            xpathString      : String,
-            namespaceMapping : NamespaceMapping,
-            locationData     : LocationData): PooledXPathExpression =
+        configuration    : Configuration,
+        contextItem      : Item,
+        xpathString      : String,
+        namespaceMapping : NamespaceMapping,
+        locationData     : LocationData
+    ): PooledXPathExpression =
         getXPathExpression(configuration, contextItem, xpathString, namespaceMapping, null, null, null, locationData)
 
     // No call from XForms
     def getXPathExpression(
-            configuration      : Configuration,
-            contextItem        : Item,
-            xpathString        : String,
-            namespaceMapping   : NamespaceMapping,
-            variableToValueMap : JMap[String, ValueRepresentation],
-            functionLibrary    : FunctionLibrary,
-            baseURI            : String,
-            locationData       : LocationData
+        configuration      : Configuration,
+        contextItem        : Item,
+        xpathString        : String,
+        namespaceMapping   : NamespaceMapping,
+        variableToValueMap : JMap[String, ValueRepresentation],
+        functionLibrary    : FunctionLibrary,
+        baseURI            : String,
+        locationData       : LocationData
     ): PooledXPathExpression =
         getXPathExpression(
             configuration,
@@ -430,16 +431,16 @@ object XPathCache {
         )
 
     private def getXPathExpression(
-            configuration      : Configuration,
-            contextItems       : JList[Item],
-            contextPosition    : Int,
-            xpathString        : String,
-            namespaceMapping   : NamespaceMapping,
-            variableToValueMap : JMap[String, ValueRepresentation],
-            functionLibrary    : FunctionLibrary,
-            baseURI            : String,
-            isAVT              : Boolean,
-            locationData       : LocationData
+        configuration      : Configuration,
+        contextItems       : JList[Item],
+        contextPosition    : Int,
+        xpathString        : String,
+        namespaceMapping   : NamespaceMapping,
+        variableToValueMap : JMap[String, ValueRepresentation],
+        functionLibrary    : FunctionLibrary,
+        baseURI            : String,
+        isAVT              : Boolean,
+        locationData       : LocationData
     ): PooledXPathExpression = {
         try {
             // Find pool from cache

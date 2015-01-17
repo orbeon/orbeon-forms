@@ -58,7 +58,8 @@
                              required="true()"/>
                     <xf:bind name="other-classification" id="other-classification-bind"
                              ref="other-classification"
-                             relevant="$federal-tax-classification = '7'"/>
+                             relevant="$federal-tax-classification = '7'"
+                             required="$federal-tax-classification = '7'"/>
                     <xf:bind name="exempt-payee" id="exempt-payee-bind" ref="exempt-payee" type="xf:boolean"/>
                 </xf:bind>
                 <xf:bind name="address-account" id="address-account-bind" ref="address-account">

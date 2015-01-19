@@ -270,7 +270,7 @@ object Multipart {
 
                     // Process the first item specially to catch $uuid (XForms-engine specific)
                     val progressUUIDOpt =
-                        itemIterator.nextOption flatMap { fis ⇒
+                        itemIterator.nextOption() flatMap { fis ⇒
                             processStreamItem(fis, None)
                             result.headOption collect {
                                 case ("$uuid", value: String) ⇒ value

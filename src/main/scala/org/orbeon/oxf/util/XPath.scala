@@ -121,7 +121,7 @@ object XPath {
 
                     values.toList
                 } else if (targetClass.isAssignableFrom(classOf[Option[_]])) {
-                    XML.asScalaIterator(Value.asIterator(value)).nextOption map (itemToAny(_, context))
+                    XML.asScalaIterator(Value.asIterator(value)).nextOption() map (itemToAny(_, context))
                 } else if (targetClass.isAssignableFrom(classOf[Iterator[_]])) {
                     XML.asScalaIterator(Value.asIterator(value)) map (itemToAny(_, context))
                 } else {

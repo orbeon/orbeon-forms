@@ -69,7 +69,7 @@ trait ControlEventSupport {
                         if (focusEvent.inputOnly)
                             allIt collectFirst { case input: XFormsInputControl ⇒ input }
                         else
-                            allIt.nextOption
+                            allIt.nextOption()
 
                     filteredIt foreach Focus.focusWithEvents
                 case _ ⇒

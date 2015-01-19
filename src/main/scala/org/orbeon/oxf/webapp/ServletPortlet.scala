@@ -89,6 +89,6 @@ trait ServletPortlet {
                 getDefinitionFromMap(webAppContext.initParameters, _, _)
             )
 
-        functions flatMap (_(processorPrefix, inputPrefix)) nextOption
+        (functions flatMap (_(processorPrefix, inputPrefix))).nextOption()
     }
 }

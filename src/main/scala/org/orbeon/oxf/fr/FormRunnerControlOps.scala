@@ -55,7 +55,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             control ← findInViewTryIndex(inDoc, controlName + '-' + suffix).iterator
         } yield
             control
-    ).nextOption
+    ).nextOption()
 
     // Find a control id by name
     def findControlIdByName(inDoc: NodeInfo, controlName: String) =

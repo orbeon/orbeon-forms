@@ -33,7 +33,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     def controlNameFromId(controlOrBindId: String) =
         getStaticIdFromId(controlOrBindId) match {
             case ControlName(name, _) ⇒ name
-            case _ ⇒ null
+            case _                    ⇒ null
         }
 
     def controlNameFromIdOpt(controlOrBindId: String) =
@@ -52,7 +52,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     def findControlByName(inDoc: NodeInfo, controlName: String) = (
         for {
             suffix  ← PossibleControlSuffixes.iterator
-            control ← byId(inDoc, controlName + '-' + suffix).iterator
+            control ← findInViewTryIndex(inDoc, controlName + '-' + suffix).iterator
         } yield
             control
     ).nextOption

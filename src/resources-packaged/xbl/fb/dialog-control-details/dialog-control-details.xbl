@@ -407,7 +407,14 @@
                                                                    else string($required[not($true-or-false)])"/>
                                                 </xf:itemset>
                                             </xf:select1>
-                                            <xf:input id="required-xpath" ref="$required[not($true-or-false)]"/>
+                                            <xf:input id="required-xpath" ref="$required[not($true-or-false)]">
+                                                <!-- When the control appears and its value is empty, it means that the
+                                                     user just chose the "Formula" option. -->
+                                                <xf:setfocus
+                                                    event="xforms-enabled"
+                                                    if="normalize-space() = ''"
+                                                    control="required-xpath"/>
+                                            </xf:input>
                                         </xf:group>
 
                                         <!-- Built-in type -->
@@ -470,10 +477,10 @@
                                     </xf:select1>
                                 </xh:td>
                                 <xh:td>
-                                    <xf:textarea ref="if (@type = 'constraint' and @default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
+                                    <xf:textarea ref="if (@type = ('required', 'datatype', 'constraint') and @default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
                                         <xf:label ref="$resources/dialog-control-details/alert/label"/>
                                     </xf:textarea>
-                                    <xf:input ref=".[@type = 'constraint' and @level = 'error']/@default-alert">
+                                    <xf:input ref=".[@type = ('required', 'datatype', 'constraint') and @level = 'error']/@default-alert">
                                         <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
                                     </xf:input>
                                 </xh:td>

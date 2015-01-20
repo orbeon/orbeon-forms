@@ -106,6 +106,7 @@ class Upload extends Control
         newInputElement.setAttribute "name", inputElement.name
         newInputElement.setAttribute "size", inputElement.size
         newInputElement.setAttribute "unselectable", "on" # The server sets this, so we have to set it again
+        newInputElement.setAttribute "accept", inputElement.accept
         parentElement.replaceChild newInputElement, inputElement
 
 Page.registerControlConstructor Upload, (container) -> YD.hasClass container, "xforms-upload"

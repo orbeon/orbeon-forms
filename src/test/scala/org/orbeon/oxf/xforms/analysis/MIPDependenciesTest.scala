@@ -33,8 +33,8 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         // Change first item price to foo
         setControlValue("price⊙1", "foo")
 
-        assert(!isValid("price⊙1"))
-        assert(!isValid("line-total⊙1"))
+        assert(! isValid("price⊙1"))
+        assert(! isValid("line-total⊙1"))
         assert("-" === getControlValue("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
@@ -55,7 +55,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         // Change first item units to foo
         setControlValue("units⊙1", "foo")
 
-        assert(!isValid("units⊙1"))
+        assert(! isValid("units⊙1"))
         assert(!isRelevant("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
@@ -77,14 +77,14 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         // Change first item units to a constraint-invalid value
         setControlValue("units⊙1", "0")
 
-        assert(!isValid("units⊙1"))
+        assert(! isValid("units⊙1"))
         assert(!isRelevant("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
         // Then change to type-invalid too
         setControlValue("units⊙1", "foo")
 
-        assert(!isValid("units⊙1"))
+        assert(! isValid("units⊙1"))
         assert(!isRelevant("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
@@ -108,7 +108,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
         setControlValue("name⊙1", "")
         assert(isRequired("name⊙1"))
-        assert(!isValid("name⊙1"))
+        assert(! isValid("name⊙1"))
 
         setControlValue("name⊙1", "100")
         assert(isRequired("name⊙1"))
@@ -123,7 +123,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         assert(isValid("name⊙1"))
 
         setControlValue("name⊙1", "    ") // series of spaces
-        assert(!isValid("name⊙1"))
+        assert(! isValid("name⊙1"))
 
         setControlValue("name⊙1", "100")
         assert(isValid("name⊙1"))
@@ -156,9 +156,9 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         // Test all combinations of MIPs
         for {
             required ← Seq(false, true)
-            valid ← Seq(false, true)
+            valid    ← Seq(false, true)
             readonly ← Seq(false, true)
-            value = Seq(required, valid, readonly) map (if (_) "1" else "0") mkString
+            value    = Seq(required, valid, readonly) map (if (_) "1" else "0") mkString
         } yield {
             // Value looks like "000" to "111"
             setControlValue("input", value)

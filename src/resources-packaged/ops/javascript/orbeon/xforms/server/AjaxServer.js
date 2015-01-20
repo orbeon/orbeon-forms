@@ -1111,20 +1111,22 @@
 
                                             var templateClone = template.cloneNode(true);
 
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement.label);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement.value);
+                                            // Handle empty string explicitly as otherwise $.parseHTML("") returns null
+                                            var parsedLabel = itemElement.label == "" ? [] : $.parseHTML(itemElement.label);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-label$", parsedLabel, true);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-value$", itemElement.value, false);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
-                                            ORBEON.util.Utils.stringReplace(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-name$", controlId);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId, false);
+                                            ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-item-name$", controlId, false);
 
                                             if (itemElement.help && itemElement.help != "") {
-                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-help$", itemElement.help);
+                                                ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-help$", itemElement.help, false);
                                             } else {
                                                 $(templateClone).find('.xforms-help').remove();
                                             }
 
                                             if (itemElement.hint && itemElement.hint != "") {
-                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-hint$", itemElement.hint);
+                                                ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-hint$", itemElement.hint, false);
                                             } else {
                                                 $(templateClone).find('.xforms-hint-region').removeAttr("class");
                                                 $(templateClone).find('.xforms-hint').remove();
@@ -1373,10 +1375,10 @@
 
                                                     // Replace placeholders
                                                     insertIntoDocument([booleanTemplateClone]);
-                                                    ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
-                                                    var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e0");
-                                                    ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId);
-                                                    ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-name$", controlId);
+                                                    ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-template-value$", "true", false);
+                                                    var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e0", false);
+                                                    ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId, false);
+                                                    ORBEON.util.Utils.replaceInDOM(booleanTemplateClone, "$xforms-item-name$", controlId, false);
 
                                                     // Update classes
                                                     YAHOO.util.Dom.addClass(documentElement, "xforms-type-boolean");
@@ -1977,10 +1979,10 @@
                 ORBEON.xforms.Page.getForm(formID).getLoadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
-        } catch (e) {
-            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            AjaxServer.exceptionWhenTalkingToServer(e, formID);
-            // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
+        //} catch (e) {
+        //    // Show dialog with error to the user, as they won't be able to continue using the UI anyway
+        //    AjaxServer.exceptionWhenTalkingToServer(e, formID);
+        //    // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
         } finally {
             // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
             if (! isResponseToBackgroundUpload)

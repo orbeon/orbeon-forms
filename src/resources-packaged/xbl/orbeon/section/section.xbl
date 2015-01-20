@@ -36,7 +36,6 @@
                 <xf:toggle case="case-closed"/>
             </xbl:handler>
         </xbl:handlers>
-
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -99,11 +98,11 @@
                                                 </xf:trigger>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xh:span class="fr-section-label">
-                                                    <xf:help  value="xxf:help('fr-section')"  for="switch"/>
-                                                    <xf:label value="xxf:label('fr-section')" for="switch"/>
-                                                    <xf:hint  value="xxf:hint('fr-section')"  for="switch"/>
-                                                </xh:span>
+                                                <xf:trigger appearance="minimal" class="fr-section-label" ref="'readonly'">
+                                                    <xf:help  value="xxf:help('fr-section')" />
+                                                    <xf:label value="xxf:label('fr-section')"/>
+                                                    <xf:hint  value="xxf:hint('fr-section')" />
+                                                </xf:trigger>
                                             </xsl:otherwise>
                                         </xsl:choose>
 

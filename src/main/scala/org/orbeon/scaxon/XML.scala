@@ -141,9 +141,9 @@ object XML {
     def namespaceInfo(prefix: String, uri: String): NodeInfo = Wrapper.wrap(namespace(prefix, uri))
 
     // Parse the given qualified name and return the separated prefix and local name
-    def parseQName(lexicalQName: String) = {
+    def parseQName(lexicalQName: String): (String, String) = {
         val checker = Name10Checker.getInstance
-        val parts = checker.getQNameParts(lexicalQName)
+        val parts   = checker.getQNameParts(lexicalQName)
 
         (parts(0), parts(1))
     }

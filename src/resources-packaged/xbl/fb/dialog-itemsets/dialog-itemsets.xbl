@@ -30,14 +30,15 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
                 <xf:delete ref="(items, template)/item"/>           <!-- Clear local items and template -->
 
-                <xf:var name="control-name"     value="fbf:controlNameFromId(event('control-element')/@id)"/>
-                <xf:setvalue ref="control-name" value="$control-name"/>
-                <xf:setvalue ref="control-type" value="event('control-element')/local-name()"/>
-                <xf:setvalue ref="appearance"   value="event('control-element')/@appearance"/>
-                <xf:setvalue ref="html"         value="fbf:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
+                <xf:var name="control-name"      value="fbf:controlNameFromId(event('control-element')/@id)"/>
+                <xf:setvalue ref="control-name"  value="$control-name"/>
+                <xf:setvalue ref="control-type"  value="event('control-element')/local-name()"/>
+                <xf:setvalue ref="control-value" value="fbf:findControlBoundNodeByName($control-name)"/>
+                <xf:setvalue ref="appearance"    value="event('control-element')/@appearance"/>
+                <xf:setvalue ref="html"          value="fbf:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
-            
+
             <xbl:handler event="xxforms-dialog-open" observer="dialog">
 
                 <!-- Get current language and items in the all languages -->
@@ -57,10 +58,18 @@
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
 
+            <!-- Clear Value -->
+            <xbl:handler event="DOMActivate" observer="clear-value-trigger">
+                <xf:setvalue ref="$i/control-value" />
+            </xbl:handler>
+
             <!-- Save on click on save -->
             <xbl:handler event="DOMActivate" observer="save-trigger" type="xpath">
                 fbf:setControlItems($i/control-name, $i/items),
                 fbf:setItemsetHTMLMediatype(fbf:getFormDoc(), $i/control-name, $i/html)
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger">
+                <xf:setvalue ref="fbf:findControlBoundNodeByName($i/control-name)" value="$i/control-value"/>
             </xbl:handler>
 
             <!-- Add line when users press enter -->
@@ -76,6 +85,7 @@
                     <instance>
                         <control-name/>             <!-- So we can find back the control when saving if users change the name -->
                         <control-type/>             <!-- Either 'select' or 'select1' -->
+                        <control-value/>            <!-- Default value of control -->
                         <appearance/>
                         <html/>                     <!-- Whether labels can contain HTML markup -->
                         <lang/>                     <!-- The current language -->
@@ -113,6 +123,7 @@
             <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">
                 <xf:label ref="$resources/dialog-itemsets/label"/>
                 <xh:div class="fb-dialog-body fb-hide-alert">
+
                     <!-- Only allow HTML for full appearance -->
                     <xf:input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox">
                         <xf:label ref="$resources/messages/lhha-checkbox"/>
@@ -156,11 +167,38 @@
                                         <xf:label ref="$resources/dialog-itemsets/hint-header/label"/>
                                     </xf:input>
                                 </xh:td>
+                                <xh:td>
+                                    <xf:var name="item" value="."/>
+                                    <xf:var name="is-single-selection" value="frf:isSingleSelectionControl($i/control-type)"/>
+                                    <xf:switch caseref="frf:isSingleSelectionControl($i/control-type)">
+                                        <xf:case value="false()">
+                                            <xf:select ref="$i/control-value"
+                                                       appearance="full">
+                                                <xf:item>
+                                                    <xf:label ref="''"/>
+                                                    <xf:value ref="$item/value"/>
+                                                </xf:item>
+                                            </xf:select>
+                                        </xf:case>
+                                        <xf:case value="true()">
+                                            <xf:select1 ref="$i/control-value"
+                                                        appearance="full">
+                                                <xf:item>
+                                                    <xf:label ref="''"/>
+                                                    <xf:value ref="$item/value"/>
+                                                </xf:item>
+                                            </xf:select1>
+                                        </xf:case>
+                                    </xf:switch>
+                                </xh:td>
                             </xh:tr>
                         </fr:grid>
                     </xf:group>
 
                     <xh:div class="fr-dialog-buttons">
+                        <xf:trigger id="clear-value-trigger">
+                            <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
+                        </xf:trigger>
                         <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
                             <xf:label ref="$resources/apply/label"/>
                         </xf:trigger>

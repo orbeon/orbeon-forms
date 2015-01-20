@@ -60,12 +60,19 @@ trait FormRunnerBaseOps {
 
     def defaultIterationName(repeatName: String) = repeatName + "-iteration"
 
-    // Find an element by id, using the index if possible, otherwise traversing the document
-    // NOTE: This should be done directly in the selectID implementation.
-    def byId(inDoc: NodeInfo, id: String) =
-        Option(inDoc.getDocumentRoot.selectID(id)) orElse (inDoc.root descendant * find (_.id == id))
+    // Find a view element by id, using the index if possible, otherwise traversing the document
+    // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
+    def findInViewTryIndex(inDoc: NodeInfo, id: String) = {
 
-    // Get the body
+        val bodyElement = findFRBodyElement(inDoc)
+
+        def isUnderView(node: NodeInfo) =
+            node ancestor * contains bodyElement
+
+        Option(inDoc.getDocumentRoot.selectID(id)) filter isUnderView orElse (bodyElement descendant * find (_.id == id))
+    }
+
+    // Get the body element assuming the structure of an XHTML document, annotated or not, OR the structure of xbl:xbl.
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
     def findFRBodyElement(inDoc: NodeInfo) = {
 
@@ -149,7 +156,7 @@ trait FormRunnerBaseOps {
     def authorizedOperations = split[Set](authorizedOperationsInstance.rootElement.stringValue)
     def supportsUpdate       = authorizedOperations intersect UpdateOps nonEmpty
 
-    // Whether the form has a captcha
+    // Captcha support
     def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
     def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
     def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript

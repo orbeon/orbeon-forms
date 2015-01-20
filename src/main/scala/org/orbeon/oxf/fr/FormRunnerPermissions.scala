@@ -37,8 +37,10 @@ trait FormRunnerPermissions {
 
     val MethodPropertyName                  = PropertyPrefix + "method"
     val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
+    val ContainerRolesSplitPropertyName     = PropertyPrefix + "container.roles.split"
     val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
     val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
+    val HeaderRolesSplitPropertyName        = PropertyPrefix + "header.roles.split"
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
 
@@ -60,6 +62,7 @@ trait FormRunnerPermissions {
 
                 val username    = Option(userRoles.getRemoteUser)
                 val rolesString = propertySet.getString(ContainerRolesPropertyName)
+                val rolesSplit  = propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
                 if (rolesString eq null) {
                     (username, None, None)
@@ -72,7 +75,7 @@ trait FormRunnerPermissions {
 
                     val rolesArray =
                         for {
-                            role ← rolesString.split(""",|\s+""")
+                            role ← rolesString split rolesSplit
                             if isUserInRole(role)
                         } yield
                             role
@@ -87,35 +90,34 @@ trait FormRunnerPermissions {
 
             case "header" ⇒
 
-                val headerPropertyName = propertySet.getString(HeaderRolesPropertyNamePropertyName, "").trim match {
-                    case "" ⇒ None
-                    case value ⇒ Some(value)
-                }
+                val headerPropertyName = nonEmptyOrNone(propertySet.getString(HeaderRolesPropertyNamePropertyName))
 
                 def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
 
-                // Headers can be separated by comma or pipe
-                def split1(value: String) = value split """(\s*[,\|]\s*)+"""
-                // Then, if configured, a header can have the form name=value, where name is specified in a property
-                def split2(value: String) = headerPropertyName match {
+                val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
+                def splitRoles(value: String) = value split rolesSplit
+
+                // If configured, a header can have the form `name=value` where `name` is specified in a property
+                def splitWithinRole(value: String) = headerPropertyName match {
                     case Some(propertyName) ⇒
                         value match {
-                            case NameValueMatch(`propertyName`, value) ⇒ Seq(value)
-                            case _ ⇒ Seq.empty
+                            case NameValueMatch(`propertyName`, value) ⇒ List(value)
+                            case _                                     ⇒ Nil
                         }
-                    case _ ⇒ Seq(value)
+                    case _ ⇒ List(value)
                 }
 
                 // Username and group: take the first header
                 val username = headerOption(HeaderUsernamePropertyName) map (_.head)
-                val group    = headerOption(HeaderGroupPropertyName) map (_.head)
+                val group    = headerOption(HeaderGroupPropertyName)    map (_.head)
 
                 // Roles: all headers with the given name are used, each header value is split, and result combined
-                val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap split1 flatMap split2)
+                val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
 
                 (username, group, roles)
 
-            case other ⇒ throw new OXFException("Unsupported authentication method, check the '" + MethodPropertyName + "' property:" + other)
+            case other ⇒
+                throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")
         }
     }
 

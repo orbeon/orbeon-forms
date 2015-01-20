@@ -38,7 +38,7 @@
                 <xf:bind name="classification" id="classification-bind" ref="classification">
                     <xf:bind name="federal-tax-classification" id="federal-tax-classification-bind" ref="federal-tax-classification" required="true()"/>
                     <xf:bind name="llc-classification" id="llc-classification-bind" ref="llc-classification" relevant="$federal-tax-classification = '6'" required="true()"/>
-                    <xf:bind name="other-classification" id="other-classification-bind" ref="other-classification" relevant="$federal-tax-classification = '7'"/>
+                    <xf:bind name="other-classification" id="other-classification-bind" ref="other-classification" relevant="$federal-tax-classification = '7'" required="$federal-tax-classification = '7'"/>
                     <xf:bind name="exempt-payee" id="exempt-payee-bind" ref="exempt-payee" type="xf:boolean"/>
                 </xf:bind>
                 <xf:bind name="address-account" id="address-account-bind" ref="address-account">

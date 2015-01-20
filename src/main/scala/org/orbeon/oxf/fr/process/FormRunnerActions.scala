@@ -243,9 +243,10 @@ trait FormRunnerActions {
             // Append query parameters to the URL and evaluate XVTs
             val evaluatedPropertiesAsMap =
                 propertiesAsPairs map {
-                    case ("uri", some @ Some(_)) ⇒ "uri" → (some map evaluateValueTemplate map (recombineQuery(_, paramValuesToAppend)))
-                    case (name,  some @ Some(_)) ⇒ name  → (some map evaluateValueTemplate)
-                    case other                   ⇒ other
+                    case (n @ "uri",    s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (recombineQuery(_, paramValuesToAppend)))
+                    case (n @ "method", s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (_.toLowerCase))
+                    case (n,            s @ Some(_)) ⇒ n → (s map evaluateValueTemplate)
+                    case other                       ⇒ other
                 } toMap
 
             def findDefaultSerialization(method: String) = method match {

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import Model._
 import org.orbeon.oxf.xml.NamespaceMapping
 
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsControl}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -364,26 +364,31 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def updateMip(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String): Unit = {
 
         require(Model.AllMIPNames(mipName))
-        val mipQName = convertMIP(mipName)
+        val mipQName = mipNameToFBMIPQname(mipName)
 
         findControlByName(inDoc, controlName) foreach { control ⇒
 
             // Get or create the bind element
             val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
-            val valueRequiresNamespaceMapping =
-                mipName == "type" && valueNamespaceMappingScopeIfNeeded(bind, mipValue).isDefined
-
             // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
             // expressions and types could use it. So for now the mapping is never garbage collected.
-            val isStringType =
-                valueRequiresNamespaceMapping &&
-                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(mipValue))
+            def isTypeString(value: String) =
+                mipName == Type.name &&
+                valueNamespaceMappingScopeIfNeeded(bind, value).isDefined &&
+                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(value))
 
-            // Create/update or remove attribute
+            def isRequiredFalse(value: String) =
+                mipName == Required.name && value == "false()"
+
+            def mustRemoveAttribute(value: String) =
+                isTypeString(value) || isRequiredFalse(value)
+
             nonEmptyOrNone(mipValue) match {
-                case Some(value) if ! isStringType ⇒ ensureAttribute(bind, mipQName, value)
-                case _                             ⇒ delete(bind \@ mipQName)
+                case Some(normalizedMipValue) if ! mustRemoveAttribute(normalizedMipValue) ⇒
+                    ensureAttribute(bind, mipQName, normalizedMipValue)
+                case _ ⇒
+                    delete(bind /@ mipQName)
             }
         }
     }
@@ -421,12 +426,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Get the value of a MIP attribute if present
     def getMip(inDoc: NodeInfo, controlName: String, mipName: String) = {
         require(Model.AllMIPNames(mipName))
-        val mipQName = convertMIP(mipName)
+        val mipQName = mipNameToFBMIPQname(mipName)
 
         findBindByName(inDoc, controlName) flatMap (_ attValueOpt mipQName)
     }
 
-    private def convertMIP(mipName: String) =
+    def mipNameToFBMIPQname(mipName: String) =
         RewrittenMIPs.get(mipName)                 orElse
         (AllMIPsByName.get(mipName) map (_.aName)) getOrElse
         (throw new IllegalArgumentException)
@@ -471,7 +476,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             control
     }
 
-    // Find a given concrete control by name
+    // Find the control by name (resolved from the top-level form model `fr-form-model`)
     def findConcreteControlByName(controlName: String) = {
         val model = getFormModel
         for {
@@ -480,6 +485,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         } yield
             control
     }
+
+    // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
+    def findControlBoundNodeByName(controlName: String) = (
+        findConcreteControlByName(controlName)
+        collect { case c: XFormsSingleNodeControl ⇒ c }
+        flatMap (_.boundNode)
+    )
 
     // Find a control's LHHA (there can be more than one for alerts)
     def getControlLHHA(inDoc: NodeInfo, controlName: String, lhha: String) =
@@ -582,7 +594,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         buildFormBuilderControlEffectiveId(inDoc, staticId).orNull
 
     private def buildFormBuilderControlEffectiveId(inDoc: NodeInfo, staticId: String) =
-        byId(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
+        findInViewTryIndex(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
 
     // Build an effective id for a given static id
     //

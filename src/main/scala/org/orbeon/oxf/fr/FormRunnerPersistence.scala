@@ -148,14 +148,21 @@ trait FormRunnerPersistence {
 
         val url = new URI(rewrittenURLString)
 
+        val headers = Connection.buildConnectionHeadersLowerIfNeeded(
+            url.getScheme,
+            None,
+            Map(),
+            Option(Connection.getForwardHeaders)
+        )
+
         val cxr = Connection(
-            httpMethod  = "GET",
-            url         = url,
-            credentials = None,
-            content     = None,
-            headers     = Connection.buildConnectionHeadersLowerIfNeeded(url.getScheme, None, Map(), Option(Connection.getForwardHeaders)),
-            loadState   = true,
-            logBody     = false
+            httpMethodUpper = "GET",
+            url             = url,
+            credentials     = None,
+            content         = None,
+            headers         = headers,
+            loadState       = true,
+            logBody         = false
         ).connect(
             saveState = true
         )

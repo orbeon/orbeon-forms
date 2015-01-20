@@ -363,6 +363,27 @@ body {
         .fr-grid-validations .fr-grid-col-3 { width: 110px }
 
         .fr-grid-help .xforms-textarea textarea { height: @baseLineHeight * 5 + 8px; }
+
+        .fr-grid-validations {
+
+            td:nth-of-type(5) .fr-grid-content {
+                .flex();
+
+                .xforms-textarea {
+                    .flex-flow(column);
+                    width: 100%;
+                }
+
+                .xforms-input.xforms-type-boolean {
+                    .flex-flow(column);
+                    input {
+                        margin-top: 0;
+                        margin-left: 4px;
+                        padding-top: 0;
+                    }
+                }
+            }
+        }
     }
 
     #fb-schema-upload-dialog {
@@ -466,11 +487,19 @@ body {
     }
 
     .fb-label-editor {
-        position: absolute;                         // If not explicitely set, jQuery uses position: relative, which create scrollbars
+        position: absolute;                         // If not explicitly set, jQuery uses position: relative, which create scrollbars
+        .flex();
+        input[type='text'] {
+            .flex-flow(column);
+            width: 100%;
+        }
         input[type='checkbox'] {                    // Use margin as padding doesn't work well on HTML input elements
-            margin-left: 5px; }
+            margin-left: 5px;
+            .flex-flow(column);
+        }
         &.fb-label-editor-for-hint input {          // Smaller font size for hint, to match hint itself
-            font-size: smaller; }
+            font-size: smaller;
+        }
     }
 
     h2 .fr-section-label {

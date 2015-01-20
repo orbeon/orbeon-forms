@@ -88,9 +88,11 @@
     <property as="xs:string"  name="oxf.fr.authentication.header.username"                      value="My-Username-Header"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.group"                         value="My-Group-Header"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles"                         value="My-Roles-Header"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.roles.split"                   value="(\s*[,\|]\s*)+"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles.property-name"           value=""/>
     <!-- E.g. "orbeon admin user" -->
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value=""/>
+    <property as="xs:string"  name="oxf.fr.authentication.container.roles.split"                value=",|\s+"/>
 
     <property as="xs:boolean" name="oxf.fr.noscript-link.*.*"                                   value="false"/>
 
@@ -363,11 +365,11 @@
     <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
     <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>
     <property as="xs:boolean" name="oxf.fr.detail.send.success.prune.*.*"                       value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.success.annotate.*.*"                    value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.annotate.*.*"                    value=""/>
     <property as="xs:string"  name="oxf.fr.detail.send.success.content.*.*"                     value="xml"/>
     <property as="xs:string"  name="oxf.fr.detail.send.error.replace.*.*"                       value="all"/>
     <property as="xs:boolean" name="oxf.fr.detail.send.error.prune.*.*"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.error.annotate.*.*"                      value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.annotate.*.*"                      value=""/>
     <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                        value="get"/>
     <property as="xs:string"  name="oxf.fr.detail.send.error.content.*.*"                       value="xml"/>
 
@@ -449,5 +451,8 @@
         ]
     -->
     <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
+
+    <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                     value="false"/>
+    <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"               value="true"/>
 
 </properties>

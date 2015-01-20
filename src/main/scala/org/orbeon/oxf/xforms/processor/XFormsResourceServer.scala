@@ -89,13 +89,13 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                 try {
                     val cxr =
                         Connection(
-                            httpMethod  = "GET",
-                            url         = resource.uri,
-                            credentials = None,
-                            content     = None,
-                            headers     = resource.headers,
-                            loadState   = true,
-                            logBody     = false
+                            httpMethodUpper = "GET",
+                            url             = resource.uri,
+                            credentials     = None,
+                            content         = None,
+                            headers         = resource.headers,
+                            loadState       = true,
+                            logBody         = false
                         ).connect(
                             saveState = true
                         )

@@ -29,7 +29,7 @@ trait ContainerOps extends ControlOps {
     def containerById(containerId: String): NodeInfo = {
         // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
         val staticId = XFormsUtils.getStaticIdFromId(containerId)
-        byId(fbFormInstance, staticId) filter IsContainer head
+        findInViewTryIndex(fbFormInstance, staticId) filter IsContainer head
     }
 
     def controlsInContainer(containerId: String): Int = (containerById(containerId) \\ "*:td" \ *).length
@@ -149,7 +149,7 @@ trait ContainerOps extends ControlOps {
                                     (moveOp(holder, _))
                     }
 
-                val movedContainer = byId(doc, container \@ "id").get // must get new reference
+                val movedContainer = findInViewTryIndex(doc, container.id).get // must get new reference
 
                 (firstControl(movedContainer preceding *), firstControl(movedContainer following *)) match {
                     case (Some(preceding), _) ⇒ tryToMoveHolders(getControlName(preceding), moveElementAfter)
@@ -323,7 +323,7 @@ trait ContainerOps extends ControlOps {
     def findCurrentBindingByName(inDoc: NodeInfo, controlName: String, bindings: Seq[NodeInfo]) =
         for {
             controlElement ← findControlByName(inDoc, controlName)
-            datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
+            datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
             binding        ← findCurrentBinding(controlElement.uriQualifiedName, datatype, bindings)
         } yield
             binding

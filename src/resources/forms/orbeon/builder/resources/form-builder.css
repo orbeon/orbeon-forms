@@ -380,6 +380,24 @@ body {
 .orbeon .fb-dialog-control-details .fr-grid-help .xforms-textarea textarea {
   height: 108px;
 }
+.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content {
+  display: flex;
+  display: -webkit-flex;
+}
+.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content .xforms-textarea {
+  flex-flow: column;
+  -webkit-flex-flow: column;
+  width: 100%;
+}
+.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content .xforms-input.xforms-type-boolean {
+  flex-flow: column;
+  -webkit-flex-flow: column;
+}
+.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content .xforms-input.xforms-type-boolean input {
+  margin-top: 0;
+  margin-left: 4px;
+  padding-top: 0;
+}
 .orbeon #fb-schema-upload-dialog {
   width: 400px;
 }
@@ -508,9 +526,18 @@ body {
 }
 .orbeon .fb-label-editor {
   position: absolute;
+  display: flex;
+  display: -webkit-flex;
+}
+.orbeon .fb-label-editor input[type='text'] {
+  flex-flow: column;
+  -webkit-flex-flow: column;
+  width: 100%;
 }
 .orbeon .fb-label-editor input[type='checkbox'] {
   margin-left: 5px;
+  flex-flow: column;
+  -webkit-flex-flow: column;
 }
 .orbeon .fb-label-editor.fb-label-editor-for-hint input {
   font-size: smaller;

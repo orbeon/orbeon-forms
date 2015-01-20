@@ -16,8 +16,8 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
                     <xf:bind id="control-1-bind" name="control-1" ref="control-1" constraint="true()" xxf:default="42">
-                        <xf:constraint value="string-length() le 100"/>
-                        <xxf:default value="43"/>
+                        <xf:validation constraint="string-length() le 100"/>
+                        <xf:validation xxf:default="43"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>

@@ -68,16 +68,23 @@ class Connection(
         val scheme    = url.getScheme
 
         try {
-            if (httpMethod == "GET" && Set("file", "oxf")(scheme)) {
-                // GET with file: or oxf:
+            if (httpMethod == "GET" && SupportedNonHttpReadonlySchemes(scheme)) {
+                // GET for supported but non-http: or https: schemes
 
                 // Create URL connection object
                 val urlConnection = URLFactory.createURL(urlString).openConnection
                 urlConnection.connect()
 
-                // Try to get a reasonable mediatype based on the extension
+                // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
+                // "data:" only as urlConnection.getContentType returns funny results e.g. for "file:".
+                def contentTypeFromConnection =
+                    if (scheme == "data") Option(urlConnection.getContentType) else None
+
+                def contentTypeFromPath =
+                    Option(url.getPath) flatMap Mediatypes.getMimeType
+
                 def contentTypeHeader =
-                    Mediatypes.getMimeType(url.getPath) map (ct ⇒ ContentType → List(ct))
+                    contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
 
                 val headers =
                     urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
@@ -216,6 +223,7 @@ class Connection(
 }
 
 trait ConnectionState {
+    
     self: Connection ⇒
 
     import org.orbeon.oxf.util.ConnectionState._
@@ -287,26 +295,28 @@ private object ConnectionState {
 
 object Connection extends Logging {
 
+    private val SupportedNonHttpReadonlySchemes = Set("file", "oxf", "data")
+
     private val HttpInternalPathsProperty  = "oxf.http.internal-paths"
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
     
     // Create a new Connection
     def apply(
-        httpMethod  : String,
-        url         : URI,
-        credentials : Option[Credentials],
-        content     : Option[StreamedContent],
-        headers     : Map[String, List[String]],
-        loadState   : Boolean,
-        logBody     : Boolean)(implicit
-        logger      : IndentedLogger
+        httpMethodUpper : String,
+        url             : URI,
+        credentials     : Option[Credentials],
+        content         : Option[StreamedContent],
+        headers         : Map[String, List[String]],
+        loadState       : Boolean,
+        logBody         : Boolean)(implicit
+        logger          : IndentedLogger
     ): Connection = {
 
-        require(! requiresRequestBody(httpMethod) || content.isDefined)
+        require(! requiresRequestBody(httpMethodUpper) || content.isDefined)
 
         val connection =
-            new Connection(httpMethod, url, credentials, content, headers, logBody)
+            new Connection(httpMethodUpper, url, credentials, content, headers, logBody)
 
         // Get connection state if possible
         if (loadState && isHTTPOrHTTPS(url.getScheme))
@@ -317,7 +327,7 @@ object Connection extends Logging {
     
     // For Java callers
     def jApply(
-        httpMethod        : String,
+        httpMethodUpper   : String,
         url               : URI,
         credentialsOrNull : Credentials,
         messageBodyOrNull : Array[Byte],
@@ -328,20 +338,20 @@ object Connection extends Logging {
     ): Connection = {
 
         val messageBody: Option[Array[Byte]] =
-            if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
+            if (requiresRequestBody(httpMethodUpper)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
         val content = messageBody map
             (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
 
         apply(
-            httpMethod  = httpMethod,
-            url         = url,
-            credentials = Option(credentialsOrNull),
-            content     = content,
-            headers     = headers,
-            loadState   = loadState,
-            logBody     = logBody)(
-            logger      = logger
+            httpMethodUpper = httpMethodUpper,
+            url             = url,
+            credentials     = Option(credentialsOrNull),
+            content         = content,
+            headers         = headers,
+            loadState       = loadState,
+            logBody         = logBody)(
+            logger          = logger
         )
     }
 
@@ -354,7 +364,7 @@ object Connection extends Logging {
     }
 
     // Whether the given method requires a request body
-    def requiresRequestBody(method: String) = Set("POST", "PUT")(method)
+    def requiresRequestBody(httpMethodUpper: String) = Set("POST", "PUT")(httpMethodUpper)
 
     private def schemeRequiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)
     private def isHTTPOrHTTPS(scheme: String)         = Set("http", "https")(scheme)
@@ -390,7 +400,7 @@ object Connection extends Logging {
 
     def buildConnectionHeadersLowerWithSOAPIfNeeded(
         scheme            : String,
-        httpMethod        : String,
+        httpMethodUpper   : String,
         credentialsOrNull : Credentials,
         mediatype         : String,
         encodingForSOAP   : String,
@@ -406,7 +416,7 @@ object Connection extends Logging {
 
                 val headers = customHeaders.toMap
 
-                if (requiresRequestBody(httpMethod) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
+                if (requiresRequestBody(httpMethodUpper) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
                     headers + (ContentType → List(mediatype ensuring (_ ne null)))
                 else
                     headers
@@ -427,7 +437,7 @@ object Connection extends Logging {
 
             val soapHeadersLower =
                 buildSOAPHeadersLowerIfNeeded(
-                    httpMethod,
+                    httpMethodUpper,
                     soapMediatypeWithContentType,
                     encodingForSOAP
                 )
@@ -660,7 +670,7 @@ object Connection extends Logging {
             { session ⇒ "cookie" →  List(sessionCookieName + "=" + session.getId) }
 
     private def buildSOAPHeadersLowerIfNeeded(
-        httpMethod                : String,
+        httpMethodUpper           : String,
         mediatypeMaybeWithCharset : String,
         encoding                  : String)(implicit
         logger                    : IndentedLogger
@@ -681,7 +691,7 @@ object Connection extends Logging {
             "; charset=" + parameters.getOrElse("charset", encoding)
 
         val newHeaders =
-            httpMethod match {
+            httpMethodUpper match {
                 case "GET" if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
                     // Set an Accept header
 

@@ -28,6 +28,14 @@ appliesToControl = (control) ->
 
 Event.onDOMReady ->
 
+    setValue = (control, formattedDate) ->
+        attributeName = if $(control).is(".xforms-input-appearance-minimal") then "alt" else "value"
+        inputHolder = $(control).children('.xforms-input-input')
+        $(inputHolder).attr(attributeName, formattedDate)
+        value = Controls.getCurrentValue(control)
+        changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, value, "xxforms-value")
+        ORBEON.xforms.server.AjaxServer.fireEvents([changeEvent], false)
+
     # Only enable date/time support on mobile WebKit for now. We don't detect if the browser supports the date/time types
     # as Safari does support them, but in such a minimal way that we wouldn't want to enable that on Safari.
     if YD.hasClass document.body, "xforms-ios"
@@ -68,9 +76,8 @@ Event.onDOMReady ->
                         input = (YD.getElementsByClassName clazz, "input", event.control)[0]
                         input.value = value
                 else
-                    # For date and time, just set value of the input
-                    input = (event.control.getElementsByTagName "input")[0]
-                    input.value = event.newValue
+                    # For date and time, just set value of the .xforms-input-input
+                    setValue(event.control, event.newValue)
 
     else
 
@@ -96,11 +103,8 @@ Event.onDOMReady ->
         # User selected a date in the picker
         calendarSelectEvent = ->
             jsDate = yuiCalendar.getSelectedDates()[0]
-            inputField.value = DateTime.jsDateToFormatDisplayDate jsDate
-            inputField.alt = inputField.value  if YAHOO.util.Dom.hasClass control, "xforms-input-appearance-minimal"
-            value = Controls.getCurrentValue control
-            changeEvent = new ORBEON.xforms.server.AjaxServer.Event null, control.id, value, "xxforms-value"
-            ORBEON.xforms.server.AjaxServer.fireEvents [changeEvent], false
+            formattedDate = DateTime.jsDateToFormatDisplayDate(jsDate)
+            setValue(control, formattedDate)
             closeCalendar()
 
         # Open calendar on click

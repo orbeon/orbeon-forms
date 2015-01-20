@@ -104,12 +104,12 @@ trait ControlBindingSupport {
 
     // Set this control's binding context and handle create/destroy/update lifecycle
     final def setBindingContext(
-        bindingContext: BindingContext,
-        parentRelevant: Boolean,
-        update        : Boolean,
-        restoreState  : Boolean,
-        state         : Option[ControlState]
-    ) {
+        bindingContext : BindingContext,
+        parentRelevant : Boolean,
+        update         : Boolean,
+        restoreState   : Boolean,
+        state          : Option[ControlState]
+    ): Unit = {
         val oldBinding = this._bindingContext
         this._bindingContext = bindingContext
 

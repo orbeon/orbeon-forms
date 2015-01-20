@@ -31,7 +31,7 @@ object SubmissionHeaders {
         sourceEffectiveId : String,                     // effective id of the enclosing <xf:*>element
         enclosingElement  : Element,                    // enclosing <xf:*> element
         initialHeaders    : Map[String, List[String]]   // initial headers or empty list of headers
-   ): Map[String, List[String]] = {
+    ): Map[String, List[String]] = {
 
         val fullPrefix = xblContainer.getFullPrefix
 
@@ -46,18 +46,29 @@ object SubmissionHeaders {
                 def getElementValue(name: QName) = {
                     val element = headerElement.element(name)
                     if (element eq null)
-                        throw new OXFException("Missing <" + name.getQualifiedName + "> child element of <header> element")
+                        throw new OXFException(s"Missing <${name.getQualifiedName}> child element of <header> element")
 
-                    val scope = xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))
+                    val scope =
+                        xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))
+
                     contextStack.pushBinding(element, sourceEffectiveId, scope)
-                    val result = XFormsUtils.getElementValue(xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, false, null)
+                    val result =
+                        XFormsUtils.getElementValue(
+                            xblContainer.getContainingDocument,
+                            contextStack,
+                            sourceEffectiveId,
+                            element,
+                            false,
+                            false,
+                            null
+                        )
                     contextStack.popBinding
 
                     result
                 }
 
                 // Evaluate header name and value
-                val headerName = getElementValue(XFormsConstants.XFORMS_NAME_QNAME)
+                val headerName  = getElementValue(XFormsConstants.XFORMS_NAME_QNAME)
                 val headerValue = getElementValue(XFormsConstants.XFORMS_VALUE_QNAME)
 
                 // Evaluate combine attribute as AVT
@@ -75,7 +86,7 @@ object SubmissionHeaders {
                         xblContainer.getContainingDocument.getRequestStats.getReporter)
 
                     if (! AllowedCombineValues(result))
-                        throw new OXFException("Invalid value '" + result + "' for attribute combine.")
+                        throw new OXFException(s"Invalid value '$result' for attribute combine.")
 
                     result
                 }
@@ -93,7 +104,9 @@ object SubmissionHeaders {
 
             // Process all nested <header> elements
             for (headerElement ← headerElements) {
-                val headerScope = xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(headerElement))
+                val headerScope =
+                    xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(headerElement))
+
                 contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 
                 if (contextStack.getCurrentBindingContext.newBind) {

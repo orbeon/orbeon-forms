@@ -35,15 +35,7 @@
                 .xbl-fr-button { display: inline }
                 .xbl-fr-button .yui-button {
                     display: inline-block;
-                    *zoom: 1;
-                    *display: inline;
                     vertical-align: middle;
-                    <!-- The following fixes:
-                         [ #315153 ] IE 6/7: fr:button border is cut when in table with cellpadding="0"
-                         http://forge.ow2.org/tracker/index.php?func=detail&aid=315153&group_id=168&atid=350207
-                         This issue cannot be reproduced on IE8 in IE7 mode.
-                         We only want to override the margin-bottom here, not other margins declared in button.css. -->
-                    *margin-bottom: 1px;
                 }
                 <!-- Override Liferay rule that must not apply to us
                      NOTE: Use a rule that is not too strong so that CSS that actually places a background image on

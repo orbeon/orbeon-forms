@@ -421,11 +421,11 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
                                 <errors>
-                                    <error absolute-id="|first-name-control|" position="146" label="First name" alert="Invalid first name" level="error"/>
-                                    <error absolute-id="|note-control⊙1|" position="151" label="Note" alert="Invalid note" level="error"/>
-                                    <error absolute-id="|note-control⊙2|" position="151" label="Note" alert="Invalid note" level="error"/>
-                                    <error absolute-id="|note-control⊙3|" position="151" label="Note" alert="Invalid note" level="error"/>
-                                    <error absolute-id="|last-name-control|" position="154" label="Last name" alert="Invalid last name" level="error"/>
+                                    <error absolute-id="|first-name-control|" position="147" label="First name" alert="Invalid first name" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙1|" position="152" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙2|" position="152" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙3|" position="152" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|last-name-control|" position="155" label="Last name" alert="Invalid last name" level="error" section-name=""/>
                                 </errors>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">

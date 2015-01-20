@@ -436,7 +436,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                  // Compute new type validity if the value of the node might have changed OR the value of requiredness
                  // might have changed
                 typeValidity = validateType(bindNode.parentBind(), currentNodeInfo, isRequired);
-                bindNode.setTypeValid(typeValidity, staticBind.typeMIPAsList().head());
+                bindNode.setTypeValid(typeValidity, staticBind.typeMIPOpt().get());
              } else {
                  // Keep current value
                 typeValidity = bindNode.typeValid();

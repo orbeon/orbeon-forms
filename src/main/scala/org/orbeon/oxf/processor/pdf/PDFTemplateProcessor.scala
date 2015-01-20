@@ -307,20 +307,20 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
                     val cxr =
                         Connection(
-                            httpMethod  = "GET",
-                            url         = url,
-                            credentials = None,
-                            content     = None,
-                            headers     = Connection.buildConnectionHeadersLowerIfNeeded(
+                            httpMethodUpper = "GET",
+                            url             = url,
+                            credentials     = None,
+                            content         = None,
+                            headers         = Connection.buildConnectionHeadersLowerIfNeeded(
                                 scheme           = url.getScheme,
                                 credentials      = None,
                                 customHeaders    = Map(),
                                 headersToForward = Option(Connection.getForwardHeaders))(
                                 logger           = context.logger
                             ),
-                            loadState   = true,
-                            logBody     = false)(
-                            logger      = context.logger
+                            loadState       = true,
+                            logBody         = false)(
+                            logger          = context.logger
                         ).connect(
                             saveState = true
                         )

@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import collection.JavaConverters._
 import java.util.{Iterator ⇒ JIterator}
-import org.dom4j.Namespace
-import org.dom4j.QName
+
+import org.dom4j.{Namespace, QName ⇒ Dom4jQName}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{XPath, PooledXPathExpression, XPathCache}
+import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.model.BindNode
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils, XFormsModel}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsModel, XFormsUtils}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.sxpath.IndependentContext
-import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.saxon.value.QNameValue
+import org.orbeon.saxon.value.{AtomicValue, QNameValue}
+import org.orbeon.scaxon.XML
+
+import scala.collection.JavaConverters._
 
 /**
  * Base class for all XForms functions.
@@ -71,43 +73,20 @@ abstract class XFormsFunction extends SystemFunction {
     def getContainingDocument(implicit xpathContext: XPathContext) =
         Option(context) map (_.container.getContainingDocument) orNull
 
-    protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): QName = {
+    protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
 
-        def createQName(qNameString: String, qNameURI: String, colonIndex: Int, prefix: String) =
-            if (colonIndex == -1)
-                // NCName (this assumes that if there is no prefix, the QName is in no namespace)
-                new QName(qNameString)
-            else
-                // QName-but-not-NCName
-                new QName(qNameString.substring(colonIndex + 1), new Namespace(prefix, qNameURI))
+        val evaluatedExpression =
+            qNameExpression.evaluateItem(xpathContext)
 
-        Option(qNameExpression) map (_.evaluateItem(xpathContext)) match {
-            case Some(qName: QNameValue) ⇒
-                // Directly got a QName
-                val qNameString = qName.getStringValue
-                val qNameURI = qName.getNamespaceURI
-                val colonIndex = qNameString.indexOf(':')
-                val prefix = qNameString.substring(0, colonIndex)
-
-                createQName(qNameString, qNameURI, colonIndex, prefix)
-            case Some(qName: AtomicValue) ⇒
-                val qNameString = qName.getStringValue
-                val colonIndex = qNameString.indexOf(':')
-                if (colonIndex == -1)
-                    // NCName
-                    createQName(qNameString, null, colonIndex, null)
-                else {
-                    // QName-but-not-NCName
-                    val prefix = qNameString.substring(0, colonIndex)
-                    val namespaceMapping = context.container.getNamespaceMappings(bindingContext.controlElement)
-
-                    // Get QName URI
-                    val qNameURI = namespaceMapping.mapping.get(prefix)
-                    if (qNameURI eq null)
-                        throw new OXFException("Namespace prefix not in space for QName: " + qNameString)
-                    createQName(qNameString, qNameURI, colonIndex, prefix)
-                }
-            case _ ⇒ null
+        evaluatedExpression match {
+            case qName: QNameValue ⇒
+                // Directly got a QName so there is no need for namespace resolution
+                qNameFromQNameValue(qName)
+            case atomic: AtomicValue ⇒
+                // Must resolve prefix if present
+                qNameFromStringValue(atomic.getStringValue, bindingContext)
+            case other ⇒
+                throw new OXFException(s"Cannot create QName from non-atomic item of class '${other.getClass.getName}'")
         }
     }
 
@@ -188,12 +167,12 @@ abstract class XFormsFunction extends SystemFunction {
 object XFormsFunction {
 
     case class Context(
-        container: XBLContainer,
-        bindingContext: BindingContext,
-        sourceEffectiveId: String,
-        model: XFormsModel,
-        data: Any) extends XPath.FunctionContext {
-
+        container         : XBLContainer,
+        bindingContext    : BindingContext,
+        sourceEffectiveId : String,
+        model             : XFormsModel,
+        data              : Any
+    ) extends XPath.FunctionContext {
         def containingDocument = container.containingDocument
     }
 
@@ -205,4 +184,51 @@ object XFormsFunction {
 
     def context =
         XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
+
+    // This ADT or something like it should be defined somewhere else
+    sealed trait QNameType
+    case   class UnprefixedName(local: String) extends QNameType
+    case   class PrefixedName(prefix: String, local: String) extends QNameType
+
+    def parseQName(lexicalQName: String): QNameType =
+        XML.parseQName(lexicalQName) match {
+            case ("", local)     ⇒ UnprefixedName(local)
+            case (prefix, local) ⇒ PrefixedName(prefix, local)
+        }
+
+    def qNameFromQNameValue(value: QNameValue): Dom4jQName =
+        parseQName(value.getStringValue) match {
+            case PrefixedName(prefix, local) ⇒ new Dom4jQName(local, new Namespace(prefix, value.getNamespaceURI))
+            case UnprefixedName(local)       ⇒ new Dom4jQName(local)
+        }
+
+    def qNameFromStringValue(value: String, bindingContext: BindingContext): Dom4jQName =
+        parseQName(value) match {
+            case PrefixedName(prefix, local) ⇒
+
+                def prefixNotInScope() =
+                    throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
+
+                val namespaceMapping = context.data match {
+                    case Some(bindNode: BindNode) ⇒
+                        // Function was called from a bind
+                        bindNode.parentBind.staticBind.namespaceMapping
+                    case _ if bindingContext.controlElement ne null ⇒
+                        // Function was called from a control
+                        // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
+                        context.container.getNamespaceMappings(bindingContext.controlElement)
+                    case _ ⇒
+                        // Unclear which cases reach here!
+                        // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
+                        prefixNotInScope()
+                }
+
+                val qNameURI = namespaceMapping.mapping.get(prefix)
+                if (qNameURI eq null)
+                    prefixNotInScope()
+
+                new Dom4jQName(local, new Namespace(prefix, qNameURI))
+            case UnprefixedName(local) ⇒
+                new Dom4jQName(local)
+        }
 }

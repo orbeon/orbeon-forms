@@ -5,7 +5,6 @@
       <value>
         <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="" />
         <ScalaCodeStyleSettings>
-          <option name="ENFORCE_PROCEDURE_SYNTAX_FOR_UNIT" value="false" />
           <option name="REPLACE_CASE_ARROW_WITH_UNICODE_CHAR" value="true" />
           <option name="REPLACE_MAP_ARROW_WITH_UNICODE_CHAR" value="true" />
           <option name="REPLACE_FOR_GENERATOR_ARROW_WITH_UNICODE_CHAR" value="true" />

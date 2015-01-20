@@ -491,8 +491,10 @@
 
                     <xsl:if test="$is-editable">
                         <!-- Point to this td -->
+                        <!-- Used by $control below and $td/@id -->
                         <xf:var name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
                         <!-- Point to the contained control -->
+                        <!-- Used below by fbf:hasEditor() only -->
                         <xf:var name="control" value="$td/*[1]" as="element()?"/>
                     </xsl:if>
 

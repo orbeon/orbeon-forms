@@ -13,11 +13,78 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
 trait FormRunnerErrorSummary {
+
+    private val ErrorSummaryIds = List("error-summary-control-top", "error-summary-control-bottom")
+
+    private def findErrorSummaryControl = (
+        ErrorSummaryIds
+        flatMap      { id ⇒ Option(containingDocument.getControlByEffectiveId(id)) }
+        collectFirst { case c: XFormsComponentControl ⇒ c }
+    )
+
+    private def findErrorSummaryModel =
+        findErrorSummaryControl flatMap (_.nestedContainer.models find (_.getId == "fr-error-summary-model"))
+
+    private def findErrorsInstance =
+        findErrorSummaryModel map (_.getInstance("fr-errors-instance"))
+
+    def sectionNameForControlId(absoluteControlId: String): Option[String] =
+        Option(containingDocument.getControlByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
+            control ⇒
+                val sectionsIt =
+                    new AncestorOrSelfIterator(control) collect {
+                        case section: XFormsComponentControl if section.localName == "section" ⇒ section
+                    }
+
+                sectionsIt.lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
+        }
+
+    // Return the subset of section names passed which contain errors in the global error summary
+    def topLevelSectionsWithErrors(sectionIds: String, onlyVisible: Boolean): Seq[String] =
+        findErrorsInstance match {
+            case Some(errorsInstance) ⇒
+
+                val sectionNamesSet = split[Set](sectionIds)
+
+                def allErrorsIt =
+                    (errorsInstance.rootElement / "error").iterator
+
+                def visibleErrorsIt =
+                    findErrorSummaryModel.iterator flatMap (m ⇒ asScalaIterator(m.getVariable("visible-errors"))) collect {
+                        case n: NodeInfo ⇒ n
+                    }
+
+                val relevantErrorsIt =
+                    (if (onlyVisible) visibleErrorsIt else allErrorsIt) filter (_.attValue("level") == "error")
+
+                val sectionNameErrorIt = (
+                    relevantErrorsIt
+                    map    { e ⇒ e.attValue("section-name") → e }
+                    filter { case (name, _) ⇒ sectionNamesSet(name) }
+                )
+
+                val groupedIt =
+                    sectionNameErrorIt.to[List] groupBy (_._1) iterator
+
+                val sectionNameCountIt =
+                    groupedIt map { case (name, list) ⇒ name → list.size }
+
+                sectionNameCountIt.map(_._1).to[List]
+
+            case None ⇒
+                Nil
+        }
+
     // Update the iteration in a control's absolute id
     def updateIteration(absoluteId: String, repeatAbsoluteId: String, fromIterations: Array[Int], toIterations: Array[Int]): String = {
 

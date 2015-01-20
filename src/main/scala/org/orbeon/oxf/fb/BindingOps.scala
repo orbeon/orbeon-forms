@@ -22,7 +22,7 @@ import org.orbeon.scaxon.XML._
 
 trait BindingOps {
 
-    def newElementName(currentControlName: QName, oldDatatype: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
+    def newElementName(currentControlName: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
 
         val mappings = BindingDescriptor.createDirectToDatatypeMappingsForAllBindings(bindings)
 
@@ -85,7 +85,7 @@ trait BindingOps {
 
         val instanceTemplate = bindingMetadata(binding) / "*:templates" / "*:instance"
 
-        if (! instanceTemplate.isEmpty)
+        if (instanceTemplate.nonEmpty)
             elementInfo(controlName, (instanceTemplate.head /@ @*) ++ (instanceTemplate / *))
         else
             elementInfo(controlName)

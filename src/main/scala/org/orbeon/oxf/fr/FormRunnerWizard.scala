@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2015 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,19 +13,9 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.PathOps
+trait FormRunnerWizard extends FormRunnerBaseOps {
 
-object FormRunner
-    extends FormRunnerPersistence
-    with FormRunnerPermissions
-    with FormRunnerPDF
-    with FormRunnerLang
-    with FormRunnerErrorSummary
-    with FormRunnerBaseOps
-    with FormRunnerControlOps
-    with FormRunnerContainerOps
-    with FormRunnerSummary
-    with FormRunnerWizard
-    with FormRunnerHome
-    with FormRunnerMetadata
-    with PathOps
+    def isWizardValidate =
+        formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) exists (_ == "true")
+
+}

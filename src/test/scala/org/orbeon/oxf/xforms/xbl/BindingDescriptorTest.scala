@@ -44,10 +44,10 @@ class BindingDescriptorTest extends AssertionsForJUnit {
     val Bindings = ComponentsDocument.rootElement child (XBL → "xbl") child (XBL → "binding")
 
     @Test def testNewElementName(): Unit = {
-        assert(Some(FR → "number": QName) === newElementName(XF → "input",  XS → "string",  XS → "decimal",  Bindings))
-        assert(Some(FR → "number": QName) === newElementName(XF → "input",  XS → "string",  XF → "decimal",  Bindings))
-        assert(Some(XF → "input" : QName) === newElementName(FR → "number", XS → "decimal", XS → "string",   Bindings))
-        assert(Some(XF → "input" : QName) === newElementName(FR → "number", XF → "decimal", XS → "string",   Bindings))
-        assert(None                       === newElementName(XF → "input",  XS → "string",  XS → "boolean",  Bindings))
+        assert(Some(FR → "number": QName) === newElementName(XF → "input",  XS → "decimal",  Bindings))
+        assert(Some(FR → "number": QName) === newElementName(XF → "input",  XF → "decimal",  Bindings))
+        assert(Some(XF → "input" : QName) === newElementName(FR → "number", XS → "string",   Bindings))
+        assert(Some(XF → "input" : QName) === newElementName(FR → "number", XS → "string",   Bindings))
+        assert(None                       === newElementName(XF → "input",  XS → "boolean",  Bindings))
     }
 }

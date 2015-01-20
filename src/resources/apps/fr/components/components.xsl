@@ -81,7 +81,7 @@
 
     <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
 
-    <xsl:variable name="error-summary-top" select="normalize-space($error-summary) = ('top', 'both')" as="xs:boolean"/>
+    <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"        as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
 
     <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>

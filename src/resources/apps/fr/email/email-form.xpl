@@ -142,7 +142,7 @@
         <p:input name="fr-resources" href="#fr-resources"/>
         <p:input name="attachments" href="#attachments"/>
         <p:input name="config">
-            <message xsl:version="2.0">
+            <message xsl:version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
                 <xsl:variable name="data" select="/*" as="element()"/>
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xh:html)"/>
@@ -159,7 +159,7 @@
 
                 <!-- Find fr-email-recipient controls and binds -->
                 <xsl:variable name="recipient-controls" as="element()*"
-                              select="$xhtml/xh:body//xf:*[p:has-class('fr-email-recipient')]"/>
+                              select="$xhtml/xh:body//(xf:* | fr:*)[@bind and @class and p:has-class('fr-email-recipient')]"/>
                 <xsl:variable name="recipient-binds" as="element(xf:bind)*"
                               select="for $control in $recipient-controls return $xhtml/xh:head/xf:model//xf:bind[@id = $control/@bind]"/>
 
@@ -170,9 +170,9 @@
                 <xsl:variable name="email-addresses" as="xs:string*"
                               select="for $path in $recipient-paths[normalize-space()] return $data/saxon:evaluate($path)"/>
 
-                <!-- Find fr-email-recipient controls and binds -->
+                <!-- Find fr-email-subject controls and binds -->
                 <xsl:variable name="subject-controls" as="element()*"
-                              select="$xhtml/xh:body//xf:*[p:has-class('fr-email-subject')]"/>
+                              select="$xhtml/xh:body//(xf:* | fr:*)[@bind and @class and p:has-class('fr-email-subject')]"/>
                 <xsl:variable name="subject-binds" as="element(xf:bind)*"
                               select="for $control in $subject-controls return $xhtml/xh:head/xf:model//xf:bind[@id = $control/@bind]"/>
 

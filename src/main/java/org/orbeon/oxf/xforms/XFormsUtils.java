@@ -20,18 +20,20 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.xforms.state.ControlState;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.model.DataModel;
+import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -111,10 +113,10 @@ public class XFormsUtils {
             // No encryption
             if (gzipByteArray == null) {
                 // The data was not compressed above
-                return "X3" + Base64.encode(bytesToEncode, false);
+                return "X3" + org.orbeon.oxf.util.Base64.encode(bytesToEncode, false);
             } else {
                 // The data was compressed above
-                return "X4" + Base64.encode(gzipByteArray, false);
+                return "X4" + org.orbeon.oxf.util.Base64.encode(gzipByteArray, false);
             }
         }
     }
@@ -417,12 +419,12 @@ public class XFormsUtils {
                 gzipByteArray = SecureUtils.decrypt(encodedString);
             } else if (prefix.equals("X3")) {
                 // No encryption + uncompressed
-                resultBytes1 = Base64.decode(encodedString);
+                resultBytes1 = org.orbeon.oxf.util.Base64.decode(encodedString);
                 gzipByteArray = null;
             } else if (prefix.equals("X4")) {
                 // No encryption + compressed
                 resultBytes1 = null;
-                gzipByteArray = Base64.decode(encodedString);
+                gzipByteArray = org.orbeon.oxf.util.Base64.decode(encodedString);
             } else {
                 throw new OXFException("Invalid prefix for encoded string: " + prefix);
             }

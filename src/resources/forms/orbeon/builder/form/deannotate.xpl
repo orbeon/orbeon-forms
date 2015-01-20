@@ -84,21 +84,20 @@
                 </xsl:template>
 
                 <!-- Convert MIP names (attributes and nested elements) -->
-                <xsl:template match="xf:bind/@fb:relevant | xf:bind/@fb:readonly | xf:bind/@fb:required | xf:bind/@fb:constraint | xf:bind/@fb:calculate">
+                <xsl:template match="xf:bind/@fb:relevant
+                                   | xf:bind/@fb:readonly
+                                   | xf:bind/@fb:required
+                                   | xf:bind/@fb:constraint
+                                   | xf:bind/@fb:calculate
+                                   | xf:validation/@fb:relevant
+                                   | xf:validation/@fb:readonly
+                                   | xf:validation/@fb:required
+                                   | xf:validation/@fb:constraint
+                                   | xf:validation/@fb:calculate">
                     <xsl:attribute name="{local-name()}" select="."/>
                 </xsl:template>
-                <xsl:template match="xf:bind/@fb:default">
+                <xsl:template match="xf:bind/@fb:default | xf:validation/@fb:default">
                     <xsl:attribute name="xxf:{local-name()}" select="."/>
-                </xsl:template>
-                <xsl:template match="xf:bind/fb:relevant | xf:bind/fb:readonly | xf:bind/fb:required | xf:bind/fb:constraint | xf:bind/fb:calculate">
-                    <xsl:element name="xf:{local-name()}">
-                        <xsl:apply-templates select="@* | node()"/>
-                    </xsl:element>
-                </xsl:template>
-                <xsl:template match="xf:bind/fb:default">
-                    <xsl:element name="xxf:{local-name()}">
-                        <xsl:apply-templates select="@* | node()"/>
-                    </xsl:element>
                 </xsl:template>
 
                 <!-- Restore xxf:custom-mips -->

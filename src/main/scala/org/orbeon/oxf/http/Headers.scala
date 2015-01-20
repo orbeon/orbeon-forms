@@ -28,6 +28,7 @@ object Headers {
     val ContentLength       = "Content-Length"
     val LastModified        = "Last-Modified"
     val Authorization       = "Authorization"
+    val OrbeonClient        = "Orbeon-Client"
             
     val OrbeonTokenLower    = OrbeonToken.toLowerCase
     val OrbeonUsernameLower = OrbeonUsername.toLowerCase
@@ -38,6 +39,7 @@ object Headers {
     val ContentLengthLower  = ContentLength.toLowerCase
     val LastModifiedLower   = LastModified.toLowerCase
     val AuthorizationLower  = Authorization.toLowerCase
+    val OrbeonClientLower   = OrbeonClient.toLowerCase
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
     //

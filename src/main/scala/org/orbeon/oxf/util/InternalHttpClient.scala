@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{LocalExternalContext, LocalRequest, LocalResponse, URLRewriter}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.portlet.OrbeonPortlet
@@ -28,12 +28,12 @@ import org.orbeon.oxf.servlet.OrbeonServlet
 object InternalHttpClient extends HttpClient{
 
     def connect(
-        url        : String,
-        credentials: Option[Credentials], // ignored
-        cookieStore: CookieStore,         // ignored
-        method     : String,
-        headers    : Map[String, List[String]],
-        content    : Option[StreamedContent]
+        url         : String,
+        credentials : Option[Credentials], // ignored
+        cookieStore : CookieStore,         // ignored
+        method      : String,
+        headers     : Map[String, List[String]],
+        content     : Option[StreamedContent]
     ): HttpResponse = {
 
         require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
@@ -45,17 +45,27 @@ object InternalHttpClient extends HttpClient{
 
         val incomingExternalContext = NetUtils.getExternalContext
         val incomingRequest         = incomingExternalContext.getRequest
-        val urlRewriter             = incomingExternalContext.getResponse: URLRewriter
 
         val request =
             new LocalRequest(
                 incomingRequest         = incomingRequest,
                 contextPath             = incomingRequest.getContextPath,
                 pathQuery               = url,
-                method                  = method,
+                methodUpper             = method,
                 headersMaybeCapitalized = headers,
                 content                 = content
             )
+        
+        // Honor Orbeon-Client header (see also ServletExternalContext)
+        val urlRewriter =
+            Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
+                case Some(client) if EmbeddedClientValues(client) ⇒
+                    new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
+                case Some(client) ⇒
+                    new ServletURLRewriter(request)
+                case None ⇒
+                    incomingExternalContext.getResponse: URLRewriter
+            }
 
         val response = new LocalResponse(urlRewriter)
 
@@ -83,4 +93,6 @@ object InternalHttpClient extends HttpClient{
     }
 
     override def shutdown() = ()
+
+    private val EmbeddedClientValues = Set("embedded", "portlet")
 }

@@ -395,27 +395,30 @@ Inserting error information into error list:
                                     <xf:repeat ref="$visible-errors" id="er">
                                         <xh:tr>
                                             <!-- Clickable / linkable label -->
-                                            <xf:var name="has-label" value="exists(normalize-space(@label))"/>
-                                            <xf:var name="focusable" value="xxf:focusable(@absolute-id)"/>
+                                            <xf:var
+                                                name="label"
+                                                value="if (normalize-space(@label) != '') then @label else '&lt;i class=&quot;icon-arrow-right&quot;/>'"/>
+                                            <xf:var
+                                                name="focusable"
+                                                value="xxf:focusable(@absolute-id)"/>
+
                                             <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
                                             <xh:td>
-                                                <xf:group ref=".[$has-label]">
-                                                    <!-- In noscript mode, use a plain link to the client id -->
-                                                    <xf:group ref=".[$noscript]">
-                                                        <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="@label" class="fr-error-label"/></xh:a>
-                                                    </xf:group>
-                                                    <!-- If the control is not focusable, don't link -->
-                                                    <xf:output
-                                                        ref=".[not($noscript) and not($focusable)]"
-                                                        class="fr-error-label"
-                                                        mediatype="text/html"
-                                                        value="@label"/>
-                                                    <!-- Otherwise use trigger -->
-                                                    <xf:trigger ref=".[not($noscript) and $focusable]" appearance="minimal" class="fr-error-label">
-                                                        <xf:label mediatype="text/html" value="@label"/>
-                                                        <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
-                                                    </xf:trigger>
+                                                <!-- In noscript mode, use a plain link to the client id -->
+                                                <xf:group ref=".[$noscript]">
+                                                    <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="$label" class="fr-error-label"/></xh:a>
                                                 </xf:group>
+                                                <!-- If the control is not focusable, don't link -->
+                                                <xf:output
+                                                    ref=".[not($noscript) and not($focusable)]"
+                                                    class="fr-error-label"
+                                                    mediatype="text/html"
+                                                    value="$label"/>
+                                                <!-- Otherwise use trigger -->
+                                                <xf:trigger ref=".[not($noscript) and $focusable]" appearance="minimal" class="fr-error-label">
+                                                    <xf:label mediatype="text/html" value="$label"/>
+                                                    <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
+                                                </xf:trigger>
                                             </xh:td>
                                             <xh:td>
                                                 <xf:output

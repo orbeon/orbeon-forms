@@ -25,7 +25,7 @@ import org.orbeon.oxf.servlet.OrbeonServlet
 //
 // - no actual HTTP requests are performed
 // - internal requests are made to the Orbeon servlet
-object InternalHttpClient extends HttpClient{
+object InternalHttpClient extends HttpClient {
 
     def connect(
         url         : String,

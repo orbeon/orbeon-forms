@@ -380,7 +380,7 @@ trait FormRunnerActions {
             val requestedLangQuery = (
                 paramByName(params, "lang")
                 flatMap nonEmptyOrNone
-                map { lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang) }
+                map     (lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang))
             )
 
             recombineQuery(s"/fr/$app/$form/pdf/$document", requestedLangQuery getOrElse Nil)

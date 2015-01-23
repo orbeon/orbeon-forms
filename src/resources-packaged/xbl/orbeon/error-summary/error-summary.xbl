@@ -156,7 +156,7 @@ Inserting error information into error list:
                         <xf:setvalue ref="@level"        value="$level"/>
                         <xf:setvalue ref="@alert"        value="$alert"/>
                         <xf:setvalue ref="@label"        value="$label"/>
-                        <xf:setvalue ref="@section-name" value="frf:sectionNameForControlId($absolute-id)"/>
+                        <xf:setvalue ref="@section-name" value="frf:topLevelSectionNameForControlId($absolute-id)"/>
                     </xf:action>
 
                 </xf:action>

@@ -38,7 +38,7 @@ trait FormRunnerErrorSummary {
     private def findErrorsInstance =
         findErrorSummaryModel map (_.getInstance("fr-errors-instance"))
 
-    def sectionNameForControlId(absoluteControlId: String): Option[String] =
+    def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
         Option(containingDocument.getControlByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
             control ⇒
                 val sectionsIt =

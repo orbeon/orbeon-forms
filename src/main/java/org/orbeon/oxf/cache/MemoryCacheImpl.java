@@ -15,10 +15,11 @@ package org.orbeon.oxf.cache;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.iterators.TransformIterator;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -30,44 +31,16 @@ public class MemoryCacheImpl implements Cache {
 
     private int maxSize;
 
-    private final String statisticsContextKey;
-
     private Map<CacheKey, CacheEntry> keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
     private CacheLinkedList linkedList = new CacheLinkedList();
     private int currentSize;
 
     public MemoryCacheImpl(String cacheName, int maxSize) {
         this.maxSize = maxSize;
-        this.statisticsContextKey =  "memory-cache-statistics." + cacheName;
-    }
-
-    private class MemoryCacheStatistics implements CacheStatistics {
-
-        private int hitsCount;
-        private int missCount;
-        private int addCount;
-        private int expirationCount;
-
-        public int getMaxSize() { return maxSize; }
-        public int getCurrentSize() { return currentSize; }
-
-        public int getHitCount() { return hitsCount; }
-        public int getMissCount() { return missCount; }
-        public int getAddCount() { return addCount; }
-        public int getExpirationCount() { return expirationCount; }
-
-        public void incrementHitsCount() { hitsCount++; }
-        public void incrementMissCount() { missCount++; }
-        public void incrementAddCount() { addCount++; }
-        public void incrementExpirationCount() { expirationCount++; }
     }
 
     public synchronized void add(CacheKey key, Object validity, Object cacheable) {
         if (key == null || validity == null || maxSize == 0) return;
-        final PropertyContext propertyContext = PipelineContext.get();
-        final MemoryCacheStatistics statistics = (propertyContext != null) ? (MemoryCacheStatistics) getStatistics() : null;
-        if (statistics != null)
-            statistics.incrementAddCount();
         CacheEntry entry = keyToEntryMap.get(key);
         if (entry == null) {
             // No existing entry found
@@ -173,10 +146,6 @@ public class MemoryCacheImpl implements Cache {
         if (object instanceof Cacheable) {
             ((Cacheable) object).evicted();
         }
-        final PropertyContext propertyContext = PipelineContext.get();
-        final MemoryCacheStatistics statistics = (propertyContext != null) ? (MemoryCacheStatistics) getStatistics() : null;
-        if (statistics != null)
-            statistics.incrementExpirationCount();
     }
 
     public synchronized int removeAll() {
@@ -204,12 +173,8 @@ public class MemoryCacheImpl implements Cache {
     }
 
     private synchronized Object getValid(CacheKey key, Object validity, boolean remove) {
-        final PropertyContext propertyContext = PipelineContext.get();
         final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null && lowerOrEqual(validity, entry.validity)) {
-
-            if (propertyContext != null)
-                ((MemoryCacheStatistics) getStatistics()).incrementHitsCount();
 
             if (remove) {
                 // Remove and notify
@@ -223,8 +188,6 @@ public class MemoryCacheImpl implements Cache {
             return entry.cacheable;
         } else {
             // Not latest validity
-            if (propertyContext != null)
-                ((MemoryCacheStatistics) getStatistics()).incrementMissCount();
             return null;
         }
     }
@@ -272,17 +235,6 @@ public class MemoryCacheImpl implements Cache {
                 return ((CacheEntry) o).cacheable;
             }
         });
-    }
-
-    public synchronized CacheStatistics getStatistics() {
-        final PropertyContext propertyContext = PipelineContext.get();
-        MemoryCacheStatistics statistics = (MemoryCacheStatistics) propertyContext.getAttribute(statisticsContextKey);
-        if (statistics == null) {
-            statistics = new MemoryCacheStatistics();
-            propertyContext.setAttribute(statisticsContextKey, statistics);
-        }
-
-        return statistics;
     }
 
     private boolean lowerOrEqual(Object left, Object right) {

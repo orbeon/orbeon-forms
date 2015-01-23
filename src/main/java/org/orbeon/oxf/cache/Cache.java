@@ -27,5 +27,4 @@ public interface Cache {
     int getCurrentSize();
     int getMaxSize();
     void setMaxSize(int maxSize);
-    CacheStatistics getStatistics();
 }

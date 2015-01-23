@@ -189,8 +189,19 @@ public class XFormsServer extends ProcessorImpl {
         // IMPORTANT: We now have a lock associated with the document
         LifecycleLogger.eventAssumingRequestJava("xforms", "before document lock", new String[] { "uuid", parameters.getUUID() });
         final long timestamp = System.currentTimeMillis();
-        // The following throws if the lock is not found either the UUID is not in the session OR the session doesn't exist
-        final Lock lock = XFormsStateManager.instance().acquireDocumentLock(parameters);
+
+        // We don't wait on the lock for an Ajax request. But for a simulated request on GET, we do wait. See:
+        //
+        // - https://github.com/orbeon/orbeon-forms/issues/2071
+        // - https://github.com/orbeon/orbeon-forms/issues/1984
+        //
+        // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
+        final Lock lock =
+            XFormsStateManager.instance().acquireDocumentLock(
+                parameters,
+                isAjaxRequest ? 0 : XFormsProperties.getAjaxTimeout()
+            );
+
         if (lock != null) {
             try {
                 LifecycleLogger.eventAssumingRequest(

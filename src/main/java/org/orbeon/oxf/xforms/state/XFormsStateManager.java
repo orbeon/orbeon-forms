@@ -286,7 +286,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param parameters    incoming Ajax request
      * @return              the document lock, already locked
      */
-    public Lock acquireDocumentLock(RequestParameters parameters) {
+    public Lock acquireDocumentLock(RequestParameters parameters, long timeout) {
         assert parameters.getUUID() != null;
 
         // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
@@ -300,9 +300,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         // Lock document for at most the max retry delay plus an increment
         try {
-            // Don't wait at all if the lock cannot be obtained
-            // See https://github.com/orbeon/orbeon-forms/issues/1984
-            final boolean acquired = lock.tryLock(0L, TimeUnit.MILLISECONDS);
+            final boolean acquired = lock.tryLock(timeout, TimeUnit.MILLISECONDS);
             if (acquired)
                 return lock;
             else

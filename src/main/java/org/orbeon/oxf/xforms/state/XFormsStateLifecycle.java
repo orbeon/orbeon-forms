@@ -37,7 +37,7 @@ public interface XFormsStateLifecycle {
 
     XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState, boolean updates);
 
-    Lock acquireDocumentLock(RequestParameters parameters);
+    Lock acquireDocumentLock(RequestParameters parameters, long timeout);
     XFormsContainingDocument beforeUpdate(RequestParameters parameters);
     void beforeUpdateResponse(XFormsContainingDocument containingDocument, boolean ignoreSequence);
     void afterUpdateResponse(XFormsContainingDocument containingDocument);

@@ -18,6 +18,7 @@
      */
     ORBEON.xforms.server.AjaxServer = {};
 
+    var $ = ORBEON.jQuery;
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
     var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
@@ -1012,7 +1013,7 @@
 
                                         // Utility function to generate an option
                                         function generateOption(label, value, clazz, selectedValues) {
-                                            var selected = xformsArrayContains(selectedValues, value);
+                                            var selected = _.contains(selectedValues, value);
                                             return '<option value="' + ORBEON.util.String.escapeForMarkup(value) + '"'
                                                     + (selected ? ' selected="selected"' : '')
                                                     + (clazz != null ? ' class="' + ORBEON.util.String.escapeForMarkup(clazz) + '"' : '')

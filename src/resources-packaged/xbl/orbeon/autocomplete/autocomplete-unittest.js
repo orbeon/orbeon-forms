@@ -13,6 +13,7 @@
  */
 (function() {
 
+    var $ = ORBEON.jQuery;
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
         name: "Autocomplete",

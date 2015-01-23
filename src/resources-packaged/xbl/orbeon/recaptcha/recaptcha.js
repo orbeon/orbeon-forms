@@ -13,6 +13,7 @@
  */
 
 (function() {
+    var $ = ORBEON.jQuery;
     var Document = ORBEON.xforms.Document;
     var Event = YAHOO.util.Event;
 

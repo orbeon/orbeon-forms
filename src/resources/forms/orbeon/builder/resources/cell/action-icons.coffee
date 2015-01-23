@@ -10,6 +10,7 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+$ = ORBEON.jQuery
 AjaxServer = ORBEON.xforms.server.AjaxServer
 Builder = ORBEON.Builder
 Controls = ORBEON.xforms.Controls

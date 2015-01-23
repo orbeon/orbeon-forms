@@ -468,7 +468,7 @@ if ( typeof define === 'function' && define.amd ) {
 
 'use strict';
 
-var $ = window.jQuery;
+var $ = ORBEON.jQuery;
 var console = window.console;
 var hasConsole = typeof console !== 'undefined';
 

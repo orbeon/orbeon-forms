@@ -11,7 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-window.jQuery(function($) { // NOTE: Bootstrap 3 uses non-global jQuery
+ORBEON.jQuery(function() {
+
+    var $ = ORBEON.jQuery;
 
     // Keep pointing to menu so we can move it around as needed
     // NOTE: When scripts are in the head, this returns undefined. Should be fixed!

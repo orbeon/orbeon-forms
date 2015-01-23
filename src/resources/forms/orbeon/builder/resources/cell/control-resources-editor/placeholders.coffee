@@ -19,6 +19,7 @@ Show placeholders, e.g. "Click here to…"
 - The value of the placeholder is shown with CSS :empty:before.
 ###
 
+$ = ORBEON.jQuery
 Builder = ORBEON.Builder
 Events = ORBEON.xforms.Events
 

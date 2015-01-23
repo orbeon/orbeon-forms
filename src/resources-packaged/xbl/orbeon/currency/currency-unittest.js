@@ -13,6 +13,8 @@
  */
 (function() {
 
+    var $ = ORBEON.jQuery;
+
     function input(id) {
         return $(document.getElementById(id)).find('.xbl-fr-number-visible-input')[0];
     }

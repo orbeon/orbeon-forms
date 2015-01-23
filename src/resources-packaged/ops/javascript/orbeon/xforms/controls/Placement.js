@@ -1,5 +1,6 @@
 (function() {
 
+    var $ = ORBEON.jQuery;
     var Controls = ORBEON.xforms.Controls;
 
     Controls.getPosition = getPosition;

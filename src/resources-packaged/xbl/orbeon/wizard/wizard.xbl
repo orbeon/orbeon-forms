@@ -62,6 +62,7 @@
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <xxf:script ev:event="fr-section-scroll" ev:target="#observer">
                                     <![CDATA[
+                                    var $ = ORBEON.jQuery;
                                     var target = event.target;
                                     var sectionTitle = $(target).closest('.xbl-fr-wizard').find('.fr-wizard-body .xforms-case-selected .fr-section-title')[0];
 

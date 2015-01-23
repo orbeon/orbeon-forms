@@ -13,6 +13,7 @@
  */
 (function() {
 
+    var $ = ORBEON.jQuery;
     var AS = ORBEON.xforms.server.AjaxServer;
     var Document = ORBEON.xforms.Document;
 

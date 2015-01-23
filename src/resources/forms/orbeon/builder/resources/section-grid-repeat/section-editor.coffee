@@ -1,3 +1,4 @@
+$ = ORBEON.jQuery
 $ ->
     AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Orbeon, Inc.
+ * Copyright (C) 2015 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,20 +13,7 @@
  */
 (function() {
 
-    var $ = ORBEON.jQuery;
-    YAHOO.namespace("xbl.fr");
-    YAHOO.xbl.fr.Tabbable = function() {};
-    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Tabbable, "xbl-fr-tabbable");
-    YAHOO.xbl.fr.Tabbable.prototype = {
-
-        init: function() {
-            $(this.container).find('.nav-tabs a').click(function (e) {
-                e.preventDefault();
-                $(this).tab('show');
-            })
-        }
-    };
+    window.ORBEON = window.ORBEON || {};
+    window.ORBEON.jQuery = $.noConflict(true);
 
 })();
-
-

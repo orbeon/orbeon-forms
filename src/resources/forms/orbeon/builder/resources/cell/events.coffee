@@ -10,6 +10,7 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+$ = ORBEON.jQuery
 createCustomEvent = () -> new YAHOO.util.CustomEvent null, null, false, YAHOO.util.CustomEvent.FLAT
 
 ORBEON.Builder =

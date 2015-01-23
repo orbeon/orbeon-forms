@@ -12,6 +12,7 @@ See the GNU Lesser General Public License for more details.
 The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 ###
 
+$ = ORBEON.jQuery
 Builder = ORBEON.Builder
 
 LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text'

@@ -12,6 +12,7 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 (function() {
+    var $ = ORBEON.jQuery;
     var Document = ORBEON.xforms.Document;
 
     YAHOO.namespace("xbl.fr");

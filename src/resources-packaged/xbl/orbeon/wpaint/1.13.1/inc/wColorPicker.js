@@ -12,7 +12,8 @@
  *
  ******************************************/
 (function($)
-{	
+{
+	var jQuery = $;
 	$.fn.wColorPicker = function(option, settings)
 	{
 		if(typeof option === 'object')
@@ -43,18 +44,18 @@
 		}
 
 		settings = $.extend({}, $.fn.wColorPicker.defaultSettings, settings || {});
-		
+
 		return this.each(function()
 		{
-			var elem = $(this);	
+			var elem = $(this);
 			var $settings = jQuery.extend(true, {}, settings);
-			
+
 			var cp = new ColorPicker($settings, elem);
 
 			cp.generate();
 
-			cp.appendToElement(elem);			
-		
+			cp.appendToElement(elem);
+
 			cp.colorSelect(cp, $settings.initColor);
 
 			elem.data('_wColorPicker', cp);
@@ -79,23 +80,23 @@
 	 * ColorPicker class definition
 	 */
 	function ColorPicker(settings, elem)
-	{ 
+	{
 		this.colorPicker = null;
 		this.settings = settings;
 		this.$elem = elem;
 		this.currentColor = settings.initColor;
-		
+
 		this.height = null;					// init this, need to get height/width proper while element is still showing
 		this.width = null;
 		this.slideTopToBottom = null;		// used to assist with sliding in proper direction
-		
-		this.customTarget = null;			
+
+		this.customTarget = null;
 		this.buttonColor = null;
 		this.paletteHolder = null;
-		
+
 		return this;
 	}
-	
+
 	ColorPicker.prototype =
 	{
 		generate: function ()
@@ -104,7 +105,7 @@
 
 			var $this = this;
 
-			var clearFloats = {clear: 'both', height: 0, lineHeight: 0, fontSize: 0}; 
+			var clearFloats = {clear: 'both', height: 0, lineHeight: 0, fontSize: 0};
 
 			//custom colors
 			this.customTarget = $('<div class="_wColorPicker_customTarget"></div>');
@@ -112,14 +113,14 @@
 			$('<input type="text" class="_wColorPicker_customInput" value=""/>').keyup(function(e)
 			{
 				var code = (e.keyCode ? e.keyCode : e.which);
-				
+
 				var hex = $this.validHex($(this).val());
-				
+
 				$(this).val(hex)
-				
+
 				//auto set color in target if it's valid hex code
 				if(hex.length == 7) $this.customTarget.css('backgroundColor', hex);
-				
+
 				if(code == 13)//set color if user hits enter while on input
 				{
 					$this.colorSelect($this, $(this).val());
@@ -127,9 +128,9 @@
 				}
 			})
 			.click(function(e){e.stopPropagation();});
-			
+
 			//setup custom area
-			var custom = 
+			var custom =
 			$('<div class="_wColorPicker_custom"></div>')
 			.append(this.appendColors($('<div class="_wColorPicker_noColor">'), [''], 1))
 			.append(this.customTarget)
@@ -140,7 +141,7 @@
 			//grays/simple palette
 			var simpleColors = ['000000', '333333', '666666', '999999', 'CCCCCC', 'FFFFFF', 'FF0000', '00FF00', '0000FF', 'FFFF00', '00FFFF', 'FF00FF'];
 			var simplePalette = this.appendColors($('<div class="_wColorPicker_palette_simple"></div>'), simpleColors, 1);
-			
+
 			//colors palette
 			var mixedColors = [
 				'000000', '003300', '006600', '009900', '00CC00', '00FF00', '330000', '333300', '336600', '339900', '33CC00', '33FF00', '660000', '663300', '666600', '669900', '66CC00', '66FF00',
@@ -157,16 +158,16 @@
 				'9900FF', '9933FF', '9966FF', '9999FF', '99CCFF', '99FFFF', 'CC00FF', 'CC33FF', 'CC66FF', 'CC99FF', 'CCCCFF', 'CCFFFF', 'FF00FF', 'FF33FF', 'FF66FF', 'FF99FF', 'FFCCFF', 'FFFFFF',
 			];
 			var mixedPalette = this.appendColors($('<div class="_wColorPicker_palette_mixed"></div>'), mixedColors, 18);
-			
+
 			//palette container
 			var bg = $('<div class="_wColorPicker_bg"></div>').css({opacity: this.settings.opacity});
 			var content =
-			$('<div class="_wColorPicker_content"></div>')			
+			$('<div class="_wColorPicker_content"></div>')
 			.append(custom)
 			.append(simplePalette)
 			.append(mixedPalette)
 			.append($('<div></div>').css(clearFloats));
-			
+
 			//put it all together
 			this.colorPicker =
 			$('<div class="_wColorPicker_holder"></div>')
@@ -180,15 +181,15 @@
 				)
 			)
 			.addClass('_wColorPicker_' + this.settings.theme)
-			
+
 			return this.colorPicker;
 		},
-		
+
 		appendColors: function($palette, colors, lineCount)
 		{
 			var counter = 1;
 			var $this = this;
-			
+
 			for(index in colors)
 			{
 				$palette.append(
@@ -197,73 +198,73 @@
 					.mouseout(function(e){$this.colorHoverOff($this, $(this));})
 					.mouseover(function(){$this.colorHoverOn($this, $(this));})
 				);
-				
+
 				if(counter == lineCount)
 				{
 					$palette.append($('<div></div>').css({clear:'both', height:0, fontSize:0, lineHeight:0, marginTop:-1}))
 					counter = 0;
 				}
-				
+
 				counter++;
 			}
-			
+
 			return $palette;
 		},
-		
+
 		colorSelect: function($this, color)
 		{
 			color = $this.toHex(color);;
-			
+
 			$this.customTarget.css('backgroundColor', color);
 			$this.currentColor = color;
 			$this.customInput.val(color);
-			
+
 			if($this.settings.onSelect) $this.settings.onSelect.apply(this, [color]);
-			
+
 			if($this.buttonColor)
 			{
 				$this.buttonColor.css('backgroundColor', color);
 				$this.hidePalette($this);
-			} 
+			}
 		},
-		
+
 		colorHoverOn: function($this, $element)
 		{
 			$element.parent().children('active').removeClass('active');
 			$element.addClass('active').next().addClass('activeLeft');
 			$element.nextAll('.' + $element.attr('id') + ':first').addClass('activeTop');
-			
+
 			var color = $this.toHex($element.css('backgroundColor'));
-			
+
 			$this.customTarget.css('backgroundColor', color);
 			$this.customInput.val(color);
-			
+
 			if($this.settings.onMouseover) $this.settings.onMouseover.apply(this, [color]);
 		},
-		
+
 		colorHoverOff: function($this, $element)
 		{
 			$element.removeClass('active').next().removeClass('activeLeft')
 			$element.nextAll('.' + $element.attr('id') + ':first').removeClass('activeTop')
-			
+
 			$this.customTarget.css('backgroundColor', $this.currentColor);
 			$this.customInput.val($this.currentColor);
-			
+
 			if($this.settings.onMouseout) $this.settings.onMouseout.apply(this, [$this.currentColor]);
 		},
-		
+
 		appendToElement: function($element)
 		{
 			var $this = this;
-			
+
 			if($this.settings.mode == 'flat') $element.append($this.colorPicker);
 			else
 			{
 				//setup button
 				$this.paletteHolder = $('<div class="_wColorPicker_paletteHolder"></div>').css({position: 'absolute', overflow: 'hidden', width: 1000}).append($this.colorPicker);
-				
+
 				$this.buttonColor = $('<div class="_wColorPicker_buttonColor"></div>').css({width: $this.settings.buttonSize, height: $this.settings.buttonSize});
-				
+
 				var buttonHolder =
 				$('<div class="_wColorPicker_buttonHolder"></div>')
 				.css({position: 'relative'})
@@ -271,13 +272,13 @@
 				.append($this.paletteHolder);
 
 				$element.append(buttonHolder);
-				
+
 				$this.width = $this.colorPicker.outerWidth(true);
 				$this.height = $this.colorPicker.outerHeight(true);
 				$this.paletteHolder.css({width: $this.width, height: $this.height}).hide();
-				
+
 				if($this.settings.effect == 'fade') $this.paletteHolder.css({opacity: 0});
-				
+
 				//setup events
 				if($this.settings.mode == 'hover')
 				{
@@ -289,7 +290,7 @@
 				else if($this.settings.mode == 'click')
 				{
 					$(document).click(function(){if($this.paletteHolder.hasClass('active'))$this.hidePalette($this);});
-					
+
 					buttonHolder
 					.click(function(e)
 					{
@@ -297,31 +298,31 @@
 						$this.paletteHolder.hasClass('active') ? $this.hidePalette($this) : $this.showPalette(e, $this);
 					});
 				}
-				
+
 				$this.colorSelect($this, $this.settings.initColor);
 			}
 		},
-		
+
 		showPalette: function(e, $this)
 		{
 			var offset = $this.paletteHolder.parent().offset();
-			
+
 			//init some vars
 			var left = 0;
 			var top = $this.paletteHolder.parent().outerHeight(true);
 			$this.slideTopToBottom = top;
-			
+
 			if(offset.left - $(window).scrollLeft() + $this.width > $(window).width()) left = -1 * ($this.width - $this.paletteHolder.parent().outerWidth(true));
 			if(offset.top - $(window).scrollTop() + $this.height > $(window).height())
 			{
 				$this.slideTopToBottom = 0;
 				top = -1 * ($this.height);
 			}
-			
+
 			$this.paletteHolder.css({left: left, top: top});
-			
+
 			$this.paletteHolder.addClass('active')
-			
+
 			if($this.settings.effect == 'slide')
 			{
 				$this.paletteHolder.stop(true, false).css({height: 0, top: ($this.slideTopToBottom == 0 ? 0 : top)}).show().animate({height: $this.height, top: top}, $this.settings.showSpeed);
@@ -335,14 +336,14 @@
 				$this.paletteHolder.show();
 			}
 		},
-		
+
 		hidePalette: function($this)
 		{
 			//need this to avoid the double hide when you click on colour (once on click, once on mouse out) - this way it's only triggered once
 			if($this.paletteHolder.hasClass('active'))
 			{
 				$this.paletteHolder.removeClass('active');
-				
+
 				if($this.settings.effect == 'slide')
 				{
 					$this.paletteHolder.stop(true, false).animate({height: 0, top: ($this.slideTopToBottom == 0 ? 0 : $this.slideTopToBottom)}, $this.settings.hideSpeed, function(){$this.paletteHolder.hide()});
@@ -357,7 +358,7 @@
 				}
 			}
 		},
-		
+
 		toHex: function(color)
 		{
 			if(color.substring(0,4) === 'rgba')
@@ -367,13 +368,13 @@
 			else if(color.substring(0,3) === 'rgb')
 			{
 				var rgb = color.substring(4, color.length - 1).replace(/\s/g, '').split(',');
-				
+
 				for(i in rgb)
 				{
 					rgb[i] = parseInt(rgb[i]).toString(16);
 					if(rgb[i] == '0') rgb[i] = '00';
 				}
-				
+
 				var hex = '#' + rgb.join('').toUpperCase();
 			}
 			else
@@ -383,12 +384,12 @@
 
 			return  hex;
 		},
-		
+
 		validHex: function(hex)
-		{			
+		{
 			return '#' + hex.replace(/[^0-9a-f]/ig, '').substring(0,6).toUpperCase();
 		}
 	}
 
-})(jQuery);
+})(ORBEON.jQuery);
 

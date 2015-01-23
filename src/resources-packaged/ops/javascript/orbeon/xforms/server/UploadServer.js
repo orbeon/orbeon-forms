@@ -18,6 +18,7 @@
      */
     ORBEON.xforms.server.UploadServer = {};
 
+    var $ = ORBEON.jQuery;
     var ExecutionQueue = ORBEON.util.ExecutionQueue;
     var Properties = ORBEON.util.Properties;
     var UploadServer = ORBEON.xforms.server.UploadServer;

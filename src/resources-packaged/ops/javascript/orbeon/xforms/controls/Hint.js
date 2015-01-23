@@ -14,6 +14,7 @@
 
 (function() {
 
+    var $ = ORBEON.jQuery;
     var Controls = ORBEON.xforms.Controls;
 
     /**

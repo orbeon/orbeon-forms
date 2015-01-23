@@ -10,6 +10,7 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+$ = ORBEON.jQuery
 elementStateMatches = (states, element) ->                                                                              # Case where state is per element
     state = f$.data 'state', element
     ((_.isUndefined state) and (_.contains states, 'initial')) or (_.contains states, state)

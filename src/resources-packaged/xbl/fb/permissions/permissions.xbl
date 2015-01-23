@@ -165,7 +165,7 @@
                         </xf:action>
 
                         <!-- Log metadata permissions -->
-                        <xf:load if="event('xxf:type') = 'fr-test'" resource="javascript:console.log($.parseXML(unescape('{encode-for-uri(saxon:serialize($metadata/permissions, 'xml'))}')))"/>
+                        <xf:load if="event('xxf:type') = 'fr-test'" resource="javascript:console.log(ORBEON.jQuery.parseXML(unescape('{encode-for-uri(saxon:serialize($metadata/permissions, 'xml'))}')))"/>
 
                     </xf:action>
                 </xf:action>

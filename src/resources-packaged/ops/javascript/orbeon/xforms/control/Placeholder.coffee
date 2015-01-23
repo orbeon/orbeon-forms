@@ -10,6 +10,7 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+$ = ORBEON.jQuery
 Controls = ORBEON.xforms.Controls
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events

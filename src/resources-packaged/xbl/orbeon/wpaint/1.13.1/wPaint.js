@@ -12,6 +12,7 @@
  *
  ******************************************/
 (function ($) {
+    var jQuery = $;
     $.fn.wPaint = function (option, settings) {
         if (typeof option === 'object') {
             settings = option;
@@ -1013,4 +1014,4 @@
             $canvas.textCalc.css({textDecoration: fontTypeUnderline});
         }
     }
-})(jQuery);
+})(ORBEON.jQuery);

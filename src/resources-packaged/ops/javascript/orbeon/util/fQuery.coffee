@@ -12,6 +12,7 @@
 
 # Functional jQuery
 
+$ = ORBEON.jQuery
 f$ = do ->
     jQueryObject = $ '<div>'
     result = {}

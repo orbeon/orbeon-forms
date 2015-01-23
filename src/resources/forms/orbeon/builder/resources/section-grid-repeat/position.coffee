@@ -1,3 +1,4 @@
+$ = ORBEON.jQuery
 $ ->
     Builder = ORBEON.Builder
     Events = ORBEON.xforms.Events

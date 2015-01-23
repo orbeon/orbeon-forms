@@ -1,3 +1,4 @@
+$        = ORBEON.jQuery
 AS       = -> ORBEON.xforms.server.AjaxServer
 Document = -> ORBEON.xforms.Document
 Events   = -> ORBEON.xforms.Events

@@ -235,6 +235,18 @@ object ScalaUtils extends PathOps {
         builder.result()
     }
 
+    def truncateWithEllipsis(s: String, maxLength: Int, tolerance: Int): String =
+        if (s.length <= maxLength + tolerance) {
+            s
+        } else {
+            val after = s.substring(maxLength, (maxLength + tolerance + 1) min s.length)
+            val afterSpaceIndex = after lastIndexOf " "
+            if (afterSpaceIndex != -1)
+                s.substring(0, maxLength) + after.substring(0, afterSpaceIndex) + '…'
+            else
+                s.substring(0, maxLength) + '…'
+        }
+
     implicit class TraversableLikeOps[A, Repr](val t: TraversableLike[A, Repr]) extends AnyVal {
         def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
             val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]

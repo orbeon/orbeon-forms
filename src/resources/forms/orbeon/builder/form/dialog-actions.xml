@@ -19,6 +19,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
+      xmlns:utils="java:org.orbeon.oxf.util.ScalaUtils"
 
       id="fb-action-dialog" level="modal" close="true" draggable="true" model="fb-actions-editor-model">
 
@@ -99,7 +100,7 @@
                     <xf:label ref="$form-resources/dialog-actions/event-control/label"/>
                     <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
                         <!-- Try to build a reasonably user-friendly label -->
-                        <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                        <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
                         <xf:value value="@id"/>
                     </xf:itemset>
                 </fr:dropdown-select1>
@@ -138,7 +139,7 @@
                                     <xf:label ref="$form-resources/dialog-actions/source-control/label"/>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                        <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>
@@ -163,7 +164,7 @@
                                     <xf:label ref="$form-resources/dialog-actions/source-control/label"/>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                        <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>
@@ -188,7 +189,7 @@
                                     <xf:label ref="$form-resources/dialog-actions/destination-control/label"/>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                        <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>

@@ -37,16 +37,22 @@
                         <tolerance/>
                     </state>
                 </xf:instance>
-                <xf:var name="model-max-characters" value="(max-characters, 0)[. castable as xs:integer][1]"/>
-                <xf:var name="model-tolerance" value="(tolerance, 0)[. castable as xs:integer][1]"/>
-                <xf:var name="short-value" value="
-                    if (string-length(full-value) le $model-max-characters + $model-tolerance) then full-value                        (: Not too long, just show it :)
-                    else for $around-cut-point in substring(full-value, $model-max-characters, $model-tolerance) return               (: Look for space around max-chars with tolerance :)
-                    if (contains($around-cut-point, ' '))                                                                             (: If we find a space in the tolerance zone, :)
-                    then concat(substring(full-value, 1, $model-max-characters - 1), substring-before($around-cut-point, ' '), '…')   (: then cut there :)
-                    else concat(substring(full-value, 1, $model-max-characters), '…')                                                 (: Else cut at max-chars and add ellipsis :)"/>
-                <xf:bind ref="short-value" calculate="$short-value"/>
-                <xf:bind ref="show-full" calculate="if (string-length(../full-value) gt string-length(../short-value)) then 'false' else 'true'"/>
+                <xf:var
+                    name="model-max-characters"
+                    value="(max-characters, 0)[. castable as xs:integer][1]"/>
+                <xf:var
+                    name="model-tolerance"
+                    value="(tolerance, 0)[. castable as xs:integer][1]"/>
+                <xf:var
+                    xmlns:utils="java:org.orbeon.oxf.util.ScalaUtils"
+                    name="short-value"
+                    value="utils:truncateWithEllipsis(full-value, $model-max-characters, $model-tolerance)"/>
+                <xf:bind
+                    ref="short-value"
+                    calculate="$short-value"/>
+                <xf:bind
+                    ref="show-full"
+                    calculate="if (string-length(../full-value) gt string-length(../short-value)) then 'false' else 'true'"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

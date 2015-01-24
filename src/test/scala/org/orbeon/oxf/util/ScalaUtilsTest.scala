@@ -173,4 +173,28 @@ class ScalaUtilsTest extends AssertionsForJUnit {
             assert(out.to[mutable.LinkedHashSet].to[List] === split[mutable.LinkedHashSet](in).to[List])
         }
     }
+
+    @Test def testTruncateWithEllipsis(): Unit = {
+
+        val expected = Seq(
+            ("abcdef",        3,  0) → "abc…",
+            ("abcdef",        3, 10) → "abcdef",
+            ("abcdef",       10,  0) → "abcdef",
+            ("abcd ",         3,  1) → "abcd…",
+            ("abcde ",        3,  1) → "abc…",
+            ("abc d",         3,  1) → "abc…",
+            ("abc d e f",     3,  3) → "abc d…",
+            ("abc d e f",     3,  4) → "abc d e…",
+            ("abc d e f",     3,  5) → "abc d e…",
+            ("abc de fg hi",  3,  3) → "abc de…",
+            ("abc de fg hi",  3,  4) → "abc de…",
+            ("abc de fg hi",  3,  5) → "abc de…",
+            ("abc de fg hi",  3,  6) → "abc de fg…"
+        )
+
+        val truncateWithEllipsisTupled = (truncateWithEllipsis _).tupled
+
+        for ((in, out) ← expected)
+            assert(out === truncateWithEllipsisTupled(in))
+    }
 }

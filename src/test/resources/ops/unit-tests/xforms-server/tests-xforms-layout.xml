@@ -1963,6 +1963,7 @@
                 <xh:script src="/ops/jquery/jquery-1.11.0.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/jquery/jquery-migrate-1.2.1.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dom/dom-min.js" class="xforms-baseline"/>

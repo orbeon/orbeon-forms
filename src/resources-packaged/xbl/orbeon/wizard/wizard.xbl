@@ -268,9 +268,14 @@
                                 name="section-label"
                                 value="xxf:label('{@id}')"/>
 
-                            <xf:trigger appearance="minimal" ref="if ($visited) then xxf:instance('local')/readwrite else ''">
+                            <xf:trigger
+                                appearance="minimal"
+                                ref="
+                                    if (xxf:instance('local')/validate != 'true' or $visited)
+                                    then xxf:instance('local')/readwrite
+                                    else ''">
                                 <xf:label value="$section-label"/>
-                                <xf:hint value="$section-label"/>
+                                <xf:hint  value="$section-label"/>
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Toggle to top-level section... -->
                                     <xf:toggle case="{$top-level-section-case-id}"/>

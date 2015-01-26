@@ -146,7 +146,15 @@ trait FormRunnerHome {
     def canUpgradeRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemote)
 
-    def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
+    def publish(
+        xhtml            : NodeInfo,
+        toBaseURI        : String,
+        app              : String,
+        form             : String,
+        username         : String,
+        password         : String,
+        forceAttachments : Boolean
+    ): Unit =
         putWithAttachments(
             data              = xhtml.root,
             toBaseURI         = toBaseURI,
@@ -162,7 +170,11 @@ trait FormRunnerHome {
 
     // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
     // serialization. Here we juggle between XML and typed data.
-    def joinLocalAndRemoteMetadata(local: SequenceIterator, remote: SequenceIterator, permissionInstance: NodeInfo): SequenceIterator = {
+    def joinLocalAndRemoteMetadata(
+        local              : SequenceIterator,
+        remote             : SequenceIterator,
+        permissionInstance : NodeInfo
+    ): SequenceIterator = {
 
         val combinedIndexIterator = {
 

@@ -554,17 +554,27 @@
      *      going to another page. We handle this as a communication failure, and resend the request to the server,
      *      This  doesn't hurt as the server knows that it must not execute the request more than once.
      *
+     *      2015-01-26: Firefox (and others) return a <parsererror> document if the XML doesn't parse. So if there is an
+     *      XML Content-Type header but an empty body, for example, we get <parsererror>. See:
+     *
+     *      https://github.com/orbeon/orbeon-forms/issues/2074
      */
     AjaxServer.handleFailureAjax = function(o) {
         var formID = ORBEON.xforms.Globals.requestForm.id;
 
-        if (o.responseXML && o.responseXML.documentElement && o.responseXML.documentElement.tagName.indexOf("error") != -1) {
+        if (o.responseXML &&
+            o.responseXML.documentElement &&
+            o.responseXML.documentElement.tagName == "error" && // don't catch <parsererror>
+            o.status != 503) {                                  // 503 is specifically sent to trigger a retry
+
             // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
             // we show an error to users.
-            //      <error>
-            //          <title>...</title>
-            //          <body>...</body>
-            //      </error>
+            //
+            //   <error>
+            //       <title>...</title>
+            //       <body>...</body>
+            //   </error>
+
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
             var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);

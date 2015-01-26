@@ -55,7 +55,7 @@
         </fb:metadata>
 
         <xbl:template>
-            <xf:output xxbl:attr="fr:text/@ref" mediatype="text/html" xxbl:scope="outer" class="xforms-text"/>
+            <xf:output xxbl:attr="fr:text/( @ref | @mediatype )" xxbl:scope="outer" class="xforms-text"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

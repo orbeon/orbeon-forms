@@ -551,9 +551,12 @@
                                                 <xsl:variable
                                                     name="hint-mediatype-class"
                                                     select="if (xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
+                                                <xsl:variable
+                                                    name="text-mediatype-class"
+                                                    select="if (fr:text/@mediatype = 'text/html') then 'fb-text-is-html'  else ()"/>
                                                 <xsl:attribute
                                                     name="class"
-                                                    select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
+                                                    select="string-join((@class, $label-mediatype-class, $hint-mediatype-class, $text-mediatype-class ), ' ')"/>
                                                 <xsl:copy-of select="@* except @class | node()"/>
                                             </xsl:copy>
                                         </xf:group>

@@ -58,6 +58,6 @@ $ ->
         Builder.resourceEditorCurrentLabelHint =
             if   repeat.is('*') \
             then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
-            else container.find('.xforms-label')
+            else container.find('.xforms-label').first()
         if (Builder.resourceEditorCurrentLabelHint.is('*'))
             Builder.resourceEditorStartEdit()

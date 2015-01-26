@@ -113,15 +113,16 @@
                             the value: https://github.com/orbeon/orbeon-forms/issues/599
                         -->
                         <xf:var name="formatted" id="formatted-value"
-                            value="if (string($binding) castable as xs:decimal)
-                                   then
-                                       if (string-length(substring-after(string(xs:decimal($binding)), $decimal-separator)) gt xs:integer($digits-after-decimal))
-                                       then
-                                           string($binding)
-                                       else
-                                           translate(format-number(xs:decimal($binding), $picture-string), '.,', concat($decimal-separator, $grouping-separator))
-                                   else
-                                        string($binding)">
+                            value="
+                                if (string($binding) castable as xs:decimal)
+                                then
+                                    if (string-length(substring-after(string(xs:decimal($binding)), '.')) gt xs:integer($digits-after-decimal))
+                                    then
+                                        translate(string($binding), '.', $decimal-separator)
+                                    else
+                                        translate(format-number(xs:decimal($binding), $picture-string), '.,', concat($decimal-separator, $grouping-separator))
+                                else
+                                     string($binding)">
                             <!-- Rewrite event as xxforms-iteration-moved doesn't bubble -->
                             <xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>
                         </xf:var>

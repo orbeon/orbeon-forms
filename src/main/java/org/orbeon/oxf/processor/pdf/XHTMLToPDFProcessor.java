@@ -76,6 +76,9 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
         try {
             final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
+
+                final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
+
                 // Called for:
                 //
                 // - CSS URLs
@@ -94,11 +97,19 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
                     // However this caused issues, for example resources like background images referred by CSS files
                     // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
-                    return URLRewriterUtils.rewriteServiceURL(
-                        NetUtils.getExternalContext().getRequest(),
-                        uri,
-                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE | ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
-                    );
+
+                    indentedLogger.logDebug("pdf", "before resolving URL", "url", uri);
+
+                    final String resolved =
+                        URLRewriterUtils.rewriteServiceURL(
+                            NetUtils.getExternalContext().getRequest(),
+                            uri,
+                            ExternalContext.Response.REWRITE_MODE_ABSOLUTE | ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+                        );
+
+                    indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved);
+
+                    return resolved;
                 }
 
                 // Called by:
@@ -117,8 +128,6 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // called by the proxy portlet or if we are directly within a portlet.
                     final Map<String, String[]> explicitHeaders = new HashMap<String, String[]>();
                     explicitHeaders.put(Headers.OrbeonClient(), new String[] { "servlet" });
-
-                    final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
 
                     final URI url;
                     try {
@@ -166,6 +175,8 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     } else {
                         final InputStream is = resolveAndOpenStream(resolvedURI);
                         final String localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger);
+
+                        indentedLogger.logDebug("pdf", "getting image resource", "url", uri, "local", localURI);
 
                         final ImageResource retrievedImageResource = super.getImageResource(localURI);
                         localImageCache.put(resolvedURI, retrievedImageResource);

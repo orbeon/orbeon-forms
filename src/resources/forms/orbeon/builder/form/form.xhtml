@@ -359,10 +359,12 @@
 
                             </xf:group>
 
-                            <xf:group class="fb">
+                            <xf:group class="fb fb-hide-alert">
                                 <!-- Dynamically display the form being edited -->
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
+                                <!--<fr:xforms-inspector/>-->
                             </xf:group>
+
 
                             <!-- Editors -->
                             <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the binding of the current node,

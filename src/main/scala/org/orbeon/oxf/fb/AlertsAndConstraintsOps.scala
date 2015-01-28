@@ -31,8 +31,6 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     self: GridOps ⇒ // funky dependency, to resolve at some point
 
-    private val XFValidationQName: QName = XF → "validation"
-
     private val OldAlertRefMatcher = """\$form-resources/([^/]+)/alert(\[(\d+)\])?""".r
     private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.alert(\.(\d+))?'\)""".r
 
@@ -87,7 +85,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             writeValidations(
                 inDoc,
                 controlName,
-                Required.name,
+                Required,
                 List(v)
             )
         }
@@ -102,7 +100,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             writeValidations(
                 inDoc,
                 controlName,
-                Type.name,
+                Type,
                 List(v)
             )
         }
@@ -111,7 +109,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         writeValidations(
             inDoc,
             controlName,
-            Constraint.name,
+            Constraint,
             allValidations collect { case v: ConstraintValidation ⇒ v }
         )
 
@@ -126,16 +124,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
     private def writeValidations(
         inDoc       : NodeInfo,
         controlName : String,
-        mipName     : String,
+        mip         : MIP,
         validations : List[Validation]
     ): Unit = {
 
         val bind = findBindByName(inDoc, controlName).get
 
-        val mipAttQName = mipNameToFBMIPQname(mipName)
+        val existingAttributeValidations = mipAtts (bind, mip)
+        val existingElementValidations   = mipElems(bind, mip)
 
-        val existingAttributeValidations = bind /@ mipAttQName
-        val existingElementValidations   = bind /  XFValidationQName filter (_ /@ mipAttQName nonEmpty)
+        val (_, mipElemQName) = mipToFBMIPQNames(mip)
 
         validations match {
             case Nil ⇒
@@ -145,7 +143,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
                 // See also: https://github.com/orbeon/orbeon-forms/issues/1829
                 // NOTE: We could optimize further by taking this branch if there is no type or required validation.
-                updateMip(inDoc, controlName, mipName, value)
+                updateMipAsAttributeOnly(inDoc, controlName, mip.name, value)
                 delete(existingElementValidations)
             case _ ⇒
                 val nestedValidations =
@@ -154,22 +152,20 @@ trait AlertsAndConstraintsOps extends ControlOps {
                         nonEmptyOrNone(value) match {
                             case Some(nonEmptyValue) ⇒
 
-                                val validationElem =
-                                    <xf:validation
+                                val prefix = mipElemQName.getNamespaceURI match {
+                                    case FB ⇒ "fb" // also covers the case of `xxf:default` (Form Builder names here)
+                                    case XF ⇒ "xf" // case of `xf:type`, `xf:required`
+                                }
+
+                                val dummyMIPElem =
+                                    <xf:dummy
                                         id={idOpt.orNull}
                                         level={if (level != ErrorLevel) level.name else null}
+                                        value={if (mip != Type) nonEmptyValue else null}
                                         xmlns:xf={XF}
-                                        xmlns:fb={FB}/>
+                                        xmlns:fb={FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
 
-                                val mipAtt =
-                                    sx.Attribute(
-                                        mipAttQName.getNamespacePrefix,
-                                        mipAttQName.getName,
-                                        sx.Text(nonEmptyValue),
-                                        sx.Null
-                                    )
-
-                                List(validationElem % mipAtt: NodeInfo)
+                                List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.getName): NodeInfo)
                             case None ⇒
                                 Nil
                         }
@@ -290,15 +286,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
         val DefaultRequireValidation = RequiredValidation(None, Left(false), None)
 
-        def fromForm(inDoc: NodeInfo, controlName: String): RequiredValidation = {
-            val mipAttQName = mipNameToFBMIPQname(Required.name)
-
-            findMIPs(inDoc, controlName, mipAttQName).headOption map {
+        def fromForm(inDoc: NodeInfo, controlName: String): RequiredValidation =
+            findMIPs(inDoc, controlName, Required).headOption map {
                 case (idOpt, _, value, alertOpt) ⇒
                     RequiredValidation(idOpt, xpathOptToEither(Some(value)), alertOpt)
             } getOrElse
                 DefaultRequireValidation
-        }
 
         def fromXML(validationElem: NodeInfo, newIds: Iterator[String]): Option[RequiredValidation] = {
             require(validationElem /@ "type" === Required.name)
@@ -397,9 +390,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     Right(qName)
             }
             
-            val mipAttQName = mipNameToFBMIPQname(Type.name)
-
-            findMIPs(inDoc, controlName, mipAttQName).headOption map {
+            findMIPs(inDoc, controlName, Type).headOption map {
                 case (idOpt, _, value, alertOpt) ⇒
                     DatatypeValidation(idOpt, builtinOrSchemaType(value), alertOpt)
             } getOrElse
@@ -488,7 +479,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     object ConstraintValidation {
 
         def fromForm(inDoc: NodeInfo, controlName: String): List[ConstraintValidation] =
-            findMIPs(inDoc, controlName, mipNameToFBMIPQname(Constraint.name)) map {
+            findMIPs(inDoc, controlName, Constraint) map {
                 case (idOpt, level, value, alertOpt) ⇒
                     ConstraintValidation(idOpt, level, value, alertOpt)
             }
@@ -612,7 +603,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         }
     }
 
-    private def findMIPs(inDoc: NodeInfo, controlName: String, attQName: QName) = {
+    private def findMIPs(inDoc: NodeInfo, controlName: String, mip: MIP) = {
 
         val bind            = findBindByName(inDoc, controlName).get // require the bind
         val supportedAlerts = AlertDetails.fromForm(inDoc, controlName)
@@ -635,17 +626,20 @@ trait AlertsAndConstraintsOps extends ControlOps {
             (
                 nonEmptyOrNone(id),
                 nonEmptyOrNone(e attValue LEVEL_QNAME) map LevelByName getOrElse ErrorLevel,
-                e attValue attQName,
+                if (mip == Type) e.getStringValue else e attValue VALUE_QNAME,
                 findAlertForId(id)
             )
         }
 
-        // Gather all validations (in fb:*)
-        def attributeValidations = bind /@ attQName map fromAttribute
-        def elementValidations   = bind /  XFValidationQName filter (_ /@ attQName nonEmpty) map fromElement
+        // Gather all validations (in fb:* except for type)
+        def attributeValidations = mipAtts (bind, mip) map fromAttribute
+        def elementValidations   = mipElems(bind, mip) map fromElement
 
         attributeValidations ++ elementValidations toList
     }
+
+    private def mipAtts (bind: NodeInfo, mip: MIP) = bind /@ mipToFBMIPQNames(mip)._1
+    private def mipElems(bind: NodeInfo, mip: MIP) = bind /  mipToFBMIPQNames(mip)._2
 
     private def alertOrPlaceholder(alert: Option[AlertDetails], forLang: String) =
         alert orElse Some(AlertDetails(None, List(currentLang → ""), global = false)) map (_.toXML(forLang)) get

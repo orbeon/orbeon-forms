@@ -48,8 +48,8 @@
                 <xf:setvalue ref="$i/min-repeat"                     value="fbf:getNormalizedMin($form, $i/control-name)"/>
                 <xf:setvalue ref="$i/max-repeat"                     value="fbf:getNormalizedMaxOrEmpty($form, $i/control-name)"/>
 
-                <xf:setvalue ref="$i/relevant"                       value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly"                       value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/relevant"                       value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"                       value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'readonly')"/>
 
                 <xf:setvalue ref="$i/control-names"                  value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
 
@@ -87,8 +87,8 @@
                         then fbf:renameControlIterationIfNeeded($form, $old-name, $new-name, $i/original-custom-iteration-name/string(), $i/custom-iteration-name/string())
                         else (),
                     fbf:renameControlIfNeeded($form, $old-name, $new-name),
-                    fbf:updateMip($form, $new-name, 'relevant', $i/relevant),
-                    fbf:updateMip($form, $new-name, 'readonly', $i/readonly),
+                    fbf:updateMipAsAttributeOnly($form, $new-name, 'relevant', $i/relevant),
+                    fbf:updateMipAsAttributeOnly($form, $new-name, 'readonly', $i/readonly),
                     fbf:setRepeatProperties($form, $new-name,
                                             $i/is-repeat = true(),
                                             $i/min-repeat,

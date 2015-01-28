@@ -112,10 +112,10 @@
                     value="'true()'"/>
 
                 <!-- Read MIPs -->
-                <xf:setvalue ref="$i/relevant"   value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
-                <xf:setvalue ref="$i/readonly"   value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
-                <xf:setvalue ref="$i/calculate"  value="fbf:getMipOrEmpty($form, $i/control-name, 'calculate')"/>
-                <xf:setvalue ref="$i/default"    value="fbf:getMipOrEmpty($form, $i/control-name, 'default')"/>
+                <xf:setvalue ref="$i/relevant"   value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"   value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/calculate"  value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'calculate')"/>
+                <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'default')"/>
 
                 <!-- Read help -->
                 <xf:setvalue ref="$i/help"  value="fbf:getControlHelpOrEmpty($i/control-name)"/>
@@ -158,7 +158,7 @@
                     fbf:writeAlertsAndValidationsAsXML($form, $i/control-name, $i/default-alert/alert, $i/validations/validation),
                     (: Write MIPs :)
                     for $mip in ('relevant', 'readonly', 'calculate', 'default') return
-                        fbf:updateMip($form, $i/control-name, $mip, $i/*[name() = $mip]),
+                        fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
                     (: Write help :)
                     fbf:setControlHelp($i/control-name, $i/help),
                     fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')

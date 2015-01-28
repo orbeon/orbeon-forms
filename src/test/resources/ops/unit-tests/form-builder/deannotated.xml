@@ -15,9 +15,18 @@
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" constraint="true()" xxf:default="42">
-                        <xf:validation constraint="string-length() le 100"/>
-                        <xf:validation xxf:default="43"/>
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" constraint="true()" xxf:default="42" type="xf:string">
+                        <xxf:default value="43"/>
+                        <xf:constraint value="string-length() le 100" id="validation-1-validation"/>
+                        <xf:constraint value="string-length() ge 10" id="validation-2-validation"/>
+                        <xf:type id="validation-3-validation">xf:string</xf:type>
+                        <xf:required value="true()" id="validation-4-validation"/>
+
+                        <xxf:default value="43"/>
+                        <xf:constraint value="string-length() le 100" id="validation-5-validation"/>
+                        <xf:constraint value="string-length() ge 10" id="validation-6-validation"/>
+                        <xf:type id="validation-7-validation">xf:string</xf:type>
+                        <xf:required value="true()" id="validation-8-validation"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>

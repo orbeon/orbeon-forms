@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
+import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath, ScalaUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
@@ -129,15 +129,23 @@ class StaticBind(
             for (value ← Option(element.attributeValue(TYPE_QNAME)))
             yield new TypeMIP(staticId, value)
 
-        // Only support collecting one type MIP per bind (but at runtime more than one type MIP can touch a given node)
-        def fromNestedElements =
+        // For a while we supported <xf:validation>
+        def fromNestedElementsLegacy =
             for {
-                e           ← Dom4j.elements(element, XFORMS_VALIDATION_QNAME) // <xf:validation>
+                e           ← Dom4j.elements(element, XFORMS_VALIDATION_QNAME)
                 value       ← Option(e.attributeValue(TYPE_QNAME))
             } yield
                 new TypeMIP(getElementId(e), value)
-        
-        fromAttribute orElse fromNestedElements.headOption
+
+        def fromNestedElement =
+            for {
+                e           ← Dom4j.elements(element, XFORMS_TYPE_QNAME) // <xf:type>
+                value       ← ScalaUtils.nonEmptyOrNone(e.getText)       // text literal (doesn't support @value)
+            } yield
+                new TypeMIP(getElementId(e), value)
+
+        // Only support collecting one type MIP per bind (but at runtime more than one type MIP can touch a given node)
+        fromAttribute orElse fromNestedElement.headOption orElse fromNestedElementsLegacy.headOption
     }
 
     val dataTypeOrNull =
@@ -154,24 +162,24 @@ class StaticBind(
             for (value ← Option(element.attributeValue(name)).toList)
             yield (staticId, value, ErrorLevel)
 
-        def fromLegacyNestedElement(name: QName) =
-            for {
-                e     ← Dom4j.elements(element, name).toList
-                value ← Option(e.attributeValue(VALUE_QNAME))
-                if value ne null
-            } yield
-                (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
-
-        def fromNestedElements(name: QName) =
+        // For a while we supported <xf:validation>
+        def fromNestedElementLegacy(name: QName) =
             for {
                 e     ← Dom4j.elements(element, XFORMS_VALIDATION_QNAME).toList
                 value ← Option(e.attributeValue(name))
             } yield
                 (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
 
+        def fromNestedElement(name: QName) =
+            for {
+                e     ← Dom4j.elements(element, name).toList
+                value ← Option(e.attributeValue(VALUE_QNAME))
+            } yield
+                (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
+
         for {
             mip              ← QNameToXPathMIP.values
-            idValuesAndLevel = fromLegacyNestedElement(mip.eName) ::: fromNestedElements(mip.aName) ::: fromAttribute(mip.aName)
+            idValuesAndLevel = fromNestedElement(mip.eName) ::: fromNestedElementLegacy(mip.aName) ::: fromAttribute(mip.aName)
             if idValuesAndLevel.nonEmpty
             mips             = idValuesAndLevel map {
                 case (id, value, level) ⇒
@@ -195,18 +203,19 @@ class StaticBind(
             } yield
                 (staticId, customMIPName, value)
 
+        // NOTE: We don't support custom MIP elements yet as those are pruned by the annotator/extractor. The following
+        // function can be used to retrieve them once that is fixed.
         def elementCustomMIPs =
             for {
                 elem          ← Dom4j.elements(element).toList
                 if bindTree.isCustomMIP(elem.getQName)
-                value         = elem.attributeValue(VALUE_QNAME)
-                if value ne null
+                value         ← Option(elem.attributeValue(VALUE_QNAME))
                 customMIPName = buildCustomMIPName(elem.getQualifiedName)
             } yield
                 (getElementId(elem), customMIPName, value)
 
         for {
-            (name, idNameValue) ← elementCustomMIPs ::: attributeCustomMIP groupBy (_._2)
+            (name, idNameValue) ← attributeCustomMIP groupBy (_._2)
             mips = idNameValue map { case (id, _, value) ⇒ new XPathMIP(id, name, ErrorLevel, value) }
         } yield
             name → mips

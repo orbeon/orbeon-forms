@@ -384,9 +384,9 @@ object XXFormsDynamicControl {
 
         val XF = XFORMS_NAMESPACE_URI
 
-        // XPath: ((self::xf:bind | self::@*/parent::xf:bind)/ancestor::xf:model)[1]
+        // Any change to a model bind element or a descendant element or attribute
         val modelOption =
-            (node self (XF → "bind")) ++ (node self @* parent (XF → "bind")) ancestor (XF → "model") headOption
+            node ancestorOrSelf (XF → "bind") ancestor (XF → "model") headOption
 
         modelOption map { modelNode ⇒
             val modelElement = unwrapElement(modelNode)

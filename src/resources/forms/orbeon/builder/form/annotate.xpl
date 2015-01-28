@@ -158,21 +158,25 @@
                 </xsl:template>
 
                 <!-- Convert MIP names (attributes and nested elements) -->
+                <!-- NOTE: We leave custom MIPs as they are. The user must not use fb:* custom MIPs. -->
                 <xsl:template match="xf:bind/@relevant
                                    | xf:bind/@readonly
-                                   | xf:bind/@required
                                    | xf:bind/@constraint
                                    | xf:bind/@calculate
-                                   | xf:bind/@xxf:default
-                                   | xf:validation/@relevant
-                                   | xf:validation/@readonly
-                                   | xf:validation/@required
-                                   | xf:validation/@constraint
-                                   | xf:validation/@calculate
-                                   | xf:validation/@xxf:default"
+                                   | xf:bind/@xxf:default"
                               mode="within-model">
-                    <!-- Further below we only allow fb:required to be interpreted as a custom MIP -->
                     <xsl:attribute name="fb:{local-name()}" select="."/>
+                </xsl:template>
+
+                <xsl:template match="xf:bind/xf:relevant
+                                   | xf:bind/xf:readonly
+                                   | xf:bind/xf:constraint
+                                   | xf:bind/xf:calculate
+                                   | xf:bind/xxf:default"
+                              mode="within-model">
+                    <xsl:element name="fb:{local-name()}">
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
+                    </xsl:element>
                 </xsl:template>
 
                 <!-- Add model actions -->
@@ -180,14 +184,8 @@
 
                     <xsl:copy>
                         <!-- Namespace for fb:required -->
-                        <xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>
-                        <xsl:apply-templates select="@* except @xxf:custom-mips" mode="within-model"/>
-                        <!-- Only let fb:required act as a custom MIP. All other non-standard bind attributes, including
-                             @fb:relevant, are ignored. We don't need the result of these rewritten MIPs at design time,
-                             and this helps with performance in case there is a large number of binds. -->
-                        <xsl:attribute name="xxf:custom-mips" select="string-join((@xxf:custom-mips, 'fb:required'), ' ')"/>
-
-                        <xsl:apply-templates select="node()" mode="within-model"/>
+                        <!--<xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>-->
+                        <xsl:apply-templates select="@* | node()" mode="within-model"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
                         <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">
@@ -397,19 +395,40 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Convert xf:constraint/@value to xf:validation/@fb:constraint, etc. -->
-                <xsl:template match="xf:bind/xf:relevant
-                                   | xf:bind/xf:readonly
-                                   | xf:bind/xf:required
-                                   | xf:bind/xf:constraint
-                                   | xf:bind/xf:calculate
-                                   | xf:bind/xxf:default"
+                <!-- For a while (not in a release) we supported xf:validation/@* (but not custom MIPs on them) -->
+                <xsl:template match="xf:bind/xf:validation[@relevant | @readonly | @constraint | @calculate | @xxf:default]"
                               mode="within-model">
-                    <xsl:element name="xf:validation">
-                        <xsl:if test="@value">
-                            <xsl:attribute name="fb:{local-name()}" select="@value"/>
-                        </xsl:if>
-                        <xsl:apply-templates select="(@* except @value) | node()" mode="#current"/>
+
+                    <xsl:variable
+                        name="validation"
+                        select="."/>
+
+                    <xsl:variable
+                        name="atts"
+                        select="@relevant | @readonly | @constraint | @calculate | @xxf:default"/>
+
+                    <!-- XForms supported more than one attribute, but FB only generated one -->
+                    <xsl:for-each select="$atts[1]">
+                        <xsl:element name="fb:{local-name()}">
+                            <xsl:attribute name="value" select="."/>
+                            <xsl:apply-templates select="$validation/@* except $atts" mode="#current"/>
+                        </xsl:element>
+                    </xsl:for-each>
+                </xsl:template>
+
+                <xsl:template match="xf:bind/xf:validation[@type]"
+                              mode="within-model">
+                    <xsl:element name="xf:type">
+                        <xsl:apply-templates select="@* except @type" mode="#current"/>
+                        <xsl:value-of select="@type"/>
+                    </xsl:element>
+                </xsl:template>
+
+                <xsl:template match="xf:bind/xf:validation[@required]"
+                              mode="within-model">
+                    <xsl:element name="xf:required">
+                        <xsl:attribute name="value" select="@required"/>
+                        <xsl:apply-templates select="@* except @required" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 

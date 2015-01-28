@@ -6,7 +6,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <xh:head>
         <xh:title/>
-        <xf:model id="fr-form-model" xxf:custom-mips="fb:required" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+        <xf:model id="fr-form-model" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
             <xf:instance id="fr-form-instance">
                 <form>
                     <section-1>
@@ -16,9 +16,18 @@
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" fb:constraint="true()" fb:default="42">
-                        <xf:validation fb:constraint="string-length() le 100"/>
-                        <xf:validation fb:default="43"/>
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" fb:constraint="true()" fb:default="42" type="xf:string">
+                        <fb:default value="43"/>
+                        <fb:constraint value="string-length() le 100" id="validation-1-validation"/>
+                        <fb:constraint value="string-length() ge 10" id="validation-2-validation"/>
+                        <xf:type id="validation-3-validation">xf:string</xf:type>
+                        <xf:required value="true()" id="validation-4-validation"/>
+
+                        <fb:default value="43"/>
+                        <fb:constraint value="string-length() le 100" id="validation-5-validation"/>
+                        <fb:constraint value="string-length() ge 10" id="validation-6-validation"/>
+                        <xf:type id="validation-7-validation">xf:string</xf:type>
+                        <xf:required value="true()" id="validation-8-validation"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>

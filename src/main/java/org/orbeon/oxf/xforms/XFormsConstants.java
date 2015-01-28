@@ -234,8 +234,13 @@ public class XFormsConstants {
     public static final QName XXFORMS_DEFAULT_QNAME = new QName("default", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFAULTS_QNAME = new QName("defaults", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFERRED_QNAME = new QName("deferred", XXFORMS_NAMESPACE);
+
     public static final QName VALIDATION_QNAME = new QName("validation");
     public static final QName XFORMS_VALIDATION_QNAME = new QName("validation", XFORMS_NAMESPACE);
+
+    public static final QName XFORMS_TYPE_QNAME = new QName("type", XFORMS_NAMESPACE);
+    public static final QName XFORMS_RELEVANT_QNAME = new QName("relevant", XFORMS_NAMESPACE);
+    public static final QName XFORMS_REQUIRED_QNAME = new QName("required", XFORMS_NAMESPACE);
 
     public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
     public static final QName XXFORMS_INDEX_QNAME = new QName("index", XXFORMS_NAMESPACE);

@@ -144,7 +144,7 @@ body.orbeon { background-color: @frBackground }
     // Add a star before the label of required fields, but only in new/edit modes
     // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
     .fr-mode-new, .fr-mode-edit, .fr-mode-test, .xforms-dialog {
-        .xforms-required, .fb-required-true {           // also for Form Builder at edit time
+        .xforms-required {
             .xforms-label {
                 background-position: 0 2px;             // lower the star, so it doesn't sit "too high" relative to the text of the label
                 background-repeat: no-repeat;
@@ -156,7 +156,7 @@ body.orbeon { background-color: @frBackground }
             background-image: url(asterisk-bw.png);     // black and white when filled
         }
 
-        .xforms-required.xforms-empty, .fb-required-true {
+        .xforms-required.xforms-empty {
             .xforms-label {
                 background-image: url(asterisk.png);    // red when empty
             }

@@ -60,11 +60,11 @@ body {
 }
 .orbeon .fr-section-title.hover {
   background-color: #f1f1f1;
-  background-image: -moz-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#dddddd));
-  background-image: -webkit-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -o-linear-gradient(top, #ffffff, #dddddd);
-  background-image: linear-gradient(to bottom, #ffffff, #dddddd);
+  background-image: -moz-linear-gradient(top, white, #dddddd);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#dddddd));
+  background-image: -webkit-linear-gradient(top, white, #dddddd);
+  background-image: -o-linear-gradient(top, white, #dddddd);
+  background-image: linear-gradient(to bottom, white, #dddddd);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffdddddd', GradientType=0);
 }
@@ -174,11 +174,11 @@ body {
 }
 .orbeon .fb-toolbox .fb-toolbox-inside .fb-tools .fb-tool .xforms-trigger button:hover {
   background-color: #f1f1f1;
-  background-image: -moz-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#dddddd));
-  background-image: -webkit-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -o-linear-gradient(top, #ffffff, #dddddd);
-  background-image: linear-gradient(to bottom, #ffffff, #dddddd);
+  background-image: -moz-linear-gradient(top, white, #dddddd);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#dddddd));
+  background-image: -webkit-linear-gradient(top, white, #dddddd);
+  background-image: -o-linear-gradient(top, white, #dddddd);
+  background-image: linear-gradient(to bottom, white, #dddddd);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffdddddd', GradientType=0);
 }
@@ -267,7 +267,7 @@ body {
   clear: both;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid > * {
-  background-color: #ffffff;
+  background-color: white;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid table.fr-grid {
   table-layout: auto;
@@ -369,7 +369,7 @@ body {
   padding: 0;
 }
 .orbeon .fb-dialog-control-details .tab-pane > * {
-  background-color: #ffffff;
+  background-color: white;
 }
 .orbeon .fb-dialog-control-details .fr-grid-validations .fr-grid-col-1 {
   width: 140px;
@@ -646,6 +646,7 @@ body {
 }
 .orbeon .fr-view .fr-grid.fr-editable .xforms-text .xforms-output-output {
   min-height: 50px;
+  display: block;
 }
 .orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label,
 .orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint,

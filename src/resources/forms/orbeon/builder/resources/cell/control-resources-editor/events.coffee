@@ -15,8 +15,9 @@ The full text of the license is available at http://www.gnu.org/copyleft/lesser.
 $ = ORBEON.jQuery
 Builder = ORBEON.Builder
 
-LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text'
+LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint, .fr-editable .xforms-text .xforms-output-output'
 ControlSelector = '.xforms-control, .xbl-component'
+ExplanationSelector = '.xbl-component.xbl-fr-explanation'
 
 # Heuristic to close the editor based on click and focus events
 clickOrFocus = ({target}) ->
@@ -47,7 +48,10 @@ $ ->
                 tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
                 tdWithControl.find(ControlSelector)
             else
-                Builder.resourceEditorCurrentLabelHint.parents(ControlSelector).first()
+                explanation = Builder.resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
+                controls = Builder.resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()
+                parents = $($.merge(explanation, controls))
+                parents.first()
         Builder.resourceEditorStartEdit()
 
     # New control added
@@ -57,7 +61,7 @@ $ ->
         repeat = container.parents('.fr-repeat').first()
         Builder.resourceEditorCurrentLabelHint =
             if   repeat.is('*') \
-            then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
-            else container.find('.xforms-label').first()
+            then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label, tbody tr td:nth-child(' + (container.index() + 1) + ') .xforms-text .xforms-output-output')
+            else container.find('.xforms-label, .xforms-text .xforms-output-output').first()
         if (Builder.resourceEditorCurrentLabelHint.is('*'))
             Builder.resourceEditorStartEdit()

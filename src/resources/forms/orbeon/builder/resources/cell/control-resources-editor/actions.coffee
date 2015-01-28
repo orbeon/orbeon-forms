@@ -21,7 +21,10 @@ Builder.resourceEditorCurrentControl = null
 Builder.resourceEditorCurrentLabelHint = null
 
 # Read/write class telling us if the label/hint is in HTML, set in grid.xml
-lhha = -> if Builder.resourceEditorCurrentLabelHint.is('.xforms-label') then 'label' else 'hint'
+lhha = ->
+    if      Builder.resourceEditorCurrentLabelHint.is('.xforms-label')             then 'label'
+    else if Builder.resourceEditorCurrentLabelHint.parents('.xforms-text').is('*') then 'text'
+    else                                                                                'hint'
 htmlClass = -> 'fb-' + lhha() + '-is-html'
 isLabelHintHtml = -> Builder.resourceEditorCurrentControl.is('.' + htmlClass())
 setLabelHintHtml = (isHtml) -> Builder.resourceEditorCurrentControl.toggleClass(htmlClass(), isHtml)
@@ -37,9 +40,15 @@ labelHintValue = (value) ->
 labelHintEditor = _.memoize ->
     # Create elements and add to the DOM
     editor = {}
-    editor.textfield = $('<input type="text">')
-    editor.checkbox  = $('<input type="checkbox">')
-    editor.container = $('<div class="fb-label-editor">').append(editor.textfield).append(editor.checkbox)
+    editor._textarea  = $('<textarea style="display:none"></textarea>')
+    editor._textfield = $('<input type="text">')
+    editor.textfield  = editor._textfield
+    editor.selectTextInput = ->
+        editor.textfield.hide()
+        editor.textfield = if lhha() == 'text' then editor._textarea else editor._textfield
+        editor.textfield.show()
+    editor.checkbox   = $('<input type="checkbox">')
+    editor.container  = $('<div class="fb-label-editor">').append(editor._textarea).append(editor._textfield).append(editor.checkbox)
     editor.container.hide()
     $('.fb-main').append(editor.container)
     # Register event listeners
@@ -54,6 +63,7 @@ Builder.resourceEditorStartEdit = () ->
     # Show, position, and populate editor
     # Get position before showing editor, so showing doesn't move things in the page
     labelHintOffset = Builder.resourceEditorCurrentLabelHint.offset()
+    labelHintEditor().selectTextInput()
     labelHintEditor().container.show()
     labelHintEditor().container.offset(labelHintOffset)
     labelHintEditor().container.width(Builder.resourceEditorCurrentLabelHint.outerWidth())

@@ -164,7 +164,7 @@ object ScalaUtils extends PathOps {
         def iterateWhileDefined[T](elemOpt: ⇒ Option[T]): Iterator[T] =
             Iterator.continually(elemOpt).takeWhile(_.isDefined).flatten
     }
-    implicit def fromIteratorExt(i: Iterator.type) = IteratorExt
+    implicit def fromIteratorExt(i: Iterator.type): IteratorExt.type = IteratorExt
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
     // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.

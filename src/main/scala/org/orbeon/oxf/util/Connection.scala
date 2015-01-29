@@ -389,7 +389,7 @@ object Connection extends Logging {
         customHeadersOrNull : JMap[String, Array[String]],
         headersToForward    : String,
         logger              : IndentedLogger
-   ): Map[String, List[String]] =
+    ): Map[String, List[String]] =
         buildConnectionHeadersLowerIfNeeded(
             scheme,
             Option(credentialsOrNull),
@@ -446,19 +446,20 @@ object Connection extends Logging {
         } else
             EmptyHeaders
 
-    // Get a space-separated list of header names to forward from the configuration properties
-    def getForwardHeaders: String = {
+    private def getPropertyHandleCustom(propertyName: String) = {
         val propertySet = Properties.instance.getPropertySet
-        propertySet.getString(HttpForwardHeadersProperty, "")
+
+        Option(propertySet.getString(propertyName + ".custom")).to[List] ++
+            Option(propertySet.getString(propertyName)).to[List] mkString " "
     }
 
+    // Get a space-separated list of header names to forward from the configuration properties
+    def getForwardHeaders: String =
+        getPropertyHandleCustom(HttpForwardHeadersProperty)
+
     // Get a list of cookie names to forward from the configuration properties
-    def getForwardCookies: List[String] = {
-        val propertySet = Properties.instance.getPropertySet
-        val maybeHeaderList = Option(propertySet.getString(HttpForwardCookiesProperty))
-        
-        maybeHeaderList.map(_.split("""\s+""").toList).getOrElse(Nil)
-    }
+    def getForwardCookies: List[String] =
+        split[List](getPropertyHandleCustom(HttpForwardCookiesProperty))
 
     /**
      * Build connection headers to send given:

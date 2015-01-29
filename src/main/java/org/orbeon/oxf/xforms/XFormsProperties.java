@@ -113,8 +113,6 @@ public class XFormsProperties {
 
     public static final String HELP_HANDLER_PROPERTY = "help-handler";
     public static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
-    public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
-    public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "";
 
     public static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
@@ -227,7 +225,6 @@ public class XFormsProperties {
             new PropertyDefinition(FLOAT_FORMAT_PROPERTY, "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .", false),
             new PropertyDefinition(DOUBLE_FORMAT_PROPERTY, "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .", false),
             new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
-            new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
             new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
             new PropertyDefinition(NO_UPDATES, false, false),

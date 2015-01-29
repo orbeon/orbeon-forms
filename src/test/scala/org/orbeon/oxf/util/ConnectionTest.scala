@@ -62,11 +62,11 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 scheme            = "http",
                 httpMethodUpper   = "GET",
-                credentialsOrNull = null,
+                hasCredentials    = false,
                 mediatype         = null,
                 encodingForSOAP   = "UTF-8",
                 customHeaders     = customHeaderValuesMap,
-                headersToForward  = "cookie authorization user-agent")(
+                headersToForward  = Set("cookie", "authorization", "user-agent"))(
                 logger            = ResourceManagerTestBase.newIndentedLogger
             )
 
@@ -109,11 +109,11 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 scheme            = "http",
                 httpMethodUpper   = method,
-                credentialsOrNull = null,
+                hasCredentials    = false,
                 mediatype         = bodyMediaType,
                 encodingForSOAP   = "UTF-8",
                 customHeaders     = explicitHeaders,
-                headersToForward  = "")(
+                headersToForward  = Set())(
                 logger            = ResourceManagerTestBase.newIndentedLogger
             )
 

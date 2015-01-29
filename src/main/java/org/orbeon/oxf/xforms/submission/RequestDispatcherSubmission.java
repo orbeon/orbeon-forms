@@ -150,7 +150,6 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         // Headers
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
-        final String headersToForward = containingDocument().getForwardSubmissionHeaders();
 
         final String submissionEffectiveId = submission().getEffectiveId();
 
@@ -170,7 +169,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
                         containingDocument(), detailsLogger, resolvedURI.toString(), p,
                         submission().isURLNorewrite(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
-                        sp.queryString, headersToForward, customHeaderNameValues);
+                        sp.queryString, customHeaderNameValues);
 
                     // Update status
                     status[0] = true;
@@ -216,7 +215,6 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         String encoding,
         byte[] messageBody,
         String queryString,
-        String headerNames,
         scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues
     ) {
 
@@ -257,7 +255,6 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             encoding,
             messageBody,
             queryString,
-            headerNames,
             customHeaderNameValues,
             new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {

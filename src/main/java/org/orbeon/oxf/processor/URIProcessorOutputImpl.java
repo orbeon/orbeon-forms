@@ -206,7 +206,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
                     final String urlString = url.toExternalForm();
-                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.credentials, uriReference.headersToForward);
+                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.credentials);
                     return state.getLastModified(urlString, uriReference.credentials);
 
                 } else  {
@@ -259,18 +259,16 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
         public final String context;
         public final String spec;
         public final Credentials credentials;
-        public final String headersToForward;
 
-        public URIReference(String context, String spec, Credentials credentials, String headersToForward) {
+        public URIReference(String context, String spec, Credentials credentials) {
             this.context = context;
             this.spec = spec;
             this.credentials = credentials;
-            this.headersToForward = headersToForward;
         }
 
         @Override
         public String toString() {
-            return "[" + context + ", " + spec + ", " + credentials + ", " + headersToForward + "]";
+            return "[" + context + ", " + spec + ", " + credentials + "]";
         }
     }
 
@@ -323,13 +321,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
          * @param context           optional context (can be null)
          * @param spec              URL spec
          * @param credentials       optional credentials
-         * @param headersToForward  headers to forward
          */
-        public void addReference(String context, String spec, Credentials credentials, String headersToForward) {
+        public void addReference(String context, String spec, Credentials credentials) {
             if (references == null)
                 references = new ArrayList<URIReference>();
 
-            references.add(new URIReference(context, spec, credentials, headersToForward));
+            references.add(new URIReference(context, spec, credentials));
         }
 
         /**
@@ -358,9 +355,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
      * @param url               URL to read
      * @param state             state to read to
      * @param credentials       optional credentials
-     * @param headersToForward  headers to forward
      */
-    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, Credentials credentials, String headersToForward) {
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, Credentials credentials) {
 
         final String urlString = url.toExternalForm();
 
@@ -388,7 +384,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 // Open connection
                 final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
                 final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
-                    Connection.jBuildConnectionHeadersLowerIfNeeded(submissionURL.getScheme(), credentials, null, headersToForward, indentedLogger);
+                    Connection.jBuildConnectionHeadersLowerIfNeeded(
+                        submissionURL.getScheme(),
+                        credentials != null,
+                        null,
+                        Connection.jHeadersToForward(),
+                        indentedLogger
+                    );
 
                 final ConnectionResult connectionResult
                     = Connection.jApply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);

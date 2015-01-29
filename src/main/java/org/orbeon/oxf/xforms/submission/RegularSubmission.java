@@ -49,17 +49,16 @@ public class RegularSubmission extends BaseSubmission {
 
         // Headers
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
-        final String headersToForward = containingDocument().getForwardSubmissionHeaders();
 
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 absoluteResolvedURL.getScheme(),
                 p.actualHttpMethod,
-                p2.credentials,
+                p2.credentials != null,
                 sp.actualRequestMediatype,
                 p2.encoding,
                 customHeaderNameValues,
-                headersToForward,
+                Connection.headersToForwardFromProperty(),
                 detailsLogger
             );
 

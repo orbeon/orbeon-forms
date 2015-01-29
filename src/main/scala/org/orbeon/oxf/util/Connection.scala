@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 import scala.collection.JavaConverters._
+import scala.collection.generic.CanBuildFrom
 import scala.util.control.NonFatal
 
 /**
@@ -297,9 +298,10 @@ object Connection extends Logging {
 
     private val SupportedNonHttpReadonlySchemes = Set("file", "oxf", "data")
 
-    private val HttpInternalPathsProperty  = "oxf.http.internal-paths"
-    private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
-    private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
+    private val HttpInternalPathsProperty              = "oxf.http.internal-paths"
+    private val HttpForwardCookiesProperty             = "oxf.http.forward-cookies"
+    private val HttpForwardHeadersProperty             = "oxf.http.forward-headers"
+    private val LegacyXFormsHttpForwardHeadersProperty = "oxf.xforms.forward-submission-headers"
     
     // Create a new Connection
     def apply(
@@ -372,40 +374,42 @@ object Connection extends Logging {
     // Build all the connection headers
     def buildConnectionHeadersLowerIfNeeded(
         scheme           : String,
-        credentials      : Option[Credentials],
+        hasCredentials   : Boolean,
         customHeaders    : Map[String, List[String]],
-        headersToForward : Option[String])(implicit
+        headersToForward : Set[String],
+        cookiesToForward : List[String])(implicit
         logger           : IndentedLogger
     ): Map[String, List[String]] =
         if (schemeRequiresHeaders(scheme))
-            buildConnectionHeadersLower(credentials, customHeaders, headersToForward)
+            buildConnectionHeadersLower(hasCredentials, customHeaders, headersToForward, cookiesToForward)
         else
             EmptyHeaders
 
     // For Java callers
     def jBuildConnectionHeadersLowerIfNeeded(
         scheme              : String,
-        credentialsOrNull   : Credentials,
+        hasCredentials      : Boolean,
         customHeadersOrNull : JMap[String, Array[String]],
         headersToForward    : String,
         logger              : IndentedLogger
     ): Map[String, List[String]] =
         buildConnectionHeadersLowerIfNeeded(
             scheme,
-            Option(credentialsOrNull),
+            hasCredentials,
             Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
-            Option(headersToForward))(
+            valueAs[Set](headersToForward),
+            cookiesToForwardFromProperty)(
             logger
         )
 
     def buildConnectionHeadersLowerWithSOAPIfNeeded(
         scheme            : String,
         httpMethodUpper   : String,
-        credentialsOrNull : Credentials,
+        hasCredentials    : Boolean,
         mediatype         : String,
         encodingForSOAP   : String,
         customHeaders     : Map[String, List[String]],
-        headersToForward  : String)(implicit
+        headersToForward  : Set[String])(implicit
         logger            : IndentedLogger
     ): Map[String, List[String]] =
         if (schemeRequiresHeaders(scheme)) {
@@ -430,9 +434,10 @@ object Connection extends Logging {
             // So we have: @serialization → @mediatype →  xf:header → SOAP
             val connectionHeadersLower =
                 buildConnectionHeadersLower(
-                    Option(credentialsOrNull),
+                    hasCredentials,
                     headersWithContentTypeIfNeeded,
-                    Option(headersToForward)
+                    headersToForward,
+                    cookiesToForwardFromProperty
                 )
 
             val soapHeadersLower =
@@ -446,6 +451,7 @@ object Connection extends Logging {
         } else
             EmptyHeaders
 
+
     private def getPropertyHandleCustom(propertyName: String) = {
         val propertySet = Properties.instance.getPropertySet
 
@@ -453,28 +459,36 @@ object Connection extends Logging {
             Option(propertySet.getString(propertyName)).to[List] mkString " "
     }
 
-    // Get a space-separated list of header names to forward from the configuration properties
-    def getForwardHeaders: String =
-        getPropertyHandleCustom(HttpForwardHeadersProperty)
+    private def valueAs[T[_]](value: String)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] =
+        nonEmptyOrNone(value) map (split[T](_)) getOrElse cbf().result()
 
-    // Get a list of cookie names to forward from the configuration properties
-    def getForwardCookies: List[String] =
-        split[List](getPropertyHandleCustom(HttpForwardCookiesProperty))
+    // Get a Set of header names to forward from the configuration properties
+    def headersToForwardFromProperty: Set[String] =
+        valueAs[Set](getPropertyHandleCustom(HttpForwardHeadersProperty)) ++
+            valueAs[Set](getPropertyHandleCustom(LegacyXFormsHttpForwardHeadersProperty))
+
+    def jHeadersToForward =
+        nonEmptyOrNone(headersToForwardFromProperty mkString " ").orNull
+
+    // Get a List of cookie names to forward from the configuration properties
+    def cookiesToForwardFromProperty: List[String] =
+        valueAs[List](getPropertyHandleCustom(HttpForwardCookiesProperty)).distinct
 
     /**
      * Build connection headers to send given:
      *
      * - the incoming request if present
      * - a list of headers names and values to set
-     * - credentials information
+     * - whether explicit credentials are available (disables forwarding of session cookies and Authorization header)
      * - a list of headers to forward
      *
      * NOTE: All header names returned are lowercase.
      */
     private def buildConnectionHeadersLower(
-        credentials      : Option[Credentials],
+        hasCredentials   : Boolean,
         customHeaders    : Map[String, List[String]],
-        headersToForward : Option[String])(implicit
+        headersToForward : Set[String],
+        cookiesToForward : List[String])(implicit
         logger           : IndentedLogger
     ): Map[String, List[String]] = {
 
@@ -485,14 +499,14 @@ object Connection extends Logging {
             Option(externalContext.getRequest) match {
                 case Some(request) ⇒
 
-                    val forwardHeaderNamesLower = stringOptionToSet(headersToForward) map (_.toLowerCase)
+                    val forwardHeaderNamesLower = headersToForward map (_.toLowerCase)
 
                     // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ session cookies
                     val requestHeaderValuesMap = request.getHeaderValuesMap.asScala
 
                     def canForwardHeader(nameLower: String) = {
                         // Only forward Authorization header if there is no credentials provided
-                        val canForward = nameLower != AuthorizationLower || credentials.isEmpty
+                        val canForward = nameLower != AuthorizationLower || ! hasCredentials
 
                         if (! canForward)
                             debug("not forwarding Authorization header because credentials are present")
@@ -509,17 +523,18 @@ object Connection extends Logging {
                         nameLower → values.toList
                     }
                 case None ⇒
-                    Seq()
+                    Nil
             }
 
         // 2. Explicit caller-specified header name/values
         val explicitHeadersLower = customHeaders map { case (k, v) ⇒ k.toLowerCase → v }
 
         // 3. Forward cookies for session handling only if no credentials have been explicitly set
-        val newCookieHeaderLower = credentials match {
-            case None    ⇒ sessionCookieHeaderLower(externalContext)
-            case Some(_) ⇒ None
-        }
+        val newCookieHeaderLower =
+            if (! hasCredentials)
+                sessionCookieHeaderLower(externalContext, cookiesToForward)
+            else
+                None
 
         // 4. Authorization token
         val tokenHeaderLower = {
@@ -537,12 +552,12 @@ object Connection extends Logging {
     }
 
     private def sessionCookieHeaderLower(
-        externalContext : ExternalContext)(implicit 
-        logger          : IndentedLogger
+        externalContext  : ExternalContext,
+        cookiesToForward : List[String])(implicit
+        logger           : IndentedLogger
     ): Option[(String, List[String])] = {
         
         // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
-        val cookiesToForward = getForwardCookies
         if (cookiesToForward.nonEmpty) {
 
             // By convention, the first cookie name is the session cookie
@@ -622,7 +637,7 @@ object Connection extends Logging {
     private def sessionCookieFromIncomingLower(
         externalContext  : ExternalContext,
         nativeRequest    : HttpServletRequest,
-        cookiesToForward : Seq[String],
+        cookiesToForward : List[String],
         sessionCookieName: String)(implicit
         logger           : IndentedLogger
     ): Option[(String, List[String])] = {

@@ -112,7 +112,6 @@ public class LocalPortletSubmission extends BaseSubmission {
 
         // Headers
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
-        final String headersToForward = containingDocument().getForwardSubmissionHeaders();
 
         final String submissionEffectiveId = submission().getEffectiveId();
 
@@ -140,7 +139,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                 try {
                     connectionResult = openLocalConnection(newExternalContext.getRequest(), response,
                         detailsLogger, resolvedURI.toString(), p, sp.actualRequestMediatype, p2.encoding, sp.messageBody,
-                        sp.queryString, headersToForward, customHeaderNameValues, new SubmissionProcess() {
+                        sp.queryString, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
                                 currentPortlet.processorService().service(new PipelineContext(), new ExternalContextWrapper(newExternalContext) {

@@ -61,9 +61,10 @@ object SubmissionUtils {
             content         = None,
             headers         = Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = url.getScheme,
-                credentials      = None,
+                hasCredentials   = false,
                 customHeaders    = Map(),
-                headersToForward = getHeadersToForward(model.containingDocument)
+                headersToForward = Connection.headersToForwardFromProperty,
+                cookiesToForward = Connection.cookiesToForwardFromProperty
             ) mapValues (_.toList),
             loadState       = true,
             logBody         = BaseSubmission.isLogBody
@@ -71,9 +72,6 @@ object SubmissionUtils {
             saveState = true
         )
     }
-
-    private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
-        Option(containingDocument.getForwardSubmissionHeaders)
 
     def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): Map[String, List[String]] = {
         try {

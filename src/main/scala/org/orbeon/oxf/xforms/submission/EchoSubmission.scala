@@ -52,16 +52,15 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         }
 
         val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll)
-        val headersToForward       = containingDocument.getForwardSubmissionHeaders
 
         val headers = Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
             scheme            = "http",
             httpMethodUpper   = p.actualHttpMethod,
-            credentialsOrNull = p2.credentials,
+            hasCredentials    = p2.credentials != null,
             mediatype         = sp.actualRequestMediatype,
             encodingForSOAP   = p2.encoding,
             customHeaders     = customHeaderNameValues,
-            headersToForward  = headersToForward)(
+            headersToForward  = Connection.headersToForwardFromProperty)(
             logger            = getDetailsLogger(p, p2)
         )
 

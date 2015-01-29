@@ -112,13 +112,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         implicit val logger = new IndentedLogger(ProcessorImpl.logger, "")
 
-        // This handles forwarding of configured cookie headers
         val allHeaders =
             Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = outgoingURL.getScheme,
-                credentials      = None,
+                hasCredentials   = false,
                 customHeaders    = persistenceHeaders ++ proxiedHeaders,
-                headersToForward = None // handled by proxyAndCapitalizeHeaders()
+                headersToForward = Set(),                                  // handled by proxyAndCapitalizeHeaders()
+                cookiesToForward = Connection.cookiesToForwardFromProperty // NOT handled by proxyAndCapitalizeHeaders()
             )
 
         val method = request.getMethod

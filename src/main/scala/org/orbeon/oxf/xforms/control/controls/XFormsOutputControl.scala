@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.orbeon.oxf.externalcontext.ServletURLRewriter
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsError
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -130,7 +130,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                     value
 
             def doProxyURI(uri: String, lastModified: Long) =
-                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Option(containingDocument.getForwardSubmissionHeaders))
+                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Connection.headersToForwardFromProperty)
 
             if (StringUtils.isNotBlank(internalValue)) {
                 getBuiltinTypeName match {

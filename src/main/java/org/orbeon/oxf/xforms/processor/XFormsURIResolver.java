@@ -22,7 +22,6 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -60,10 +59,10 @@ public class XFormsURIResolver extends TransformerURIResolver {
     @Override
     public SAXSource resolve(String href, String base) throws TransformerException {
         // Use global definition for headers to forward
-        return resolve(href, base, null, Connection.getForwardHeaders());
+        return resolve(href, base, null);
     }
 
-    public SAXSource resolve(String href, String base, final Credentials credentials, final String headersToForward) throws TransformerException {
+    public SAXSource resolve(String href, String base, final Credentials credentials) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {
@@ -82,7 +81,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
                 final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) getProcessor().getState(getPipelineContext());
 
                 // First, put in state if necessary
-                processorOutput.readURLToStateIfNeeded(getPipelineContext(), url, state, credentials, headersToForward);
+                processorOutput.readURLToStateIfNeeded(getPipelineContext(), url, state, credentials);
 
                 // Then try to read from state
                 if (state.isDocumentSet(urlString, credentials)) {// not sure why this would not be the case
@@ -107,9 +106,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readAsDom4j(String urlString, Credentials credentials, String headersToForward) {
+    public Document readAsDom4j(String urlString, Credentials credentials) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, credentials, headersToForward);
+            final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed
             return TransformerUtils.readDom4j(source, false);
         } catch (Exception e) {
@@ -117,9 +116,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Credentials credentials, String headersToForward) {
+    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Credentials credentials) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, credentials, headersToForward);
+            final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed
             return TransformerUtils.readTinyTree(configuration, source, false);
         } catch (Exception e) {

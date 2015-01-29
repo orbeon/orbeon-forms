@@ -214,7 +214,7 @@ object XFormsResourceServer {
         contentType      : Option[String],
         lastModified     : Long,
         customHeaders    : Map[String, List[String]],
-        headersToForward : Option[String])(implicit
+        headersToForward : Set[String])(implicit
         logger           : IndentedLogger
     ): String = {
 
@@ -231,8 +231,17 @@ object XFormsResourceServer {
             val serviceURI = new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE))
 
             // Store mapping into session
-            val outgoingHeaders = Connection.buildConnectionHeadersLowerIfNeeded(serviceURI.getScheme, None, customHeaders, headersToForward)(logger)
-            val resource        = DynamicResource(serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
+            val outgoingHeaders =
+                Connection.buildConnectionHeadersLowerIfNeeded(
+                    scheme           = serviceURI.getScheme,
+                    hasCredentials   = false,
+                    customHeaders    = customHeaders,
+                    headersToForward = headersToForward,
+                    cookiesToForward = Connection.cookiesToForwardFromProperty)(
+                    logger           = logger
+                )
+
+            val resource = DynamicResource(serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
 
             session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)
         }
@@ -243,7 +252,7 @@ object XFormsResourceServer {
 
     // For Java callers
     def jProxyURI(uri: String, contentType: String) =
-        proxyURI(uri, None, Option(contentType), -1, Map(), None)(null)
+        proxyURI(uri, None, Option(contentType), -1, Map(), Set())(null)
 
     // For unit tests only (called from XSLT)
     def testGetResources(key: String)  =

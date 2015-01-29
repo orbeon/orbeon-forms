@@ -64,9 +64,10 @@ private object HttpRequest {
 
             Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = documentURL.getScheme,
-                credentials      = None,
+                hasCredentials   = false,
                 customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
-                headersToForward = Option(Connection.getForwardHeaders)
+                headersToForward = Connection.headersToForwardFromProperty,
+                cookiesToForward = Connection.cookiesToForwardFromProperty
             )
         }
 

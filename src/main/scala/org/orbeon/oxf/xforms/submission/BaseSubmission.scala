@@ -112,7 +112,6 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         encoding               : String,
         messageBodyOrNull      : Array[Byte],
         queryString            : String,
-        headerNames            : String,
         customHeaderNameValues : Map[String, List[String]],
         submissionProcess      : SubmissionProcess,
         isContextRelative      : Boolean,
@@ -142,11 +141,11 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 scheme            = "http",
                 httpMethodUpper   = httpMethodUpper,
-                credentialsOrNull = null,
+                hasCredentials    = false,
                 mediatype         = actualRequestMediatype,
                 encodingForSOAP   = encoding,
                 customHeaders     = customHeaderNameValues,
-                headersToForward  = headerNames)(
+                headersToForward  = Connection.headersToForwardFromProperty)(
                 logger            = indentedLogger
             )
 

@@ -136,7 +136,13 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                         throw new OXFException(e);
                     }
                     final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
-                        Connection.jBuildConnectionHeadersLowerIfNeeded(url.getScheme(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
+                        Connection.jBuildConnectionHeadersLowerIfNeeded(
+                            url.getScheme(),
+                            false,
+                            explicitHeaders,
+                            Connection.jHeadersToForward(),
+                            indentedLogger
+                        );
 
                     final ConnectionResult cxr =
                         Connection.jApply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);

@@ -405,8 +405,6 @@ abstract public class XFormsToSomething extends ProcessorImpl {
 
     private void gatherInputDependencies(XFormsContainingDocument containingDocument, IndentedLogger logger, Stage1CacheableState stage1CacheableState) {
 
-        final String forwardSubmissionHeaders = containingDocument.getForwardSubmissionHeaders();
-
         // Add static instance source dependencies for top-level models
         // TODO: check all models/instances
         final PartAnalysis topLevelPart = containingDocument.getStaticState().topLevelPart();
@@ -418,7 +416,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                     if (!instance.cache()) {
-                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.credentialsOrNull(), forwardSubmissionHeaders);
+                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.credentialsOrNull());
 
                         if (logger.isDebugEnabled())
                                 logger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL);
@@ -445,7 +443,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                     if (logger.isDebugEnabled())
                         logger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI);
 
-                    stage1CacheableState.addReference(null, currentSchemaURI, null, forwardSubmissionHeaders);// TODO: support credentials on schema refs
+                    stage1CacheableState.addReference(null, currentSchemaURI, null);// TODO: support credentials on schema refs
                 }
             }
         }
@@ -456,7 +454,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             final Metadata metadata = containingDocument.getStaticState().topLevelPart().metadata();
             final Set<String> includes = metadata.getBindingIncludesJava();
             for (final String include: includes) {
-                stage1CacheableState.addReference(null, "oxf:" + include, null, null);
+                stage1CacheableState.addReference(null, "oxf:" + include, null);
             }
         }
     }

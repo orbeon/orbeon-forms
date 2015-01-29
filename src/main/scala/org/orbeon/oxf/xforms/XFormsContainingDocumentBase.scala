@@ -222,9 +222,6 @@ trait ContainingDocumentProperties {
         require(SupportedTypesForInputFormat(typeName))
         staticStringProperty(TYPE_INPUT_FORMAT_PROPERTY_PREFIX + typeName)
     }
-
-    def getForwardSubmissionHeaders =
-        nonEmptyOrNone(staticStringProperty(FORWARD_SUBMISSION_HEADERS)) getOrElse Connection.getForwardHeaders
 }
 
 private object ContainingDocumentProperties {

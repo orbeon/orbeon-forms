@@ -140,7 +140,7 @@ class XIncludeReceiver(
 
             // Keep URI reference for caching
             if (uriReferences ne null)
-                uriReferences.addReference(base, href, null, null)
+                uriReferences.addReference(base, href, null)
 
             def createChildReceiver =
                 new XIncludeReceiver(pipelineContext, Some(self), getXMLReceiver, uriReferences, uriResolver, systemId, generateXMLBase, outputLocator)

@@ -149,10 +149,11 @@ trait FormRunnerPersistence {
         val url = new URI(rewrittenURLString)
 
         val headers = Connection.buildConnectionHeadersLowerIfNeeded(
-            url.getScheme,
-            None,
-            Map(),
-            Option(Connection.getForwardHeaders)
+            scheme           = url.getScheme,
+            hasCredentials   = false,
+            customHeaders    = Map(),
+            headersToForward = Connection.headersToForwardFromProperty,
+            cookiesToForward = Connection.cookiesToForwardFromProperty
         )
 
         val cxr = Connection(

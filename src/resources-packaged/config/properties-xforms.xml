@@ -93,7 +93,6 @@
     <property as="xs:boolean" name="oxf.xforms.local-submission-forward"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.local-submission-include"                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.local-instance-include"                      value="false"/>
-    <property as="xs:string"  name="oxf.xforms.forward-submission-headers"                  value="Orbeon-Client"/>
     <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="2000"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>

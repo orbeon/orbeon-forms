@@ -40,20 +40,21 @@ labelHintValue = (value) ->
 labelHintEditor = _.memoize ->
     # Create elements and add to the DOM
     editor = {}
-    editor._textarea  = $('<textarea style="display:none"></textarea>')
-    editor._textfield = $('<input type="text">')
-    editor.textfield  = editor._textfield
+    textfield = $('<input style="display: none" type="text">')
+    textarea  = $('<textarea style="display: none"></textarea>')
+    # End edit when users press enter in the textfield (but not the text area)
+    textfield.on('keypress', (e) -> if e.which == 13 then Builder.resourceEditorEndEdit())
+    editor.editControl = null
     editor.selectTextInput = ->
-        editor.textfield.hide()
-        editor.textfield = if lhha() == 'text' then editor._textarea else editor._textfield
-        editor.textfield.show()
+        editor.editControl?.hide()
+        editor.editControl = if lhha() == 'text' then textarea else textfield
+        editor.editControl.show()
     editor.checkbox   = $('<input type="checkbox">')
-    editor.container  = $('<div class="fb-label-editor">').append(editor._textarea).append(editor._textfield).append(editor.checkbox)
+    editor.container  = $('<div class="fb-label-editor">').append(textarea).append(textfield).append(editor.checkbox)
     editor.container.hide()
     $('.fb-main').append(editor.container)
     # Register event listeners
-    editor.checkbox.on('click', -> labelHintEditor().textfield.focus())
-    editor.textfield.on('keypress', (e) -> if e.which == 13 then Builder.resourceEditorEndEdit())
+    editor.checkbox.on('click', -> labelHintEditor().editControl.focus())
     editor
 
 # Show editor on click on label
@@ -67,11 +68,11 @@ Builder.resourceEditorStartEdit = () ->
     labelHintEditor().container.show()
     labelHintEditor().container.offset(labelHintOffset)
     labelHintEditor().container.width(Builder.resourceEditorCurrentLabelHint.outerWidth())
-    labelHintEditor().textfield.val(labelHintValue()).focus()
+    labelHintEditor().editControl.val(labelHintValue()).focus()
     labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
     # Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
     labelHintEditor().checkbox.tooltip(title: $('.fb-message-lhha-checkbox').text())
-    labelHintEditor().textfield.attr('placeholder', $(".fb-message-type-#{lhha()}").text())
+    labelHintEditor().editControl.attr('placeholder', $(".fb-message-type-#{lhha()}").text())
     # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
     Builder.resourceEditorCurrentLabelHint.css('visibility', 'hidden')
     # Add class telling if this is a label or hint editor
@@ -82,7 +83,7 @@ Builder.resourceEditorEndEdit = ->
     # If editor is hidden, editing has already been ended (endEdit can be called more than once)
     if labelHintEditor().container.is(':visible')
         # Send value to server, handled in FB's model.xml
-        newValue = labelHintEditor().textfield.val()
+        newValue = labelHintEditor().editControl.val()
         isChecked = labelHintEditor().checkbox.is(':checked')
         OD.dispatchEvent
             targetId: Builder.resourceEditorCurrentControl.attr('id')

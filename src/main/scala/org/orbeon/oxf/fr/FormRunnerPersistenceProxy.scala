@@ -100,7 +100,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]) = {
         // Create the absolute outgoing URL
         val outgoingURL =
-            URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
+            new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE))
 
         val persistenceHeaders =
             for ((name, value) ← headers)
@@ -108,6 +108,16 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         val proxiedHeaders =
             proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala mapValues (_.toList), request = true)
+
+        implicit val logger = new IndentedLogger(ProcessorImpl.logger, "")
+
+        val allHeaders =
+            Connection.buildConnectionHeadersLowerIfNeeded(
+                scheme           = outgoingURL.getScheme,
+                credentials      = None,
+                customHeaders    = persistenceHeaders ++ proxiedHeaders,
+                headersToForward = Option(Connection.getForwardHeaders)
+            )
 
         val method = request.getMethod
 
@@ -133,13 +143,12 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         Connection(
             httpMethodUpper = method,
-            url             = new URI(outgoingURL),
+            url             = outgoingURL,
             credentials     = None,
             content         = requestContent,
-            headers         = persistenceHeaders ++ proxiedHeaders,
+            headers         = allHeaders,
             loadState       = true,
-            logBody         = false)(
-            logger          = new IndentedLogger(ProcessorImpl.logger, "")
+            logBody         = false
         ).connect(
             saveState = true
         )

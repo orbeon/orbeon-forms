@@ -69,7 +69,14 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     }
 
     // Proxy the request depending on app/form name and whether we are accessing form or data
-    private def proxyRequest(request: Request, response: Response, app: String, form: String, formOrData: String, path: String): Unit = {
+    private def proxyRequest(
+        request    : Request,
+        response   : Response,
+        app        : String,
+        form       : String,
+        formOrData : String,
+        path       : String
+    ): Unit = {
 
         def buildQueryString =
             NetUtils.encodeQueryString(request.getParameterMap)
@@ -142,7 +149,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
      * Proxies the request to every configured persistence layer to get the list of the forms, and aggregates the
      * results. So the response is not simply proxied, unlike for other persistence layer calls.
      */
-    private def proxyPublishedFormsMetadata(request: Request, response: Response, app: Option[String], form: Option[String], path: String): Unit = {
+    private def proxyPublishedFormsMetadata(
+        request  : Request,
+        response : Response,
+        app      : Option[String],
+        form     : Option[String],
+        path     : String
+    ): Unit = {
         val propertySet = Properties.instance.getPropertySet
 
         val providers = {

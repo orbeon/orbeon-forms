@@ -46,19 +46,33 @@ object InternalHttpClient extends HttpClient {
         val incomingExternalContext = NetUtils.getExternalContext
         val incomingRequest         = incomingExternalContext.getRequest
 
+        def headersUpdatedWithIncoming(headersToUpdate: Map[String, List[String]], headerNameCapitalized: String) = {
+
+            def incomingHeaderValue =
+                incomingRequest.getHeaderValuesMap.get(headerNameCapitalized.toLowerCase).headOption
+
+            if (Headers.firstHeaderIgnoreCase(headersToUpdate, headerNameCapitalized).isDefined)
+                headersToUpdate
+            else
+                headersToUpdate ++ (incomingHeaderValue map (headerNameCapitalized → List(_)))
+        }
+
+        // Keep explicitly passed Orbeon-Client header, otherwise forward incoming header if available
+        val effectiveHeaders = headersUpdatedWithIncoming(headers, Headers.OrbeonClient)
+
         val request =
             new LocalRequest(
                 incomingRequest         = incomingRequest,
                 contextPath             = incomingRequest.getContextPath,
                 pathQuery               = url,
                 methodUpper             = method,
-                headersMaybeCapitalized = headers,
+                headersMaybeCapitalized = effectiveHeaders,
                 content                 = content
             )
         
         // Honor Orbeon-Client header (see also ServletExternalContext)
         val urlRewriter =
-            Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
+            Headers.firstHeaderIgnoreCase(effectiveHeaders, Headers.OrbeonClient) match {
                 case Some(client) if EmbeddedClientValues(client) ⇒
                     new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
                 case Some(client) ⇒

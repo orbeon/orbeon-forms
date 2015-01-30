@@ -451,12 +451,11 @@ object Connection extends Logging {
         } else
             EmptyHeaders
 
-
     private def getPropertyHandleCustom(propertyName: String) = {
         val propertySet = Properties.instance.getPropertySet
 
-        Option(propertySet.getString(propertyName + ".custom")).to[List] ++
-            Option(propertySet.getString(propertyName)).to[List] mkString " "
+        Option(propertySet.getString(propertyName)).to[List] ++
+            Option(propertySet.getString(propertyName + ".private")).to[List] mkString " "
     }
 
     private def valueAs[T[_]](value: String)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] =

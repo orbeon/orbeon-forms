@@ -47,10 +47,10 @@
     <property as="xs:string"  name="oxf.http.internal-paths"                         value="(?!/exist/)/.*(?&lt;!\.jsp)"/>
     <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <property as="xs:string"  name="oxf.http.forward-headers"                        value="Orbeon-Client"/>
-    <property as="xs:string"  name="oxf.http.forward-headers.custom"                 value="Orbeon-Client"/>
+    <property as="xs:string"  name="oxf.http.forward-headers.private"                value="Orbeon-Client"/>
     <property as="xs:string"  name="oxf.xforms.forward-submission-headers"           value=""/>
     <property as="xs:string"  name="oxf.http.forward-cookies"                        value=""/>
-    <property as="xs:string"  name="oxf.http.forward-cookies.custom"                 value=""/>
+    <property as="xs:string"  name="oxf.http.forward-cookies.private"                value=""/>
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>
     <property as="xs:integer" name="oxf.http.so-timeout"                             value="0"/>
     <property as="xs:boolean" name="oxf.http.chunk-requests"                         value="false"/>

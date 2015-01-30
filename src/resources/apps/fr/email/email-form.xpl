@@ -72,8 +72,6 @@
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
                 </url>
-                <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
             </config>
         </p:input>
         <p:output name="data" id="fr-resources"/>
@@ -304,8 +302,6 @@
                                 <!-- Force binary content type, as the data is stored that way -->
                                 <content-type>application/octet-stream</content-type>
                                 <force-content-type>true</force-content-type>
-                                <!-- Forward the same headers that the XForms engine forwards -->
-                                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                             </config>
                         </p:input>
                         <p:output name="data" id="attachment-{position()}"/>

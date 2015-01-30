@@ -40,8 +40,6 @@
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
                 </url>
-                <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                 <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
             </config>

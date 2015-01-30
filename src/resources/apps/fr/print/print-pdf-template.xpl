@@ -103,8 +103,6 @@
                 <url>
                     <xsl:value-of select="xpl:rewriteServiceURI(//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
                 </url>
-                <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                 <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
             </config>

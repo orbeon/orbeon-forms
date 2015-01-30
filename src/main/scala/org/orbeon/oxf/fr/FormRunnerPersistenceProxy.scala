@@ -106,17 +106,19 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             for ((name, value) ← headers)
             yield capitalizeCommonOrSplitHeader(name) → List(value)
 
+        // Forwards all incoming headers, with exceptions like connection headers and, importantly, cookie headers
         val proxiedHeaders =
             proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala mapValues (_.toList), request = true)
 
         implicit val logger = new IndentedLogger(ProcessorImpl.logger, "")
 
+        // This handles forwarding of configured cookie headers
         val allHeaders =
             Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = outgoingURL.getScheme,
                 credentials      = None,
                 customHeaders    = persistenceHeaders ++ proxiedHeaders,
-                headersToForward = Option(Connection.getForwardHeaders)
+                headersToForward = None // handled by proxyAndCapitalizeHeaders()
             )
 
         val method = request.getMethod

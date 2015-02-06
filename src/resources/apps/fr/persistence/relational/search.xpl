@@ -351,7 +351,7 @@
                                         and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'postgresql'">
-                                        and (xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', xml, <xsl:value-of select="f:postgresql-namespaces(f:namespaces(., @path))"/>))[1]::text = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                        and (xpath('<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()', xml, <xsl:value-of select="f:postgresql-namespaces(f:namespaces(., @path))"/>))[1]::text = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
                                         and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:oracle-namespaces(f:namespaces(., @path))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'

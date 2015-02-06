@@ -31,7 +31,7 @@ Event.onDOMReady ->
 
     setValue = (control, formattedDate) ->
         attributeName = if $(control).is(".xforms-input-appearance-minimal") then "alt" else "value"
-        inputHolder = $(control).children('.xforms-input-input')
+        inputHolder = $(control).children('.xforms-input-input').first()
         $(inputHolder).attr(attributeName, formattedDate)
         value = Controls.getCurrentValue(control)
         changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, value, "xxforms-value")

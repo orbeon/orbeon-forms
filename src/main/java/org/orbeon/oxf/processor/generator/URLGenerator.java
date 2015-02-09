@@ -416,8 +416,6 @@ public class URLGenerator extends ProcessorImpl {
                                     cacheUseLocalCache, enableConditionalGET,
                                     username, password, preemptiveAuth, domain,
                                     tidyConfig);
-                            if (logger.isDebugEnabled())
-                                logger.debug("Read configuration: " + config.toString());
                             return new ConfigURIReferences(config);
                         }
                     });

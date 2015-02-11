@@ -81,7 +81,7 @@ private object FlatView {
                 val extractFunction = req.provider match {
                     case "oracle"     ⇒ s"extractValue(d.xml, '/*/$path')"
                     case "db2"        ⇒ s"XMLSERIALIZE(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
-                    case "postgresql" ⇒ s"(xpath('/*/$path/text()', d.xml))[1]"
+                    case "postgresql" ⇒ s"(xpath('/*/$path/text()', d.xml))[1]::text"
                     case _            ⇒ ???
                 }
                 Col(extractFunction, col)

@@ -303,7 +303,7 @@ object SchemaGenerator {
 
                     // Find top-level xf:bind, which is the one without a `ref`
                     // (there is a xf:bind making instance('fr-form-instance') readonly in certain cases; is it really needed?)
-                    val componentTopLevelBind = xblBindingEl \ "*:implementation" \ "*:model" \ "*:bind" filter (_.att("ref").isEmpty)
+                    val componentTopLevelBind = xblBindingEl \ "*:implementation" \ "*:model" \ "*:bind" filter (_.attValue("id") == "fr-form-binds")
                     assert(componentTopLevelBind.length == 1, "expect exactly one top-level bind in component")
 
                     // Find xf:bind for the nodes inside this component

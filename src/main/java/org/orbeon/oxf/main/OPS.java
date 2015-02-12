@@ -23,6 +23,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.CommandLineExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.Processor;
@@ -144,7 +145,7 @@ public class OPS {
                     }
                 } else {
                     // URL
-                    processorDefinition.addInput(inputName, inputValue);                    
+                    processorDefinition.addInput(inputName, inputValue);
                 }
             }
         } else {
@@ -235,13 +236,16 @@ public class OPS {
             // is supplied for those processors using external contexts, such as most serializers.
 
             InitUtils.processorDefinitions();
+            final ExternalContext externalContext = new CommandLineExternalContext();
             if (outputs == null) {
                 // No outputs to connect: just execute the pipeline
-                InitUtils.runProcessor(createProcessor(processorDefinition), new CommandLineExternalContext(), pipelineContext, logger);
+                InitUtils.runProcessor(createProcessor(processorDefinition), externalContext, pipelineContext, logger);
             } else {
                 // At least one output to connect...
                 final Processor processor = createProcessor(processorDefinition);
                 processor.reset(pipelineContext);
+                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+
                 // Loop over outputs
                 for (int i = 0;  i < outputs.length; i ++) {
                     final String outputArg = outputs[i];

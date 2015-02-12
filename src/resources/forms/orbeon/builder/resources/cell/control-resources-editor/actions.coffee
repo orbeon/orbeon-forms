@@ -67,6 +67,7 @@ Builder.resourceEditorStartEdit = () ->
     labelHintEditor().selectTextInput()
     labelHintEditor().container.show()
     labelHintEditor().container.offset(labelHintOffset)
+    labelHintEditor().container.offset(labelHintOffset)
     labelHintEditor().container.width(Builder.resourceEditorCurrentLabelHint.outerWidth())
     labelHintEditor().editControl.val(labelHintValue()).focus()
     labelHintEditor().checkbox.prop('checked', isLabelHintHtml())

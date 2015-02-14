@@ -48,13 +48,22 @@ trait BindingOps {
     // From an <xbl:binding>, return all bind attributes
     // They are obtained from the legacy datatype element or from templates/bind.
     def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
-        val metadata = bindingMetadata(binding)
-        val typeFromDatatype = ("", "type") → ((metadata / "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
-        val bindAttributes = metadata / "*:templates" / "*:bind" /@ @* map (att ⇒ att.uriQualifiedName →  att.stringValue)
 
-        typeFromDatatype +: bindAttributes filterNot
-            { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
-            { case (qname, value)        ⇒ attributeInfo(qname, value) }
+        val allAttributes = {
+            val metadata = bindingMetadata(binding)
+            val typeFromDatatype = QName.get("type") → ((metadata / "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
+            val bindAttributes = {
+                val asNodeInfo = metadata / "*:templates" / "*:bind" /@ @*
+                asNodeInfo map (att ⇒ QName.get(att.getLocalPart, att.getPrefix, att.getURI) →  att.stringValue)
+            }
+            typeFromDatatype +: bindAttributes
+        }
+
+        for {
+            (qname, value) ← allAttributes
+            if !(qname.getName == "type" && value == "xs:string") // TODO: assume literal 'xs:' prefix (should resolve namespace)
+        } yield
+            attributeInfo(qname, value)
     }
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>

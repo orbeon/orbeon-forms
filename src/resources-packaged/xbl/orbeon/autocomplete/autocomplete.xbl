@@ -216,7 +216,7 @@
                         </xf:action>
                         <!-- For resource mode: when the component is initialized or when resources changes, update our internal itemset -->
                         <xsl:if test="exists(@resource)">
-                            <xf:action ev:event="xforms-value-changed" ev:observer="resource-variable">
+                            <xf:action ev:event="xforms-value-changed xforms-enabled" ev:observer="resource-variable">
                                 <!-- Update itemset based on resource -->
                                 <xf:send submission="get-itemset">
                                     <xf:property name="resource" value="$resource"/>

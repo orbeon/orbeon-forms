@@ -3149,7 +3149,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, "DOMActivate");
                     ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
-                    if (YAHOO.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
+                    if (YAHOO.util.Dom.hasClass(target, "xforms-trigger-appearance-modal") || YAHOO.util.Dom.hasClass(target, "xforms-submit-appearance-modal")) {
                         // If click on a modal trigger, we want to prevent any further interaction with the form until
                         // we get a response to this Ajax request from the server.
                         // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the

@@ -78,10 +78,21 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                 response.setContentType(resource.contentType getOrElse "application/octet-stream")
 
                 // File name visible by the user
-                val contentFilename = resource.filename getOrElse filenameFromRequest
+                val rawFilename = resource.filename getOrElse filenameFromRequest
+
+                // Try to provide extension based on mediatype if file one is not provided
+                // Windows needs this
+                val contentFilename = if (rawFilename.indexOf('.') >= 0) {
+                    rawFilename
+                } else {
+                    def contentExtension(contentType: Option[String]) = contentType match {
+                        case Some("application/pdf") ⇒ ".pdf"
+                        case _                       ⇒ ""
+                    }
+                    rawFilename ++ contentExtension(resource.contentType)
+                }
 
                 // Handle as attachment
-                // TODO: should try to provide extension based on mediatype if file name is not provided?
                 // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
                 response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, "UTF-8"))
 

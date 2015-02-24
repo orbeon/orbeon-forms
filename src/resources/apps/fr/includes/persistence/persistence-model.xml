@@ -125,7 +125,7 @@
                     context="xxf:instance('fr-form-instance')/root()"
                     origin="
                         (
-                            if (xxf:get-request-parameter('data-format-version') != 'edge')
+                            if (not(xxf:get-request-parameter('data-format-version') = 'edge'))
                             then migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
                             else (),
                             $form-data

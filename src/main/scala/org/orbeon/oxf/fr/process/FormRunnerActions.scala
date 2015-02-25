@@ -282,7 +282,8 @@ trait FormRunnerActions {
         EmbeddableParam → (() ⇒ isEmbeddable)
     )
 
-    private val CommonParamNames = (TestCommonParams map (_._1) toSet) + "form-version"
+    private val CommonParamNames              = (TestCommonParams map (_._1) toSet) + "form-version"
+    private val ParamsToExcludeUponModeChange = CommonParamNames + "data-format-version"
 
     // Automatically prepend fr-noscript and orbeon-embeddable when needed, unless they are already specified
     // NOTE: We don't need to pass fr-language to most submissions, as the current language is kept in the session.
@@ -305,14 +306,14 @@ trait FormRunnerActions {
         } else
             pathQuery
 
-    private def prependUserParameters(pathQuery: String) = {
+    private def prependUserParamsForModeChange(pathQuery: String) = {
 
         val (path, params) = splitQueryDecodeParams(pathQuery)
 
         val newParams =
             for {
                 (name, values) ← containingDocument.getRequestParameters.to[List]
-                if ! CommonParamNames(name) // built-in parameters win
+                if ! ParamsToExcludeUponModeChange(name)
                 value          ← values
             } yield
                 name → value
@@ -326,7 +327,7 @@ trait FormRunnerActions {
     private def tryChangeMode(path: String): Try[Any] =
         Try {
             Map[Option[String], String](
-                Some("uri")                 → prependUserParameters(prependCommonFormRunnerParameters(path)),
+                Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path)),
                 Some("method")              → "post",
                 Some("prune")               → "false",
                 Some("replace")             → "all",

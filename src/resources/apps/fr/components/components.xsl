@@ -87,9 +87,6 @@
     <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
-    <xsl:variable name="is-rendered" select="doc('input:request')/request/request-path = '/xforms-renderer'" as="xs:boolean"/>
-    <xsl:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(doc('input:request')/request/request-uri, '/xforms-renderer') else ''" as="xs:string"/>
-
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"
@@ -217,8 +214,6 @@
 
         </xf:model>
 
-        <xf:var name="url-base-for-requests" value="'{$url-base-for-requests}'"/>
-
         <!-- This model handles global actions on form sections -->
         <xf:model id="fr-sections-model">
 
@@ -286,20 +281,6 @@
                     concat('open-pdf(lang = "', event('fr-language')[not(contains(., '"'))], '")')
                 )
             </xf:action>
-        </xf:model>
-
-        <!-- This model supports Form Runner rendered through the xforms-renderer -->
-        <xf:model id="fr-xforms-renderer-model">
-            <xf:instance id="fr-xforms-renderer-instance">
-                <xforms-renderer>
-                    <is-rendered>
-                        <xsl:value-of select="$is-rendered"/>
-                    </is-rendered>
-                    <url-base-for-requests>
-                        <xsl:value-of select="$url-base-for-requests"/>
-                    </url-base-for-requests>
-                </xforms-renderer>
-            </xf:instance>
         </xf:model>
 
         <!-- Copy and annotate existing main model -->

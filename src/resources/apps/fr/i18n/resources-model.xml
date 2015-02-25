@@ -50,7 +50,7 @@
         id="fr-get-fr-resources"
         serialization="none"
         method="get"
-        resource="{xxf:instance('fr-xforms-renderer-instance')/url-base-for-requests}/fr/service/i18n/fr-resources/{$app}/{$form}"
+        resource="/fr/service/i18n/fr-resources/{$app}/{$form}"
         replace="instance"
         instance="fr-fr-resources"
         xxf:readonly="true"

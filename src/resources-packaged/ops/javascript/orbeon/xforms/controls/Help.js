@@ -14,8 +14,9 @@
 
 (function() {
 
-    var $ = ORBEON.jQuery;
+    var $        = ORBEON.jQuery;
     var Controls = ORBEON.xforms.Controls;
+    var Dom      = ORBEON.util.Dom;
 
     /**
      * We're asked to show the help popover for a control, either because the user clicked on the help icon,
@@ -32,8 +33,8 @@
         controlEl = $(controlEl);
         var labelText           = Controls.getLabelMessage(controlEl[0]);
         var helpText            = Controls.getHelpMessage (controlEl[0]);
-        var firstChildFormEl    = controlEl.find(':input').first();
-        var el                  = firstChildFormEl.is(':visible') ? firstChildFormEl : controlEl; // [1]
+        var formElContainer     = Dom.commonAncestor(controlEl.find(':input:visible'));
+        var el                  = formElContainer.is('*') ? formElContainer : controlEl; // [1]
         var elPos               = Controls.getPosition(el);
         var placement           = Controls.getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');

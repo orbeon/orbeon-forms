@@ -498,6 +498,36 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     if (node == null || node == document) break;
                 }
                 return false;
+            },
+
+            commonAncestor: function (nodes) {
+
+                // Trivial case
+                if (nodes.length == 0) return $([]);
+
+                // Parents for each node, including the node, starting from the node itself
+                var nodesParents = _.map(nodes, function(node) {
+                    return [node].concat($(node).parents().toArray());
+                });
+
+                // Remove the first x elements of each list of parents, so they are all the same length
+                var trimmedNodesParents = (function() {
+                    var nodesParentsLength = _.map(nodesParents, function(parents) { return parents.length;});
+                    var minLength = Math.min.apply(null, [Infinity].concat(nodesParentsLength));
+                    return _.map(nodesParents, function(parents) {
+                        return parents.slice(parents.length - minLength);
+                    });
+                })();
+
+                // Transpose matrix of parents
+                var levelsParents = _.zip.apply(_, trimmedNodesParents);
+                // Find level where all the parents are equal
+                var levelWithCommonParents = _.find(levelsParents, function(parents) {
+                    return _.unique(parents).length == 1;
+                });
+                return _.isUndefined(levelWithCommonParents)
+                        ? $([])
+                        : $(levelWithCommonParents[0]);
             }
         },
 

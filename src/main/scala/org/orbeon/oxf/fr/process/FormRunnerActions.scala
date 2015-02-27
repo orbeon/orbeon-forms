@@ -277,32 +277,39 @@ trait FormRunnerActions {
             sendThrowOnError(s"fr-send-submission-$replace", evaluatedSendProperties)
         }
 
-    private val TestCommonParams = List[(String, () ⇒ Boolean)](
-        NoscriptParam   → (() ⇒ isNoscript),
-        EmbeddableParam → (() ⇒ isEmbeddable)
+    private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](
+        NoscriptParam   → (() ⇒ isNoscript.toString,     _ == "true"),
+        LanguageParam   → (() ⇒ currentLang.stringValue, _ ⇒ false  ),
+        EmbeddableParam → (() ⇒ isEmbeddable.toString,   _ == "true")
     )
 
-    private val CommonParamNames              = (TestCommonParams map (_._1) toSet) + "form-version"
-    private val ParamsToExcludeUponModeChange = CommonParamNames + "data-format-version"
+    private val StateParamNames               = (StateParams map (_._1) toSet) + "form-version"
+    private val ParamsToExcludeUponModeChange = StateParamNames + "data-format-version"
 
-    // Automatically prepend fr-noscript and orbeon-embeddable when needed, unless they are already specified
-    // NOTE: We don't need to pass fr-language to most submissions, as the current language is kept in the session.
-    // Heuristic: We append only if the URL doesn't have a protocol. This might not always be a right guess.
-    private def prependCommonFormRunnerParameters(pathQuery: String) =
-        if (! NetUtils.urlHasProtocol(pathQuery)) {
+    // Automatically prepend fr-noscript, fr-language and orbeon-embeddable based on their current value unless they are
+    // already specified in the given path.
+    //
+    // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
+    // are part of the state the user expects to be kept.
+    //
+    // We didn't use to propagate fr-language, as the current language is kept in the session. But this caused an issue,
+    // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only (that is, when
+    // `optimize == false`.
+    private def prependCommonFormRunnerParameters(pathQuery: String, optimize: Boolean) =
+        if (! NetUtils.urlHasProtocol(pathQuery)) { // heuristic, which might not always be a right guess?
 
             val (path, params) = splitQueryDecodeParams(pathQuery)
 
             val newParams =
                 for {
-                    (name, currentValue) ← TestCommonParams
-                    valueFromPath        = params collectFirst { case (`name`, v) ⇒ v == "true" }
-                    effectiveValue       = valueFromPath getOrElse currentValue.apply
-                    if effectiveValue
+                    (name, (valueFromCurrent, keepValue)) ← StateParams
+                    valueFromPath                         = params collectFirst { case (`name`, v) ⇒ v }
+                    effectiveValue                        = valueFromPath getOrElse valueFromCurrent.apply
+                    if ! optimize || optimize && keepValue(effectiveValue)
                 } yield
-                    name → "true"
+                    name → effectiveValue
 
-            recombineQuery(path, newParams ::: (params filterNot (p ⇒ CommonParamNames(p._1))))
+            recombineQuery(path, newParams ::: (params filterNot (p ⇒ StateParamNames(p._1))))
         } else
             pathQuery
 
@@ -322,12 +329,12 @@ trait FormRunnerActions {
     }
 
     private def tryNavigateTo(path: String): Try[Any] =
-        Try(load(prependCommonFormRunnerParameters(path), progress = false))
+        Try(load(prependCommonFormRunnerParameters(path, optimize = true), progress = false))
 
     private def tryChangeMode(path: String): Try[Any] =
         Try {
             Map[Option[String], String](
-                Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path)),
+                Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false)),
                 Some("method")              → "post",
                 Some("prune")               → "false",
                 Some("replace")             → "all",

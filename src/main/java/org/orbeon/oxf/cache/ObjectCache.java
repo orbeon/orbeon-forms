@@ -32,7 +32,7 @@ public class ObjectCache {
     private static final Map<String, Cache> namedObjectCaches = new HashMap<String, Cache>();
 
     static {
-        namedObjectCaches.put(DEFAULT_CACHE_NAME, new MemoryCacheImpl(DEFAULT_CACHE_NAME, DEFAULT_SIZE));
+        namedObjectCaches.put(DEFAULT_CACHE_NAME, new MemoryCacheImpl(DEFAULT_SIZE));
     }
 
     private ObjectCache() {}
@@ -58,7 +58,7 @@ public class ObjectCache {
         if (cache == null) {
             final String propertyName = CACHE_PROPERTY_NAME_PREFIX + cacheName + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
             final Integer size = Properties.instance().getPropertySet().getInteger(propertyName, defaultSize);
-            cache = new MemoryCacheImpl(cacheName, size);
+            cache = new MemoryCacheImpl(size);
             namedObjectCaches.put(cacheName, cache);
         }
         return cache;

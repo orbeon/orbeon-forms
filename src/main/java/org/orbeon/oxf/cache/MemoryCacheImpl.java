@@ -35,7 +35,7 @@ public class MemoryCacheImpl implements Cache {
     private CacheLinkedList linkedList = new CacheLinkedList();
     private int currentSize;
 
-    public MemoryCacheImpl(String cacheName, int maxSize) {
+    public MemoryCacheImpl(int maxSize) {
         this.maxSize = maxSize;
     }
 

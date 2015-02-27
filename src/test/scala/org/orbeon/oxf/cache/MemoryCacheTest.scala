@@ -37,7 +37,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     val VALIDITY = 0L
 
     @Test def testFindKeepsInCache() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
 
@@ -55,7 +55,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testTakeRemovesFromCache() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
 
@@ -73,7 +73,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testRemoveNotifies() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
 
@@ -90,7 +90,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testRemoveAllNotifies() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
 
@@ -107,7 +107,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testReduceSizeEvicts() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
 
@@ -124,7 +124,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testReduceSizeWithLock() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
         val lock = new ReentrantLock
 
         val o1 = new MyCacheable(lock)
@@ -144,7 +144,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testEvictedIfLockAvailable() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(new ReentrantLock)
 
@@ -159,7 +159,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testNotEvictedIfLockUnavailable() {
-        val cache = new MemoryCacheImpl("test", 1)
+        val cache = new MemoryCacheImpl(1)
         val lock = new ReentrantLock
 
         val o1 = new MyCacheable(lock)
@@ -178,7 +178,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testNextToLastEvicted() {
-        val cache = new MemoryCacheImpl("test", 2)
+        val cache = new MemoryCacheImpl(2)
         val lock = new ReentrantLock
 
 
@@ -206,7 +206,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
 
     @Test def testIterators() {
         val size = 100
-        val cache = new MemoryCacheImpl("test", size)
+        val cache = new MemoryCacheImpl(size)
 
         val range = 1 to size
         

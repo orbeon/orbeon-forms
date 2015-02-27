@@ -64,7 +64,11 @@ trait XFormsActions {
             evaluateOne(requiredParamByName(params, "setvalue", "ref")) match {
                 case nodeInfo: NodeInfo ⇒
                     val valueToSet = params.get(Some("value")) match {
-                        case Some(valueExpr) ⇒ evalOne(nodeInfo, "string(" + valueExpr + ")").getStringValue
+                        case Some(valueExpr) ⇒
+                            evaluateString(
+                                item = nodeInfo,
+                                expr = valueExpr
+                            )
                         case None            ⇒ ""
                     }
                     setvalue(nodeInfo, valueToSet)

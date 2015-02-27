@@ -288,12 +288,21 @@ trait ProcessInterpreter extends Logging {
     def tryNop(params: ActionParams): Try[Any] =
         Success()
 
-    def evaluateBoolean(expr: String) =
-        evaluateOne("boolean(" + expr + ")").asInstanceOf[BooleanValue].getBooleanValue
+    def evaluateBoolean(expr: String, item: Item = xpathContext) =
+        evaluateOne(
+            expr = "boolean(" + expr + ")",
+            item = item
+        ).asInstanceOf[BooleanValue].getBooleanValue
 
-    def evaluateOne(expr: String) =
+    def evaluateString(expr: String, item: Item = xpathContext) =
+        evaluateOne(
+            expr = "string(" + expr + ")",
+            item = item
+        ).getStringValue
+
+    def evaluateOne(expr: String, item: Item = xpathContext) =
         evalOne(
-            item            = xpathContext,
+            item            = item,
             expr            = expr,
             functionContext = xpathFunctionContext
         )

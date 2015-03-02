@@ -197,7 +197,7 @@ public class IndentedLogger {
 
     private static void log(Logger logger, Level level, int indentLevel, String prefix, String type, String message, String... parameters) {
         final String parametersString;
-        if (parameters != null) {
+        if (parameters != null && parameters.length > 0) {
             final StringBuilder sb = new StringBuilder(" {");
             boolean first = true;
             for (int i = 0; i < parameters.length; i += 2) {
@@ -222,15 +222,8 @@ public class IndentedLogger {
             parametersString = "";
         }
 
-        // If the text to log is on multiple lines, indent all the lines, and use indentLevel+2 for all but the first line
         final String text = (StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString;
-        final String[] lines = text.split("\n");
-        boolean first = true;
-        for (String line: lines) {
-            String indentation = getLogIndentSpaces(indentLevel + (first ? 0 : 2));
-            logger.log(level, indentation + line);
-            if (first) first = false;
-        }
+        logger.log(level, text);
     }
 
     public static class Indentation {

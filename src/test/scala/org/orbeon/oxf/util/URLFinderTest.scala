@@ -33,7 +33,9 @@ class URLFinderTest extends AssertionsForJUnit {
             """this http://userid:password@example.com:8080/, works"""     → List("""http://userid:password@example.com:8080/"""),
             """this http://223.255.255.254, works"""                       → List("""http://223.255.255.254"""),
             """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" → List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),
-            """some google.com URL and another (http://twitter.com/)"""    → List("""google.com""", """http://twitter.com/""")
+            """naked google.com URL and another (http://twitter.com/)"""   → List("""google.com""", """http://twitter.com/"""),
+            """trailing / works too for google.com/."""                    → List("""google.com/"""),
+            """email info@orbeon.com is not matched"""                     → List()
         )
 
         for ((in, out) ← expected)

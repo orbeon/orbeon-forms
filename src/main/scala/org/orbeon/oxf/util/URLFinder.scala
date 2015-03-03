@@ -95,15 +95,15 @@ object URLFinder {
                 [^\\s`!()\\[\\]{};:'".,<>?«»“”‘’]
               )
               |
-              (?:
-                (?<!@)
-                [a-z0-9]+
-                (?:[.\\-][a-z0-9]+)*
-                [.]
-                (?:$RegexpDomains)
-                \\b
-                /?
-                (?!@)
+              (?:                       # non-capturing group
+                (?<![@.])               # not preceded by @ or .
+                [a-z0-9]+               # lowercase ASCII and numbers for first part
+                (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
+                [.]                     # followed by .
+                (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+                \\b                     # word boundary (0-length match)
+                /?                      # optional trailing /
+                (?!@)                   # not followed by @
               )
             )""".r
 }

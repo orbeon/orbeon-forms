@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.xml.XMLParsing._
 import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import scala.util.matching.Regex
 
@@ -49,7 +48,8 @@ object URLFinder {
         URLMatchRegex.findAllIn(s) map Regex.quoteReplacement
 
     // Useful resources:
-
+    //
+    // - http://data.iana.org/TLD/tlds-alpha-by-domain.txt
     // - https://gist.github.com/gruber/8891611
     // - https://gist.github.com/winzig/8894715
     // - https://gist.github.com/dperini/729294
@@ -58,8 +58,15 @@ object URLFinder {
     // - http://developer.android.com/reference/android/text/util/Linkify.html
     // - https://github.com/android/platform_frameworks_base/blob/master/core/java/android/util/Patterns.java
     // - http://blog.codinghorror.com/the-problem-with-urls/
+    //
+    // "xn--" domains:
+    //
+    // - we don't support them yet
+    // - "XN--VERMGENSBERATUNG-PWB".size == 24
+    // - can also contain numbers
+    // - also unclear: they could also appear in text with actual Unicode characters
 
-    private val RegexpDomains              = """[a-z]{2,13}"""
+    private val RegexpDomains              = """[a-z]{2,25}"""
     private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
     private val BalancedParens             = """\([^\s]+?\)"""
 

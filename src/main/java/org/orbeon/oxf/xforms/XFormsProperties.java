@@ -132,8 +132,6 @@ public class XFormsProperties {
     public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
     public static final boolean CACHE_DOCUMENT_DEFAULT = true;
 
-    public static final String DATATABLE_INIT_IN_VIEWPORT = "xbl.fr.datatable.init-in-viewport";
-
     public static final String SANITIZE_PROPERTY = "sanitize";
 
     public static class PropertyDefinition {
@@ -261,7 +259,6 @@ public class XFormsProperties {
             new PropertyDefinition(LOGIN_PAGE_DETECTION_REGEXP, "", true),
             new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY, "default", true),
             new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true),
-            new PropertyDefinition(DATATABLE_INIT_IN_VIEWPORT, false, true)
     };
 
     public static final Map<String, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;

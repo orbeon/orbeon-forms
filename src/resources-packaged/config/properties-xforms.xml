@@ -235,7 +235,6 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service">
         https://www.google.com/tbproxy/spell?lang=en&amp;hl=en
     </property>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.datatable.init-in-viewport"           value="false"/>
 
     <!--<property as="xs:NCName"  name="oxf.xforms.pipeline.trace.class"                        value="org.orbeon.oxf.processor.trace.StdOutTrace"/>-->
 

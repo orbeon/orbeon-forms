@@ -42,12 +42,13 @@ object CSSSelectorParser extends Parser {
     case class TypeSelector(prefix: Option[Option[String]], name: String) extends SimpleElementSelector
     case class UniversalSelector(prefix: Option[Option[String]]) extends SimpleElementSelector
 
+    // TODO: Attribute existence.
     case class AttributePredicate(op: String, value: String)
 
     trait Filter extends SelectorNode
     case class IdFilter(id: String) extends Filter
     case class ClassFilter(className: String) extends Filter
-    case class AttributeFilter(prefix: Option[Option[String]], ident: String, predicate: Option[AttributePredicate]) extends Filter
+    case class AttributeFilter(prefix: Option[Option[String]], name: String, predicate: Option[AttributePredicate]) extends Filter
     case class NegationFilter(selector: SelectorNode) extends Filter
 
     trait Expr extends SelectorNode

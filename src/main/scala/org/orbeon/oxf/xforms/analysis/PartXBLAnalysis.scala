@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
+import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings}
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.dom4j.{Element, QName}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
+
 import scala.collection.mutable
 
 trait PartXBLAnalysis extends TransientState {
@@ -96,13 +97,11 @@ trait PartXBLAnalysis extends TransientState {
     def scopeForPrefixedId(prefixedId: String) =
         prefixedIdToXBLScopeMap.get(prefixedId) orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
 
-    def isComponent(binding: QName) = xblBindings.isComponent(binding)
-    def getBinding(prefixedId: String) = xblBindings.getBinding(prefixedId)
-    def getBindingId(prefixedId: String) = xblBindings.getBindingId(prefixedId)
-    def jBindingQNames = xblBindings.abstractBindings.keys toSeq
-    def getAbstractBinding(binding: QName) = xblBindings.abstractBindings.get(binding)
+    def getBinding(prefixedId: String) =
+        xblBindings.getBinding(prefixedId)
 
-    def abstractBindings: Iterable[AbstractBinding] = xblBindings.abstractBindings.values
+    def allBindingsMaybeDuplicates =
+        metadata.allBindingsMaybeDuplicates
 
     // Search scope in ancestor or self parts
     def searchResolutionScopeByPrefixedId(prefixedId: String) =

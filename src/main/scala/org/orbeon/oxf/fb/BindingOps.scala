@@ -24,10 +24,10 @@ trait BindingOps {
 
     def newElementName(currentControlName: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
 
-        val mappings = BindingDescriptor.createDirectToDatatypeMappingsForAllBindings(bindings)
+        val mappings = createDirectToDatatypeMappingsForAllBindings(bindings)
 
         // The current control name might be a direct binding, in which case we can find its original name
-        val originalName = mappings.get(currentControlName) map (_.elementName) getOrElse currentControlName
+        val originalName = mappings.get(currentControlName) flatMap (_.elementName) getOrElse currentControlName
 
         // Using the original control name and the new datatype, try to find a new direct binding
         val newName = findDirectBindingForDatatypeBinding(originalName, newDatatype, mappings) getOrElse originalName
@@ -72,7 +72,7 @@ trait BindingOps {
         bindings find (b ⇒
             findViewTemplate(b) match {
                 case Some(viewTemplate) ⇒
-                    viewTemplate.uriQualifiedName                         == controlElement.uriQualifiedName &&
+                    viewTemplate.uriQualifiedName              == controlElement.uriQualifiedName &&
                     viewTemplate.att("appearance").stringValue == controlElement.att("appearance").stringValue
                 case _ ⇒ false
             })

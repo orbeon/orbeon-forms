@@ -74,11 +74,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def controlsByName(controlName: String) = collectInParts(_.controlsByName(controlName))
     def jControlsByName(controlName: String) = controlsByName(controlName).asJava
     def hasControlAppearance(controlName: String, appearance: QName) = existsInParts(_.hasControlAppearance(controlName, appearance))
-    def isComponent(binding: QName) = existsInParts(_.isComponent(binding))
     def getBinding(prefixedId: String) = findInPartsOpt(_.getBinding(prefixedId))
-    def getBindingId(prefixedId: String) = findInParts(_.getBindingId(prefixedId)) orNull
-
-    def jBindingQNames = collectInParts(_.jBindingQNames) // called from XHTMLBodyHandler, could do w/ abstractBindings only once XHTMLBodyHandler is in Scala
 
     def repeats = collectInPartsReverse(_.repeats)
     def getRepeatHierarchyString(ns: String) = parts map (_.getRepeatHierarchyString(ns)) mkString "," // just concat the repeat strings from all parts
@@ -86,14 +82,14 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))
     def getAttributeControl(prefixedForAttribute: String, attributeName: String) = findInParts(_.getAttributeControl(prefixedForAttribute, attributeName)).orNull
 
-    def getGlobals = collectInParts(_.getGlobals) toMap
+    def getGlobals = collectInParts(_.getGlobals)
 
     def scripts = collectInParts(_.scripts) toMap
     def uniqueClientScripts = collectInParts(_.uniqueClientScripts)
-    def abstractBindings: Iterable[AbstractBinding] = collectInParts(_.abstractBindings)
+    def allBindingsMaybeDuplicates: Iterable[AbstractBinding] = collectInParts(_.allBindingsMaybeDuplicates)
 
-    def getXBLStyles  = XBLResources.orderedHeadElements(abstractBindings, _.styles)
-    def getXBLScripts = XBLResources.orderedHeadElements(abstractBindings, _.scripts)
+    def getXBLStyles  = XBLResources.orderedHeadElements(allBindingsMaybeDuplicates, _.styles)
+    def getXBLScripts = XBLResources.orderedHeadElements(allBindingsMaybeDuplicates, _.scripts)
 
     /**
      * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If

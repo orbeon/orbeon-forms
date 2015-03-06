@@ -26,6 +26,22 @@ import collection.JavaConverters._
 import collection.mutable
 import org.orbeon.oxf.util.ScalaUtils.{split, BooleanWrapper}
 
+case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
+
+    private var _associatedValue: Option[Any] = None
+
+    def associatedValue[U](evaluate: Property ⇒ U): U = {
+        if (_associatedValue.isEmpty)
+            _associatedValue = Option(evaluate(this))
+        _associatedValue.get.asInstanceOf[U]
+    }
+}
+
+private class PropertyNode {
+    var property: Property = null
+    var children: mutable.Map[String, PropertyNode] = null // token → property node
+}
+
 /**
  * Represent a set of properties.
  *
@@ -36,8 +52,6 @@ import org.orbeon.oxf.util.ScalaUtils.{split, BooleanWrapper}
  */
 class PropertySet {
     
-    import JPropertySet._
-
     private var exactProperties = Map[String, Property]()
     private val wildcardProperties = new PropertyNode
 
@@ -248,24 +262,4 @@ class PropertySet {
 
     def getNMTOKEN(nm: String): String =
         getPropertyValue(nm, XMLConstants.XS_NMTOKEN_QNAME).asInstanceOf[String]
-}
-
-// Different name to help with Java callers
-object JPropertySet {
-
-    case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
-
-        private var _associatedValue: Option[Any] = None
-
-        def associatedValue[U](evaluate: Property ⇒ U): U = {
-            if (_associatedValue.isEmpty)
-                _associatedValue = Option(evaluate(this))
-            _associatedValue.get.asInstanceOf[U]
-        }
-    }
-
-    class PropertyNode {
-        var property: Property = null
-        var children: mutable.Map[String, PropertyNode] = null // token → property node
-    }
 }

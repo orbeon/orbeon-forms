@@ -19,8 +19,10 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.xml.sax.{Locator, Attributes}
 import org.orbeon.oxf.xforms.XFormsProperties
 
-abstract class XFormsAnnotatorBase(templateReceiver: XMLReceiver, extractorReceiver: XMLReceiver)
-        extends XMLReceiverAdapter {
+abstract class XFormsAnnotatorBase(
+    templateReceiver  : XMLReceiver,
+    extractorReceiver : XMLReceiver
+) extends XMLReceiverAdapter {
     
     private val keepLocationData = XFormsProperties.isKeepLocation
     private var _documentLocator: Locator = null
@@ -43,13 +45,12 @@ abstract class XFormsAnnotatorBase(templateReceiver: XMLReceiver, extractorRecei
     )
     
     case class StackElement(parent: Option[StackElement], uri: String, localname: String) {
-        val isXForms            = uri == XFORMS_NAMESPACE_URI
-        val isXXForms           = uri == XXFORMS_NAMESPACE_URI
-        val isEXForms           = uri == EXFORMS_NAMESPACE_URI
-        val isXBL               = uri == XBL_NAMESPACE_URI
-        val isXFormsOrExtension = isXForms || isXXForms || isEXForms
-
-        def isXHTML             = uri == XHTML_NAMESPACE_URI
+        val isXForms                   = uri == XFORMS_NAMESPACE_URI
+        val isXXForms                  = uri == XXFORMS_NAMESPACE_URI
+        val isEXForms                  = uri == EXFORMS_NAMESPACE_URI
+        val isXBL                      = uri == XBL_NAMESPACE_URI
+        val isXFormsOrBuiltinExtension = isXForms || isXXForms || isEXForms
+        def isXHTML                    = uri == XHTML_NAMESPACE_URI
         
         private var endElementName: Option[(String, String, String)] = None
         

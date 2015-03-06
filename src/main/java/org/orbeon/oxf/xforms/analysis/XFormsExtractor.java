@@ -96,24 +96,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
     private final boolean ignoreRootElement;
     private final boolean outputSingleTemplate;
 
-    private static class XMLElementDetails {
-        public final String id;
-        public final URI xmlBase;
-        public final String xmlLang;
-        public final String xmlLangAvtId;
-        public final XFormsConstants.XXBLScope scope;
-        public final boolean isModel;
-
-        private XMLElementDetails(String id, URI xmlBase, String xmlLang, String xmlLangAvtId, XFormsConstants.XXBLScope scope, boolean isModel) {
-            this.id = id;
-            this.xmlBase = xmlBase;
-            this.xmlLang = xmlLang;
-            this.xmlLangAvtId = xmlLangAvtId;
-            this.scope = scope;
-            this.isModel = isModel;
-        }
-    }
-
     private Stack<XMLElementDetails> elementStack = new Stack<XMLElementDetails>();
 
     private boolean inXFormsOrExtension;       // whether we are in a model
@@ -145,7 +127,23 @@ public class XFormsExtractor extends XFormsExtractorBase {
         // Create xml:base stack
         try {
             assert baseURI != null;
-            elementStack.push(new XMLElementDetails(null, new URI(null, null, baseURI, null), null, null, startScope, false));
+            elementStack.push(
+                new XMLElementDetails(
+                    null,
+                    new URI(null, null, baseURI, null),
+                    null,
+                    null,
+                    startScope,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                )
+            );
         } catch (URISyntaxException e) {
             throw new ValidationException(e, LocationData.createIfPresent(locator));
         }
@@ -231,13 +229,16 @@ public class XFormsExtractor extends XFormsExtractorBase {
         }
 
         // Check for XForms or extension namespaces
-        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXForms  = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
-        final boolean isXXBL = XFormsConstants.XXBL_NAMESPACE_URI.equals(uri); // for xxbl:global
+        final boolean isXBL     = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final boolean isXXBL    = XFormsConstants.XXBL_NAMESPACE_URI.equals(uri); // for xxbl:global
 
-        final boolean isExtension = metadata.isXBLBinding(uri, localname);
+        final String staticId   = attributes.getValue("", "id");
+        final String prefixedId = (staticId != null) ? getPrefixedId(staticId) : null;
+
+        final boolean isExtension = prefixedId != null && metadata.prefixedIdHasBinding(prefixedId);
         final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isXXBL || isExtension;
 
         final XMLElementDetails parentElementDetails = elementStack.peek();
@@ -247,19 +248,17 @@ public class XFormsExtractor extends XFormsExtractorBase {
             final String xmlLangAttribute = attributes.getValue(XMLConstants.XML_URI, "lang");
             final String xblScopeAttribute = attributes.getValue(XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI(), XFormsConstants.XXBL_SCOPE_QNAME.getName());
 
-            final String id = attributes.getValue("", "id");
-
             // xbl:base
             final URI newBase;
             if (xmlBaseAttribute != null) {
                 try {
                     // Resolve
-                    newBase = parentElementDetails.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize();// normalize to remove "..", etc.
+                    newBase = parentElementDetails.xmlBase().resolve(new URI(xmlBaseAttribute)).normalize();// normalize to remove "..", etc.
                 } catch (URISyntaxException e) {
                     throw new ValidationException("Error creating URI from: '" + parentElementDetails + "' and '" + xmlBaseAttribute + "'.", e, LocationData.createIfPresent(locator));
                 }
             } else {
-                newBase = parentElementDetails.xmlBase;
+                newBase = parentElementDetails.xmlBase();
             }
 
             // xml:lang
@@ -268,12 +267,12 @@ public class XFormsExtractor extends XFormsExtractorBase {
             if (xmlLangAttribute != null) {
                 newLang = xmlLangAttribute;
                 if (XFormsUtils.maybeAVT(newLang))
-                    xmlLangAvtId = id;
+                    xmlLangAvtId = staticId;
                 else
-                    xmlLangAvtId = parentElementDetails.xmlLangAvtId;
+                    xmlLangAvtId = parentElementDetails.xmlLangAvtId();
             } else {
-                newLang = parentElementDetails.xmlLang;
-                xmlLangAvtId =  parentElementDetails.xmlLangAvtId;
+                newLang = parentElementDetails.xmlLang();
+                xmlLangAvtId =  parentElementDetails.xmlLangAvtId();
             }
 
             // xxbl:scope
@@ -281,10 +280,26 @@ public class XFormsExtractor extends XFormsExtractorBase {
             if (xblScopeAttribute != null) {
                 newScope = XFormsConstants.XXBLScope.valueOf(xblScopeAttribute);
             } else {
-                newScope = parentElementDetails.scope;
+                newScope = parentElementDetails.scope();
             }
 
-            elementStack.push(new XMLElementDetails(id, newBase, newLang, xmlLangAvtId, newScope, isXForms && localname.equals("model")));
+            elementStack.push(
+                new XMLElementDetails(
+                    staticId,
+                    newBase,
+                    newLang,
+                    xmlLangAvtId,
+                    newScope,
+                    isXForms && localname.equals("model"),
+                    isXForms,
+                    isXXForms,
+                    isEXForms,
+                    isXBL,
+                    isXXBL,
+                    isExtension,
+                    isXFormsOrExtension
+                )
+            );
         }
 
         // Handle properties of the form @xxf:* when outside of models or controls
@@ -315,10 +330,10 @@ public class XFormsExtractor extends XFormsExtractorBase {
                 attributes = SAXUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
 
                 // Add xml:lang on element if found
-                final String xmlLang = elementStack.peek().xmlLang;
+                final String xmlLang = elementStack.peek().xmlLang();
                 if (xmlLang != null) {
                     final String newXMLLang;
-                    final String xmlLangAvtId = elementStack.peek().xmlLangAvtId;
+                    final String xmlLangAvtId = elementStack.peek().xmlLangAvtId();
                     if (XFormsUtils.maybeAVT(xmlLang) && xmlLangAvtId != null) {
                         // In this case the latest xml:lang on the stack might be an AVT and we set a special value for
                         // xml:lang containing the id of the control that evaluates the runtime value.
@@ -368,14 +383,14 @@ public class XFormsExtractor extends XFormsExtractorBase {
                 // Callback for elements of interest
                 if (isXFormsOrExtension || inLHHA) {
                     // NOTE: We call this also for HTML elements within LHHA so we can gather scope information for AVTs
-                    indexElementWithScope(uri, localname, attributes, elementStack.peek().scope);
+                    indexElementWithScope(uri, localname, attributes, elementStack.peek().scope());
                 }
             }
 
             if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || isXFormsOrExtension)) {
                 // We are within preserved content or we output regular XForms content
                 super.startElement(uri, localname, qName, attributes);
-            } else if (inXFormsOrExtension && ! isXFormsOrExtension && parentElementDetails.isModel) {
+            } else if (inXFormsOrExtension && ! isXFormsOrExtension && parentElementDetails.isModel()) {
                 // Start foreign content in the model
                 inForeign = true;
                 preserveOrLHHAOrForeignLevel = level;
@@ -391,7 +406,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
     }
 
     private String getCurrentBaseURI() {
-        final URI currentXMLBaseURI = elementStack.peek().xmlBase;
+        final URI currentXMLBaseURI = elementStack.peek().xmlBase();
         return currentXMLBaseURI.toString();
     }
 
@@ -416,19 +431,9 @@ public class XFormsExtractor extends XFormsExtractorBase {
     public void endElement(String uri, String localname, String qName) throws SAXException {
         level--;
 
-        // Check for XForms or extension namespaces
-        // TODO: use stack and avoid redoing all the tests on endElement()
-        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
-
-        final boolean isExtension = metadata.isXBLBinding(uri, localname);
-        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
-
         if (level > 0 || ! ignoreRootElement) {
             // We are within preserved content or we output regular XForms content
-            if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || isXFormsOrExtension)) {
+            if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || elementStack.peek().isXFormsOrExtension())) {
                 super.endElement(uri, localname, qName);
             }
 
@@ -468,6 +473,14 @@ public class XFormsExtractor extends XFormsExtractorBase {
         }
     }
 
+    protected String getPrefixedId(String staticId) {
+        return staticId;
+    }
+
+    protected void indexElementWithScope(String uri, String localname, Attributes attributes, XFormsConstants.XXBLScope scope) {
+        // NOP
+    }
+
     @Override
     public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
         // ignore, should not happen
@@ -490,10 +503,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
         super.setDocumentLocator(locator);
-    }
-
-    protected void indexElementWithScope(String uri, String localname, Attributes attributes, XFormsConstants.XXBLScope scope) {
-        // NOP
     }
 
     @Override

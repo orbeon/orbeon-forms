@@ -147,7 +147,7 @@ trait PartControlsAnalysis extends TransientState {
 
     def getTopLevelControlElements =
         Seq(controlTypes("root").values.head.element) ++
-            (xblBindings.allGlobals.values map (_.compactShadowTree.getRootElement)) asJava
+            (xblBindings.allGlobals map (_.compactShadowTree.getRootElement)) asJava
 
     def hasControls = getTopLevelControlElements.size > 0
 

@@ -15,18 +15,14 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.dom4j._
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.{IndentedLogger, Logging, Whitespace}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings._
-import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, LocationDocumentResult}
 import org.xml.sax.Attributes
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 
@@ -46,7 +42,7 @@ import scala.collection.mutable
 class XBLBindings(
     indentedLogger : IndentedLogger,
     partAnalysis   : PartAnalysisImpl,
-    var metadata   : Metadata,
+    metadata       : Metadata,
     inlineXBL      : Seq[Element]
 ) extends Logging {
 
@@ -56,7 +52,13 @@ class XBLBindings(
     def this(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata) =
         this(indentedLogger, partAnalysis, metadata: Metadata, Seq.empty)
     
-    private val logShadowTrees = true                  // whether to log shadow trees as they are built
+    // We now know all inline XBL bindings, which we didn't in XFormsAnnotator. So
+    // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
+    // all XBL components. They would then have to be properly scoped.
+    if (partAnalysis ne null) // for unit test which passes null in!
+        metadata.extractInlineXBL(inlineXBL, partAnalysis.startScope)
+    
+    private val logShadowTrees = false // whether to log shadow trees as they are built
     
     /*
      * Notes about id generation
@@ -78,30 +80,9 @@ class XBLBindings(
 
     case class Global(templateTree: SAXStore, compactShadowTree: Document)
 
-    val abstractBindings = mutable.LinkedHashMap[QName, AbstractBinding]()  // FIXME: might no longer need order as we sort bindings when needed
-    val concreteBindings = mutable.LinkedHashMap[String, ConcreteBinding]() // FIXME: might no longer need order as we sort bindings when needed
-
-    val allGlobals       = mutable.LinkedHashMap[QName, Global]()
-
-    // Inline <xbl:xbl> and automatically-included XBL documents
-    private val xblDocuments = (inlineXBL map ((_, 0L))) ++
-        (metadata.getBindingIncludesJava.asScala map readXBLResourceUpdateLastModified)
-
-    // Process <xbl:xbl>
-    if (xblDocuments.nonEmpty) {
-        withDebug("generating global XBL shadow content") {
-
-            val bindingCounts = xblDocuments map { case (element, lastModified) ⇒
-                val bindingsForDoc = extractXBLBindings(None, element, lastModified)
-                registerXBLBindings(bindingsForDoc)
-                bindingsForDoc.size
-            }
-
-            debugResults(Seq("xbl:xbl count" → xblDocuments.size.toString, "xbl:binding count" → bindingCounts.sum.toString))
-
-            bindingCounts
-        }
-    }
+    val concreteBindings            = mutable.HashMap[String, ConcreteBinding]()
+    val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
+    val allGlobals                  = mutable.ArrayBuffer[Global]()
 
     // Create concrete binding if there is an applicable abstract binding
     def processElementIfNeeded(
@@ -110,73 +91,22 @@ class XBLBindings(
         locationData      : LocationData,
         containerScope    : Scope
     ): Option[ConcreteBinding] =
-        abstractBindings.get(controlElement.getQName) flatMap { abstractBinding ⇒
-
-            // Generate the shadow content for this particular binding
-            withProcessAutomaticXBL {
-                generateRawShadowTree(controlElement, abstractBinding) map {
-                    rawShadowTree ⇒
-                        val newBinding =
-                            createConcreteBinding(
-                                controlElement,
-                                controlPrefixedId,
-                                locationData,
-                                containerScope,
-                                abstractBinding,
-                                rawShadowTree
-                            )
-                        concreteBindings += controlPrefixedId → newBinding
-                        newBinding
-                }
+        metadata.findBindingByPrefixedId(controlPrefixedId) flatMap { abstractBinding ⇒
+            generateRawShadowTree(controlElement, abstractBinding) map {
+                rawShadowTree ⇒
+                    val newBinding =
+                        createConcreteBinding(
+                            controlElement,
+                            controlPrefixedId,
+                            locationData,
+                            containerScope,
+                            abstractBinding,
+                            rawShadowTree
+                        )
+                    concreteBindings += controlPrefixedId → newBinding
+                    newBinding
             }
         }
-
-    private def registerXBLBindings(bindings: Traversable[AbstractBinding]) =
-        bindings foreach (binding ⇒ abstractBindings += binding.qNameMatch → binding)
-
-    private def withProcessAutomaticXBL[T](body: ⇒ T) = {
-        // Check how many automatic XBL includes we have so far
-        val initialIncludesCount = metadata.bindingIncludes.size
-
-        // Run body
-        val result = body
-
-        // Process newly added automatic XBL includes if any
-        val finalIncludesCount = metadata.bindingIncludes.size
-        if (finalIncludesCount > initialIncludesCount) {
-            withDebug("adding XBL bindings") {
-
-                // Get new paths
-                val newPaths = metadata.bindingIncludes.slice(initialIncludesCount, finalIncludesCount)
-
-                // Extract and register new bindings
-                val bindingCounts =
-                    newPaths map { path ⇒
-                        val (document, lastModified) = readXBLResourceUpdateLastModified(path)
-                        val bindingsForDoc = extractXBLBindings(Some(path), document, lastModified)
-                        registerXBLBindings(bindingsForDoc)
-                        bindingsForDoc.size
-                    }
-
-                debugResults(Seq(
-                    "xbl:xbl count"           → (finalIncludesCount - initialIncludesCount).toString,
-                    "xbl:binding count"       → bindingCounts.sum.toString,
-                    "total xbl:binding count" → abstractBindings.size.toString
-                ))
-
-                None
-            }
-        }
-
-        result
-    }
-
-    private def readXBLResourceUpdateLastModified(path: String) = {
-        // Update last modified so that dependencies on external XBL files can be handled
-        val result = readXBLResource(path)
-        metadata.updateBindingsLastModified(result._2)
-        result
-    }
 
     private def createConcreteBinding(
         boundElement           : Element,
@@ -185,7 +115,7 @@ class XBLBindings(
         containerScope         : Scope,
         abstractBinding        : AbstractBinding,
         rawShadowTree          : Document
-    ) = {
+    ): ConcreteBinding = {
 
         // New prefix corresponds to bound element prefixed id
         //val newPrefix = boundControlPrefixedId + COMPONENT_SEPARATOR
@@ -245,7 +175,7 @@ class XBLBindings(
         outerScope     : Scope,
         startScope     : XXBLScope,
         containerScope : Scope
-    ) = annotateSubtree1(
+    ): Element = annotateSubtree1(
             Some(boundElement),
             Dom4jUtils.createDocumentCopyParentNamespaces(element, false),
             innerScope,
@@ -266,7 +196,7 @@ class XBLBindings(
        containerScope : Scope,
        hasFullUpdate  : Boolean,
        ignoreRoot     : Boolean
-    ) = withDebug("annotating tree") {
+    ): Document = withDebug("annotating tree") {
 
         val baseURI = XFormsUtils.resolveXMLBase(boundElement.orNull, null, ".").toString
         val fullAnnotatedTree = annotateShadowTree(rawTree, containerScope.fullPrefix)
@@ -289,7 +219,7 @@ class XBLBindings(
        containerScope : Scope,
        hasFullUpdate  : Boolean,
        ignoreRoot     : Boolean
-    ) = withDebug("annotating and extracting tree") {
+    ): (SAXStore, Document) = withDebug("annotating and extracting tree") {
 
         val baseURI = XFormsUtils.resolveXMLBase(boundElement.orNull, null, ".").toString
 
@@ -319,7 +249,8 @@ class XBLBindings(
                         ),
                         metadata,
                         false) {
-                        // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls and shadow trees
+                        // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls
+                        // and shadow trees
                         protected override def rewriteId(id: String) = containerScope.fullPrefix + id
                     },
                     Whitespace.defaultHTMLPolicy,
@@ -341,39 +272,35 @@ class XBLBindings(
     }
 
     private def processGlobalsIfNeeded(abstractBinding: AbstractBinding, locationData: LocationData): Unit =
-        abstractBinding.global match {
-            case Some(globalDocument) if ! allGlobals.contains(abstractBinding.qNameMatch) ⇒
+        if (partAnalysis.isTopLevel) // see also "Issues with xxbl:global" in PartAnalysisImpl
+            abstractBinding.global match {
+                case Some(globalDocument) if ! abstractBindingsWithGlobals.exists(abstractBinding eq) ⇒
 
-                val (globalTemplateTree, globalCompactShadowTree) =
-                    withDebug("generating global XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
+                    val (globalTemplateTree, globalCompactShadowTree) =
+                        withDebug("generating global XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
 
-                        val topLevelScopeForGlobals = partAnalysis.startScope
-        
-                        // TODO: in script mode, XHTML elements in template should only be kept during page generation
-                        annotateAndExtractSubtree(
-                            boundElement   = None,
-                            rawTree        = globalDocument,
-                            innerScope     = topLevelScopeForGlobals,
-                            outerScope     = topLevelScopeForGlobals,
-                            startScope     = XXBLScope.inner,
-                            containerScope = topLevelScopeForGlobals,
-                            hasFullUpdate  = hasFullUpdate(globalDocument),
-                            ignoreRoot     = true
-                        )
-                    }
+                            val topLevelScopeForGlobals = partAnalysis.startScope
 
-                allGlobals += abstractBinding.qNameMatch → Global(globalTemplateTree, globalCompactShadowTree)
+                            // TODO: in script mode, XHTML elements in template should only be kept during page generation
+                            annotateAndExtractSubtree(
+                                boundElement   = None,
+                                rawTree        = globalDocument,
+                                innerScope     = topLevelScopeForGlobals,
+                                outerScope     = topLevelScopeForGlobals,
+                                startScope     = XXBLScope.inner,
+                                containerScope = topLevelScopeForGlobals,
+                                hasFullUpdate  = hasFullUpdate(globalDocument),
+                                ignoreRoot     = true
+                            )
+                        }
 
-            case _ ⇒ // no global to process
-        }
+                    abstractBindingsWithGlobals += abstractBinding
+                    allGlobals                  += Global(globalTemplateTree, globalCompactShadowTree)
 
-    /**
-     * Generate raw (non-annotated) shadow content for the given control id and XBL binding.
-     *
-     * @param boundElement      element to which the binding applies
-     * @param abstractBinding  corresponding <xbl:binding>
-     * @return Some shadow tree document if there is a template, None otherwise
-     */
+                case _ ⇒ // no global to process
+            }
+
+    // Generate raw (non-annotated) shadow content for the given control id and XBL binding.
     private def generateRawShadowTree(boundElement: Element, abstractBinding: AbstractBinding): Option[Document] =
         abstractBinding.templateElement map {
             templateElement ⇒
@@ -390,7 +317,12 @@ class XBLBindings(
                             Dom4jUtils.createDocumentCopyParentNamespaces(templateElement)
 
                     // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
-                    XBLTransformer.transform(shadowTreeDocument, boundElement, abstractBinding.modeHandlers, abstractBinding.modeLHHA)
+                    XBLTransformer.transform(
+                        shadowTreeDocument,
+                        boundElement,
+                        abstractBinding.modeHandlers,
+                        abstractBinding.modeLHHA
+                    )
                 }
         }
 
@@ -429,7 +361,7 @@ class XBLBindings(
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
         TransformerUtils.writeDom4j(shadowTree, new XFormsAnnotator(output, null, metadata, false) {
-            // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls and shadow trees
+            // Use prefixed id for marks and namespaces to avoid clashes between top-level controls and shadow trees
             protected override def rewriteId(id: String) = prefix + id
         })
 
@@ -437,33 +369,32 @@ class XBLBindings(
         documentResult.getDocument
     }
 
-    /**
-     *
-     * @param xmlReceiver           output of transformation or null
-     * @param innerScope            inner scope
-     * @param outerScope            outer scope, i.e. scope of the bound element
-     * @param startScope            scope of root element
-     * @param prefix                prefix of the ids within the new shadow tree, e.g. "my-stuff$my-foo-bar$"
-     * @param baseURI               base URI of new tree
-     */
     private class ScopeExtractor(
-        xmlReceiver : XMLReceiver,
-        innerScope  : Scope,
-        outerScope  : Scope,
-        startScope  : XXBLScope,
-        prefix      : String,
-        baseURI     : String)
+        xmlReceiver : XMLReceiver,  // output of transformation or null
+        innerScope  : Scope,        // inner scope
+        outerScope  : Scope,        // outer scope, i.e. scope of the bound
+        startScope  : XXBLScope,    // scope of root element
+        prefix      : String,       // prefix of the ids within the new shadow tree
+        baseURI     : String)       // base URI of new tree
     extends XFormsExtractor(xmlReceiver, metadata, null, baseURI, startScope, false, false, true) {
 
         assert(innerScope ne null)
         assert(outerScope ne null)
 
-        override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, currentScope: XXBLScope) {
+        override def getPrefixedId(staticId: String) = prefix + staticId
+
+        override def indexElementWithScope(
+            uri          : String,
+            localname    : String,
+            attributes   : Attributes,
+            currentScope : XXBLScope
+        ): Unit = {
 
             // Index prefixed id ⇒ scope
             val staticId = attributes.getValue("id")
 
-            // NOTE: We can be called on HTML elements within LHHA, which may or may not have an id (they must have one if they have AVTs)
+            // NOTE: We can be called on HTML elements within LHHA, which may or may not have an id (they must have one
+            // if they have AVTs).
             if (staticId ne null) {
                 val prefixedId = prefix + staticId
                 if (metadata.getNamespaceMapping(prefixedId) ne null) {
@@ -488,77 +419,21 @@ class XBLBindings(
         }
     }
 
-    def freeTransientState(): Unit = {
-        // Not needed after analysis
-        if (partAnalysis.isTopLevel)
-            metadata = null
-    }
+    // NOTE: We used to clear metadata, but since the enclosing PartAnalysisImpl keeps a reference to metadata, there is
+    // no real point to it.
+    def freeTransientState() =
+        metadata.commitBindingIndex()
 
     // This function is not called as of 2011-06-28 but if/when we support removing scopes, check these notes:
     // - deindex prefixed ids ⇒ Scope
     // - remove models associated with scope
     // - remove control analysis
     // - deindex scope id ⇒ Scope
-    def removeScope(scope: Scope) = ???
+    //def removeScope(scope: Scope) = ???
 
-    /**
-     * Return whether the given QName has an associated binding.
-     *
-     * @param qName QName to check
-     * @return      true iif there is a binding
-     */
-    def isComponent(qName: QName) = abstractBindings.contains(qName)
-
-    /**
-     * Return the id of the <xbl:binding> element associated with the given prefixed control id.
-     *
-     * @param controlPrefixedId     prefixed control id
-     * @return binding id or null if not found
-     */
-    def getBindingId(controlPrefixedId: String) = getBinding(controlPrefixedId) map (_.bindingId) orNull
-
-    // Return true if the given prefixed control id has a binding
-    def hasBinding(controlPrefixedId: String) = getBinding(controlPrefixedId).isDefined
-
-    // Return the given binding
-    def getBinding(controlPrefixedId: String) = concreteBindings.get(controlPrefixedId)
-
-    // Remove the given binding
-    def removeBinding(controlPrefixedId: String): Unit = {
-        concreteBindings -= controlPrefixedId
-        // NOTE: Can't update abstractBindings, allScripts, allStyles, allGlobals without checking all again, so for now leave that untouched
-    }
-}
-
-object XBLBindings {
-
-    def readXBLResource(path: String) = {
-        // Update last modified so that dependencies on external XBL files can be handled
-        val lastModified = ResourceManagerWrapper.instance.lastModified(path, false)
-
-        // Read content
-        val sourceXBL = ResourceManagerWrapper.instance.getContentAsDOM4J(path, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, false)
-
-        (Transform.transformXBLDocumentIfNeeded(path, sourceXBL, lastModified).getRootElement, lastModified)
-    }
-
-    // path == None in case of inline XBL
-    def extractXBLBindings(path: Option[String], xblElement: Element, lastModified: Long) = {
-
-        // Extract xbl:xbl/xbl:script
-        // TODO: should do this differently, in order to include only the scripts and resources actually used
-        val scriptElements = Dom4j.elements(xblElement, XBL_SCRIPT_QNAME) map HeadElement.apply
-
-        // Find abstract bindings
-        val resultingBindings =
-            for {
-                // Find xbl:binding/@element
-                bindingElement ← Dom4jUtils.elements(xblElement, XBL_BINDING_QNAME).asScala
-                currentElementAttribute = bindingElement.attributeValue(ELEMENT_QNAME)
-                if currentElementAttribute ne null
-            } yield
-                AbstractBinding.findOrCreate(path, bindingElement, lastModified, scriptElements)
-
-        resultingBindings.toList
-    }
+    def hasBinding(controlPrefixedId: String)          = getBinding(controlPrefixedId).isDefined
+    def getBinding(controlPrefixedId: String)          = concreteBindings.get(controlPrefixedId)
+    def removeBinding(controlPrefixedId: String): Unit = concreteBindings -= controlPrefixedId
+    // NOTE: Can't update abstractBindings, allScripts, allStyles, allGlobals without checking all again, so for now
+    // leave that untouched.
 }

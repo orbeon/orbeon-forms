@@ -43,6 +43,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     private final Map<String, List<HandlerMatcher>> handlerMatchers = new HashMap<String, List<HandlerMatcher>>();
     private final Map<String, String> uriHandlers = new HashMap<String, String>();
+    private final List<HandlerMatcher> plainMatchers = new ArrayList<HandlerMatcher>();
 
     private final Stack<HandlerInfo> handlerInfos = new Stack<HandlerInfo>();
     private HandlerInfo currentHandlerInfo;
@@ -80,6 +81,10 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
             // Match on URI only
             uriHandlers.put(uri, handlerClassName);
         }
+    }
+
+    public void registerHandler(String handlerClassName, Matcher matcher) {
+        plainMatchers.add(new HandlerMatcher(handlerClassName, matcher));
     }
 
     public void setElementHandlerContext(Object elementHandlerContext) {
@@ -494,26 +499,23 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
      */
     public ElementHandler getHandler(Element element) {
         final HandlerInfo handlerInfo = 
-        getHandler(element.getNamespaceURI(),
+            getHandler(
+                element.getNamespaceURI(),
                 XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
-                Dom4jUtils.getSAXAttributes(element));
+                Dom4jUtils.getSAXAttributes(element)
+            );
         
         return (handlerInfo != null) ? handlerInfo.elementHandler : null;
     }
 
     private HandlerInfo getHandler(String uri, String explodedQName, Attributes attributes) {
+
         // 1: Try full matchers
         final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(explodedQName);
         if (handlerMatchers != null) {
-            // Try matchers in order
-            for (HandlerMatcher handlerMatcher: handlerMatchers) {
-                // Run matcher
-                final Object matched = handlerMatcher.matcher.match(attributes, elementHandlerContext);
-                if (matched != null) {
-                    final ElementHandler elementHandler = getHandlerByClassName(handlerMatcher.handlerClassName);
-                    return new HandlerInfo(level, explodedQName, elementHandler, attributes, matched, this.locator);
-                }
-            }
+            final HandlerInfo handlerInfo = runMatchers(handlerMatchers, explodedQName, attributes);
+            if (handlerInfo != null)
+                return handlerInfo;
         }
 
         // 2: Try URI-based handler
@@ -521,9 +523,25 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         if (uriHandlerClassName != null) {
             final ElementHandler elementHandler = getHandlerByClassName(uriHandlerClassName);
             return new HandlerInfo(level, explodedQName, elementHandler, attributes, null, this.locator);
-        } else {
-            return null;
         }
+
+        // 3: Try plain matchers
+        final HandlerInfo handlerInfo = runMatchers(plainMatchers, explodedQName, attributes);
+        if (handlerInfo != null)
+            return handlerInfo;
+
+        return null;
+    }
+
+    private HandlerInfo runMatchers(List<HandlerMatcher> matchers, String explodedQName, Attributes attributes) {
+        for (HandlerMatcher handlerMatcher: matchers) {
+            final Object matched = handlerMatcher.matcher.match(attributes, elementHandlerContext);
+            if (matched != null) {
+                final ElementHandler elementHandler = getHandlerByClassName(handlerMatcher.handlerClassName);
+                return new HandlerInfo(level, explodedQName, elementHandler, attributes, matched, this.locator);
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -574,7 +592,6 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     private final Matcher ALL_MATCHER = new Matcher<Boolean>() {
         public Boolean match(Attributes attributes, Object handlerContext) {
-            // Just return something
             return Boolean.TRUE;
         }
     };

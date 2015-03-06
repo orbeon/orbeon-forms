@@ -378,8 +378,8 @@ trait ContainerResolver {
         // 1. Check if requesting the binding id. If so, we interpret this as requesting the bound element
         //    and return the control associated with the bound element.
         // TODO: should this use sourceControlEffectiveId?
-        val bindingId = containingDocument.getStaticOps.getBindingId(prefixedId)
-        if (staticOrAbsoluteId == bindingId)
+        val bindingIdOpt = containingDocument.getStaticOps.getBinding(prefixedId) map (_.bindingId)
+        if (Some(staticOrAbsoluteId) == bindingIdOpt)
             return containingDocument.getControlByEffectiveId(effectiveId)
 
         // 2. Search in directly contained models

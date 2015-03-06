@@ -453,7 +453,7 @@ abstract public class XFormsToSomething extends ProcessorImpl {
         {
             final Metadata metadata = containingDocument.getStaticState().topLevelPart().metadata();
             final Set<String> includes = metadata.getBindingIncludesJava();
-            for (final String include: includes) {
+            for (final String include : includes) {
                 stage1CacheableState.addReference(null, "oxf:" + include, null);
             }
         }

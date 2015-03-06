@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.properties.JPropertySet;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -294,8 +293,6 @@ public class XFormsProperties {
     public static final String ENCODE_VERSION_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.encode-version";
     public static final boolean ENCODE_VERSION_PROPERTY_DEFAULT = true;
 
-    public static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
-
     public static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     public static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
@@ -376,10 +373,6 @@ public class XFormsProperties {
     public static boolean isEncodeVersion() {
         return Properties.instance().getPropertySet().getBoolean
                 (ENCODE_VERSION_PROPERTY, ENCODE_VERSION_PROPERTY_DEFAULT);
-    }
-
-    public static JPropertySet.Property getResourcesBaseline() {
-        return Properties.instance().getPropertySet().getProperty(BASELINE_PROPERTY);
     }
 
     public static boolean getDebugLogXPathAnalysis() {

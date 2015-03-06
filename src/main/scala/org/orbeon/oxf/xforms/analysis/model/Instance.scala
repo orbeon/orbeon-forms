@@ -68,7 +68,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
                 "model id"       → parent.get.staticId,
                 "instance id"    → staticId,
                 "scope id"       → component.binding.innerScope.scopeId,
-                "binding name"   → component.binding.abstractBinding.printableBindingName,
+                "binding name"   → component.binding.abstractBinding.debugBindingName,
                 "model index"    → modelIndex.toString,
                 "instance index" → instanceIndex.toString))
 

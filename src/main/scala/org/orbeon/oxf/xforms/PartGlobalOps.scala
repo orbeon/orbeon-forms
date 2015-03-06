@@ -20,7 +20,7 @@ import event.EventHandler
 import org.dom4j.QName
 import java.util.{Collection ⇒ JCollection}
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings, ConcreteBinding}
+import org.orbeon.oxf.xforms.xbl._
 import org.apache.commons.lang3.StringUtils
 import collection.JavaConverters._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -47,12 +47,9 @@ trait PartGlobalOps {
     def keypressHandlers: Seq[EventHandler]
 
     // XBL
-    def isComponent(binding: QName): Boolean
     def getBinding(prefixedId: String): Option[ConcreteBinding]
-    def getBindingId(prefixedId: String): String
-    def jBindingQNames: Seq[QName]
-    def getGlobals: collection.Map[QName, XBLBindings#Global]
-    def abstractBindings: Iterable[AbstractBinding]
+    def getGlobals: collection.Seq[XBLBindings#Global]
+    def allBindingsMaybeDuplicates: Iterable[AbstractBinding]
 
     // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)
     def containingScope(prefixedId: String): Scope

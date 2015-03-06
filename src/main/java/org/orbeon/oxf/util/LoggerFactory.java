@@ -47,6 +47,10 @@ public class LoggerFactory {
 
     private static final Logger logger = LoggerFactory.createLogger(LoggerFactory.class);
 
+    public static Logger createLogger(String name) {
+        return Logger.getLogger(name);
+    }
+
     public static Logger createLogger(Class clazz) {
         return Logger.getLogger(clazz.getName());
     }

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import java.net.URI
+
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLReceiver, ForwardingXMLReceiver}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsConstants, XFormsProperties}
@@ -27,6 +29,22 @@ import org.orbeon.oxf.util.ScalaUtils._
 abstract class XFormsExtractorBase(xmlReceiver: XMLReceiver)
     extends ForwardingXMLReceiver(xmlReceiver)
     with ExtractorProperties
+
+case class XMLElementDetails(
+    id                  : String,
+    xmlBase             : URI,
+    xmlLang             : String,
+    xmlLangAvtId        : String,
+    scope               : XFormsConstants.XXBLScope,
+    isModel             : Boolean,
+    isXForms            : Boolean,
+    isXXForms           : Boolean,
+    isEXForms           : Boolean,
+    isXBL               : Boolean,
+    isXXBL              : Boolean,
+    isExtension         : Boolean,
+    isXFormsOrExtension : Boolean
+)
 
 trait ExtractorProperties extends ForwardingXMLReceiver {
 

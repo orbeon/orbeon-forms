@@ -217,7 +217,11 @@ object XFormsStaticStateImpl {
         }
 
         // Extractor with prefix
-        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractor(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
+        class Extractor(xmlReceiver: XMLReceiver)
+                extends XFormsExtractor(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
+
+            override def getPrefixedId(staticId: String) = prefix + staticId
+
             override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
                 val staticId = attributes.getValue("id")
                 if (staticId ne null) {

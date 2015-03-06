@@ -75,15 +75,17 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             )
         )
 
+        val baselineResources = XBLResources.baselineResources
+
         // Stylesheets
         val attributesImpl = new AttributesImpl
-        outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl)
+        outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, baselineResources._2)
 
         // Scripts
         if (! handlerContext.isNoScript) {
 
             // Main JavaScript resources
-            outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl)
+            outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, baselineResources._1)
 
             // Configuration properties
             outputConfigurationProperties(xhtmlPrefix, isVersionedResources)
@@ -124,7 +126,13 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         helper.endElement()
     }
 
-    private def outputCSSResources(xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl)(implicit helper: XMLReceiverHelper): Unit = {
+    private def outputCSSResources(
+        xhtmlPrefix       : String,
+        minimal           : Boolean,
+        attributesImpl    : AttributesImpl,
+        baselineResources : List[String])(
+        implicit helper   : XMLReceiverHelper
+    ): Unit = {
 
         // Function to output either a <link> or <style> element
         def outputCSSElement = outputElement(xhtmlPrefix, attributesImpl,
@@ -139,14 +147,22 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         }
 
         // Output all CSS
-        XBLResources.outputResources(outputCSSElement,
+        XBLResources.outputResources(
+            outputCSSElement,
             getCSSResources,
             containingDocument.getStaticOps.getXBLStyles,
-            XBLResources.baselineResources._2,
-            minimal)
+            baselineResources,
+            minimal
+        )
     }
 
-    private def outputJavaScriptResources(xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl)(implicit helper: XMLReceiverHelper): Unit = {
+    private def outputJavaScriptResources(
+        xhtmlPrefix       : String,
+        minimal           : Boolean,
+        attributesImpl    : AttributesImpl,
+        baselineResources : List[String])(
+        implicit helper   : XMLReceiverHelper
+    ): Unit = {
 
         // Function to output either a <script> element
         def outputJSElement = outputElement(xhtmlPrefix, attributesImpl,
@@ -158,11 +174,13 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         }
 
         // Output all JS
-        XBLResources.outputResources(outputJSElement,
+        XBLResources.outputResources(
+            outputJSElement,
             getJavaScriptResources,
             containingDocument.getStaticOps.getXBLScripts,
-            XBLResources.baselineResources._1,
-            minimal)
+            baselineResources,
+            minimal
+        )
     }
 
     private def outputConfigurationProperties(xhtmlPrefix: String, versionedResources: Boolean)(implicit helper: XMLReceiverHelper): Unit = {

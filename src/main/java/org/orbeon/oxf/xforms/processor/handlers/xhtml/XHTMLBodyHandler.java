@@ -17,25 +17,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.control.LHHASupport;
-import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
+import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
+import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import scala.collection.Seq;
 
 /**
  * Handle xhtml:body.
@@ -373,11 +371,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert", ANY_MATCHER);
 
         // Add handlers for custom components
-        final Seq<QName> componentBindings = containingDocument.getStaticOps().jBindingQNames();
-        for (final scala.collection.Iterator<QName> i = componentBindings.iterator(); i.hasNext();) {
-            final QName currentQName = i.next();
-            controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName(), ANY_MATCHER);
-        }
+        final StaticStateGlobalOps ops = containingDocument.getStaticOps();
+        controller.registerHandler(XXFormsComponentHandler.class.getName(), new Matcher() {
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
+                return ops.getBinding(getPrefixedId(attributes, handlerContext)).isDefined();
+            }
+        });
 
         // xxf:dynamic
         controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic", ANY_MATCHER);
@@ -386,7 +385,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         // Add global top-level XBL markup
-        final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.getStaticOps().getGlobals().values().iterator();
+        final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.getStaticOps().getGlobals().iterator();
         while (i.hasNext())
             XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().templateTree());
 

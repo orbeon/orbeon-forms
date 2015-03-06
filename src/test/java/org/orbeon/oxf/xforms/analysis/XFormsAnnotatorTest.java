@@ -72,12 +72,24 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
 
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", XMLParsing.ParserConfiguration.PLAIN);
         final Metadata metadata = new Metadata();
-        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.logger, ""), null, metadata)
-                .annotateShadowTree(document, "");
-        final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPath.GlobalConfiguration());
+        final Document annotatedDocument =
+            new XBLBindings(new IndentedLogger(XFormsServer.logger, ""), null, metadata).annotateShadowTree(document, "");
+        final DocumentWrapper documentWrapper =
+            new DocumentWrapper(annotatedDocument, null, XPath.GlobalConfiguration());
 
         // Check there is an xxf:attribute for "html" with correct name
-        List<Object> result = XPathCache.evaluate(documentWrapper, "//xxf:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null, null);
+        List<Object> result =
+            XPathCache.evaluate(
+                documentWrapper,
+                "//xxf:attribute[@for = 'html']",
+                XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -86,7 +98,17 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxf:attribute for "span" with correct name
-        result = XPathCache.evaluate(documentWrapper, "//xxf:attribute[@for = 'span']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null, null);
+        result =
+            XPathCache.evaluate(
+                documentWrapper, "//xxf:attribute[@for = 'span']",
+                XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
 
         assertNotNull(result);
         assertEquals(1, result.size());

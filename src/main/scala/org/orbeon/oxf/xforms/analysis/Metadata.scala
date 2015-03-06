@@ -16,12 +16,11 @@ package org.orbeon.oxf.xforms.analysis
 import java.util.{Map ⇒ JMap}
 
 import org.dom4j.io.DocumentSource
-import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl.XBLResources
-import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, TransformerUtils}
+import org.orbeon.oxf.xforms.xbl._
+import org.orbeon.oxf.xml.{NamespaceContext, NamespaceMapping, SAXStore, TransformerUtils}
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable, mutable}
@@ -38,7 +37,7 @@ import scala.collection.{immutable, mutable}
  *
  * Split into traits for modularity.
  */
-class Metadata(val idGenerator: IdGenerator) extends NamespaceMappings with Bindings with Marks {
+class Metadata(val idGenerator: IdGenerator) extends NamespaceMappings with BindingMetadata with Marks {
     def this() { this(new IdGenerator) }
 }
 
@@ -73,67 +72,9 @@ trait Marks {
     def hasTopLevelMarks = topLevelMarks.nonEmpty
 }
 
-// Handling of XBL bindings
-trait Bindings {
-    private val xblBindings = new mutable.HashMap[String, collection.mutable.Set[String]]
-    private var lastModified = -1L
-
-    val bindingIncludes = new mutable.LinkedHashSet[String]
-
-    def isXBLBindingCheckAutomaticBindings(uri: String, localname: String): Boolean = {
-
-        // Is this already registered?
-        if (isXBLBinding(uri, localname))
-            return true
-
-        // If not, check if it exists as automatic binding
-        XBLResources.getAutomaticXBLMappingPath(uri, localname) match {
-            case Some(path) ⇒
-                storeXBLBinding(uri, localname)
-                bindingIncludes.add(path)
-                true
-            case _ ⇒
-                false
-        }
-    }
-
-    def storeXBLBinding(bindingURI: String, localname: String) {
-        val localnames = xblBindings.getOrElseUpdate(bindingURI, new mutable.HashSet[String])
-        localnames += localname
-    }
-
-    def isXBLBinding(uri: String, localname: String) =
-        xblBindings.get(uri) match {
-            case Some(localnames) ⇒ localnames(localname)
-            case None ⇒ false
-        }
-
-    def getBindingIncludesJava = bindingIncludes.asJava
-
-    def updateBindingsLastModified(lastModified: Long) {
-        this.lastModified = math.max(this.lastModified, lastModified)
-    }
-
-    private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
-        val last = rm.lastModified(path, true)
-        last != -1 && last <= this.lastModified
-    }
-
-    // Whether the binding includes are up to date
-    def bindingsIncludesAreUpToDate = {
-        implicit val rm = ResourceManagerWrapper.instance
-        bindingIncludes.iterator forall pathExistsAndIsUpToDate
-    }
-
-    // For debugging only
-    def debugOutOfDateBindingsIncludesJava = {
-        implicit val rm = ResourceManagerWrapper.instance
-        bindingIncludes.iterator filterNot pathExistsAndIsUpToDate mkString ", "
-    }
-}
-
 // Handling of namespaces
 trait NamespaceMappings {
+
     private val namespaceMappings = new mutable.HashMap[String, NamespaceMapping]
     private val hashes = new mutable.LinkedHashMap[String, NamespaceMapping]
 

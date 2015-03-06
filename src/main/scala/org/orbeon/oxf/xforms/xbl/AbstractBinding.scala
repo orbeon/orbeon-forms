@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import org.orbeon.css.CSSSelectorParser
+import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
@@ -24,12 +26,31 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
+
+trait IndexableBinding {
+    def selectors           : List[Selector]
+    def selectorsNamespaces : Map[String, String]
+    def path                : Option[String]
+    def lastModified        : Long
+}
+
+// Inline binding details, which cannot be shared between forms
+case class InlineBindingRef(
+    bindingPrefixedId   : String,
+    selectors           : List[Selector],
+    selectorsNamespaces : Map[String, String]
+) extends IndexableBinding {
+    val path         = None
+    val lastModified = -1L
+}
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
-    qNameMatch     : QName,
+    selectors      : List[Selector],
+    cssName        : Option[String],
     bindingElement : Element,
+    path           : Option[String],
     lastModified   : Long,
     bindingId      : Option[String],
     scripts        : Seq[HeadElement],
@@ -37,7 +58,8 @@ case class AbstractBinding(
     handlers       : Seq[Element],
     modelElements  : Seq[Element],
     global         : Option[Document]
-) {
+) extends IndexableBinding {
+
     val containerElementName =          // "div" by default
         Option(bindingElement.attributeValue(XXBL_CONTAINER_QNAME)) getOrElse
             "div"
@@ -54,16 +76,13 @@ case class AbstractBinding(
 
     val labelFor        = Option(bindingElement.attributeValue(XXBL_LABEL_FOR_QNAME))
 
-    // Return a CSS-friendly name for this binding (no `|` or `:`)
-    val cssName   = qNameMatch.getQualifiedName.replace(':', '-')
-
     // Printable name for the binding match
-    def printableBindingName = qNameMatch.getQualifiedName
+    def debugBindingName = bindingElement.getQualifiedName
 
     // CSS classes to put in the markup
     val cssClasses =
         "xbl-component"                  ::
-        ("xbl-" + cssName)               ::
+        (cssName map ("xbl-" +) toList)  :::
         (modeFocus list "xbl-focusable") :::
         attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
@@ -115,12 +134,19 @@ case class AbstractBinding(
 
             generatedDocument
     }
+    
+    def selectorsNamespaces =
+        Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
 }
 
 object AbstractBinding {
 
-    // Construct an AbstractBinding
-    def apply(bindingElement: Element, lastModified: Long, scripts: Seq[HeadElement]) = {
+    def fromBindingElement(
+        bindingElement : Element,
+        path           : Option[String],
+        lastModified   : Long,
+        scripts        : Seq[HeadElement]
+    ): AbstractBinding = {
 
         assert(bindingElement ne null)
 
@@ -129,7 +155,7 @@ object AbstractBinding {
         val styles =
             for {
                 resourcesElement ← Dom4j.elements(bindingElement, XBL_RESOURCES_QNAME)
-                styleElement ← Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
+                styleElement     ← Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
             } yield
                 HeadElement(styleElement)
 
@@ -150,31 +176,30 @@ object AbstractBinding {
         val global = Option(bindingElement.element(XXBL_GLOBAL_QNAME)) map
             (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
 
-        new AbstractBinding(directBindingQName(bindingElement), bindingElement, lastModified, bindingId, scripts, styles, handlers, modelElements, global)
-    }
+        val selectors =
+            CSSSelectorParser.parseSelectors(bindingElement.attributeValue(ELEMENT_QNAME))
 
-    // Find a cached abstract binding or create and cache a new one
-    def findOrCreate(
-            path: Option[String],
-            bindingElement: Element,
-            lastModified: Long,
-            scripts: Seq[HeadElement]): AbstractBinding = {
+        // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
+        val cssName = {
 
-        val qName = directBindingQName(bindingElement)
+            val ns    = Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
+            val qName = selectors collectFirst BindingDescriptor.directBindingPF(ns, None) flatMap (_.elementName)
 
-        path flatMap (BindingCache.get(_, qName, lastModified)) match {
-            case Some(cachedBinding) ⇒
-                // Found in cache
-                cachedBinding
-            case None ⇒
-                val newBinding = AbstractBinding(bindingElement, lastModified, scripts)
-                // Cache binding
-                path foreach (BindingCache.put(_, lastModified, newBinding))
-                newBinding
+            qName map (_.getQualifiedName) map (_.replace(':', '-'))
         }
-    }
 
-    // Parse the selector and return the first direct binding binding
-    private def directBindingQName(bindingElement: Element) =
-        BindingDescriptor.findFirstDirectBinding(bindingElement.attributeValue(ELEMENT_QNAME), Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap).get
+        AbstractBinding(
+            selectors,
+            cssName,
+            bindingElement,
+            path,
+            lastModified,
+            bindingId,
+            scripts,
+            styles,
+            handlers,
+            modelElements,
+            global
+        )
+    }
 }

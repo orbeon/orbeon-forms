@@ -106,7 +106,7 @@
     <property as="xs:boolean" name="oxf.xforms.resources.javascript-at-bottom"             value="true"/>
     <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                   value="true"/>
     <property as="xs:string"  name="oxf.xforms.resources.baseline">
-        fr:button fr:tabview fr:autocomplete
+        fr:button fr:number fr:autocomplete
     </property>
 
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
@@ -222,6 +222,10 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
         year-from-date(current-date())
+    </property>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.library">
+        fr:number fr:currency
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->

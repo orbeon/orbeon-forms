@@ -18,6 +18,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.xbl.IndexableBinding;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -38,6 +39,9 @@ import java.util.Map;
  *   - adds ids to those elements
  *   - produces xxf:attribute elements
  * - finds title information and produces xxf:text elements
+ * - register xbl:binding mappings
+ * - add ids to elements with XBL bindings
+ * - insert fr:xforms-inspector if requested and needed
  *
  * NOTE: There was a thought of merging this with XFormsExtractor but we need a separate annotated document in
  * XFormsToXHTML to produce the output. So if we modify this, we should modify it so that two separate XMLReceiver (at
@@ -101,8 +105,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
     /**
      * This constructor just computes the namespace mappings and AVT elements and gathers id information.
-     *
-     * @param metadata              metadata to gather
      */
     public XFormsAnnotator(Metadata metadata) {
         super(null, null);
@@ -122,14 +124,13 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         final int idIndex = attributes.getIndex("id");
 
         // Entering model or controls
-        if (!inXForms && stackElement.isXFormsOrExtension()) {
+        if (!inXForms && stackElement.isXFormsOrBuiltinExtension()) {
             inXForms = true;
             xformsLevel = level;
         }
 
         if (inPreserve) {
             // Within preserved content
-
 
             if (inLHHA) {
                 // Gather id and namespace information about content of LHHA
@@ -141,17 +142,18 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
                 }
             } else if (inXBL && level - 1 == preserveLevel && stackElement.isXBL() && "binding".equals(localname)) {
-                // Gather binding information in xbl:xbl/xbl:binding
-                final String elementAttribute = attributes.getValue("element");
-                if (elementAttribute != null) {
-                    storeXBLBinding(elementAttribute);
-                }
+
                 // Gather id and namespace information
                 attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+
+                // Gather binding information from xbl:xbl/xbl:binding/@element
+                final String elementAtt = attributes.getValue("element");
+                if (elementAtt != null)
+                    metadata.registerInlineBinding(namespaceContext.current().mappings(), elementAtt, rewriteId(reusableStringArray[0]));
             }
             // Output element
             stackElement.startElement(uri, localname, qName, attributes);
-        } else if (stackElement.isXFormsOrExtension()) {
+        } else if (stackElement.isXFormsOrBuiltinExtension()) {
             // This is an XForms element
 
             // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
@@ -208,32 +210,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Leave element untouched (except for the id attribute)
                 stackElement.startElement(uri, localname, qName, attributes);
             }
-        } else if (! stackElement.isXBL() && metadata.isXBLBindingCheckAutomaticBindings(uri, localname)) {
-            // Element with a binding
-
-            // Create a new id and update the attributes if needed
-            attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
-            final String xformsElementId = reusableStringArray[0];
-
-            if (templateSAXStore != null) {
-                // Remember mark if xxf:update="full"
-                final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
-                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
-                    // Remember this subtree has a full update
-                    putMark(xformsElementId);
-                    // Add a class to help the client
-                    attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
-                }
-            }
-
-            // Leave element untouched (except for the id attribute)
-            stackElement.startElement(uri, localname, qName, attributes);
-
-            // Don't handle the content
-            inPreserve = true;
-            inXBLBinding = true;
-            preserveLevel = level;
-
         } else if (stackElement.isXBL()) {
             // This must be xbl:xbl (otherwise we will have isPreserve == true) or xbl:template
             assert localname.equals("xbl") || localname.equals("template") || localname.equals("handler");
@@ -241,108 +217,142 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
             stackElement.startElement(uri, localname, qName, attributes);
         } else {
-            // Non-XForms element without an XBL binding
 
-            String htmlElementId = null;
+            final scala.Option<IndexableBinding> bindingOpt =
+                metadata.findBindingForElement(uri, localname, attributes);
 
-            if (level == 1) {
-                if ("head".equals(localname)) {
-                    // Entering head
-                    inHead = true;
+            if (bindingOpt.isDefined()) {
+                // Element with a binding
+
+                // Create a new id and update the attributes if needed
+                attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                final String xformsElementId = reusableStringArray[0];
+
+                // Index binding by prefixed id
+                metadata.mapBindingToElement(rewriteId(xformsElementId), bindingOpt.get());
+
+                if (templateSAXStore != null) {
+                    // Remember mark if xxf:update="full"
+                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
+                    if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                        // Remember this subtree has a full update
+                        putMark(xformsElementId);
+                        // Add a class to help the client
+                        attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
+                    }
                 }
-            } else if (level == 2) {
-                if (inHead && "title".equals(localname)) {
-                    // Entering title
-                    inTitle = true;
-                    // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
-                    attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
-                    htmlElementId = reusableStringArray[0];
-                    htmlTitleElementId = htmlElementId;
+
+                // Leave element untouched (except for the id attribute)
+                stackElement.startElement(uri, localname, qName, attributes);
+
+                // Don't handle the content
+                inPreserve = true;
+                inXBLBinding = true;
+                preserveLevel = level;
+            } else {
+                // Non-XForms element without an XBL binding
+
+                String htmlElementId = null;
+
+                if (level == 1) {
+                    if ("head".equals(localname)) {
+                        // Entering head
+                        inHead = true;
+                    }
+                } else if (level == 2) {
+                    if (inHead && "title".equals(localname)) {
+                        // Entering title
+                        inTitle = true;
+                        // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
+                        attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                        htmlElementId = reusableStringArray[0];
+                        htmlTitleElementId = htmlElementId;
+                    }
                 }
-            }
 
-            // NOTE: @id attributes on XHTML elements are rewritten with their effective id during XHTML output by
-            // XHTMLElementHandler.
-            if ("true".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "control"))) {
-                // Non-XForms element which we want to turn into a control (specifically, into a group)
+                // NOTE: @id attributes on XHTML elements are rewritten with their effective id during XHTML output by
+                // XHTMLElementHandler.
+                if ("true".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "control"))) {
+                    // Non-XForms element which we want to turn into a control (specifically, into a group)
 
-                // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
-                // given QName must be in scope as that QName is the original element name.
-                final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex));
-                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxf:element", XMLReceiverHelper.CDATA, qName);
+                    // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
+                    // given QName must be in scope as that QName is the original element name.
+                    final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex));
+                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxf:element", XMLReceiverHelper.CDATA, qName);
 
-                startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                stackElement.startElement(XFormsConstants.XFORMS_NAMESPACE_URI, "group", "xf:group", newAttributes);
-            } else if (hostLanguageAVTs) {
-                // This is a non-XForms element and we allow AVTs
-                final int attributesCount = attributes.getLength();
-                if (attributesCount > 0) {
-                    boolean elementWithAVTHasBeenOutput = false;
-                    for (int i = 0; i < attributesCount; i++) {
-                        final String currentAttributeURI = attributes.getURI(i);
-                        if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
-                            // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
-                            final String attributeValue = attributes.getValue(i);
-                            if (XFormsUtils.maybeAVT(attributeValue)) {
-                                // This is an AVT
-                                final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
+                    startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    stackElement.startElement(XFormsConstants.XFORMS_NAMESPACE_URI, "group", "xf:group", newAttributes);
+                } else if (hostLanguageAVTs) {
+                    // This is a non-XForms element and we allow AVTs
+                    final int attributesCount = attributes.getLength();
+                    if (attributesCount > 0) {
+                        boolean elementWithAVTHasBeenOutput = false;
+                        for (int i = 0; i < attributesCount; i++) {
+                            final String currentAttributeURI = attributes.getURI(i);
+                            if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
+                                // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
+                                final String attributeValue = attributes.getValue(i);
+                                if (XFormsUtils.maybeAVT(attributeValue)) {
+                                    // This is an AVT
+                                    final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
 
-                                // Create a new id and update the attributes if needed
-                                if (htmlElementId == null) {
-                                    attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
-                                    htmlElementId = reusableStringArray[0];
+                                    // Create a new id and update the attributes if needed
+                                    if (htmlElementId == null) {
+                                        attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                                        htmlElementId = reusableStringArray[0];
 
-                                    // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
+                                        // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
+                                    }
+
+                                    if (!elementWithAVTHasBeenOutput) {
+                                        // Output the element with the new or updated id attribute
+                                        stackElement.startElement(uri, localname, qName, attributes);
+                                        elementWithAVTHasBeenOutput = true;
+                                    }
+
+                                    // Create a new xxf:attribute control
+                                    reusableAttributes.clear();
+
+                                    final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, -1);
+
+                                    newAttributes.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, htmlElementId);
+                                    newAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, attributeName);
+                                    newAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, attributeValue);
+
+                                    newAttributes.addAttribute("", "for-name", "for-name", XMLReceiverHelper.CDATA, localname);
+
+                                    // These extra attributes can be used alongside src/href attributes
+                                    if ("src".equals(attributeName) || "href".equals(attributeName)) {
+                                        final String urlType = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
+                                        final String portletMode = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
+                                        final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
+
+                                        if (urlType != null)
+                                            newAttributes.addAttribute("", "url-type", "url-type", XMLReceiverHelper.CDATA, urlType);
+                                        if (portletMode != null)
+                                            newAttributes.addAttribute("", "portlet-mode", "portlet-mode", XMLReceiverHelper.CDATA, "portlet-mode");
+                                        if (windowState != null)
+                                            newAttributes.addAttribute("", "window-state", "window-state", XMLReceiverHelper.CDATA, "window-state");
+                                    }
+
+                                    startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                                    stackElement.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxf:attribute", newAttributes);
+                                    endPrefixMapping2("xxf");
                                 }
-
-                                if (!elementWithAVTHasBeenOutput) {
-                                    // Output the element with the new or updated id attribute
-                                    stackElement.startElement(uri, localname, qName, attributes);
-                                    elementWithAVTHasBeenOutput = true;
-                                }
-
-                                // Create a new xxf:attribute control
-                                reusableAttributes.clear();
-
-                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, -1);
-
-                                newAttributes.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, htmlElementId);
-                                newAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, attributeName);
-                                newAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, attributeValue);
-
-                                newAttributes.addAttribute("", "for-name", "for-name", XMLReceiverHelper.CDATA, localname);
-
-                                // These extra attributes can be used alongside src/href attributes
-                                if ("src".equals(attributeName) || "href".equals(attributeName)) {
-                                    final String urlType = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
-                                    final String portletMode = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
-                                    final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
-
-                                    if (urlType != null)
-                                        newAttributes.addAttribute("", "url-type", "url-type", XMLReceiverHelper.CDATA, urlType);
-                                    if (portletMode != null)
-                                        newAttributes.addAttribute("", "portlet-mode", "portlet-mode", XMLReceiverHelper.CDATA, "portlet-mode");
-                                    if (windowState != null)
-                                        newAttributes.addAttribute("", "window-state", "window-state", XMLReceiverHelper.CDATA, "window-state");
-                                }
-
-                                startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                                stackElement.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxf:attribute", newAttributes);
-                                endPrefixMapping2("xxf");
                             }
                         }
+
+                        // Output the element as is if no AVT was found
+                        if (!elementWithAVTHasBeenOutput)
+                            stackElement.startElement(uri, localname, qName, attributes);
+                    } else {
+                        stackElement.startElement(uri, localname, qName, attributes);
                     }
 
-                    // Output the element as is if no AVT was found
-                    if (!elementWithAVTHasBeenOutput)
-                        stackElement.startElement(uri, localname, qName, attributes);
                 } else {
+                    // No AVT handling, just output the element
                     stackElement.startElement(uri, localname, qName, attributes);
                 }
-
-            } else {
-                // No AVT handling, just output the element
-                stackElement.startElement(uri, localname, qName, attributes);
             }
         }
 
@@ -421,21 +431,29 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
                 final String frURI = "http://orbeon.org/oxf/xml/form-runner";
                 final String inspectorLocal = "xforms-inspector";
-                if (propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isXBLBinding(frURI, inspectorLocal)) {
+                if (propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isByNameBindingInUse(frURI, inspectorLocal)) {
 
-                    // This registers the binding
-                    metadata.isXBLBindingCheckAutomaticBindings(frURI, inspectorLocal);
-
-                    final String inspectorPrefix = "fr";
-                    final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
-
+                    // Register the fr:xforms-inspector binding
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
-                    final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
+                    final scala.Option<IndexableBinding> inspectorBindingOpt =
+                        metadata.findBindingForElement(frURI, inspectorLocal, reusableAttributes);
 
-                    startPrefixMapping2(inspectorPrefix, frURI);
-                    stackElement.element(frURI, inspectorLocal, inspectorQName, newAttributes);
-                    endPrefixMapping2(inspectorPrefix);
+                    if (inspectorBindingOpt.isDefined()) {
+
+                        final String inspectorPrefix = "fr";
+                        final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
+
+                        reusableAttributes.clear();
+                        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
+                        final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
+                        final String xformsElementId = reusableStringArray[0];
+
+                        metadata.mapBindingToElement(rewriteId(xformsElementId), inspectorBindingOpt.get());
+
+                        startPrefixMapping2(inspectorPrefix, frURI);
+                        stackElement.element(frURI, inspectorLocal, inspectorQName, newAttributes);
+                        endPrefixMapping2(inspectorPrefix);
+                    }
                 }
             }
         } else if (level == 2) {
@@ -494,18 +512,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
     protected String rewriteId(String id) {
         return id;
-    }
-
-    private void storeXBLBinding(String elementAttribute) {
-        elementAttribute = elementAttribute.replace('|', ':');
-        final String bindingPrefix = XMLUtils.prefixFromQName(elementAttribute);
-        if (bindingPrefix != null) {
-            final String bindingURI = namespaceContext.getURI(bindingPrefix);
-            if (bindingURI != null) {
-                // Found URI
-                metadata.storeXBLBinding(bindingURI, XMLUtils.localNameFromQName(elementAttribute));
-            }
-        }
     }
 
     @Override

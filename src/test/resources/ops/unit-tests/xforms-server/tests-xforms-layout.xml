@@ -1957,8 +1957,7 @@
                 <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/button/assets/skins/sam/button.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/tabview/assets/skins/sam/tabview.css" class="xforms-baseline"/>
-                <xh:link href="/xbl/orbeon/tabview/tabview.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/currency/currency.css"/>
                 <xh:script src="/ops/jquery/jquery-1.11.0.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/jquery/jquery-migrate-1.2.1.min.js" class="xforms-baseline"/>
@@ -2006,11 +2005,8 @@
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/button/button-min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/button/button.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/element/element.js" class="xforms-baseline"/>
-                <xh:script src="/xbl/orbeon/tabview/tabview.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/tabview/tabview-min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/number/number.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/slider/slider-min.js"/>
-                <xh:script src="/xbl/orbeon/number/number.js"/>
                 <xh:script src="/xbl/orbeon/currency/currency.js"/>
             </xh:head>
         </output>

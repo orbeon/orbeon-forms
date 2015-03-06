@@ -60,6 +60,14 @@
         <priority value="debug"/>
     </category>
 
+    <category name="org.orbeon.lifecycle">
+        <priority value="debug"/>
+    </category>
+
+    <category name="org.orbeon.xbl">
+        <priority value="debug"/>
+    </category>
+
     <category name="org.orbeon.oxf.properties.Properties">
         <priority value="debug"/>
     </category>

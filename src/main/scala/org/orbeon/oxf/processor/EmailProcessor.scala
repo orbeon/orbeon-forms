@@ -48,13 +48,12 @@ import org.xml.sax._
  *
  * TODO:
  *
- * o revise support of text/html
- * o built-in support for HTML could handle src="cid:*" with part/message ids
- * o support text/xml? or just XHTML?
- * o build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
+ * - revise support of text/html
+ * - built-in support for HTML could handle src="cid:*" with part/message ids
+ * - support text/xml? or just XHTML?
+ * - build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
  */
 class EmailProcessor extends ProcessorImpl {
-
 
     addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA, ConfigNamespaceURI))
 

@@ -23,9 +23,9 @@ import java.util.Stack;
 /**
  * Abstraction over log4j, which provides:
  *
- * o start/end operation with parameters
- * o indenting depending on current nesting of operations
- * o custom handling of debug level
+ * - start/end operation with parameters
+ * - indenting depending on current nesting of operations
+ * - custom handling of debug level
  */
 public class IndentedLogger {
 

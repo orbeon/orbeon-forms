@@ -15,30 +15,31 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 
-import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
-
-import collection.mutable
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.processor.XFormsFeatures
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLResources
+import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XINCLUDE_URI}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+
 import scala.collection.JavaConverters._
-import state.XFormsStateManager
-import XFormsUtils.{escapeJavaScript, namespaceId}
+import scala.collection.mutable
 
 // Handler for <xh:head>
 class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
-    import XHTMLHeadHandler._
+    import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler._
 
     private var formattingPrefix: String = null
 
@@ -70,7 +71,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         // Include static XForms CSS
         val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
 
-        helper.element("", XMLConstants.XINCLUDE_URI, "include",
+        helper.element("", XINCLUDE_URI, "include",
             Array(
                 "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css.xml"),
                 "fixup-xml-base", "false"
@@ -110,21 +111,21 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
     // Output an element
     private def outputElement(
-            xhtmlPrefix: String,
-            attributesImpl: AttributesImpl,
-            getElementDetails: (Option[String], Option[String]) ⇒ (String, Array[String])
-        )(
-            resource: Option[String],
-            cssClass: Option[String],
-            content: Option[String]
-        )(implicit helper: XMLReceiverHelper): Unit = {
+        xhtmlPrefix       : String,
+        attributesImpl    : AttributesImpl,
+        getElementDetails : (Option[String], Option[String]) ⇒ (String, Array[String]))(
+        resource          : Option[String],
+        cssClass          : Option[String],
+        content           : Option[String])(implicit
+        helper            : XMLReceiverHelper
+    ): Unit = {
 
         val (elementName, attributes) = getElementDetails(resource, cssClass)
 
         attributesImpl.clear()
         XMLReceiverHelper.populateAttributes(attributesImpl, attributes)
-        helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, elementName, attributesImpl)
-        // output content only if present
+        helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, elementName, attributesImpl)
+        // Output content only if present
         content foreach helper.text
         helper.endElement()
     }
@@ -134,16 +135,22 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         minimal           : Boolean,
         attributesImpl    : AttributesImpl,
         headElements      : List[HeadElement],
-        baselineResources : List[String])(
-        implicit helper   : XMLReceiverHelper
+        baselineResources : List[String])(implicit
+        helper            : XMLReceiverHelper
     ): Unit = {
 
         // Function to output either a <link> or <style> element
-        def outputCSSElement = outputElement(xhtmlPrefix, attributesImpl,
-            (resource, cssClass) ⇒ resource match {
-                case Some(resource) ⇒ ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
-                case None ⇒ ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
-            })(_, _, _)
+        def outputCSSElement =
+            outputElement(
+                xhtmlPrefix,
+                attributesImpl,
+                (resource, cssClass) ⇒ resource match {
+                    case Some(resource) ⇒
+                        ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
+                    case None ⇒
+                        ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
+                }
+            )(_, _, _)
 
         def getCSSResources(useDoc: Boolean) = {
             val ops = if (useDoc) containingDocument.getStaticOps else null
@@ -165,13 +172,17 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         minimal           : Boolean,
         attributesImpl    : AttributesImpl,
         headElements      : List[HeadElement],
-        baselineResources : List[String])(
-        implicit helper   : XMLReceiverHelper
+        baselineResources : List[String])(implicit
+        helper            : XMLReceiverHelper
     ): Unit = {
 
         // Function to output either a <script> element
-        def outputJSElement = outputElement(xhtmlPrefix, attributesImpl,
-            (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull)))(_, _, _)
+        def outputJSElement =
+            outputElement(
+                xhtmlPrefix,
+                attributesImpl,
+                (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
+            )(_, _, _)
 
         def getJavaScriptResources(useDoc: Boolean) = {
             val ops = if (useDoc) containingDocument.getStaticOps else null
@@ -188,7 +199,11 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         )
     }
 
-    private def outputConfigurationProperties(xhtmlPrefix: String, versionedResources: Boolean)(implicit helper: XMLReceiverHelper): Unit = {
+    private def outputConfigurationProperties(
+        xhtmlPrefix        : String,
+        versionedResources : Boolean)(implicit
+        helper             : XMLReceiverHelper
+    ): Unit = {
 
         // Gather all static properties that need to be sent to the client
         val staticProperties = containingDocument.getStaticState.clientNonDefaultProperties
@@ -200,15 +215,18 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
             // Heartbeat delay is dynamic because it depends on session duration
             def heartbeat = {
-                val propertyDefinition = getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
-                val heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
+                val propertyDefinition =
+                    getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
+
+                val heartbeatDelay =
+                    XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
 
                 dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[java.lang.Integer],
                     SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
             }
 
             // Help events are dynamic because they depend on whether the xforms-help event is used
-            // TODO: Need better way to enable/disable xforms-help event support, probably better static analysis of event handlers
+            // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
             def help = dynamicProperty(
                 containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
                 HELP_HANDLER_PROPERTY,
@@ -243,7 +261,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                 if (sb isEmpty) {
                     // First iteration
                     sb append "var opsXFormsProperties = {"
-                    helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+                    helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
                 } else
                     sb append ','
 
@@ -276,8 +294,12 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
 
         val dialogsToOpen = {
-            val dialogsMap =
-                Option(containingDocument.getControls.getCurrentControlTree.getDialogControls) map (_.asScala) getOrElse Map.empty
+
+            val dialogsMap = (
+                Option(containingDocument.getControls.getCurrentControlTree.getDialogControls)
+                map (_.asScala)
+                getOrElse Map.empty
+            )
 
             for {
                 control       ← dialogsMap.values
@@ -294,10 +316,14 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             uniqueClientScripts.nonEmpty
 
         val mustRunAnyScripts =
-            scriptsToRun.nonEmpty || focusElementIdOpt.isDefined || messagesToRun.nonEmpty || dialogsToOpen.nonEmpty || javascriptLoads.nonEmpty
+            scriptsToRun.nonEmpty       ||
+            focusElementIdOpt.isDefined ||
+            messagesToRun.nonEmpty      ||
+            dialogsToOpen.nonEmpty      ||
+            javascriptLoads.nonEmpty
 
         if (hasScriptDefinitions || mustRunAnyScripts) {
-            helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+            helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
 
             if (hasScriptDefinitions)
                 outputScripts(uniqueClientScripts)
@@ -331,15 +357,19 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                 // Initial dialogs to open
                 for (dialogControl ← dialogsToOpen) {
                     val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
-                    val neighbor = Option(dialogControl.getNeighborControlId) map (n ⇒ s""""${namespaceId(containingDocument, n)}"""") getOrElse "null"
+                    val neighbor = (
+                        Option(dialogControl.getNeighborControlId)
+                        map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
+                        getOrElse "null"
+                    )
 
                     sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
                 }
 
                 // Initial setfocus if present
                 // Seems reasonable to do this after dialogs as focus might be within a dialog
-                focusElementIdOpt foreach { focusElementId ⇒
-                    sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, focusElementId)}");"""
+                focusElementIdOpt foreach { id ⇒
+                    sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
                 }
                 sb append " }"
 
@@ -350,15 +380,16 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     }
 
     private def outputJavaScriptInitialData(
-            xhtmlPrefix: String,
-            javaScriptControlsAppearancesMap: collection.Map[String, collection.Map[String, collection.Seq[String]]]
-        )(implicit helper: XMLReceiverHelper): Unit = {
+        xhtmlPrefix              : String,
+        jsControlsAppearancesMap : collection.Map[String, collection.Map[String, collection.Seq[String]]])(implicit
+        helper                   : XMLReceiverHelper
+    ): Unit = {
 
-        helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+        helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
 
         // Produce JSON output
         val hasPaths = true
-        val hasInitControls = javaScriptControlsAppearancesMap.nonEmpty
+        val hasInitControls = jsControlsAppearancesMap.nonEmpty
         val hasKeyListeners = containingDocument.getStaticOps.keypressHandlers.nonEmpty
         val hasServerEvents = {
             val delayedEvents = containingDocument.getDelayedEvents
@@ -371,20 +402,26 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             sb.append(XFormsUtils.getFormId(containingDocument))
             sb.append("\"] = {")
 
+            val rewriteResource =
+                handlerContext.getExternalContext.getResponse.rewriteResourceURL(
+                    _: String,
+                    REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
+                )
+
             // Output path information
             if (hasPaths) {
                 sb.append("\"paths\":{")
                 sb.append("\"xforms-server\": \"")
-                sb.append(handlerContext.getExternalContext.getResponse.rewriteResourceURL("/xforms-server", URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE))
+                sb.append(rewriteResource("/xforms-server"))
                 sb.append("\",\"xforms-server-upload\": \"")
-                sb.append(handlerContext.getExternalContext.getResponse.rewriteResourceURL("/xforms-server/upload", URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE))
+                sb.append(rewriteResource("/xforms-server/upload"))
 
                 // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
                 // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
                 // for use in portlets. This should ideally be handled by a template and/or the server should provide
                 // the markup directly when needed.
                 val calendarImage = "/ops/images/xforms/calendar.png"
-                val rewrittenCalendarImage = handlerContext.getExternalContext.getResponse.rewriteResourceURL(calendarImage, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+                val rewrittenCalendarImage = rewriteResource(calendarImage)
                 sb.append("\",\"calendar-image\": \"")
                 sb.append(rewrittenCalendarImage)
                 sb.append('"')
@@ -397,7 +434,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                     sb.append(',')
                 sb.append("\"controls\":{")
                 locally {
-                    val i = javaScriptControlsAppearancesMap.iterator
+                    val i = jsControlsAppearancesMap.iterator
                     while (i.hasNext) {
                         val (controlName, controlMap) = i.next()
                         sb.append("\"")
@@ -496,7 +533,9 @@ object XHTMLHeadHandler {
             helper.text("}\n")
         }
 
-    def gatherJavascriptControls(containingDocument: XFormsContainingDocument): collection.Map[String, collection.Map[String, collection.Seq[String]]] = {
+    def gatherJavascriptControls(
+        containingDocument : XFormsContainingDocument
+    ): collection.Map[String, collection.Map[String, collection.Seq[String]]] = {
 
         // control name → appearance or mediatype → ids
         val result = mutable.HashMap[String, mutable.HashMap[String, mutable.Buffer[String]]]()

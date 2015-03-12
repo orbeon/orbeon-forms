@@ -19,7 +19,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.{breakOut, mutable}
 
-// Handle XBL scripts and CSS resources
 object XBLResources {
 
     sealed trait HeadElement
@@ -48,7 +47,9 @@ object XBLResources {
                 case "script" if src eq null ⇒
                     InlineElement(e.getStringValue)
                 case _ ⇒
-                    throw new IllegalArgumentException("Invalid element passed to HeadElement(): " + Dom4jUtils.elementToDebugString(e))
+                    throw new IllegalArgumentException(
+                        s"Invalid element passed to HeadElement(): ${Dom4jUtils.elementToDebugString(e)}"
+                    )
             }
         }
     }
@@ -91,20 +92,5 @@ object XBLResources {
 
         // Output inline XBL resources
         xbl collect { case e: InlineElement ⇒ outputElement(None, None, Option(e.text)) }
-    }
-
-    // Get all the baseline JS and CSS resources
-    // The returned resources are in a consistent order
-    def baselineResources = {
-
-        // If out-of-date, form got recompiled so index becomes up-to-date here. We could also contemplate passing the
-        // actual index from BindingMetadata here.
-        val (_, _, scripts, styles) =
-            BindingLoader.getUpToDateLibraryAndBaseline(
-                GlobalBindingIndex.currentIndex,
-                checkUpToDate = false
-            )
-
-        (scripts, styles)
     }
 }

@@ -78,8 +78,10 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             )
         )
 
-        val (baselineScripts, baselineStyles) = XBLResources.baselineResources
-        val (scripts, styles)                 = containingDocument.getStaticOps.bindingResources
+        val ops = containingDocument.getStaticOps
+
+        val (baselineScripts, baselineStyles) = ops.baselineResources
+        val (scripts, styles)                 = ops.bindingResources
 
         // Stylesheets
         val attributesImpl = new AttributesImpl

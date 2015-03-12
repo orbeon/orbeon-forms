@@ -88,6 +88,9 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def uniqueClientScripts = collectInParts(_.uniqueClientScripts)
     def allBindingsMaybeDuplicates: Iterable[AbstractBinding] = collectInParts(_.allBindingsMaybeDuplicates)
 
+    def baselineResources =
+        topLevelPart.metadata.baselineResources
+
     def bindingResources = {
         val bindings = allBindingsMaybeDuplicates
         (XBLResources.orderedHeadElements(bindings, _.scripts), XBLResources.orderedHeadElements(bindings, _.styles))

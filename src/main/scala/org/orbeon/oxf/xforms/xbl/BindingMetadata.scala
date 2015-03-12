@@ -33,8 +33,10 @@ trait BindingMetadata extends Logging {
     // ==== Annotator/Extractor API
     
     // Preemptively ensure the XBL library is up to date
-    private var (xblIndex: BindingIndex[IndexableBinding], checkedPaths, _, _) =
+    private var (xblIndex: BindingIndex[IndexableBinding], checkedPaths, _scripts, _styles) =
         BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
+
+    val baselineResources = (_scripts, _styles)
 
     def commitBindingIndex() = {
         val cleanIndex = BindingIndex.keepBindingsWithPathOnly(xblIndex)

@@ -223,7 +223,8 @@ public class IndentedLogger {
         }
 
         final String text = (StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString;
-        logger.log(level, text);
+        final String indentation = getLogIndentSpaces(indentLevel);
+        logger.log(level, indentation + text);
     }
 
     public static class Indentation {

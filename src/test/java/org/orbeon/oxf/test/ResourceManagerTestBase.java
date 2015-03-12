@@ -40,7 +40,7 @@ public abstract class ResourceManagerTestBase {
     public static final Logger logger = LoggerFactory.createLogger(ResourceManagerTestBase.class);
 
     public static IndentedLogger newIndentedLogger() {
-        return new IndentedLogger(logger, true, "test");
+        return new IndentedLogger(logger, true);
     }
 
     public ResourceManagerTestBase() {}

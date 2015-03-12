@@ -27,7 +27,7 @@ import org.scalatest.junit.AssertionsForJUnit
  */
 class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Logging {
 
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true, "")
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true)
 
     private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
         val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"

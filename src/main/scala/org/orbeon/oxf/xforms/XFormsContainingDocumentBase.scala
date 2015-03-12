@@ -239,8 +239,7 @@ trait ContainingDocumentLogging {
             new IndentedLogger(
                 XFormsServer.logger,
                 XFormsServer.logger.isDebugEnabled && getDebugLogging.contains(loggingCategory),
-                indentation,
-                loggingCategory
+                indentation
             )
         )
 

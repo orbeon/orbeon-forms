@@ -382,7 +382,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 }
 
                 // Open connection
-                final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
+                final IndentedLogger indentedLogger = new IndentedLogger(logger);
                 final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
                     Connection.jBuildConnectionHeadersLowerIfNeeded(
                         submissionURL.getScheme(),

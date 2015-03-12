@@ -77,7 +77,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         try {
             final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
 
-                final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
+                final IndentedLogger indentedLogger = new IndentedLogger(logger);
 
                 // Called for:
                 //

@@ -110,7 +110,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         val proxiedHeaders =
             proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala mapValues (_.toList), request = true)
 
-        implicit val logger = new IndentedLogger(ProcessorImpl.logger, "")
+        implicit val logger = new IndentedLogger(ProcessorImpl.logger)
 
         val allHeaders =
             Connection.buildConnectionHeadersLowerIfNeeded(

@@ -39,5 +39,5 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
  *     - bindingsIncludesAreUpToDate (to see if static state has expired)
  */
 package object xbl {
-    implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.xbl"), "")
+    implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.xbl"))
 }

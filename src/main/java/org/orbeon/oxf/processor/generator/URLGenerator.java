@@ -57,7 +57,7 @@ import java.util.*;
 public class URLGenerator extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(URLGenerator.class);
-    public static IndentedLogger indentedLogger = new IndentedLogger(logger, "oxf:url-generator");
+    public static IndentedLogger indentedLogger = new IndentedLogger(logger);
 
     public static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;

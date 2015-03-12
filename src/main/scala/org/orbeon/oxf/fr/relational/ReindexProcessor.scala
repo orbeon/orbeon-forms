@@ -35,7 +35,7 @@ import org.orbeon.scaxon.XML
  */
 class ReindexProcessor extends ProcessorImpl {
 
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[ReindexProcessor]), "")
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[ReindexProcessor]))
 
     private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
     private val XPathPredicateRegex = """\[[^\]]*\]""".r

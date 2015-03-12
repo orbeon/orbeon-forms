@@ -31,40 +31,27 @@ public class IndentedLogger {
 
     private final Logger logger;
     private final Indentation indentation;
-    private final String prefix;
 
     private final boolean debugEnabled;
 
     private Stack<Operation> stack = new Stack<Operation>();
 
-    public IndentedLogger(Logger logger, String prefix) {
-        this(logger, new Indentation(), prefix);
+    public IndentedLogger(Logger logger) {
+        this(logger, logger.isDebugEnabled(), new Indentation());
     }
 
-    public IndentedLogger(Logger logger, Indentation indentation, String prefix) {
-        this(logger, logger.isDebugEnabled(), indentation, prefix);
+    public IndentedLogger(Logger logger, boolean isDebugEnabled) {
+        this(logger, isDebugEnabled, new Indentation());
     }
 
-    public IndentedLogger(Logger logger, boolean isDebugEnabled, String prefix) {
-        this(logger, isDebugEnabled, new Indentation(), prefix);
-    }
-
-    public IndentedLogger(Logger logger, boolean debugEnabled, Indentation indentation, String prefix) {
+    public IndentedLogger(Logger logger, boolean debugEnabled, Indentation indentation) {
         this.logger = logger;
         this.debugEnabled = debugEnabled;
         this.indentation = indentation;
-        this.prefix = prefix;
     }
 
-    /**
-     * Create a new IndentedLogger allowing overriding indentation and/or isDebugEnabled.
-     *
-     * @param indentedLogger    initial logger
-     * @param indentation       new indentation to use
-     * @param isDebugEnabled    new isDebugEnabled
-     */
     public IndentedLogger(IndentedLogger indentedLogger, Indentation indentation, boolean isDebugEnabled) {
-        this(indentedLogger.logger, isDebugEnabled, indentation, indentedLogger.prefix);
+        this(indentedLogger.logger, isDebugEnabled, indentation);
     }
 
     public Logger getLogger() {
@@ -188,14 +175,14 @@ public class IndentedLogger {
 
     private void log(Level level, int indentLevel, String type, String message, String... parameters) {
         if (!(level == Level.DEBUG && !debugEnabled)) // handle DEBUG level locally, everything else goes through
-            log(logger, level, getActualIndentLevel(indentLevel), prefix, type, message, parameters);
+            log(logger, level, getActualIndentLevel(indentLevel), type, message, parameters);
     }
 
     private int getActualIndentLevel(int indentLevel) {
         return indentLevel;
     }
 
-    private static void log(Logger logger, Level level, int indentLevel, String prefix, String type, String message, String... parameters) {
+    private static void log(Logger logger, Level level, int indentLevel, String type, String message, String... parameters) {
         final String parametersString;
         if (parameters != null && parameters.length > 0) {
             final StringBuilder sb = new StringBuilder(" {");

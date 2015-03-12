@@ -10,7 +10,7 @@ object Permissions {
 
     def checkPermissions(app: String, form: String, metadataFromDB: NodeInfo, dataExists: Boolean, method: String): Unit = {
 
-        implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(Permissions.getClass), "")
+        implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(Permissions.getClass))
 
         val authorizedOperations = {
 

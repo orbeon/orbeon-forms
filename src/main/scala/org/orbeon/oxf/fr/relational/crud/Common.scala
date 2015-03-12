@@ -24,7 +24,7 @@ import org.orbeon.saxon.om.DocumentInfo
 
 trait Common extends RequestResponse with FormRunnerPersistence {
 
-    implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[CRUD]), "")
+    implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[CRUD]))
 
     /**
      * Finds in the database what form version is used for an app/form and optional document id:

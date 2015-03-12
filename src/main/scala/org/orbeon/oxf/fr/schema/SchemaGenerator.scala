@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 object SchemaGenerator {
 
     case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[XFormsToSchema]), "")
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[XFormsToSchema]))
     private val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
 
     def createSchema(appName: String, formSource: DocumentInfo, containingDocument: XFormsContainingDocument): Elem = {

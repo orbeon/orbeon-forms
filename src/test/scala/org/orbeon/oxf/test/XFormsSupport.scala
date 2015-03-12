@@ -47,7 +47,7 @@ trait XFormsSupport extends MockitoSugar {
         val actionInterpreter = mock[XFormsActionInterpreter]
         Mockito when actionInterpreter.containingDocument thenReturn doc
         Mockito when actionInterpreter.container thenReturn doc
-        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
+        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger)
 
         // Resolve assuming target relative to the document
         Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString()) thenAnswer new Answer[XFormsObject] {

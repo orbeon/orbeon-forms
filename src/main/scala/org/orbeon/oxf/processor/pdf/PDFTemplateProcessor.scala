@@ -78,7 +78,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             val initialContext =
                 ElementContext(
                     pipelineContext,
-                    new IndentedLogger(Logger, ""),
+                    new IndentedLogger(Logger),
                     null,
                     stamper.getAcroFields,
                     0,

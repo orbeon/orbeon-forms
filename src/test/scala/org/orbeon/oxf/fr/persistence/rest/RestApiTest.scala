@@ -39,7 +39,7 @@ import scala.xml.Elem
  */
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true, "")
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
     val AllOperations = Set("create", "read", "update", "delete")
 
     private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"

@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.w3c.dom.Node;
-import org.xml.sax.XMLReader;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +69,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             final Map<String, String> localProperties = entry.getValue();
             try {
                 // Create instance
-                final Class<ResourceManagerFactoryFunctor> clazz = (Class<ResourceManagerFactoryFunctor>) Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
+                final Class<ResourceManagerFactoryFunctor> clazz =
+                    (Class<ResourceManagerFactoryFunctor>) Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
                 final Constructor<ResourceManagerFactoryFunctor> constructor = clazz.getConstructor(Map.class);
                 final Map<String, String> allProps = new HashMap<String, String>(props);
                 allProps.putAll(localProperties);
@@ -210,14 +210,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
                 if (!resourceManager.canWrite(key))
                     throw new ResourceNotFoundException(key);
                 return resourceManager.getWriteContentHandler(key);
-            }
-        });
-    }
-
-    public XMLReader getXMLReader() {
-        return (XMLReader) delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                return resourceManager.getXMLReader();
             }
         });
     }

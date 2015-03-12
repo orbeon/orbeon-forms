@@ -92,15 +92,6 @@ public interface ResourceManager {
     InputStream getContentAsStream(String key);
 
     /**
-     * Returns a XMLReader interface to the resource manager. One should then
-     * use the <code>setContentHandler()<code> and <code>parse(String key)</code
-     * method to get and parse an XML document into SAX events.
-     *
-     * @return An XML reader
-     */
-    XMLReader getXMLReader();
-
-    /**
      * Gets the last modified timestamp for the specified resource
      * @param key a Resource Manager key
      * @param doNotThrowResourceNotFound

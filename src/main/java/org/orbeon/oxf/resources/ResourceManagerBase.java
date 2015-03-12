@@ -23,7 +23,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Node;
 import org.xml.sax.Locator;
-import org.xml.sax.XMLReader;
 
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
@@ -114,15 +113,6 @@ public abstract class ResourceManagerBase implements ResourceManager {
                 throw new OXFException(e);
             }
         }
-    }
-
-    public XMLReader getXMLReader() {
-        return new XMLReaderToReceiver() {
-            @Override
-            public void parse(String systemId) {
-                getContentAsSAX(systemId, createXMLReceiver());
-            }
-        };
     }
 
     public XMLReceiver getWriteContentHandler(String key) {

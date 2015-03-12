@@ -68,7 +68,7 @@ object XBLResources {
     def outputResources(
         outputElement : (Option[String], Option[String], Option[String]) ⇒ Unit,
         getBuiltin    : Boolean ⇒ Seq[ResourceConfig],
-        getXBL        : ⇒ Iterable[HeadElement],
+        headElements  : Iterable[HeadElement],
         xblBaseline   : Iterable[String],
         minimal       : Boolean
     ): Unit = {
@@ -81,7 +81,7 @@ object XBLResources {
         allBaseline foreach (s ⇒ outputElement(Some(s), Some("xforms-baseline"), None))
 
         // This is in the order defined by XBLBindings.orderedHeadElements
-        val xbl = getXBL
+        val xbl = headElements
 
         val builtinUsed: mutable.LinkedHashSet[String] = getBuiltin(true).map(_.getResourcePath(minimal))(breakOut)
         val xblUsed: List[String] = xbl.collect({ case e: ReferenceElement ⇒ e.src })(breakOut)

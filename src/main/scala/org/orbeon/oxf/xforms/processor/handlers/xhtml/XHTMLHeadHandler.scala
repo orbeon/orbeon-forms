@@ -15,6 +15,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 
+import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
+
 import collection.mutable
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.URLRewriterUtils
@@ -75,17 +77,18 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             )
         )
 
-        val baselineResources = XBLResources.baselineResources
+        val (baselineScripts, baselineStyles) = XBLResources.baselineResources
+        val (scripts, styles)                 = containingDocument.getStaticOps.bindingResources
 
         // Stylesheets
         val attributesImpl = new AttributesImpl
-        outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, baselineResources._2)
+        outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, styles, baselineStyles)
 
         // Scripts
         if (! handlerContext.isNoScript) {
 
             // Main JavaScript resources
-            outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, baselineResources._1)
+            outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, scripts, baselineScripts)
 
             // Configuration properties
             outputConfigurationProperties(xhtmlPrefix, isVersionedResources)
@@ -130,6 +133,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         xhtmlPrefix       : String,
         minimal           : Boolean,
         attributesImpl    : AttributesImpl,
+        headElements      : List[HeadElement],
         baselineResources : List[String])(
         implicit helper   : XMLReceiverHelper
     ): Unit = {
@@ -150,7 +154,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         XBLResources.outputResources(
             outputCSSElement,
             getCSSResources,
-            containingDocument.getStaticOps.getXBLStyles,
+            headElements,
             baselineResources,
             minimal
         )
@@ -160,6 +164,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         xhtmlPrefix       : String,
         minimal           : Boolean,
         attributesImpl    : AttributesImpl,
+        headElements      : List[HeadElement],
         baselineResources : List[String])(
         implicit helper   : XMLReceiverHelper
     ): Unit = {
@@ -177,7 +182,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         XBLResources.outputResources(
             outputJSElement,
             getJavaScriptResources,
-            containingDocument.getStaticOps.getXBLScripts,
+            headElements,
             baselineResources,
             minimal
         )

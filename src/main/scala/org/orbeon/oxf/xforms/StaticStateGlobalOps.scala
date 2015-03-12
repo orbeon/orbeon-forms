@@ -88,8 +88,10 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def uniqueClientScripts = collectInParts(_.uniqueClientScripts)
     def allBindingsMaybeDuplicates: Iterable[AbstractBinding] = collectInParts(_.allBindingsMaybeDuplicates)
 
-    def getXBLStyles  = XBLResources.orderedHeadElements(allBindingsMaybeDuplicates, _.styles)
-    def getXBLScripts = XBLResources.orderedHeadElements(allBindingsMaybeDuplicates, _.scripts)
+    def bindingResources = {
+        val bindings = allBindingsMaybeDuplicates
+        (XBLResources.orderedHeadElements(bindings, _.scripts), XBLResources.orderedHeadElements(bindings, _.styles))
+    }
 
     /**
      * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If

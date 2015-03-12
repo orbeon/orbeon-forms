@@ -53,9 +53,24 @@
     <xsl:template match="fr:pdf-button">
         <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
         <fr:href-button
-                model="fr-persistence-model"
-                ref="instance('fr-triggers-instance')/pdf"
-                href="/fr/service/{$app}/{$form}/pdf/{{xxf:instance('fr-parameters-instance')/document}}/{{xxf:document-id()}}.pdf">
+            xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+            model="fr-persistence-model"
+            ref="instance('fr-triggers-instance')/pdf"
+            href=
+                "/fr/service/{
+                    $app
+                }/{
+                    $form
+                }/pdf/{{
+                    string-join(
+                        (
+                            xxf:instance('fr-parameters-instance')/document/string(),
+                            xxf:document-id(),
+                            frf:pdfFilenameOrNull()[. != '']
+                        ),
+                        '/'
+                    )
+                }}.pdf">
             <xsl:copy-of select="@appearance | @ref | @class" />
             <xf:label mediatype="text/html" value="$fr-resources/buttons/pdf"/>
         </fr:href-button>

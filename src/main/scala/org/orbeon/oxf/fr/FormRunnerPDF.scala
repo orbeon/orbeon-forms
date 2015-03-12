@@ -13,6 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunner.FormRunnerParams
+import org.orbeon.saxon.functions.EscapeURI
+
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
@@ -23,6 +27,8 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 trait FormRunnerPDF {
+
+    val PDFFileNameProperty = "oxf.fr.detail.pdf.filename"
 
     // Return mappings (formatName → expression) for all PDF formats in the properties
     def getPDFFormats = {
@@ -84,4 +90,13 @@ trait FormRunnerPDF {
     // Add HTTP/HTTPS hyperlinks to a plain string
     def hyperlinkURLs(s: String, hyperlinks: Boolean) =
         replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
+
+    // Custom PDF filename for the detail page if specified and if evaluates to a non-empty name
+    def pdfFilenameOrNull: String = (
+        formRunnerProperty(PDFFileNameProperty)(FormRunnerParams())
+        flatMap nonEmptyOrNone
+        flatMap (expr ⇒ nonEmptyOrNone(process.SimpleProcess.evaluateString(expr)))
+        map     (EscapeURI.escape(_, "-_.~").toString)
+        orNull
+    )
 }

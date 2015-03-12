@@ -122,6 +122,7 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.pdf.filename.*.*"                             value=""/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.hyperlinks.*.*"                           value="true"/>

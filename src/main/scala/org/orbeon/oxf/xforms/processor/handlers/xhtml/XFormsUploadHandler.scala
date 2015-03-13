@@ -63,7 +63,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
                 uploadControl flatMap (_.acceptValue) map mediatypeToAccept foreach
                     (accept ⇒ reusableAttributes.addAttribute("", "accept", "accept", XMLReceiverHelper.CDATA, accept))
     
-                XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
+                XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes, control)
                 element(xhtmlPrefix, XHTML_NAMESPACE_URI, "input", reusableAttributes)
             }
     

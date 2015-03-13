@@ -104,18 +104,24 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return control == null || ! control.isRelevant();
     }
 
-    public static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
+    public static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes, XFormsControl control) {
         // Handle "tabindex"
         {
             // This is the standard XForms attribute
             String value = srcAttributes.getValue("navindex");
-            if (value == null) {
-                // Try the the XHTML attribute
+            if(value != null) {
+                if (control != null && control.isRelevant()) {
+                    destAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, control.evaluateAvt(value));
+                } else {
+                    destAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, XFormsUtils.maybeAVT(value) ? "" : value);
+                }
+            } else {
+                // Try the the XHTML attribute (which doesn't have AVT support)
                 value = srcAttributes.getValue("tabindex");
+                if(value != null) {
+                	destAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, value);
+                }
             }
-
-            if (value != null)
-                destAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, value);
         }
         // Handle "accesskey"
         {

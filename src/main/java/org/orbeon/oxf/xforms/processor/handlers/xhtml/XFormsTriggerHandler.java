@@ -69,7 +69,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
         }
 
         // Handle accessibility attributes on <a>, <input> or <button>
-        handleAccessibilityAttributes(attributes, containerAttributes);
+        handleAccessibilityAttributes(attributes, containerAttributes, control);
 
         return containerAttributes;
     }

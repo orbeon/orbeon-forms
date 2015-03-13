@@ -67,7 +67,7 @@ trait ControlExtensionAttributesSupport {
     final def addExtensionAttributesExceptClassAndAcceptForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
         for {
             (name, value) ← evaluatedExtensionAttributes
-            if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
+            if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name) && name != NAVINDEX_QNAME
             if value ne null
             localName = name.getName
         } attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)

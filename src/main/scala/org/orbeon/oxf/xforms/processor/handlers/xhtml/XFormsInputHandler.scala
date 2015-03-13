@@ -135,7 +135,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
                     reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
 
-                    handleAccessibilityAttributes(attributes, reusableAttributes)
+                    handleAccessibilityAttributes(attributes, reusableAttributes, control)
                     if (isDateMinimal) {
                         val imgQName = XMLUtils.buildQName(xhtmlPrefix, "img")
                         reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
@@ -181,7 +181,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
                     // TODO: set @size and @maxlength
 
-                    handleAccessibilityAttributes(attributes, reusableAttributes)
+                    handleAccessibilityAttributes(attributes, reusableAttributes, control)
                     xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
                     xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
                 }

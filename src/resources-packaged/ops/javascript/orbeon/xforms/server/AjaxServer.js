@@ -1655,7 +1655,11 @@
                                     var nameAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "name");
                                     var htmlElement = ORBEON.util.Dom.get(forAttribute);
                                     if (htmlElement != null) {// use case: xh:html/@lang but HTML fragment produced
-                                        ORBEON.util.Dom.setAttribute(htmlElement, nameAttribute, newAttributeValue);
+                                        if (nameAttribute == 'navindex') {
+                                            $(htmlElement).find('*[tabindex]').attr('tabindex', newAttributeValue);
+                                        } else {
+                                            ORBEON.util.Dom.setAttribute(htmlElement, nameAttribute, newAttributeValue);
+                                        }
                                     }
                                 }
 

@@ -62,9 +62,11 @@
                     value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="formatted"
                     ref="$binding"
-                    value="if (matches(., '^\d+$'))
-                           then concat('(', substring(., 1, 3), ') ', substring(., 4, 3), if (string-length() gt 6) then '-' else '', substring(., 7))
-                           else ."/>
+                    value="for $v in string(.)
+                           return
+                               if (matches($v, '^\d+$'))
+                               then concat('(', substring($v, 1, 3), ') ', substring($v, 4, 3), if (string-length($v) gt 6) then '-' else '', substring($v, 7))
+                               else $v"/>
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">
                 <xh:span class="input-append">

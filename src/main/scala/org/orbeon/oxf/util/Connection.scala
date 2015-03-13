@@ -82,7 +82,7 @@ class Connection(
                     if (scheme == "data") Option(urlConnection.getContentType) else None
 
                 def contentTypeFromPath =
-                    Option(url.getPath) flatMap Mediatypes.getMimeType
+                    Option(url.getPath) flatMap Mediatypes.findMediatype
 
                 def contentTypeHeader =
                     contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
@@ -224,7 +224,7 @@ class Connection(
 }
 
 trait ConnectionState {
-    
+
     self: Connection ⇒
 
     import org.orbeon.oxf.util.ConnectionState._
@@ -302,7 +302,7 @@ object Connection extends Logging {
     private val HttpForwardCookiesProperty             = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty             = "oxf.http.forward-headers"
     private val LegacyXFormsHttpForwardHeadersProperty = "oxf.xforms.forward-submission-headers"
-    
+
     // Create a new Connection
     def apply(
         httpMethodUpper : String,
@@ -326,7 +326,7 @@ object Connection extends Logging {
 
         connection
     }
-    
+
     // For Java callers
     def jApply(
         httpMethodUpper   : String,
@@ -555,7 +555,7 @@ object Connection extends Logging {
         cookiesToForward : List[String])(implicit
         logger           : IndentedLogger
     ): Option[(String, List[String])] = {
-        
+
         // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
         if (cookiesToForward.nonEmpty) {
 
@@ -678,7 +678,7 @@ object Connection extends Logging {
     }
 
     private def sessionCookieFromGuessLower(
-        externalContext   : ExternalContext, 
+        externalContext   : ExternalContext,
         sessionCookieName : String
     ): Option[(String, List[String])] =
         Option(externalContext.getSession(false)) map

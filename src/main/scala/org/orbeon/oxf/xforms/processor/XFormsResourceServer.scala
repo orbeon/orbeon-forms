@@ -78,10 +78,23 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                 response.setContentType(resource.contentType getOrElse "application/octet-stream")
 
                 // File name visible by the user
-                val contentFilename = resource.filename getOrElse filenameFromRequest
+                val rawFilename = resource.filename getOrElse filenameFromRequest
+
+                def addExtensionIfNeeded(filename: String) =
+                    findExtension(filename) match {
+                        case Some(_) ⇒
+                            filename
+                        case None    ⇒
+                            resource.contentType             map
+                            NetUtils.getContentTypeMediaType flatMap
+                            Mediatypes.extensionForMediatype map
+                            (filename + "." +)               getOrElse
+                            filename
+                    }
+
+                val contentFilename = addExtensionIfNeeded(rawFilename)
 
                 // Handle as attachment
-                // TODO: should try to provide extension based on mediatype if file name is not provided?
                 // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
                 response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, "UTF-8"))
 
@@ -259,7 +272,14 @@ object XFormsResourceServer {
         Option(Caches.resourcesCache.get(key)) map (_.getObjectValue.asInstanceOf[Array[String]]) orNull
 
     // Information about the resource, stored into the session
-    case class DynamicResource(uri: URI, filename: Option[String], contentType: Option[String], size: Long, lastModified: Long, headers: Map[String, List[String]])
+    case class DynamicResource(
+        uri          : URI,
+        filename     : Option[String],
+        contentType  : Option[String],
+        size         : Long,
+        lastModified : Long,
+        headers      : Map[String, List[String]]
+    )
 
     private def filename(requestPath: String) = requestPath.substring(requestPath.lastIndexOf('/') + 1)
 }

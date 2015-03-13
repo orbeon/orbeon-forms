@@ -69,4 +69,11 @@ trait PathOps {
     // Encode a sequence of pairs to a query string
     def encodeSimpleQuery(parameters: Seq[(String, String)]): String =
         parameters map { case (name, value) ⇒ encodeURL(name, "utf-8") + '=' + encodeURL(value, "utf-8") } mkString "&"
+
+    // Find a path extension
+    def findExtension(path: String): Option[String] =
+        path.lastIndexOf(".") match {
+            case -1    ⇒ None
+            case index ⇒ Some(path.substring(index + 1))
+        }
 }

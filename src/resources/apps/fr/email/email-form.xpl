@@ -165,8 +165,22 @@
                               select="for $bind in $recipient-binds return string-join(($bind/ancestor-or-self::xf:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
 
                 <!-- Extract email addresses from form if any -->
-                <xsl:variable name="email-addresses" as="xs:string*"
-                              select="for $path in $recipient-paths[normalize-space()] return $data/saxon:evaluate($path)"/>
+                <xsl:variable name="to-email-addresses"
+                              as="xs:string*"
+                              select="
+                                    for $email in
+                                        (
+                                            for $path in $recipient-paths[normalize-space()]
+                                            return tokenize(
+                                                $data/saxon:evaluate($path),
+                                                '(,|\s)\s*'
+                                            ),
+                                            xpl:property(string-join(('oxf.fr.email.to', $app, $form), '.'))
+                                        )
+                                    return
+                                        for $normalized in normalize-space($email)
+                                        return if ($normalized = '') then () else $normalized
+                              "/>
 
                 <!-- Find fr-email-subject controls and binds -->
                 <xsl:variable name="subject-controls" as="element()*"
@@ -208,18 +222,13 @@
                     </email>
                 </from>
                 <!-- Recipients -->
-                <xsl:for-each select="$email-addresses">
+                <xsl:for-each select="$to-email-addresses">
                     <to>
                         <email>
                             <xsl:value-of select="."/>
                         </email>
                     </to>
                 </xsl:for-each>
-                <to>
-                    <email>
-                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.to', $app, $form), '.'))"/>
-                    </email>
-                </to>
                 <!-- Subject -->
                 <subject>
                     <xsl:choose>

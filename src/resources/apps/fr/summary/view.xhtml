@@ -164,9 +164,10 @@
                 <!-- Don't send this to the server -->
                 <xf:bind ref="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
                 <!-- Set types so the search fields display the proper controls -->
-                <xf:bind ref="query[ends-with(@type, ':date')]" type="xf:date"/>
-                <xf:bind ref="query[ends-with(@type, ':time')]" type="xf:time"/>
+                <xf:bind ref="query[ends-with(@type, ':date')]"     type="xf:date"/>
+                <xf:bind ref="query[ends-with(@type, ':time')]"     type="xf:time"/>
                 <xf:bind ref="query[ends-with(@type, ':dateTime')]" type="xf:dateTime"/>
+                <xf:bind ref="query[ends-with(@type, ':decimal')]"  type="xf:decimal"/>
 
                 <!-- Set default value for app and form if needed -->
                 <!-- Do this declaratively so we don't depend on order of execution of submissions -->
@@ -516,9 +517,16 @@
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                             <!-- input -->
+                                            <!-- Testing on control name is not ideal, see https://github.com/orbeon/orbeon-forms/issues/2077 -->
                                             <xf:input ref=".[@control = ('input', 'inplace-input', 'output')]">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </xf:input>
+                                            <fr:number ref=".[@control = 'number']">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                            </fr:number>
+                                            <fr:currency ref=".[@control ='currency']">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                            </fr:currency>
                                             <!-- textarea -->
                                             <xf:input ref=".[@control = 'textarea']">
                                                 <xf:label mediatype="text/html" value="$label"/>
@@ -531,7 +539,7 @@
                                                     <xf:value/>
                                                 </xf:item>
                                                 <xf:itemset model="fr-persistence-model"
-                                                                ref="$form-resources/*[local-name() = $control-name]/item">
+                                                            ref="$form-resources/*[local-name() = $control-name]/item">
                                                     <xf:label ref="label"/>
                                                     <xf:value ref="value"/>
                                                 </xf:itemset>

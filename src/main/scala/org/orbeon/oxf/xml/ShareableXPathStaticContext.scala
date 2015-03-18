@@ -14,10 +14,14 @@ import org.orbeon.oxf.util.{Logging, IndentedLogger}
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which
 // is not desirable as variable resolution occurs at runtime. So here instead we create a fully shareable context.
-class ShareableXPathStaticContext(config: Configuration, namespaceMapping: NamespaceMapping, functionLibrary: FunctionLibrary)(implicit logger: IndentedLogger)
-        extends AbstractStaticContext
-        with XPathStaticContext
-        with Logging {
+class ShareableXPathStaticContext(
+    config           : Configuration,
+    namespaceMapping : NamespaceMapping,
+    functionLibrary  : FunctionLibrary)(implicit
+    logger           : IndentedLogger
+) extends AbstractStaticContext
+     with XPathStaticContext
+     with Logging {
 
     // This also creates an Executable
     setConfiguration(config)

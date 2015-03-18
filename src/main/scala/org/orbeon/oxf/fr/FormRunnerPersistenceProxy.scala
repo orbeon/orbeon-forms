@@ -18,7 +18,7 @@ import java.net.URI
 import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}
@@ -83,9 +83,9 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
+        val serviceURI = NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString)
 
-        val cxr =
-            proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
+        val cxr = proxyEstablishConnection(request, serviceURI, headers)
 
         useAndClose(cxr) { cxr ⇒
             // Proxy status code
@@ -100,7 +100,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]) = {
         // Create the absolute outgoing URL
         val outgoingURL =
-            new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE))
+            new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
 
         val persistenceHeaders =
             for ((name, value) ← headers)

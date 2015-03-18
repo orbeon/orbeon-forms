@@ -19,11 +19,11 @@ public interface URLRewriter {
     // 1: whether to produce an absolute URL (starting with "http" or "https")
     // 2: whether to leave the URL as is if it is does not start with "/"
     // 4: whether to prevent insertion of a context at the start of the path
-    static final int REWRITE_MODE_ABSOLUTE = 1;
-    static final int REWRITE_MODE_ABSOLUTE_PATH = 0;
-    static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 2;
-    static final int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
-    static final int REWRITE_MODE_ABSOLUTE_NO_CONTEXT = 5;
+    int REWRITE_MODE_ABSOLUTE = 1;
+    int REWRITE_MODE_ABSOLUTE_PATH = 0;
+    int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 2;
+    int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
+    int REWRITE_MODE_ABSOLUTE_NO_CONTEXT = 5;
 
     String rewriteRenderURL(String urlString);
     String rewriteRenderURL(String urlString, String portletMode, String windowState);

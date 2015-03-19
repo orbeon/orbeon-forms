@@ -173,7 +173,6 @@ object BindingIndex {
         )
 }
 
-
 object GlobalBindingIndex {
 
     val Empty = BindingIndex[AbstractBinding](Nil, Nil, Nil)

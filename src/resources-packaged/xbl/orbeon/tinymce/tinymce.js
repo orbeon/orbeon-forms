@@ -82,7 +82,7 @@
 
         // TinyMCE got the focus
         focus: function(event) {
-            event.target = this.container;                          // From the perspetive of the XForms engine, the focus is on the XBL component
+            event.target = this.container;                          // From the perspective of the XForms engine, the focus is on the XBL component
             Events.focus(event);                                    // Forward to the "XForms engine"
         },
 

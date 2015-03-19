@@ -230,66 +230,65 @@ object XFormsAPI {
 
     // The xf:dispatch action
     def dispatch(
-            name: String,
-            targetId: String,
-            bubbles: Boolean = true,
-            cancelable: Boolean = true,
-            properties: XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
-            delay: Int = 0,
-            showProgress: Boolean = true,
-            progressMessage: String = null): Unit = {
-
-        val target = containingDocument.getObjectByEffectiveId(targetId).asInstanceOf[XFormsEventTarget]
-
-        XFormsDispatchAction.dispatch(
-            name,
-            target,
-            bubbles,
-            cancelable,
-            properties,
-            delay,
-            showProgress,
-            progressMessage
-        )
-    }
+        name            : String,
+        targetId        : String,
+        bubbles         : Boolean = true,
+        cancelable      : Boolean = true,
+        properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
+        delay           : Int = 0,
+        showProgress    : Boolean = true,
+        progressMessage : String = null
+    ): Unit =
+        resolveAs[XFormsEventTarget](targetId) foreach {
+            XFormsDispatchAction.dispatch(
+                name,
+                _,
+                bubbles,
+                cancelable,
+                properties,
+                delay,
+                showProgress,
+                progressMessage
+            )
+        }
 
     private val SubmitEvents = Seq("xforms-submit-done", "xforms-submit-error")
 
     // xf:send
     // Send the given submission and applies the body with the resulting event if the submission completed
     def send[T](submissionId: String, properties: PropertyGetter = EmptyGetter)(body: XFormsEvent ⇒ T): Option[T] = {
+        resolveAs[XFormsModelSubmission](submissionId) flatMap { submission ⇒
 
-        val submission = containingDocument.getObjectByEffectiveId(submissionId).asInstanceOf[XFormsModelSubmission]
+            var result: Option[Try[T]] = None
 
-        var result: Option[Try[T]] = None
+            // Listener runs right away but stores the Try
+            val listener: Dispatch.EventListener = { e ⇒
+                result = Some(Try(body(e)))
+            }
 
-        // Listener runs right away but stores the Try
-        val listener: Dispatch.EventListener = { e ⇒
-            result = Some(Try(body(e)))
+            // Add both listeners
+            SubmitEvents foreach (submission.addListener(_, listener))
+
+            // Dispatch and make sure the listeners are removed
+            try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, properties))
+            finally SubmitEvents foreach (submission.removeListener(_, listener))
+
+            // - If the dispatch completed successfully and the submission started, it *should* have completed with either
+            //   `xforms-submit-done` or `xforms-submit-error`. In this case, we have called `body(event)` and return
+            //   `Option[T]` or throw an exception if `body(event)` failed.
+            // - But in particular if the xforms-submit event got canceled, we might be in a situation where no
+            //   xforms-submit-done or xforms-submit-error was dispatched. In this case, we return `None`.
+            // - If the dispatch failed for other reasons, it might have thrown an exception, which is propagated.
+
+            result map (_.get)
         }
-
-        // Add both listeners
-        SubmitEvents foreach (submission.addListener(_, listener))
-
-        // Dispatch and make sure the listeners are removed
-        try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, properties))
-        finally SubmitEvents foreach (submission.removeListener(_, listener))
-
-        // - If the dispatch completed successfully and the submission started, it *should* have completed with either
-        //   `xforms-submit-done` or `xforms-submit-error`. In this case, we have called `body(event)` and return
-        //   `Option[T]` or throw an exception if `body(event)` failed.
-        // - But in particular if the xforms-submit event got canceled, we might be in a situation where no
-        //   xforms-submit-done or xforms-submit-error was dispatched. In this case, we return `None`.
-        // - If the dispatch failed for other reasons, it might have thrown an exception, which is propagated.
-
-        result map (_.get)
     }
 
     class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
 
     // xf:send which throws a SubmitException in case of error
     def sendThrowOnError(submissionId: String, properties: PropertyGetter = EmptyGetter): Option[XFormsSubmitDoneEvent] =
-        XFormsAPI.send(submissionId, properties) {
+        send(submissionId, properties) {
             case done:  XFormsSubmitDoneEvent  ⇒ done
             case error: XFormsSubmitErrorEvent ⇒ throw new SubmitException(error)
         }

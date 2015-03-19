@@ -37,7 +37,7 @@ updateGridTd = (gridTd) ->
         elementInDiv.attr('placeholder', placeholderTextForResource[lhha])
 
 # Reads and stores the placeholder text
-updatePlacehodlerText = ->
+updatePlaceholderText = ->
     foundDifference = false
     _.each resourceNames, (lhha) ->
         newText = $(".fb-message-enter-#{lhha}").children().text()
@@ -53,9 +53,9 @@ updatePlacehodlerText = ->
 
 $ ->
     # Do initial update when the page is loaded
-    updatePlacehodlerText()
+    updatePlaceholderText()
     # Update on Ajax response in case the language changed
-    Events.ajaxResponseProcessedEvent.subscribe updatePlacehodlerText
+    Events.ajaxResponseProcessedEvent.subscribe updatePlaceholderText
 
     # When label/hint empty, show placeholder hinting users can click to edit the label/hint
     Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) ->

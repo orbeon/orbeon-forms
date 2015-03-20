@@ -1,5 +1,5 @@
 ###
-Copyright (C) 2014 Orbeon, Inc.
+Copyright (C) 2015 Orbeon, Inc.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -28,7 +28,7 @@ lhha = ->
 htmlClass = -> 'fb-' + lhha() + '-is-html'
 isLabelHintHtml = -> Builder.resourceEditorCurrentControl.is('.' + htmlClass())
 setLabelHintHtml = (isHtml) -> Builder.resourceEditorCurrentControl.toggleClass(htmlClass(), isHtml)
-annotateWithLhhaClass = (add) -> labelHintEditor().container.toggleClass('fb-label-editor-for-' + lhha(), add)
+annotateWithLhhaClass = (add) -> resourceEditor().container.toggleClass('fb-label-editor-for-' + lhha(), add)
 
 labelHintValue = (value) ->
     valueAccessor = if isLabelHintHtml() then Builder.resourceEditorCurrentLabelHint.html else Builder.resourceEditorCurrentLabelHint.text
@@ -37,25 +37,86 @@ labelHintValue = (value) ->
     if value? then valueAccessor(value) else valueAccessor()
 
 # Returns a <div> which contains the text field and checkbox
-labelHintEditor = _.memoize ->
-    # Create elements and add to the DOM
-    editor = {}
-    textfield = $('<input style="display: none" type="text">')
-    textarea  = $('<textarea style="display: none"></textarea>')
-    # End edit when users press enter in the textfield (but not the text area)
-    textfield.on('keypress', (e) -> if e.which == 13 then Builder.resourceEditorEndEdit())
-    editor.editControl = null
-    editor.selectTextInput = ->
-        editor.editControl?.hide()
-        editor.editControl = if lhha() == 'text' then textarea else textfield
-        editor.editControl.show()
-    editor.checkbox   = $('<input type="checkbox">')
-    editor.container  = $('<div class="fb-label-editor">').append(textarea).append(textfield).append(editor.checkbox)
-    editor.container.hide()
-    $('.fb-main').append(editor.container)
-    # Register event listeners
-    editor.checkbox.on('click', -> labelHintEditor().editControl.focus())
-    editor
+resourceEditor = _.memoize ->
+
+    # Create elements for editing
+    container        = $('<div   style="display: none" class="fb-label-editor">')
+    textfield        = $('<input style="display: none" type="text">')
+    checkbox         = $('<input style="display: none" type="checkbox">')
+    tinymceAnchor    = $('<div   style="display: none">')
+
+    # Nest and add to the page
+    container.append(textfield)
+             .append(checkbox)
+             .append(tinymceAnchor)
+    $('.fb-main').append(container)
+
+    # Event handlers
+    textfield.on 'keypress', (e) ->
+        # End edit when users press enter
+        if e.which == 13 then Builder.resourceEditorEndEdit()
+    checkbox.on 'click', ->
+        # When checkbox clicked, set focus back on the textfield, where it was before
+        resourceEditor().textfield.focus()
+
+    # State
+    tinymceObject = null
+
+    afterTinyMCEInitialized = (f) ->
+        if tinymceObject.initialized then f()
+#        else tinymceObject.onInit.add(f)
+        else tinymceObject.onPostRender.add(f)
+
+    # Function to initialize the TinyMCE, memoized so it runs at most once
+    initTinyMCE = _.memoize ->
+        tinymceAnchor.show()
+        tinymceAnchor.attr('id', _.uniqueId())
+        tinymceObject = new window.tinymce.Editor(tinymceAnchor.attr('id'), YAHOO.xbl.fr.Tinymce.DefaultConfig)
+        tinymceObject.render()
+        window.t = tinymceObject
+        # We don't need the anchor anymore; just used to tell TinyMCE where to go in the DOM
+        afterTinyMCEInitialized -> tinymceAnchor.detach()
+
+    # Set width of TinyMCE to the width of the container
+    # - If not yet initialized, set width on anchor, which is copied by TinyMCE to table
+    # - If already initialized, set width directly on table created by TinyMCE
+    # (Hacky, but didn't find a better way to do it)
+    setTinyMCEWidth = ->
+        tinymceTable = $(tinymceObject?.container).find('.mceLayout')
+        widthSetOn = if tinymceTable.is('*') then tinymceTable else tinymceAnchor
+        widthSetOn.width(container.outerWidth())
+
+    # Create the object we return
+    checkbox          : checkbox
+    container         : container
+    textfield         : textfield
+    getValue          : ->
+                            if lhha() == 'text' then tinymceObject.getContent()
+                            else textfield.val()
+    setValue          : (newValue) ->
+                            if lhha() == 'text'
+                                afterTinyMCEInitialized ->
+                                    tinymceObject.setContent(newValue)
+
+                            else
+                                textfield.val(newValue)
+                                textfield.focus()
+    isHTML            : ->
+                            if lhha() == 'text' then true
+                            else checkbox.is(':checked')
+    showEditControl   : ->
+                            textfield.hide()
+                            checkbox.hide()
+                            tinymceObject?.hide()
+                            if lhha() == 'text'
+                                setTinyMCEWidth()
+                                initTinyMCE()
+                                afterTinyMCEInitialized ->
+                                    tinymceObject.show()
+                                    tinymceObject.focus()
+                            else
+                                textfield.show()
+                                checkbox.show()
 
 # Show editor on click on label
 Builder.resourceEditorStartEdit = () ->
@@ -63,16 +124,16 @@ Builder.resourceEditorStartEdit = () ->
     Builder.resourceEditorCurrentLabelHint.removeAttr('for')
     # Show, position, and populate editor
     # Get position before showing editor, so showing doesn't move things in the page
+    resourceEditor().container.width(Builder.resourceEditorCurrentLabelHint.outerWidth())
+    resourceEditor().container.show()
+    resourceEditor().showEditControl()
     labelHintOffset = Builder.resourceEditorCurrentLabelHint.offset()
-    labelHintEditor().selectTextInput()
-    labelHintEditor().container.show()
-    labelHintEditor().container.offset(labelHintOffset)
-    labelHintEditor().container.width(Builder.resourceEditorCurrentLabelHint.outerWidth())
-    labelHintEditor().editControl.val(labelHintValue()).focus()
-    labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
+    resourceEditor().container.offset(labelHintOffset)
+    resourceEditor().setValue(labelHintValue())
+    resourceEditor().checkbox.prop('checked', isLabelHintHtml())
     # Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
-    labelHintEditor().checkbox.tooltip(title: $('.fb-message-lhha-checkbox').text())
-    labelHintEditor().editControl.attr('placeholder', $(".fb-message-type-#{lhha()}").text())
+    resourceEditor().checkbox.tooltip(title: $('.fb-message-lhha-checkbox').text())
+    resourceEditor().textfield.attr('placeholder', $(".fb-message-type-#{lhha()}").text())
     # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
     Builder.resourceEditorCurrentLabelHint.css('visibility', 'hidden')
     # Add class telling if this is a label or hint editor
@@ -81,23 +142,22 @@ Builder.resourceEditorStartEdit = () ->
 # Called when users press enter or tab out
 Builder.resourceEditorEndEdit = ->
     # If editor is hidden, editing has already been ended (endEdit can be called more than once)
-    if labelHintEditor().container.is(':visible')
+    if resourceEditor().container.is(':visible')
         # Send value to server, handled in FB's model.xml
-        newValue = labelHintEditor().editControl.val()
-        isChecked = labelHintEditor().checkbox.is(':checked')
+        newValue = resourceEditor().getValue()
+        isHTML = resourceEditor().isHTML()
         OD.dispatchEvent
             targetId: Builder.resourceEditorCurrentControl.attr('id')
             eventName: 'fb-update-control-lhha'
-            properties: lhha: lhha(), value: newValue, isHtml: isChecked.toString()
+            properties: lhha: lhha(), value: newValue, isHtml: isHTML.toString()
         # Destroy tooltip, or it doesn't get recreated on startEdit()
-        labelHintEditor().checkbox.tooltip('destroy')
-        labelHintEditor().container.hide()
+        resourceEditor().checkbox.tooltip('destroy')
+        resourceEditor().container.hide()
         annotateWithLhhaClass(false)
         Builder.resourceEditorCurrentLabelHint.css('visibility', '')
         # Update values in the DOM, without waiting for the server to send us the value
-        setLabelHintHtml(isChecked)
+        setLabelHintHtml(isHTML)
         labelHintValue(newValue)
         # Clean state
         Builder.resourceEditorCurrentControl = null
         Builder.resourceEditorCurrentLabelHint = null
-

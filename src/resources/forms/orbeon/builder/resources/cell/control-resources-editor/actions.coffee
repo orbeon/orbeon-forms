@@ -90,14 +90,16 @@ resourceEditor = _.memoize ->
     container         : container
     textfield         : textfield
     getValue          : ->
-                            if lhha() == 'text' then tinymceObject.getContent()
-                            else textfield.val()
+                            if lhha() == 'text'
+                                content = tinymceObject.getContent()
+                                # Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+                                if content == '<div>\xa0</div>' then '' else content
+                            else
+                                textfield.val()
     setValue          : (newValue) ->
                             if lhha() == 'text'
                                 afterTinyMCEInitialized ->
-                                    # Workaround to TinyMCE issue, see https://twitter.com/avernet/status/578986913694109696
-                                    valueSet = if newValue == '' then '<span>' else newValue
-                                    tinymceObject.setContent(valueSet)
+                                    tinymceObject.setContent(newValue)
                             else
                                 textfield.val(newValue)
                                 textfield.focus()

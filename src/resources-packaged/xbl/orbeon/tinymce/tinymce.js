@@ -73,10 +73,13 @@
 
         // Send value in MCE to server
         clientToServer: function() {
+            var content = this.myEditor.getContent();
+            // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+            if (content == '<div>\xa0</div>') content = '';
             ORBEON.xforms.Document.dispatchEvent({
                 targetId:   this.container.id,
                 eventName:  'fr-set-client-value',
-                properties: { 'fr-value': this.myEditor.getContent() }
+                properties: { 'fr-value': content }
             });
         },
 

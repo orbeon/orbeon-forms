@@ -96,8 +96,9 @@ resourceEditor = _.memoize ->
     setValue          : (newValue) ->
                             if lhha() == 'text'
                                 afterTinyMCEInitialized ->
-                                    tinymceObject.setContent(newValue)
-
+                                    # Workaround to TinyMCE issue, see https://twitter.com/avernet/status/578986913694109696
+                                    valueSet = if newValue == '' then '<span>' else newValue
+                                    tinymceObject.setContent(valueSet)
                             else
                                 textfield.val(newValue)
                                 textfield.focus()

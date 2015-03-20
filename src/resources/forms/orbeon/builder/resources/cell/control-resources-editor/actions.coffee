@@ -64,7 +64,6 @@ resourceEditor = _.memoize ->
 
     afterTinyMCEInitialized = (f) ->
         if tinymceObject.initialized then f()
-#        else tinymceObject.onInit.add(f)
         else tinymceObject.onPostRender.add(f)
 
     # Function to initialize the TinyMCE, memoized so it runs at most once

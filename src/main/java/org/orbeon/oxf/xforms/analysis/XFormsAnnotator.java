@@ -53,6 +53,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
     private int level = 0;
     private boolean inHead;         // whether we are in the HTML head
+    private boolean inBody;         // whether we are in the HTML body
     private boolean inTitle;        // whether we are in the HTML title
 
     private boolean inXForms;       // whether we are in a model or other XForms content
@@ -218,8 +219,10 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             stackElement.startElement(uri, localname, qName, attributes);
         } else {
 
+            // Only search for XBL bindings when under xh:body or if we are not at the top-level (which means that we
+            // are within an XBL component already)
             final scala.Option<IndexableBinding> bindingOpt =
-                metadata.findBindingForElement(uri, localname, attributes);
+                (inBody || ! topLevel) ? metadata.findBindingForElement(uri, localname, attributes) : NONE_INDEXABLE_BINDING;
 
             if (bindingOpt.isDefined()) {
                 // Element with a binding
@@ -258,6 +261,10 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     if ("head".equals(localname)) {
                         // Entering head
                         inHead = true;
+                    } else if ("body".equals(localname)) {
+                        // Entering body
+                        inBody = true;
+                        metadata.enterView();
                     }
                 } else if (level == 2) {
                     if (inHead && "title".equals(localname)) {
@@ -455,6 +462,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                         endPrefixMapping2(inspectorPrefix);
                     }
                 }
+
+                inBody = false;
             }
         } else if (level == 2) {
             if ("title".equals(localname)) {
@@ -562,4 +571,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
         return attributes;
     }
+
+    private static final scala.Option<IndexableBinding> NONE_INDEXABLE_BINDING = scala.Option.apply(null);
 }

@@ -25,6 +25,7 @@ import scala.collection.JavaConverters._
 
 trait BindingMetadata extends Logging {
 
+    private var inlineBindingsRefs          = List[InlineBindingRef]()
     // NOTE: Multiple prefixed ids can point to the same AbstractBinding object.
     private var bindingsByControlPrefixedId = Map[String, IndexableBinding]()
     private var bindingsPaths               = Set[String]()
@@ -32,39 +33,68 @@ trait BindingMetadata extends Logging {
 
     // ==== Annotator/Extractor API
     
-    // Preemptively ensure the XBL library is up to date
-    private var (xblIndex: BindingIndex[IndexableBinding], checkedPaths, _scripts, _styles) =
-        BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
+    private var _xblIndex          : Option[BindingIndex[IndexableBinding]] = None
+    private var _checkedPaths      : Set[String]= Set.empty
+    private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
 
-    val baselineResources = (_scripts, _styles)
+    def enterView(): Unit =
+        if (_xblIndex.isEmpty) {
 
-    def commitBindingIndex() = {
-        val cleanIndex = BindingIndex.keepBindingsWithPathOnly(xblIndex)
-        debug("committing global binding index", BindingIndex.stats(cleanIndex))
-        GlobalBindingIndex.updateIndex(cleanIndex)
-    }
+            debug("entering view")
+            
+            val (newIndex, newCheckedPaths, scripts, styles) =
+                BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
+            
+            var currentIndex = newIndex
 
-    def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit = {
+            if (inlineBindingsRefs.nonEmpty) {
+                debug(s"indexing ${inlineBindingsRefs.size} inline bindings")
 
-        debug("registering inline binding", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
+                inlineBindingsRefs foreach { inlineBinding ⇒
+                    currentIndex = BindingIndex.indexBinding(currentIndex, inlineBinding)
+                }
+                inlineBindingsRefs = Nil
+            }
+            
+            _xblIndex          = Some(currentIndex)
+            _checkedPaths      = newCheckedPaths
+            _baselineResources = (scripts, styles)
+        }
+    
+    def commitBindingIndex() =
+        _xblIndex match {
+            case Some(index) ⇒
+                val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
+                debug("committing global binding index", BindingIndex.stats(cleanIndex))
+                GlobalBindingIndex.updateIndex(cleanIndex)
+            case None ⇒
+                debug("no binding index to commit")
+        }
 
-        val binding =
-            InlineBindingRef(
-                bindingPrefixedId,
-                CSSSelectorParser.parseSelectors(elementAtt),
-                ns
-            )
+    def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit =
+        _xblIndex match {
+            case Some(_) ⇒
+                debug("ignoring inline binding after view", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
+            case None ⇒
+                debug("registering inline binding", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
+                inlineBindingsRefs ::=
+                    InlineBindingRef(
+                        bindingPrefixedId,
+                        CSSSelectorParser.parseSelectors(elementAtt),
+                        ns
+                    )
+        }
 
-        xblIndex = BindingIndex.indexBinding(xblIndex, binding)
-    }
-
-    def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] = {
+    def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
+        _xblIndex flatMap { index ⇒
 
         val (newIndex, newPaths, bindingOpt) =
-            BindingLoader.findMostSpecificBinding(xblIndex, Some(checkedPaths), uri, localname, atts)
+            BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), uri, localname, atts)
 
-        xblIndex     = newIndex
-        checkedPaths = newPaths
+        if (index ne newIndex)
+            _xblIndex = Some(newIndex)
+
+        _checkedPaths = newPaths
 
         if (debugEnabled)
             bindingOpt foreach { binding ⇒
@@ -105,44 +135,51 @@ trait BindingMetadata extends Logging {
 
     // ==== XBLBindings API
     
-    def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit = {
+    def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit =
+        _xblIndex foreach { index ⇒
 
-        val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(xblIndex, inlineXBL)
+            val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(index, inlineXBL)
 
-        debug("extracted inline XBL", List("elements" → inlineXBL.size.toString, "bindings" → newBindings.size.toString))
+            debug("extracted inline XBL", List(
+                "elements" → inlineXBL.size.toString,
+                "bindings" → newBindings.size.toString
+            ))
 
-        def replaceBindingRefs(mappings: Map[String, IndexableBinding], newBindings: List[AbstractBinding]) = {
+            def replaceBindingRefs(mappings: Map[String, IndexableBinding], newBindings: List[AbstractBinding]) = {
 
-            var currentMappings = mappings
+                var currentMappings = mappings
 
-            newBindings foreach { newBinding ⇒
+                newBindings foreach { newBinding ⇒
 
-                val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
+                    val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
 
-                currentMappings foreach {
-                    case (controlPrefixedId, ib @ InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
-                        currentMappings += controlPrefixedId → newBinding
-                    case _ ⇒
+                    currentMappings foreach {
+                        case (controlPrefixedId, ib @ InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
+                            currentMappings += controlPrefixedId → newBinding
+                        case _ ⇒
+                    }
                 }
+
+                currentMappings
             }
 
-            currentMappings
+            // Replace in bindingsByControlPrefixedId
+            bindingsByControlPrefixedId = replaceBindingRefs(bindingsByControlPrefixedId, newBindings)
+
+            // Remove InlineBindingRef if any (AbstractBinding are added by extractAndIndexFromElements)
+            if (newIndex ne index)
+                _xblIndex = Some(BindingIndex.keepAbstractBindingsOnly(newIndex))
         }
-
-        // Replace in bindingsByControlPrefixedId
-        bindingsByControlPrefixedId = replaceBindingRefs(bindingsByControlPrefixedId, newBindings)
-
-        // Remove from xblIndex (AbstractBinding are added by extractAndIndexFromElements)
-        xblIndex = BindingIndex.keepAbstractBindingsOnly(newIndex)
-    }
 
     def findBindingByPrefixedId(controlPrefixedId: String): Option[AbstractBinding] =
         bindingsByControlPrefixedId.get(controlPrefixedId) collect {
             case binding: AbstractBinding ⇒ binding
             case _                        ⇒ throw new IllegalStateException("missing binding")
         }
-    
+
     // ==== Other API
+    
+    def baselineResources = _baselineResources 
 
     def allBindingsMaybeDuplicates = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
 

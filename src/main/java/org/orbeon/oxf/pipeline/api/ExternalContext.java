@@ -31,12 +31,12 @@ import java.util.Map;
  */
 public interface ExternalContext {
 
-    static final int SC_OK = 200;
-    static final int SC_NOT_FOUND = 404;
-    static final int SC_NOT_MODIFIED = 304;
-    static final int SC_INTERNAL_SERVER_ERROR = 500;
+    int SC_OK = 200;
+    int SC_NOT_FOUND = 404;
+    int SC_NOT_MODIFIED = 304;
+    int SC_INTERNAL_SERVER_ERROR = 500;
 
-    public interface Request {
+    interface Request {
         String getContainerType();
         String getContainerNamespace();
 
@@ -89,7 +89,7 @@ public interface ExternalContext {
         Object getNativeRequest();
     }
 
-    public interface Rewriter extends URLRewriter {
+    interface Rewriter extends URLRewriter {
         String rewriteActionURL(String urlString);
         String rewriteRenderURL(String urlString);
         String rewriteActionURL(String urlString, String portletMode, String windowState);
@@ -98,7 +98,7 @@ public interface ExternalContext {
         String getNamespacePrefix();
     }
 
-    public interface Response extends Rewriter {
+    interface Response extends Rewriter {
         PrintWriter getWriter() throws IOException;
         OutputStream getOutputStream() throws IOException;
         boolean isCommitted();
@@ -135,9 +135,9 @@ public interface ExternalContext {
         Object getNativeResponse();
     }
 
-    public interface Session {
-        static final int APPLICATION_SCOPE = 1;
-        static final int PORTLET_SCOPE = 2;
+    interface Session {
+        int APPLICATION_SCOPE = 1;
+        int PORTLET_SCOPE = 2;
 
         long getCreationTime();
         String getId();
@@ -164,8 +164,8 @@ public interface ExternalContext {
     // available a session even though no request or response is available.
     Session getSession(boolean create);
 
-    public interface RequestDispatcher {
-        abstract void forward(Request request, Response response) throws IOException;
+    interface RequestDispatcher {
+        void forward(Request request, Response response) throws IOException;
         void include(Request request, Response response) throws IOException;
         boolean isDefaultContext();
     }

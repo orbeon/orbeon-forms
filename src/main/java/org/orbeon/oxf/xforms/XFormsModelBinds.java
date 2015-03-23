@@ -496,7 +496,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 // Don't consider the node invalid if the string is empty with xf:* types
                 typeValid = true;
             } else if (isBuiltInXFormsType && "email".equals(typeLocalname)) {
-                typeValid = EmailValidator.getInstance(false).isValid(nodeValue);
+                typeValid = EmailValidatorNoDomainValidation$.MODULE$.isValid(nodeValue);
             } else if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames().contains(typeLocalname)) {
                 // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
                 if (xformsValidator == null) {

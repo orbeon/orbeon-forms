@@ -13,22 +13,25 @@
 */
 package org.orbeon.oxf.xforms
 
-import collection.JavaConverters._
-import collection.{mutable ⇒ m}
 import java.{util ⇒ ju}
+
+import org.apache.commons.validator.routines.{EmailValidator, RegexValidator}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
-import org.orbeon.oxf.xforms.model.{DataModel, BindIteration, BindNode, RuntimeBind}
+import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, DataModel, RuntimeBind}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.dom4j.TypedNodeWrapper
-import org.orbeon.saxon.om.{NodeInfo, Item}
+import org.orbeon.saxon.om.{Item, NodeInfo}
+
+import scala.collection.JavaConverters._
+import scala.collection.{mutable ⇒ m}
 import scala.util.control.NonFatal
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
@@ -291,5 +294,25 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 handleMIPXPathException(e, bindNode, mip, "evaluating XForms custom bind")
                 null
         }
+    }
+}
+
+object XFormsModelBindsBase {
+
+    // Modified email validator which:
+    //
+    // 1. Doesn't check whether a TLD is known, as there are two many of those now (2015) and changing constantly.
+    // 2. Doesn't support IP addresses (we probably could, but we don't care right now).
+    //
+    object EmailValidatorNoDomainValidation extends EmailValidator(false) {
+
+        private val DomainLabelRegex = "\\p{Alnum}(?>[\\p{Alnum}-]*\\p{Alnum})*"
+        private val TopLabelRegex    = "\\p{Alpha}{2,}"
+        private val DomainNameRegex  = "^(?:" + DomainLabelRegex + "\\.)+" + "(" + TopLabelRegex + ")$"
+
+        private val DomainRegex = new RegexValidator(DomainNameRegex)
+
+        override def isValidDomain(domain: String) =
+            Option(DomainRegex.`match`(domain)) exists (_.length > 0)
     }
 }

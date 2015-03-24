@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.util.{StringConversions, NetUtils}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{NetUtils, StringConversions}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
-import org.orbeon.saxon.value.StringValue
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
 // xxf:get-request-method() as xs:string
 class XXFormsGetRequestMethod extends XFormsFunction with FunctionSupport {
@@ -79,4 +79,28 @@ trait RequestFunction extends XFormsFunction with FunctionSupport {
 
         values map asIterator getOrElse EmptyIterator.getInstance
     }
+}
+
+// xxf:username()  as xs:string? and xxf:get-remote-user() as xs:string?
+class XXFormsUsername extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+        Option(NetUtils.getExternalContext.getRequest.getUsername)
+}
+
+// xxf:user-group() as xs:string?
+class XXFormsUserGroup extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+        Option(NetUtils.getExternalContext.getRequest.getUserGroup)
+}
+
+// xxf:user-roles() as xs:string*
+class XXFormsUserRoles extends XFormsFunction with FunctionSupport {
+    override def iterate(xpathContext: XPathContext): SequenceIterator =
+        asIterator(NetUtils.getExternalContext.getRequest.getUserRoles)
+}
+
+// xxf:is-user-in-role(xs:string) as xs:boolean
+class XXFormsIsUserInRole extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+        NetUtils.getExternalContext.getRequest.isUserInRole(stringArgument(0)(xpathContext))
 }

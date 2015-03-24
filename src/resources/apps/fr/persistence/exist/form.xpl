@@ -67,7 +67,7 @@
             <xf:submission xsl:version="2.0" method="post" replace="instance"
                                resource="{{xxf:get-request-header('orbeon-exist-uri')}}?app={encode-for-uri(/request/app)}&amp;form={encode-for-uri(/request/form)}">
                 <xf:insert event="xforms-submit-done" ref="/*" origin="xxf:element('forms', *)"/>
-                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
             </xf:submission>
         </p:input>
         <p:output name="response" ref="data"/>

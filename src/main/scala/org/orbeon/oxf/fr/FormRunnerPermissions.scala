@@ -112,6 +112,7 @@ trait FormRunnerPermissions {
                 val group    = headerOption(HeaderGroupPropertyName)    map (_.head)
 
                 // Roles: all headers with the given name are used, each header value is split, and result combined
+                // See also: https://github.com/orbeon/orbeon-forms/issues/1690
                 val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
 
                 (username, group, roles)
@@ -265,13 +266,8 @@ trait FormRunnerPermissions {
         }
     }
 
-    def orbeonRoles: Set[String] = {
-        val request = NetUtils.getExternalContext.getRequest
-        // Split header values on commas, in case the incoming header was not processed, see:
-        // https://github.com/orbeon/orbeon-forms/issues/1690
-        request.getHeaderValuesMap.asScala.getOrElse(OrbeonRolesHeaderName, Array.empty[String]) flatMap
-                (ScalaUtils.split[Array](_, ",")) toSet
-    }
+    def orbeonRoles: Set[String] =
+        NetUtils.getExternalContext.getRequest.getUserRoles.to[Set]
 
     def orbeonRolesSequence: SequenceIterator =
         orbeonRoles.iterator map stringToStringValue

@@ -634,11 +634,11 @@ object Connection extends Logging {
     }
 
     private def sessionCookieFromIncomingLower(
-        externalContext  : ExternalContext,
-        nativeRequest    : HttpServletRequest,
-        cookiesToForward : List[String],
-        sessionCookieName: String)(implicit
-        logger           : IndentedLogger
+        externalContext   : ExternalContext,
+        nativeRequest     : HttpServletRequest,
+        cookiesToForward  : List[String],
+        sessionCookieName : String)(implicit
+        logger            : IndentedLogger
     ): Option[(String, List[String])] = {
 
         def requestedSessionIdMatches =

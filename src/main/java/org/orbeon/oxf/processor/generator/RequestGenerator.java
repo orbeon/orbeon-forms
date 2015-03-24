@@ -367,7 +367,8 @@ public class RequestGenerator extends ProcessorImpl {
         addTextElement(requestElement, "path-info", request.getPathInfo());
         addTextElement(requestElement, "path-translated", request.getPathTranslated());
         addTextElement(requestElement, "query-string", request.getQueryString());
-        addTextElement(requestElement, "remote-user", request.getRemoteUser());
+        addTextElement(requestElement, "remote-user", request.getUsername());
+        // NOTE: We could output username, user-group, user-roles, but those are already present as headers.
         addTextElement(requestElement, "requested-session-id", request.getRequestedSessionId());
         addTextElement(requestElement, "request-uri", request.getRequestURI());
         addTextElement(requestElement, "request-url", request.getRequestURL());

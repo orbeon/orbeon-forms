@@ -286,8 +286,20 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/remote-host");
         }
 
-        public String getRemoteUser() {
-            return XPathUtils.selectStringValueNormalize(requestDocument, "/*/remote-user");
+        public String getUsername() {
+            return XPathUtils.selectStringValueNormalize(requestDocument, "/*/username");
+        }
+
+        public String getUserGroup() {
+            return XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-group");
+        }
+
+        public String[] getUserRoles() {
+            final String rolesOrNull = XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-roles");
+            if (rolesOrNull == null)
+                return new String[0];
+            else
+                return rolesOrNull.split("\\s+");
         }
 
         public Session getSession(boolean create) {

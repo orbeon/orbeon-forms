@@ -155,8 +155,28 @@ public class Portlet2ExternalContext implements ExternalContext {
             return portletRequest.getAuthType();
         }
 
-        public String getRemoteUser() {
-            return portletRequest.getRemoteUser();
+        public String getUsername() {
+            final String[] headers = getHeaderValuesMap().get(Headers.OrbeonUsernameLower());
+            if (headers == null || headers.length == 0)
+                return portletRequest.getRemoteUser();
+            else
+                return headers[0];
+        }
+
+        public String getUserGroup() {
+            final String[] headers = getHeaderValuesMap().get(Headers.OrbeonGroupLower());
+            if (headers == null || headers.length == 0)
+                return null;
+            else
+                return headers[0];
+        }
+
+        public String[] getUserRoles() {
+            final String[] headers = getHeaderValuesMap().get(Headers.OrbeonRolesLower());
+            if (headers == null || headers.length == 0)
+                return new String[0];
+            else
+                return headers;
         }
 
         public boolean isSecure() {
@@ -164,6 +184,13 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public boolean isUserInRole(String role) {
+
+            final String[] roles = getUserRoles();
+            for (final String r : roles)
+                if (r.equals(role))
+                    return true;
+
+            // Delegate in last resort, but should we do it?
             return portletRequest.isUserInRole(role);
         }
 

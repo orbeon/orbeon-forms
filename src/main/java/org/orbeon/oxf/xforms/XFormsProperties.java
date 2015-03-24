@@ -341,13 +341,13 @@ public class XFormsProperties {
         final String additionalElementNamespacesStr = Properties.instance().getPropertySet().getString
                 (ADDITIONAL_AVT_ELEMENT_NAMESPACES);
 
-        return additionalElementNamespacesStr != null?additionalElementNamespacesStr.split("\\s"):EMPTY_STRING_ARRAY;
+        return additionalElementNamespacesStr != null ? additionalElementNamespacesStr.split("\\s+") : EMPTY_STRING_ARRAY;
     }
 
     public static String[] getAdditionalRefIdAttributeNames() {
         String additionalRefIdAttributeNames = Properties.instance().getPropertySet().getString
                 (ADDITIONAL_REF_ID_ATTRIBUTE_NAMES);
-        return additionalRefIdAttributeNames != null?additionalRefIdAttributeNames.split("\\s"):EMPTY_STRING_ARRAY;
+        return additionalRefIdAttributeNames != null ? additionalRefIdAttributeNames.split("\\s+") : EMPTY_STRING_ARRAY;
     }
 
     public static boolean isMinimalResources() {

@@ -132,7 +132,7 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
     }
 
     public String getRemoteUser() {
-        return request.getRemoteUser();
+        return request.getUsername();
     }
 
     public String getRequestedSessionId() {

@@ -163,7 +163,7 @@ trait FormRunnerSupport {
             <server-port>8080</server-port>
             <is-secure>false</is-secure>
             <auth-type>BASIC</auth-type>
-            <remote-user>jdoe</remote-user>
+            <username>jdoe</username>
             <context-path>/orbeon</context-path>
             <headers>
                 <header>

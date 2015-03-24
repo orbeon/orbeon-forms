@@ -53,14 +53,14 @@ public class RequestSecurityGenerator extends ProcessorImpl {
                     } else {
                         addElement(xmlReceiver, "secure", "false");
                     }
-                    addElement(xmlReceiver, "remote-user", request.getRemoteUser());
+                    addElement(xmlReceiver, "remote-user", request.getUsername());
                     {
                         final Principal principal = request.getUserPrincipal();
                         if (principal != null) {
                             addElement(xmlReceiver, "user-principal", principal.getName());
                         }
                     }
-
+                    // NOTE: We could output username, user-group, user-roles, but those are already present as headers.
                     for (Iterator i = XPathUtils.selectIterator(config, "/config/role"); i.hasNext();) {
                         Node node = (Node) i.next();
                         String nodeString = XPathUtils.selectStringValueNormalize(node, ".");

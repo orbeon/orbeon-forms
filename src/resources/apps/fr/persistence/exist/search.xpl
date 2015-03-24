@@ -95,7 +95,7 @@
                                replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xf:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>
-                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
             </xf:submission>
         </p:input>
         <p:output name="data" id="submission"/>

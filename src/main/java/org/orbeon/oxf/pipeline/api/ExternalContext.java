@@ -71,8 +71,13 @@ public interface ExternalContext {
 
         String getAuthType();
         boolean isSecure();
-        String getRemoteUser();
+
+        // NOTE: Consider using a class such as `Credentials` (there is one in used in test code).
+        String getUsername();
+        String getUserGroup();
+        String[] getUserRoles();
         boolean isUserInRole(String role);
+
         Principal getUserPrincipal();
 
         Locale getLocale();

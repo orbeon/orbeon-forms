@@ -222,8 +222,28 @@ public class ServletExternalContext implements ExternalContext  {
             return nativeRequest.getAuthType();
         }
 
-        public String getRemoteUser() {
-            return nativeRequest.getRemoteUser();
+        public String getUsername() {
+            final String[] headers = getHeaderValuesMap().get(Headers.OrbeonUsernameLower());
+            if (headers == null || headers.length == 0)
+                return nativeRequest.getRemoteUser();
+            else
+                return headers[0];
+        }
+
+        public String getUserGroup() {
+            final String[] headers = getHeaderValuesMap().get(Headers.OrbeonGroupLower());
+            if (headers == null || headers.length == 0)
+                return null;
+            else
+                return headers[0];
+        }
+
+        public String[] getUserRoles() {
+            final String[] headers = getHeaderValuesMap().get(Headers.OrbeonRolesLower());
+            if (headers == null || headers.length == 0)
+                return new String[0];
+            else
+                return headers;
         }
 
         public boolean isSecure() {
@@ -231,6 +251,13 @@ public class ServletExternalContext implements ExternalContext  {
         }
 
         public boolean isUserInRole(String role) {
+
+            final String[] roles = getUserRoles();
+            for (final String r : roles)
+                if (r.equals(role))
+                    return true;
+
+            // Delegate in last resort, but should we do it?
             return nativeRequest.isUserInRole(role);
         }
 

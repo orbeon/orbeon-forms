@@ -35,12 +35,12 @@ import java.{util ⇒ ju}
 // - RequestDispatcherSubmission
 //
 class LocalRequest(
-    incomingRequest        : Request,
-    contextPath            : String,
-    pathQuery              : String,
-    methodUpper            : String,
-    headersMaybeCapitalized: Map[String, List[String]],
-    content                : Option[StreamedContent]
+    incomingRequest         : Request,
+    contextPath             : String,
+    pathQuery               : String,
+    methodUpper             : String,
+    headersMaybeCapitalized : Map[String, List[String]],
+    content                 : Option[StreamedContent]
 ) extends Request {
 
     require(StringUtils.isAllUpperCase(methodUpper))
@@ -50,11 +50,12 @@ class LocalRequest(
 
     private val _headersIncludingAuthBodyLowercase = {
 
-        def userGroupRoleHeadersIterator = {
-            incomingRequest.getHeaderValuesMap.asScala.iterator collect {
-                case (k, v) if LocalRequest.UserGroupRolesHeadersLower(k.toLowerCase) ⇒ k → v.toList
-            }
-        }
+        def userGroupRoleHeadersIterator =
+            Iterator(
+                Option(incomingRequest.getUsername)                      map (Headers.OrbeonUsernameLower → List(_)),
+                Option(incomingRequest.getUserGroup)                     map (Headers.OrbeonGroupLower    → List(_)),
+                Option(incomingRequest.getUserRoles) filter (_.nonEmpty) map (Headers.OrbeonRolesLower    → _.to[List])
+            ).flatten
 
         def bodyHeadersIterator =
             if (Connection.requiresRequestBody(methodUpper)) {
@@ -210,13 +211,11 @@ class LocalRequest(
     def getRequestedSessionId                   = incomingRequest.getRequestedSessionId
 
     // User information is preserved
-    def getRemoteUser                           = incomingRequest.getRemoteUser
+    def getUsername                             = incomingRequest.getUsername
+    def getUserRoles                            = incomingRequest.getUserRoles
+    def getUserGroup                            = incomingRequest.getUserGroup
+    def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
+
     def getUserPrincipal                        = incomingRequest.getUserPrincipal
     def getAuthType                             = incomingRequest.getAuthType
-    def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
-}
-
-private object LocalRequest {
-    val UserGroupRolesHeadersLower =
-        Set(Headers.OrbeonUsernameLower, Headers.OrbeonGroupLower, Headers.OrbeonRolesLower)
 }

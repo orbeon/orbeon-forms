@@ -59,8 +59,8 @@ private object HttpRequest {
             val credentialHeaders = credentials.map(c ⇒ List(
                 OrbeonUsernameHeaderName → List(c.username),
                 OrbeonGroupHeaderName    → List(c.group),
-                OrbeonRolesHeaderName    → List(c.roles.mkString(","))// split on commas as for other HTTP headers
-            )).toSeq.flatten
+                OrbeonRolesHeaderName    → c.roles.to[List]
+            )).to[List].flatten
 
             Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = documentURL.getScheme,

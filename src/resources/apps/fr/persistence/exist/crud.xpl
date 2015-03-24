@@ -162,7 +162,7 @@
                                                 }&amp;groupname={ /*/groupname
                                                 }&amp;method={    /*/method
                                                 }">
-                        <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                        <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                     </xf:submission>
                 </p:input>
                 <p:output name="response" id="exist-result"/>
@@ -210,6 +210,15 @@
                         </url>
                         <!-- Produce binary so we do our own XML parsing -->
                         <mode>binary</mode>
+                        <xsl:for-each select="'Orbeon-Username', 'Orbeon-Group', 'Orbeon-Roles'">
+                            <xsl:variable name="name" select="."/>
+                            <xsl:for-each select="p:get-request-header($name)">
+                                <header>
+                                    <name><xsl:value-of select="$name"/></name>
+                                    <value><xsl:value-of select="."/></value>
+                                </header>
+                            </xsl:for-each>
+                        </xsl:for-each>
                     </config>
                 </p:input>
                 <p:output name="data" id="document"/>
@@ -241,7 +250,7 @@
                             <xf:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
                                     resource="{/*/exist-uri}/{/*/path}">
-                                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                                <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
                         <p:input name="request" href="#request-description"/>
@@ -256,7 +265,7 @@
                         <p:input name="submission">
                             <xf:submission method="delete" replace="none" serialization="none"
                                     resource="{/*/exist-uri}/{/*/path}">
-                                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                                <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
                         <p:input name="request" href="#request-description"/>
@@ -271,7 +280,7 @@
                         <p:input name="submission">
                             <xf:submission ref="/*/*[1]" method="put" replace="none"
                                     resource="{/root/request-description/exist-uri}/{/root/request-description/path}">
-                                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+                                <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
                         <p:input name="request" href="aggregate('root', #instance, #request-description)"/>

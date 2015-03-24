@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.servlet
 
-import collection.JavaConversions._
-import javax.servlet.http.{HttpServletRequestWrapper, HttpServletRequest}
-import org.orbeon.oxf.fr.FormRunner
 import java.util.{Enumeration ⇒ JEnumeration}
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
+
+import org.orbeon.oxf.fr.FormRunnerAuth
+
+import scala.collection.JavaConversions._
 
 /**
  * This filter adds the Orbeon-Username and Orbeon-Roles to the request headers.
@@ -29,7 +31,7 @@ class FormRunnerRequestFilter extends RequestFilter {
             case array   ⇒ Some(array)
         }
 
-        val headers = FormRunner.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
+        val headers = FormRunnerAuth.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
 
         trait CustomHeaders extends HttpServletRequestWrapper {
             override def getHeaderNames =

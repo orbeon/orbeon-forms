@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fr.relational.crud
 
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
+import org.orbeon.oxf.fr.FormRunnerAuth._
 import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.FormRunnerPermissions._
 
 case class DataPart(isDraft: Boolean, documentId: String)
 case class Request(provider: String, app: String, form: String, filename: Option[String], version: Version, dataPart: Option[DataPart]) {

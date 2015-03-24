@@ -13,20 +13,21 @@
  */
 package org.orbeon.oxf.portlet
 
-import liferay.FormRunnerRequestFilter
-import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.junit.Test
-import java.lang.String
-import collection.JavaConversions._
-import org.scalatest.mock.MockitoSugar
+import java.util.Arrays
 import javax.portlet.PortletRequest
 import javax.portlet.filter.PortletRequestWrapper
-import org.mockito.Mockito
+
 import com.liferay.portal.model.{Group, Role, User}
-import java.util.Arrays
-import collection.immutable.TreeMap
-import org.orbeon.oxf.fr.FormRunnerPermissions._
+import org.junit.Test
+import org.mockito.Mockito
+import org.orbeon.oxf.fr.FormRunnerAuth._
+import org.orbeon.oxf.portlet.liferay.FormRunnerRequestFilter
+import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.mock.MockitoSugar
+
+import scala.collection.JavaConversions._
+import scala.collection.immutable.TreeMap
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 

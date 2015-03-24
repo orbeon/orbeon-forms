@@ -13,15 +13,17 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import collection.JavaConverters._
-import collection.JavaConversions.asJavaEnumeration
-import com.liferay.portal.model.User
-import com.liferay.portal.util.PortalUtil
 import javax.portlet._
 import javax.portlet.filter._
-import org.orbeon.oxf.fr.FormRunner
+
+import com.liferay.portal.model.User
+import com.liferay.portal.util.PortalUtil
+import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.RequestFilter
 import org.orbeon.oxf.util.ScalaUtils
+
+import scala.collection.JavaConversions.asJavaEnumeration
+import scala.collection.JavaConverters._
 
 /**
  * Custom request filter for Liferay.
@@ -63,7 +65,7 @@ class FormRunnerRequestFilter extends RequestFilter {
             }
 
             // 3. Result is all new headers
-            liferayUserRolesHeaders ++ FormRunner.getUserGroupRolesAsHeaders(portletRequest, getCombine)
+            liferayUserRolesHeaders ++ FormRunnerAuth.getUserGroupRolesAsHeaders(portletRequest, getCombine)
         }
 
         // Wrap incoming request depending on request type and add to existing properties

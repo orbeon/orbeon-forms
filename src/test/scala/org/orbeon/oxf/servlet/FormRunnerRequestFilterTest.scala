@@ -13,15 +13,17 @@
  */
 package org.orbeon.oxf.servlet
 
+import java.util.{Enumeration ⇒ JEnumeration}
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
+
+import org.junit.Test
+import org.orbeon.oxf.fr.FormRunnerAuth._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
-import org.junit.Test
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
-import collection.JavaConversions._
-import collection.immutable.TreeMap
-import java.util.{Enumeration ⇒ JEnumeration}
-import org.orbeon.oxf.fr.FormRunnerPermissions._
+
+import scala.collection.JavaConversions._
+import scala.collection.immutable.TreeMap
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 

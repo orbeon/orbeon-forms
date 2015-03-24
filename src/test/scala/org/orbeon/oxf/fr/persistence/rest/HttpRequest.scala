@@ -17,7 +17,7 @@ import java.io.ByteArrayOutputStream
 import java.net.URI
 
 import org.dom4j.Document
-import org.orbeon.oxf.fr.FormRunnerPermissions._
+import org.orbeon.oxf.fr.FormRunnerAuth._
 import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.ScalaUtils._

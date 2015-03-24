@@ -208,6 +208,18 @@
                 <dispatcher>REQUEST</dispatcher>
             </filter-mapping>
 
+            <xsl:comment>Add internal Orbeon-* headers for auth</xsl:comment>
+            <filter>
+                <filter-name>orbeon-form-runner-auth-servlet-filter</filter-name>
+                <filter-class>org.orbeon.oxf.servlet.FormRunnerAuthFilter</filter-class>
+            </filter>
+            <filter-mapping>
+                <filter-name>orbeon-form-runner-auth-servlet-filter</filter-name>
+                <url-pattern>/*</url-pattern>
+                <dispatcher>REQUEST</dispatcher>
+                <dispatcher>FORWARD</dispatcher>
+            </filter-mapping>
+
             <xsl:comment>All JSP files under /xforms-jsp go through the XForms filter</xsl:comment>
             <filter>
                 <filter-name>orbeon-xforms-filter</filter-name>

@@ -35,17 +35,6 @@ import java.util.*;
  */
 public class Portlet2ExternalContext implements ExternalContext {
 
-    private static RequestFilter requestFilter;
-    static {
-        try {
-            final Class<? extends RequestFilter> customContextClass
-                    = (Class<? extends RequestFilter>) Class.forName("org.orbeon.oxf.portlet.liferay.FormRunnerRequestFilter");
-            requestFilter = customContextClass.newInstance();
-        } catch (Exception e) {
-            // Silently ignore as this typically means that we are not in Liferay
-        }
-    }
-
     private ExternalContext.Request request;
     private ExternalContext.Response response;
     private ExternalContext.Session session;
@@ -59,17 +48,7 @@ public class Portlet2ExternalContext implements ExternalContext {
     Portlet2ExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, PortletRequest portletRequest, boolean amendRequest) {
         this.webAppContext = webAppContext;
         this.pipelineContext = pipelineContext;
-
-        // Wrap request if needed
-        if (amendRequest && requestFilter != null) {
-            try {
-                this.portletRequest = requestFilter.amendRequest(portletRequest);
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
-        } else {
-            this.portletRequest = portletRequest;
-        }
+        this.portletRequest = portletRequest;
 
         if (portletRequest instanceof ClientDataRequest)
             this.clientDataRequest = (ClientDataRequest) portletRequest;

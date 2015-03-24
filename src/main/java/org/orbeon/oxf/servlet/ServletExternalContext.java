@@ -16,7 +16,10 @@ package org.orbeon.oxf.servlet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.*;
+import org.orbeon.oxf.externalcontext.ServletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.externalcontext.ServletURLRewriter;
+import org.orbeon.oxf.externalcontext.URLRewriter;
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -53,17 +56,6 @@ public class ServletExternalContext implements ExternalContext  {
     public static final String HTTP_NOCACHE_CACHE_HEADERS_PROPERTY  = "oxf.http.nocache.cache-headers";
 
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
-
-    private static RequestFilter requestFilter;
-    static {
-        try {
-            final Class<? extends RequestFilter> customContextClass
-                    = (Class<? extends RequestFilter>) Class.forName("org.orbeon.oxf.servlet.FormRunnerRequestFilter");
-            requestFilter = customContextClass.newInstance();
-        } catch (Exception e) {
-            // Silently ignore as this typically means that we are not in Liferay
-        }
-    }
 
     private static String defaultFormCharset;
     private static Map<String, String> pageCacheHeaders;
@@ -710,18 +702,7 @@ public class ServletExternalContext implements ExternalContext  {
     public ServletExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, HttpServletRequest request, HttpServletResponse response) {
         this.webAppContext = webAppContext;
         this.pipelineContext = pipelineContext;
-
-        // Wrap request if needed
-        if (requestFilter != null) {
-            try {
-                this.nativeRequest = requestFilter.amendRequest(request);
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
-        } else {
-            this.nativeRequest = request;
-        }
-
+        this.nativeRequest = request;
         this.nativeResponse = response;
     }
 

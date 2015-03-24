@@ -21,7 +21,7 @@ import com.liferay.portal.model.{Group, Role, User}
 import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.oxf.fr.FormRunnerAuth._
-import org.orbeon.oxf.portlet.liferay.FormRunnerRequestFilter
+import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
@@ -62,7 +62,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         Mockito when mockUser.getRoles        thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
         Mockito when mockUser.getGroup        thenReturn mockGroup
 
-        val amendedRequest = (new FormRunnerRequestFilter).amendRequest(mockRequest, mockUser)
+        val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest, mockUser)
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedProperties = initialProperties ++ Map(

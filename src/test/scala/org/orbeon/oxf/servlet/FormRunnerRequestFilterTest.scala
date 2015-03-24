@@ -45,7 +45,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
             override def getHeaderNames= initialHeaders.keysIterator
         }
 
-        val amendedRequest = (new FormRunnerRequestFilter).amendRequest(mockRequest)
+        val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest)
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedHeaders = initialHeaders ++ Map(

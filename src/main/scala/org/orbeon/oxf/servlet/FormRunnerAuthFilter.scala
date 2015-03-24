@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2015 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,17 +13,26 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.util.{Enumeration ⇒ JEnumeration}
+import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 
 import org.orbeon.oxf.fr.FormRunnerAuth
 
 import scala.collection.JavaConversions._
 
-/**
- * This filter adds the Orbeon-Username and Orbeon-Roles to the request headers.
- */
-class FormRunnerRequestFilter extends RequestFilter {
+class FormRunnerAuthFilter extends Filter {
+    
+    def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) =
+        chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+
+    def init(filterConfig: FilterConfig) = ()
+    def destroy() = ()
+}
+
+object FormRunnerAuthFilter {
+
+    import java.util.{Enumeration ⇒ JEnumeration}
+
     def amendRequest(servletRequest: HttpServletRequest) = {
 
         def getHeader(name: String) = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {

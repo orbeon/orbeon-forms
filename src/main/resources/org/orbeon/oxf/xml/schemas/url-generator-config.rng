@@ -101,9 +101,11 @@
                             <element name="name">
                                 <data type="string"/>
                             </element>
-                            <element name="value">
-                                <data type="string"/>
-                            </element>
+                            <oneOrMore>
+                                <element name="value">
+                                    <data type="string"/>
+                                </element>
+                            </oneOrMore>
                         </element>
                     </zeroOrMore>
                     <optional>

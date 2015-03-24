@@ -111,14 +111,45 @@ public class URLGenerator extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical,
-                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, List<String> readHeaders,
-                      boolean cacheUseLocalCache, boolean enableConditionalGET) {
-        this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
-                forceEncoding, ignoreConnectionEncoding, parserConfiguration, handleLexical, mode,
-                headerNameValues, forwardHeaders, readHeaders,
-                cacheUseLocalCache, enableConditionalGET, null, null, DEFAULT_PREEMPTIVE_AUTHENTICATION, null, new TidyConfig(null)));
+    public URLGenerator(URL url,
+        String contentType,
+        boolean forceContentType,
+        String encoding,
+        boolean forceEncoding,
+        boolean ignoreConnectionEncoding,
+        XMLParsing.ParserConfiguration parserConfiguration,
+        boolean handleLexical,
+        String mode,
+        scala.collection.immutable.Map<String, String[]> headerNameValues,
+        String forwardHeaders,
+        List<String> readHeaders,
+        boolean cacheUseLocalCache,
+        boolean enableConditionalGET
+    ) {
+        this.localConfigURIReferences =
+            new ConfigURIReferences(
+                new Config(
+                    url,
+                    contentType,
+                    forceContentType,
+                    encoding,
+                    forceEncoding,
+                    ignoreConnectionEncoding,
+                    parserConfiguration,
+                    handleLexical,
+                    mode,
+                    headerNameValues,
+                    forwardHeaders,
+                    readHeaders,
+                    cacheUseLocalCache,
+                    enableConditionalGET,
+                    null,
+                    null,
+                    DEFAULT_PREEMPTIVE_AUTHENTICATION,
+                    null,
+                    new TidyConfig(null)
+                )
+            );
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -129,7 +160,7 @@ public class URLGenerator extends ProcessorImpl {
         private String encoding;
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
-        private Map<String, String[]> headerNameValues;
+        private scala.collection.immutable.Map<String, String[]> headerNameValues;
         private String forwardHeaders;
         private List<String> readHeaders;
         private XMLParsing.ParserConfiguration parserConfiguration = null;
@@ -167,11 +198,26 @@ public class URLGenerator extends ProcessorImpl {
             this.tidyConfig = new TidyConfig(null);
         }
 
-        public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, XMLParsing.ParserConfiguration parserConfiguration,
-                      boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
-                      List<String> readHeaders, boolean cacheUseLocalCache, boolean enableConditionalGET, String username,
-                      String password, boolean preemptiveAuth, String domain, TidyConfig tidyConfig) {
+        public Config(URL url,
+              String contentType,
+              boolean forceContentType,
+              String encoding,
+              boolean forceEncoding,
+              boolean ignoreConnectionEncoding,
+              XMLParsing.ParserConfiguration parserConfiguration,
+              boolean handleLexical,
+              String mode,
+              scala.collection.immutable.Map<String, String[]> headerNameValues,
+              String forwardHeaders,
+              List<String> readHeaders,
+              boolean cacheUseLocalCache,
+              boolean enableConditionalGET,
+              String username,
+              String password,
+              boolean preemptiveAuth,
+              String domain,
+              TidyConfig tidyConfig
+        ) {
 
             this.url = url;
             this.contentType = contentType;
@@ -245,7 +291,7 @@ public class URLGenerator extends ProcessorImpl {
             return mode;
         }
 
-        public Map<String, String[]> getHeaderNameValues() {
+        public scala.collection.immutable.Map<String, String[]> getHeaderNameValues() {
             return headerNameValues;
         }
 
@@ -343,19 +389,8 @@ public class URLGenerator extends ProcessorImpl {
                                 throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
 
                             // Get headers
-                            Map<String, String[]> headerNameValues = null;
-                            for (Object o: configElement.selectNodes("/config/header")) {
-                                final Element currentHeaderElement = (Element) o;
-                                final String currentHeaderName = currentHeaderElement.element("name").getStringValue();
-                                final String currentHeaderValue = currentHeaderElement.element("value").getStringValue();
-
-                                if (headerNameValues == null) {
-                                    // Lazily create collections
-                                    headerNameValues = new LinkedHashMap<String, String[]>();
-                                }
-
-                                headerNameValues.put(currentHeaderName, new String[]{currentHeaderValue});
-                            }
+                            final scala.collection.immutable.Map<String, String[]> headerNameValues =
+                                URLGeneratorBase.extractHeaders(configElement);
 
                             final String forwardHeaders; {
                                 // Get from configuration first, otherwise use global default
@@ -896,17 +931,8 @@ public class URLGenerator extends ProcessorImpl {
             if (connectionResult == null) {
                 // TODO: pass logging callback
 
-                final Map<String, String[]> newHeaders;
-                if (lastModified != null) {
-                    // A conditional GET is requested
-                    newHeaders = new HashMap<String, String[]>();
-                    if (config.getHeaderNameValues() != null)
-                        newHeaders.putAll(config.getHeaderNameValues());
-                    newHeaders.put("If-Modified-Since", new String[] { DateUtils.RFC1123Date().print(lastModified) });
-                } else {
-                    // Regular GET
-                    newHeaders = config.getHeaderNameValues();
-                }
+                final Map<String, String[]> newHeaders =
+                    URLGeneratorBase.setIfModifiedIfNeeded(config.getHeaderNameValues(), lastModified);
 
                 final Credentials credentials = config.getUsername() == null ?
                     null :
@@ -997,7 +1023,7 @@ public class URLGenerator extends ProcessorImpl {
 
         private void checkStatusCode() throws IOException {
             if (isFailureStatusCode())
-                throw new HttpStatusCodeException(getConnectionStatusCode(), Option.<String>apply(config.getURL().toExternalForm()), Option.<Throwable>apply(null));
+                throw new HttpStatusCodeException(getConnectionStatusCode(), Option.apply(config.getURL().toExternalForm()), Option.<Throwable>apply(null));
         }
     }
 

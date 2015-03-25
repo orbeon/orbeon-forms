@@ -208,7 +208,7 @@ trait ModelContainer {
         else
             None
 
-    def restoreModelsState(): Unit = {
+    def restoreModelsState(deferRRR: Boolean): Unit = {
         // Handle this container only
 
         // 1: Restore all instances
@@ -218,7 +218,7 @@ trait ModelContainer {
         // 2: Restore everything else
         // NOTE: It's important to do this as a separate step, because variables which might refer to other models' instances.
         for (model ← _models)
-            model.restoreState()
+            model.restoreState(deferRRR)
     }
 }
 

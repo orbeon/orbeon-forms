@@ -334,19 +334,19 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     /**
      * Restore the state of the model when the model object was just recreated.
      */
-    public void restoreState() {
+    public void restoreState(boolean deferRRR) {
         // Ensure schema are loaded
         schemaValidator();
 
         // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
-        deferredActionContext().markRebuild();
-
         // TODO: We used to not redo recalculations upon state restore. Does this cause a problem? Shouldn't
         // recalculations not depend on the number of times they run anyway?
-        deferredActionContext().markRecalculateRevalidate();
+        deferredActionContext().markStructuralChange();
 
-        doRebuild();
-        doRecalculateRevalidate(false);
+        if (! deferRRR) {
+            doRebuild();
+            doRecalculateRevalidate(false);
+        }
     }
 
     /**

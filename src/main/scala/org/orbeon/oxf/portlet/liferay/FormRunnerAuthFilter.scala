@@ -48,10 +48,9 @@ class FormRunnerAuthFilter
 
 object FormRunnerAuthFilter {
 
+    // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to either
+    // userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the user.
     def amendRequest[T <: PortletRequest](req: T): T =
-        // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to
-        // either userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the
-        // user.
         PortalUtil.getUser(PortalUtil.getHttpServletRequest(req)) match {
             case user: User ⇒ amendRequest(req, user)
             case _          ⇒ req
@@ -60,20 +59,24 @@ object FormRunnerAuthFilter {
     // Public for unit tests
     def amendRequest[T <: PortletRequest](req: T, user: User): T = {
 
-        val liferayUserRolesHeaders =
+        val liferayUserHeaders =
             LiferaySupport.userHeaders(user) map
                 { case (name, value) ⇒ name.toLowerCase → Array(value) } toMap
 
-        val reqWithCustomLiferayHeaders = wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserRolesHeaders)
+        // First wrap clears and sets Liferay user headers
+        val reqWithCustomLiferayUserHeaders =
+            wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)
 
         def getHeader(s: String) = req.getProperties(s).asScala.toArray match {
             case Array() ⇒ None
             case array   ⇒ Some(array)
         }
 
-        val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(req, getHeader).toMap
+        val authHeaders =
+            FormRunnerAuth.getUserGroupRolesAsHeaders(req, getHeader).toMap
 
-        wrap(reqWithCustomLiferayHeaders, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
+        // Second wrap clears and set Orbeon auth headers
+        wrap(reqWithCustomLiferayUserHeaders, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
     }
 
     private def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, Array[String]]): T = {
@@ -83,14 +86,13 @@ object FormRunnerAuthFilter {
             override val headersToPrepend = prepend
         }
 
-        (
-            req match {
-                case r: RenderRequest   ⇒ new RenderRequestWrapper(r)   with CustomProperties
-                case r: ActionRequest   ⇒ new ActionRequestWrapper(r)   with CustomProperties
-                case r: ResourceRequest ⇒ new ResourceRequestWrapper(r) with CustomProperties
-                case r: EventRequest    ⇒ new EventRequestWrapper(r)    with CustomProperties
-                case r: PortletRequest  ⇒ new PortletRequestWrapper(r)  with CustomProperties
-            }
-        ).asInstanceOf[T] // We can prove that the types work out for us ;)
-    }
+        req match {
+            case r: RenderRequest   ⇒ new RenderRequestWrapper(r)   with CustomProperties
+            case r: ActionRequest   ⇒ new ActionRequestWrapper(r)   with CustomProperties
+            case r: ResourceRequest ⇒ new ResourceRequestWrapper(r) with CustomProperties
+            case r: EventRequest    ⇒ new EventRequestWrapper(r)    with CustomProperties
+            case r: PortletRequest  ⇒ new PortletRequestWrapper(r)  with CustomProperties
+        }
+
+    }.asInstanceOf[T] // We can prove that the types work out for us ;)
 }

@@ -138,8 +138,8 @@ object FormRunnerAuth {
         val headerAsJSONStrings =
             headers map {
                 case (name, values) ⇒
-                    val valuesAsString = values.mkString("""[""", """", """", """"]""")
-                    s""""$name": [$valuesAsString] """
+                    val valuesAsString = values.mkString("""["""", """", """", """"]""")
+                    s""""$name": $valuesAsString"""
             }
 
         headerAsJSONStrings.mkString("{", ", ", "}")

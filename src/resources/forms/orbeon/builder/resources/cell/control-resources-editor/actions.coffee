@@ -79,6 +79,7 @@ resourceEditor = _.memoize ->
         mceConfig = _.clone(YAHOO.xbl.fr.Tinymce.DefaultConfig)
         mceConfig.plugins += ',autoresize'
         mceConfig.autoresize_min_height = 100
+        mceConfig.autoresize_bottom_margin = 16 # Default padding for autoresize adds too much empty space at the bottom
 
         tinymceObject = new window.tinymce.Editor(tinymceAnchor.attr('id'), mceConfig)
         tinymceObject.render()

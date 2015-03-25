@@ -16,7 +16,7 @@ package org.orbeon.oxf.servlet
 import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 
-import org.orbeon.oxf.fr.FormRunnerAuth._
+import org.orbeon.oxf.fr.FormRunnerAuth
 
 import scala.collection.JavaConversions._
 
@@ -40,10 +40,10 @@ object FormRunnerAuthFilter {
             case array   ⇒ Some(array)
         }
 
-        val authHeaders = getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
+        val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
 
         trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-            override val headersToRemove  = AllHeaderNamesLower
+            override val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
             override val headersToPrepend = authHeaders
         }
 

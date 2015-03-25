@@ -46,8 +46,8 @@ abstract class BaseServletRequestWrapper(val request: HttpServletRequest)
     extends HttpServletRequestWrapper(request) {
 
     // Clean-up API by adding type parameters
-    override def getHeaders(name: String): JEnumeration[String] = super.getHeaders(name).asInstanceOf[JEnumeration[String]]
-    override def getHeaderNames: JEnumeration[String] = super.getHeaderNames.asInstanceOf[JEnumeration[String]]
+    override def getHeaders(name: String) = super.getHeaders(name).asInstanceOf[JEnumeration[String]]
+    override def getHeaderNames           = super.getHeaderNames.asInstanceOf[JEnumeration[String]]
 }
 
 trait RequestPathQuery extends BaseServletRequestWrapper {
@@ -58,12 +58,12 @@ trait RequestPathQuery extends BaseServletRequestWrapper {
     override def getServletPath = ""
 
     private lazy val (pathInfo, queryString) = splitQuery(overriddenPathQuery)
-    private lazy val parameters = combineValues[String, String, Array](queryString.toList flatMap decodeSimpleQuery).toMap
+    private lazy val params = combineValues[String, String, Array](queryString.toList flatMap decodeSimpleQuery).toMap
 
-    override def getParameterMap                  = parameters.asJava
-    override def getParameterNames                = parameters.keys.iterator.asJavaEnumeration
-    override def getParameterValues(name: String) = parameters.get(name).orNull
-    override def getParameter(name: String)       = parameters.get(name) flatMap (_.headOption) orNull
+    override def getParameterMap                  = params.asJava
+    override def getParameterNames                = params.keys.iterator.asJavaEnumeration
+    override def getParameterValues(name: String) = params.get(name).orNull
+    override def getParameter(name: String)       = params.get(name) flatMap (_.headOption) orNull
 
     override def getPathInfo    = pathInfo
     override def getQueryString = queryString getOrElse ""
@@ -73,14 +73,24 @@ trait RequestPrependHeaders extends BaseServletRequestWrapper {
 
     def headersToPrepend: Map[String, Array[String]]
 
-    override def getHeaderNames = (headersToPrepend.keysIterator ++ (super.getHeaderNames.asScala filterNot headersToPrepend.keySet)).asJavaEnumeration
+    override def getHeaderNames =
+        (headersToPrepend.keysIterator ++ (super.getHeaderNames.asScala filterNot headersToPrepend.keySet))
+            .asJavaEnumeration
 
-    private def addedHeaderOption(name: String) = headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
+    override def getHeader(name: String) =
+        addedHeaderOption(name) getOrElse super.getHeader(name)
 
-    override def getHeader(name: String)     = addedHeaderOption(name) getOrElse super.getHeader(name)
-    override def getHeaders(name: String)    = headersToPrepend.get(name) map (_.iterator.asJavaEnumeration) getOrElse super.getHeaders(name)
-    override def getDateHeader(name: String) = addedHeaderOption(name) map DateUtils.parseRFC1123 getOrElse super.getDateHeader(name)
-    override def getIntHeader(name: String)  = addedHeaderOption(name) map (_.toInt) getOrElse super.getIntHeader(name)
+    override def getHeaders(name: String) =
+        headersToPrepend.get(name) map (_.iterator.asJavaEnumeration) getOrElse super.getHeaders(name)
+
+    override def getDateHeader(name: String) =
+        addedHeaderOption(name) map DateUtils.parseRFC1123 getOrElse super.getDateHeader(name)
+
+    override def getIntHeader(name: String) =
+        addedHeaderOption(name) map (_.toInt) getOrElse super.getIntHeader(name)
+
+    private def addedHeaderOption(name: String) =
+        headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
 }
 
 trait RequestRemoveHeaders extends BaseServletRequestWrapper {
@@ -99,11 +109,11 @@ trait RequestEmptyBody extends BaseServletRequestWrapper {
 
     import BaseServletRequestWrapper._
 
-    private lazy val inputStream = newEmptyServletInputStream
-    private lazy val reader      = newEmptyReader
+    private lazy val inputStream  = newEmptyServletInputStream
+    private lazy val reader       = newEmptyReader
 
-    override def getInputStream = inputStream
-    override def getReader      = reader
+    override def getInputStream   = inputStream
+    override def getReader        = reader
 
     override def getContentType   = null
     override def getContentLength = -1
@@ -112,7 +122,8 @@ trait RequestEmptyBody extends BaseServletRequestWrapper {
 }
 
 object BaseServletRequestWrapper {
-    var HeadersToFilter= Set(Headers.ContentLengthLower, Headers.ContentTypeLower) // TODO: same filtering as in Headers?
+
+    var HeadersToFilter= Set(Headers.ContentLengthLower, Headers.ContentTypeLower) // TODO: filtering as in Headers?
 
     def appendExtraQueryParameters(pathQuery: String, extraQueryParameters: JMap[String, Array[String]]) = {
 

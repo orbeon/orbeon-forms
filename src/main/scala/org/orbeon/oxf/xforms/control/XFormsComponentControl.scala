@@ -111,7 +111,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
         super.onCreate(restoreState, state)
         if (Controls.isRestoringDynamicState)
-            nestedContainer.restoreModelsState()
+            restoreModels()
         else
             initializeModels()
     }
@@ -185,6 +185,16 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         // xforms-model-construct-done
         for (model ← nestedContainer.models)
             Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
+    }
+
+    private def restoreModels(): Unit = {
+        nestedContainer.restoreModelsState(deferRRR = true)
+        initializeMirrorListenerIfNeeded(dispatch = false)
+        // Do RRR as isRestoringDynamicState() didn't do it
+        for (model ← nestedContainer.models) {
+            model.doRebuild()
+            model.doRecalculateRevalidate(applyDefaults = false)
+        }
     }
 
     private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Unit = {

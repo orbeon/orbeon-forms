@@ -64,21 +64,23 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
         val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest, mockUser)
 
-        // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
-        val expectedProperties = initialProperties ++ Map(
-            "orbeon-liferay-user-id"          → Seq("123"),
-            "orbeon-liferay-user-screen-name" → Seq("jsmith"),
-            "orbeon-liferay-user-full-name"   → Seq("John Smith"),
-            "orbeon-liferay-user-email"       → Seq("test@orbeon.com"),
-            "orbeon-liferay-user-group-id"    → Seq("42"),
-            "orbeon-liferay-user-group-name"  → Seq("universe"),
-            "orbeon-liferay-user-roles"       → Seq("manager", "employee"),
-            OrbeonUsernameHeaderName          → Seq("test@orbeon.com"),
-            OrbeonGroupHeaderName             → Seq("universe"),
-            OrbeonRolesHeaderName             → Seq("manager", "employee")
-        )
+        val expectedProperties =
+            initialProperties ++ Map(
+                "orbeon-liferay-user-id"          → List("123"),
+                "orbeon-liferay-user-screen-name" → List("jsmith"),
+                "orbeon-liferay-user-full-name"   → List("John Smith"),
+                "orbeon-liferay-user-email"       → List("test@orbeon.com"),
+                "orbeon-liferay-user-group-id"    → List("42"),
+                "orbeon-liferay-user-group-name"  → List("universe"),
+                "orbeon-liferay-user-roles"       → List("manager", "employee"),
+                OrbeonUsernameHeaderName          → List("test@orbeon.com"),
+                OrbeonGroupHeaderName             → List("universe"),
+                OrbeonRolesHeaderName             → List("manager", "employee")
+            )
 
-        val actualProperties = amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap
+        // NOTE: Don't use Array for comparison, because Array's == doesn't work as expected in Scala
+        val actualProperties =
+            amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap
 
         // Compare using TreeMap to get a reliable order
         def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

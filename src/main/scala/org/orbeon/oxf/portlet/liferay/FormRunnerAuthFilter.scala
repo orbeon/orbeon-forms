@@ -20,6 +20,7 @@ import com.liferay.portal.model.User
 import com.liferay.portal.util.PortalUtil
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
+import org.orbeon.oxf.util.ScalaUtils
 
 import scala.collection.JavaConverters._
 
@@ -57,15 +58,19 @@ object FormRunnerAuthFilter {
         }
 
     // Public for unit tests
-    def amendRequest[T <: PortletRequest](req: T, user: User): T = {
+    def amendRequest[T <: PortletRequest](req: T, user: User): T =
+        wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(req, user))
+
+    private def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: User): T = {
 
         val liferayUserHeaders =
-            LiferaySupport.userHeaders(user) map
-                { case (name, value) ⇒ name.toLowerCase → Array(value) } toMap
+            ScalaUtils.combineValues[String, String, Array](LiferaySupport.userHeaders(user)) map
+                { case (name, value) ⇒ name.toLowerCase → value } toMap
 
-        // First wrap clears and sets Liferay user headers
-        val reqWithCustomLiferayUserHeaders =
-            wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)
+        wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)
+    }
+
+    private def wrapWithOrbeonAuthHeaders[T <: PortletRequest](req: T): T = {
 
         def getHeader(s: String) = req.getProperties(s).asScala.toArray match {
             case Array() ⇒ None
@@ -75,8 +80,7 @@ object FormRunnerAuthFilter {
         val authHeaders =
             FormRunnerAuth.getUserGroupRolesAsHeaders(req, getHeader).toMap
 
-        // Second wrap clears and set Orbeon auth headers
-        wrap(reqWithCustomLiferayUserHeaders, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
+        wrap(req, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
     }
 
     private def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, Array[String]]): T = {

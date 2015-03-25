@@ -38,7 +38,9 @@
 				var deltaSize, d = ed.getDoc(), body = d.body, de = d.documentElement, DOM = tinymce.DOM, resizeHeight = t.autoresize_min_height, myHeight;
 
 				// Get height differently depending on the browser used
-				myHeight = tinymce.isIE ? body.scrollHeight : (tinymce.isWebKit && body.clientHeight == 0 ? 0 : body.offsetHeight);
+                // 2015-03-25 avernet Original code doesn't take the margins around the body into account
+				//myHeight = tinymce.isIE ? body.scrollHeight : (tinymce.isWebKit && body.clientHeight == 0 ? 0 : body.offsetHeight);
+				myHeight = ORBEON.jQuery(body).outerHeight(true);
 
 				// Don't make it smaller than the minimum height
 				if (myHeight > t.autoresize_min_height)
@@ -77,9 +79,10 @@
 			t.autoresize_max_height = parseInt(ed.getParam('autoresize_max_height', 0));
 
 			// Add padding at the bottom for better UX
-			ed.onInit.add(function(ed){
-				ed.dom.setStyle(ed.getBody(), 'paddingBottom', ed.getParam('autoresize_bottom_margin', 50) + 'px');
-			});
+            // 2015-03-25 avernet Don't add padding, which looked like a hack for incorrect code to compute height
+			//ed.onInit.add(function(ed){
+			//	ed.dom.setStyle(ed.getBody(), 'paddingBottom', ed.getParam('autoresize_bottom_margin', 50) + 'px');
+			//});
 
 			// Add appropriate listeners for resizing content area
 			ed.onChange.add(resize);

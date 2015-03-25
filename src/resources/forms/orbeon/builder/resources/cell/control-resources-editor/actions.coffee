@@ -64,7 +64,7 @@ resourceEditor = _.memoize ->
 
     afterTinyMCEInitialized = (f) ->
         if tinymceObject.initialized then f()
-        else tinymceObject.onPostRender.add(f)
+        else tinymceObject.onInit.add(f)
 
     makeSpaceForMCE = ->
         mceHeight = $(tinymceObject.container).height()
@@ -79,7 +79,6 @@ resourceEditor = _.memoize ->
         mceConfig = _.clone(YAHOO.xbl.fr.Tinymce.DefaultConfig)
         mceConfig.plugins += ',autoresize'
         mceConfig.autoresize_min_height = 100
-        mceConfig.autoresize_bottom_margin = 16 # Default padding for autoresize adds too much empty space at the bottom
 
         tinymceObject = new window.tinymce.Editor(tinymceAnchor.attr('id'), mceConfig)
         tinymceObject.render()
@@ -105,7 +104,8 @@ resourceEditor = _.memoize ->
     getValue          : ->
                             if lhha() == 'text'
                                 content = tinymceObject.getContent()
-                                # Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+                                # Workaround to TinyMCE issue, see
+                                # https://twitter.com/avernet/status/579031182605750272
                                 if content == '<div>\xa0</div>' then '' else content
                             else
                                 textfield.val()
@@ -113,6 +113,10 @@ resourceEditor = _.memoize ->
                             if lhha() == 'text'
                                 afterTinyMCEInitialized ->
                                     tinymceObject.setContent(newValue)
+                                    # Workaround for resize not happening with empty values, see
+                                    # https://twitter.com/avernet/status/580798585291177984
+                                    tinymceObject.execCommand('mceAutoResize')
+
                             else
                                 textfield.val(newValue)
                                 textfield.focus()

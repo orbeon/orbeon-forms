@@ -66,15 +66,27 @@ resourceEditor = _.memoize ->
         if tinymceObject.initialized then f()
         else tinymceObject.onPostRender.add(f)
 
+    makeSpaceForMCE = ->
+        mceHeight = $(tinymceObject.container).height()
+        Builder.resourceEditorCurrentLabelHint.height(mceHeight)
+
     # Function to initialize the TinyMCE, memoized so it runs at most once
     initTinyMCE = _.memoize ->
         tinymceAnchor.show()
         tinymceAnchor.attr('id', _.uniqueId())
-        tinymceObject = new window.tinymce.Editor(tinymceAnchor.attr('id'), YAHOO.xbl.fr.Tinymce.DefaultConfig)
+
+        # Auto-size MCE height based on the content, with min height of 100px
+        mceConfig = _.clone(YAHOO.xbl.fr.Tinymce.DefaultConfig)
+        mceConfig.plugins += ',autoresize'
+        mceConfig.autoresize_min_height = 100
+
+        tinymceObject = new window.tinymce.Editor(tinymceAnchor.attr('id'), mceConfig)
         tinymceObject.render()
-        window.t = tinymceObject
-        # We don't need the anchor anymore; just used to tell TinyMCE where to go in the DOM
-        afterTinyMCEInitialized -> tinymceAnchor.detach()
+        afterTinyMCEInitialized ->
+            # We don't need the anchor anymore; just used to tell TinyMCE where to go in the DOM
+            tinymceAnchor.detach()
+            $(tinymceObject.getWin()).on('resize', makeSpaceForMCE)
+
 
     # Set width of TinyMCE to the width of the container
     # - If not yet initialized, set width on anchor, which is copied by TinyMCE to table
@@ -106,7 +118,7 @@ resourceEditor = _.memoize ->
     isHTML            : ->
                             if lhha() == 'text' then true
                             else checkbox.is(':checked')
-    showEditControl   : ->
+    startEdit         : ->
                             textfield.hide()
                             checkbox.hide()
                             tinymceObject?.hide()
@@ -114,11 +126,17 @@ resourceEditor = _.memoize ->
                                 setTinyMCEWidth()
                                 initTinyMCE()
                                 afterTinyMCEInitialized ->
+                                    makeSpaceForMCE()
                                     tinymceObject.show()
                                     tinymceObject.focus()
                             else
                                 textfield.show()
                                 checkbox.show()
+    endEdit           : ->
+                            if lhha() == 'text'
+                                # Reset height we might have placed on the explanation element inside the cell
+                                Builder.resourceEditorCurrentLabelHint.height('')
+
 
 # Show editor on click on label
 Builder.resourceEditorStartEdit = () ->
@@ -128,7 +146,7 @@ Builder.resourceEditorStartEdit = () ->
     # Get position before showing editor, so showing doesn't move things in the page
     resourceEditor().container.width(Builder.resourceEditorCurrentLabelHint.outerWidth())
     resourceEditor().container.show()
-    resourceEditor().showEditControl()
+    resourceEditor().startEdit()
     labelHintOffset = Builder.resourceEditorCurrentLabelHint.offset()
     resourceEditor().container.offset(labelHintOffset)
     resourceEditor().setValue(labelHintValue())
@@ -155,6 +173,7 @@ Builder.resourceEditorEndEdit = ->
         # Destroy tooltip, or it doesn't get recreated on startEdit()
         resourceEditor().checkbox.tooltip('destroy')
         resourceEditor().container.hide()
+        resourceEditor().endEdit()
         annotateWithLhhaClass(false)
         Builder.resourceEditorCurrentLabelHint.css('visibility', '')
         # Update values in the DOM, without waiting for the server to send us the value

@@ -17,10 +17,14 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.ScalaUtils._
+import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
 
 object FormRunnerAuth {
+
+    val LoggerName = "org.orbeon.auth"
+    val Logger     = LoggerFactory.getLogger(LoggerName)
 
     val OrbeonUsernameHeaderName = Headers.OrbeonUsernameLower
     val OrbeonGroupHeaderName    = Headers.OrbeonGroupLower
@@ -52,9 +56,7 @@ object FormRunnerAuth {
 
     def properties: PropertySet = Properties.instance.getPropertySet
 
-    /**
-     * Get the username and roles from the request, based on the Form Runner configuration.
-     */
+    // Get the username and roles from the request, based on the Form Runner configuration.
     def getUserGroupRoles(
         userRoles : UserRoles,
         getHeader : String ⇒ Option[Array[String]]
@@ -131,15 +133,40 @@ object FormRunnerAuth {
         }
     }
 
+    private def headersAsJSONString(headers: List[(String, Array[String])]) = {
+
+        val headerAsJSONStrings =
+            headers map {
+                case (name, values) ⇒
+                    val valuesAsString = values.mkString("""[""", """", """", """"]""")
+                    s""""$name": [$valuesAsString] """
+            }
+
+        headerAsJSONStrings.mkString("{", ", ", "}")
+    }
+
     def getUserGroupRolesAsHeaders(
         userRoles : UserRoles,
         getHeader : String ⇒ Option[Array[String]]
     ): List[(String, Array[String])] = {
 
-        val (username, group, roles) = getUserGroupRoles(userRoles, getHeader)
+        val (usernameOpt, groupOpt, rolesOpt) = getUserGroupRoles(userRoles, getHeader)
 
-        (username.toList map (OrbeonUsernameHeaderName → Array(_))) :::
-        (group.toList    map (OrbeonGroupHeaderName    → Array(_))) :::
-        (roles.toList    map (OrbeonRolesHeaderName    →))
+        def headersAsList =
+            (usernameOpt.toList map (OrbeonUsernameHeaderName → Array(_))) :::
+            (groupOpt.toList    map (OrbeonGroupHeaderName    → Array(_))) :::
+            (rolesOpt.toList    map (OrbeonRolesHeaderName    →))
+
+        usernameOpt match {
+            case Some(username) ⇒
+                val result = headersAsList
+                Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
+                result
+            case None ⇒
+                // Don't set any headers in case there is no username
+                if (groupOpt.isDefined || (rolesOpt exists (_.nonEmpty)))
+                    Logger.warn(s"not setting auth headers because username is missing: $headersAsList")
+                Nil
+        }
     }
 }

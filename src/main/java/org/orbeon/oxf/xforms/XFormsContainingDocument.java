@@ -278,7 +278,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
                         createControlsAndModels();
 
                         // Restore top-level models state, including instances
-                        restoreModelsState();
+                        restoreModelsState(false);
 
                         // Restore controls state
                         // Store serialized control state for retrieval later

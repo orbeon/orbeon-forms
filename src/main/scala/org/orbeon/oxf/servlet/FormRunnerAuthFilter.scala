@@ -14,9 +14,9 @@
 package org.orbeon.oxf.servlet
 
 import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
+import javax.servlet.http.HttpServletRequest
 
-import org.orbeon.oxf.fr.FormRunnerAuth
+import org.orbeon.oxf.fr.FormRunnerAuth._
 
 import scala.collection.JavaConversions._
 
@@ -33,24 +33,20 @@ object FormRunnerAuthFilter {
 
     import java.util.{Enumeration ⇒ JEnumeration}
 
-    def amendRequest(servletRequest: HttpServletRequest) = {
+    def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
         def getHeader(name: String) = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
             case Array() ⇒ None
             case array   ⇒ Some(array)
         }
 
-        val headers = FormRunnerAuth.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
+        val authHeaders = getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
 
-        trait CustomHeaders extends HttpServletRequestWrapper {
-            override def getHeaderNames =
-                headers.keysIterator ++ super.getHeaderNames
-            override def getHeader(name: String) =
-                headers.get(name) map (_.head) getOrElse super.getHeader(name)
-            override def getHeaders(name: String): JEnumeration[_] =
-                headers.get(name) map (n ⇒ asJavaEnumeration(n.iterator)) getOrElse super.getHeaders(name)
+        trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
+            override val headersToRemove  = AllHeaderNamesLower
+            override val headersToPrepend = authHeaders
         }
 
-        new HttpServletRequestWrapper(servletRequest) with CustomHeaders
+        new BaseServletRequestWrapper(servletRequest) with CustomHeaders
     }
 }

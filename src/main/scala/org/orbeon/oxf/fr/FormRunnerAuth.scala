@@ -25,6 +25,8 @@ object FormRunnerAuth {
     val OrbeonUsernameHeaderName = Headers.OrbeonUsernameLower
     val OrbeonGroupHeaderName    = Headers.OrbeonGroupLower
     val OrbeonRolesHeaderName    = Headers.OrbeonRolesLower
+    
+    val AllHeaderNamesLower = Set(OrbeonUsernameHeaderName, OrbeonGroupHeaderName, OrbeonRolesHeaderName)
 
     private object Private {
         val PropertyPrefix = "oxf.fr.authentication."

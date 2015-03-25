@@ -19,9 +19,8 @@ import javax.portlet.filter._
 import com.liferay.portal.model.User
 import com.liferay.portal.util.PortalUtil
 import org.orbeon.oxf.fr.FormRunnerAuth
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
 
-import scala.collection.JavaConversions.asJavaEnumeration
 import scala.collection.JavaConverters._
 
 class FormRunnerAuthFilter
@@ -61,41 +60,27 @@ object FormRunnerAuthFilter {
     // Public for unit tests
     def amendRequest[T <: PortletRequest](req: T, user: User): T = {
 
-        val headers = {
-            // 1. Get Orbeon-Liferay-User-* headers
+        val liferayUserRolesHeaders =
+            LiferaySupport.userHeaders(user) map
+                { case (name, value) ⇒ name.toLowerCase → Array(value) } toMap
 
-            // Get and lowercase user headers
-            val liferayUserRolesHeaders =
-                ScalaUtils.combineValues[String, String, Array](LiferaySupport.userHeaders(user)) map
-                    { case (name, value) ⇒ name.toLowerCase → value } toMap
+        val reqWithCustomLiferayHeaders = wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserRolesHeaders)
 
-            // 2. Get Orbeon-* headers
-
-            // Get a header value first from the list of user/roles headers, then from the original request
-            def getCombine(s: String) = {
-                def getCombine1(s: String) = liferayUserRolesHeaders.get(s)
-                def getCombine2(s: String) = req.getProperties(s).asScala.toArray match {
-                    case Array() ⇒ None
-                    case array ⇒ Some(array)
-                }
-
-                getCombine1(s).orElse(getCombine2(s))
-            }
-
-            // 3. Result is all new headers
-            liferayUserRolesHeaders ++ FormRunnerAuth.getUserGroupRolesAsHeaders(req, getCombine)
+        def getHeader(s: String) = req.getProperties(s).asScala.toArray match {
+            case Array() ⇒ None
+            case array   ⇒ Some(array)
         }
 
-        // Wrap incoming request depending on request type and add to existing properties
-        trait CustomProperties extends PortletRequestWrapper {
-            override def getPropertyNames =
-                asJavaEnumeration(headers.keysIterator ++ super.getPropertyNames.asScala)
+        val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(req, getHeader).toMap
 
-            override def getProperty(name: String) =
-                headers.get(name) map (_.head) getOrElse super.getProperty(name)
+        wrap(reqWithCustomLiferayHeaders, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
+    }
 
-            override def getProperties(name: String) =
-                headers.get(name) map (n ⇒ asJavaEnumeration(n.iterator)) getOrElse super.getProperties(name)
+    private def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, Array[String]]): T = {
+
+        trait CustomProperties extends RequestRemoveHeaders with RequestPrependHeaders  {
+            override val headersToRemove  = remove
+            override val headersToPrepend = prepend
         }
 
         (

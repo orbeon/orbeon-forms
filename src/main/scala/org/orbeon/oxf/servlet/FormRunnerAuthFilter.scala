@@ -43,8 +43,8 @@ object FormRunnerAuthFilter {
         val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
 
         trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-            override val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
-            override val headersToPrepend = authHeaders
+            val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
+            val headersToPrepend = authHeaders
         }
 
         new BaseServletRequestWrapper(servletRequest) with CustomHeaders

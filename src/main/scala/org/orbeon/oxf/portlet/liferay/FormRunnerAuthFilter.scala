@@ -86,8 +86,8 @@ object FormRunnerAuthFilter {
     private def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, Array[String]]): T = {
 
         trait CustomProperties extends RequestRemoveHeaders with RequestPrependHeaders  {
-            override val headersToRemove  = remove
-            override val headersToPrepend = prepend
+            val headersToRemove  = remove
+            val headersToPrepend = prepend
         }
 
         req match {

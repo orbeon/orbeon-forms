@@ -87,6 +87,8 @@
     <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
+    <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus.enable', $app, $form), '.'))" as="xs:boolean"/>
+
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"
@@ -296,7 +298,9 @@
                  Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to
                  understand that if a modal dialog is currently visible, setting focus to a control outside that dialog
                  should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
-            <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
+            <xsl:if test="$enable-initial-focus">
+                <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
+            </xsl:if>
 
             <!-- Custom model content -->
             <xsl:apply-templates select="node()"/>

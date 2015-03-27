@@ -1193,6 +1193,7 @@
                                     var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                     var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
                                     var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
+                                    var newLevel = ORBEON.util.Dom.getAttribute(controlElement, "level");
                                     var progressState = ORBEON.util.Dom.getAttribute(controlElement, "progress-state");
                                     var progressReceived = ORBEON.util.Dom.getAttribute(controlElement, "progress-received");
                                     var progressExpected = ORBEON.util.Dom.getAttribute(controlElement, "progress-expected");
@@ -1205,6 +1206,8 @@
                                     }
                                     var documentElementClasses = documentElement.className.split(" ");
                                     var isLeafControl = YAHOO.util.Dom.hasClass(documentElement, "xforms-control");
+
+                                    var jDocumentElement = $(documentElement);
 
                                     // Save new value sent by server (upload controls don't carry their value the same way as other controls)
                                     var previousServerValue = ORBEON.xforms.ServerValueStore.get(controlId);
@@ -1251,13 +1254,6 @@
                                         if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea-appearance-xxforms-autosize")) {
                                             ORBEON.xforms.Controls.autosizeTextarea(documentElement);
                                         }
-                                    }
-
-                                    // Handle required
-                                    if (required != null) {
-                                        var isRequired = required == "true";
-                                        if (isRequired) YAHOO.util.Dom.addClass(documentElement, "xforms-required");
-                                        else YAHOO.util.Dom.removeClass(documentElement, "xforms-required");
                                     }
 
                                     // Update input control type
@@ -1421,8 +1417,13 @@
                                             var isBuiltIn = typeNamespace == 'http://www.w3.org/2001/XMLSchema'
                                                          || typeNamespace == 'http://www.w3.org/2002/xforms';
                                             var newClass = typePrefix + (isBuiltIn ? '' : 'custom-') + typeLocalName;
-                                            $(documentElement).addClass(newClass);
+                                            jDocumentElement.addClass(newClass);
                                         }
+                                    }
+
+                                    // Handle required
+                                    if (required != null) {
+                                        jDocumentElement.toggleClass("xforms-required", required == "true");
                                     }
 
                                     // Handle readonly
@@ -1445,6 +1446,29 @@
 
                                     // Update value
                                     if (isLeafControl) {
+
+                                        // Aria attributes
+                                        if (jDocumentElement.is(".xforms-input")                                     ||
+                                            jDocumentElement.is(".xforms-textarea")                                  ||
+                                            jDocumentElement.is(".xforms-select1.xforms-select1-appearance-compact") ||
+                                            jDocumentElement.is(".xforms-select1.xforms-select1-appearance-minimal")) {
+
+                                            var firstInput = jDocumentElement.find(":input");
+
+                                            if (required != null) {
+                                                if (required == "true")
+                                                    firstInput.attr("aria-required", "true");
+                                                else
+                                                    firstInput.removeAttr("aria-required");
+                                            }
+                                            if (newLevel != null) {
+                                                if (newLevel == "error")
+                                                    firstInput.attr("aria-invalid", "true");
+                                                else
+                                                    firstInput.removeAttr("aria-invalid");
+                                            }
+                                        }
+
                                         if (YAHOO.util.Dom.hasClass(documentElement, "xforms-upload")) {
                                             // Additional attributes for xf:upload
                                             // <xxf:control id="xforms-control-id"
@@ -1563,7 +1587,6 @@
                                     if (newAlert != null)
                                         ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
                                     // Store validity, label, hint, help in element
-                                    var newLevel = ORBEON.util.Dom.getAttribute(controlElement, "level");
                                     if (newLevel != null)
                                         ORBEON.xforms.Controls.setConstraintLevel(documentElement, newLevel);
 
@@ -1595,7 +1618,7 @@
                                         // Found container
                                         // Detaching children to avoid nodes becoming disconnected
                                         // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-In-IE-nodes-become-disconnected-when-removed-from-the-DOM-with-an-innerHTML
-                                        $(documentElement).children().detach();
+                                        jDocumentElement.children().detach();
                                         documentElement.innerHTML = innerHTML;
                                         ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
                                     } else {

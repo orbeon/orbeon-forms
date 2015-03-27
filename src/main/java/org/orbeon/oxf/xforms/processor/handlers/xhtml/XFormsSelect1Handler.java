@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.analysis.controls.SelectAppearanceTrait;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
 import org.orbeon.oxf.xforms.control.LHHAValue;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control$;
@@ -82,7 +83,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                               final boolean isMultiple, final boolean isFull, boolean isBooleanInput) throws SAXException {
 
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
+
         final XFormsControl xformsControl = (XFormsControl) control; // cast because Java is not aware that XFormsValueControl extends XFormsControl
+        final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control; // same as above
 
         final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, !isFull);
 
@@ -117,6 +120,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
             if (isHTMLDisabled(xformsControl))
                 outputDisabledAttribute(containerAttributes);
+
+            if (singleNodeControl != null)
+                handleAriaAttributes(singleNodeControl.isRequired(), singleNodeControl.isValid(), reusableAttributes);
+
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
             {
                 final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");

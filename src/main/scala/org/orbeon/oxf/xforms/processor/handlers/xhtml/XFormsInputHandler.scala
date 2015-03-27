@@ -145,6 +145,10 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
                     } else {
                         if (isHTMLDisabled(inputControl))
                             outputDisabledAttribute(reusableAttributes)
+
+                        if (isConcreteControl)
+                            handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
+
                         xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
                         xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
                     }

@@ -125,6 +125,13 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
+    public static void handleAriaAttributes(boolean required, boolean valid, AttributesImpl destAttributes) {
+        if (required)
+            destAttributes.addAttribute("", "aria-required", "aria-required", XMLReceiverHelper.CDATA, "true");
+        if (! valid)
+            destAttributes.addAttribute("", "aria-invalid", "aria-invalid", XMLReceiverHelper.CDATA, "true");
+    }
+
     protected AttributesImpl getIdClassXHTMLAttributes(Attributes elementAttributes, String classes, String effectiveId) {
         return getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveId);
     }

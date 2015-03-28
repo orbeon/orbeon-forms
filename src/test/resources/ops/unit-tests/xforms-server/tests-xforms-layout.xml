@@ -26,7 +26,7 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="New layout for xf:input" name="oxf:pipeline">
+    <test description="Layout for xf:input" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -169,7 +169,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:select1[@appearance = 'minimal']" name="oxf:pipeline">
+    <test description="Layout for xf:select1[@appearance = 'minimal']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -235,7 +235,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:output" name="oxf:pipeline">
+    <test description="Layout for xf:output" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -287,7 +287,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:group" name="oxf:pipeline">
+    <test description="Layout for xf:group" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -417,7 +417,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:trigger" name="oxf:pipeline">
+    <test description="Layout for xf:trigger" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -512,7 +512,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:range" name="oxf:pipeline">
+    <test description="Layout for xf:range" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -568,7 +568,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
+    <test description="Layout for xf:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -670,7 +670,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:upload" name="oxf:pipeline">
+    <test description="Layout for xf:upload" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -989,7 +989,7 @@
         </output>
     </test>
 
-    <test description="New layout for hierarchical xf:select[@appearance = 'compact'] with classes" name="oxf:pipeline">
+    <test description="Layout for hierarchical xf:select[@appearance = 'compact'] with classes" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1267,7 +1267,7 @@
         </output>
     </test>
 
-    <test description="New layout for xf:select1[@appearance = 'full']" name="oxf:pipeline">
+    <test description="Layout for xf:select1[@appearance = 'full']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">

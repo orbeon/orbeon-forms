@@ -152,9 +152,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref) =
         if (getBooleanPreference(request, EnableURLParameters))
-            None
-        else
             portalQuery(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value}
+        else
+            None
 
     private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
         preferenceFromPortalQuery(request, pref) getOrElse getPreference(request, pref)

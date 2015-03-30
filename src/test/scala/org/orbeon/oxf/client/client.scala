@@ -257,7 +257,7 @@ trait FormBuilderOps extends FormRunnerOps {
         def findCell(row: Int, col: Int) =
             Option(
                 executeScript(
-                    "return $('.fb-selected').closest('tbody').find('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')')[0]",
+                    "return ORBEON.jQuery('.fb-selected').closest('tbody').find('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')')[0]",
                     new java.lang.Integer(row),
                     new java.lang.Integer(col)
                 ).asInstanceOf[WebElement]
@@ -292,22 +292,22 @@ trait FormBuilderOps extends FormRunnerOps {
 
             private def getFieldValue(controlId: String) =
                 cssSelector(s"#dialog-control-details≡fb-tabbable≡fb-base-tab-grid≡$controlId").element.fieldText
-        } 
+        }
 
         def countAllToolboxControlButtons =
             cssSelector(".fb-tool > .fb-add-control").findAllElements.size
 
         def countCurrentGridRows =
-            executeScript("return $('.fb-selected').closest('.fr-grid').find('.fb-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
+            executeScript("return ORBEON.jQuery('.fb-selected').closest('.fr-grid').find('.fb-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
 
         def countSections =
-            executeScript("return $('.xbl-fr-section').size()").asInstanceOf[Long]
+            executeScript("return ORBEON.jQuery('.xbl-fr-section').size()").asInstanceOf[Long]
 
         def countGrids =
-            executeScript("return $('.xbl-fr-section .xbl-fr-grid').size()").asInstanceOf[Long]
+            executeScript("return ORBEON.jQuery('.xbl-fr-section .xbl-fr-grid').size()").asInstanceOf[Long]
 
         def countRepeatedGrids =
-            executeScript("return $('.xbl-fr-section .xbl-fr-grid .fr-repeat').size()").asInstanceOf[Long]
+            executeScript("return ORBEON.jQuery('.xbl-fr-section .xbl-fr-grid .fr-repeat').size()").asInstanceOf[Long]
     }
 }
 

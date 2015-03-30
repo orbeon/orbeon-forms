@@ -15,7 +15,6 @@ package org.orbeon.oxf.client.fb
 
 import org.junit.Test
 import org.orbeon.oxf.client.{FormBuilderOps, XFormsOps}
-import org.orbeon.oxf.util.ScalaUtils._
 import org.scalatest.junit.AssertionsForJUnit
 
 trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
@@ -28,7 +27,7 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
 
         def clickOnToolboxControlButtons(from: Int, to: Int) =
             executeScript(
-                "$('.fb-tool > .fb-add-control > button').slice(arguments[0], arguments[1] + 1).click();",
+                "ORBEON.jQuery('.fb-tool > .fb-add-control > button').slice(arguments[0], arguments[1] + 1).click();",
                 new java.lang.Integer(from),
                 new java.lang.Integer(to)
             )

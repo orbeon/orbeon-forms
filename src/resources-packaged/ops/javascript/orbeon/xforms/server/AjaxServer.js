@@ -1450,6 +1450,7 @@
                                         // Aria attributes
                                         if (jDocumentElement.is(".xforms-input")                                     ||
                                             jDocumentElement.is(".xforms-textarea")                                  ||
+                                            jDocumentElement.is(".xforms-secret")                                    ||
                                             jDocumentElement.is(".xforms-select1.xforms-select1-appearance-compact") ||
                                             jDocumentElement.is(".xforms-select1.xforms-select1-appearance-minimal")) {
 

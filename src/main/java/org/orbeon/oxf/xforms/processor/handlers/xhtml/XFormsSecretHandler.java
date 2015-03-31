@@ -61,6 +61,9 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 if (isHTMLDisabled(secretControl))
                     outputDisabledAttribute(reusableAttributes);
 
+                if (isConcreteControl)
+                    handleAriaAttributes(secretControl.isRequired(), secretControl.isValid(), reusableAttributes);
+
                 // Output element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);

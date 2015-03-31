@@ -58,15 +58,15 @@ object XPathCache {
     // etc.), but NodeInfo wrappers are preserved.
     // 7 external usages
     def evaluate(
-            contextItem        : Item,
-            xpathString        : String,
-            namespaceMapping   : NamespaceMapping,
-            variableToValueMap : JMap[String, ValueRepresentation],
-            functionLibrary    : FunctionLibrary,
-            functionContext    : FunctionContext,
-            baseURI            : String,
-            locationData       : LocationData,
-            reporter           : Reporter
+        contextItem        : Item,
+        xpathString        : String,
+        namespaceMapping   : NamespaceMapping,
+        variableToValueMap : JMap[String, ValueRepresentation],
+        functionLibrary    : FunctionLibrary,
+        functionContext    : FunctionContext,
+        baseURI            : String,
+        locationData       : LocationData,
+        reporter           : Reporter
     ): JList[AnyRef] =
         evaluate(
             Seq(contextItem).asJava,
@@ -99,8 +99,17 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
-                variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
+                XPath.GlobalConfiguration,
+                contextItems,
+                contextPosition,
+                xpathString,
+                namespaceMapping,
+                variableToValueMap,
+                functionLibrary,
+                baseURI,
+                isAVT = false,
+                locationData
+            )
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateKeepNodeInfo(functionContext)
@@ -128,8 +137,17 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
-                variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
+                XPath.GlobalConfiguration,
+                contextItems,
+                contextPosition,
+                xpathString,
+                namespaceMapping,
+                variableToValueMap,
+                functionLibrary,
+                baseURI,
+                isAVT = false,
+                locationData
+            )
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateKeepItems(functionContext)
@@ -153,8 +171,17 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
-                variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
+                XPath.GlobalConfiguration,
+                contextItems,
+                contextPosition,
+                xpathString,
+                namespaceMapping,
+                variableToValueMap,
+                functionLibrary,
+                baseURI,
+                isAVT = false,
+                locationData
+            )
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateSingleKeepItemOrNull(functionContext)
@@ -178,9 +205,17 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration,
+                contextItems,
+                contextPosition,
+                xpathString,
+                namespaceMapping,
                 variableToValueMap,
-                functionLibrary, baseURI, isAVT = false, locationData)
+                functionLibrary,
+                baseURI,
+                isAVT = false,
+                locationData
+            )
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateAsExtent(functionContext)
@@ -251,9 +286,17 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration,
+                contextItems,
+                contextPosition,
+                xpathString,
+                namespaceMapping,
                 variableToValueMap,
-                functionLibrary, baseURI, isAVT = false, locationData)
+                functionLibrary,
+                baseURI,
+                isAVT = false,
+                locationData
+            )
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)
@@ -319,9 +362,17 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                XPath.GlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
+                XPath.GlobalConfiguration,
+                contextItems,
+                contextPosition,
+                xpathString,
+                namespaceMapping,
                 variableToValueMap,
-                functionLibrary, baseURI, isAVT = true, locationData)
+                functionLibrary,
+                baseURI,
+                isAVT = true,
+                locationData
+            )
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString) orNull // FIXME: can ever return null?

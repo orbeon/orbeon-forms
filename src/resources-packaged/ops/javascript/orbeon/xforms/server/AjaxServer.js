@@ -1618,7 +1618,7 @@
                                         // Found container
                                         // Detaching children to avoid nodes becoming disconnected
                                         // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-In-IE-nodes-become-disconnected-when-removed-from-the-DOM-with-an-innerHTML
-                                        jDocumentElement.children().detach();
+                                        $(documentElement).children().detach();
                                         documentElement.innerHTML = innerHTML;
                                         ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
                                     } else {
@@ -2013,10 +2013,10 @@
                 ORBEON.xforms.Page.getForm(formID).getLoadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
-        } catch (e) {
-            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            AjaxServer.exceptionWhenTalkingToServer(e, formID);
-            // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
+        //} catch (e) {
+        //    // Show dialog with error to the user, as they won't be able to continue using the UI anyway
+        //    AjaxServer.exceptionWhenTalkingToServer(e, formID);
+        //    // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
         } finally {
             // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
             if (! isResponseToBackgroundUpload)

@@ -93,7 +93,6 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                         Option(username) → Option(groupname)
                     }
                     val operations = authorizedOperations(formMetadata, dataUserGroup)
-                    System.out.println(operations)
                     if (! operations.contains("read"))
                         throw new HttpStatusCodeException(403)
                     httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))

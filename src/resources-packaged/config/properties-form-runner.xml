@@ -130,7 +130,6 @@
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                              value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.hide-top.*.*"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                         value="false"/>
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                           value="5000"/>
 

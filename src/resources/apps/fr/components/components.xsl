@@ -67,7 +67,6 @@
     <xsl:variable name="default-logo-uri" select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="hide-logo" select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-footer" select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-top" select="p:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))))" as="xs:string*"/>
     <xsl:variable name="custom-css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))))" as="xs:string*"/>

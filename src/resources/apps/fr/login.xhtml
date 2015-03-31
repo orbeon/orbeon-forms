@@ -11,29 +11,62 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>Form Runner Login</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>Form Runner Login — Orbeon Forms</title>
+        <link rel="stylesheet" href="/apps/fr/style/bootstrap/css/bootstrap.css"/>
+        <link rel="stylesheet" href="/apps/fr/style/form-runner-bootstrap-override.css"/>
+        <link rel="stylesheet" href="/apps/fr/style/form-runner-orbeon.css"/>
+        <link rel="stylesheet" href="/apps/fr/style/form-runner-common.css"/>
+        <link rel="stylesheet" href="/apps/fr/style/form-runner-base.css"/>
     </head>
-    <body>
-        <p>
-            Please enter your login and password:
-        </p>
-        <form action="/j_security_check" method="post">
-            <table>
-                <tr>
-                    <td align="right">Login:</td>
-                    <td><input name="j_username"/></td>
-                </tr>
-                <tr>
-                    <td align="right">Password:</td>
-                    <td><input type="password" name="j_password"/></td>
-                </tr>
-                <tr>
-                    <td/><td>
-                    <input type="submit" value="Login"/></td>
-                </tr>
-            </table>
-        </form>
+    <body class="orbeon">
+
+        <div id="fr-view" class="fr-view container">
+            <nav class="navbar navbar-inverse">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a href="http://www.orbeon.com/"><img alt="" src="/apps/fr/style/orbeon-navbar-logo.png"/></a>
+                        <h1>Orbeon Forms</h1>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="row">
+                <div class="span12">
+                    <div class="fr-border xbl-fr-section">
+                        <div class="fr-section-content">
+                            <h1>Form Runner Login</h1>
+                            <p>
+                                Please enter your login and password:
+                            </p>
+                            <form action="/j_security_check" method="post">
+                                <div class="control-group">
+                                    <label class="control-label" for="username">Login:</label>
+                                    <div class="controls">
+                                        <input type="text" id="username" name="j_username"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="password">Password:</label>
+                                    <div class="controls">
+                                        <input type="password" id="password" name="j_password"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <button type="submit" class="btn">Login</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

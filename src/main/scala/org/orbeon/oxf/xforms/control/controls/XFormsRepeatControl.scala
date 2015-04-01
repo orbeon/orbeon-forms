@@ -77,8 +77,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             case Some(state) ⇒
                 setLocal(new XFormsRepeatControlLocal(state.keyValues("index").toInt))
             case None if restoreState ⇒
-                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
-                // particular control might not be found.
+                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
+                // a particular control might not be found.
                 setLocal(new XFormsRepeatControlLocal(ensureIndexBounds(getStartIndex)))
             case None ⇒
                 setIndexInternal(getStartIndex)
@@ -140,7 +140,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     def doDnD(dndEvent: XXFormsDndEvent) {
         // Only support this on DnD-enabled controls
         if (! isDnD)
-            throw new ValidationException("Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId, getLocationData)
+            throw new ValidationException(
+                "Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId, getLocationData)
 
         // Get all repeat iteration details
         val dndStart = StringUtils.split(dndEvent.getDndStart, '-')
@@ -158,7 +159,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             val destinationControl =
                 if (dndEnd.length > 1) {
                     // DnD destination is a different repeat control
-                    val containingRepeatEffectiveId = getPrefixedId + REPEAT_SEPARATOR + (dndEnd mkString REPEAT_INDEX_SEPARATOR_STRING)
+                    val containingRepeatEffectiveId =
+                        getPrefixedId + REPEAT_SEPARATOR + (dndEnd mkString REPEAT_INDEX_SEPARATOR_STRING)
                     containingDocument.getControlByEffectiveId(containingRepeatEffectiveId).asInstanceOf[XFormsRepeatControl]
                 } else
                     // DnD destination is the current repeat control
@@ -189,7 +191,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         val (actualDestinationIndex, destinationPosition) =
             if (deletedNodePosition != -1) {
                 // Deleted node was part of the destination nodeset
-                // NOTE: This removes from our copy of the nodeset, not from the control's nodeset, which must not be touched until control bindings are updated
+                // NOTE: This removes from our copy of the nodeset, not from the control's nodeset, which must not be
+                // touched until control bindings are updated.
                 destinationNodeset.remove(deletedNodePosition)
                 // If the insertion position is after the delete node, must adjust it
                 if (requestedDestinationIndex <= deletedNodePosition + 1)
@@ -274,10 +277,16 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 contextStack.popBinding
             }
 
-            // Do this before evaluating the binding because after that controls are temporarily in an inconsistent state
+            // Do this before evaluating the binding because after that controls are temporarily in an inconsistent
+            // state
             containingDocument.getControls.cloneInitialStateIfNeeded()
 
-            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true, restoreState = false, state = None)
+            evaluateBindingAndValues(
+                parentContext = contextStack.getCurrentBindingContext,
+                update        = true,
+                restoreState  = false,
+                state         = None
+            )
         }
 
         // Move things around and create new iterations if needed
@@ -286,7 +295,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
             val focusedBefore = containingDocument.getControls.getFocusedControl
 
-            val (newIterations, partialFocusRepeatOption) = updateIterations(oldRepeatNodeset, insertedNodeInfos, isInsertDelete = true)
+            val (newIterations, partialFocusRepeatOption) =
+                updateIterations(oldRepeatNodeset, insertedNodeInfos, isInsertDelete = true)
 
             // Evaluate all controls and then dispatches creation events
             val currentControlTree = containingDocument.getControls.getCurrentControlTree
@@ -313,8 +323,11 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
      * @param insertedItems         items just inserted by xf:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
-    def updateIterations(oldRepeatItems: Seq[Item], insertedItems: Seq[NodeInfo], isInsertDelete: Boolean):
-            (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
+    def updateIterations(
+        oldRepeatItems : Seq[Item],
+        insertedItems  : Seq[NodeInfo],
+        isInsertDelete : Boolean
+    ): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
         // NOTE: The following assumes the nodesets have changed
 
@@ -389,7 +402,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         findNodeIndexes(insertedItems, newRepeatNodeset).reverse find (_ != -1) exists { index ⇒
                             val newRepeatIndex = index + 1
 
-                            debug("setting index to new node", Seq("id" → getEffectiveId, "new index" → newRepeatIndex.toString))
+                            debug("setting index to new node", Seq(
+                                "id"        → getEffectiveId,
+                                "new index" → newRepeatIndex.toString
+                            ))
 
                             setIndexInternal(newRepeatIndex)
                             true
@@ -406,23 +422,30 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         val newRepeatIndex = newIndexes(oldRepeatIndex - 1) + 1
                         if (newRepeatIndex != oldRepeatIndex) {
                             
-                            debug("adjusting index for existing node", Seq("id" → getEffectiveId, "old index" → oldRepeatIndex.toString, "new index" → newRepeatIndex.toString))
+                            debug("adjusting index for existing node", Seq(
+                                "id"        → getEffectiveId,
+                                "old index" → oldRepeatIndex.toString,
+                                "new index" → newRepeatIndex.toString
+                            ))
 
                             setIndexInternal(newRepeatIndex)
                         }
                     } else if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length) {
                         // The index was pointing to a node which has been removed
                         if (oldRepeatIndex > newRepeatNodeset.size) {
-                            // "if the repeat index was pointing to one of the deleted repeat items, and if the new size of
-                            // the collection is smaller than the index, the index is changed to the new size of the
+                            // "if the repeat index was pointing to one of the deleted repeat items, and if the new size
+                            // of the collection is smaller than the index, the index is changed to the new size of the
                             // collection."
 
-                            debug("setting index to the size of the new nodeset", Seq("id" → getEffectiveId, "new index" → newRepeatNodeset.size.toString))
+                            debug("setting index to the size of the new nodeset", Seq(
+                                "id"        → getEffectiveId,
+                                "new index" → newRepeatNodeset.size.toString
+                            ))
 
                             setIndexInternal(newRepeatNodeset.size)
                         } else {
-                            // "if the new size of the collection is equal to or greater than the index, the index is not
-                            // changed"
+                            // "if the new size of the collection is equal to or greater than the index, the index is
+                            // not changed"
                             // NOP
                         }
                     } else {
@@ -446,7 +469,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
                         // Add new iteration
                         newChildren +=
-                            withDebug("creating new iteration", Seq("id" → getEffectiveId, "index" → repeatIndex.toString)) {
+                            withDebug("creating new iteration", Seq(
+                                "id"    → getEffectiveId,
+                                "index" → repeatIndex.toString
+                            )) {
 
                                 // Create repeat iteration
                                 val newIteration = controls.createRepeatIterationTree(this, repeatIndex)
@@ -473,7 +499,11 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
                         if (newIterationOldIndex != repeatIndex) {
                             // Iteration index changed
-                            debug("moving iteration", Seq("id" → getEffectiveId, "old index" → newIterationOldIndex.toString, "new index" → repeatIndex.toString))
+                            debug("moving iteration", Seq(
+                                "id"        → getEffectiveId,
+                                "old index" → newIterationOldIndex.toString,
+                                "new index" → repeatIndex.toString
+                            ))
 
                             // Set new index
                             existingIteration.setIterationIndex(repeatIndex)
@@ -503,7 +533,12 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Set the new children iterations
                 setChildren(newChildren)
 
-                (newIterations, movedIterationsOldPositions.toList, movedIterationsNewPositions.toList, partialFocusRepeatOption)
+                (
+                    newIterations,
+                    movedIterationsOldPositions.toList,
+                    movedIterationsNewPositions.toList,
+                    partialFocusRepeatOption
+                )
             } else {
                 // New repeat nodeset is now empty
 
@@ -514,7 +549,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Remove control information for iterations that disappear
                 for (removedIteration ← children) {
 
-                    withDebug("removing iteration", Seq("id" → getEffectiveId, "index" → removedIteration.iterationIndex.toString)) {
+                    withDebug("removing iteration", Seq(
+                        "id"    → getEffectiveId,
+                        "index" → removedIteration.iterationIndex.toString
+                    )) {
                         // Dispatch destruction events and deindex old iteration
                         currentControlTree.dispatchDestructionEventsForRemovedContainer(removedIteration, true)
                         currentControlTree.deindexSubtree(removedIteration, true)
@@ -532,7 +570,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 (Seq(), Seq(), Seq(), None)
             }
 
-        // Keep information available until refresh events are dispatched, which must happen soon after this method was called
+        // Keep information available until refresh events are dispatched, which must happen soon after this method was
+        // called
         this.refreshInfo =
             if (updated || oldRepeatIndex != getIndex)
                 RefreshInfo(
@@ -593,12 +632,21 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         case _ ⇒ super.performDefaultAction(event)
     }
 
-    override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) = {
+    override def buildChildren(
+        buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
+        idSuffix  : Seq[Int]
+    ): Unit = {
 
         // Build all children that are not repeat iterations
-        Controls.buildChildren(this, staticControl.children filterNot (_.isInstanceOf[RepeatIterationControl]), buildTree, idSuffix)
+        Controls.buildChildren(
+            this,
+            staticControl.children filterNot (_.isInstanceOf[RepeatIterationControl]),
+            buildTree,
+            idSuffix
+        )
 
-        // Build one sub-tree per repeat iteration (iteration itself handles its own binding with pushBinding, depending on its index/suffix)
+        // Build one sub-tree per repeat iteration (iteration itself handles its own binding with pushBinding,
+        // depending on its index/suffix)
         val iterationAnalysis = staticControl.iteration.get
         for (iterationIndex ← 1 to bindingContext.nodeset.size)
             buildTree(container, bindingContext, iterationAnalysis, idSuffix :+ iterationIndex)
@@ -623,7 +671,11 @@ object XFormsRepeatControl {
     // Find the initial repeat indexes for the given doc
     // NOTE: cast is ugly, but we know Scala boxes Int as java.lang.Integer, however asJava doesn't reflect this
     def initialIndexesJava(doc: XFormsContainingDocument): JMap[String, JInteger] =
-        findIndexes(doc.getControls.getCurrentControlTree, doc.getStaticOps.repeats, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index).asJava.asInstanceOf[JMap[String, JInteger] ]
+        findIndexes(
+            doc.getControls.getCurrentControlTree,
+            doc.getStaticOps.repeats,
+            _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index
+        ).asJava.asInstanceOf[JMap[String, JInteger]]
 
     // Find the current repeat indexes for the given doc
     // NOTE: cast is ugly, but we know Scala boxes Int as java.lang.Integer, however asJava doesn't reflect this

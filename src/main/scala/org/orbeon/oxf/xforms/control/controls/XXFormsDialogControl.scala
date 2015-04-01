@@ -123,12 +123,12 @@ class XXFormsDialogControl(
             case XXFORMS_DIALOG_OPEN ⇒
                 // If dialog is closed and the focus is within the dialog, remove the focus
                 // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
-                if (! isVisible && Focus.isFocusWithinContainer(this))
-                    Focus.removeFocus(containingDocument)
-            case XXFORMS_DIALOG_CLOSE ⇒
-                // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
                 if (isVisible && ! Focus.isFocusWithinContainer(this))
                     Dispatch.dispatchEvent(new XFormsFocusEvent(this, false))
+            case XXFORMS_DIALOG_CLOSE ⇒
+                // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
+                if (! isVisible && Focus.isFocusWithinContainer(this))
+                    Focus.removeFocus(containingDocument)
             case _ ⇒
         }
         super.performDefaultAction(event)

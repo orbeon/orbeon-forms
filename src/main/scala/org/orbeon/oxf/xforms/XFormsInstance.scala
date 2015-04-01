@@ -216,7 +216,7 @@ class XFormsInstance(
             val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
             
             // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
-            val repeatControls = repeatControlsMap.values
+            val repeatControls = repeatControlsMap.values.to[List]
             for {
                 repeatControl ← repeatControls
                 // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates

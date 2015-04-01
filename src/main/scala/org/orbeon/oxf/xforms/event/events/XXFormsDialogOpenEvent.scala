@@ -25,6 +25,5 @@ class XXFormsDialogOpenEvent(target: XFormsEventTarget, properties: PropertyGett
         this(target, properties orElse Map("neighbor" → Option(neighbor), "constrain-to-viewport" → Option(constrainToViewport)))
 
     def neighbor            = property[String]("neighbor")
-    def jNeighbor           = neighbor.orNull
     def constrainToViewport = property[Boolean]("constrain-to-viewport") getOrElse false
 }

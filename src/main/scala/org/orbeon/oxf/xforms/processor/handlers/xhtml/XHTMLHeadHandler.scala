@@ -360,7 +360,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                 for (dialogControl ← dialogsToOpen) {
                     val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
                     val neighbor = (
-                        Option(dialogControl.getNeighborControlId)
+                        dialogControl.neighborControlId
                         map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
                         getOrElse "null"
                     )

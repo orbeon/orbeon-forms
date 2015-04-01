@@ -184,20 +184,20 @@ class XXFormsDialogControl(
             atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
             
             val visible = isVisible
-            if (visible != otherDialog.wasVisible) {
+            if (isNewlyVisibleSubtree || visible != otherDialog.wasVisible) {
                 atts.addAttribute("", "visibility", "visibility", CDATA, if (visible) "visible" else "hidden")
                 doOutputElement = true
             }
             if (visible) {
                 val neighborOpt = neighborControlId
-                if (neighborOpt != otherDialog.neighborControlId) {
+                if (isNewlyVisibleSubtree || neighborOpt != otherDialog.neighborControlId) {
                     neighborOpt foreach { neighbor ⇒
                         atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
                         doOutputElement = true
                     }
                 }
                 val constrain = isConstrainToViewport
-                if (constrain != otherDialog.isConstrainToViewport) {
+                if (isNewlyVisibleSubtree || constrain != otherDialog.isConstrainToViewport) {
                     atts.addAttribute("", "constrain", "constrain", CDATA, constrain.toString)
                     doOutputElement = true
                 }

@@ -23,7 +23,7 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
 
         import Builder._
 
-        val ControlsCount = 29 // change when we add/remove controls to toolbox (ideally would be known from source)
+        val ControlsCount = 30 // change when we add/remove controls to toolbox (ideally would be known from source)
 
         def clickOnToolboxControlButtons(from: Int, to: Int) =
             executeScript(

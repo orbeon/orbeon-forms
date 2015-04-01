@@ -262,7 +262,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Set new binding context on the repeat control
         locally {
-            // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
+            // NOTE: Here we just reevaluate against the parent; maybe we should reevaluate all the way down. See also:
+            // https://github.com/orbeon/orbeon-forms/issues/2156
             val contextStack = container.getContextStack
             if (bindingContext.parent eq null)
                 // This might happen at the top-level if there is no model and no variables in scope?

@@ -206,23 +206,53 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void outputAjaxDiff(XMLReceiverHelper ch, XFormsControl other,
-                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+    public void outputAjaxDiff(
+        XMLReceiverHelper ch,
+        XFormsControl other,
+        AttributesImpl attributesImpl,
+        boolean isNewlyVisibleSubtree
+    ) {
 
         // If needed, output basic diffs such as changes in class or LHHA
-        final boolean doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other);
-        if (doOutputElement) {
-            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+        {
+            final boolean doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other);
+            if (doOutputElement) {
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+            }
         }
 
-        // NOTE: At this point, this uses visible/hidden. But we could also handle this with relevant="true|false".
-        final String neighbor = getNeighborControlId();
-        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
-                "id", XFormsUtils.namespaceId(containingDocument(), getEffectiveId()),
-                "visibility", isVisible() ? "visible" : "hidden",
-                (neighbor != null && isVisible()) ? "neighbor" : null, XFormsUtils.namespaceId(containingDocument(), neighbor),
-                isVisible() ? "constrain" : null, Boolean.toString(isConstrainToViewport())
-        });
+        {
+            // NOTE: This uses visible/hidden. But we could also handle this with relevant="true|false".
+            // 2015-04-01: Unsure if note above still makes sense.
+            final XXFormsDialogControl otherDialog = (XXFormsDialogControl) other;
+            boolean doOutputElement = false;
+
+            final AttributesImpl atts = new AttributesImpl();
+            atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsUtils.namespaceId(containingDocument(), getEffectiveId()));
+
+            final boolean visible = isVisible();
+            if (visible != otherDialog.wasVisible()) {
+                atts.addAttribute("", "visibility", "visibility", XMLReceiverHelper.CDATA, visible ? "visible" : "hidden");
+                doOutputElement = true;
+            }
+
+            if (visible) {
+                final String neighbor = getNeighborControlId();
+                if (neighbor != null && ! neighbor.equals(otherDialog.getNeighborControlId())) {
+                    atts.addAttribute("", "neighbor", "neighbor", XMLReceiverHelper.CDATA, XFormsUtils.namespaceId(containingDocument(), neighbor));
+                    doOutputElement = true;
+                }
+                final boolean constrain = isConstrainToViewport();
+                if (constrain != otherDialog.isConstrainToViewport()) {
+                    atts.addAttribute("", "constrain", "constrain", XMLReceiverHelper.CDATA, Boolean.toString(constrain));
+                    doOutputElement = true;
+                }
+            }
+
+            if (doOutputElement) {
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", atts);
+            }
+        }
     }
 
     public boolean contentVisible() {

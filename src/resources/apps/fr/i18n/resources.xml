@@ -52,7 +52,7 @@
             <save-locally>Save Locally</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Refresh"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
 
@@ -340,7 +340,7 @@
             <save-locally>Enreg. Local</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Rafraîchir"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Suivant</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Précédent</wizard-prev>
 
@@ -632,7 +632,7 @@
             <save-locally>Save Locally</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Actualizar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
 
@@ -910,7 +910,7 @@
             <save-locally>Lagre lokalt</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Oppdater"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
 
@@ -1186,7 +1186,7 @@
             <save-locally>Сохр.на диск</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Обновить"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
 
@@ -1460,7 +1460,7 @@
             <save-locally>Salva localmente</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Aggiorna"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
 
@@ -1747,7 +1747,7 @@
             <save-locally>Lokal speichern</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Aktualisieren"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
 
@@ -2034,7 +2034,7 @@
             <save-locally>Tallenna paikallisesti</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Lataa sivu uudelleen"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Seuraava</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Edellinen</wizard-prev>
 
@@ -2321,7 +2321,7 @@
             <save-locally>Spara lokalt</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Visa på nytt"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
 
@@ -2608,7 +2608,7 @@
             <save-locally>Lokaal bewaren</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Verversen"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
 
@@ -2895,7 +2895,7 @@
             <save-locally>Guardar Localmente</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
-            <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+            <refresh>&lt;i class="icon-refresh" aria-label="Refrescar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
 

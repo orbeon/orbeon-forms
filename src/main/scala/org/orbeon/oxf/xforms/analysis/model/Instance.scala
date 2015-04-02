@@ -33,10 +33,19 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 /**
  * Static analysis of an XForms instance.
  */
-class Instance(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-        with InstanceMetadata
-        with Logging {
+class Instance(
+    staticStateContext : StaticStateContext,
+    element            : Element,
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
+    scope              : Scope
+) extends SimpleElementAnalysis(
+    staticStateContext,
+    element,
+    parent,
+    preceding,
+    scope
+) with InstanceMetadata with Logging {
 
     def partExposeXPathTypes = part.isExposeXPathTypes
 
@@ -45,7 +54,8 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
             locationData,
             Some("processing XForms instance"),
             List("id" → staticId),
-            Option(element))
+            Option(element)
+        )
 
     // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
     // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple
@@ -138,13 +148,15 @@ trait InstanceMetadata {
     def inlineContent: DocumentInfo
 
     // Extract the inline content into a new document (mutable or not)
-    protected def extractInlineContent = extractDocument(root.get, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false)
+    protected def extractInlineContent =
+        extractDocument(root.get, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false)
 
     // Don't allow more than one child element
     if (Dom4j.elements(element).size > 1)
         throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
-    private def getAttributeEncode(qName: QName) = Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trim, true))
+    private def getAttributeEncode(qName: QName) =
+        Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trim, true))
 
     private def src = getAttributeEncode(SRC_QNAME)
     private def resource = getAttributeEncode(RESOURCE_QNAME)
@@ -179,7 +191,13 @@ object Instance {
     //
     // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
     // @exposeXPathTypes if true, use a TypedDocumentWrapper
-    def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean, removeInstanceData: Boolean): DocumentInfo = {
+    def extractDocument(
+        element               : Element,
+        excludeResultPrefixes : Set[String],
+        readonly              : Boolean,
+        exposeXPathTypes      : Boolean,
+        removeInstanceData    : Boolean
+    ): DocumentInfo = {
 
         require(! (readonly && exposeXPathTypes)) // we can't expose types on readonly instances at the moment
 
@@ -202,12 +220,23 @@ object Instance {
         if (readonly)
             TransformerUtils.dom4jToTinyTree(XPath.GlobalConfiguration, extractDocument, false)
         else
-            wrapDocument(if (removeInstanceData) InstanceData.remove(extractDocument) else extractDocument, exposeXPathTypes)
+            wrapDocument(
+                if (removeInstanceData) InstanceData.remove(extractDocument) else extractDocument,
+                exposeXPathTypes
+            )
     }
 
-    def wrapDocument(document: Document, exposeXPathTypes: Boolean) =
+    def wrapDocument(document: Document, exposeXPathTypes: Boolean): DocumentWrapper =
         if (exposeXPathTypes)
-            new TypedDocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPath.GlobalConfiguration)
+            new TypedDocumentWrapper(
+                Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document],
+                null,
+                XPath.GlobalConfiguration
+            )
         else
-            new DocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPath.GlobalConfiguration)
+            new DocumentWrapper(
+                Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document],
+                null,
+                XPath.GlobalConfiguration
+            )
 }

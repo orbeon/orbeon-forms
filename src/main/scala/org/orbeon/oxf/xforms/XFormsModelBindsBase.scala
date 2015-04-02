@@ -83,7 +83,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             // Only need to do this after the first rebuild
             if (! isFirstRebuild)
                 for (instance ← model.getInstances.asScala) {
-                    // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                    // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to
+                    // figure out the dependencies.
                     // The reason is that clearing this state can take quite some time
                     val instanceMightBeSchemaValidated = model.hasSchema && instance.isSchemaValidation
                     val instanceMightHaveMips =
@@ -209,7 +210,12 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             variableResolver   = model.variableResolver
         )
 
-    protected def handleMIPXPathException(throwable: Throwable, bindNode: BindNode, xpathMIP: StaticXPathMIP, message: String): Unit = {
+    protected def handleMIPXPathException(
+        throwable : Throwable,
+        bindNode  : BindNode,
+        xpathMIP  : StaticXPathMIP,
+        message   : String
+    ): Unit = {
         Exceptions.getRootThrowable(throwable) match {
             case e: TypedNodeWrapper.TypedValueException ⇒
                 // Consider validation errors as ignorable. The rationale is that if the function (the XPath
@@ -217,7 +223,11 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 // produce a meaningful result. We think that it is worth handling this condition slightly differently
                 // from other dynamic and static errors, so that users can just write expression without constant checks
                 // with `castable as` or `instance of`.
-                debug("typed value exception", List("node name" → e.nodeName, "expected type" → e.typeName, "actual value" → e.nodeValue))
+                debug("typed value exception", List(
+                    "node name"     → e.nodeName,
+                    "expected type" → e.typeName,
+                    "actual value"  → e.nodeValue
+                ))
             case t ⇒
                 // All other errors dispatch an event and will cause the usual fatal-or-not behavior
                 val ve = OrbeonLocationException.wrapException(t,

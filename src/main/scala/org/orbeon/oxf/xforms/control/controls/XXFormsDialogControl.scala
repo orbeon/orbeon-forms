@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import java.{util ⇒ ju}
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
@@ -35,7 +35,7 @@ private case class XXFormsDialogControlLocal(
     var neighborControlId   : Option[String]
 ) extends XFormsControlLocal
 
-// Represents an extension xxf:dialog control.
+// Represents an extension xxf:dialog control
 class XXFormsDialogControl(
     container   : XBLContainer, 
     parent      : XFormsControl, 
@@ -73,8 +73,8 @@ class XXFormsDialogControl(
                     neighborControlId   = keyValues.get("neighbor")
                 ))
             case None if restoreState ⇒
-                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
-                // particular control might not be found.
+                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
+                // a particular control might not be found.
                 setLocal(XXFormsDialogControlLocal(
                     visible             = initiallyVisible,
                     constrainToViewport = false,
@@ -171,7 +171,7 @@ class XXFormsDialogControl(
         locally {
             val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
             if (doOutputElement)
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl)
+                ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
         }
 
         locally {
@@ -203,7 +203,7 @@ class XXFormsDialogControl(
                 }
             }
             if (doOutputElement)
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", atts)
+                ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", atts)
         }
     }
 

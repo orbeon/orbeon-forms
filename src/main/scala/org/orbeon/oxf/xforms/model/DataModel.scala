@@ -248,13 +248,9 @@ object DataModel {
         null
     }
 
-    // For Java callers
-    trait NodeVisitor { def visit(nodeInfo: NodeInfo) }
-    def visitElementJava(root: NodeInfo, visitor: NodeVisitor) = visitElement(root, visitor.visit)
-
     // Visit the given element, its attributes, and its children nodes recursively
     // NOTE: Because this can be a hot spot, this is written more Java-like. Make changes carefully.
-    def visitElement(e: NodeInfo, visit: NodeInfo ⇒ Unit) {
+    def visitElement(e: NodeInfo, visit: NodeInfo ⇒ Unit): Unit = {
 
         visit(e)
 

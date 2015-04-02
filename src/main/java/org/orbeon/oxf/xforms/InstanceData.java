@@ -372,7 +372,8 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static void clearState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
+        final InstanceData existingInstanceData =
+            getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
         if (existingInstanceData != null) {
             existingInstanceData.bindNodes = null;
             existingInstanceData.bindType = null;
@@ -383,7 +384,8 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static void clearSchemaState(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
+        final InstanceData existingInstanceData =
+            getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
         if (existingInstanceData != null) {
             existingInstanceData.schemaType = null;
             existingInstanceData.schemaInvalid = false;

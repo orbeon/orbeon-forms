@@ -92,10 +92,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                         dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId)
     
                     if (instanceMightBeSchemaValidated || instanceMightHaveMips)
-                        DataModel.visitElementJava(instance.rootElement, new DataModel.NodeVisitor {
-                            def visit(nodeInfo: NodeInfo): Unit =
-                                InstanceData.clearState(nodeInfo)
-                        })
+                        DataModel.visitElement(instance.rootElement, InstanceData.clearState)
                 }
 
             // Not ideal, but this state is updated when the bind tree is updated below

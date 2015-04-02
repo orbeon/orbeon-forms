@@ -172,10 +172,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
                 instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
                 if instanceMightBeSchemaValidated
             } locally {
-                DataModel.visitElementJava(instance.rootElement, new DataModel.NodeVisitor {
-                    def visit(nodeInfo: NodeInfo) =
-                        InstanceData.clearSchemaState(nodeInfo)
-                })
+                DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
             }
 
             // Validate using schemas if needed

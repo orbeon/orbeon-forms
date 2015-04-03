@@ -35,7 +35,7 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             regularInput ← regularSpan.findElement(By.cssSelector("input"))
             // Clear input
             _ ← regularInput.click()
-            _ ← regularInput.sendKeys(Keys.DELETE)
+            _ ← regularInput.clear()
             // Should not be invalid or shown in the error summary
             _ ← assert(! isInvalid(regularSpan))
             _ ← assert(! inErrorSummary("regular"))

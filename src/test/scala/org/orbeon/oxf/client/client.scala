@@ -40,7 +40,10 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     implicit val patienceConfig       = PatienceConfig(timeout = scaled(OrbeonClientBase.DefaultTimeout), interval = scaled(Span(100, Millis)))
 
     def loadOrbeonPage(path: String) =
-        go to "http://localhost:8080/orbeon/" + dropStartingSlash(path)
+        for  {
+            _ ← webDriver.get("http://localhost:8080/orbeon/" + dropStartingSlash(path))
+            _ ← assert(executeScript("return document.readyState == 'complete'").asInstanceOf[Boolean])
+        }()
 
     def loadHomePage() = loadOrbeonPage("/")
 

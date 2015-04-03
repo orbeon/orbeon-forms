@@ -78,7 +78,7 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             _ ← incrementalInput.click()
             _ ← assert(! isInvalid(incrementalSpan))
             _ ← assert(! inErrorSummary("incremental"))
-            _ ← incrementalInput.sendKeys(Keys.DELETE)
+            _ ← incrementalInput.clear()
             _ ← assert(isInvalid(incrementalSpan))
             //_ ← assert(inErrorSummary("incremental")) // FIXME
         }()

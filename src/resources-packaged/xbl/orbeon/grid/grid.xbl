@@ -45,26 +45,26 @@
         <!-- Keep a single global copy of the grid row menu. It is moved around as needed. -->
         <xxbl:global>
             <div class="dropdown fr-grid-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml">
-                <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1">
+                <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1" aria-expanded="false">
                     <span class="caret"/>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li class="fr-insert-above">
-                        <a tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
+                    <li role="presentation" class="fr-insert-above">
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
                     </li>
-                    <li class="fr-insert-below">
-                        <a tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
+                    <li role="presentation" class="fr-insert-below">
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
                     </li>
-                    <li class="divider"/>
-                    <li class="fr-move-up">
-                        <a tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
+                    <li role="presentation" class="divider"/>
+                    <li role="presentation" class="fr-move-up">
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
                     </li>
-                    <li class="fr-move-down">
-                        <a tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                    <li role="presentation" class="fr-move-down">
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
                     </li>
-                    <li class="divider"/>
-                    <li class="fr-remove">
-                        <a tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
+                    <li role="presentation" class="divider"/>
+                    <li role="presentation" class="fr-remove">
+                        <a role="menuitem" tabindex="-1" href="#"><i class="icon-minus-sign"/><xf:output value="xxf:r('components.grid.remove', 'fr-fr-resources')"/></a>
                     </li>
                 </ul>
             </div>
@@ -463,7 +463,10 @@
                         <xsl:if test="$is-repeat and not($readonly) and $static-row-pos = 1">
                             <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
                                 <xh:div class="dropdown">
-                                    <xh:button class="btn btn-mini fr-grid-dropdown-button">
+                                    <xh:button
+                                        class="btn btn-mini fr-grid-dropdown-button"
+                                        aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
+                                        aria-expanded="false">
                                         <xh:span class="caret"/>
                                     </xh:button>
                                 </xh:div>

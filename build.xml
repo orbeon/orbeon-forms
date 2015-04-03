@@ -218,7 +218,7 @@
 
             Suffix CE or PE is separate from the version number.
          -->
-        <property name="version.number" value="4.9.0.pre"/>
+        <property name="version.number" value="4.9.0"/>
         <property name="edition" value="CE"/>
         <property name="version.suffix" value=""/>
         <tstamp>

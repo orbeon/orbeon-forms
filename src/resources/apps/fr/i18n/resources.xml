@@ -360,7 +360,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
             <no>&lt;i class="icon-remove"/&gt; Non</no>
-            <ok>D'accord</ok>
+            <ok>OK</ok>
         </buttons>
         <components>
             <labels>

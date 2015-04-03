@@ -123,7 +123,10 @@
                                                     <fr:repeater ref="*" xbl:attr="template origin min max remove-constraint">
                                                         <xsl:if test="not($readonly)">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-repeat-menu dropdown">
-                                                                <xh:button class="btn btn-mini fr-repeater-dropdown-button">
+                                                                <xh:button
+                                                                    class="btn btn-mini fr-repeater-dropdown-button"
+                                                                    aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
+                                                                    aria-expanded="false">
                                                                     <xh:span class="caret"/>
                                                                 </xh:button>
                                                             </xh:div>

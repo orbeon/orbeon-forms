@@ -467,65 +467,65 @@
                     <xf:group ref=".[$any-has-admin-permission]" class="btn-toolbar" xmlns="http://www.w3.org/1999/xhtml" xxf:element="div">
                         <div class="btn-group">
 
-                            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                            <button id="select-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                 <xf:output value="$fr-resources/home/buttons/select"/>
                                 <span class="caret"/>
                             </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <xf:trigger appearance="minimal">
+                            <ul class="dropdown-menu" role="menu" aria-labelledBy="select-button">
+                                <li role="presentation">
+                                    <xf:trigger appearance="minimal" role="menuitem">
                                         <xf:label ref="$fr-resources/home/buttons/all"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin'] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
-                                <li>
-                                    <xf:trigger appearance="minimal">
+                                <li role="presentation">
+                                    <xf:trigger appearance="minimal" role="menuitem">
                                         <xf:label ref="$fr-resources/home/buttons/none"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"/>
                                     </xf:trigger>
                                 </li>
 
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(local-unpublish-select)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-unpublish-select">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(local-unpublish-select)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-unpublish-select">
                                         <xf:label ref="$fr-resources/home/buttons/unpublished-local"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalUnavailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(local-publish-select)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-publish-select">
+                                <li role="presentation" class="{if (xxf:readonly(local-publish-select)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-publish-select">
                                         <xf:label ref="$fr-resources/home/buttons/published-local"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalAvailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(remote-unpublish-select)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-unpublish-select">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(remote-unpublish-select)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-unpublish-select">
                                         <xf:label ref="$fr-resources/home/buttons/unpublished-remote"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteUnavailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(remote-publish-select)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-publish-select">
+                                <li role="presentation" class="{if (xxf:readonly(remote-publish-select)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-publish-select">
                                         <xf:label ref="$fr-resources/home/buttons/published-remote"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteAvailable(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(local-newer-select)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-newer-select">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(local-newer-select)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-newer-select">
                                         <xf:label ref="$fr-resources/home/buttons/newer-local"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalNewer(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(remote-newer-select)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-newer-select">
+                                <li role="presentation" class="{if (xxf:readonly(remote-newer-select)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-newer-select">
                                         <xf:label ref="$fr-resources/home/buttons/newer-remote"/>
                                         <xf:setvalue event="DOMActivate" ref="instance()/selection"
                                             value="string-join(for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteNewer(.)] return concat($f/application-name, '/', $f/form-name), ' ')"/>
@@ -536,64 +536,64 @@
 
                         <div class="btn-group">
 
-                            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                            <button id="operations-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                 <xf:output value="$fr-resources/home/buttons/operation"/>
                                 <span class="caret"/>
                             </button>
-                            <ul class="dropdown-menu">
-                                <li class="{if (xxf:readonly(local-publish-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-publish-action" id="fr-publish-local-button">
+                            <ul class="dropdown-menu" role="menu" aria-labelledBy="operations-button">
+                                <li role="presentation" class="{if (xxf:readonly(local-publish-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-publish-action" id="fr-publish-local-button">
                                         <xf:label ref="$fr-resources/home/buttons/publish-local"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(local-unpublish-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-unpublish-action" id="fr-unpublish-local-button">
+                                <li role="presentation" class="{if (xxf:readonly(local-unpublish-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-unpublish-action" id="fr-unpublish-local-button">
                                         <xf:label ref="$fr-resources/home/buttons/unpublish-local"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(remote-publish-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-publish-action" id="fr-publish-remote-button">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(remote-publish-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-publish-action" id="fr-publish-remote-button">
                                         <xf:label ref="$fr-resources/home/buttons/publish-remote"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(remote-unpublish-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-unpublish-action" id="fr-unpublish-remote-button">
+                                <li role="presentation" class="{if (xxf:readonly(remote-unpublish-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-unpublish-action" id="fr-unpublish-remote-button">
                                         <xf:label ref="$fr-resources/home/buttons/unpublish-remote"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(local-to-remote-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-to-remote-action" id="fr-local-to-remote-button">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(local-to-remote-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-to-remote-action" id="fr-local-to-remote-button">
                                         <xf:label ref="$fr-resources/home/buttons/push-to-remote"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(remote-to-local-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-to-local-action" id="fr-remote-to-local-button">
+                                <li role="presentation" class="{if (xxf:readonly(remote-to-local-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-to-local-action" id="fr-remote-to-local-button">
                                         <xf:label ref="$fr-resources/home/buttons/pull-from-remote"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(summary-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="summary-action" id="fr-summary-button">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(summary-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="summary-action" id="fr-summary-button">
                                         <xf:label ref="$fr-resources/home/buttons/navigate-summary"/>
                                         <xf:load event="DOMActivate" resource="/fr/{xxf:split($selection[1], '/')[1]}/{xxf:split($selection[1], '/')[2]}/summary"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(new-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="summary-action" id="fr-new-button">
+                                <li role="presentation" class="{if (xxf:readonly(new-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="summary-action" id="fr-new-button">
                                         <xf:label ref="$fr-resources/home/buttons/navigate-new"/>
                                         <xf:load event="DOMActivate" resource="/fr/{xxf:split($selection[1], '/')[1]}/{xxf:split($selection[1], '/')[2]}/new"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="divider"/>
-                                <li class="{if (xxf:readonly(local-upgrade-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="local-upgrade-action" id="fr-upgrade-local-button">
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(local-upgrade-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-upgrade-action" id="fr-upgrade-local-button">
                                         <xf:label ref="$fr-resources/home/buttons/upgrade-local"/>
                                     </xf:trigger>
                                 </li>
-                                <li class="{if (xxf:readonly(remote-upgrade-action)) then 'disabled' else ()}">
-                                    <xf:trigger appearance="minimal" ref="remote-upgrade-action" id="fr-upgrade-remote-button">
+                                <li role="presentation" class="{if (xxf:readonly(remote-upgrade-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-upgrade-action" id="fr-upgrade-remote-button">
                                         <xf:label ref="$fr-resources/home/buttons/upgrade-remote"/>
                                     </xf:trigger>
                                 </li>
@@ -637,7 +637,7 @@
                             </li>
                             <!-- Some results -->
                             <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
-                                <li>
+                                <li role="presentation">
                                     <span>
                                         <xf:output value="max((instance('fr-paging-instance')/from, 0))"/>
                                         <xf:output value="$fr-resources/summary/paging/to"/>

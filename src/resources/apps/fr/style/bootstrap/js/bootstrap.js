@@ -664,6 +664,7 @@
         var $el = $(element).on('click.dropdown.data-api', this.toggle)
         $('html').on('click.dropdown.data-api', function () {
           $el.parent().removeClass('open')
+          $el.attr('aria-expanded', 'false')
         })
       }
 
@@ -690,9 +691,8 @@
           $('<div class="dropdown-backdrop"/>').insertBefore($(this)).on('click', clearMenus)
         }
         $parent.toggleClass('open')
+        $this.focus().attr('aria-expanded', 'true')
       }
-
-      $this.focus()
 
       return false
     }
@@ -743,7 +743,9 @@
   function clearMenus() {
     $('.dropdown-backdrop').remove()
     $(toggle).each(function () {
-      getParent($(this)).removeClass('open')
+      var $this = $(this)
+      getParent($this).removeClass('open')
+      $this.attr('aria-expanded', 'false')
     })
   }
 

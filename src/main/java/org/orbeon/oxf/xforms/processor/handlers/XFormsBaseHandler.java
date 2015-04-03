@@ -123,6 +123,12 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             if (value != null)
                 destAttributes.addAttribute("", "accesskey", "accesskey", XMLReceiverHelper.CDATA, value);
         }
+        // Handle "role"
+        {
+            final String value = srcAttributes.getValue("role");
+            if (value != null)
+                destAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, value);
+        }
     }
 
     public static void handleAriaAttributes(boolean required, boolean valid, AttributesImpl destAttributes) {

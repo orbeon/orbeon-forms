@@ -15,11 +15,8 @@
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -39,29 +36,37 @@
                 <xxf:show dialog="dialog" xxbl:scope="inner"/>
             </xbl:handler>
         </xbl:handlers>
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance>
+                    <alert>
+                        <message/>
+                        <context/>
+                        <positive/>
+                        <negative/>
+                        <neutral/>
+                    </alert>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:template match="/*">
 
-                    <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
+                    <xsl:variable 
+                        name="has-multiple-choices" 
+                        select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
 
                     <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
-                    <xxf:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="{(@close, 'false')[1]}"
-                            class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
-
-                        <xf:model>
-                            <xf:instance>
-                                <alert>
-                                    <message/>
-                                    <context/>
-                                    <positive/>
-                                    <negative/>
-                                    <neutral/>
-                                </alert>
-                            </xf:instance>
-                        </xf:model>
+                    <xxf:dialog 
+                        xxbl:scope="inner" 
+                        id="dialog" 
+                        level="modal" 
+                        appearance="full" 
+                        close="{(@close, 'false')[1]}"
+                        class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
 
                         <xf:var name="local" value="instance()"/>
 
@@ -103,7 +108,7 @@
                                     <xxf:hide dialog="dialog" xxbl:scope="inner"/>
                                     <xf:setvalue iterate="*" ref="." xxbl:scope="inner"/>
                                 </xf:action>
-                                <xsl:variable name="buttons" as="element(xf:trigger)*">
+                                <xsl:variable name="buttons" as="element()*">
                                     <xsl:apply-templates/>
                                 </xsl:variable>
                                 <xsl:for-each select="$buttons">
@@ -121,44 +126,40 @@
                 </xsl:template>
 
                 <xsl:template match="fr:positive-choice">
-                    <!-- TODO: i18n -->
-                    <xsl:variable name="default"><xh:i class="icon-ok"/> Yes</xsl:variable>
-                    <xsl:copy-of select="xf:trigger(@xxf:modal | *, $default, 'positive')"/>
+                    <xsl:copy-of
+                        select="xf:trigger(@xxf:modal | *, 'xxf:r(''buttons.yes'', ''|fr-fr-resources|'')', 'positive')"/>
                 </xsl:template>
 
                 <xsl:template match="fr:negative-choice">
-                    <!-- TODO: i18n -->
-                    <xsl:variable name="default"><xh:i class="icon-remove"/> No</xsl:variable>
-                    <xsl:copy-of select="xf:trigger(@xxf:modal | *, $default, 'negative')"/>
+                    <xsl:copy-of
+                        select="xf:trigger(@xxf:modal | *, 'xxf:r(''buttons.no'', ''|fr-fr-resources|'')', 'negative')"/>
                 </xsl:template>
 
                 <xsl:template match="fr:neutral-choice">
-                    <!-- TODO: i18n -->
-                    <xsl:copy-of select="xf:trigger(@xxf:modal | *, 'OK', 'neutral')"/>
+                    <xsl:copy-of
+                        select="xf:trigger(@xxf:modal | *, 'xxf:r(''buttons.ok'', ''|fr-fr-resources|'')', 'neutral')"/>
                 </xsl:template>
 
                 <xsl:function name="xf:trigger" as="element(xf:trigger)">
                     <xsl:param name="content" as="node()*"/>
-                    <xsl:param name="default" as="item()*"/>
+                    <xsl:param name="default" as="xs:string"/>
                     <xsl:param name="handler" as="xs:string"/>
                     <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
                     <xf:trigger xxbl:scope="outer">
                         <xsl:copy-of select="$content except $fr-label"/>
-                        <xf:label>
-                            <xsl:choose>
-                                <xsl:when test="exists($fr-label)">
-                                    <!-- We used to use an <xf:output> wrapper here because we prepended icons above.
-                                         This change broke the case where there was a non-default static label. Now we
-                                         pass <xh:i> via $default instead. It's not ideal that we need to hardcode
-                                         <xh:i> and it would be better if we could revert to using CSS for this.
-                                         See: https://github.com/orbeon/orbeon-forms/issues/607 -->
-                                    <xsl:copy-of select="$fr-label/(@* | node())"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:copy-of select="$default"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xf:label>
+                        <xsl:choose>
+                            <xsl:when test="exists($fr-label)">
+                                <!-- We used to use an <xf:output> wrapper here because we prepended icons above.
+                                     This change broke the case where there was a non-default static label. Now we
+                                     pass <xh:i> via $default instead. It's not ideal that we need to hardcode
+                                     <xh:i> and it would be better if we could revert to using CSS for this.
+                                     See: https://github.com/orbeon/orbeon-forms/issues/607 -->
+                                <xf:label><xsl:copy-of select="$fr-label/(@* | node())"/></xf:label>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:label mediatype="text/html" value="{$default}"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                         <!-- If a custom target is provided, dispatch to it -->
                         <xf:action ev:event="DOMActivate">
                             <xf:var name="local"><xxf:value value="$local" xxbl:scope="inner"/></xf:var>

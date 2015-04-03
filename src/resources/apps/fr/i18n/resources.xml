@@ -71,6 +71,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Yes</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
+            <ok>OK</ok>
         </buttons>
         <components>
             <labels>
@@ -359,6 +360,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
             <no>&lt;i class="icon-remove"/&gt; Non</no>
+            <ok>D'accord</ok>
         </buttons>
         <components>
             <labels>
@@ -651,6 +653,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -929,6 +932,7 @@
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -1205,6 +1209,7 @@
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -1479,6 +1484,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Sì</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -1766,6 +1772,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nein</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -2053,6 +2060,7 @@
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -2340,6 +2348,7 @@
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -2627,6 +2636,7 @@
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>
@@ -2914,6 +2924,7 @@
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
+            <ok todo="true">OK</ok>
         </buttons>
         <components>
             <labels>

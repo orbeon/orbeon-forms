@@ -949,6 +949,7 @@
                 <move-up todo="true">[Move Up]</move-up>
                 <move-down todo="true">[Move Down]</move-down>
                 <remove todo="true">[Remove]</remove>
+                <menu todo="true">Menu</menu>
             </grid>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
@@ -1226,6 +1227,7 @@
                 <move-up todo="true">[Move Up]</move-up>
                 <move-down todo="true">[Move Down]</move-down>
                 <remove todo="true">[Remove]</remove>
+                <menu todo="true">Menu</menu>
             </grid>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>

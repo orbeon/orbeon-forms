@@ -42,7 +42,8 @@ trait ControlEventSupport {
                 val controls = containingDocument.getControls
                 // Find all repeat iterations and controls again
                 for (repeatIterationEffectiveId ← repeatIterationsToModify) {
-                    val repeatIterationControl = containingDocument.getControlByEffectiveId(repeatIterationEffectiveId).asInstanceOf[XFormsRepeatIterationControl]
+                    val repeatIterationControl =
+                        containingDocument.getControlByEffectiveId(repeatIterationEffectiveId).asInstanceOf[XFormsRepeatIterationControl]
                     val newRepeatIndex = repeatIterationControl.iterationIndex
 
                     val indentedLogger = controls.getIndentedLogger

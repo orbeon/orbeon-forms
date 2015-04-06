@@ -148,7 +148,7 @@ public class XFormsContextStack {
         if (model != null && model.getDefaultInstance() != null) {
             // Push the default context if there is a model with an instance
             final Item defaultNode = model.getDefaultInstance().rootElement();
-            final List<Item> defaultNodeset = Arrays.asList(defaultNode);
+            final List<Item> defaultNodeset = Collections.singletonList(defaultNode);
             this.head = new BindingContext(parentBindingContext, model, null, defaultNodeset, 1, null, true, null,
                     model.getDefaultInstance().getLocationData(), false, defaultNode, container.innerScope());
         } else {

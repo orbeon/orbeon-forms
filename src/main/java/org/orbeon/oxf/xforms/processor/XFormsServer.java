@@ -733,7 +733,7 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             // Output errors
-            final List<XFormsError.ServerError> errors = containingDocument.getServerErrors();
+            final List<ServerError> errors = containingDocument.getServerErrors();
             if (errors.size() > 0)
                 XFormsError.outputAjaxErrors(ch, errors);
 

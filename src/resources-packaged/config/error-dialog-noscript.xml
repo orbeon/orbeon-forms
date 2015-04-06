@@ -1,8 +1,8 @@
 <div xmlns="http://www.w3.org/1999/xhtml"
      class="xforms-error-panel yui-panel">
-    <div class="hd">Error</div>
+    <div class="hd">An error has occurred</div>
     <div class="bd">
-        <p>A system error occurred. You can do one of the following:</p>
+        <p>You may want to try one of the following:</p>
         <ol>
             <li><p>Try to continue to use this page.</p></li>
             <li>

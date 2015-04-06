@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XINCLUDE_URI}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+import scala.StringBuilder
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
@@ -291,6 +292,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
         val uniqueClientScripts = containingDocument.getStaticOps.uniqueClientScripts
 
+        val errorsToShow      = containingDocument.getServerErrors.asScala
         val scriptsToRun      = containingDocument.getScriptsToRun.asScala
         val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
         val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
@@ -318,6 +320,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
             uniqueClientScripts.nonEmpty
 
         val mustRunAnyScripts =
+            errorsToShow.nonEmpty       ||
             scriptsToRun.nonEmpty       ||
             focusElementIdOpt.isDefined ||
             messagesToRun.nonEmpty      ||
@@ -373,6 +376,17 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
                 focusElementIdOpt foreach { id ⇒
                     sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
                 }
+
+                // Initial errors
+                if (errorsToShow.nonEmpty) {
+
+                    val title   = "Non-fatal error"
+                    val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
+                    val formId  = XFormsUtils.getFormId(containingDocument)
+
+                    sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
+                }
+
                 sb append " }"
 
                 helper.text(sb.toString)

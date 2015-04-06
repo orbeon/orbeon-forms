@@ -87,7 +87,6 @@ public class XFormsProperties {
     public static final String DATEPICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
     public static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
     public static final String SHOW_RECOVERABLE_ERRORS_PROPERTY = "show-recoverable-errors";
-    public static final String FATAL_ERRORS_DURING_INITIALIZATION_PROPERTY = "fatal-errors-during-initialization";
 
     public static final String LOGIN_PAGE_DETECTION_REGEXP = "login-page-detection-regexp";
     public static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
@@ -213,7 +212,6 @@ public class XFormsProperties {
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(SHOW_RECOVERABLE_ERRORS_PROPERTY, 10, false),
-            new PropertyDefinition(FATAL_ERRORS_DURING_INITIALIZATION_PROPERTY, true, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),

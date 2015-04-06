@@ -1980,6 +1980,7 @@
 
                 } else if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "errors") {
 
+                    // NOTE: Similar code is in XFormsError.scala.
                     // <xxf:errors>
                     var errorsElement = responseRoot.childNodes[i];
                     var details = "<ul>";

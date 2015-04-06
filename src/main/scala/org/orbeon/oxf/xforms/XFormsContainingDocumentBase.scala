@@ -204,7 +204,6 @@ trait ContainingDocumentProperties {
     def getDateFormatInput                    = staticStringProperty(DATE_FORMAT_INPUT_PROPERTY)
 
     def getShowMaxRecoverableErrors           = staticIntProperty(SHOW_RECOVERABLE_ERRORS_PROPERTY)
-    def getFatalErrorsDuringInitialization    = staticBooleanProperty(FATAL_ERRORS_DURING_INITIALIZATION_PROPERTY)
     def getSubmissionPollDelay                = staticIntProperty(ASYNC_SUBMISSION_POLL_DELAY)
     def getAjaxFullUpdateThreshold            = staticIntProperty(AJAX_UPDATE_FULL_THRESHOLD)
 

@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.errorified._
+import org.orbeon.oxf.util.ScalaUtils._
 
 // Orbeon-specific exception formatter
 object OrbeonFormatter extends Formatter {
@@ -35,14 +36,20 @@ object OrbeonFormatter extends Formatter {
 
     // Create SourceLocation from LocationData
     private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
-        if (isNotBlank(locationData.getSystemID)) {
+        isNotBlank(locationData.getSystemID) option {
+
             val (description, params) =
                 locationData match {
                     case extended: ExtendedLocationData ⇒ (extended.description, extended.params)
                     case _                              ⇒ (None, Nil)
                 }
 
-            Some(SourceLocation(locationData.getSystemID, filterLineCol(locationData.getLine), filterLineCol(locationData.getCol), description, params.to[List]))
-        } else
-            None
+            SourceLocation(
+                locationData.getSystemID,
+                filterLineCol(locationData.getLine),
+                filterLineCol(locationData.getCol),
+                description,
+                params.to[List]
+            )
+        }
 }

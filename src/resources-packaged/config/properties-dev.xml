@@ -31,7 +31,7 @@
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                     value="false"/>
-    <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                      value="10"/>
+    <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                      value="0"/>
 
     <xi:include href="oxf:/config/properties-local.xml"/>
     <xi:include href="oxf:/config/properties-local-dev.xml"/>

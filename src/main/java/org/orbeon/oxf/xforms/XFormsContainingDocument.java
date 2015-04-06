@@ -101,7 +101,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     private List<Script> scriptsToRun;
     private String helpEffectiveControlId;
     private List<DelayedEvent> delayedEvents;
-    private List<XFormsError.ServerError> serverErrors;
+    private List<ServerError> serverErrors;
     private Set<String> controlsStructuralChanges;
 
     private final XPathDependencies xpathDependencies;
@@ -757,19 +757,19 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         }
     }
     
-    public void addServerError(XFormsError.ServerError serverError) {
+    public void addServerError(ServerError serverError) {
         final int maxErrors = getShowMaxRecoverableErrors();
         if (maxErrors > 0) {
             if (serverErrors == null)
-                serverErrors = new ArrayList<XFormsError.ServerError>();
+                serverErrors = new ArrayList<ServerError>();
 
             if (serverErrors.size() < maxErrors)
                 serverErrors.add(serverError);
         }
     }
     
-    public List<XFormsError.ServerError> getServerErrors() {
-        return serverErrors != null ? serverErrors : Collections.<XFormsError.ServerError>emptyList();
+    public List<ServerError> getServerErrors() {
+        return serverErrors != null ? serverErrors : Collections.<ServerError>emptyList();
     }
 
     public Set<String> getControlsStructuralChanges() {

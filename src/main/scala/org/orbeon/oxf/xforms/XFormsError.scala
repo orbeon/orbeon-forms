@@ -13,123 +13,182 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.errorified.Exceptions
-import action.XFormsAPI._
-import event.XFormsEventTarget
-import model.DataModel.Reason
-import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.scaxon.XML._
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.oxf.util.XPath
-import collection.JavaConverters._
-import org.orbeon.oxf.xml._
-import dom4j.LocationData
-import processor.handlers.xhtml.XHTMLBodyHandler
-import org.orbeon.saxon.om.NodeInfo
-import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.common.{OrbeonLocationException, OXFException}
 import java.util.{List ⇒ JList}
-import xbl.{Scope, XBLContainer}
+
+import org.apache.commons.lang3.StringUtils
+import org.orbeon.errorified.Exceptions
+import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
+import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.model.DataModel.Reason
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.trans.XPathException
+import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
+
+// Represent a non-fatal server XForms error
+case class ServerError(
+    message  : String,
+    fileOpt  : Option[String],
+    lineOpt  : Option[Int],
+    colOpt   : Option[Int],
+    classOpt : Option[String]
+)
+
+object ServerError {
+
+    def apply(t: Throwable): ServerError = {
+        val root = Exceptions.getRootThrowable(t)
+        ServerError(
+            root.getMessage,
+            OrbeonLocationException.getRootLocationData(t),
+            Some(root.getClass.getName)
+        )
+    }
+    
+    def apply(message: String, location : Option[LocationData], classOpt : Option[String] = None): ServerError =
+        ServerError(
+            StringUtils.trimToEmpty(message),
+            location flatMap (l ⇒ Option(l.getSystemID)),
+            location map     (_.getLine) filter (_ >= 0),
+            location map     (_.getCol)  filter (_ >= 0),
+            classOpt
+        )
+
+    private val attributes  = List("file", "line", "column", "exception")
+    private val description = List("in",   "line", "column", "cause")
+
+    private def collectList(error: ServerError, names: List[String]) = (
+        names
+        zip List(error.fileOpt, error.lineOpt, error.colOpt, error.classOpt)
+        collect { case (k, Some(v)) ⇒ List(k, v.toString) }
+        flatten
+    )
+
+    def getDetailsAsArray(error: ServerError) =
+        collectList(error, attributes) toArray
+
+    // NOTE: A similar concatenation logic is in AjaxServer.js
+    def getDetailsAsUserMessage(error: ServerError) =
+        error.message :: collectList(error, description) mkString " "
+    
+    def errorsAsHTMLElem(errors: TraversableOnce[ServerError]) =
+        <ul>{
+            for (error ← errors)
+                yield <li>{XMLUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
+        }</ul>
+    
+    def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]) =
+        <ul xmlns="http://www.w3.org/1999/xhtml">{
+            for (error ← errors)
+                yield <li>{XMLUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
+        }</ul>
+}
 
 object XFormsError {
 
-    // Represent a non-fatal server XForms error
-    case class ServerError(message: String, private val locationData: Option[LocationData], exceptionClass: Option[String] = None) {
+    // What kind of errors get here:
+    //
+    // - setvalue errors (binding exceptions except in actions)
+    //    - @calculate, @xxf:default
+    //    - write xf:upload file metadata
+    //    - store external value from control
+    //    - xf:setvalue
+    //    - use of XFormsAPI's setvalue
+    //    - instance mirror (XBL, xxf:dynamic)
+    //    - xf:switch/@caseref and xf:repeat/@indexref
+    //    - xf:submission[@replace = 'text']
+    // - XPath errors
+    //    - during model rebuild
+    //    - evaluating MIPs
+    //    - evaluating variables
+    //    - evaluating bindings except for actions
+    //        - control and LHHA bindings
+    //        - itemsets
+    //        - xf:submission/@ref
+    //        - submission headers
+    //        - xf:upload/xf:output metadata
+    //    - evaluating value attributes, as with xf:label/@value
+    //    - evaluating control AVTs
+    //    - evaluating control @format, @unformat, @value
+    // - action errors
+    //    - XPath errors
+    //    - any other action error
 
-        assert(message ne null)
-
-        val file = locationData flatMap (l ⇒ Option(l.getSystemID))
-        val line = locationData map     (_.getLine) filter (_ >= 0)
-        val col  = locationData map     (_.getCol)  filter (_ >= 0)
-
-        private val attributes  = Seq("file", "line", "column", "exception")
-        private val description = Seq("in", "line", "column", "cause")
-
-        private def collectSeq(names: Seq[String]) = names zip
-            Seq(file, line, col, exceptionClass) collect
-                {case (k, Some(v)) ⇒ Seq(k, v.toString)} flatten
-
-        def getDetailsAsArray = collectSeq(attributes) toArray
-
-        // NOTE: A similar concatenation logic is in AjaxServer.js
-        def getDetailsAsUserMessage = Seq(message) ++ collectSeq(description) mkString " "
-    }
-
-    object ServerError {
-        def apply(t: Throwable): ServerError = {
-            val root = Exceptions.getRootThrowable(t)
-            ServerError(StringUtils.trimToEmpty(root.getMessage), OrbeonLocationException.getRootLocationData(t), Some(root.getClass.getName))
-        }
+    def handleNonFatalSetvalueError(target: XFormsEventTarget, locationData: LocationData, reason: Reason): Unit = {
+        val containingDocument = target.container.getContainingDocument
+        containingDocument.indentedLogger.logDebug("", reason.message)
+        containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
     }
 
     def handleNonFatalXPathError(container: XBLContainer, t: Throwable): Unit =
         handleNonFatalXFormsError(container, "exception while evaluating XPath expression", t)
-
-    def logNonFatalXPathErrorAsDebug(container: XBLContainer, scope: Scope, t: Throwable): Unit =
-        container.getContainingDocument.indentedLogger.logDebug("", "exception while evaluating XPath expression", t)
 
     def handleNonFatalActionError(target: XFormsEventTarget, t: Throwable): Unit =
         handleNonFatalXFormsError(target.container, "exception while running action", t)
 
     private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable): Unit = {
 
-        def log() = {
-            // Log + add server error
+        def causesContainStaticXPathException =
+            Exceptions.causesIterator(t) exists {
+                case e: XPathException if e.isStaticError ⇒ true
+                case _                                    ⇒ false
+            }
+
+        if (container.getPartAnalysis.isTopLevel           &&
+            container.getContainingDocument.isInitializing &&
+            causesContainStaticXPathException) {
+            throw new OXFException(t)
+        } else {
             val containingDocument = container.getContainingDocument
-            containingDocument.indentedLogger.logWarning("", message, t)
+            containingDocument.indentedLogger.logDebug("", message, t)
             containingDocument.addServerError(ServerError(t))
         }
-
-        fatalOrNot(container, throw new OXFException(t), log())
-    }
-
-    def handleNonFatalSetvalueError(target: XFormsEventTarget, locationData: LocationData, reason: Reason): Unit = {
-
-        def log() = {
-            // Log + add server error
-            val containingDocument = target.container.getContainingDocument
-            containingDocument.indentedLogger.logWarning("", reason.message)
-            containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
-        }
-
-        fatalOrNot(target.container, throw new OXFException(reason.message), log())
-    }
-
-    // The error is non fatal only upon XForms updates OR for nested parts OR if disabled by property
-    private def fatalOrNot(container: XBLContainer, fatal: ⇒ Any, nonFatal: ⇒ Any): Unit = {
-        val doc = container.getContainingDocument
-        if (container.getPartAnalysis.isTopLevel && doc.isInitializing && doc.getFatalErrorsDuringInitialization)
-            fatal
-        else
-            nonFatal
     }
 
     // Output the Ajax error panel with a placeholder for errors
-    def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: XMLReceiverHelper, htmlPrefix: String): Unit =
+    def outputAjaxErrorPanel(
+        containingDocument : XFormsContainingDocument,
+        helper             : XMLReceiverHelper,
+        htmlPrefix         : String
+    ): Unit =
         helper.element("", XMLConstants.XINCLUDE_URI, "include", Array(
             "href", XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"),
-            "fixup-xml-base", "false"))
+            "fixup-xml-base", "false"
+        ))
 
     // Output the Noscript error panel and insert the errors
-    def outputNoscriptErrorPanel(containingDocument: XFormsContainingDocument, helper: XMLReceiverHelper, htmlPrefix: String): Unit = {
+    def outputNoscriptErrorPanel(
+        containingDocument : XFormsContainingDocument,
+        helper             : XMLReceiverHelper,
+        htmlPrefix         : String
+    ): Unit = {
         val errors = containingDocument.getServerErrors.asScala
         if (errors nonEmpty) {
 
             // Read the template
-            val resourcePath = XHTMLBodyHandler.getIncludedResourcePath(containingDocument.getRequestPath, "error-dialog-noscript.xml")
-            val template = new DocumentWrapper(ResourceManagerWrapper.instance().getContentAsDOM4J(resourcePath), null, XPath.GlobalConfiguration)
+            val resourcePath =
+                XHTMLBodyHandler.getIncludedResourcePath(containingDocument.getRequestPath, "error-dialog-noscript.xml")
+
+            val template =
+                new DocumentWrapper(
+                    ResourceManagerWrapper.instance().getContentAsDOM4J(resourcePath),
+                    null,
+                    XPath.GlobalConfiguration
+                )
 
             // Find insertion point and insert list of errors
             // NOTE: This is a poor man's template system. Ideally, we would use XForms or XSLT for this.
             template \\ * find (_.attClasses("xforms-error-panel-details")) foreach { div ⇒
-
-                val ul: Seq[NodeInfo] =
-                    <ul xmlns="http://www.w3.org/1999/xhtml">{
-                        for (error ← errors)
-                            yield <li>{error.getDetailsAsUserMessage}</li>
-                    }</ul>
-
-                insert(into = div, origin = ul)
+                insert(into = div, origin = ServerError.errorsAsXHTMLElem(errors): NodeInfo)
             }
 
             // Write out result using XInclude semantics
@@ -139,11 +198,13 @@ object XFormsError {
         }
     }
 
+    import XFormsConstants.XXFORMS_NAMESPACE_URI
+
     // Insert server errors into the Ajax response
     def outputAjaxErrors(ch: XMLReceiverHelper, errors: JList[ServerError]): Unit = {
-        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "errors")
+        ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "errors")
         for (error ← errors.asScala) {
-            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "error", error.getDetailsAsArray)
+            ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "error",  ServerError.getDetailsAsArray(error))
             ch.text(error.message)
             ch.endElement()
         }

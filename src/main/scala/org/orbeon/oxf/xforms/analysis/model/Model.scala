@@ -32,14 +32,19 @@ import org.orbeon.oxf.xforms.analysis.StaticStateContext
 /**
  * Static analysis of an XForms model <xf:model> element.
  */
-class Model(val staticStateContext: StaticStateContext, elem: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], val scope: Scope)
-        extends ElementAnalysis(staticStateContext.partAnalysis, elem, parent, preceding)
-        with ChildrenBuilderTrait
-        with ModelInstances
-        with ModelVariables
-        with ModelSubmissions
-        with ModelEventHandlers
-        with ModelBinds {
+class Model(
+    val staticStateContext : StaticStateContext,
+    elem                   : Element,
+    parent                 : Option[ElementAnalysis],
+    preceding              : Option[ElementAnalysis],
+    val scope              : Scope
+) extends ElementAnalysis(staticStateContext.partAnalysis, elem, parent, preceding)
+    with ChildrenBuilderTrait
+    with ModelInstances
+    with ModelVariables
+    with ModelSubmissions
+    with ModelEventHandlers
+    with ModelBinds {
 
     require(staticStateContext ne null)
     require(scope ne null)
@@ -56,8 +61,19 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
     def containerScope = part.containingScope(prefixedId)
 
     override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId ⇒ // instance('defaultInstanceId')
-        PathMapXPathAnalysis(part, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
-            null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element, avt = false)
+        PathMapXPathAnalysis(
+            part,
+            PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
+            null,
+            None,
+            Map.empty[String, VariableTrait],
+            null,
+            scope,
+            Some(defaultInstancePrefixedId),
+            locationData,
+            element,
+            avt = false
+        )
     }
 
     // For now this only checks actions and submissions, in the future should also build rest of content

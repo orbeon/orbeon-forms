@@ -117,8 +117,18 @@ public class XFormsActionInterpreter {
             // Push @iterate (if present) within the @model and @context context
             final NamespaceMapping namespaceMapping = actionAnalysis.namespaceMapping();
             // TODO: function context
-            _actionXPathContext.pushBinding(iterateIterationAttribute, actionAnalysis.contextJava(), null, actionAnalysis.modelJava(),
-                    null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionAnalysis.scope(), false);
+            _actionXPathContext.pushBinding(
+                iterateIterationAttribute,
+                actionAnalysis.contextJava(),
+                null,
+                actionAnalysis.modelJava(),
+                null,
+                actionElement,
+                namespaceMapping,
+                getSourceEffectiveId(actionElement),
+                actionAnalysis.scope(),
+                false
+            );
 
             // NOTE: At this point, the context has already been set to the current action element
             if (iterateIterationAttribute != null) {
@@ -195,8 +205,18 @@ public class XFormsActionInterpreter {
             //
             // In this case, in the second iteration, xf:repeat must find an up-to-date nodeset!
             // TODO: function context
-            _actionXPathContext.pushBinding(actionAnalysis.refJava(), null, null, null, actionAnalysis.bindJava(), actionAnalysis.element(),
-                    actionAnalysis.namespaceMapping(), getSourceEffectiveId(actionAnalysis.element()), actionAnalysis.scope(), false);
+            _actionXPathContext.pushBinding(
+                actionAnalysis.refJava(),
+                null,
+                null,
+                null,
+                actionAnalysis.bindJava(),
+                actionAnalysis.element(),
+                actionAnalysis.namespaceMapping(),
+                getSourceEffectiveId(actionAnalysis.element()),
+                actionAnalysis.scope(),
+                false
+            );
 
             XFormsActions.getAction(actionQName).execute(dynamicActionContext);
 

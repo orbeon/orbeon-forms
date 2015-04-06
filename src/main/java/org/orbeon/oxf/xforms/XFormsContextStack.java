@@ -235,17 +235,22 @@ public class XFormsContextStack {
     public void pushBinding(Element bindingElement, String sourceEffectiveId, Scope scope) {
         pushBinding(bindingElement, sourceEffectiveId, scope, true);
     }
-    
+
+    // NOTE: actions pass handleNonFatal = "false", other callers pass handleNonFatal = "true".
     public void pushBinding(Element bindingElement, String sourceEffectiveId, Scope scope, boolean handleNonFatal) {
         // TODO: move away from element and use static analysis information
-        final String ref = bindingElement.attributeValue(XFormsConstants.REF_QNAME);
-        final String context = bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
-        final String nodeset = bindingElement.attributeValue(XFormsConstants.NODESET_QNAME);
-        final String model = bindingElement.attributeValue(XFormsConstants.MODEL_QNAME);
-        final String bind = bindingElement.attributeValue(XFormsConstants.BIND_QNAME);
-
-        final NamespaceMapping bindingElementNamespaceMapping = container.getNamespaceMappings(bindingElement);
-        pushBinding(ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
+        pushBinding(
+            bindingElement.attributeValue(XFormsConstants.REF_QNAME),
+            bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME),
+            bindingElement.attributeValue(XFormsConstants.NODESET_QNAME),
+            bindingElement.attributeValue(XFormsConstants.MODEL_QNAME),
+            bindingElement.attributeValue(XFormsConstants.BIND_QNAME),
+            bindingElement,
+            container.getNamespaceMappings(bindingElement),
+            sourceEffectiveId,
+            scope,
+            handleNonFatal
+        );
     }
 
     private BindingContext getBindingContext(Scope scope) {
@@ -258,8 +263,18 @@ public class XFormsContextStack {
         return bindingContext;
     }
 
-    public void pushBinding(String ref, String context, String nodeset, String modelId, String bindId,
-                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, Scope scope, boolean handleNonFatal) {
+    // NOTE: actions pass handleNonFatal = "false", other callers pass handleNonFatal = "true".
+    public void pushBinding(
+        String ref,
+        String context,
+        String nodeset,
+        String modelId,
+        String bindId,
+        Element bindingElement,
+        NamespaceMapping bindingElementNamespaceMapping,
+        String sourceEffectiveId,
+        Scope scope,
+        boolean handleNonFatal) {
 
         assert scope != null;
 
@@ -313,7 +328,8 @@ public class XFormsContextStack {
 
                     // NOTE: For now, only the top-level models in a resolution scope are considered
                     final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
-                    final XFormsObject o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
+                    final XFormsObject o =
+                        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
                     if (o == null && resolutionScopeContainer.containsBind(bindId)) {
                         // The bind attribute was valid for this scope, but no runtime object was found for the bind
                         // This can happen e.g. if a nested bind is within a bind with an empty nodeset
@@ -448,16 +464,26 @@ public class XFormsContextStack {
                             // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,
                             // static analysis of expressions might provide enough information to handle the two situations.
 
-                            pushTemporaryContext(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItem());// provide context information for the context() function
+                            // Provide context information for the context() function
+                            pushTemporaryContext(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItem());
 
                             // Use updated binding context to set model
                             final XFormsFunction.Context functionContext = getFunctionContext(sourceEffectiveId, evaluationContextBinding);
 
                             List<Item> result;
                                 try {
-                                    result = XPathCache.evaluateKeepItems(evaluationContextBinding.nodeset(), evaluationContextBinding.position(),
-                                            ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                            functionContext, null, locationData, containingDocument.getRequestStats().getReporter());
+                                    result = XPathCache.evaluateKeepItems(
+                                        evaluationContextBinding.nodeset(),
+                                        evaluationContextBinding.position(),
+                                        ref != null ? ref : nodeset,
+                                        bindingElementNamespaceMapping,
+                                        evaluationContextBinding.getInScopeVariables(),
+                                        XFormsContainingDocument.getFunctionLibrary(),
+                                        functionContext,
+                                        null,
+                                        locationData,
+                                        containingDocument.getRequestStats().getReporter()
+                                    );
                                 } catch (Exception e) {
                                     if (handleNonFatal) {
                                         XFormsError.handleNonFatalXPathError(container, e);

@@ -271,10 +271,13 @@ object ScalaUtils extends PathOps {
         }
     }
 
-    private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = { case NonFatal(t) ⇒ Failure(Exceptions.getRootThrowable(t)) }
+    private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = {
+        case NonFatal(t) ⇒ Failure(Exceptions.getRootThrowable(t))
+    }
 
     // Operations on Try
     implicit class TryOps[U](val t: Try[U]) extends AnyVal {
+
         def onFailure(f: PartialFunction[Throwable, Any]) =
             t recoverWith new OnFailurePF(f)
 

@@ -181,6 +181,7 @@ trait InstanceMetadata {
 }
 
 object Instance {
+
     def timeToLiveOrDefault(element: Element) = {
         val timeToLiveValue = element.attributeValue(XXFORMS_TIME_TO_LIVE_QNAME)
         Option(timeToLiveValue) map (_.toLong) getOrElse -1L

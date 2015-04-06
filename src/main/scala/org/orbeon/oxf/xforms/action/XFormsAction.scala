@@ -124,20 +124,27 @@ object XFormsAction {
 
                         // Set context on context element
                         val currentActionScope = actionInterpreter.getActionScope(element)
-                        contextStack.pushBinding(element, actionInterpreter.getSourceEffectiveId(element), currentActionScope, false)
+                        contextStack.pushBinding(
+                            element,
+                            actionInterpreter.getSourceEffectiveId(element),
+                            currentActionScope,
+                            false
+                        )
 
                         // Evaluate context parameter
-                        val result = XPathCache.normalizeSingletons(XPathCache.evaluate(
-                            actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
-                            actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
-                            value,
-                            actionInterpreter.getNamespaceMappings(element),
-                            contextStack.getCurrentBindingContext.getInScopeVariables,
-                            XFormsContainingDocument.getFunctionLibrary,
-                            contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
-                            null,
-                            element.getData.asInstanceOf[LocationData],
-                            actionInterpreter.containingDocument().getRequestStats.addXPathStat).asScala)
+                        val result =
+                            XPathCache.normalizeSingletons(XPathCache.evaluate(
+                                actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
+                                actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
+                                value,
+                                actionInterpreter.getNamespaceMappings(element),
+                                contextStack.getCurrentBindingContext.getInScopeVariables,
+                                XFormsContainingDocument.getFunctionLibrary,
+                                contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
+                                null,
+                                element.getData.asInstanceOf[LocationData],
+                                actionInterpreter.containingDocument().getRequestStats.addXPathStat).asScala
+                            )
 
                         contextStack.popBinding()
 

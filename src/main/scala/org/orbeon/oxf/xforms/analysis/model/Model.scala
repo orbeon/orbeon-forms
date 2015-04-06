@@ -78,8 +78,9 @@ class Model(
 
     // For now this only checks actions and submissions, in the future should also build rest of content
     override def findRelevantChildrenElements =
-        findAllChildrenElements collect
-            { case (e, s) if XFormsActions.isAction(e.getQName) || Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)(e.getQName) ⇒ (e, s) }
+        findAllChildrenElements collect {
+            case t @ (e, s) if XFormsActions.isAction(e.getQName) || ChildrenElementsQNames(e.getQName) ⇒ t
+        }
 
     // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
     override def indexedElements = super.indexedElements ++ bindsById.values
@@ -304,6 +305,8 @@ trait ModelBinds {
 }
 
 object Model {
+
+    val ChildrenElementsQNames = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)
 
     // MIP enumeration
     sealed trait MIP         { def name: String; val aName: QName;                               val eName: QName }

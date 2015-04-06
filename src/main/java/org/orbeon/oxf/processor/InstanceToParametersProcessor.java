@@ -63,8 +63,8 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
         final ProcessorOutput output = new ProcessorOutputImpl(InstanceToParametersProcessor.this, name) {
             public void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 try {
-                    Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
-                    Document instance = ( Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
+                    final Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
+                    final Document instance = ( Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
 
                     final LocationData locationData = ((LocationData) instance.getRootElement().getData());
 
@@ -78,12 +78,18 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     // Mark all nodes referenced by XPath expressions
                     final Set<Object> markedNodes = new HashSet<Object>();
                     for (Iterator i = filterElement.elements().iterator(); i.hasNext();) {
-                        Element paramElement = (Element) i.next();
-                        Attribute refAttribute = paramElement.attribute("ref");
-                        String excludeRef = refAttribute.getValue();
-                        PooledXPathExpression xpath = XPathCache.getXPathExpression(instanceWrapper.getConfiguration(),
-                                instanceWrapper.wrap(instance), excludeRef,
-                                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(paramElement)), getLocationData());
+                        final Element paramElement   = (Element) i.next();
+                        final Attribute refAttribute = paramElement.attribute("ref");
+                        final String excludeRef      = refAttribute.getValue();
+
+                        final PooledXPathExpression xpath =
+                            XPathCache.getXPathExpression(
+                                instanceWrapper.getConfiguration(),
+                                instanceWrapper.wrap(instance),
+                                excludeRef,
+                                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(paramElement)),
+                                getLocationData()
+                            );
 
                         markedNodes.add(xpath.evaluateSingleToJavaReturnToPoolOrNull());
                     }

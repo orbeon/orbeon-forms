@@ -13,6 +13,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
 
 import scala.collection.immutable.List
+import scala.util.Try
 
 // Represent a static <xf:bind> element
 class StaticBind(
@@ -107,6 +108,24 @@ class StaticBind(
         }
     }
 
+    object XPathMIP {
+        def createOrNone(
+            id         : String,
+            name       : String,
+            level      : ValidationLevel,
+            expression : String
+        ): Option[XPathMIP] = {
+            // 1. Ignoring errors makes sense for Form Builder. For other dynamic components, which we don't have as of
+            //    2015-04-06, we should also fail at this point. In short, this should probably be decided by an
+            //    attribute  of xxf:dynamic. This should also allow providing feedback to the Form Builder user.
+            // 2. When using Try, we should capture errors so that xxf:dynamic can report them.
+            if (part.isTopLevel)
+                Some(new XPathMIP(id, name, level, expression))
+            else
+                Try(new XPathMIP(id, name, level, expression)).toOption
+        }
+    }
+
     // The type MIP is not an XPath expression
     class TypeMIP(val id: String, val datatype: String) extends {
         val name  = Type.name
@@ -181,11 +200,11 @@ class StaticBind(
             mip              ← QNameToXPathMIP.values
             idValuesAndLevel = fromNestedElement(mip.eName) ::: fromNestedElementLegacy(mip.aName) ::: fromAttribute(mip.aName)
             if idValuesAndLevel.nonEmpty
-            mips             = idValuesAndLevel map {
+            mips             = idValuesAndLevel flatMap {
                 case (id, value, level) ⇒
                     // Ignore level for non-constraint MIPs as it's not supported yet
                     val overriddenLevel = if (mip.name == Constraint.name) level else ErrorLevel
-                    new XPathMIP(id, mip.name, overriddenLevel, value)
+                    XPathMIP.createOrNone(id, mip.name, overriddenLevel, value)
             }
         } yield
             mip.name → mips
@@ -216,7 +235,10 @@ class StaticBind(
 
         for {
             (name, idNameValue) ← attributeCustomMIP groupBy (_._2)
-            mips = idNameValue map { case (id, _, value) ⇒ new XPathMIP(id, name, ErrorLevel, value) }
+            mips                = idNameValue flatMap {
+                case (id, _, value) ⇒
+                    XPathMIP.createOrNone(id, name, ErrorLevel, value)
+            }
         } yield
             name → mips
     }

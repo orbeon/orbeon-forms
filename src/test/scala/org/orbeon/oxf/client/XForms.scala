@@ -43,19 +43,19 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
         block(regularSpan, regularInput)
     }
 
-    @Test def issue619ErrorShownOnTabOut(): Unit =
+    @Test def issue619ErrorShownOnClickBody(): Unit =
         issue619WithClearInput { (regularSpan, regularInput) ⇒
             for {
-                _ ← regularInput.sendKeys(Keys.TAB)
+                _ ← webDriver.findElement(By.cssSelector("body")).click()
                 _ ← assert(isInvalid(regularSpan))
                 _ ← assert(inErrorSummary("regular"))
             }()
         }
 
-    @Test def issue619ErrorShownOnClickBody(): Unit =
+    @Test def issue619ErrorShownOnTabOut(): Unit =
         issue619WithClearInput { (regularSpan, regularInput) ⇒
             for {
-                _ ← webDriver.findElement(By.cssSelector("body")).click()
+                _ ← regularInput.sendKeys(Keys.TAB)
                 _ ← assert(isInvalid(regularSpan))
                 _ ← assert(inErrorSummary("regular"))
             }()

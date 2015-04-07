@@ -66,6 +66,7 @@ class StaticBind(
 
         // Compile the expression right away
         val compiledExpression = {
+
             val booleanOrStringExpression =
                 if (BooleanXPathMIPNames(name))
                     OrbeonXPath.makeBooleanExpression(expression)
@@ -84,7 +85,7 @@ class StaticBind(
         // Default to negative, analyzeXPath() can change that
         var analysis: XPathAnalysis = NegativeAnalysis(expression)
 
-        def analyzeXPath() {
+        def analyzeXPath(): Unit = {
 
             val allBindVariablesInScope = bindTree.allBindVariables
 
@@ -378,7 +379,7 @@ class StaticBind(
         _children foreach (_.analyzeMIPs())
     }
 
-    override def freeTransientState() {
+    override def freeTransientState(): Unit = {
 
         super.freeTransientState()
 

@@ -215,6 +215,7 @@
     </page>
 
     <!-- Login -->
+    <page path="/fr/auth"       view="auth.xpl"/>
     <page path="/fr/login"       view="login.xhtml"/>
     <page path="/fr/login-error" view="login-error.xhtml" public-methods="GET HEAD POST"/>
 

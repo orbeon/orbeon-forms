@@ -392,39 +392,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * Use W3C DOM API to get the content of an element.
              */
             getStringValue: function(element) {
-                if (element.textContent) {
-                    return element.textContent;
-                } else if (element.innerText) {
-                    // This is probably only called on IE8 as of 2014-12-10
-                    return element.innerText;
-                } else {
-                    // For XML DOM
-                    var result = "";
-                    for (var i = 0; i < element.childNodes.length; i++) {
-                        var child = element.childNodes[i];
-                        if (child.nodeType == TEXT_TYPE)
-                            result += child.nodeValue;
-                    }
-                    return result;
-                }
+                return $(element).text();
             },
 
             /**
              * Use W3C DOM API to set the content of an element.
              */
             setStringValue: function(element, text) {
-                if (element.innerText == null) {
-                    // Use W3C DOM API
-                    // Remove content
-                    while (element.childNodes.length > 0)
-                        element.removeChild(element.firstChild);
-                    // Add specified text
-                    var textNode = element.ownerDocument.createTextNode(text);
-                    element.appendChild(textNode);
-                } else {
-                    // Use IE's innerText, which is faster on IE
-                    element.innerText = text;
-                }
+                $(element).text(text);
             },
 
             /**
@@ -1517,11 +1492,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         getForm: function (control) {
             // If the control is not an HTML form control look for an ancestor which is a form
             if (typeof control.form == "undefined") {
-                // There is a span around the control go through parents until we find the form element
-                var candidateForm = control;
-                while (candidateForm.tagName.toLowerCase() != "form")
-                    candidateForm = candidateForm.parentNode;
-                return candidateForm;
+                return $(control).closest('form')[0];
             } else {
                 // We have directly a form control
                 return control.form;

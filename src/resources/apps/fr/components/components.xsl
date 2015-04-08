@@ -87,7 +87,7 @@
     <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
-    <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus.enable', $app, $form), '.'))" as="xs:boolean"/>
+    <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))" as="xs:boolean"/>
 
     <xsl:template match="/xh:html">
         <!-- Handle document language -->

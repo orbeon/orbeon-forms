@@ -45,14 +45,14 @@
 
     <!-- Matches form definitions, form data and attachments -->
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/exist/crud((/([^/]+)/([^/]+))/((form)/[^/]+|((data)/[^/]+)/[^/]+))</config></p:input>
+        <p:input name="config"><config>/fr/service/exist/crud((?:/([^/]+)/([^/]+))/(?:(?:form)/[^/]+|((data)/[^/]+)/[^/]+))</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
     <!-- Matches a form data collection (for DELETE) -->
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/(data)/)</config></p:input>
+        <p:input name="config"><config>/fr/service/exist/crud/(([^/]+)/([^/]+)/(data)/)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="delete-matcher-groups"/>
     </p:processor>
@@ -63,22 +63,45 @@
         <p:input name="delete-matcher-groups" href="#delete-matcher-groups"/>
         <p:input name="config">
             <request-description xsl:version="2.0">
-                <xsl:variable name="matcher-groups" select="doc('input:matcher-groups')/*/group"/>
+                <xsl:variable name="matcher-groups"        select="doc('input:matcher-groups')/*/group"/>
                 <xsl:variable name="delete-matcher-groups" select="doc('input:delete-matcher-groups')/*/group"/>
+
+                <xsl:variable name="headers"               select="/request/headers/header"/>
+                <xsl:variable name="exist-base-uri"        select="($headers[name = 'orbeon-exist-uri']/value)[1]/string()"/>
+                <xsl:variable name="path"                  select="($matcher-groups[1], $delete-matcher-groups[1])[1]/string()"/>
+
                 <xsl:copy-of select="/request/*"/>
-                <exist-uri><xsl:value-of select="/request/headers/header[name = 'orbeon-exist-uri']/value"/></exist-uri>
-                <xsl:variable name="username" select="/request/headers/header[name = 'orbeon-username']/value/text()"/>
-                <xsl:if test="exists($username)">
-                    <username><xsl:value-of select="$username"/></username>
-                    <groupname><xsl:value-of select="/request/headers/header[name = 'orbeon-group']/value"/></groupname>
-                </xsl:if>
+
+                <exist-base-uri><xsl:value-of select="$exist-base-uri"/></exist-base-uri>
+
+                <xsl:for-each select="($headers[name = 'orbeon-username']/value)[1]">
+                    <username><xsl:value-of select="."/></username>
+                    <groupname><xsl:value-of select="($headers[name = 'orbeon-group']/value)[1]"/></groupname>
+                </xsl:for-each>
+                <!-- /collection used for data only -->
                 <xsl:if test="exists($matcher-groups)">
-                    <collection><xsl:value-of select="concat($matcher-groups[2], '/', $matcher-groups[7])"/></collection>
+                    <collection><xsl:value-of select="string-join($matcher-groups[position() = (2, 3, 4)], '/')"/></collection>
                 </xsl:if>
-                <path><xsl:value-of select="($matcher-groups[1], $delete-matcher-groups[1])[1]"/></path>
-                <for-data><xsl:value-of select="$matcher-groups[8] = 'data' or $delete-matcher-groups[2] = 'data'"/></for-data>
-                <app><xsl:value-of select="$matcher-groups[3]"/></app>
-                <form><xsl:value-of select="$matcher-groups[4]"/></form>
+                <resource-uri>
+                    <xsl:value-of select="
+                        string-join(
+                            (
+                                if (ends-with($exist-base-uri, '/')) then
+                                    substring($exist-base-uri, 1, string-length($exist-base-uri) - 1)
+                                else
+                                    $exist-base-uri,
+                                if (starts-with($path, '/')) then
+                                    substring($path, 2)
+                                else
+                                    $path
+                            ),
+                            '/'
+                        )
+                    "/>
+                </resource-uri>
+                <for-data><xsl:value-of select="$matcher-groups[5] = 'data' or $delete-matcher-groups[4] = 'data'"/></for-data>
+                <app><xsl:value-of select="$matcher-groups[2]"/></app>
+                <form><xsl:value-of select="$matcher-groups[3]"/></form>
             </request-description>
         </p:input>
         <p:output name="data" id="request-description"/>
@@ -101,7 +124,7 @@
             <p:processor name="oxf:xforms-submission">
                 <p:input name="request" transform="oxf:xslt" href="#request-description">
                     <request xsl:version="2.0" xsl:exclude-result-prefixes="#all">
-                        <xsl:copy-of select="/*/(exist-uri | collection | username | groupname | method)"/>
+                        <xsl:copy-of select="/*/(exist-base-uri | collection | username | groupname | method)"/>
                         <exist:query>
                             <exist:text>
 
@@ -156,7 +179,7 @@
                 <p:input name="submission">
                     <xf:submission method="post"
                                    ref="/*/exist:query"
-                                   resource="{/*/exist-uri
+                                   resource="{/*/exist-base-uri
                                                 }?collection={    /*/collection
                                                 }&amp;username={  /*/username
                                                 }&amp;groupname={ /*/groupname
@@ -206,7 +229,7 @@
                 <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
                     <config xsl:version="2.0">
                         <url>
-                            <xsl:value-of select="xpl:rewriteServiceURI(concat(/*/exist-uri, '/', /*/path), true())"/>
+                            <xsl:value-of select="xpl:rewriteServiceURI(/*/resource-uri, true())"/>
                         </url>
                         <!-- Produce binary so we do our own XML parsing -->
                         <mode>binary</mode>
@@ -249,7 +272,7 @@
                             <!-- NOTE: The <body> element contains the xs:anyURI type -->
                             <xf:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
-                                    resource="{/*/exist-uri}/{/*/path}">
+                                    resource="{/*/resource-uri}">
                                 <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
@@ -264,7 +287,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xf:submission method="delete" replace="none" serialization="none"
-                                    resource="{/*/exist-uri}/{/*/path}">
+                                    resource="{/*/resource-uri}">
                                 <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>
@@ -279,7 +302,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xf:submission ref="/*/*[1]" method="put" replace="none"
-                                    resource="{/root/request-description/exist-uri}/{/root/request-description/path}">
+                                    resource="{/*/request-description/resource-uri}">
                                 <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                             </xf:submission>
                         </p:input>

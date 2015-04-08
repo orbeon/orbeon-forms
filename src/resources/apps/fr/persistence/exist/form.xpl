@@ -64,8 +64,22 @@
     <p:processor name="oxf:xforms-submission">
         <p:input name="request" href="#query"/>
         <p:input name="submission" transform="oxf:xslt" href="#instance">
-            <xf:submission xsl:version="2.0" method="post" replace="instance"
-                               resource="{{xxf:get-request-header('orbeon-exist-uri')}}?app={encode-for-uri(/request/app)}&amp;form={encode-for-uri(/request/form)}">
+            <xf:submission
+                xsl:version="2.0"
+                method="post"
+                replace="instance"
+                resource="{{
+                        for $uri in xxf:get-request-header('orbeon-exist-uri')[1]
+                        return
+                            if (ends-with($uri, '/')) then
+                                substring($uri, 1, string-length($uri) - 1)
+                            else
+                                $uri
+                    }}?app={
+                        encode-for-uri(/request/app)
+                    }&amp;form={
+                        encode-for-uri(/request/form)
+                    }">
                 <xf:insert event="xforms-submit-done" ref="/*" origin="xxf:element('forms', *)"/>
                 <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
             </xf:submission>

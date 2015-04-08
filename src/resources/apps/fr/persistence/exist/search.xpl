@@ -77,22 +77,39 @@
         <p:input name="data" href="#search-input"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
-            <xf:submission xsl:version="2.0" method="post"
-                               resource="{doc('input:request')/request/headers/header[name = 'orbeon-exist-uri']/value}/{/*/app}/{/*/form
-                                            }/data/?page-size={/*/page-size
-                                            }&amp;page-number={/*/page-number
-                                            }&amp;query={encode-for-uri(/*/query[empty(@path)])
-                                            }{
-                                                   string-join(
-                                                       for $query in /*/query[@path and normalize-space() != '']
-                                                       return concat(
-                                                           '&amp;path=' , encode-for-uri($query/@path),
-                                                           '&amp;value=', encode-for-uri($query)
-                                                       ),
-                                                       ''
-                                                   )
-                                            }&amp;lang={/*/lang}"
-                               replace="instance">
+            <xf:submission
+                xsl:version="2.0"
+                method="post"
+                resource="{
+                    for $uri in doc('input:request')/request/headers/header[name = 'orbeon-exist-uri']/value
+                    return
+                        if (ends-with($uri, '/')) then
+                            substring($uri, 1, string-length($uri) - 1)
+                        else
+                            $uri
+                    }/{
+                        /*/app
+                    }/{
+                        /*/form
+                     }/data/?page-size={
+                        /*/page-size
+                     }&amp;page-number={
+                        /*/page-number
+                     }&amp;query={
+                        encode-for-uri(/*/query[empty(@path)])
+                     }{
+                        string-join(
+                            for $query in /*/query[@path and normalize-space() != '']
+                            return concat(
+                                '&amp;path=' , encode-for-uri($query/@path),
+                                '&amp;value=', encode-for-uri($query)
+                            ),
+                            ''
+                        )
+                     }&amp;lang={
+                        /*/lang
+                     }"
+                replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xf:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>
                 <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>

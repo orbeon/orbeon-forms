@@ -358,7 +358,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         val (updateResult, valueAnalysis) =
             cached match {
                 case Some(result) ⇒ (result, if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null)
-                case None ⇒ {
+                case None ⇒
                     val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
                     val tempValueAnalysis = control.getValueAnalysis
                     val tempUpdateResult = tempValueAnalysis match {
@@ -382,7 +382,6 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                         RefreshState.modifiedValueCacheForRepeats += controlPrefixedId → tempUpdateResult
 
                     (tempUpdateResult, tempValueAnalysis)
-                }
             }
 
         if (updateResult.requireUpdate && valueAnalysis.isDefined) // TODO: see above, check on valueAnalysis only because non-value controls still call this method

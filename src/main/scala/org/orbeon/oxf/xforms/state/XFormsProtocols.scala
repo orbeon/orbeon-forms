@@ -213,19 +213,17 @@ trait JavaLongUTF extends CoreProtocol {
             while (count < utfLength) {
                 c = bbuffer(count).toInt & 0xFF
                 cbuffer(charCount) = ((c >> 4) match {
-                    case 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 ⇒ {
+                    case 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 ⇒
                         count += 1
                         c
-                    }
-                    case 12 | 13 ⇒ {
+                    case 12 | 13 ⇒
                         count += 2
                         if (count > utfLength) partial
 
                         char2 = bbuffer(count - 1)
                         if ((char2 & 0xC0) != 0x80) malformed(count)
                         (((c & 0x1F) << 6) | (char2 & 0x3F))
-                    }
-                    case 14 ⇒ {
+                    case 14 ⇒
                         count += 3
                         char2 = bbuffer(count - 2)
                         char3 = bbuffer(count - 1)
@@ -233,7 +231,6 @@ trait JavaLongUTF extends CoreProtocol {
                             malformed(count - 1)
 
                         ((c & 0x0F).toInt << 12) | ((char2 & 0x3F).toInt << 6) | ((char3 & 0x3F).toInt << 0)
-                    }
                     case _ ⇒ malformed(count)
                 }).toChar
                 charCount += 1

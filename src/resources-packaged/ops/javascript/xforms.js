@@ -1624,7 +1624,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
             ORBEON.xforms.Controls.valueChange.fire(customEvent);
             var isStaticReadonly = YAHOO.util.Dom.hasClass(control, "xforms-static");
-            var formElement = ORBEON.xforms.Controls.getForm(control);
             if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
                 // XForms output with xxf:download appearance
                 var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];

@@ -111,7 +111,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(containers(0).localname === "grid")
             assert(containers(1).localname === "section")
 
-            assert(findContainerNames(firstTd) === Seq("section-1"))
+            assert(findContainerNamesForModel(firstTd) === Seq("section-1"))
         }
 
     // Select the first grid td (assume there is one)
@@ -138,7 +138,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(newlySelectedTd.isDefined)
             assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
 
-            val containerNames = findContainerNames(newlySelectedTd.get)
+            val containerNames = findContainerNamesForModel(newlySelectedTd.get)
             assert(containerNames == Seq("section-1"))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
@@ -197,7 +197,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert(newlySelectedTd.isDefined)
                 assert((newlySelectedTd flatMap (_ parent * headOption) flatMap (_ parent * headOption) head) \@ "id" === gridId(newRepeatName))
 
-                val containerNames = findContainerNames(newlySelectedTd.get)
+                val containerNames = findContainerNamesForModel(newlySelectedTd.get)
                 assert(containerNames === Seq("section-1", newRepeatName, newRepeatIterationName))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
@@ -225,7 +225,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert(newlySelectedTd.isDefined)
                 assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
 
-                val containerNames = findContainerNames(newlySelectedTd.get)
+                val containerNames = findContainerNamesForModel(newlySelectedTd.get)
                 assert(containerNames === Seq("section-1", newRepeatName, newRepeatIterationName))
 
                 assert(hasIdValue(findControlByName(doc, newControlName).get, controlId(newControlName)))

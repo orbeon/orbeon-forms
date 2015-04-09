@@ -234,7 +234,7 @@ trait ContainerOps extends ControlOps {
 
                 // Insert nested iteration bind
                 findControlByName(inDoc, controlName) foreach { control ⇒
-                    ensureBinds(inDoc, findContainerNames(control) :+ controlName :+ iterationName)
+                    ensureBinds(inDoc, findContainerNamesForModel(control) :+ controlName :+ iterationName)
                 }
 
                 val controlBind   = findBindByName(inDoc, controlName)

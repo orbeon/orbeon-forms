@@ -124,7 +124,7 @@ object ToolboxOps {
                 renameControlByElement(newControlElement, newControlName, resourceNamesInUseForControl(newControlName))
 
                 // Insert the bind element
-                val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName)
+                val bind = ensureBinds(doc, findContainerNamesForModel(gridTd) :+ newControlName)
 
                 // Make sure there is a @bind instead of a @ref on the control
                 delete(newControlElement \@ "ref")
@@ -278,7 +278,7 @@ object ToolboxOps {
         )
 
         // Insert the bind element
-        ensureBinds(inDoc, findContainerNames(newSectionElement, includeSelf = true))
+        ensureBinds(inDoc, findContainerNamesForModel(newSectionElement, includeSelf = true))
 
         // This can impact templates
         updateTemplates(inDoc)
@@ -324,7 +324,7 @@ object ToolboxOps {
         )
 
         // Make sure binds are created
-        ensureBinds(inDoc, findContainerNames(newGridElement, includeSelf = true))
+        ensureBinds(inDoc, findContainerNamesForModel(newGridElement, includeSelf = true))
 
         // This takes care of all the repeat-related items
         setRepeatProperties(
@@ -475,7 +475,7 @@ object ToolboxOps {
                 )
 
                 // Create the bind and copy all attributes and content
-                val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ name)
+                val bind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
                 }

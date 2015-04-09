@@ -177,6 +177,9 @@ trait BindingMetadata extends Logging {
             case _                        ⇒ throw new IllegalStateException("missing binding")
         }
 
+    def removeBindingByPrefixedId(controlPrefixedId: String): Unit =
+        bindingsByControlPrefixedId -= controlPrefixedId
+
     // ==== Other API
     
     def baselineResources = _baselineResources 

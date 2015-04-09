@@ -25,6 +25,15 @@
     var StringUtils = ORBEON.util.String;
     var Globals = ORBEON.xforms.Globals;
 
+    function childrenWithLocalName(node, name) {
+        var result = [];
+        _.each(node.childNodes, function(child) {
+            if (child.localName == name)
+                result.push(child);
+        });
+        return result;
+    }
+
     /**
      * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
      * This is to prevent the UI from becoming totally unusable after an error.
@@ -819,7 +828,7 @@
 
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var copyRepeatTemplateElements = $(controlValuesElement).children(xxfPrefix + '\\:copy-repeat-template');
+                                var copyRepeatTemplateElements = childrenWithLocalName(controlValuesElement, 'copy-repeat-template');
                                 var copyRepeatTemplateElementsLength = copyRepeatTemplateElements.length;
                                 for (var j = 0; j < copyRepeatTemplateElementsLength; j++) {
 
@@ -919,7 +928,7 @@
                                     ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                 }
 
-                                var deleteRepeatTemplateElements = $(controlValuesElement).children(xxfPrefix + '\\:delete-repeat-elements');
+                                var deleteRepeatTemplateElements = childrenWithLocalName(controlValuesElement, 'delete-repeat-elements');
                                 var deleteRepeatTemplateElementsLength = deleteRepeatTemplateElements.length;
                                 for (var j = 0; j < deleteRepeatTemplateElementsLength; j++) {
 
@@ -1181,7 +1190,7 @@
                             // Update controls
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var controlElements = $(controlValuesElement).children(xxfPrefix + '\\:control');
+                                var controlElements = childrenWithLocalName(controlValuesElement, 'control');
                                 var controlElementsLength = controlElements.length;
                                 // Update control value and MIPs
                                 for (var j = 0; j < controlElementsLength; j++) {
@@ -1566,8 +1575,8 @@
                                     // Update the required-empty/required-full even if the required has not changed or
                                     // is not specified as the value may have changed
                                     if (! isStaticReadonly) {
-                                        var emptyAttr = $(controlElement).attr("empty");
-                                        if (!_.isUndefined(emptyAttr))
+                                        var emptyAttr = controlElement.getAttribute("empty");
+                                        if (!_.isNull(emptyAttr))
                                             ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, emptyAttr);
                                     }
 
@@ -1608,7 +1617,7 @@
                                 }
 
                                 // Handle innerHTML updates
-                                var innerElements = $(controlValuesElement).children(xxfPrefix + '\\:inner-html');
+                                var innerElements = childrenWithLocalName(controlValuesElement, 'inner-html');
                                 var innerElementsLength = innerElements.length;
                                 for (var j = 0; j < innerElementsLength; j++) {
                                     var innerElement = innerElements[j];
@@ -1670,7 +1679,7 @@
                                 }
 
                                 // Handle updates to HTML attributes
-                                var attributeElements = $(controlValuesElement).children(xxfPrefix + '\\:attribute');
+                                var attributeElements = childrenWithLocalName(controlValuesElement, 'attribute');
                                 var attributeElementslength = attributeElements.length;
                                 for (var j = 0; j < attributeElementslength; j++) {
                                     var attributeElement = attributeElements[j];
@@ -1684,7 +1693,7 @@
                                 }
 
                                 // Handle text updates
-                                var textElements = $(controlValuesElement).children(xxfPrefix + '\\:text');
+                                var textElements = childrenWithLocalName(controlValuesElement, 'text');
                                 var textElementslength = textElements.length;
                                 for (var j = 0; j < textElementslength; j++) {
                                     var textElement = textElements[j];
@@ -1699,7 +1708,7 @@
                                 }
 
                                 // Model item properties on a repeat item
-                                var repeatIterationElements = $(controlValuesElement).children(xxfPrefix + '\\:repeat-iteration');
+                                var repeatIterationElements = childrenWithLocalName(controlValuesElement, 'repeat-iteration');
                                 var repeatIterationElementslength = repeatIterationElements.length;
                                 for (var j = 0; j < repeatIterationElementslength; j++) {
                                     var repeatIterationElement = repeatIterationElements[j];
@@ -1713,7 +1722,7 @@
                                 }
 
                                 // "div" elements for xf:switch and xxf:dialog
-                                var divsElements = $(controlValuesElement).children(xxfPrefix + '\\:div');
+                                var divsElements = childrenWithLocalName(controlValuesElement, 'div');
                                 var divElementsLength = divsElements.length;
                                 for (var j = 0; j < divElementsLength; j++) {
                                     var divElement = divsElements[j];

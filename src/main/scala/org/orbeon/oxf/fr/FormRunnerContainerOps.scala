@@ -53,12 +53,16 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
         (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
     // Find ancestor section and grid names from root to leaf
-    def findContainerNames(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
+    // Don't return non-repeated fr:grid until an enclosing element is needed. See:
+    // - https://github.com/orbeon/orbeon-forms/issues/2173
+    // - https://github.com/orbeon/orbeon-forms/issues/1947
+    def findContainerNamesForModel(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
         
         val namesWithContainers =
             for {
                 container ← findAncestorContainers(descendant, includeSelf)
                 name      ← getControlNameOpt(container)
+                if ! (IsGrid(container) && ! isRepeat(container))
             } yield
                 name → container
 

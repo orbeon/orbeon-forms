@@ -167,6 +167,7 @@ trait PartControlsAnalysis extends TransientState {
         controlTypes.get(controlName) foreach (_ -= prefixedId)
 
         metadata.removeNamespaceMapping(prefixedId)
+        metadata.removeBindingByPrefixedId(prefixedId)
         unmapScopeIds(control)
 
         control match {

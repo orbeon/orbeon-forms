@@ -30,8 +30,8 @@ object DataModel {
     private def childrenBindsWithNames(bind: NodeInfo) =
         bind \ (XF → "bind") collect bindWithName
 
-    private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any) {
-        def update(bind: NodeInfo) {
+    private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any): Unit = {
+        def update(bind: NodeInfo): Unit = {
             childrenBindsWithNames(bind) foreach { child ⇒
                 op(child)
                 update(child)

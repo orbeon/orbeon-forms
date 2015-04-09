@@ -100,7 +100,7 @@ trait NamespaceMappings {
 
     def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
 
-    def debugPrintNamespaces() {
+    def debugPrintNamespaces(): Unit = {
         println("Number of different namespace mappings: " + hashes.size)
         for ((key, value) ← hashes) {
             println("   hash: " + key)

@@ -222,7 +222,7 @@ object XFormsStaticStateImpl {
 
             override def getPrefixedId(staticId: String) = prefix + staticId
 
-            override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
+            override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope): Unit = {
                 val staticId = attributes.getValue("id")
                 if (staticId ne null) {
                     val prefixedId = prefix + staticId

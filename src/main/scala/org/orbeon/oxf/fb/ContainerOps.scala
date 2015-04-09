@@ -108,7 +108,7 @@ trait ContainerOps extends ControlOps {
     }
 
     // Move a container based on a move function
-    def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo) {
+    def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit = {
 
         // Get names before moving the container
         val nameOption      = getControlNameOpt(container)

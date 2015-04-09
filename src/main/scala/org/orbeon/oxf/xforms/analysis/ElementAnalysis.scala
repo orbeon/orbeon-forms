@@ -222,7 +222,7 @@ abstract class ElementAnalysis(
         helper.endElement()
     }
 
-    def freeTransientState() {
+    def freeTransientState(): Unit = {
         if (_contextAnalyzed && getContextAnalysis.isDefined)
             getContextAnalysis.get.freeTransientState()
         if (_bindingAnalyzed && getBindingAnalysis.isDefined)

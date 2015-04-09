@@ -57,7 +57,7 @@ class EmailProcessor extends ProcessorImpl {
 
     addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA, ConfigNamespaceURI))
 
-    override def start(pipelineContext: PipelineContext) {
+    override def start(pipelineContext: PipelineContext): Unit = {
 
         val dataDocument   = readInputAsDOM4J(pipelineContext, ProcessorImpl.INPUT_DATA)
         val messageElement = dataDocument.getRootElement
@@ -219,7 +219,7 @@ class EmailProcessor extends ProcessorImpl {
         }
     }
 
-    private def handleBody(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, bodyElement: Element) {
+    private def handleBody(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, bodyElement: Element): Unit = {
 
         // Find out if there are embedded parts
         val parts = bodyElement.elementIterator("part")
@@ -258,7 +258,7 @@ class EmailProcessor extends ProcessorImpl {
         }
     }
 
-    private def handlePart(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, partOrBodyElement: Element) {
+    private def handlePart(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, partOrBodyElement: Element): Unit = {
         val name = partOrBodyElement.attributeValue("name")
         val contentTypeAttribute = partOrBodyElement.attributeValue(Headers.ContentTypeLower)
         val contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute)

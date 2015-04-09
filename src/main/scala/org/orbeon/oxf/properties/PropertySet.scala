@@ -63,7 +63,7 @@ class PropertySet {
      * @param typ             property type, or null
      * @param stringValue     property string value
      */
-    def setProperty(element: Element, name: String, typ: QName, stringValue: String) {
+    def setProperty(element: Element, name: String, typ: QName, stringValue: String): Unit = {
         val value = PropertyStore.getObjectFromStringValue(stringValue, typ, element)
         val property = Property(typ, value, Dom4jUtils.getNamespaceContext(element).asScala.toMap)
         

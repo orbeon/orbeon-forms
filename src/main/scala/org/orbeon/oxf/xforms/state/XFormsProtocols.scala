@@ -39,8 +39,8 @@ object XFormsOperations {
 object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLongUTF {
 
     class JavaOutputStream(output: Output) extends OutputStream {
-        def write(b: Int) { output.writeByte(b.asInstanceOf[Byte]) }
-        override def write(b: Array[Byte], off: Int, len: Int) { output.writeAll(b, off, len) }
+        def write(b: Int): Unit = { output.writeByte(b.asInstanceOf[Byte]) }
+        override def write(b: Array[Byte], off: Int, len: Int): Unit = { output.writeAll(b, off, len) }
     }
 
     class JavaInputStream(input: Input) extends InputStream {
@@ -86,7 +86,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
     implicit object InstanceCachingFormat extends Format[InstanceCaching] {
 
-        def writes(output: Output, instance: InstanceCaching) {
+        def writes(output: Output, instance: InstanceCaching): Unit = {
             write(output, instance.timeToLive)
             write(output, instance.handleXInclude)
             write(output, instance.sourceURI)
@@ -104,7 +104,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
     implicit object InstanceFormat extends Format[InstanceState] {
         
-        def writes(output: Output, instance: InstanceState) {
+        def writes(output: Output, instance: InstanceState): Unit = {
             write(output, instance.effectiveId)
             write(output, instance.modelEffectiveId)
             instance.cachingOrContent match {
@@ -135,7 +135,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     }
 
     implicit object QNameFormat extends Format[QName] {
-        def writes(out: Output, value: QName) {
+        def writes(out: Output, value: QName): Unit = {
             write(out, value.getName)
             write(out, value.getNamespace.getPrefix)
             write(out, value.getNamespace.getURI)
@@ -152,7 +152,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     }
     
     implicit object PathMatcherFormat extends Format[PathMatcher] {
-        def writes(output: Output, value: PathMatcher) {
+        def writes(output: Output, value: PathMatcher): Unit = {
             write(output, value.regexp)
             write(output, Option(value.mimeType))
             write(output, value.versioned)
@@ -242,7 +242,7 @@ trait JavaLongUTF extends CoreProtocol {
             new String(cbuffer, 0, charCount)
         }
 
-        def writes(output: Output, value: String) {
+        def writes(output: Output, value: String): Unit = {
 
             // Write 4-byte size header (ObjectOutputStream uses 2 or 8)
             val utfLength = getUTFLength(value).toInt
@@ -250,7 +250,7 @@ trait JavaLongUTF extends CoreProtocol {
 
             val bbuffer = new Array[Byte](utfLength * 2)
             var count = 0
-            def append(value: Int) {
+            def append(value: Int): Unit = {
                 bbuffer(count) = value.toByte
                 count += 1
             }

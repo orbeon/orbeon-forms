@@ -23,7 +23,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
     private var elementName: String = _
     private var elementQName: String = _
 
-    override def start(uri: String, localname: String, qName: String, attributes: Attributes) {
+    override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
         val controller = handlerContext.getController
         val contentHandler = controller.getOutput
@@ -70,7 +70,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
         }
     }
 
-    def processShadowTree(controller: ElementHandlerController, shadowTree: SAXStore) {
+    def processShadowTree(controller: ElementHandlerController, shadowTree: SAXStore): Unit = {
         controller.startBody()
 
         // Replay content of body   
@@ -84,7 +84,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
             override def startDocument() = ()
             override def endDocument() = ()
 
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) {
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
                 super.startElement(uri, localname, qName, attributes)
 
                 // Entering body
@@ -94,7 +94,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                 level += 1
             }
 
-            override def endElement(uri: String, localname: String, qName: String) {
+            override def endElement(uri: String, localname: String, qName: String): Unit = {
                 level -= 1
 
                 // Exiting body
@@ -114,7 +114,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
         controller.endBody()
     }
 
-    override def end(uri: String, localname: String, qName: String) {
+    override def end(uri: String, localname: String, qName: String): Unit = {
         handlerContext.popComponentContext()
         val controller = handlerContext.getController
         val contentHandler = controller.getOutput

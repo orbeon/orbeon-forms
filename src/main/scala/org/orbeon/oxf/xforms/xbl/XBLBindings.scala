@@ -331,7 +331,7 @@ class XBLBindings(
             var hasUpdateFull = false
 
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement, new Dom4jUtils.VisitorListener {
-                def startElement(element: Element) {
+                def startElement(element: Element): Unit = {
                     val xxformsUpdate = element.attributeValue(XXFORMS_UPDATE_QNAME)
                     if (XFORMS_FULL_UPDATE == xxformsUpdate)
                         hasUpdateFull = true

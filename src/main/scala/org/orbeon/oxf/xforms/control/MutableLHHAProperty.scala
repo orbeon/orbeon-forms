@@ -89,7 +89,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
         _isHTML
     }
 
-    protected override def markDirty() {
+    protected override def markDirty(): Unit = {
         super.markDirty()
         _isHTML = false
     }

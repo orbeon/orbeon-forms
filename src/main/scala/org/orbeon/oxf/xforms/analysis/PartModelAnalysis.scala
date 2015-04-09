@@ -63,7 +63,7 @@ trait PartModelAnalysis extends TransientState {
         null
     }
 
-    protected def indexModel(model: Model, eventHandlers: Buffer[EventHandlerImpl]) {
+    protected def indexModel(model: Model, eventHandlers: Buffer[EventHandlerImpl]): Unit = {
         val models = modelsByScope.getOrElseUpdate(model.scope, Buffer[Model]())
         models += model
         modelsByPrefixedId += model.prefixedId → model
@@ -72,7 +72,7 @@ trait PartModelAnalysis extends TransientState {
             modelByInstancePrefixedId += instance.prefixedId → model
     }
 
-    protected def deindexModel(model: Model) {
+    protected def deindexModel(model: Model): Unit = {
         modelsByScope.get(model.scope) foreach (_ -= model)
         modelsByPrefixedId -= model.prefixedId
 

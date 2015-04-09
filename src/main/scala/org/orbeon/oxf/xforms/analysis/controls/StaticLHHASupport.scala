@@ -56,7 +56,7 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
         allLHHA filter (_.isLocal) foreach (_.analyzeXPath())
     }
 
-    override def freeTransientState() {
+    override def freeTransientState(): Unit = {
         super.freeTransientState()
         allLHHA foreach (_.freeTransientState())
     }

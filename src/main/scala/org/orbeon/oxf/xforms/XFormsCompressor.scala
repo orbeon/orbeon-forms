@@ -130,13 +130,13 @@ object XFormsCompressor extends Logging {
             }
 			
 		// Override because IBM implementation calls def.end()
-		override def finish() {
+		override def finish(): Unit = {
 
-            def writeTrailer(buf: Array[Byte], offset: Int) {
+            def writeTrailer(buf: Array[Byte], offset: Int): Unit = {
 
-                def writeInt(i: Int, offset: Int) {
+                def writeInt(i: Int, offset: Int): Unit = {
 
-                    def writeShort(s: Int, offset: Int) {
+                    def writeShort(s: Int, offset: Int): Unit = {
                         buf(offset) =  (s & 0xff).asInstanceOf[Byte]
                         buf(offset + 1) =  ((s >> 8) & 0xff).asInstanceOf[Byte]
                     }

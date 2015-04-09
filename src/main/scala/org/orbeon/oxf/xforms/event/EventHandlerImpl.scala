@@ -103,7 +103,7 @@ class EventHandlerImpl(
     def targetPrefixedIds = _targetPrefixedIds
 
     // Analyze the handler
-    def analyzeEventHandler() {
+    def analyzeEventHandler(): Unit = {
 
         // This must run only once
         assert(_observersPrefixedIds eq null)
@@ -203,7 +203,7 @@ class EventHandlerImpl(
     /**
      * Process the event on the given observer.
      */
-    def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent) {
+    def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent): Unit = {
 
         assert(_observersPrefixedIds ne null)
         assert(_targetPrefixedIds ne null)

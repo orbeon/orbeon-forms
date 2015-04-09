@@ -33,7 +33,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
     override def isMustOutputContainerElement = handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
-    def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
+    def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
         val isTopLevelRepeat = handlerContext.countParentRepeats == 0
         val isRepeatSelected = handlerContext.isRepeatSelected || isTopLevelRepeat
@@ -76,7 +76,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         // Shortcut function to output the delimiter
         outputDelimiter = outputInterceptor.outputDelimiter(savedOutput, _, _)
 
-        def appendClasses(sb: StringBuilder, classes: String) {
+        def appendClasses(sb: StringBuilder, classes: String): Unit = {
             if (classes.nonEmpty) {
                 if (sb.nonEmpty)
                     sb += ' '
@@ -84,7 +84,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             }
         }
 
-        def addDnDClasses(sb: StringBuilder) {
+        def addDnDClasses(sb: StringBuilder): Unit = {
             val dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd")
             if (Set("vertical", "horizontal")(dndAttribute)) {
 
@@ -97,7 +97,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
         var bodyRepeated = false
         
-        def repeatBody(iteration: Int, classes: StringBuilder, generateTemplate: Boolean, repeatSelected: Boolean) {
+        def repeatBody(iteration: Int, classes: StringBuilder, generateTemplate: Boolean, repeatSelected: Boolean): Unit = {
 
             if (isMustGenerateDelimiters) {
                 // User and DnD classes

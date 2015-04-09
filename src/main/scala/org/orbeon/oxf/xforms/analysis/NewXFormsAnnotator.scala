@@ -100,7 +100,7 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
     
     private val metadata: Metadata = null // TODO
 
-    protected def addNamespaces(id: String) {
+    protected def addNamespaces(id: String): Unit = {
         val tuples =
             namespaceContext.current.mappingsWithDefault filterNot
             { case (prefix, uri) ⇒ prefix.startsWith("xml") }

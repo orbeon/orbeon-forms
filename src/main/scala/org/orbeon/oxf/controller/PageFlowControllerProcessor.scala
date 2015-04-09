@@ -45,7 +45,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
     addInputInfo(new ProcessorInputOutputInfo(ControllerInput, ControllerNamespaceURI))
 
-    override def start(pc: PipelineContext) {
+    override def start(pc: PipelineContext): Unit = {
 
         implicit val logger = new IndentedLogger(Logger)
 

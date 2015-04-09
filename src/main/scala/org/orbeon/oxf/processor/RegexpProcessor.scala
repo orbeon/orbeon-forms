@@ -31,7 +31,7 @@ class RegexpProcessor extends ProcessorImpl {
 
     override def createOutput(name: String) =
         addOutput(name, new CacheableTransformerOutputImpl(self, name) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) {
+            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
                 // Read inputs
                 val data   = readInputAsDOM4J(pipelineContext, INPUT_DATA)
                 val config = readInputAsDOM4J(pipelineContext, INPUT_CONFIG)

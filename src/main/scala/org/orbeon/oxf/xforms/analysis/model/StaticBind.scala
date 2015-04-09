@@ -366,7 +366,7 @@ class StaticBind(
         refSucceeded && childrenSucceeded
     }
 
-    def analyzeMIPs() {
+    def analyzeMIPs(): Unit = {
         // Analyze local MIPs if there is a @ref
         ref match {
             case Some(_) ⇒

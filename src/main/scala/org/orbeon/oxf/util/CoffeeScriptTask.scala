@@ -27,7 +27,7 @@ class CoffeeScriptTask extends MatchingTask {
     @BeanProperty var fromDir: File = _
     @BeanProperty var toDir: File = _
 
-    override def execute() {
+    override def execute(): Unit = {
 
         Seq(fromDir, toDir) find (!_.isDirectory) foreach (s ⇒ throw new BuildException(s + " is not a valid directory"))
 

@@ -85,7 +85,7 @@ class Model(
     // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
     override def indexedElements = super.indexedElements ++ bindsById.values
 
-    override def analyzeXPath() {
+    override def analyzeXPath(): Unit = {
         // Analyze this
         super.analyzeXPath()
 
@@ -133,7 +133,7 @@ trait ModelInstances {
 
     def instancesToXML(helper: XMLReceiverHelper): Unit = {
         // Output instances information
-        def outputInstanceList(name: String, values: collection.Set[String]) {
+        def outputInstanceList(name: String, values: collection.Set[String]): Unit = {
             if (values.nonEmpty) {
                 helper.startElement(name)
                 for (value ← values)

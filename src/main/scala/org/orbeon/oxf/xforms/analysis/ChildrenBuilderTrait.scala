@@ -57,7 +57,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
     }
     
     // Build this element's children and its descendants
-    final def build(builder: Builder) {
+    final def build(builder: Builder): Unit = {
 
         def buildChildren() = {
 

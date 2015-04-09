@@ -313,7 +313,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         // http://hc.apache.org/httpcomponents-client-ga/tutorial/html/authentication.html#d4e950
 
         object PreemptiveAuthHttpRequestInterceptor extends HttpRequestInterceptor {
-            def process(request: HttpRequest, context: HttpContext) {
+            def process(request: HttpRequest, context: HttpContext): Unit = {
 
                 val authState           = context.getAttribute(ClientContext.TARGET_AUTH_STATE).asInstanceOf[AuthState]
                 val credentialsProvider = context.getAttribute(ClientContext.CREDS_PROVIDER).asInstanceOf[CredentialsProvider]

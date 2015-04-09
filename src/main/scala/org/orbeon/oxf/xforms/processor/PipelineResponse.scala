@@ -53,12 +53,12 @@ object PipelineResponse {
                 override def setContentLength(len: Int): Unit =
                     setHeader(Headers.ContentLength, Integer.toString(len))
 
-                override def setStatus(status: Int) {
+                override def setStatus(status: Int): Unit = {
                     // See: http://wiki.orbeon.com/forms/projects/xforms/better-error-handling-for-replace-all-submission
                     contentHandlerOutputStream.setStatusCode(status.toString)
                 }
 
-                override def setHeader(name: String, value: String) {
+                override def setHeader(name: String, value: String): Unit = {
                     // Handle Content-Type
                     if (name equalsIgnoreCase Headers.ContentType) {
                         charset = Option(NetUtils.getContentTypeCharset(value))

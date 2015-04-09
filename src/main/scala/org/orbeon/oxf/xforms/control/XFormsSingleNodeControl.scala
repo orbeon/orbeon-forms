@@ -278,7 +278,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         containingDocument.staticReadonly ||
             XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
-    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {
+    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
         assert(attributesImpl.getLength == 0)
 
         val control1 = other.asInstanceOf[XFormsSingleNodeControl]
@@ -349,7 +349,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         added
     }
 
-    protected def outputValueElement(ch: XMLReceiverHelper, valueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String) {
+    protected def outputValueElement(ch: XMLReceiverHelper, valueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String): Unit = {
 
         // Create element with text value
         val value = valueControl.getEscapedExternalValue
@@ -362,7 +362,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         }
     }
 
-    override def writeMIPs(write: (String, String) ⇒ Unit) {
+    override def writeMIPs(write: (String, String) ⇒ Unit): Unit = {
         super.writeMIPs(write)
 
         write("valid",            isValid.toString)

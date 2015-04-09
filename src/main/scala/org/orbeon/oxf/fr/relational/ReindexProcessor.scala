@@ -46,7 +46,7 @@ class ReindexProcessor extends ProcessorImpl {
         "xf" → XFormsConstants.XFORMS_NAMESPACE_URI
     ).asJava)
 
-    override def start(pipelineContext: PipelineContext) {
+    override def start(pipelineContext: PipelineContext): Unit = {
 
         val ReindexPathRegex(provider) = NetUtils.getExternalContext.getRequest.getRequestPath
 

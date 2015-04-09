@@ -29,7 +29,7 @@ import org.orbeon.saxon.om.Item
  * 10.1.10 The send Element
  */
 class XFormsSendAction extends XFormsAction {
-    override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
+    override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
 
         // Find submission object
         val submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME)

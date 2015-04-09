@@ -28,13 +28,13 @@ import XMLConstants._
  */
 class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with HandlerSupport {
 
-    protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) {
+    protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
         val uploadControl = control.asInstanceOf[XFormsUploadControl]
         val state = if (uploadControl eq null) "empty" else uploadControl.state
         classes.append(" xforms-upload-state-" + state)
     }
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
+    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
         implicit val receiver   = handlerContext.getController.getOutput
 

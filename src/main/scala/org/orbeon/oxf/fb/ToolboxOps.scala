@@ -205,7 +205,7 @@ object ToolboxOps {
         (inDoc ne null) && willEnsureEmptyTdSucceed(inDoc)
 
     // Insert a new grid
-    def insertNewGrid(inDoc: NodeInfo) {
+    def insertNewGrid(inDoc: NodeInfo): Unit = {
 
         val (into, after, _) = findGridInsertionPoint(inDoc)
 

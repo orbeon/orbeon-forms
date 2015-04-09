@@ -33,7 +33,7 @@ import collection.breakOut
  */
 class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
+    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
         val triggerControl = control.asInstanceOf[XFormsTriggerControl]
         val xmlReceiver = handlerContext.getController.getOutput

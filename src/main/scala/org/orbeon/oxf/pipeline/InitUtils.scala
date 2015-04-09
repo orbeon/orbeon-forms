@@ -60,7 +60,7 @@ object InitUtils {
     }
 
     // Run a processor with an ExternalContext
-    def runProcessor(processor: Processor, externalContext: ExternalContext, pipelineContext: PipelineContext, logger: Logger) {
+    def runProcessor(processor: Processor, externalContext: ExternalContext, pipelineContext: PipelineContext, logger: Logger): Unit = {
 
         // Record start time for this request
         val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L

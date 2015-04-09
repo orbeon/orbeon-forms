@@ -69,7 +69,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     override def getJavaScriptInitialization =
         if (isDnD) getCommonJavaScriptInitialization else null
 
-    override def onCreate(restoreState: Boolean, state: Option[ControlState]) {
+    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
         super.onCreate(restoreState, state)
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
@@ -89,7 +89,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     // Set the repeat index. The index is automatically adjusted to fall within bounds.
-    def setIndex(index: Int) {
+    def setIndex(index: Int): Unit = {
 
         val oldRepeatIndex = getIndex // 1-based
 
@@ -105,7 +105,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         resolutionScopeContainer.setDeferredFlagsForSetindex()
     }
 
-    private def setIndexInternal(index: Int) {
+    private def setIndexInternal(index: Int): Unit = {
         val local = getLocalForUpdate.asInstanceOf[XFormsRepeatControl.XFormsRepeatControlLocal]
         local.index = ensureIndexBounds(index)
     }
@@ -137,7 +137,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         else
             children(getIndex - 1)
 
-    def doDnD(dndEvent: XXFormsDndEvent) {
+    def doDnD(dndEvent: XXFormsDndEvent): Unit = {
         // Only support this on DnD-enabled controls
         if (! isDnD)
             throw new ValidationException(
@@ -488,7 +488,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         val existingIteration = oldChildren(currentOldIndex)
                         val newIterationOldIndex = existingIteration.iterationIndex
 
-                        def updateBindingsIfNeeded() {
+                        def updateBindingsIfNeeded(): Unit = {
                             // NOTE: We used to only update the binding on the iteration itself
                             if (isInsertDelete) {
                                 val updater = Controls.updateBindings(existingIteration)

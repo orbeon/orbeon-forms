@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsContainerControl, XF
 
 class XXFormsSetvisitedAction extends XFormsAction {
 
-    override def execute(context: DynamicActionContext) {
+    override def execute(context: DynamicActionContext): Unit = {
 
         // "This XForms Action begins by invoking the deferred update behavior."
         synchronizeAndRefreshIfNeeded(context)

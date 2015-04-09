@@ -43,7 +43,7 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
 
     // Set a new iteration index. This will cause the nested effective ids to update.
     // This is used to "shuffle" around repeat iterations when repeat nodesets change.
-    def setIterationIndex(iterationIndex: Int) {
+    def setIterationIndex(iterationIndex: Int): Unit = {
         if (_iterationIndex != iterationIndex) {
             _iterationIndex = iterationIndex
             updateEffectiveId()
@@ -64,7 +64,7 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     override def supportFullAjaxUpdates = false
 
     // Update this control's effective id and its descendants based on the parent's effective id.
-    override def updateEffectiveId() {
+    override def updateEffectiveId(): Unit = {
         // Update this iteration's effective id
         setEffectiveId(XFormsUtils.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
         children foreach (_.updateEffectiveId())

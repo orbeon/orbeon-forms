@@ -202,7 +202,7 @@ class XIncludeReceiver(
         level += 1
     }
 
-    override def endElement(uri: String, localname: String, qName: String) {
+    override def endElement(uri: String, localname: String, qName: String): Unit = {
         level -= 1
 
         if (Set(XINCLUDE_URI, OLD_XINCLUDE_URI)(uri) && localname == "include") {

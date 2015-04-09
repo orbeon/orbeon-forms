@@ -38,7 +38,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
     private var placeHolderInfo: XFormsInputControl.PlaceHolderInfo = _
 
-    override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef) {
+    override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
         super.init(uri, localname, qName, attributes, matched)
         this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(elementAnalysis, currentControlOrNull)
     }
@@ -53,7 +53,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
     private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.getAppearances.contains(XFORMS_MINIMAL_APPEARANCE_QNAME))
     private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
+    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
         val inputControl = control.asInstanceOf[XFormsInputControl]
         implicit val xmlReceiver = handlerContext.getController.getOutput
         val isRelevantControl = ! isNonRelevant(inputControl)

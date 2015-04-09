@@ -160,7 +160,7 @@ case class DynamicState(
         document
     }
 
-    private def debug() {
+    private def debug(): Unit = {
         val bytes = toByteSeq(this)
         println("  size: " + bytes.size)
         println("   versionedPathMatchers: " + pathMatchers.size)

@@ -49,7 +49,7 @@ case class InstanceCaching(
         "requestBodyHash" → requestBodyHash.orNull
     )
     
-    def writeAttributes(att: (String, String) ⇒ Unit) {
+    def writeAttributes(att: (String, String) ⇒ Unit): Unit = {
         att("cache", "true")
         if (timeToLive >= 0) att("ttl", timeToLive.toString)
         if (handleXInclude)  att("xinclude", "true")
@@ -210,7 +210,7 @@ class XFormsInstance(
             case _ ⇒
         }
 
-    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: Seq[NodeInfo]) {
+    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: Seq[NodeInfo]): Unit = {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls.asScala
         if (repeatControlsMap.nonEmpty) {
             val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)

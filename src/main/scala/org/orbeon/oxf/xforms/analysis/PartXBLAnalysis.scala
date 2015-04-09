@@ -31,7 +31,7 @@ trait PartXBLAnalysis extends TransientState {
     private[PartXBLAnalysis] val scopesById              = mutable.HashMap[String, Scope]()
     private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = mutable.HashMap[String, Scope]()
 
-    protected def initializeScopes() {
+    protected def initializeScopes(): Unit = {
         // Add existing ids to scope map
         val prefix = startScope.fullPrefix
         metadata.idGenerator.add("#document") // top-level is not added to the id generator until now

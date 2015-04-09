@@ -110,7 +110,7 @@ object XXFormsComponentHandler {
 
             var level = 0
 
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) {
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
                 if (level != 0)
                     super.startElement(uri, localname, qName, attributes)
@@ -118,7 +118,7 @@ object XXFormsComponentHandler {
                 level += 1
             }
 
-            override def endElement(uri: String, localname: String, qName: String) {
+            override def endElement(uri: String, localname: String, qName: String): Unit = {
 
                 level -= 1
 
@@ -126,7 +126,7 @@ object XXFormsComponentHandler {
                     super.endElement(uri, localname, qName)
             }
 
-            override def setDocumentLocator(locator: Locator) {
+            override def setDocumentLocator(locator: Locator): Unit = {
                 // NOP for now. In the future, we should push/pop the locator on ElementHandlerController
             }
         })

@@ -45,7 +45,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         var recalculateChangeset = new MapSet[String, String]   // changeset for recalculate MIPs
         var revalidateChangeset  = recalculateChangeset         // changeset for revalidate MIPs
 
-        def markValueChanged(node: NodeInfo) {
+        def markValueChanged(node: NodeInfo): Unit = {
             // Only care about path changes if there is no structural change for this model, since structural changes
             // for now disable any more subtle path-based check.
             if (! hasStructuralChanges) {
@@ -55,7 +55,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
                 val instancePrefixedId = instance.getPrefixedId
 
-                def processNode(n: NodeInfo) {
+                def processNode(n: NodeInfo): Unit = {
                     val path = PathMapXPathDependencies.createFingerprintedPath(n)
 
                     val instancePath = instancePrefixedId → path
@@ -80,7 +80,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             }
         }
 
-        def markStructuralChange() {
+        def markStructuralChange(): Unit = {
 
             // Update model and view information
             hasStructuralChanges = true
@@ -89,13 +89,13 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             markBindsDirty()
         }
 
-        def rebuildDone() {
+        def rebuildDone(): Unit = {
             hasStructuralChanges = false
 
             markBindsDirty()
         }
 
-        private def markBindsDirty() {
+        private def markBindsDirty(): Unit = {
             calculateMIPsEvaluatedOnce = false
             validateMIPsEvaluatedOnce = false
 
@@ -105,13 +105,13 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         }
 
         // Say that for this model, calculate binds are clean and can be checked for modifications based on value changes
-        def recalculateDone() {
+        def recalculateDone(): Unit = {
             calculateMIPsEvaluatedOnce = true
             recalculateChangeset = clearChangeset(recalculateChangeset, revalidateChangeset)
         }
 
         // Say that for this model, validate binds are clean and can be checked for modifications based on value changes
-        def revalidateDone() {
+        def revalidateDone(): Unit = {
             validateMIPsEvaluatedOnce = true
             revalidateChangeset = clearChangeset(revalidateChangeset, recalculateChangeset)
         }
@@ -162,7 +162,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         def getStructuralChangeModels = structuralChangeModels
 
-        def refreshDone() {
+        def refreshDone(): Unit = {
             structuralChangeModels.clear()
             changeset.clear()
 
@@ -195,7 +195,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     private var itemsetMissCount: Int = 0
     private var itemsetHitCount: Int = 0
 
-    def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) {
+    def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo): Unit = {
 
         // Caller must only call this for a mutable node belonging to the given model
         require(nodeInfo.isInstanceOf[VirtualNode])
@@ -211,11 +211,11 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     def recalculateDone(model: Model) = getModelState(model.prefixedId).recalculateDone()
     def revalidateDone(model: Model)  = getModelState(model.prefixedId).revalidateDone()
 
-    def refreshStart() {
+    def refreshStart(): Unit = {
         inRefresh = true
     }
 
-    def refreshDone() {
+    def refreshDone(): Unit = {
 
         if (logger.isDebugEnabled)
             logger.logDebug("dependencies", "refresh done",
@@ -239,19 +239,19 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     }
 
 
-    def bindingUpdateStart() {
+    def bindingUpdateStart(): Unit = {
         inBindingUpdate = true
     }
 
-    def bindingUpdateDone() {
+    def bindingUpdateDone(): Unit = {
         inBindingUpdate = false
     }
 
-    def afterInitialResponse() {
+    def afterInitialResponse(): Unit = {
         outputLHHAItemsetStats()
     }
 
-    def beforeUpdateResponse() {
+    def beforeUpdateResponse(): Unit = {
         lhhaEvaluationCount = 0
         lhhaOptimizedCount = 0
         lhhaUnknownDependencies = 0
@@ -265,7 +265,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         itemsetHitCount = 0
     }
 
-    def afterUpdateResponse() {
+    def afterUpdateResponse(): Unit = {
         outputLHHAItemsetStats()
     }
 
@@ -275,7 +275,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     def notifyComputeItemset(): Unit = itemsetEvaluationCount += 1
     def notifyOptimizeItemset(): Unit = itemsetOptimizedCount += 1
 
-    private def outputLHHAItemsetStats() {
+    private def outputLHHAItemsetStats(): Unit = {
         if (logger.isDebugEnabled)
             logger.logDebug("dependencies", "summary after response",
                 Array("LHHA evaluations", lhhaEvaluationCount.toString,
@@ -291,12 +291,12 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     }
 
     // For unit tests
-    def markStructuralChangeTest(modelPrefixedId: String) {
+    def markStructuralChangeTest(modelPrefixedId: String): Unit = {
         getModelState(modelPrefixedId).markStructuralChange()
     }
 
     // For unit tests
-    def setModifiedPathTest(instance: String, namespaces: JMap[String, String], path: String) {
+    def setModifiedPathTest(instance: String, namespaces: JMap[String, String], path: String): Unit = {
         assert(RefreshState.changeset.isEmpty)
 
         RefreshState.changeset += instance → PathMapXPathAnalysis.getInternalPath(namespaces, path)

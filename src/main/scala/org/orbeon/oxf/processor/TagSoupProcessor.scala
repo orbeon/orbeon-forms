@@ -29,7 +29,7 @@ class TagSoupProcessor extends ProcessorImpl {
 
     override def createOutput(name: String) =
         addOutput(name, new ProcessorOutputImpl(this, name) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) {
+            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
                 // Read input as binary document in byte array
                 val inputValue = {

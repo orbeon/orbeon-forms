@@ -126,7 +126,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 
                 Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener {
                     val hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs
-                    def startElement(element: Element) {
+                    def startElement(element: Element): Unit = {
                         if (element.getQName == XFORMS_OUTPUT_QNAME) {
                             // Add dependencies
                             val outputAnalysis =

@@ -50,7 +50,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
         try {
             visit(null, new ItemsetListener[AnyRef] {
 
-                def startItem(o: AnyRef, item: Item, first: Boolean) {
+                def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
                     if (! first)
                         sb.append(',')
 
@@ -104,7 +104,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
                         sb.append(""","children":[""")
                 }
 
-                def endItem(o: AnyRef, item: Item) {
+                def endItem(o: AnyRef, item: Item): Unit = {
                     // End array of children items
                     if (item.hasChildren)
                         sb.append(']')

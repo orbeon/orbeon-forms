@@ -126,7 +126,7 @@ abstract class XFormsFunction extends SystemFunction {
     private var staticContext: IndependentContext = null
 
     // The following copies all the StaticContext information into a new StaticContext
-    def copyStaticContextIfNeeded(visitor: ExpressionVisitor) {
+    def copyStaticContextIfNeeded(visitor: ExpressionVisitor): Unit = {
         // See same method in Saxon Evaluate.java
         if (staticContext eq null) { // only do this once
             val env = visitor.getStaticContext

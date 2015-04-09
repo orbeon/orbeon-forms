@@ -134,7 +134,7 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
     // NOP because the label is output as the text within <a>
     protected override def handleLabel() = ()
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
+    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
         implicit val context     = handlerContext
         implicit val xmlReceiver = context.getController.getOutput

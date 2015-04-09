@@ -149,7 +149,7 @@ object Focus {
     
     // Partially remove the focus until the given boundary if any
     // The boundary is used by XFormsRepeatControl when an iteration is removed if the focus is within that iteration
-    def removeFocusPartially(doc: XFormsContainingDocument, boundary: Option[XFormsContainerControl]) {
+    def removeFocusPartially(doc: XFormsContainingDocument, boundary: Option[XFormsContainerControl]): Unit = {
 
         // Dispatch DOMFocusOut events to the given control and to its container ancestors
         def dispatchFocusOuts(control: XFormsControl) =
@@ -163,7 +163,7 @@ object Focus {
     }
 
     // Partially set the focus to the control, dispatching events from the given boundary if any
-    def setFocusPartially(control: XFormsControl, boundary: Option[XFormsContainerControl]) {
+    def setFocusPartially(control: XFormsControl, boundary: Option[XFormsContainerControl]): Unit = {
         val doc = control.containingDocument
 
         // Remember first that the new control has focus

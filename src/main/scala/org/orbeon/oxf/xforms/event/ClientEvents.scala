@@ -459,7 +459,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     // Process an incoming client event. Preprocessing for noscript and encrypted events is assumed to have taken place.
     // This handles checking for stale controls, relevance, readonly, and special cases like xf:output.
     // NOTE: Leave public for unit tests
-    def processEvent(doc: XFormsContainingDocument, event: XFormsEvent) {
+    def processEvent(doc: XFormsContainingDocument, event: XFormsEvent): Unit = {
 
         // Check whether an event can be be dispatched to the given object. This only checks:
         // - the the target is still live

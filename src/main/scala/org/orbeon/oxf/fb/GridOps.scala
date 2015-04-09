@@ -218,7 +218,7 @@ trait GridOps extends ContainerOps {
 
     // Insert a column to the right
     def insertColRight(gridId: String, colPos: Int): Unit = insertColRight(tdAtColPos(gridId, colPos))
-    def insertColRight(firstRowTd: NodeInfo) {
+    def insertColRight(firstRowTd: NodeInfo): Unit = {
         val grid = getContainingGrid(firstRowTd)
         if (getGridSize(grid) < maxGridColumns) {
 
@@ -242,7 +242,7 @@ trait GridOps extends ContainerOps {
 
     // Insert a column to the left
     def insertColLeft(gridId: String, colPos: Int): Unit = insertColLeft(tdAtColPos(gridId, colPos))
-    def insertColLeft(firstRowTd: NodeInfo) {
+    def insertColLeft(firstRowTd: NodeInfo): Unit = {
         val grid = getContainingGrid(firstRowTd)
         if (getGridSize(grid) < maxGridColumns) {
             val pos = firstRowTd precedingSibling "*:td" size
@@ -277,7 +277,7 @@ trait GridOps extends ContainerOps {
     def deleteCol(gridId: String, colPos: Int): Unit =
         deleteCol(tdAtColPos(gridId, colPos))
 
-    def deleteCol(firstRowTd: NodeInfo) {
+    def deleteCol(firstRowTd: NodeInfo): Unit = {
 
         val doc = firstRowTd.getDocumentRoot
 
@@ -453,7 +453,7 @@ trait GridOps extends ContainerOps {
     }
 
     // Vertically expand the given cell
-    def expandCell(td: NodeInfo) {
+    def expandCell(td: NodeInfo): Unit = {
         val allRowCells  = getAllRowCells(getContainingGrid(td))
         val (x, y) = tdCoordinates(td, allRowCells)
 
@@ -468,7 +468,7 @@ trait GridOps extends ContainerOps {
     }
 
     // Vertically shrink the given cell
-    def shrinkCell(td: NodeInfo) {
+    def shrinkCell(td: NodeInfo): Unit = {
 
         val grid = getContainingGrid(td)
         val allRowCells  = getAllRowCells(grid)
@@ -490,7 +490,7 @@ trait GridOps extends ContainerOps {
         insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
     }
 
-    def initializeGrids(doc: NodeInfo) {
+    def initializeGrids(doc: NodeInfo): Unit = {
         // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
         // We do this so that ids are stable as we move things around, otherwise if the XForms document is recreated
         // new automatic ids are generated for objects without id.

@@ -87,11 +87,11 @@ class PathMapXPathAnalysis(
             dependentInstances
         )
 
-    def toXML(helper: XMLReceiverHelper) {
+    def toXML(helper: XMLReceiverHelper): Unit = {
 
         helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
 
-        def toXML(traversable: Traversable[String], enclosingElementName: String, elementName: String) {
+        def toXML(traversable: Traversable[String], enclosingElementName: String, elementName: String): Unit = {
             if (traversable.nonEmpty) {
                 helper.startElement(enclosingElementName)
                 for (value ← traversable)
@@ -458,7 +458,7 @@ object PathMapXPathAnalysis {
         // Return true if we moved an arc
         def reduceAncestorAxis(node: PathMap.PathMapNode): Boolean = {
 
-            def moveArc(nodeArc: NodeArc, ancestorNode: PathMap.PathMapNode) {
+            def moveArc(nodeArc: NodeArc, ancestorNode: PathMap.PathMapNode): Unit = {
                 if (ancestorNode ne null) {
 
                     // Move arcs
@@ -622,7 +622,7 @@ object PathMapXPathAnalysis {
     /**
      * Output the structure of the given pathmap to the standard output.
      */
-    def dumpPathMap(configuration: Configuration, xpathString: String, pathmap: PathMap) {
+    def dumpPathMap(configuration: Configuration, xpathString: String, pathmap: PathMap): Unit = {
 
         val result =
             <pathmap>

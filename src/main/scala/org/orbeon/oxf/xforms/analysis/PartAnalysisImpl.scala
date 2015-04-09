@@ -145,7 +145,7 @@ class PartAnalysisImpl(
     }
 
     // Analyze a subtree of controls
-    def analyzeSubtree(container: ChildrenBuilderTrait) {
+    def analyzeSubtree(container: ChildrenBuilderTrait): Unit = {
 
         implicit val logger = getIndentedLogger
         withDebug("performing static analysis of subtree", Seq("prefixed id" → container.prefixedId)) {
@@ -178,7 +178,7 @@ class PartAnalysisImpl(
     }
 
     // Analyze the entire tree of controls
-    def analyze() {
+    def analyze(): Unit = {
 
         implicit val logger = getIndentedLogger
         withDebug("performing static analysis") {

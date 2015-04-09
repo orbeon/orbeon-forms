@@ -163,7 +163,7 @@ class XFormsControl(
         result
     }
 
-    def commitCurrentUIState() {
+    def commitCurrentUIState(): Unit = {
         wasRelevantCommit()
         previousEffectiveIdCommit()
     }
@@ -280,12 +280,12 @@ object XFormsControl {
 
             private var isStartElement = false
 
-            override def characters(chars: Array[Char], start: Int, length: Int) {
+            override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
                 sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length))) // NOTE: not efficient to create a new String here
                 isStartElement = false
             }
 
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) {
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
                 sb.append('<')
                 sb.append(localname)
                 val attributeCount = attributes.getLength
@@ -304,7 +304,7 @@ object XFormsControl {
                 isStartElement = true
             }
 
-            override def endElement(uri: String, localname: String, qName: String) {
+            override def endElement(uri: String, localname: String, qName: String): Unit = {
                 if (! isStartElement || ! XFormsUtils.isVoidElement(localname)) {
                     // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.). Be sure not to drop closing elements of other tags though!
                     sb.append("</")
@@ -371,7 +371,7 @@ object XFormsControl {
             _value
         }
 
-        def handleMarkDirty(force: Boolean) {
+        def handleMarkDirty(force: Boolean): Unit = {
 
             def isDirty = ! isEvaluated
             def markOptimized() = isOptimized = true
@@ -391,7 +391,7 @@ object XFormsControl {
             }
         }
 
-        protected def markDirty() {
+        protected def markDirty(): Unit = {
             _value = null
             isEvaluated = false
             isOptimized = false

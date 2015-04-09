@@ -50,13 +50,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(/([^/]+))?)?""".r
 
     // Start the processor
-    override def start(pipelineContext: PipelineContext) {
+    override def start(pipelineContext: PipelineContext): Unit = {
         val ec = NetUtils.getExternalContext
         proxyRequest(ec.getRequest, ec.getResponse)
     }
 
     // Proxy the request to the appropriate persistence implementation
-    def proxyRequest(request: Request, response: Response) {
+    def proxyRequest(request: Request, response: Response): Unit = {
         val incomingPath = request.getRequestPath
         incomingPath match {
             case FormPath(path, app, form, _)                   ⇒ proxyRequest(request, response, app, form, "form", path)

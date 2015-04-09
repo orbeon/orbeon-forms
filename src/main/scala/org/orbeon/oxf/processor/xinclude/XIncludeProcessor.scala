@@ -44,7 +44,7 @@ class XIncludeProcessor extends ProcessorImpl {
 
     override def createOutput(name: String) =
         addOutput(name, new URIProcessorOutputImpl(self, name, INPUT_CONFIG) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) {
+            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
                 // Read attributes input only if connected (just in case, for backward compatibility, although it shouldn't happen)
                 val configurationAttributes =
                     if (getConnectedInputs.get(AttributesInput) ne null) {

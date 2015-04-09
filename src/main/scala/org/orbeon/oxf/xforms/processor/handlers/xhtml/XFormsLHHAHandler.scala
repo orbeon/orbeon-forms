@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
  */
 class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
 
-    override def start(uri: String, localname: String, qName: String, attributes: Attributes) {
+    override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
         // Find control ids based on @for attribute
         val lhhaPrefixedId = handlerContext.getPrefixedId(attributes)

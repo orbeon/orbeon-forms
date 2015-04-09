@@ -37,7 +37,7 @@ trait PartControlsAnalysis extends TransientState {
             lhhas: Buffer[LHHAAnalysis],
             eventHandlers: Buffer[EventHandlerImpl],
             models: Buffer[Model],
-            attributes: Buffer[AttributeControl]) {
+            attributes: Buffer[AttributeControl]): Unit = {
         val controlName = elementAnalysis.localName
 
         // Index by prefixed id

@@ -59,7 +59,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         _value = null
     }
 
-    override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean) {
+    override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
 
         super.evaluateImpl(relevant, parentRelevant)
 

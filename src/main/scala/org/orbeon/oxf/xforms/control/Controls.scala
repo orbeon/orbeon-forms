@@ -257,7 +257,7 @@ object Controls {
 
         val targetIndexBuilder = new StringBuilder
 
-        def appendIterationToSuffix(iteration: Int) {
+        def appendIterationToSuffix(iteration: Int): Unit = {
             if (targetIndexBuilder.isEmpty)
                 targetIndexBuilder.append(REPEAT_SEPARATOR)
             else if (targetIndexBuilder.length != 1)

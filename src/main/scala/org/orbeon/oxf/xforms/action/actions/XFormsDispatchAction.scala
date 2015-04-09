@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils.isNotBlank
  */
 class XFormsDispatchAction extends XFormsAction {
     
-    override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
+    override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
         
         // Mandatory attribute
         val newEventNameAttributeValue =

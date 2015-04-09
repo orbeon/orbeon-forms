@@ -29,7 +29,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
 
     // If we are really at the root, register to ControlTree. This so that the tree is made available during
     // construction to XPath functions like index() or case()
-    override def addChild(control: XFormsControl ) {
+    override def addChild(control: XFormsControl ): Unit = {
         super.addChild(control)
 
         if (parent eq null) // ne null when child of xxf:dynamic

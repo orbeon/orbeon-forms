@@ -30,7 +30,7 @@ trait XFormsContainerControl extends VisitableTrait {
     def childrenJava: JList[XFormsControl] = children.asJava
 
     // Add a child control
-    def addChild(control: XFormsControl) {
+    def addChild(control: XFormsControl): Unit = {
         if (_children eq null)
             _children = mutable.Buffer[XFormsControl]()
         _children += control
@@ -50,7 +50,7 @@ trait XFormsContainerControl extends VisitableTrait {
         this._children = null
 
     // Update this control's effective id and its descendants based on the parent's effective id
-    override def updateEffectiveId() {
+    override def updateEffectiveId(): Unit = {
         super.updateEffectiveId()
         
         if (hasChildren)
@@ -75,7 +75,7 @@ trait XFormsContainerControl extends VisitableTrait {
         cloned
     }
 
-    override def iterationRemoved() {
+    override def iterationRemoved(): Unit = {
         if (hasChildren)
             for (currentControl ← _children)
                 currentControl.iterationRemoved()
@@ -88,7 +88,7 @@ trait XFormsContainerControl extends VisitableTrait {
         else
             Iterator.empty
 
-    override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit) {
+    override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
         super.toXML(helper, attributes) {
             children foreach (_.toXML(helper, List.empty)())
         }

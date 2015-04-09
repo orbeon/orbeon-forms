@@ -73,7 +73,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                     new SimpleElementAnalysis(staticStateContext, element, Some(stack.head), None, stack.head.getChildElementScope(element))
                         with ValueTrait with OptionalSingleNode with ViewTrait
 
-                def processElement(qName: QName, required: Boolean) {
+                def processElement(qName: QName, required: Boolean): Unit = {
                     val nestedElement = element.element(qName)
 
                     if (required)

@@ -44,7 +44,7 @@ trait ControlLocalSupport {
             Some(ControlState(effectiveId, isVisited, keyValues.asScala.toMap))
     }
 
-    final def updateLocalCopy(copy: XFormsControl) {
+    final def updateLocalCopy(copy: XFormsControl): Unit = {
         if (this.currentLocal != null) {
             // There is some local data
             if (this.currentLocal ne this.initialLocal) {
@@ -60,7 +60,7 @@ trait ControlLocalSupport {
         }
     }
 
-    final def setLocal(local: XFormsControlLocal) {
+    final def setLocal(local: XFormsControlLocal): Unit = {
         this.initialLocal = local
         this.currentLocal = local
     }

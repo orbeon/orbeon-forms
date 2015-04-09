@@ -24,7 +24,7 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
 
     private val map = new LinkedHashMap[A, LinkedHashSet[B]]
 
-    def put(a: A, b: B) {
+    def put(a: A, b: B): Unit = {
         (map.get(a) match {
             case Some(set) ⇒ set
             case None ⇒

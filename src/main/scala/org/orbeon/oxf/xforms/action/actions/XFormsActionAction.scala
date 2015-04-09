@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis._
  */
 class XFormsActionAction extends XFormsAction {
 
-    override def execute(actionContext: DynamicActionContext) {
+    override def execute(actionContext: DynamicActionContext): Unit = {
 
         val actionInterpreter = actionContext.interpreter
         val actionElement = actionContext.element

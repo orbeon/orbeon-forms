@@ -337,7 +337,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous
         // names. In practice, the ancestor holders should already exist.
         locally {
-            val containerNames = findContainerNames(controlElement)
+            val containerNames = findContainerNamesForModel(controlElement)
             ensureDataHolder(
                 formInstanceRoot(doc),
                 (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName)
@@ -369,7 +369,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         findControlByName(inDoc, controlName) foreach { control ⇒
 
             // Get or create the bind element
-            val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
+            val bind = ensureBinds(inDoc, findContainerNamesForModel(control) :+ controlName)
 
             // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
             // expressions and types could use it. So for now the mapping is never garbage collected.

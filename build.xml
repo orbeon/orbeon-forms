@@ -873,7 +873,10 @@
                     <then>
 
                         <!-- Only keep the 10 most recent databases on SQL Server -->
-                        <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                        <!-- - Set delimiter to character we don't use, so the task doesn't spit the command on ';' -->
+                        <sql    driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}"
+                                userid="orbeon" password="${env.RDS_PASSWORD}"
+                                expandProperties="true" delimiter="~">
                             <classpath><pathelement location="${sqlserver.jar}"/></classpath>
                             BEGIN
                                 DECLARE @qry nvarchar(max);

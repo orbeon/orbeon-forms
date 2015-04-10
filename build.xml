@@ -872,6 +872,33 @@
                     <not><isset property="skip.selenium"/></not>
                     <then>
 
+                        <!-- Only keep the 10 most recent databases on SQL Server -->
+                        <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                            <classpath><pathelement location="${sqlserver.jar}"/></classpath>
+                            BEGIN
+                                DECLARE @qry nvarchar(max);
+                                SELECT @qry =
+                                    (
+                                        SELECT 'DROP DATABASE ' + to_drop.name + '; '
+                                        FROM
+                                            (
+                                                SELECT all_dbs.name
+                                                FROM
+                                                    (
+                                                        SELECT row_number() OVER (ORDER BY name DESC) AS row,
+                                                               name
+                                                        FROM   sys.databases
+                                                        WHERE  name LIKE 'orbeon_%_tomcat'
+                                                    ) all_dbs
+                                                WHERE all_dbs.row > 10
+                                            ) to_drop
+                                        WHERE name LIKE 'orbeon_%_tomcat'
+                                        FOR XML PATH('')
+                                    );
+                                EXEC sp_executesql @qry;
+                            END;
+                        </sql>
+
                         <!-- Create schemas -->
                         <sql driver="${oracle.driver}" url="${env.ORACLE_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
                             <classpath><pathelement location="${oracle.jar}"/></classpath>

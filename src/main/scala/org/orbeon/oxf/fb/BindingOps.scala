@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.dom4j.QName
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
@@ -22,18 +23,37 @@ import org.orbeon.scaxon.XML._
 
 trait BindingOps {
 
-    def newElementName(currentControlName: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
+    // Return a new element name for the control if needed
+    // Examples:
+    //
+    // - fr:number: decimal → string  ⇒ xf:input
+    // - fr:number: string  → string  ⇒ fr:number
+    // - xf:input:  string  → string  ⇒ xf:string
+    // - xf:input:  string  → decimal ⇒ fr:number
+    def newElementName(oldControlName: QName, oldDatatype: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
 
-        val mappings = createDirectToDatatypeMappingsForAllBindings(bindings)
+        val directToDatatypeMappings = createDirectToDatatypeMappingsForAllBindings(bindings)
 
-        // The current control name might be a direct binding, in which case we can find its original name
-        val originalName = mappings.get(currentControlName) flatMap (_.elementName) getOrElse currentControlName
+        // The old control name might be a direct binding, in which case we can find the old "virtual" name, that is the
+        // name the control would have had if we natively supported datatype bindings
+        val oldVirtualNameOpt =
+            for {
+                BindingDescriptor(elementNameOpt, datatypeOpt, _) ← directToDatatypeMappings.get(oldControlName)
+                datatype                                          ← datatypeOpt
+                if Set(datatype, Model.getVariationTypeOrKeep(datatype))(oldDatatype)
+                elementName                                       ← elementNameOpt
+            } yield
+                elementName
 
-        // Using the original control name and the new datatype, try to find a new direct binding
-        val newName = findDirectBindingForDatatypeBinding(originalName, newDatatype, mappings) getOrElse originalName
+        val oldVirtualName =
+            oldVirtualNameOpt getOrElse oldControlName
+
+        // Using the old virtual control name and the new datatype, try to find a new direct binding
+        val newControlName =
+            findDirectBindingForDatatypeBinding(oldVirtualName, newDatatype, directToDatatypeMappings) getOrElse oldVirtualName
 
         // Only return Some if the name changes
-        currentControlName != newName option newName
+        oldControlName != newControlName option newControlName
     }
 
     private def bindingMetadata(binding: NodeInfo) =

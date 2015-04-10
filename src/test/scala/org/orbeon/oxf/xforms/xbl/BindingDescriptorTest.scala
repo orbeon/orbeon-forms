@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.scaxon.XML._
@@ -44,10 +45,20 @@ class BindingDescriptorTest extends AssertionsForJUnit {
     val Bindings = ComponentsDocument.rootElement child (XBL → "xbl") child (XBL → "binding")
 
     @Test def testNewElementName(): Unit = {
-        assert(Some(FR → "number": QName) === newElementName(XF → "input",  XS → "decimal",  Bindings))
-        assert(Some(FR → "number": QName) === newElementName(XF → "input",  XF → "decimal",  Bindings))
-        assert(Some(XF → "input" : QName) === newElementName(FR → "number", XS → "string",   Bindings))
-        assert(Some(XF → "input" : QName) === newElementName(FR → "number", XS → "string",   Bindings))
-        assert(None                       === newElementName(XF → "input",  XS → "boolean",  Bindings))
+
+        def assertVaryTypes(oldControlName: QName, oldDatatype: QName, newDatatype: QName)(result: Option[QName]) =
+            for {
+                oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
+                newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
+            } locally {
+                assert(result === newElementName(oldControlName,  oldT,  newT,  Bindings))
+            }
+
+        assertVaryTypes(XF → "input",  XS → "string",  XS → "decimal")(Some(FR → "number"))
+        assertVaryTypes(FR → "number", XS → "string",  XS → "string" )(None)
+        assertVaryTypes(FR → "number", XS → "decimal", XS → "string" )(Some(XF → "input"))
+        assertVaryTypes(FR → "number", XS → "decimal", XS → "boolean")(Some(XF → "input"))
+        assertVaryTypes(XF → "input",  XS → "string",  XS → "boolean")(None)
+        assertVaryTypes(XF → "input",  XS → "boolean", XS → "boolean")(None)
     }
 }

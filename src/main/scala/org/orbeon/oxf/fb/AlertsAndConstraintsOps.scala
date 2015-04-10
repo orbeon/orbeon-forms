@@ -341,7 +341,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 control        ← findControlByName(inDoc, controlName)
                 oldDatatype    = DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
                 if oldDatatype != newDatatype
-                newElementName ← FormBuilder.newElementName(control.uriQualifiedName, newDatatype, componentBindings)
+                newElementName ← FormBuilder.newElementName(control.uriQualifiedName, oldDatatype, newDatatype, componentBindings)
             } locally {
                 // TODO: If binding changes, what about instance and bind templates? Should also be updated? Not a concrete
                 // case as of now, but can happen depending on which bindings are available.

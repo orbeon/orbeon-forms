@@ -2354,9 +2354,9 @@
             <test>&lt;i class="icon-cog"/&gt; Testa</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
 
-            <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
-            <ok todo="true">OK</ok>
+            <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
+            <no>&lt;i class="icon-remove"/&gt; Nej</no>
+            <ok>OK</ok>
         </buttons>
         <components>
             <labels>
@@ -2369,8 +2369,8 @@
                 <insert-below>Infoga nedanför</insert-below>
                 <move-up>Flytta upp</move-up>
                 <move-down>Flytta ned</move-down>
-                <remove>Tag bort</remove>
-                <menu todo="true">Menu</menu>
+                <remove>Ta bort</remove>
+                <menu>Meny</menu>
             </grid>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
@@ -2488,9 +2488,9 @@
                 <open-draft>Öppna automatiskt sparat utkast</open-draft>
                 <view-drafts>Visa automatiskt sparat utkast</view-drafts>
                 <start-new>Börja från början</start-new>
-                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
-                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
-                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
+                <multiple-docs-title>Existerande formulärdata finns</multiple-docs-title>
+                <multiple-docs-explanation>Nya ifyllda formulär kan inte skapas från detta formulär, men det kan gå att ändra existerande ifyllda formulär.</multiple-docs-explanation>
+                <multiple-docs-view-data>Visa existerande ifyllda formulär</multiple-docs-view-data>
             </draft-singleton>
             <labels>
                 <language-choice>Språk</language-choice>
@@ -2580,7 +2580,7 @@
                 <unavailable>Ej tillgänglig</unavailable>
                 <library>Bibliotek</library>
                 <newer>Nyare</newer>
-                <remote-server todo="true">[Remote server]</remote-server>
+                <remote-server>Server</remote-server>
                 <username>Användarnamn</username>
                 <password>Lösenord</password>
             </labels>

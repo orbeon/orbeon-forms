@@ -7778,8 +7778,8 @@
             <hint>Beskrivning av formuläret på aktuellt språk</hint>
         </description>
         <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            <label>Singulärt formulär</label>
+            <hint>Användare kan inte skapa ytterligare ifyllda formulär om de har tillgång något ifyllt formulär av denna typ</hint>
         </singleton>
         <logo>
             <label>Logotyp</label>
@@ -8116,7 +8116,7 @@
                 <hint>Indikerar om fältet måste fyllas i</hint>
                 <item id="0">Ja</item>
                 <item id="1">Nej</item>
-                <item id="2" todo="true">XPath</item>
+                <item id="2">Formel</item>
             </required>
             <constraint>
                 <label>Villkor</label>
@@ -8167,7 +8167,7 @@
             <use-html>Använd HTML</use-html>
         </dialog-control-details>
         <dialog-container-details>
-            <label todo="true">Sektionsinställningar</label>
+            <label>Sektions-/rutnätsinställningar</label>
             <control-name>
                 <label>Namn</label>
                 <alert>Namnet är felaktigt eller redan definierat</alert>
@@ -8329,7 +8329,7 @@
                 <label>Anvisning</label>
             </hint-header>
             <clear-value>
-                <label todo="true">[Clear Value]</label>
+                <label>Rensa</label>
             </clear-value>
         </dialog-itemsets>
         <dialog-http-services>

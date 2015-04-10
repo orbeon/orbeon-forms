@@ -33,12 +33,12 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
             _ ← loadOrbeonPage("/unit-tests/issue-0619")
             regularSpan  ← webDriver.findElement(By.cssSelector("#regular"))
             regularInput ← regularSpan.findElement(By.cssSelector("input"))
-            // Clear input
-            _ ← regularInput.click()
-            _ ← regularInput.clear()
             // Should not be invalid or shown in the error summary
             _ ← assert(! isInvalid(regularSpan))
             _ ← assert(! inErrorSummary("regular"))
+            // Clear input
+            _ ← regularInput.click()
+            _ ← regularInput.clear()
         }
         block(regularSpan, regularInput)
     }

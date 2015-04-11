@@ -107,7 +107,18 @@
                         <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
-
+                
+                <!-- Restore xxf:custom-mips if we had added it -->
+                <xsl:template match="
+                    xh:head/xf:model[
+                        @id = 'fr-form-model'
+                        and @fb:added-empty-custom-mips = 'true'
+                    ]/@xxf:custom-mips"/>
+                <xsl:template match="
+                    xh:head/xf:model[
+                        @id = 'fr-form-model'
+                    ]/@fb:added-empty-custom-mips"/>
+                
                 <!-- Remove model actions -->
                 <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']/*[p:has-class('fb-annotation')]"/>
 

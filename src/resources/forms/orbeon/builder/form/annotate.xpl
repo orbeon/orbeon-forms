@@ -183,9 +183,15 @@
                 <xsl:template match="xf:model[generate-id() = generate-id($model)]">
 
                     <xsl:copy>
-                        <!-- Namespace for fb:required -->
-                        <!--<xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>-->
-                        <xsl:apply-templates select="@* | node()" mode="within-model"/>
+                        <!-- Make sure xxf:custom-mips is not missing otherwise all fb:* MIPs are evaluated -->
+                        <xsl:if test="empty(@xxf:custom-mips)">
+                            <xsl:attribute name="xxf:custom-mips"/>
+                            <xsl:attribute name="fb:added-empty-custom-mips" select="'true'"/>
+                        </xsl:if>
+                        
+                        <xsl:apply-templates
+                            select="(@* except (@xxf:custom-mips, @fb:added-empty-custom-mips)) | node()"
+                            mode="within-model"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
                         <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">

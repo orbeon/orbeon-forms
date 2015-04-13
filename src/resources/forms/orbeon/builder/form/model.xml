@@ -51,7 +51,9 @@
     <xf:var name="metadata-instance" value="$model/xf:instance[@id = 'fr-form-metadata']/*"/>
     <xf:var name="resources" value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
     <xf:var name="current-resources" value="($resources/resource[@xml:lang = $fb-lang])[1]"/>
-    <xf:var name="body" value="xh:body//xf:group[xxf:has-class('fb-body')]"/>
+    <!-- Was: xh:body//xf:group[xxf:has-class('fb-body')]"/> -->
+    <!-- There *should* not be an id conflict as we add fb-body in annotate.xpl. Can we really make sure? -->
+    <xf:var name="body" value="id('fb-body', instance('fb-form-instance'))"/>
 
     <xf:var name="component-bindings" value="instance('fb-components-instance')/xbl:xbl/xbl:binding" as="element(xbl:binding)*"/>
 

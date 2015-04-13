@@ -76,11 +76,12 @@ trait FormRunnerBaseOps {
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
     def findFRBodyElement(inDoc: NodeInfo) = {
 
-        def fromGroup    = inDoc.rootElement \ "*:body" \\ XFGroupTest find (_.attClasses("fb-body"))
-        def fromFRBody   = inDoc.rootElement \ "*:body" \\ FRBodyTest headOption
-        def fromTemplate = inDoc.rootElement \ XBLTemplateTest headOption
+        def fromGroupById = Option(inDoc.getDocumentRoot.selectID("fb-body"))
+        def fromGroup     = inDoc.rootElement \ "*:body" \\ XFGroupTest find (_.id == "fb-body")
+        def fromFRBody    = inDoc.rootElement \ "*:body" \\ FRBodyTest headOption
+        def fromTemplate  = inDoc.rootElement \ XBLTemplateTest headOption
 
-        fromGroup orElse fromFRBody orElse fromTemplate get
+        fromGroupById orElse fromGroup orElse fromFRBody orElse fromTemplate get
     }
 
     // Get the form model

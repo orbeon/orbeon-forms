@@ -64,7 +64,7 @@
                     <xsl:attribute name="ev:{local-name()}" select="."/>
                 </xsl:template>
 
-                <xsl:template match="xf:group[p:has-class('fb-body')]">
+                <xsl:template match="xf:group[@id = 'fb-body']">
                     <fr:body>
                         <xsl:copy-of select="namespace::*"/>
                         <xsl:apply-templates select="node() except *[@class = 'fb-annotation']"/>

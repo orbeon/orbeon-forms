@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
@@ -27,7 +28,8 @@ trait ContainerOps extends ControlOps {
     self: GridOps ⇒ // funky dependency, to resolve at some point
 
     def containerById(containerId: String): NodeInfo = {
-        // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
+        // Support effective id, to make it easier to use from XForms (i.e. no need to call
+        // XFormsUtils.getStaticIdFromId every time)
         val staticId = XFormsUtils.getStaticIdFromId(containerId)
         findInViewTryIndex(fbFormInstance, staticId) filter IsContainer head
     }
@@ -320,11 +322,11 @@ trait ContainerOps extends ControlOps {
         }
     }
 
-    def findCurrentBindingByName(inDoc: NodeInfo, controlName: String, bindings: Seq[NodeInfo]) =
+    def findCurrentBindingByName(inDoc: NodeInfo, controlName: String, descriptors: Seq[BindingDescriptor]) =
         for {
             controlElement ← findControlByName(inDoc, controlName)
             datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
-            binding        ← findCurrentBinding(controlElement.uriQualifiedName, datatype, bindings)
+            binding        ← findCurrentBinding(controlElement.uriQualifiedName, datatype, descriptors)
         } yield
             binding
 
@@ -332,15 +334,15 @@ trait ContainerOps extends ControlOps {
     // This checks each control binding in case the control specifies a custom data holder.
     def createTemplateContentFromBind(bind: NodeInfo): NodeInfo = {
 
-        val inDoc    = bind.getDocumentRoot
-        val bindings = componentBindings
+        val inDoc       = bind.getDocumentRoot
+        val descriptors = getAllDirectAndDatatypeDescriptors(componentBindings)
 
         def holderForBind(bind: NodeInfo): NodeInfo = {
 
             val controlName = getBindNameOrEmpty(bind)
 
             val fromBinding =
-                findCurrentBindingByName(inDoc, controlName, bindings) map
+                findCurrentBindingByName(inDoc, controlName, descriptors) map
                     (FormBuilder.newDataHolder(controlName, _))
 
             val e = fromBinding getOrElse elementInfo(controlName)

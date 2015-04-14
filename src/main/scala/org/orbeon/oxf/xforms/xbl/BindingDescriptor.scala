@@ -162,12 +162,10 @@ object BindingDescriptor {
 
     // For a given control name and datatype
     // NOTE: Again, some assumptions are made. We search first a datatype descriptor, then a direct descriptor.
-    def findCurrentBinding(controlName: QName, datatype: QName, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
+    def findCurrentBinding(controlName: QName, datatype: QName, descriptors: Seq[BindingDescriptor]): Option[NodeInfo] = {
 
         val Datatype1 = datatype
         val Datatype2 = Model.getVariationTypeOrKeep(datatype)
-
-        val descriptors = getAllDirectAndDatatypeDescriptors(bindings)
 
         def findDatatypeDescriptor =
             descriptors collectFirst {

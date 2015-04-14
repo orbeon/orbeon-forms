@@ -81,14 +81,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     // Find a bind by name
     def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
-        findBind(inDoc, isBindForName(_, name))
+        findInBindsTryIndex(inDoc, bindId(name)) orElse findBind(inDoc, isBindForName(_, name))
 
     // XForms callers: find a bind by name or null (the empty sequence)
     def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) =
         findBindByName(inDoc, name).orNull
 
     // Find a bind by predicate
-    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
+    private def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
         findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
 
     // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name

@@ -6,7 +6,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <xh:head>
         <xh:title/>
-        <xf:model id="fr-form-model" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxf:custom-mips="" fb:added-empty-custom-mips="true" id="fr-form-model">
             <xf:instance id="fr-form-instance">
                 <form>
                     <section-1>
@@ -22,7 +22,6 @@
                         <fb:constraint value="string-length() ge 10" id="validation-2-validation"/>
                         <xf:type id="validation-3-validation">xf:string</xf:type>
                         <xf:required value="true()" id="validation-4-validation"/>
-
                         <fb:default value="43"/>
                         <fb:constraint value="string-length() le 100" id="validation-5-validation"/>
                         <fb:constraint value="string-length() ge 10" id="validation-6-validation"/>
@@ -63,7 +62,7 @@
     </xh:head>
     <xh:body>
         <fr:view width="800px" appearance="custom">
-            <xf:group class="fb-body">
+            <xf:group id="fb-body" class="fb-body">
                 <xf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
                 <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
                 <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>

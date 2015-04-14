@@ -62,14 +62,36 @@ trait FormRunnerBaseOps {
 
     // Find a view element by id, using the index if possible, otherwise traversing the document
     // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
-    def findInViewTryIndex(inDoc: NodeInfo, id: String) = {
-
-        val bodyElement = findFRBodyElement(inDoc)
-
-        def isUnderView(node: NodeInfo) =
-            node ancestor * contains bodyElement
-
-        Option(inDoc.getDocumentRoot.selectID(id)) filter isUnderView orElse (bodyElement descendant * find (_.id == id))
+    def findInViewTryIndex(inDoc: NodeInfo, id: String) =
+        findTryIndex(inDoc, id, findFRBodyElement(inDoc), includeSelf = false)
+    
+    def findInModelTryIndex(inDoc: NodeInfo, id: String) =
+        findTryIndex(inDoc, id, findModelElement(inDoc), includeSelf = false)
+    
+    def findInBindsTryIndex(inDoc: NodeInfo, id: String) =
+        findTryIndex(inDoc, id, findTopLevelBind(inDoc).get, includeSelf = true)
+    
+    private def findTryIndex(inDoc: NodeInfo, id: String, under: NodeInfo, includeSelf: Boolean) = {
+        
+        // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
+        // only called from the functions above, which search in a form's view, model, or binds, which implies the
+        // existence of a form model.
+        val hasIndex = inDoc.getDocumentRoot.selectID("fr-form-model") ne null
+        
+        def isUnder(node: NodeInfo) =
+            if (includeSelf)
+                node ancestorOrSelf * contains under
+            else
+                node ancestor * contains under
+        
+        if (hasIndex) {
+            Option(inDoc.getDocumentRoot.selectID(id)) filter isUnder
+        } else {
+            if (includeSelf)
+                under descendantOrSelf * find (_.id == id) 
+            else
+                under descendant * find (_.id == id)
+        }
     }
 
     // Get the body element assuming the structure of an XHTML document, annotated or not, OR the structure of xbl:xbl.
@@ -110,12 +132,13 @@ trait FormRunnerBaseOps {
     def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata")
     def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
+    private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
+    
     // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
     def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
         findModelElement(inDoc) \ "*:bind" find {
             // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-            bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.id)             ||
-                bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
+            bind ⇒ TopLevelBindIds(bind.id) || bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
         }
 
     def properties = Properties.instance.getPropertySet

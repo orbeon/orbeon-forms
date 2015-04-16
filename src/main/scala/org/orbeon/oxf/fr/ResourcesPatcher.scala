@@ -66,8 +66,10 @@ object ResourcesPatcher {
                 tokens = name split """\."""
                 lang   = tokens(5)
                 path   = filterPathForBackwardCompatibility(tokens drop 6) mkString "/"
+                value  = properties.getString(name)
+                if value ne null // got one case where this happened
             } yield
-                (lang, path, properties.getString(name))
+                (lang, path, value)
 
         // Return all languages or the language specified if it exists
         // For now we don't support creating new top-level resource elements for new languages.

@@ -101,6 +101,9 @@ trait PartControlsAnalysis extends TransientState {
         for (control ← controlAnalysisMap.values if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
             control.analyzeXPath()
 
+    def iterateControls =
+        controlAnalysisMap.valuesIterator
+    
     def getControlAnalysisOpt(prefixedId: String) =
         controlAnalysisMap.get(prefixedId)
 

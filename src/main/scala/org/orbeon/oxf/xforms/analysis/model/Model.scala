@@ -298,6 +298,8 @@ trait ModelBinds {
     def containsBind(bindId: String) = bindTree().bindIds(bindId)
 
     def figuredAllBindRefAnalysis = bindTree().figuredAllBindRefAnalysis
+    def recalculateOrder  = bindTree().recalculateOrder
+    def defaultValueOrder = bindTree().defaultValueOrder
 
     def analyzeBindsXPath() = bindTree().analyzeBindsXPath()
     def bindsToXML(helper: XMLReceiverHelper) = bindTree().bindsToXML(helper)

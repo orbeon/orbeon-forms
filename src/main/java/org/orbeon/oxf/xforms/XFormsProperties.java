@@ -125,6 +125,7 @@ public class XFormsProperties {
 
     public static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
+    public static final String CALCULATE_ANALYSIS_PROPERTY = "analysis.calculate";
 
     // TODO: Make this a global property: right now it is used 1/2 global, 1/2 document
     public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
@@ -225,6 +226,7 @@ public class XFormsProperties {
             new PropertyDefinition(NO_UPDATES, false, false),
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY, false, false), // false for now, but default should change at some point
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY, false, false),
+            new PropertyDefinition(CALCULATE_ANALYSIS_PROPERTY, false, false),
             new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
             new PropertyDefinition(SANITIZE_PROPERTY, "", false),
 

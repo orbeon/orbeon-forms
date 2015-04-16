@@ -35,6 +35,8 @@ trait XFormsStaticState {
     def isHTMLDocument: Boolean
 
     def isXPathAnalysis: Boolean
+    def isCalculateDependencies: Boolean
+    
     def sanitizeInput: String ⇒ String
 
     def staticProperty(name: String): Any

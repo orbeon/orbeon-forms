@@ -63,6 +63,10 @@
     <category name="org.orbeon.auth">
         <priority value="debug"/>
     </category>
+    
+    <category name="org.orbeon.xforms.analysis.calculate">
+        <priority value="debug"/>
+    </category>
 
     <category name="org.orbeon.lifecycle">
         <priority value="debug"/>

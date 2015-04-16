@@ -138,9 +138,10 @@ class StaticBind(
     bindTree.bindsById += staticId → staticBind
 
     // Remember variables mappings
-    val name = element.attributeValue(NAME_QNAME)
-    if (name ne null)
+    val nameOpt = Option(element.attributeValue(NAME_QNAME))
+    nameOpt foreach { name ⇒
         bindTree.bindsByName += name → staticBind
+    }
 
     // Type MIP is special as it is not an XPath expression
     val typeMIPOpt: Option[TypeMIP] = {
@@ -292,8 +293,9 @@ class StaticBind(
     def removeBind(bind: StaticBind): Unit = {
         bindTree.bindIds -= bind.staticId
         bindTree.bindsById -= bind.staticId
-        if (bind.name ne null)
-            bindTree.bindsByName -= bind.name
+        bind.nameOpt foreach { name ⇒
+            bindTree.bindsByName -= name
+        }
 
         _children = _children filterNot (_ eq bind)
 
@@ -305,10 +307,12 @@ class StaticBind(
 
     // TODO: Support multiple relevant, readonly, and required MIPs.
     private def firstXPathMIPOrNull(mipName: String) = allMIPNameToXPathMIP.getOrElse(mipName, Nil).headOption.orNull
+    def firstXPathMIP(mip: Model.XPathMIP)           = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
 
-    // For Java callers (can return null)
-    def getDefaultValue = firstXPathMIPOrNull(Default.name)
-    def getCalculate    = firstXPathMIPOrNull(Calculate.name)
+    def hasXPathMIP(mip: Model.XPathMIP) = firstXPathMIP(mip).isDefined
+    
+    def hasDefault      = hasXPathMIP(Default)
+    def hasCalculate    = hasXPathMIP(Calculate)
 
     // These can have multiple values
     def getRelevant     = firstXPathMIPOrNull(Relevant.name)

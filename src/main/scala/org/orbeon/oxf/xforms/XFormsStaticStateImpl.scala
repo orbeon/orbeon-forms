@@ -60,11 +60,12 @@ class XFormsStaticStateImpl(
     def toXML(helper: XMLReceiverHelper) = topLevelPart.toXML(helper)
 
     // Properties
-    lazy val allowedExternalEvents = stringOptionToSet(Option(staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY)))
-    lazy val isHTMLDocument        = staticStateDocument.isHTMLDocument
-    lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
+    lazy val allowedExternalEvents   = stringOptionToSet(Option(staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY)))
+    lazy val isHTMLDocument          = staticStateDocument.isHTMLDocument
+    lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),         P.XPATH_ANALYSIS_PROPERTY)
+    lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CALCULATE_ANALYSIS_PROPERTY), P.CALCULATE_ANALYSIS_PROPERTY)
 
-    lazy val sanitizeInput         = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
+    lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
 
     def isCacheDocument       = staticBooleanProperty(P.CACHE_DOCUMENT_PROPERTY)
     def isClientStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE

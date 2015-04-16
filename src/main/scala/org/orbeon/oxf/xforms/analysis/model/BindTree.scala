@@ -103,15 +103,20 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
 
     // In-scope variable on binds include variables implicitly declared with bind/@name
     // Used by XPath analysis
-    lazy val allBindVariables = model.variablesMap ++ (bindsByName map { case (k, v) ⇒ k → new BindAsVariable(v) })
+    lazy val allBindVariables = model.variablesMap ++ (bindsByName map { case (k, v) ⇒ k → new BindAsVariable(k, v) })
 
-    class BindAsVariable(bind: StaticBind) extends VariableTrait {
-        def name = bind.name
+    class BindAsVariable(val name: String, bind: StaticBind) extends VariableTrait {
         def variableAnalysis = bind.getBindingAnalysis
     }
 
     // Whether we figured out all XPath ref analysis
     var figuredAllBindRefAnalysis = ! hasBinds // default value sets to true if no binds
+    
+    private var _recalculateOrder: Option[List[StaticBind]] = None
+    def recalculateOrder = _recalculateOrder
+    
+    private var _defaultValueOrder: Option[List[StaticBind]] = None
+    def defaultValueOrder = _defaultValueOrder
 
     def analyzeBindsXPath(): Unit = {
         // Analyze all binds and return whether all of them were successfully analyzed
@@ -126,6 +131,11 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
             computedBindExpressionsInstances.clear()
             validationBindInstances.clear()
             // keep bindAnalysis as those can be used independently from each other
+        }
+        
+        if (model.part.staticState.isCalculateDependencies) {
+            _recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Calculate))
+            _defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Default))
         }
     }
 

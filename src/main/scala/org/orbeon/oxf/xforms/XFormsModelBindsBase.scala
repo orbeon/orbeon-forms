@@ -21,8 +21,9 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
+import org.orbeon.oxf.xforms.analysis.model.Model.StringMIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, DataModel, RuntimeBind}
@@ -301,6 +302,81 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 null
         }
     }
+    
+    def applyDefaultValueBindsIfNeeded(): Unit =
+        if (staticModel.hasDefaultValueBind)
+            applyCalculatedBindsUseOrderIfNeeded(Model.Default, staticModel.defaultValueOrder)
+    
+    def applyCalculateBindsIfNeeded(): Unit =
+        if (staticModel.hasCalculateBind)
+            applyCalculatedBindsUseOrderIfNeeded(Model.Calculate, staticModel.recalculateOrder)
+    
+    def applyCalculatedBindsUseOrderIfNeeded(mip: Model.StringMIP, orderOpt: Option[List[StaticBind]]): Unit =
+        orderOpt match {
+            case Some(order) ⇒
+                applyCalculatedBindsFollowDependencies(order, mip)
+            case None ⇒
+                iterateBinds(new XFormsModelBinds.BindRunner() {
+                    def applyBind(bindNode: BindNode) =
+                        if (bindNode.staticBind.hasXPathMIP(mip) &&
+                            dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, mip.name, null)) {
+                            evaluateAndSetCalculatedBind(bindNode, mip)
+                        }
+                })
+        }
+    
+    def applyCalculatedBindsFollowDependencies(order: List[StaticBind], mip: Model.StringMIP): Unit = {
+        order foreach { staticBind ⇒
+            val logger = DependencyAnalyzer.Logger
+            val isDebug = logger.isDebugEnabled
+            if (dependencies.requireModelMIPUpdate(staticModel, staticBind, mip.name, null)) {
+                var evaluationCount = 0
+                BindVariableResolver.resolveNotAncestorOrSelf(this, None, staticBind) foreach { runtimeBindIt ⇒
+                    runtimeBindIt flatMap (_.bindNodes) foreach { bindNode ⇒
+                        evaluationCount += 1
+                        evaluateAndSetCalculatedBind(bindNode, mip)
+                    }
+                }
+                if (isDebug) logger.debug(s"run  ${mip.name} for ${staticBind.staticId} ($evaluationCount total)")
+            } else {
+                if (isDebug) logger.debug(s"skip ${mip.name} for ${staticBind.staticId}")
+            }
+        }
+    }
+
+    def evaluateAndSetCalculatedBind(bindNode: BindNode, mip: Model.StringMIP): Unit =
+        evaluateCalculatedBind(bindNode, mip) foreach { stringResult ⇒
+            DataModel.jSetValueIfChanged(
+                containingDocument = containingDocument, 
+                eventTarget        = model, 
+                locationData       = bindNode.locationData, 
+                nodeInfo           = bindNode.node, 
+                valueToSet         = stringResult, 
+                source             = mip.name, 
+                isCalculate        = true
+            )
+        }
+
+    def evaluateCalculatedBind(bindNode: BindNode, mip: Model.StringMIP): Option[String] =
+        bindNode.staticBind.firstXPathMIP(mip) flatMap { xpathMIP ⇒
+            try Option(evaluateStringExpression(bindNode, xpathMIP))
+            catch {
+                case e: Exception ⇒
+                    handleMIPXPathException(e, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP")
+                    // Blank value so we don't have stale calculated values
+                    Some("")
+            }
+        }
+    
+    def jEvaluateCalculatedBind(bindNode: BindNode, mipName: String): String = {
+        val mip = mipName match {
+            case Model.Calculate.name ⇒ Model.Calculate
+            case Model.Default.name   ⇒ Model.Default
+            case _                    ⇒ throw new IllegalArgumentException(mipName)
+        }
+        evaluateCalculatedBind(bindNode, mip).orNull
+    }
+                
 }
 
 object XFormsModelBindsBase {

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -112,28 +111,13 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 indentedLogger.startHandleOperation("model", "performing bind recalculate", "model id", model.getEffectiveId());
             {
                 // 1. Evaluate initial values and calculate before the rest
-
                 if (isFirstCalculate || applyDefaults) {
-                    // Handle default values first
-                    if (staticModel.hasDefaultValueBind())
-                        iterateBinds(new BindRunner() {
-                            public void applyBind(BindNode bindNode) {
-                                if (bindNode.staticBind().getDefaultValue() != null && dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind(), Model.DEFAULT(), null))
-                                    handleDefaultValueBind(bindNode);
-                            }
-                        });
-                    // This will be false from now on as we have done our first handling of calculate binds
+                    applyDefaultValueBindsIfNeeded();
                     isFirstCalculate = false;
                 }
 
                 // Handle calculations
-                if (staticModel.hasCalculateBind())
-                    iterateBinds(new BindRunner() {
-                        public void applyBind(BindNode bindNode) {
-                            if (bindNode.staticBind().getCalculate() != null && dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind(), Model.CALCULATE(), null))
-                                handleCalculateBind(bindNode);
-                        }
-                    });
+                applyCalculateBindsIfNeeded();
 
                 // 2. Update computed expression binds if requested
                 applyComputedExpressionBinds();
@@ -228,83 +212,16 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 return null;
         } else if (mipType.equals(XFormsConstants.CALCULATE_QNAME)) {
             // Calculate
-            final String result = evaluateCalculateBind(bindNode);
+            final String result = jEvaluateCalculatedBind(bindNode, Model.CALCULATE());
             return (result != null) ? new StringValue(result) : null;
         } else if (mipType.equals(XFormsConstants.XXFORMS_DEFAULT_QNAME)) {
             // xxf:default
-            final String result = evaluateXXFormsDefaultBind(bindNode);
+            final String result = jEvaluateCalculatedBind(bindNode, Model.DEFAULT());
             return (result != null) ? new StringValue(result) : null;
         } else {
             // Try custom MIPs
             final String result = evaluateCustomMIPByName(bindNode, Model.buildCustomMIPName(mipType.getQualifiedName()));
             return (result != null) ? new StringValue(result) : null;
-        }
-    }
-
-    private String evaluateXXFormsDefaultBind(BindNode bindNode) {
-        final StaticBind.XPathMIP defaultMIP = bindNode.staticBind().getDefaultValue();
-        if (defaultMIP != null) {
-            try {
-                return evaluateStringExpression(bindNode, defaultMIP);
-            } catch (Exception e) {
-                handleMIPXPathException(e, bindNode, defaultMIP, "evaluating XForms default bind");
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private void handleDefaultValueBind(BindNode bindNode) {
-
-        final String stringResult = evaluateXXFormsDefaultBind(bindNode);
-        if (stringResult != null) {
-            // TODO: Detect if we have already handled this node and handle this error
-            final NodeInfo currentNodeInfo = bindNode.node();
-            DataModel.jSetValueIfChanged(
-                containingDocument,
-                model,
-                bindNode.locationData(),
-                currentNodeInfo,
-                stringResult,
-                "default",
-                true,
-                indentedLogger
-            );
-        }
-    }
-
-    public void handleCalculateBind(BindNode bindNode) {
-        final String stringResult = evaluateCalculateBind(bindNode);
-        if (stringResult != null) {
-            // TODO: Detect if we have already handled this node and handle this error
-            final NodeInfo currentNodeInfo = bindNode.node();
-            DataModel.jSetValueIfChanged(
-                containingDocument,
-                model,
-                bindNode.locationData(),
-                currentNodeInfo,
-                stringResult,
-                "calculate",
-                true,
-                indentedLogger
-            );
-        }
-    }
-
-    public String evaluateCalculateBind(BindNode bindNode) {
-        // Handle calculate MIP
-        final StaticBind.XPathMIP calculateMIP = bindNode.staticBind().getCalculate();
-        if (calculateMIP != null) {
-            try {
-                return evaluateStringExpression(bindNode, calculateMIP);
-            } catch (Exception e) {
-                handleMIPXPathException(e, bindNode, calculateMIP, "evaluating XForms calculate bind");
-                // Blank value so we don't have stale calculated values
-                return "";
-            }
-        } else {
-            return null;
         }
     }
 
@@ -315,7 +232,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         // Handle relevant, readonly, required, and custom MIPs
         if (staticBind.getRelevant() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.RELEVANT(), null))
             evaluateAndSetRelevantMIP(bindNode);
-        if (staticBind.getReadonly() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.READONLY(), null) || staticBind.getCalculate() != null)
+        if (staticBind.getReadonly() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.READONLY(), null) || staticBind.hasCalculate())
             evaluateAndSetReadonlyMIP(bindNode);
         if (staticBind.getRequired() != null && dependencies.requireModelMIPUpdate(staticModel, staticBind, Model.REQUIRED(), null))
             evaluateAndSetRequiredMIP(bindNode);
@@ -352,7 +269,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         final Boolean readonlyMIP = evaluateReadonlyMIP(bindNode);
         if (readonlyMIP != null) {
             bindNode.setReadonly(readonlyMIP);
-        } else if (bindNode.staticBind().getCalculate() != null) {
+        } else if (bindNode.staticBind().hasCalculate()) {
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
             bindNode.setReadonly(true);
         }

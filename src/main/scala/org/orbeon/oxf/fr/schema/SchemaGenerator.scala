@@ -270,7 +270,7 @@ object SchemaGenerator {
 
         // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from
         // the library.
-        val (childrenBinds, newResolve) = bind \ * match {
+        val (childrenBinds, newResolve) = bind \ "*:bind" match {
             case Nil ⇒
                 // No children for this bind, but there might be a section template associated with this bind
 

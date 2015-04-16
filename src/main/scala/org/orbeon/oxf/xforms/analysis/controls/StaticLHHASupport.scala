@@ -50,11 +50,8 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
     def lhhaValueAnalyses(lhhaType: String) =
         lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
 
-    override def analyzeXPath() = {
-        super.analyzeXPath()
-        // Only analyze local LHHA as external LHHA are analyzed like controls
-        allLHHA filter (_.isLocal) foreach (_.analyzeXPath())
-    }
+    // analyzeXPath(): this is done as part of control analysis, see:
+    // https://github.com/orbeon/orbeon-forms/issues/2185
 
     override def freeTransientState() {
         super.freeTransientState()

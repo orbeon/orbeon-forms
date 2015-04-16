@@ -118,7 +118,7 @@ object XPathCache {
 
     // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
     // identical to a singleton sequence containing that item." It's easier for callers to switch on the item time.
-    def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq(0) else seq
+    def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
 
     // Evaluate an XPath expression on the document and keep Item objects in the result
     // 4 external usages
@@ -516,7 +516,7 @@ object XPathCache {
             // reference all the way to e.g. an XFormsContainingDocument.
             val variableNames = Option(variableToValueMap) map (_.keySet.asScala.toList) getOrElse List()
 
-            if (variableNames.size > 0) {
+            if (variableNames.nonEmpty) {
                 // There are some variables in scope. They must be part of the key
                 // TODO: Put this in static state as this can be determined statically once and for all
                 for (variableName ← variableNames) {

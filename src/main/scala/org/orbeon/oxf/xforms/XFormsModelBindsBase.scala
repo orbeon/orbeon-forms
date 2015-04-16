@@ -319,6 +319,6 @@ object XFormsModelBindsBase {
         private val DomainRegex = new RegexValidator(DomainNameRegex)
 
         override def isValidDomain(domain: String) =
-            Option(DomainRegex.`match`(domain)) exists (_.length > 0)
+            Option(DomainRegex.`match`(domain)) exists (_.nonEmpty)
     }
 }

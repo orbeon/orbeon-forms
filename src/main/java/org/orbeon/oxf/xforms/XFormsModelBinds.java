@@ -603,7 +603,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         return "".equals(value);
     }
 
-    public static interface BindRunner {
-        public void applyBind(BindNode bind);
+    public interface BindRunner {
+        void applyBind(BindNode bind);
     }
 }

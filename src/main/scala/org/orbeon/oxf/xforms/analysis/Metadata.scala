@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl._
-import org.orbeon.oxf.xml.{NamespaceContext, NamespaceMapping, SAXStore, TransformerUtils}
+import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, TransformerUtils}
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable, mutable}

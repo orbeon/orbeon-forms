@@ -53,7 +53,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
     // Create static binds hierarchy and yield top-level binds
     val topLevelBinds: Seq[StaticBind] = {
         // NOTE: For now, do as if binds follow all top-level variables
-        val preceding = if (model.variablesSeq.isEmpty) None else Some(model.variablesSeq.last)
+        val preceding = model.variablesSeq.lastOption
         for (bindElement ← bindElements)
             yield new StaticBind(bindTree, bindElement, model, preceding)
     }

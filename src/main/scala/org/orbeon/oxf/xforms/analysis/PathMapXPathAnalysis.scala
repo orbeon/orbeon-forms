@@ -257,7 +257,7 @@ object PathMapXPathAnalysis {
                                 case Right(Some(instancePrefixedId)) ⇒
                                     // Continue with rest of expressions
                                     buildPath(expressions.tail) match {
-                                        case Right(path) ⇒ Right(Some(InstancePath(instancePrefixedId, path)))
+                                        case Right(path)  ⇒ Right(Some(InstancePath(instancePrefixedId, path)))
                                         case Left(reason) ⇒ Left(reason)
                                     }
                                 // First expression is instance() but there is no default instance so we don't add the path

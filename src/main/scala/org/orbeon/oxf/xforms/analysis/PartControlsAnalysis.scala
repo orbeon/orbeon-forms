@@ -27,17 +27,18 @@ trait PartControlsAnalysis extends TransientState {
 
     protected val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
     protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type → Map of prefixedId → ElementAnalysis
-    private val controlAppearances   = HashMap[String, HashSet[QName]]()                         // type → Set of appearances
+    private   val controlAppearances = HashMap[String, HashSet[QName]]()                         // type → Set of appearances
 
     // Special handling of attributes
     private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
 
     protected def indexNewControl(
-            elementAnalysis: ElementAnalysis,
-            lhhas: Buffer[LHHAAnalysis],
-            eventHandlers: Buffer[EventHandlerImpl],
-            models: Buffer[Model],
-            attributes: Buffer[AttributeControl]): Unit = {
+        elementAnalysis : ElementAnalysis,
+        lhhas           : Buffer[LHHAAnalysis],
+        eventHandlers   : Buffer[EventHandlerImpl],
+        models          : Buffer[Model],
+        attributes      : Buffer[AttributeControl]
+    ): Unit = {
         val controlName = elementAnalysis.localName
 
         // Index by prefixed id
@@ -171,10 +172,10 @@ trait PartControlsAnalysis extends TransientState {
         unmapScopeIds(control)
 
         control match {
-            case model: Model ⇒ deindexModel(model)
-            case eventHandler: EventHandlerImpl ⇒ deregisterEventHandler(eventHandler)
-            case attributeControl: AttributeControl ⇒ _attributeControls -= attributeControl.forPrefixedId
-            case _ ⇒
+            case model: Model              ⇒ deindexModel(model)
+            case handler: EventHandlerImpl ⇒ deregisterEventHandler(handler)
+            case att: AttributeControl     ⇒ _attributeControls -= att.forPrefixedId
+            case _                         ⇒
         }
 
         // NOTE: Can't update controlAppearances and _hasInputPlaceholder without checking all controls again, so for now leave that untouched

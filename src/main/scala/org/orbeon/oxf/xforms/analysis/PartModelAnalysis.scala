@@ -83,7 +83,7 @@ trait PartModelAnalysis extends TransientState {
     protected def analyzeModelsXPath() =
         for {
             (scope, models) ← modelsByScope
-            model ← models
+            model           ← models
         } yield
             model.analyzeXPath()
 

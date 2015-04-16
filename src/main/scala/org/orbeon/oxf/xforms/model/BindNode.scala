@@ -232,7 +232,7 @@ class BindIteration(
     childrenStaticBinds                : Seq[StaticBind]
 ) extends BindNode(parentBind, position, item) {
 
-    require(childrenStaticBinds.size > 0)
+    require(childrenStaticBinds.nonEmpty)
 
     def forStaticId = parentBind.staticId
 

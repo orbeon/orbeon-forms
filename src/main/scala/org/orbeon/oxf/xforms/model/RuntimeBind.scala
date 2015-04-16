@@ -52,7 +52,7 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
             if (itemsAsScala.nonEmpty) {
                 // Only then does it make sense to create BindNodes
                 val childrenStaticBinds = staticBind.children
-                if (childrenStaticBinds.size > 0) {
+                if (childrenStaticBinds.nonEmpty) {
                     // There are children binds (and maybe MIPs)
                     val result = new m.ArrayBuffer[BindNode](itemsSize)
                     

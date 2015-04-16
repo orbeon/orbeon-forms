@@ -24,12 +24,17 @@ import org.orbeon.oxf.util.XPath.CompiledExpression
  * Representation of a common XForms element supporting optional context, binding and value.
  */
 class SimpleElementAnalysis(
-       val staticStateContext: StaticStateContext,
-       element: Element,
-       parent: Option[ElementAnalysis],
-       preceding: Option[ElementAnalysis],
-       val scope: Scope)
-    extends ElementAnalysis(staticStateContext.partAnalysis, element, parent, preceding) {
+   val staticStateContext : StaticStateContext,
+   element                : Element,
+   parent                 : Option[ElementAnalysis],
+   preceding              : Option[ElementAnalysis],
+   val scope              : Scope
+) extends ElementAnalysis(
+    staticStateContext.partAnalysis, 
+    element, 
+    parent, 
+    preceding
+) {
     
     self ⇒
 

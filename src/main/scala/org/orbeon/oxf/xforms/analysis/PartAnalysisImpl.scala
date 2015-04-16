@@ -45,12 +45,12 @@ import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
  * The implementation is split into a series of traits to make each chunk more palatable.
  */
 class PartAnalysisImpl(
-        val staticState: XFormsStaticState,
-        val parent: Option[PartAnalysis],
-        val startScope: Scope,
-        val metadata: Metadata,
-        protected val staticStateDocument: StaticStateDocument)
-    extends PartAnalysis
+    val staticState                   : XFormsStaticState,
+    val parent                        : Option[PartAnalysis],
+    val startScope                    : Scope,
+    val metadata                      : Metadata,
+    protected val staticStateDocument : StaticStateDocument
+) extends PartAnalysis
     with PartGlobalOps
     with PartModelAnalysis
     with PartEventHandlerAnalysis

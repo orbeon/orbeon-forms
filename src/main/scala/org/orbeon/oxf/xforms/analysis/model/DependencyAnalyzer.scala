@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.saxon.expr.{Expression, LocalVariableReference, VariableReference}
+import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.expr.{LocalVariableReference, VariableReference}
 import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
 
 // Analyze a tree of binds to determine expressions dependencies based on references to MIP variables, that is to binds
 // which have a `name` attribute. The result is an evaluation order which satisfies the dependencies.
@@ -44,12 +44,7 @@ object DependencyAnalyzer {
                 val compiledExpr = mip.compiledExpression
                 val expr         = compiledExpr.expression.getInternalExpression
                 
-                def iterateExpressionTree(e: Expression): Iterator[Expression] =
-                    Iterator(e) ++ (
-                        e.iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] flatMap iterateExpressionTree
-                    )
-                
-                val externalVariableReferenceIt = iterateExpressionTree(expr) collect {
+                val externalVariableReferenceIt = SaxonUtils.iterateExpressionTree(expr) collect {
                     case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] ⇒ vr
                 }
                 

@@ -14,12 +14,18 @@
 package org.orbeon.oxf.xml
 
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.saxon.om.{NodeInfo, Item, ValueRepresentation, Name10Checker}
+import org.orbeon.saxon.expr.Expression
+import org.orbeon.saxon.om.{Item, Name10Checker, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{AtomicValue, StringValue, Value}
 import org.orbeon.scaxon.XML
 
+import scala.collection.JavaConverters._
 
 object SaxonUtils {
+    
+    def iterateExpressionTree(e: Expression): Iterator[Expression] =
+        Iterator(e) ++
+            (e.iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] flatMap iterateExpressionTree)
 
     // Make an NCName out of a non-blank string
     // Any characters that do not belong in an NCName are converted to '_'.

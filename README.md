@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 4.9 April 2014
+Last updated for Orbeon Forms 4.9 April 2015
 
 [![Build Status](https://secure.travis-ci.org/orbeon/orbeon-forms.png)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -20,6 +20,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](http://www.or
 What's new
 ----------
 
+- [Orbeon Forms 4.9](http://blog.orbeon.com/2015/04/orbeon-forms-49.html)
 - [Orbeon Forms 4.8.2](http://blog.orbeon.com/2015/03/orbeon-forms-482.html)
 - [Orbeon Forms 4.8.1](http://blog.orbeon.com/2015/02/orbeon-forms-481.html)
 - [Orbeon Forms 4.8](http://blog.orbeon.com/2015/01/orbeon-forms-48.html)
@@ -197,8 +198,8 @@ about individual licenses.
 Credits
 -------
 
-We would like to thank [YourKit, LLC](http://www.yourkit.com/) for kindly supporting open source projects like Orbeon
-Forms with the full-featured [YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp).
+We would like to thank [YourKit, LLC](https://www.yourkit.com/) for kindly supporting open source projects like Orbeon
+Forms with the full-featured [YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp).
 
 ---
 

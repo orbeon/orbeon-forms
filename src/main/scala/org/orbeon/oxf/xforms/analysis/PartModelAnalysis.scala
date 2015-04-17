@@ -82,10 +82,11 @@ trait PartModelAnalysis extends TransientState {
 
     protected def analyzeModelsXPath() =
         for {
-            (scope, models) ← modelsByScope
-            model           ← models
-        } yield
+            models ← modelsByScope.valuesIterator
+            model  ← models.iterator
+        } locally {
             model.analyzeXPath()
+        }
 
     override def freeTransientState() = {
         super.freeTransientState()

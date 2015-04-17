@@ -96,9 +96,11 @@ object DependencyAnalyzer {
                 staticBind ← allBindsByName.get(name)
             } yield
                 BindDetails.apply(staticBind, staticBind.nameOpt, Set.empty)
-            
         }
         
+        // NOTE: We would like to follow the original bind order as closely as possible, but currently we don't: the
+        // order consists of nodes without references first, followed by the order or nodes with one reference, etc.
+        // We might need to do a different algorithm to preserve the order. 
         def sortTopologically(bindsForSort: List[BindDetails]) = {
             @tailrec
             def visit(bindDetails: List[BindDetails], done: List[StaticBind]): List[StaticBind] =

@@ -4,7 +4,7 @@
     <!--Add internal Orbeon-* headers for auth-->
     <filter>
         <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
-        <filter-class>org.orbeon.oxf.portlet.FormRunnerAuthFilter</filter-class>
+        <filter-class>org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter</filter-class>
         <lifecycle>RENDER_PHASE</lifecycle>
         <lifecycle>ACTION_PHASE</lifecycle>
         <lifecycle>RESOURCE_PHASE</lifecycle>

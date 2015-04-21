@@ -32,22 +32,34 @@ import org.xml.sax.helpers.AttributesImpl
 import scala.collection.JavaConverters._
 import scala.util.control.Breaks
 
-class ControlsComparator(document: XFormsContainingDocument, valueChangeControlIds: collection.Set[String], isTestMode: Boolean)
-    extends XMLReceiverSupport {
+class ControlsComparator(
+    document              : XFormsContainingDocument, 
+    valueChangeControlIds : collection.Set[String], 
+    isTestMode            : Boolean
+) extends XMLReceiverSupport {
 
     // For Java callers
-    def this(containingDocument: XFormsContainingDocument, valueChangeControlIds: ju.Set[String], isTestMode: Boolean) =
-        this(containingDocument, Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String], isTestMode)
+    def this(
+        containingDocument    : XFormsContainingDocument, 
+        valueChangeControlIds : ju.Set[String], 
+        isTestMode            : Boolean
+    ) = this(
+        containingDocument, 
+        Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String], 
+        isTestMode
+    )
 
     // For Java callers
     def diffJava(
-            receiver: XMLReceiver,
-            left    : ju.List[XFormsControl],
-            right   : ju.List[XFormsControl]) =
-        diffChildren(
-            if (left  ne null) left.asScala  else Nil,
-            if (right ne null) right.asScala else Nil,
-            None)(receiver)
+        receiver : XMLReceiver,
+        left     : ju.List[XFormsControl],
+        right    : ju.List[XFormsControl]
+    ) = diffChildren(
+        if (left  ne null) left.asScala  else Nil,
+        if (right ne null) right.asScala else Nil,
+        None)(
+        receiver
+    )
     
     private val FullUpdateThreshold = document.getAjaxFullUpdateThreshold
 
@@ -55,10 +67,11 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
     import breaks._
 
     def diffChildren(
-            left             : Seq[XFormsControl],
-            right            : Seq[XFormsControl],
-            fullUpdateBuffer : Option[SAXStore])(
-            implicit receiver: XMLReceiver): Unit = {
+        left             : Seq[XFormsControl],
+        right            : Seq[XFormsControl],
+        fullUpdateBuffer : Option[SAXStore])(implicit
+        receiver         : XMLReceiver
+    ): Unit = {
 
         if (right.nonEmpty) {
 
@@ -133,9 +146,10 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
     }
 
     private def outputSingleControlDiffIfNeeded(
-            control1Opt      : Option[XFormsControl],
-            control2         : XFormsControl)(
-            implicit receiver: XMLReceiver): Unit = {
+        control1Opt : Option[XFormsControl],
+        control2    : XFormsControl)(implicit
+        receiver    : XMLReceiver
+    ): Unit = {
         // Force a change for controls whose values changed in the request
         // Q: Do we need a distinction between new iteration AND control just becoming relevant?
         if (control2.supportAjaxUpdates &&
@@ -149,10 +163,11 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
     }
 
     private def outputDescendantControlsDiffs(
-            control1Opt      : Option[XFormsControl],
-            control2         : XFormsControl,
-            fullUpdateBuffer : Option[SAXStore])(
-            implicit receiver: XMLReceiver): Unit = {
+        control1Opt      : Option[XFormsControl],
+        control2         : XFormsControl,
+        fullUpdateBuffer : Option[SAXStore])(implicit
+        receiver         : XMLReceiver
+    ): Unit = {
 
         control2 match {
             case containerControl2: XFormsContainerControl ⇒
@@ -204,14 +219,15 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
     }
 
     private def processFullUpdateForContent(
-            control : XFormsControl,
-            replay  : XMLReceiver ⇒ Unit)(
-            implicit receiver: XMLReceiver): Unit = {
+        control  : XFormsControl,
+        replay   : XMLReceiver ⇒ Unit)(implicit
+        receiver : XMLReceiver
+    ): Unit = {
 
         def setupController = {
 
             implicit val controller = new ElementHandlerController
-
+ 
             import XHTMLOutput.register
 
             XHTMLBodyHandler.registerHandlers(controller, document)
@@ -289,9 +305,10 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
         }
 
     private def outputDeleteRepeatTemplate(
-            control          : XFormsControl,
-            count            : Int)(
-            implicit receiver: XMLReceiver): Unit =
+        control  : XFormsControl,
+        count    : Int)(implicit
+        receiver : XMLReceiver
+    ): Unit =
         if (! isTestMode) {
 
             val (templateId, parentIndexes) = repeatDetails(control.effectiveId)
@@ -306,10 +323,11 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
         }
 
     private def outputCopyRepeatTemplate(
-            control          : XFormsControl,
-            startSuffix      : Int,
-            endSuffix        : Int)(
-            implicit receiver: XMLReceiver): Unit =
+        control     : XFormsControl,
+        startSuffix : Int,
+        endSuffix   : Int)(implicit
+        receiver    : XMLReceiver
+    ): Unit =
         if (! isTestMode) {
 
             val (_, parentIndexes) = repeatDetails(control.effectiveId)

@@ -35,6 +35,7 @@
         myEditor: null,
         serverValueOutputId: null,
         tinymceInitialized: false,
+        maskFocus: false,
 
         init: function() {
             this.serverValueOutputId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-server-value', null, this.container)[0].id;
@@ -87,8 +88,17 @@
 
         // TinyMCE got the focus
         focus: function(event) {
-            event.target = this.container;                          // From the perspective of the XForms engine, the focus is on the XBL component
-            Events.focus(event);                                    // Forward to the "XForms engine"
+            if (! this.maskFocus) {
+                event.target = this.container;                          // From the perspective of the XForms engine, the focus is on the XBL component
+                Events.focus(event);                                    // Forward to the "XForms engine"
+            }
+        },
+
+        // The server tells us to set the focus on the TinyMCE
+        serverSetFocus: function() {
+            this.maskFocus = true;
+            this.myEditor.focus();
+            this.maskFocus = false;
         },
 
         hasFocus: function() {

@@ -32,6 +32,11 @@
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-3.1/lib/codemirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
         </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="xforms-focus">
+                <xxf:script id="xf-fo">YAHOO.xbl.fr.CodeMirror.instance(this).serverSetFocus();</xxf:script>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:template>
             <xf:group id="outer" class="xbl-fr-code-mirror-editor-outer">
                 <xf:var name="script" value="not(exf:readonly(xxf:binding('fr-code-mirror')) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>

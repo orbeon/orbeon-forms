@@ -2241,13 +2241,19 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 // Special case for RTE
                 ORBEON.xforms.Page.getControl(control).setFocus();
+            } else if ($(control).is('.xbl-component.xbl-focusable')) {
+                // NOP:
+                // Right now the server tells us when a focusable XBL control gets the focus, but we wouldn't want it
+                // to, as the generic code below is likely to do something wrong for XBL controls (e.g. set the
+                // focus on the "B" icon of a TinyMCE), and instead we prefer to let XBL controls handle the focus
+                // themselves, rather than force a generic algorithm on them.
             } else {
                 // Generic code to find focusable descendant-or-self HTML element and focus on it
                 var htmlControl = $(control).find('input:visible, textarea:visible, select:visible, button:visible, a:visible');
                 if (htmlControl.is('*'))
                     ORBEON.util.Dom.focus(htmlControl.get(0));
                 else
-                // We haven't found anything to set the focus on, so don't mask the focus event, since we won't receive it
+                    // We haven't found anything to set the focus on, so don't mask the focus event, since we won't receive it
                     ORBEON.xforms.Globals.maskFocusEvents = false;
             }
 

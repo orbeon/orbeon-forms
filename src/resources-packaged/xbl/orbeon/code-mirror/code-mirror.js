@@ -43,6 +43,7 @@
             this.editor.setOption("readOnly", YD.hasClass(this.container, "xforms-readonly") ? 'nocursor' : false);
         },
 
+        serverSetFocus : function() { this.editor.focus();  },
         codeMirrorFocus: function() { this.hasFocus = true; },
         codeMirrorBlur: function() {
             this.hasFocus = false;

@@ -34,6 +34,9 @@
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
             </xbl:handler>
+            <xbl:handler event="xforms-focus">
+                <xxf:script id="xf-fo">ORBEON.jQuery(this).find('input').focus();</xxf:script>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->

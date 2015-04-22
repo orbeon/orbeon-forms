@@ -256,7 +256,7 @@ class ControlsComparator(document: XFormsContainingDocument, valueChangeControlI
                 new DeferredXMLReceiverImpl(
                     new XHTMLRewrite().getRewriteXMLReceiver(
                         externalContext.getResponse,
-                        new HTMLFragmentSerializer(new ContentHandlerWriter(receiver), true),
+                        HTMLFragmentSerializer.create(new ContentHandlerWriter(receiver), skipRootElement = true),
                         true
                     )
                 )

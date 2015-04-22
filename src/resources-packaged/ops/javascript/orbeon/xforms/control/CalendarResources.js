@@ -18,7 +18,7 @@
             properties: {
                 "MONTHS_LONG": [ "Janeiro", "Fevereiro", "Mar\xe7o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
                 "WEEKDAYS_SHORT": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\xe1b"],
-                "START_WEEKDAY": 0
+                "START_WEEKDAY": 1
             },
             navigator: {
                 month: "M\xeas",
@@ -46,8 +46,8 @@
             properties: {
                 "MONTHS_LONG": [ "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kes\u00e4kuu", "Hein\u00e4kuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu" ],
                 "MONTHS_SHORT": ["Tammi", "Helmi", "Maalis", "Huhti", "Touko", "Kes\u00e4", "Hein\u00e4", "Elo", "Syys", "Loka", "Marras", "Joulu"],
-                "WEEKDAYS_SHORT": ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
-                "START_WEEKDAY": 0
+                "WEEKDAYS_SHORT": ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"],
+                "START_WEEKDAY": 1
             },
             navigator: {
                 month: "Kuukausi",
@@ -61,7 +61,7 @@
             properties: {
                 "MONTHS_LONG": [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",  "Settembre",  "Ottobre",  "Novembre",  "Dicembre" ],
                 "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Me", "Gi", "Ve", "Sa"],
-                "START_WEEKDAY": 0
+                "START_WEEKDAY": 1
             },
             navigator: {
                 month: "Mese",
@@ -117,7 +117,7 @@
             properties: {
                 "MONTHS_LONG": [ "Januar", "Februar", "M\u00E4rz", "April", "Mai", "Juni", "July", "August",  "September",  "Oktober",  "November",  "Dezember" ],
                 "WEEKDAYS_SHORT": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
-                "START_WEEKDAY": 0
+                "START_WEEKDAY": 1
             },
             navigator: {
                 month: "Monat",
@@ -160,7 +160,7 @@
             properties: {
                 "MONTHS_LONG": [ "Stycze\u0144", "Luty", "Marzec", "Kwiecie\u0144", "Maj", "Czerwiec", "Lipiec", "Sierpie\u0144",  "Wrzesie\u0144",  "Pa\u017Adziernik",  "Listopad",  "Grudzie\u0144" ],
                 "WEEKDAYS_SHORT": ["Nd", "Pn", "Wt", "\u015Ar", "Cz", "Pt", "Sb"],
-                "START_WEEKDAY": 0
+                "START_WEEKDAY": 1
             },
             navigator: {
                 month: "Miesi\u0105c",
@@ -173,8 +173,8 @@
         "sv": {
             properties: {
                 "MONTHS_LONG": [ "Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December" ],
-                "WEEKDAYS_SHORT": ["M\u00e5n", "Tis", "Ons", "Tor", "Fre", "L\u00f6r", "S\u00f6n"],
-                "START_WEEKDAY": 0
+                "WEEKDAYS_SHORT": ["S\u00f6n", "M\u00e5n", "Tis", "Ons", "Tor", "Fre", "L\u00f6r"],
+                "START_WEEKDAY": 1
             },
             navigator: {
                 month: "M\u00e5nad",

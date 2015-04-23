@@ -83,6 +83,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
+        assert(persistenceBaseURL ne null, "no base URL specified for persistence provider, check properties")
         val serviceURI = NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString)
 
         val cxr = proxyEstablishConnection(request, serviceURI, headers)

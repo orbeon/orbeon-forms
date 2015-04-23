@@ -14,11 +14,10 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
-import scala.util.matching.Regex
 
 object URLFinder {
 
-    def replaceWithHyperlink  (s: String) = s"""<a href="$s">$s</a>"""
+    def replaceWithHyperlink  (s: String) = s"""<a href="${adjustProtocol(s)}">$s</a>"""
     def replaceWithPlaceholder(s: String) = s"""<a>$s</a>"""
 
     // Replace HTTP/HTTPS URLs in a plain string and return an HTML fragment
@@ -28,14 +27,14 @@ object URLFinder {
         var afterPreviousMatch = 0
 
         // Don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text around URLs
-        for (m ← URLMatchRegex.findAllMatchIn(s)) {
-            val before = m.before
+        for (currentMatch ← URLMatchRegex.findAllMatchIn(s)) {
+            val before = currentMatch.before
             val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
-
+            
             sb append escapeXMLMinimal(precedingUnmatched.toString)
-            sb append replace(escapeXMLMinimal(Regex.quoteReplacement(m.toString)))
+            sb append replace(escapeXMLMinimal(currentMatch.toString))
 
-            afterPreviousMatch = m.end
+            afterPreviousMatch = currentMatch.end
         }
 
         sb append escapeXMLMinimal(s.substring(afterPreviousMatch))
@@ -45,7 +44,17 @@ object URLFinder {
     }
 
     def findURLs(s: String) =
-        URLMatchRegex.findAllIn(s) map Regex.quoteReplacement
+        URLMatchRegex.findAllIn(s)
+    
+    def isEmail(s: String) =
+        EmailMatchOnly.findFirstIn(s).isDefined
+    
+    private def adjustProtocol(s: String) =
+        if (isEmail(s)) {
+            if (s.startsWith("mailto:")) s else s"mailto:$s"
+        } else {
+            if (s.startsWith("http:") || s.startsWith("https:")) s else s"http://$s"
+        }
 
     // Useful resources:
     //
@@ -69,12 +78,25 @@ object URLFinder {
     private val RegexpDomains              = """[a-z]{2,25}"""
     private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
     private val BalancedParens             = """\([^\s]+?\)"""
+    
+    private val EmailMatch =
+        s"""
+          [A-Z0-9._%+-]+@         # simplified local part
+          [a-z0-9]+               # lowercase ASCII and numbers for first part
+          (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
+          [.]                     # followed by .
+          (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+        """
+    
+    private val EmailMatchOnly =
+        s"""(?xi)^($EmailMatch)$$""".r
 
     // NOTE: All backslashes are escaped below because interpolation with triple quotes interprets backslash escapes.
     private val URLMatchRegex =
         s"""(?xi)
             \\b
             (
+              # Domain with explicit http or https protocol
               (?:
                 https?:
                 (?:
@@ -102,6 +124,7 @@ object URLFinder {
                 [^\\s`!()\\[\\]{};:'".,<>?«»“”‘’]
               )
               |
+              # Naked domain
               (?:                       # non-capturing group
                 (?<![@.])               # not preceded by @ or .
                 [a-z0-9]+               # lowercase ASCII and numbers for first part
@@ -110,6 +133,14 @@ object URLFinder {
                 (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
                 \\b                     # word boundary (0-length match)
                 /?                      # optional trailing /
+                (?!@)                   # not followed by @
+              )
+              |
+              # Email address
+              (?:                       # non-capturing group
+                (?<![@.])               # not preceded by @ or .
+                $EmailMatch             # email address proper
+                \\b                     # word boundary (0-length match)
                 (?!@)                   # not followed by @
               )
             )""".r

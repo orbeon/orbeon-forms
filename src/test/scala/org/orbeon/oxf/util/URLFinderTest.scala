@@ -35,7 +35,13 @@ class URLFinderTest extends AssertionsForJUnit {
             """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" → List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),
             """naked google.com URL and another (http://twitter.com/)"""   → List("""google.com""", """http://twitter.com/"""),
             """trailing / works too for google.com/."""                    → List("""google.com/"""),
-            """email info@orbeon.com is not matched"""                     → List()
+            """this info@orbeon.com works"""                               → List("""info@orbeon.com"""),
+            """this info@orbeon.com@ works"""                              → Nil,
+            """this (info@orbeon.com) works"""                             → List("""info@orbeon.com"""),
+            """this (info@orbeon.com, ada.lovelace@london.uk) works"""     → List("""info@orbeon.com""", """ada.lovelace@london.uk"""),
+            """this (INFO@ORBEON.COM) works"""                             → List("""INFO@ORBEON.COM"""),
+            """this info@orbeon.com/ works"""                              → List("""info@orbeon.com"""),
+            """this mailto:info@orbeon.com works"""                        → List("""info@orbeon.com""")
         )
 
         for ((in, out) ← expected)
@@ -48,18 +54,39 @@ class URLFinderTest extends AssertionsForJUnit {
             """- Music is an art (https://en.wikipedia.org/wiki/Art).
               |- URL with parameters: http://example.org/a=1&b=2.
               |- Dungeons & Dragons
+              |- Email info@orbeon.com
               |- if (a < b) 42 else 0
               |- From Wikipedia (https://en.wikipedia.org/wiki/Music).
+              |- Some naked domain is www.orbeon.com
               |- if (a < b) 42 else 0""".stripMargin
 
         val expected =
             """<span>- Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
               |- URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
               |- Dungeons &amp; Dragons
+              |- Email <a href="mailto:info@orbeon.com">info@orbeon.com</a>
               |- if (a &lt; b) 42 else 0
               |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).
+              |- Some naked domain is <a href="http://www.orbeon.com">www.orbeon.com</a>
               |- if (a &lt; b) 42 else 0</span>""".stripMargin
 
         assert(expected === replaceURLs(input, replaceWithHyperlink))
+    }
+    
+    @Test def testEmail(): Unit = {
+        
+        val expected = List(
+            """www.google.com"""         → false,
+            """info@orbeon.com"""        → true,
+            """info@orbeon.com@"""       → false,
+            """(info@orbeon.com)"""      → false,
+            """ada.lovelace@london.uk""" → true,
+            """INFO@ORBEON.COM"""        → true,
+            """info@orbeon.com/"""       → false,
+            """mailto:info@orbeon.com""" → false
+        )
+
+        for ((in, out) ← expected)
+            assert(out === isEmail(in))
     }
 }

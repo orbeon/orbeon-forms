@@ -87,7 +87,7 @@ trait FormRunnerPDF {
 
     import URLFinder._
 
-    // Add HTTP/HTTPS hyperlinks to a plain string
+    // Add http/https/mailto hyperlinks to a plain string
     def hyperlinkURLs(s: String, hyperlinks: Boolean) =
         replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 

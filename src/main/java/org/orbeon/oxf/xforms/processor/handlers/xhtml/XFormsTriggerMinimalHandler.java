@@ -49,18 +49,4 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
     }
-
-    @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
-        // Ask super first
-        super.addCustomClasses(classes, control);
-
-        if (control != null) {
-            final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
-            if (triggerControl.isReadonly()) {
-                // Add a special class to facilitate styling of readonly links with IE 6
-                classes.append(" xforms-trigger-readonly");
-            }
-        }
-    }
 }

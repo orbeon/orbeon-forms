@@ -299,10 +299,6 @@
 .orbeon .xforms-submit button span {
   vertical-align: middle;
 }
-.orbeon .xforms-trigger-readonly a {
-  color: gray;
-  cursor: default;
-}
 .orbeon #orbeon-calendar-div .yui-calendar .calheader {
   padding-top: .3em;
 }

@@ -2121,10 +2121,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Button
                 var button = ORBEON.util.Dom.getElementByTagName(control, "button");
                 ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
-                // Also update class xforms-trigger-readonly to style the a inside the span (in span layout, for IE6)
-                if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-trigger-readonly");
-                else            YAHOO.util.Dom.removeClass(control, "xforms-trigger-readonly");
             }
         },
 

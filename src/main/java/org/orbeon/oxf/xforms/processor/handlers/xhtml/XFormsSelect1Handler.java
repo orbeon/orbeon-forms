@@ -122,7 +122,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 outputDisabledAttribute(containerAttributes);
 
             if (singleNodeControl != null)
-                handleAriaAttributes(singleNodeControl.isRequired(), singleNodeControl.isValid(), reusableAttributes);
+                handleAriaAttributes(singleNodeControl.isRequired(), singleNodeControl.isValid(), containerAttributes);
 
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
             {

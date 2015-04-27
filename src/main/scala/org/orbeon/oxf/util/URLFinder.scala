@@ -79,13 +79,18 @@ object URLFinder {
     private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
     private val BalancedParens             = """\([^\s]+?\)"""
     
+    private val DomainPart = 
+        s"""
+            [a-z0-9]+               # lowercase ASCII and numbers for first part
+            (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
+            [.]                     # followed by .
+            (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+         """
+    
     private val EmailMatch =
         s"""
-          [A-Z0-9._%+-]+@         # simplified local part
-          [a-z0-9]+               # lowercase ASCII and numbers for first part
-          (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
-          [.]                     # followed by .
-          (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+            [a-z0-9._%+-]+@         # simplified local part
+            $DomainPart
         """
     
     private val EmailMatchOnly =
@@ -127,10 +132,7 @@ object URLFinder {
               # Naked domain
               (?:                       # non-capturing group
                 (?<![@.])               # not preceded by @ or .
-                [a-z0-9]+               # lowercase ASCII and numbers for first part
-                (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
-                [.]                     # followed by .
-                (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+                $DomainPart
                 \\b                     # word boundary (0-length match)
                 /?                      # optional trailing /
                 (?!@)                   # not followed by @

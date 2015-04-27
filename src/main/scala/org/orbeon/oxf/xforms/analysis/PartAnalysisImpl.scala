@@ -136,7 +136,7 @@ class PartAnalysisImpl(
         }
 
         // Throw if the element is unknown (we could also just warn?)
-        if (! elementAnalysis.isDefined)
+        if (elementAnalysis.isEmpty)
             throw new ValidationException("Unknown control: " + controlElement.getQualifiedName, locationData)
 
         // 3. Index new control

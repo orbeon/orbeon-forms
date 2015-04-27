@@ -371,13 +371,13 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 def isCreate =
                     ! delete && existing.isEmpty
 
-                def existingVersion =
+                def existingVersionOpt =
                     existing flatMap (_.formVersion)
 
                 def isUnspecifiedOrSpecificVersion =
                     req.version match {
                         case Unspecified       ⇒ true
-                        case Specific(version) ⇒ Some(version) == existingVersion
+                        case Specific(version) ⇒ Some(version) == existingVersionOpt
                         case _                 ⇒ false
                     }
 

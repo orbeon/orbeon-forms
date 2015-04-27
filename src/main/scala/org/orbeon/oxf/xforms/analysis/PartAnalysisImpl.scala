@@ -51,13 +51,13 @@ class PartAnalysisImpl(
     val metadata                      : Metadata,
     protected val staticStateDocument : StaticStateDocument
 ) extends PartAnalysis
-    with PartGlobalOps
-    with PartModelAnalysis
-    with PartEventHandlerAnalysis
-    with PartControlsAnalysis
-    with PartXBLAnalysis
-    with Logging
-    with DebugXML {
+     with PartGlobalOps
+     with PartModelAnalysis
+     with PartEventHandlerAnalysis
+     with PartControlsAnalysis
+     with PartXBLAnalysis
+     with Logging
+     with DebugXML {
 
     partAnalysis ⇒
 
@@ -105,11 +105,12 @@ class PartAnalysisImpl(
 
     // Builder that produces an ElementAnalysis for a known incoming Element
     def build(
-            parent: ElementAnalysis,
-            preceding: Option[ElementAnalysis],
-            controlElement: Element,
-            containerScope: Scope,
-            index: ElementAnalysis ⇒ Unit) = {
+        parent         : ElementAnalysis,
+        preceding      : Option[ElementAnalysis],
+        controlElement : Element,
+        containerScope : Scope,
+        index          : ElementAnalysis ⇒ Unit
+    ) = {
 
         assert(containerScope ne null)
 
@@ -151,10 +152,10 @@ class PartAnalysisImpl(
         withDebug("performing static analysis of subtree", Seq("prefixed id" → container.prefixedId)) {
 
             // Global lists of external LHHA and handlers
-            val lhhas = Buffer[LHHAAnalysis]()
+            val lhhas         = Buffer[LHHAAnalysis]()
             val eventHandlers = Buffer[EventHandlerImpl]()
-            val models = Buffer[Model]()
-            val attributes = Buffer[AttributeControl]()
+            val models        = Buffer[Model]()
+            val attributes    = Buffer[AttributeControl]()
 
             // Rebuild children
             container.build(build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))

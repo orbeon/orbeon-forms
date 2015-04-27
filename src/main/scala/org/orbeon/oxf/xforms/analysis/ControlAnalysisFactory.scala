@@ -36,39 +36,63 @@ object ControlAnalysisFactory {
     // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
     private val UploadExternalEvents  = Set(XFORMS_SELECT, XXFORMS_UPLOAD_START, XXFORMS_UPLOAD_PROGRESS, XXFORMS_UPLOAD_CANCEL, XXFORMS_UPLOAD_ERROR)
 
-    abstract class ValueControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends CoreControl(staticStateContext, element, parent, preceding, scope)
-            with ValueTrait
-            with ChildrenBuilderTrait
-            with ChildrenLHHAAndActionsTrait
-            with FormatTrait {
-    }
+    abstract class ValueControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
+         with ValueTrait
+         with ChildrenBuilderTrait
+         with ChildrenLHHAAndActionsTrait
+         with FormatTrait
 
-    class InputValueControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends ValueControl(staticStateContext, element, parent, preceding, scope)
-            with RequiredSingleNode {
+    class InputValueControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends ValueControl(staticStateContext, element, parent, preceding, scope)
+         with RequiredSingleNode {
         override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
         override val externalEvents = externalEventsDef
     }
 
-    class SelectionControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends InputValueControl(staticStateContext, element, parent, preceding, scope)
-            with SelectionControlTrait {
+    class SelectionControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
+         with SelectionControlTrait {
         override protected val allowedExtensionAttributes = ! isMultiple && isFull set XXFORMS_GROUP_QNAME
     }
 
-    class TriggerControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends CoreControl(staticStateContext, element, parent, preceding, scope)
-            with OptionalSingleNode
-            with TriggerAppearanceTrait
-            with ChildrenBuilderTrait
-            with ChildrenLHHAAndActionsTrait {
+    class TriggerControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
+         with OptionalSingleNode
+         with TriggerAppearanceTrait
+         with ChildrenBuilderTrait
+         with ChildrenLHHAAndActionsTrait {
         override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
         override val externalEvents              = externalEventsDef
     }
 
-    class UploadControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+    class UploadControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
 
         override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
         override val externalEvents = externalEventsDef
@@ -76,18 +100,33 @@ object ControlAnalysisFactory {
         override protected val allowedExtensionAttributes = Set(ACCEPT_QNAME, MEDIATYPE_QNAME)
     }
 
-    class InputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+    class InputControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
         override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
     }
 
-    class SecretControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+    class SecretControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
         override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
     }
 
-    class TextareaControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+    class TextareaControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
         override protected val allowedExtensionAttributes = Set(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
     }
 
@@ -143,11 +182,16 @@ object ControlAnalysisFactory {
     private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _)
     private val ValueControlFactory   : ControlFactory = new InputValueControl(_, _, _, _, _)
 
-    class GroupControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-            with OptionalSingleNode
-            with StaticLHHASupport
-            with ChildrenBuilderTrait {
+    class GroupControl(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis], 
+        preceding          : Option[ElementAnalysis], 
+        scope              : Scope
+    ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+         with OptionalSingleNode
+         with StaticLHHASupport
+         with ChildrenBuilderTrait {
 
         // Extension attributes depend on the name of the element
         override protected val allowedExtensionAttributes =
@@ -221,18 +265,19 @@ object ControlAnalysisFactory {
     private val ControlOrActionFactory = ControlFactory orElse XFormsActions.ActionFactory lift
 
     private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
-        (false, false) → (new ComponentControl(_, _, _, _, _)                               ),
+        (false, false) → (new ComponentControl(_, _, _, _, _)                                       ),
         (false, true)  → (new ComponentControl(_, _, _, _, _) with                 StaticLHHASupport),
-        (true,  false) → (new ComponentControl(_, _, _, _, _) with ValueTrait               ),
+        (true,  false) → (new ComponentControl(_, _, _, _, _) with ValueTrait                       ),
         (true,  true)  → (new ComponentControl(_, _, _, _, _) with ValueTrait with StaticLHHASupport)
     )
 
     def create(
-          context: StaticStateContext,
-          controlElement: Element,
-          parent: Option[ElementAnalysis],
-          preceding: Option[ElementAnalysis],
-          scope: Scope): Option[ElementAnalysis] = {
+      context        : StaticStateContext,
+      controlElement : Element,
+      parent         : Option[ElementAnalysis],
+      preceding      : Option[ElementAnalysis],
+      scope          : Scope
+    ): Option[ElementAnalysis] = {
 
         require(controlElement ne null)
         require(scope ne null)

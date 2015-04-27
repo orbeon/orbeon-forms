@@ -36,13 +36,13 @@ import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.util.XPath.CompiledExpression
 
 class XFormsStaticStateImpl(
-        val encodedState: String,
-        val digest: String,
-        val startScope: Scope,
-        metadata: Metadata,
-        val template: Option[AnnotatedTemplate],
-        val staticStateDocument: StaticStateDocument)
-    extends XFormsStaticState {
+    val encodedState        : String,
+    val digest              : String,
+    val startScope          : Scope,
+    metadata                : Metadata,
+    val template            : Option[AnnotatedTemplate],
+    val staticStateDocument : StaticStateDocument
+) extends XFormsStaticState {
 
     require(encodedState ne null)
     require(digest ne null)
@@ -200,7 +200,11 @@ object XFormsStaticStateImpl {
         })
 
     // Used by xxf:dynamic and unit tests.
-    private def createFromDocument[T](formDocument: Document, startScope: Scope, create: (Document, String, Metadata, AnnotatedTemplate) ⇒ T): (SAXStore, T) = {
+    private def createFromDocument[T](
+        formDocument : Document, 
+        startScope   : Scope,
+        create       : (Document, String, Metadata, AnnotatedTemplate) ⇒ T
+    ): (SAXStore, T) = {
         val identity = TransformerUtils.getIdentityTransformerHandler
 
         val documentResult = new LocationDocumentResult

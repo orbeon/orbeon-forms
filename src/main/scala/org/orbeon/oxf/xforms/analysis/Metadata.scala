@@ -38,7 +38,7 @@ import scala.collection.{immutable, mutable}
  * Split into traits for modularity.
  */
 class Metadata(val idGenerator: IdGenerator) extends NamespaceMappings with BindingMetadata with Marks {
-    def this() { this(new IdGenerator) }
+    def this() = this(new IdGenerator)
 }
 
 object Metadata {

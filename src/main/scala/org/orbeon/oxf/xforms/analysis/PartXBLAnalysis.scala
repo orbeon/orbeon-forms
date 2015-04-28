@@ -44,6 +44,15 @@ trait PartXBLAnalysis extends TransientState {
 
         registerScope(startScope)
     }
+    
+    def dumpScopes(): Unit = {
+        println("scopes:")
+        println(
+            prefixedIdToXBLScopeMap.to[List].map{
+                case (id, scope) ⇒ s"$id → ${scope.scopeId}"
+            }.sorted.mkString("\n")
+        )
+    }
 
     def newScope(parent: Scope, scopeId: String) =
         registerScope(new Scope(parent, scopeId))

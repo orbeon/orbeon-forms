@@ -37,7 +37,7 @@ trait BindingMetadata extends Logging {
     private var _checkedPaths      : Set[String]= Set.empty
     private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
 
-    def enterView(): Unit =
+    def initializeBindingLibraryIfNeeded(): Unit =
         if (_xblIndex.isEmpty) {
 
             debug("entering view")
@@ -71,19 +71,26 @@ trait BindingMetadata extends Logging {
                 debug("no binding index to commit")
         }
 
-    def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit =
+    def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit = {
+        debug("registering inline binding", List("index" → _xblIndex.isDefined.toString, "element" → elementAtt, "prefixed id" → bindingPrefixedId))
+        val newBindingRef = InlineBindingRef(
+            bindingPrefixedId,
+            CSSSelectorParser.parseSelectors(elementAtt),
+            ns
+        )
         _xblIndex match {
-            case Some(_) ⇒
-                debug("ignoring inline binding after view", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
+            case Some(index) ⇒
+                // Case of restore, where `initializeBindingLibraryIfNeeded()` is called first
+                val newIndex = BindingIndex.indexBinding(index, newBindingRef)
+                if (index ne newIndex)
+                    _xblIndex = Some(newIndex)
             case None ⇒
+                // Case of top-level initial analysis, where the library gets initialized once the body is found
+                // `inlineBindingsRefs` is processed during subsequent `initializeBindingLibraryIfNeeded()`
                 debug("registering inline binding", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
-                inlineBindingsRefs ::=
-                    InlineBindingRef(
-                        bindingPrefixedId,
-                        CSSSelectorParser.parseSelectors(elementAtt),
-                        ns
-                    )
+                inlineBindingsRefs ::= newBindingRef
         }
+    }
 
     def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
         _xblIndex flatMap { index ⇒

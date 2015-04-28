@@ -64,7 +64,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
     private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
     private boolean inXBLBinding;   // whether we are in the body of an XBL binding (meaningful only if inPreserve == true)
 
-    private final boolean topLevel;
+    private final boolean isTopLevel;
+    private final boolean isRestore;
     private final Metadata metadata;
     private final boolean isGenerateIds;
 
@@ -93,12 +94,13 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
      * @param extractorReceiver     extractor output (can be null for XBL for now)
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean topLevel) {
+    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean isTopLevel) {
         super(templateReceiver, extractorReceiver);
 
-        this.metadata = metadata;
+        this.metadata      = metadata;
         this.isGenerateIds = true;
-        this.topLevel = topLevel;
+        this.isTopLevel    = isTopLevel;
+        this.isRestore     = false;
 
         if (templateReceiver instanceof SAXStore)
             this.templateSAXStore = (SAXStore) templateReceiver;
@@ -111,9 +113,12 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         super(null, null);
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
-        this.metadata = metadata;
+        this.metadata      = metadata;
         this.isGenerateIds = false;
-        this.topLevel = true;
+        this.isTopLevel    = true;
+        this.isRestore     = true;
+        
+        metadata.initializeBindingLibraryIfNeeded();
     }
 
     @Override
@@ -220,9 +225,10 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         } else {
 
             // Only search for XBL bindings when under xh:body or if we are not at the top-level (which means that we
-            // are within an XBL component already)
+            // are within an XBL component already). But when restoring, always search, because we don't have a distinction
+            // between model and view under <static-state>.
             final scala.Option<IndexableBinding> bindingOpt =
-                (inBody || ! topLevel) ? metadata.findBindingForElement(uri, localname, attributes) : NONE_INDEXABLE_BINDING;
+                (inBody || isRestore || ! isTopLevel) ? metadata.findBindingForElement(uri, localname, attributes) : NONE_INDEXABLE_BINDING;
 
             if (bindingOpt.isDefined()) {
                 // Element with a binding
@@ -257,23 +263,25 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                 String htmlElementId = null;
 
-                if (level == 1) {
-                    if ("head".equals(localname)) {
-                        // Entering head
-                        inHead = true;
-                    } else if ("body".equals(localname)) {
-                        // Entering body
-                        inBody = true;
-                        metadata.enterView();
-                    }
-                } else if (level == 2) {
-                    if (inHead && "title".equals(localname)) {
-                        // Entering title
-                        inTitle = true;
-                        // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
-                        attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
-                        htmlElementId = reusableStringArray[0];
-                        htmlTitleElementId = htmlElementId;
+                if (! isRestore) {
+                    if (level == 1) {
+                        if ("head".equals(localname)) {
+                            // Entering head
+                            inHead = true;
+                        } else if ("body".equals(localname)) {
+                            // Entering body
+                            inBody = true;
+                            metadata.initializeBindingLibraryIfNeeded();
+                        }
+                    } else if (level == 2) {
+                        if (inHead && "title".equals(localname)) {
+                            // Entering title
+                            inTitle = true;
+                            // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
+                            attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                            htmlElementId = reusableStringArray[0];
+                            htmlTitleElementId = htmlElementId;
+                        }
                     }
                 }
 
@@ -427,48 +435,50 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             }
         }
 
-        if (level == 1) {
-            if ("head".equals(localname)) {
-                // Exiting head
-                inHead = false;
-            } else if ("body".equals(localname)) {
-                // Exiting body
-
-                // Add fr:xforms-inspector if requested by property AND if not already present
-                final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
-                final String frURI = "http://orbeon.org/oxf/xml/form-runner";
-                final String inspectorLocal = "xforms-inspector";
-                if (propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isByNameBindingInUse(frURI, inspectorLocal)) {
-
-                    // Register the fr:xforms-inspector binding
-                    reusableAttributes.clear();
-                    final scala.Option<IndexableBinding> inspectorBindingOpt =
-                        metadata.findBindingForElement(frURI, inspectorLocal, reusableAttributes);
-
-                    if (inspectorBindingOpt.isDefined()) {
-
-                        final String inspectorPrefix = "fr";
-                        final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
-
+        if (! isRestore) {
+            if (level == 1) {
+                if ("head".equals(localname)) {
+                    // Exiting head
+                    inHead = false;
+                } else if ("body".equals(localname)) {
+                    // Exiting body
+    
+                    // Add fr:xforms-inspector if requested by property AND if not already present
+                    final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
+                    final String frURI = "http://orbeon.org/oxf/xml/form-runner";
+                    final String inspectorLocal = "xforms-inspector";
+                    if (propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isByNameBindingInUse(frURI, inspectorLocal)) {
+    
+                        // Register the fr:xforms-inspector binding
                         reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
-                        final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
-                        final String xformsElementId = reusableStringArray[0];
-
-                        metadata.mapBindingToElement(rewriteId(xformsElementId), inspectorBindingOpt.get());
-
-                        startPrefixMapping2(inspectorPrefix, frURI);
-                        stackElement.element(frURI, inspectorLocal, inspectorQName, newAttributes);
-                        endPrefixMapping2(inspectorPrefix);
+                        final scala.Option<IndexableBinding> inspectorBindingOpt =
+                            metadata.findBindingForElement(frURI, inspectorLocal, reusableAttributes);
+    
+                        if (inspectorBindingOpt.isDefined()) {
+    
+                            final String inspectorPrefix = "fr";
+                            final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
+    
+                            reusableAttributes.clear();
+                            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
+                            final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
+                            final String xformsElementId = reusableStringArray[0];
+    
+                            metadata.mapBindingToElement(rewriteId(xformsElementId), inspectorBindingOpt.get());
+    
+                            startPrefixMapping2(inspectorPrefix, frURI);
+                            stackElement.element(frURI, inspectorLocal, inspectorQName, newAttributes);
+                            endPrefixMapping2(inspectorPrefix);
+                        }
                     }
+    
+                    inBody = false;
                 }
-
-                inBody = false;
-            }
-        } else if (level == 2) {
-            if ("title".equals(localname)) {
-                // Exiting title
-                inTitle = false;
+            } else if (level == 2) {
+                if ("title".equals(localname)) {
+                    // Exiting title
+                    inTitle = false;
+                }
             }
         }
 
@@ -546,7 +556,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Check for duplicate ids
                 // See https://github.com/orbeon/orbeon-forms/issues/1892
                 // TODO: create Element to provide more location info?
-                if (topLevel && metadata.idGenerator().contains(rawId))
+                if (isTopLevel && metadata.idGenerator().contains(rawId))
                     throw new ValidationException("Duplicate id for XForms element: " + rawId,
                         new ExtendedLocationData(LocationData.createIfPresent(documentLocator()), "analyzing control element",
                                 new String[] { "element", SAXUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));

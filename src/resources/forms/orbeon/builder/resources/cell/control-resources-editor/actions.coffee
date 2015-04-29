@@ -67,7 +67,9 @@ resourceEditor = _.memoize ->
         else tinymceObject.onInit.add(f)
 
     makeSpaceForMCE = ->
-        mceHeight = $(tinymceObject.container).height()
+        # Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
+        mceContainer = document.getElementById(tinymceObject.editorContainer)
+        mceHeight = $(mceContainer).height()
         Builder.resourceEditorCurrentLabelHint.height(mceHeight)
 
     # Function to initialize the TinyMCE, memoized so it runs at most once

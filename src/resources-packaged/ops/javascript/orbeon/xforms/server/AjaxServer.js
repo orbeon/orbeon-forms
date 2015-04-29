@@ -28,7 +28,9 @@
     function childrenWithLocalName(node, name) {
         var result = [];
         _.each(node.childNodes, function(child) {
-            if (child.localName == name)
+            // Not using child.localName, as it isn't supported by IE8
+            var childLocalName = _.last(child.nodeName.split(':'));
+            if (childLocalName == name)
                 result.push(child);
         });
         return result;
@@ -1723,6 +1725,7 @@
 
                                 // "div" elements for xf:switch and xxf:dialog
                                 var divsElements = childrenWithLocalName(controlValuesElement, 'div');
+                                console.log('divs', divsElements.length);
                                 var divElementsLength = divsElements.length;
                                 for (var j = 0; j < divElementsLength; j++) {
                                     var divElement = divsElements[j];

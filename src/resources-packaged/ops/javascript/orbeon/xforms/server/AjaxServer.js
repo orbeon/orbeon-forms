@@ -1725,7 +1725,6 @@
 
                                 // "div" elements for xf:switch and xxf:dialog
                                 var divsElements = childrenWithLocalName(controlValuesElement, 'div');
-                                console.log('divs', divsElements.length);
                                 var divElementsLength = divsElements.length;
                                 for (var j = 0; j < divElementsLength; j++) {
                                     var divElement = divsElements[j];

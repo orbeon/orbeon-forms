@@ -1636,15 +1636,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
                 // XForms output or "static readonly" mode
-                if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                    var image = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0];
-                    image.src = newControlValue;
-                } else {
-                    var output = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0];
-                    if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
-                        output.innerHTML = newControlValue;
+                var output = $(control).children(".xforms-output-output, .xforms-field").first();
+                if (output.length > 0) {
+                    if (output.is(".xforms-mediatype-image")) {
+                        output[0].src = newControlValue;
+                    } else if (output.is(".xforms-mediatype-text-html")) {
+                        output[0].innerHTML = newControlValue;
                     } else {
-                        ORBEON.util.Dom.setStringValue(output, newControlValue);
+                        ORBEON.util.Dom.setStringValue(output[0], newControlValue);
                     }
                 }
             } else if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {

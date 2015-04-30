@@ -2,5 +2,6 @@ build/
 tmp/
 target/
 build-local.properties
+.idea/shelf/
 src/resources-local/
 tmp

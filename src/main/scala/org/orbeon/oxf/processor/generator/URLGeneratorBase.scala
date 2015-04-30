@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.generator
 
+import java.{lang ⇒ jl}
 import java.{util ⇒ ju}
 
 import org.dom4j.Element
@@ -36,17 +37,20 @@ object URLGeneratorBase {
         ScalaUtils.combineValues[String, String, Array](headerPairs).toMap
     }
 
-    def setIfModifiedIfNeeded(headers: Map[String, Array[String]], lastModified: java.lang.Long) = {
-        if (lastModified ne null) {
+    def setIfModifiedIfNeeded(
+        headersOrNull      : Map[String, Array[String]], 
+        lastModifiedOrNull : jl.Long
+    ): ju.Map[String, Array[String]] = {
+        if (lastModifiedOrNull ne null) {
             
-            val newHeader = "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))
+            val newHeader = "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModifiedOrNull))
             
-            if (headers ne null)
-                headers + newHeader
+            if (headersOrNull ne null)
+                headersOrNull + newHeader
             else
                 Map(newHeader)
         } else {
-            headers
+            Map.empty[String, Array[String]]
         }
     }.asJava
 }

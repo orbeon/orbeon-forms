@@ -44,7 +44,17 @@
     <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>
 
     <!-- HTTP client -->
+    
+    <!--
+        About oxf.http.internal-paths:
+
+        The following property contains a regular expression which determines which request paths are internal.
+        Since 4.7, we avoid doing HTTP requests over the network for requests that target Orbeon Forms itself, and
+        we don't support anymore those requests being made over the network, so this property shouldn't be changed
+        by users, and thus isn't listed in the documentation. 
+      -->
     <property as="xs:string"  name="oxf.http.internal-paths"                         value="(?!/exist/)/.*(?&lt;!\.jsp)"/>
+    
     <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <property as="xs:string"  name="oxf.http.forward-headers"                        value="Orbeon-Client"/>
     <property as="xs:string"  name="oxf.http.forward-headers.private"                value="Orbeon-Client"/>

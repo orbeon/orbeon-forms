@@ -20,7 +20,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.webapp.HttpStatusCode
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel.Reason
@@ -138,15 +138,19 @@ object XFormsError {
 
     private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable): Unit = {
 
-        def causesContainDynamicXPathError =
+        // NOTE: We want to catch a status code exception which happen during an XPathException. And in that case, the XPathException
+        // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of
+        // errors are fatal. See https://github.com/orbeon/orbeon-forms/issues/2194
+        def causesContainFatalError =
             Exceptions.causesIterator(t) exists {
-                case e: XPathException if ! e.isStaticError ⇒ true
-                case _                                      ⇒ false
+                case e: XPathException if e.isStaticError ⇒ true
+                case e: HttpStatusCode                    ⇒ true
+                case _                                    ⇒ false
             }
 
         if (container.getPartAnalysis.isTopLevel           &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic. 
             container.getContainingDocument.isInitializing &&
-            ! causesContainDynamicXPathError) {
+            causesContainFatalError) {
             throw new OXFException(t)
         } else {
             val containingDocument = container.getContainingDocument

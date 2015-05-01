@@ -135,7 +135,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:html>
 
 
-            assert(! doc.getStaticState.template.isDefined)
+            assert(doc.getStaticState.template.isEmpty)
             assert(doc.getTemplate.isEmpty)
         }
 
@@ -174,7 +174,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                     </xh:head>
                 </xh:html>
 
-            assert(! doc.getStaticState.template.isDefined)
+            assert(doc.getStaticState.template.isEmpty)
             assert(doc.getTemplate.isDefined)
         }
 

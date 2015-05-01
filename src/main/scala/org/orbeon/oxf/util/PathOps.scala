@@ -19,9 +19,9 @@ import java.net.URLDecoder.{decode ⇒ decodeURL}
 
 trait PathOps {
 
-    def dropTrailingSlash(s: String)   = if (s.size == 0 || s.last != '/') s else s.init
-    def dropStartingSlash(s: String)   = if (s.size == 0 || s.head != '/') s else s.tail
-    def appendStartingSlash(s: String) = if (s.size != 0 && s.head == '/') s else '/' + s
+    def dropTrailingSlash(s: String)   = if (s.isEmpty || s.last != '/') s else s.init
+    def dropStartingSlash(s: String)   = if (s.isEmpty || s.head != '/') s else s.tail
+    def appendStartingSlash(s: String) = if (s.nonEmpty && s.head == '/') s else '/' + s
 
     // Split out a URL's query part
     def splitQuery(url: String): (String, Option[String]) = {

@@ -76,7 +76,7 @@ class WhitespaceXMLReceiver(xmlReceiver: XMLReceiver, startPolicy: Policy, polic
 
         val result = acc.collapseAndReset(stack.head.policy).toCharArray
 
-        if (result.length > 0)
+        if (result.nonEmpty)
             super.characters(result, 0, result.length)
     }
 }

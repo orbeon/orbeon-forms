@@ -162,7 +162,7 @@ trait InstanceMetadata {
     private def resource = getAttributeEncode(RESOURCE_QNAME)
 
     // @src always wins, @resource always loses
-    val useInlineContent = ! src.isDefined && hasInlineContent
+    val useInlineContent = src.isEmpty && hasInlineContent
     val useExternalContent = src.isDefined || ! hasInlineContent && resource.isDefined
 
     val (instanceSource, dependencyURL) =

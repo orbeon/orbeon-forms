@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 
 case class DataPart(isDraft: Boolean, documentId: String)
 case class Request(provider: String, app: String, form: String, filename: Option[String], version: Version, dataPart: Option[DataPart]) {
-    def forForm = ! dataPart.isDefined
+    def forForm = dataPart.isEmpty
     def forData =   dataPart.isDefined
     def forAttachment = filename.isDefined
 }

@@ -18,7 +18,7 @@ import java.lang.{Long ⇒ JLong}
 
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.http.{Headers ⇒ HttpHeaders, StreamedContent}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLParsing, XMLUtils}
@@ -37,7 +37,7 @@ case class ConnectionResult(
     
     import ConnectionResult._
 
-    val lastModified     = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+    val lastModified     = HttpHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
     def lastModifiedJava = lastModified map (_.asInstanceOf[JLong]) orNull
         
     def close() = content.close()

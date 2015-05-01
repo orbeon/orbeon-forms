@@ -126,7 +126,7 @@ trait BaseOps extends Logging {
         debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
 
     def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
-        val name            = origin(0).localname
+        val name            = origin.head.localname
         val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
         val elementsBefore  = into child * filter (e ⇒ namesUntil(e.localname))
 

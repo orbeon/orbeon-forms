@@ -222,7 +222,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
         val models = part.getModelsForScope(part.startScope)
         assert(models.size === 1)
-        assert(models(0).instances.head._2.staticId === "instance")
+        assert(models.head.instances.head._2.staticId === "instance")
 
         assert(part.getControlAnalysis("input") ne null)
         assert(part.getControlAnalysis("trigger") ne null)

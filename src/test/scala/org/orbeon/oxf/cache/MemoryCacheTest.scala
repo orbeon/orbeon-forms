@@ -28,15 +28,15 @@ class MemoryCacheTest extends AssertionsForJUnit {
         var wasEvicted = false
         var wasRemoved = false
 
-        def evicted() { wasEvicted = true }
-        def removed() { wasRemoved = true }
-        def added() {}
+        def evicted(): Unit = { wasEvicted = true }
+        def removed(): Unit = { wasRemoved = true }
+        def added(): Unit = {}
     }
 
     case class Key(key: String) extends InternalCacheKey("test", key)
     val VALIDITY = 0L
 
-    @Test def testFindKeepsInCache() {
+    @Test def testFindKeepsInCache(): Unit = {
         val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
@@ -54,7 +54,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 1)
     }
 
-    @Test def testTakeRemovesFromCache() {
+    @Test def testTakeRemovesFromCache(): Unit = {
         val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
@@ -72,7 +72,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testRemoveNotifies() {
+    @Test def testRemoveNotifies(): Unit = {
         val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
@@ -89,7 +89,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testRemoveAllNotifies() {
+    @Test def testRemoveAllNotifies(): Unit = {
         val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
@@ -106,7 +106,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testReduceSizeEvicts() {
+    @Test def testReduceSizeEvicts(): Unit = {
         val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(null)
@@ -123,7 +123,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testReduceSizeWithLock() {
+    @Test def testReduceSizeWithLock(): Unit = {
         val cache = new MemoryCacheImpl(1)
         val lock = new ReentrantLock
 
@@ -143,7 +143,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 1)
     }
 
-    @Test def testEvictedIfLockAvailable() {
+    @Test def testEvictedIfLockAvailable(): Unit = {
         val cache = new MemoryCacheImpl(1)
 
         val o1 = new MyCacheable(new ReentrantLock)
@@ -158,7 +158,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 1)
     }
 
-    @Test def testNotEvictedIfLockUnavailable() {
+    @Test def testNotEvictedIfLockUnavailable(): Unit = {
         val cache = new MemoryCacheImpl(1)
         val lock = new ReentrantLock
 
@@ -177,7 +177,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 2)
     }
 
-    @Test def testNextToLastEvicted() {
+    @Test def testNextToLastEvicted(): Unit = {
         val cache = new MemoryCacheImpl(2)
         val lock = new ReentrantLock
 
@@ -204,7 +204,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 2)
     }
 
-    @Test def testIterators() {
+    @Test def testIterators(): Unit = {
         val size = 100
         val cache = new MemoryCacheImpl(size)
 

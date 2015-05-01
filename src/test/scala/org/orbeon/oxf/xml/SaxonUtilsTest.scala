@@ -18,7 +18,7 @@ import org.junit.Test
 
 class SaxonUtilsTest extends AssertionsForJUnit {
 
-    @Test def makeNCName() {
+    @Test def makeNCName(): Unit = {
 
         intercept[IllegalArgumentException] {
             SaxonUtils.makeNCName("")

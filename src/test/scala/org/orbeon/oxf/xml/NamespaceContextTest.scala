@@ -19,7 +19,7 @@ import org.junit.Test
 
 class NamespaceContextTest extends AssertionsForJUnit {
 
-    @Test def basicNesting() {
+    @Test def basicNesting(): Unit = {
         implicit val ns = new NamespaceContext
 
         assert(ns.current.prefixes === Seq("xml"))
@@ -73,7 +73,7 @@ class NamespaceContextTest extends AssertionsForJUnit {
         }
     }
 
-    @Test def nestedWithSameMapping() {
+    @Test def nestedWithSameMapping(): Unit = {
         implicit val ns = new NamespaceContext
 
         // 2 nested elements declaring the same mapping
@@ -97,7 +97,7 @@ class NamespaceContextTest extends AssertionsForJUnit {
         }
     }
 
-    @Test def differentPrefixes() {
+    @Test def differentPrefixes(): Unit = {
         implicit val ns = new NamespaceContext
 
         withPrefix("p61", "u6") {
@@ -112,7 +112,7 @@ class NamespaceContextTest extends AssertionsForJUnit {
         }
     }
 
-    @Test def undeclaration() {
+    @Test def undeclaration(): Unit = {
         implicit val ns = new NamespaceContext
 
         withPrefix("p7", "u7") {
@@ -135,7 +135,7 @@ class NamespaceContextTest extends AssertionsForJUnit {
         }
     }
 
-    @Test def defaultNamespace() {
+    @Test def defaultNamespace(): Unit = {
         implicit val ns = new NamespaceContext
 
         withPrefix("", "u8") {

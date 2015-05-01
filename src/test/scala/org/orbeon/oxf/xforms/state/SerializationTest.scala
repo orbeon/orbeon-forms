@@ -53,7 +53,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
             </xh:body>
         </xh:html>
 
-    @Test def saxStore() {
+    @Test def saxStore(): Unit = {
 
         // Serialize then deserialize
         val saxStore = TransformerUtils.dom4jToSAXStore(simpleDoc, false)
@@ -65,12 +65,12 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         assertXMLDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc)
     }
 
-    @Test def saxStoreWithMarks() {
+    @Test def saxStoreWithMarks(): Unit = {
 
         // Transform to SAXStore while collecting marks
         val saxStore = new SAXStore
         TransformerUtils.writeDom4j(simpleDoc, new ForwardingXMLReceiver(saxStore) {
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) {
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
                 // Mark all elements with an id
                 Option(attributes.getValue("id")) foreach
                     saxStore.getMark
@@ -105,7 +105,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
             assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
     }
 
-    @Test def dynamicState() {
+    @Test def dynamicState(): Unit = {
         val originalDoc = this setupDocument simpleDoc
 
         val serialized = DynamicState(originalDoc)
@@ -115,7 +115,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         assert(serialized === deserialized)
     }
 
-    @Test def template() {
+    @Test def template(): Unit = {
 
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
@@ -201,7 +201,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         }
     }
 
-    @Test def staticState() {
+    @Test def staticState(): Unit = {
 
         Assume.assumeTrue(Version.isPE)
 

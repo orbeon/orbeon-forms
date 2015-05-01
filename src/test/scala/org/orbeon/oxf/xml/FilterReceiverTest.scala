@@ -24,7 +24,7 @@ import org.orbeon.scaxon.DocumentAndElementsCollector
 
 class FilterReceiverTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    @Test def resultingEvents() {
+    @Test def resultingEvents(): Unit = {
 
         val collector = new DocumentAndElementsCollector
 

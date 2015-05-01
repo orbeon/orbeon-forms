@@ -40,7 +40,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
         _document
     }
 
-    @After def disposeDocument() {
+    @After def disposeDocument(): Unit = {
         if (_document ne null) {
             _document.afterExternalEvents()
             _document.afterUpdateResponse()

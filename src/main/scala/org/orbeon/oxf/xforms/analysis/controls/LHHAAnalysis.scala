@@ -25,9 +25,14 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 
-class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-        with AppearanceTrait {
+class LHHAAnalysis(
+    staticStateContext : StaticStateContext, 
+    element            : Element, 
+    parent             : Option[ElementAnalysis], 
+    preceding          : Option[ElementAnalysis],
+    scope              : Scope
+) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+     with AppearanceTrait {
 
     self ⇒
 
@@ -41,13 +46,13 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 
     // What we support for alert level/validation:
     //
-    // - <xf:alert>                                             → alert applies to all alert levels
-    // - <xf:alert level="foo">                                 → same, unknown level is ignored [SHOULD WARN]
-    // - <xf:alert level="warning info">                        → alert only applies to warning and info levels
-    // - <xf:alert level="warning" validation="">               → same, blank attribute is same as missing attribute [SHOULD WARN]
-    // - <xf:alert validation="c1 c2">                          → alert only applies if either validation c1 or c2 fails
-    // - <xf:alert level="" validation="c1 c2">                 → same, blank attribute is same as missing attribute [SHOULD WARN]
-    // - <xf:alert level="error" validation="c1 c2">            → same, level is ignored when a validation is present [SHOULD WARN]
+    // - <xf:alert>                                  → alert applies to all alert levels
+    // - <xf:alert level="foo">                      → same, unknown level is ignored [SHOULD WARN]
+    // - <xf:alert level="warning info">             → alert only applies to warning and info levels
+    // - <xf:alert level="warning" validation="">    → same, blank attribute is same as missing attribute [SHOULD WARN]
+    // - <xf:alert validation="c1 c2">               → alert only applies if either validation c1 or c2 fails
+    // - <xf:alert level="" validation="c1 c2">      → same, blank attribute is same as missing attribute [SHOULD WARN]
+    // - <xf:alert level="error" validation="c1 c2"> → same, level is ignored when a validation is present [SHOULD WARN]
 
     val forValidations =
         if (localName == "alert")
@@ -130,8 +135,13 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
                         if (element.getQName == XFORMS_OUTPUT_QNAME) {
                             // Add dependencies
                             val outputAnalysis =
-                                new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element))
-                                    with ValueTrait with OptionalSingleNode with ViewTrait
+                                new SimpleElementAnalysis(
+                                    staticStateContext = staticStateContext, 
+                                    element            = element, 
+                                    parent             = Some(delegateAnalysis), 
+                                    preceding          = None, 
+                                    scope              = delegateAnalysis.getChildElementScope(element)
+                                ) with ValueTrait with OptionalSingleNode with ViewTrait
                             outputAnalysis.analyzeXPath()
                             if (outputAnalysis.getValueAnalysis.isDefined)
                                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
@@ -164,9 +174,32 @@ object LHHAAnalysis {
 
     // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
-        XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPath.GlobalConfiguration).wrap(lhhaElement),
-            "not(exists(descendant-or-self::xf:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
-            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement), null).asInstanceOf[Boolean]
+        
+        val SearchExpression =
+            """
+              not(
+                exists(
+                    descendant-or-self::xf:*[@ref or @nodeset or @bind or @value] |
+                    descendant::*[@*[contains(., '{')]]
+                )
+              )
+            """
+        
+        XPathCache.evaluateSingle(
+            contextItem        = new DocumentWrapper(
+                lhhaElement.getDocument,
+                null, 
+                XPath.GlobalConfiguration
+            ).wrap(lhhaElement),
+            xpathString        = SearchExpression,
+            namespaceMapping   = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+            variableToValueMap = null,
+            functionLibrary    = null,
+            functionContext    = null,
+            baseURI            = null,
+            locationData       = ElementAnalysis.createLocationData(lhhaElement),
+            reporter           = null
+        ).asInstanceOf[Boolean]
     }
 
     // Whether the control has label OR hint placeholder

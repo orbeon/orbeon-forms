@@ -52,6 +52,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/jquery/jquery-migrate-1.2.1.js", "/ops/jquery/jquery-migrate-1.2.1.min.js"),
             new ResourceConfig("/apps/fr/style/bootstrap/js/bootstrap.js", "/apps/fr/style/bootstrap/js/bootstrap.min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/jquery-orbeon.js", "/ops/javascript/orbeon/util/jquery-orbeon-min.js"),
+            new ResourceConfig("/ops/javascript/autosize/jquery.autosize.js", "/ops/javascript/autosize/jquery.autosize.min.js"),
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),
@@ -107,7 +108,8 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",                  "/ops/javascript/orbeon/xforms/control/Placeholder-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Placement.js",                   "/ops/javascript/orbeon/xforms/controls/Placement-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Help.js",                        "/ops/javascript/orbeon/xforms/controls/Help-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Hint.js",                        "/ops/javascript/orbeon/xforms/controls/Hint-min.js")
+            new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Hint.js",                        "/ops/javascript/orbeon/xforms/controls/Hint-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Textarea.js",                    "/ops/javascript/orbeon/xforms/controls/Textarea-min.js")
     };
 
     public static class ResourceConfig {

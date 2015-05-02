@@ -1799,11 +1799,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     else
                         textarea.rows = attribute3;
                 }
-
-                // Autosize textarea
-                if (YAHOO.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
-                    ORBEON.xforms.Controls.autosizeTextarea(control);
-                }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                     && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 // HTML area
@@ -2322,56 +2317,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
             $(control).toggleClass("xforms-empty", isRequired && emptyAttr == "true");
             $(control).toggleClass("xforms-filled", isRequired && emptyAttr == "false");
-        },
-
-        autosizeTextarea: function (textarea) {
-            if (textarea.tagName.toLowerCase() != "textarea")
-                textarea = textarea.getElementsByTagName("textarea")[0];
-            var scrollHeight = textarea.scrollHeight;
-            var clientHeight = textarea.clientHeight;
-
-            if (textarea.rows == -1)
-                textarea.rows = 2;
-
-            // In IE & Safari, scrollHeight is the length of vertical space text is taking in the textarea.
-            // In Firefox, it is the greater of text or textarea height. Here, we're interested in getting the height of text
-            // inside the text area (and not textarea height), we suppress textarea height to 0.
-            // So that scrollHeight will always return the vertical space text is taking in a text area. After  that we
-            // remove the height property, so that effect of setting of height (to 0) doesn't get proliferated elsewhere.
-            if (ORBEON.xforms.Globals.isFF3OrNewer) {
-                textarea.style.height = 0;
-                scrollHeight = textarea.scrollHeight;
-                textarea.style.height = null;
-            }
-            var rowHeight = clientHeight / textarea.rows;
-            var linesAdded = 0;
-
-            if (scrollHeight > clientHeight) {
-                // Grow
-                while (scrollHeight >= clientHeight) {
-                    textarea.rows = textarea.rows + 1;
-                    if (textarea.clientHeight <= clientHeight) {
-                        // If adding a row didn't increase the height if the text area, there is nothing we can do, so stop here.
-                        // This prevents an infinite loops happening with IE when the control is disabled.
-                        break;
-                    }
-                    clientHeight = textarea.clientHeight;
-                    linesAdded++;
-
-                }
-            } else if (scrollHeight < clientHeight) {
-                // Shrink
-                while (textarea.rows > XFORMS_WIDE_TEXTAREA_MIN_ROWS && scrollHeight < clientHeight - rowHeight) {
-                    textarea.rows = textarea.rows - 1;
-                    if (textarea.clientHeight >= clientHeight) {
-                        // If removing a row didn't decrease the height if the text area, there is nothing we can do, so stop here.
-                        // This prevents an infinite loops happening with IE when the control is disabled.
-                        break;
-                    }
-                    clientHeight = textarea.clientHeight;
-                    linesAdded--;
-                }
-            }
         },
 
         updateHTMLAreaClasses: function (textarea) {
@@ -2992,18 +2937,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
                     ORBEON.xforms.server.AjaxServer.fireEvents([event], true);
                 }
-
-                // Resize wide text area
-                if (YAHOO.util.Dom.hasClass(target, "xforms-textarea-appearance-xxforms-autosize")) {
-                    ORBEON.xforms.Controls.autosizeTextarea(target);
-                }
-            }
-        },
-
-        resize: function (event) {
-            for (var i = 0; i < ORBEON.xforms.Globals.autosizeTextareas.length; i++) {
-                var textarea = ORBEON.xforms.Globals.autosizeTextareas[i];
-                ORBEON.xforms.Controls.autosizeTextarea(textarea);
             }
         },
 
@@ -3705,7 +3638,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 },
                 "range": {"": ORBEON.xforms.Init._range},
                 "textarea": {
-                    "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
                     "text/html": genericInit
                 },
                 "dialog": {
@@ -3781,7 +3713,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
                 loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
                 activeControl: null,                 // The currently active control, used to disable hint
-                autosizeTextareas: [],               // Ids of the autosize textareas on the page
                 dialogs: {},                         // Map for dialogs: id -> YUI dialog object
                 dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
                 hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
@@ -4108,7 +4039,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
                 YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
                 YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
-                YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
                 YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
                 YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
             }
@@ -4205,11 +4135,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
             ORBEON.xforms.Globals.xformsServerUploadURL[formID] = xformsServerUploadURL;
             ORBEON.xforms.Globals.calendarImageURL[formID] = calendarImageURL;
-        },
-
-        _widetextArea: function (textarea) {
-            ORBEON.xforms.Globals.autosizeTextareas.push(textarea);
-            ORBEON.xforms.Controls.autosizeTextarea(textarea);
         },
 
         _range: function (range) {

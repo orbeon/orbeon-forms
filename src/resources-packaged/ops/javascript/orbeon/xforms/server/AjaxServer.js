@@ -1261,10 +1261,6 @@
                                     if (relevant != null) {
                                         var isRelevant = relevant == "true";
                                         ORBEON.xforms.Controls.setRelevant(documentElement, isRelevant);
-                                         // Autosize textarea
-                                        if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea-appearance-xxforms-autosize")) {
-                                            ORBEON.xforms.Controls.autosizeTextarea(documentElement);
-                                        }
                                     }
 
                                     // Update input control type

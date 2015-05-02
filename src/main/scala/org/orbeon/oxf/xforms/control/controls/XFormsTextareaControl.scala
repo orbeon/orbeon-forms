@@ -29,7 +29,7 @@ class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, elem
         with FocusableTrait {
 
     override def getJavaScriptInitialization = {
-        val hasInitialization = XFormsControl.isHTMLMediatype(this) || staticControl.appearances(XXFORMS_AUTOSIZE_APPEARANCE_QNAME)
+        val hasInitialization = XFormsControl.isHTMLMediatype(this)
         if (hasInitialization) getCommonJavaScriptInitialization else null
     }
 

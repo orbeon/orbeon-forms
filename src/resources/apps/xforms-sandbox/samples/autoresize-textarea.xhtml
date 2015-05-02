@@ -10,19 +10,46 @@
         <xf:model id="main-model">
             <xf:instance>
                 <instance>
-                    <first/>
-                    <second/>
+                    <lorem>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</lorem>
+                    <visible/>
+                    <set/>
+                    <switch/>
                 </instance>
             </xf:instance>
+            
+            <xf:setvalue event="xforms-model-construct-done" iterate="visible | switch" ref="." value="../lorem"/>
+            
         </xf:model>
     </xh:head>
     <xh:body>
 
-        <xf:textarea appearance="xxf:autosize" ref="first"/>
-        <xf:textarea ref="second"/>
         <xf:trigger>
-            <xf:label>Copy</xf:label>
-            <xf:setvalue ev:event="DOMActivate" ref="first" value="../second"/>
+            <xf:label>Set</xf:label>
+            <xf:setvalue event="DOMActivate" ref="set" value="../lorem"/>
         </xf:trigger>
+        <xf:trigger>
+            <xf:label>Switch</xf:label>
+            <xf:toggle event="DOMActivate" case="switch"/>
+        </xf:trigger>
+        <xf:trigger>
+          <xf:label>Repeat</xf:label>
+          <xf:action event="DOMActivate">
+            <xf:insert context="." origin="xxf:element('repeat')"/>
+            <xf:setvalue ref="repeat" value="../lorem"/>
+          </xf:action>
+        </xf:trigger>
+
+        <xf:textarea appearance="xxf:autosize" ref="visible"/>
+        <xf:textarea appearance="xxf:autosize" ref="set"/>
+        <xf:switch>
+          <xf:case/>
+          <xf:case id="switch">
+            <xf:textarea appearance="xxf:autosize" ref="visible"/>
+          </xf:case>
+        </xf:switch>
+        <xf:repeat ref="repeat">
+          <xf:textarea appearance="xxf:autosize" ref="."/>
+        </xf:repeat>
+          
     </xh:body>
 </xh:html>

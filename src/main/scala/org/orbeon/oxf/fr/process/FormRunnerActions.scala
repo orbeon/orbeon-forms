@@ -161,7 +161,7 @@ trait FormRunnerActions {
     def tryConfirm(params: ActionParams): Try[Any] =
         Try {
             def defaultMessage = currentFRResources \ "detail" \ "messages" \ "confirmation-dialog-message" stringValue
-            def message        = messageFromResourceOrParam(params) getOrElse defaultMessage
+            def message        = messageFromResourceOrParam(params).map(evaluateValueTemplate) getOrElse defaultMessage
 
             show("fr-confirmation-dialog", Map("message" → Some(message)))
         }

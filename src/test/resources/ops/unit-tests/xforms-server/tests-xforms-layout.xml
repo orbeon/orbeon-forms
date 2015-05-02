@@ -1963,6 +1963,7 @@
                 <xh:script src="/ops/jquery/jquery-migrate-1.2.1.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/autosize/jquery.autosize.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dom/dom-min.js" class="xforms-baseline"/>
@@ -2000,6 +2001,7 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Placement-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Help-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/controls/Textarea-min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>

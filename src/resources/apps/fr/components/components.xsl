@@ -181,7 +181,7 @@
                 id="fr-parameters-model"
                 xxf:readonly-appearance="{{for $mode in xxf:instance('fr-parameters-instance')/mode/string()
                                            return
-                                               if ($mode = ('view', 'email') or ($mode = 'pdf' and normalize-space(xxf:instance('fr-form-attachments')/pdf) = ''))
+                                               if ($mode = 'view' or ($mode = ('pdf', 'email') and normalize-space(xxf:instance('fr-form-attachments')/pdf) = ''))
                                                then 'static'
                                                else 'dynamic'}}"
                 xxf:encrypt-item-values="{{for $mode in xxf:instance('fr-parameters-instance')/mode/string()

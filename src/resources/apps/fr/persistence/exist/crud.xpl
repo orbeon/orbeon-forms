@@ -134,7 +134,11 @@
                                 declare variable $groupname  := request:get-parameter('groupname' , '');
                                 declare variable $method     := request:get-parameter('method' , '');
 
-                                declare variable $path       := concat($frPath, $collection);
+                                declare variable $path       := concat(
+                                                                    $frPath,
+                                                                    if (ends-with($frPath, '/')) then '' else '/',
+                                                                    $collection
+                                                                );
                                 declare function local:createPath($parts, $count) {
                                     concat('/', string-join(subsequence($parts, 1, $count), '/'))
                                 };

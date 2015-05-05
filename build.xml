@@ -1080,9 +1080,6 @@
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/${project.name}.war">
                 <include name="${versioned-name}.war"/>
             </zipfileset>
-            <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-embedding.war">
-                <include name="${project.name}-${release.number}-embedding.war"/>
-            </zipfileset>
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-auth.war">
                 <include name="orbeon-auth.war"/>
             </zipfileset>

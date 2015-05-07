@@ -1638,9 +1638,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // XForms output or "static readonly" mode
                 var output = $(control).children(".xforms-output-output, .xforms-field").first();
                 if (output.length > 0) {
-                    if (output.is(".xforms-mediatype-image")) {
+                    var jControl = $(control); 
+                    if (jControl.is(".xforms-mediatype-image")) {
                         output[0].src = newControlValue;
-                    } else if (output.is(".xforms-mediatype-text-html")) {
+                    } else if (jControl.is(".xforms-mediatype-text-html")) {
                         output[0].innerHTML = newControlValue;
                     } else {
                         ORBEON.util.Dom.setStringValue(output[0], newControlValue);

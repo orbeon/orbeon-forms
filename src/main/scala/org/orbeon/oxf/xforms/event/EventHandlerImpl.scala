@@ -13,21 +13,19 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import events.XXFormsActionErrorEvent
-import org.orbeon.oxf.xforms._
-import action.{XFormsActions, XFormsAPI, XFormsActionInterpreter}
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, RepeatControl, RepeatIterationControl}
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import analysis.{ElementAnalysis, SimpleElementAnalysis}
-import control.controls.XFormsRepeatControl
-import control.XFormsComponentControl
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.dom4j.{Element, QName}
 import org.orbeon.oxf.util.Logging
-
-import org.dom4j.{QName, Element}
-import xbl.Scope
-import org.orbeon.oxf.xforms.analysis.StaticStateContext
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
+import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+
 import scala.util.control.NonFatal
 
 /**
@@ -37,19 +35,19 @@ import scala.util.control.NonFatal
  * XPath analysis, which is unused here).
  */
 class EventHandlerImpl(
-        staticStateContext: StaticStateContext,
-        element: Element,
-        parent: Option[ElementAnalysis],
-        preceding: Option[ElementAnalysis],
-        scope: Scope)
-    extends SimpleElementAnalysis(
+        staticStateContext : StaticStateContext,
+        element            : Element,
+        parent             : Option[ElementAnalysis],
+        preceding          : Option[ElementAnalysis],
+        scope              : Scope
+) extends SimpleElementAnalysis(
         staticStateContext,
         element,
         parent,
         preceding,
-        scope)
-    with EventHandler
-    with Logging {
+        scope
+) with EventHandler
+  with Logging {
 
     self ⇒
 
@@ -223,7 +221,8 @@ class EventHandlerImpl(
                         xblContainer.getContextStack.resetBindingContext()
                         val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 
-                        val handlerEffectiveId = xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+                        val handlerEffectiveId =
+                            xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
 
                         (xblContainer, handlerEffectiveId, stack)
                     } else {
@@ -325,74 +324,22 @@ object EventHandlerImpl extends Logging {
                 // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id
                 Option(containingDocument.getObjectByEffectiveId(handler.prefixedId))
             } else {
-                // Scopes don't match which implies that the event handler must be a child (or grand-child in the case of repeat) of the observer
-                val parentPrefixedId      = handler.parent map (_.prefixedId)
-                val grandParent           = handler.parent flatMap (_.parent)
-                val grandParentPrefixedId = grandParent map (_.prefixedId)
-
-                // Find the effective id of the handler
-                val handlerEffectiveIdOpt =
-                    Some(eventObserver.getPrefixedId) match {
-                        case `parentPrefixedId` ⇒
-                            // Observing the parent
-                            handler.parent map {
-                                case _: ComponentControl ⇒
-                                    XFormsUtils.appendToEffectiveId(eventObserver.getEffectiveId, XFormsConstants.COMPONENT_SEPARATOR + handler.staticId)
-                                case _ ⇒
-                                    XFormsUtils.getRelatedEffectiveId(eventObserver.getEffectiveId, handler.staticId)
-                            }
-                        case `grandParentPrefixedId` ⇒
-                            // Observing the grand-parent
-                            assert(grandParent exists (_.isInstanceOf[RepeatControl]))
-                            assert(eventObserver.isInstanceOf[XFormsRepeatControl])
-    
-                            val repeat = eventObserver.asInstanceOf[XFormsRepeatControl]
-    
-                            // What we do below is infer the effective id of the handler
-                            if (targetObject eq eventObserver) {
-                                // Event targets the repeat object itself
-                                Option(repeat.getIndexIteration) map
-                                    (iteration ⇒ XFormsUtils.getRelatedEffectiveId(iteration.effectiveId, handler.staticId))
-                            } else {
-                                // Event targets the iteration or a descendant (including the case of a repeat iteration)
-                                val targetParts = XFormsUtils.getEffectiveIdSuffixParts(targetObject.getEffectiveId)
-                                val repeatParts = XFormsUtils.getEffectiveIdSuffixParts(repeat.effectiveId)
-    
-                                assert(targetParts.startsWith(repeatParts))
-    
-                                val suffix = targetParts.take(repeatParts.size + 1)
-    
-                                Some(replaceIdSuffix(handler.prefixedId, suffix))
-                            }
-                        case _ ⇒
-                            throw new IllegalStateException
-                            
-                    }
-
-                // From there find the concrete object if it is an event handler (which it must be!)
-                val result = handlerEffectiveIdOpt flatMap (id ⇒ Option(containingDocument.getObjectByEffectiveId(id)))
-
-                // NOTE: The above is a lot of code for an apparently simple resolution. This stems from the fact that
-                // we allow listening on an element in a different XBL scope. This is not a good idea in the first
-                // place, as it breaks encapsulation. The logger below allows us to track cases where this happens, and
-                // hopefully to ultimately remove this behavior. See:
-                // https://github.com/orbeon/orbeon-forms/issues/243
-                implicit val logger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-                debug("observing event in different scope (issue #243)", List(
-                    "target id"             → targetObject.getEffectiveId,
-                    "handler id"            → handler.prefixedId,
-                    "observer id"           → eventObserver.getEffectiveId,
-                    "target scope"          → targetObject.scope.scopeId,
-                    "handler scope"         → handler.scope.scopeId,
-                    "observer scope"        → eventObserver.scope.scopeId,
-                    "effective handler id"  → handlerEffectiveIdOpt.orNull
-                ))
-                
-                assert(result.isDefined, "could not resolve effective event handler")
-
-                result
+                // See https://github.com/orbeon/orbeon-forms/issues/243
+                warn(
+                    "skipping event in different scope (see issue #243)",
+                    List(
+                        "target id"             → targetObject.getEffectiveId,
+                        "handler id"            → handler.prefixedId,
+                        "observer id"           → eventObserver.getEffectiveId,
+                        "target scope"          → targetObject.scope.scopeId,
+                        "handler scope"         → handler.scope.scopeId,
+                        "observer scope"        → eventObserver.scope.scopeId
+                    ))(
+                    containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+                )
+                None
             }
-
-        resolvedObject map (_.ensuring(_.isInstanceOf[XFormsEventHandler]).asInstanceOf[XFormsEventHandler])
+        
+        resolvedObject map (_.asInstanceOf[XFormsEventHandler])
     }
 }

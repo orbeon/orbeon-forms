@@ -171,27 +171,27 @@ Inserting error information into error list:
                 <xsl:template match="/*">
                     <!-- Outer group around outer event handlers -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
-
-                        <!-- When the group becomes relevant, remember incremental flag -->
-                        <!-- NOTE:
-                            - upon initial refresh, xforms-enabled is dispatched here
-                            - iteration over $visible-errors in view has already taken place, but over empty list of errors
-                            - then correct incremental flag is set
-                            - initial errors might have been inserted already or not, depending on where error summary is on page
-                            - but in any case, this means a second refresh has to take place
+                        
+                        <xf:action ev:event="xforms-enabled">
+                            <!-- When the group becomes relevant, remember incremental flag -->
+                            <!-- NOTE:
+                                - upon initial refresh, xforms-enabled is dispatched here
+                                - iteration over $visible-errors in view has already taken place, but over empty list of errors
+                                - then correct incremental flag is set
+                                - initial errors might have been inserted already or not, depending on where error summary is on page
+                                - but in any case, this means a second refresh has to take place
                             -->
-                        <xf:setvalue
-                            ev:event="xforms-enabled"
-                            xxbl:scope="inner"
-                            ref="instance('fr-state-instance')/incremental"
-                            xbl:attr="xbl:text=incremental"/>
-
-                        <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
-                        <xf:setvalue
-                            ev:event="xforms-enabled"
-                            xxbl:scope="inner"
-                            ref="instance('fr-state-instance')/observers"
-                            xbl:attr="xbl:text=observer"/>
+                            <xf:setvalue
+                                xxbl:scope="inner"
+                                ref="instance('fr-state-instance')/incremental"
+                                xbl:attr="xbl:text=incremental"/>
+    
+                            <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
+                            <xf:setvalue
+                                xxbl:scope="inner"
+                                ref="instance('fr-state-instance')/observers"
+                                xbl:attr="xbl:text=observer"/>
+                        </xf:action>
 
                         <!-- Make sure the model is recalculated when there is a chance visited controls might have
                              changed. We do this because there is no dependency handling wit the xxf:visited()

@@ -2855,7 +2855,7 @@
         </output>
     </test>
 
-    <test description="Listener child of repeat iteration with different XBL scopes" name="oxf:pipeline">
+    <test description="#243: Listener child of repeat iteration with different XBL scopes must not run" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -2920,14 +2920,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="events" model-id="model">
-                                <events>
-                                    <event observer="|my-bar-1≡my-department-repeat|" type="my-event" target="|my-bar-1≡my-department-repeat|"/>
-                                    <event observer="|my-bar-1≡my-department-repeat|" type="xforms-enabled" target="|my-bar-1≡my-department-repeat|"/>
-                                </events>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-bar-1≡my-department-repeat" index="1"/>
                         </controls>

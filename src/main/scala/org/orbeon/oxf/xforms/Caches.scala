@@ -24,9 +24,9 @@ import scala.util.control.NonFatal
  */
 object Caches {
 
-    lazy val stateCache = getCache("xforms.state")
+    lazy val stateCache     = getCache("xforms.state")
     lazy val resourcesCache = getCache("xforms.resources")
-    lazy val xblCache = getCache("xforms.xbl")
+    lazy val xblCache       = getCache("xforms.xbl")
 
     private val ehcachePath = "oxf:/config/ehcache.xml"
 

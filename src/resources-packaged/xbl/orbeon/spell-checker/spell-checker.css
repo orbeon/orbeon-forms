@@ -23,7 +23,6 @@
 .fr-spell-checker-dialog input                 { width: 180px; *width: 174px }
 .fr-spell-checker-dialog select                { width: 180px }
 .fr-spell-checker-dialog td { padding-right: 10px; padding-bottom: 5px; vertical-align: top }
-.fr-spell-checker-dialog .label { width: 90px }
 .fr-spell-checker-dialog .not-in-dictionary { height: 60px; overflow-y: scroll; display: block; border: 1px solid #999 }
 .fr-spell-checker-dialog .unknown-word { font-weight: bold; background: url('unknown-word.png') repeat-x left bottom }
 .fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button { display: block; margin-bottom: 3px }

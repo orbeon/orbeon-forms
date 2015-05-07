@@ -66,22 +66,22 @@
         </xh:style>
     </xh:head>
     <xh:body>
-        <fr:button id="add-line">
+        <xf:trigger id="add-line">
             <xf:label>Add line</xf:label>
             <xf:insert ref="text" ev:event="DOMActivate"/>
-        </fr:button>
+        </xf:trigger>
         <xf:repeat ref="text" id="spell-checker-repeat">
             <xh:div class="block">
                 <xf:textarea ref="." id="textarea"/>
                 <fr:spell-checker ref="." id="spell-checker"/>
-                <fr:button id="remove-line">
+                <xf:trigger id="remove-line">
                     <xf:label>Remove line</xf:label>
                     <xf:delete ev:event="DOMActivate" ref="."/>
-                </fr:button>
-                <fr:button id="toggle-readonly">
+                </xf:trigger>
+                <xf:trigger id="toggle-readonly">
                     <xf:label>Toggle readonly</xf:label>
                     <xf:setvalue ev:event="DOMActivate" ref="@readonly" value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
+                </xf:trigger>
             </xh:div>
         </xf:repeat>
     </xh:body>

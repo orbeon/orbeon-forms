@@ -3651,9 +3651,11 @@
                                 <xf:trigger id="foo-trigger">
                                     <xf:label>Open me</xf:label>
                                     <!-- Open global dialog upon click -->
-                                    <xxf:show ev:event="DOMActivate" dialog="my-dialog" xxbl:scope="outer">
-                                        <xf:property name="my-id" value="event('xxf:absolute-targetid')"/>
-                                    </xxf:show>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xxf:show dialog="my-dialog" xxbl:scope="outer">
+                                            <xf:property name="my-id" value="event('xxf:absolute-targetid')"/>
+                                        </xxf:show>
+                                    </xf:action>
                                     <!-- Upon callback, store value received -->
                                     <xf:setvalue ev:event="my-callback" ref="instance()" value="event('my-value')"/>
                                 </xf:trigger>

@@ -1615,7 +1615,9 @@
                                         </xbl:handlers>
                                         <xbl:template>
                                             <xf:repeat id="level1-repeat" ref="level1" xxbl:scope="outer">
-                                                <xf:dispatch ev:event="down-2" name="down-1" targetid="fr-level1-binding" xxbl:scope="inner"/>
+                                                <xf:action ev:event="down-2">
+                                                    <xf:dispatch name="down-1" targetid="fr-level1-binding" xxbl:scope="inner"/>
+                                                </xf:action>
                                                 <fr:level2 id="level2-component"/>
                                             </xf:repeat>
                                         </xbl:template>
@@ -1643,7 +1645,9 @@
                                         </xbl:handlers>
                                         <xbl:template>
                                             <xf:repeat id="level2-repeat" ref="level2" xxbl:scope="outer">
-                                                <xf:dispatch ev:event="down-3" name="down-2" targetid="fr-level2-binding" xxbl:scope="inner"/>
+                                                <xf:action ev:event="down-3">
+                                                    <xf:dispatch name="down-2" targetid="fr-level2-binding" xxbl:scope="inner"/>
+                                                </xf:action>
                                                 <fr:level3 id="level3-component"/>
                                             </xf:repeat>
                                         </xbl:template>
@@ -1674,7 +1678,9 @@
                                         <xbl:template>
                                             <xf:repeat id="level3-repeat" ref="level3" xxbl:scope="outer">
                                                 <xf:input id="title-control" ref="title">
-                                                    <xf:dispatch ev:event="DOMFocusIn" name="down-3" targetid="fr-level3-binding" xxbl:scope="inner"/>
+                                                    <xf:action ev:event="DOMFocusIn">
+                                                        <xf:dispatch name="down-3" targetid="fr-level3-binding" xxbl:scope="inner"/>
+                                                    </xf:action>
                                                 </xf:input>
                                             </xf:repeat>
                                         </xbl:template>
@@ -2860,7 +2866,9 @@
                                 <!-- Group in inner scope -->
                                 <xf:group id="my-inner-group">
                                     <!-- Set value in outer scope -->
-                                    <xf:setvalue ev:event="foobar" ref="." xxbl:scope="outer">foobar</xf:setvalue>
+                                    <xf:action  ev:event="foobar">
+                                        <xf:setvalue ref="." xxbl:scope="outer">foobar</xf:setvalue>
+                                    </xf:action>
                                 </xf:group>
                             </xbl:template>
                         </xbl:binding>
@@ -2911,9 +2919,12 @@
                                     <xf:var name="p" value="position()" as="xs:integer"/>
                                     <!-- Group in inner scope -->
                                     <xf:group id="my-group" xxbl:scope="inner">
-                                        <!-- Action in outer scope -->
-                                        <xf:action ev:event="xforms-enabled" if="xxf:index() = $p" xxbl:scope="outer">
-                                            <xf:setvalue ref=".">Banana</xf:setvalue>
+                                        <!-- NOTE: With #243, this cannot be in outer scope. -->
+                                        <xf:action ev:event="xforms-enabled">
+                                            <!-- Action in outer scope -->
+                                            <xf:action if="xxf:index() = $p" xxbl:scope="outer">
+                                                <xf:setvalue ref=".">Banana</xf:setvalue>
+                                            </xf:action>
                                         </xf:action>
                                     </xf:group>
                                 </xf:repeat>
@@ -2972,14 +2983,17 @@
                                     <xf:var name="p" value="position()" as="xs:integer"/>
                                     <!-- Group in inner scope -->
                                     <xf:group id="my-group" xxbl:scope="inner">
-                                        <!-- Action in outer scope -->
-                                        <xf:action ev:event="xforms-enabled" if="xxf:index() = $p" xxbl:scope="outer">
-                                            <xf:dispatch name="foobar" targetid="my-group" xxbl:scope="inner">
-                                                <xf:property name="index" value="xxf:index()" xxbl:scope="outer"/>
-                                            </xf:dispatch>
-                                            <xf:dispatch name="foobar" targetid="my-other-group" xxbl:scope="inner">
-                                                <xf:property name="index" value="xxf:index()" xxbl:scope="outer"/>
-                                            </xf:dispatch>
+                                        <!-- NOTE: With #243, this cannot be in outer scope. -->
+                                        <xf:action ev:event="xforms-enabled">
+                                            <!-- Action in outer scope -->
+                                            <xf:action if="xxf:index() = $p" xxbl:scope="outer">
+                                                <xf:dispatch name="foobar" targetid="my-group" xxbl:scope="inner">
+                                                    <xf:property name="index" value="xxf:index()" xxbl:scope="outer"/>
+                                                </xf:dispatch>
+                                                <xf:dispatch name="foobar" targetid="my-other-group" xxbl:scope="inner">
+                                                    <xf:property name="index" value="xxf:index()" xxbl:scope="outer"/>
+                                                </xf:dispatch>
+                                            </xf:action>
                                         </xf:action>
 
                                         <!-- Event handler in inner scope -->

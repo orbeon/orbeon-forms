@@ -79,7 +79,7 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:upload ref="xxf:binding('fr-attachment')">
+            <xf:upload ref="xxf:binding('fr-attachment')" xbl:attr="accept">
                 <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
             </xf:upload>
             <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[normalize-space()]">

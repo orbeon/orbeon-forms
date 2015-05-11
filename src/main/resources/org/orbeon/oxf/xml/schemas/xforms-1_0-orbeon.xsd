@@ -551,6 +551,8 @@
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>
+            <xsd:attribute name="accept" type="xsd:string" use="optional"/>
+            <!-- `mediatype` is deprecated as of XForms 2.0, use `accept` instead -->
             <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
             <xsd:attribute name="incremental" type="xsd:boolean" use="optional" default="false"/>
             <xsd:anyAttribute namespace="##other" processContents="lax"/>

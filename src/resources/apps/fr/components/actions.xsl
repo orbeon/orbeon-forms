@@ -45,9 +45,14 @@
         select="$fr-form-model-id, /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
 
     <!-- Store the absolute id of the source in the request -->
-    <xsl:template match="/xh:html/xh:head//
-                            xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]/
-                            xf:action[p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')]">
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')
+                ]/
+                xf:action[
+                    p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')
+                ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xsl:variable name="action" select="."/>
@@ -73,7 +78,17 @@
         <xsl:text>frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), $control-name)</xsl:text>
     </xsl:function>
 
-    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/
+                xf:action[
+                    ends-with(@id, '-binding')
+                ]//
+                xf:action[
+                    p:has-class('fr-set-service-value-action')
+                ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -83,7 +98,17 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/
+                xf:action[
+                    ends-with(@id, '-binding')
+                ]//
+                xf:action[
+                    p:has-class('fr-set-database-service-value-action')
+                ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -95,7 +120,17 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/
+                xf:action[
+                    ends-with(@id, '-binding')
+                ]//
+                xf:action[
+                    p:has-class('fr-set-control-value-action')
+                ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -105,7 +140,17 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/
+                xf:action[
+                    ends-with(@id, '-binding')
+                ]//
+                xf:action[
+                    p:has-class('fr-itemset-action')
+                ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->

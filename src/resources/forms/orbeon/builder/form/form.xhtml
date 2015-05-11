@@ -21,6 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
+      xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
     <xh:head>
         <!-- CSS -->
@@ -413,6 +414,27 @@
                                         <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
                                         <xf:action ev:event="DOMActivate" type="xpath">
                                             fbf:deleteCellContent($td, true())
+                                        </xf:action>
+                                    </xf:trigger>
+                                    <!-- Cut control -->
+                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-cut-trigger">
+                                        <xf:label><xh:img src="/apps/fr/style/images/silk/cut.png" alt="{$form-resources/cut/label}" title="{$form-resources/cut/label}"/></xf:label>
+                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                            toolboxOps:cutToClipboard($td)
+                                        </xf:action>
+                                    </xf:trigger>
+                                    <!-- Copy control -->
+                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-copy-trigger">
+                                        <xf:label><xh:img src="/forms/orbeon/builder/images/copy.png" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/></xf:label>
+                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                            toolboxOps:copyToClipboard($td)
+                                        </xf:action>
+                                    </xf:trigger>
+                                    <!-- Paste control -->
+                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-paste-trigger">
+                                        <xf:label><xh:img src="/apps/fr/style/images/silk/paste_plain.png" alt="{$form-resources/paste/label}" title="{$form-resources/paste/label}"/></xf:label>
+                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                            toolboxOps:pasteFromClipboard($td)
                                         </xf:action>
                                     </xf:trigger>
                                 </xh:span>

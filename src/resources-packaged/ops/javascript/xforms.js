@@ -1645,9 +1645,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
                 // XForms output or "static readonly" mode
-                var output = $(control).children(".xforms-output-output, .xforms-field").first();
+                var jControl = $(control);
+                var output = jControl.children(".xforms-output-output, .xforms-field").first();
                 if (output.length > 0) {
-                    var jControl = $(control); 
                     if (jControl.is(".xforms-mediatype-image")) {
                         output[0].src = newControlValue;
                     } else if (jControl.is(".xforms-mediatype-text-html")) {

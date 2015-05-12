@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <portlet-app version="2.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
-    <!--Add internal Orbeon-* headers for auth-->
-    <filter>
-        <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
-        <filter-class>org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter</filter-class>
-        <lifecycle>RENDER_PHASE</lifecycle>
-        <lifecycle>ACTION_PHASE</lifecycle>
-        <lifecycle>RESOURCE_PHASE</lifecycle>
-        <lifecycle>EVENT_PHASE</lifecycle>
-    </filter>
-    <filter-mapping>
-        <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
-        <portlet-name>orbeon-forms-portlet</portlet-name>
-    </filter-mapping>
-
     <!-- Orbeon Forms portlet (for Orbeon Forms running directly within a portlet) -->
     <portlet>
         <portlet-name>orbeon-forms-portlet</portlet-name>
@@ -46,5 +32,19 @@
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
     </portlet>
+    
+    <!--Add internal Orbeon-* headers for auth-->
+    <filter>
+        <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
+        <filter-class>org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter</filter-class>
+        <lifecycle>RENDER_PHASE</lifecycle>
+        <lifecycle>ACTION_PHASE</lifecycle>
+        <lifecycle>RESOURCE_PHASE</lifecycle>
+        <lifecycle>EVENT_PHASE</lifecycle>
+    </filter>
+    <filter-mapping>
+        <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
+        <portlet-name>orbeon-forms-portlet</portlet-name>
+    </filter-mapping>
     
 </portlet-app>

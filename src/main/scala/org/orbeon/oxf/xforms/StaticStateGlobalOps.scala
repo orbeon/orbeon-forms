@@ -108,7 +108,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
         // If element analysis is found, find all its ancestor repeats until the root or until the end prefixed id is
         getControlAnalysisOption(startPrefixedId).toList flatMap
             (_.ancestorRepeatsAcrossParts) takeWhile
-                (a ⇒ Some(a.prefixedId) != endPrefixedId) map
+                (a ⇒ ! endPrefixedId.contains(a.prefixedId)) map
                     (_.prefixedId)
 
     def getAncestorRepeats(prefixedId: String): List[RepeatControl] =

@@ -412,7 +412,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 val bind = findBindByName(inDoc, controlName).get
 
                 val builtinTypeStringOpt = nonEmptyOrNone(validationElem / "builtin-type" stringValue)
-                val builtinTypeRequired  = nonEmptyOrNone(validationElem / "builtin-type-required" stringValue) exists (_ == "true")
+                val builtinTypeRequired  = nonEmptyOrNone(validationElem / "builtin-type-required" stringValue) contains "true"
                 val schemaTypeOpt        = nonEmptyOrNone(validationElem / "schema-type"  stringValue)
 
                 def builtinTypeQName: (QName, Boolean) = {
@@ -543,7 +543,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 val levelAtt      = attValueOrNone(LEVEL_QNAME)
                 val refAtt        = attValueOrNone(REF_QNAME)
 
-                val isGlobal = refAtt exists (_ == OldStandardAlertRef)
+                val isGlobal = refAtt contains OldStandardAlertRef
 
                 // Try to find the alert index from xf:alert/@ref
                 val alertIndexOpt =
@@ -609,7 +609,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val supportedAlerts = AlertDetails.fromForm(inDoc, controlName)
 
         def findAlertForId(id: String) =
-            supportedAlerts find (_.forValidationId == Some(id))
+            supportedAlerts find (_.forValidationId.contains(id))
 
         def fromAttribute(a: NodeInfo) = {
             val bindId = (a parent * head).id

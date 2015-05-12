@@ -103,7 +103,7 @@ object XMLOutput extends XMLReceiverSupport {
             // XBL: Should probably do via xforms:htmlFragment and/or possibly the XBL control exposing a mediatype in
             // its definition.
             val isHTML =
-                c.mediatype == Some("text/html") ||
+                c.mediatype.contains("text/html") ||
                 c.isInstanceOf[XFormsComponentControl] && c.staticControl.localName == "tinymce"
 
             writeTextOrHTML("value", c.getValue, isHTML)

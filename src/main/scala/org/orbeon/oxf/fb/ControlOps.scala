@@ -406,7 +406,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             // schema, then insert a new mapping. We place it on the top-level bind so we don't have to insert
             // it repeatedly.
             val newURI =
-                if (findSchemaPrefix(bind) == Some(prefix))
+                if (findSchemaPrefix(bind).contains(prefix))
                     findSchemaNamespace(bind)
                 else
                     None

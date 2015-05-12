@@ -377,7 +377,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 def isUnspecifiedOrSpecificVersion =
                     req.version match {
                         case Unspecified       ⇒ true
-                        case Specific(version) ⇒ Some(version) == existingVersionOpt
+                        case Specific(version) ⇒ existingVersionOpt.contains(version)
                         case _                 ⇒ false
                     }
 

@@ -182,7 +182,7 @@ object Credentials {
         Credentials(
             username.trim,
             nonEmptyOrNone(password),
-            ! (nonEmptyOrNone(preemptiveAuth) exists (_ == "false")),
+            ! (nonEmptyOrNone(preemptiveAuth) contains "false"),
             nonEmptyOrNone(domain)
         )
 }

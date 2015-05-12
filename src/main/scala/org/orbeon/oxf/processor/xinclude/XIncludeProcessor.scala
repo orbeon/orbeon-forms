@@ -61,7 +61,7 @@ class XIncludeProcessor extends ProcessorImpl {
                         Map.empty[String, Boolean]
 
                 // URL resolver is initialized with a parser configuration which can be configured to support external entities or not.
-                val parserConfiguration = new ParserConfiguration(false, false, ! (configurationAttributes.get("external-entities") exists (_ == false)))
+                val parserConfiguration = new ParserConfiguration(false, false, ! (configurationAttributes.get("external-entities") contains false))
                 val uriResolver = new TransformerURIResolver(self, pipelineContext, INPUT_CONFIG, parserConfiguration)
 
                 /**

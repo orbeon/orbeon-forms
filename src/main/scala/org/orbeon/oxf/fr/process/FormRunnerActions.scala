@@ -266,7 +266,7 @@ trait FormRunnerActions {
                 tryCreatePDFIfNeeded(EmptyActionParams).get
 
             // TODO: Remove duplication once @replace is an AVT
-            val replace = if (evaluatedSendProperties.get("replace") exists (_ == Some("all"))) "all" else "none"
+            val replace = if (evaluatedSendProperties.get("replace") exists (_.contains("all"))) "all" else "none"
 
             // Set data-safe-override as we know we are not losing data upon navigation. This happens:
             // - with changing mode (tryChangeMode)

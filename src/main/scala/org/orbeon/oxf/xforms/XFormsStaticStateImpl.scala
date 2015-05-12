@@ -328,7 +328,7 @@ object XFormsStaticStateImpl {
                 (propertyName, propertyValue)
         } toMap
         
-        val isHTMLDocument = Option(staticStateElement.attributeValue("is-html")) exists (_ == "true")
+        val isHTMLDocument = Option(staticStateElement.attributeValue("is-html")) contains "true"
         
         def getOrComputeDigest(digest: Option[String]) =
             digest getOrElse {

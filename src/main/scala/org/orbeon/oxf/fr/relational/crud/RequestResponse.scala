@@ -49,7 +49,7 @@ trait RequestResponse {
 
     def requestUsername : Option[String] = headerValue(OrbeonUsernameHeaderName)
     def requestGroup: Option[String]     = headerValue(OrbeonGroupHeaderName)
-    def requestFlatView                  = headerValue("orbeon-create-flat-view") == Some("true")
+    def requestFlatView                  = headerValue("orbeon-create-flat-view").contains("true")
 
     val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
     val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r

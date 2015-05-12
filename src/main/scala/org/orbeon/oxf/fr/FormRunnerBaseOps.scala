@@ -138,7 +138,7 @@ trait FormRunnerBaseOps {
     def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
         findModelElement(inDoc) \ "*:bind" find {
             // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-            bind ⇒ TopLevelBindIds(bind.id) || bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
+            bind ⇒ TopLevelBindIds(bind.id) || bindRefOrNodeset(bind).contains("instance('fr-form-instance')")
         }
 
     def properties = Properties.instance.getPropertySet
@@ -155,7 +155,7 @@ trait FormRunnerBaseOps {
 
     // Return a boolean property using the form's app/name, false if the property is not defined
     def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams) =
-        Option(properties.getObject(buildPropertyName(name))) map (_.toString) exists (_ == "true")
+        Option(properties.getObject(buildPropertyName(name))) map (_.toString) contains "true"
 
     // Interrupt current processing and send an error code to the client.
     // NOTE: This could be done through ExternalContext
@@ -186,7 +186,7 @@ trait FormRunnerBaseOps {
     def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
 
     def isNoscript    = containingDocument.noscript
-    def isEmbeddable  = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) exists (_ == "true")
+    def isEmbeddable  = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
     // The standard Form Runner parameters
     case class FormRunnerParams(app: String, form: String, formVersion: String, document: Option[String], mode: String)

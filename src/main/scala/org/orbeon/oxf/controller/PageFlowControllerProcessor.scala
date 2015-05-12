@@ -281,7 +281,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         // Find a handler route
         def handler(elementNames: Set[String]) =
             topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
-                { pageId ⇒ routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id == Some(pageId) ⇒ page } }
+                { pageId ⇒ routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id.contains(pageId) ⇒ page } }
 
         PageFlow(
             routes,

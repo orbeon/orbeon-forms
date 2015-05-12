@@ -116,7 +116,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
 
     def assertJSExpression(expression: String): Unit = {
         val result = executeScript(s"return $expression")
-        assert(collectByErasedType[java.lang.Boolean](result) == Some(java.lang.Boolean.TRUE))
+        assert(collectByErasedType[java.lang.Boolean](result).contains(java.lang.Boolean.TRUE))
     }
 
     // Functions from xforms.js we must provide access to:

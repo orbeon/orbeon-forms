@@ -93,7 +93,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name
     def isBindForName(bind: NodeInfo, name: String) =
-        hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
+        hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind).contains(name) // also check ref/nodeset in case id is not present
 
     // Canonical way: use the `name` attribute
     def getBindNameOrEmpty(bind: NodeInfo) =

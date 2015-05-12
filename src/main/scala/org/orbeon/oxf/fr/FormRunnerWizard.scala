@@ -16,6 +16,6 @@ package org.orbeon.oxf.fr
 trait FormRunnerWizard extends FormRunnerBaseOps {
 
     def isWizardValidate =
-        formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) exists (_ == "true")
+        formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) contains "true"
 
 }

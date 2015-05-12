@@ -356,9 +356,9 @@ object OrbeonClientBase {
 
     @AfterClass
     def stopService(): Unit = {
-        driverOpt.map(_.quit())
+        driverOpt.foreach(_.quit())
         driverOpt = None
-        serviceOpt.map(_.stop())
+        serviceOpt.foreach(_.stop())
         serviceOpt = None
     }
 }

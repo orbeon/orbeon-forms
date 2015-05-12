@@ -32,7 +32,7 @@ trait XMLSupport extends AssertionsForJUnit {
         // Produce a nicer message
         if (! result) {
             assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
-            assert(condition = false)
+            assert(false)
         }
     }
 
@@ -43,7 +43,7 @@ trait XMLSupport extends AssertionsForJUnit {
         // Produce a nicer message
         if (! result) {
             assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
-            assert(condition = false)
+            assert(false)
         }
     }
 }

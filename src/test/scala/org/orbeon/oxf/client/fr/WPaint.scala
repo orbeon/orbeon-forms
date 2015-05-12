@@ -14,10 +14,10 @@
 package org.orbeon.oxf.client.fr
 
 import org.junit.Test
-import org.scalatest.junit.MustMatchersForJUnit
 import org.orbeon.oxf.client.FormRunnerOps
+import org.scalatest.junit.AssertionsForJUnit
 
-trait WPaint extends MustMatchersForJUnit with FormRunnerOps {
+trait WPaint extends AssertionsForJUnit with FormRunnerOps {
 
     @Test def loadEditSaveWorkflow(): Unit = {
 

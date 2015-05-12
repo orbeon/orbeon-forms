@@ -674,7 +674,7 @@ object XFormsRepeatControl {
         findIndexes(
             doc.getControls.getCurrentControlTree,
             doc.getStaticOps.repeats,
-            _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index
+            _.initialLocal.asInstanceOf[XFormsRepeatControlLocal].index
         ).asJava.asInstanceOf[JMap[String, JInteger]]
 
     // Find the current repeat indexes for the given doc

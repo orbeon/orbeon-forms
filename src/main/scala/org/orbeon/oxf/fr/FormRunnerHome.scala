@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
+import scala.collection.{immutable ⇒ i}
 import scala.util.Try
 
 trait FormRunnerHome {
@@ -256,7 +257,7 @@ object FormRunnerHome {
     import spray.json._
 
     def tryRemoteServersFromString(json: String) =
-        Try(json.asJson) flatMap tryRemoteServersFromJSON
+        Try(json.parseJson) flatMap tryRemoteServersFromJSON
 
     def tryRemoteServersFromJSON(json: JsValue) = Try {
         json match {
@@ -278,9 +279,9 @@ object FormRunnerHome {
         }
     }
 
-    private def remoteServersFromJSONProperty: Option[List[(String, String)]] =
+    private def remoteServersFromJSONProperty: Option[i.Seq[(String, String)]] =
         Option(properties.getProperty("oxf.fr.home.remote-servers")) map { property ⇒
-            Try(property.associatedValue(_.value.toString.asJson)) flatMap tryRemoteServersFromJSON getOrElse {
+            Try(property.associatedValue(_.value.toString.parseJson)) flatMap tryRemoteServersFromJSON getOrElse {
                 implicit val logger = containingDocument.getIndentedLogger("form-runner")
                 warn(
                     s"incorrect JSON configuration for property `oxf.fr.home.remote-servers`",

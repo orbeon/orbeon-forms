@@ -14,11 +14,11 @@
 package org.orbeon.oxf.client
 
 import org.junit.Test
-import org.scalatest.concurrent.Eventually._
-import org.scalatest.junit.MustMatchersForJUnit
 import org.openqa.selenium.By
+import org.scalatest.concurrent.Eventually._
+import org.scalatest.junit.AssertionsForJUnit
 
-trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // with AssertionsForJUnit
+trait OrbeonFormsDemoPath extends AssertionsForJUnit with FormRunnerOps { // with AssertionsForJUnit
 
     // RFE: split into parts so we can start in the middle
     @Test def demoPath(): Unit = {
@@ -34,7 +34,7 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
 
             // RFE: test XForms examples
             _ ← click on partialLinkText("creating forms")
-            _ ← eventually(pageTitle must be ("Creating forms with Form Builder"))
+            _ ← eventually(pageTitle should be ("Creating forms with Form Builder"))
 
             _ ← click on linkText("Controls Form")
             // https://github.com/orbeon/orbeon-forms/issues/887
@@ -45,17 +45,17 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
             inputControl ← elementByStaticId("input-control")
             passwordField ← elementByStaticId("secret-control")
 
-            _ ← inputControl.classes  must not contain ("xforms-visited")
-            _ ← passwordField.classes must not contain ("xforms-visited")
+            _ ← inputControl.classes  should not contain ("xforms-visited")
+            _ ← passwordField.classes should not contain ("xforms-visited")
 
-            _ ← passwordField.classes must contain ("xforms-required")
+            _ ← passwordField.classes should contain ("xforms-required")
 
             _ ← inputControl.tabOut()
-            _ ← inputControl.classes must contain ("xforms-visited")
-            _ ← passwordField.classes must not contain ("xforms-visited")
+            _ ← inputControl.classes should contain ("xforms-visited")
+            _ ← passwordField.classes should not contain ("xforms-visited")
 
             _ ← passwordField.tabOut()
-            _ ← passwordField.classes must contain ("xforms-visited")
+            _ ← passwordField.classes should contain ("xforms-visited")
 
             _ ← Wizard.nextPage()
             _ ← assert(! Wizard.pageSelected("text-controls"))

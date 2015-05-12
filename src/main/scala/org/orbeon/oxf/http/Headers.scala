@@ -57,14 +57,14 @@ object Headers {
 
     // Filter headers that that should never be propagated in our proxies
     // Also combine headers with the same name into a single header
-    def proxyCapitalizeAndCombineHeaders[T[_]](
+    def proxyCapitalizeAndCombineHeaders[T[_] <: AnyRef](
         headers : Iterable[(String, T[String])],
         request : Boolean)(implicit
         _conv   : ConvertibleToSeq[T, String]
     ): Iterable[(String, String)] =
         proxyAndCapitalizeHeaders(headers, request) map { case (name, values) ⇒ name → (values mkString ",") }
 
-    def proxyAndCapitalizeHeaders[T[_], U](
+    def proxyAndCapitalizeHeaders[T[_] <: AnyRef, U](
         headers : Iterable[(String, T[U])],
         request : Boolean)(implicit
         _conv   : ConvertibleToSeq[T, U]
@@ -72,14 +72,14 @@ object Headers {
         proxyHeaders(headers, request) map { case (n, v) ⇒ capitalizeCommonOrSplitHeader(n) → v }
 
     // NOTE: Filtering is case-insensitive, but original case is unchanged
-    def proxyAndCombineRequestHeaders[T[_]](
+    def proxyAndCombineRequestHeaders[T[_] <: AnyRef](
         headers : Iterable[(String, T[String])])(implicit
         _conv   : ConvertibleToSeq[T, String]
     ): Iterable[(String, String)] =
         proxyHeaders(headers, request = true) map { case (name, values) ⇒ name → (values mkString ",") }
 
     // NOTE: Filtering is case-insensitive, but original case is unchanged
-    def proxyHeaders[T[_], U](
+    def proxyHeaders[T[_] <: AnyRef, U](
         headers : Iterable[(String, T[U])],
         request : Boolean)(implicit
         _conv   : ConvertibleToSeq[T, U]

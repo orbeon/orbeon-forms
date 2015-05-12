@@ -18,11 +18,11 @@ import org.junit.Test
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.{By, Keys, WebElement}
 import org.orbeon.oxf.util.ScalaUtils._
-import org.scalatest.junit.{AssertionsForJUnit, MustMatchersForJUnit}
+import org.scalatest.junit.AssertionsForJUnit
 
 import scala.util.Try
 
-trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunnerOps {
+trait XForms extends AssertionsForJUnit with FormRunnerOps {
 
     def isInvalid(el: WebElement): Boolean = split[Set](el.getAttribute("class")).contains("xforms-invalid")
     def inErrorSummary(id: String): Boolean = Try(webDriver.findElement(By.linkText(id))).isSuccess
@@ -93,20 +93,20 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
         def divGroupElements = cssSelector("#div-group > div").findAllElements.to[List]
 
         def checkNonRelevantClasses(elements: List[Element]) = {
-            elements(0).classes must not contain ("class42")
-            elements(1).classes must contain ("myClass")
+            elements(0).classes should not contain ("class42")
+            elements(1).classes should contain ("myClass")
         }
 
         def checkRelevantClasses(elements: List[Element]) = {
-            elements(0).classes must contain ("class42")
-            elements(1).classes must contain ("myClass")
+            elements(0).classes should contain ("class42")
+            elements(1).classes should contain ("myClass")
         }
 
         // Just after loading (checkbox is selected, content is hidden)
         loadOrbeonPage("/unit-tests/issue-0889")
 
-        liGroupElements foreach (_.classes must contain ("xforms-disabled"))
-        cssSelector("#div-group").element.classes must contain ("xforms-disabled")
+        liGroupElements foreach (_.classes should contain ("xforms-disabled"))
+        cssSelector("#div-group").element.classes should contain ("xforms-disabled")
 
         checkNonRelevantClasses(liGroupElements)
         checkNonRelevantClasses(divGroupElements)
@@ -114,16 +114,16 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
         // Show content
         clickCheckbox()
 
-        liGroupElements foreach (_.classes must not contain ("xforms-disabled"))
-        cssSelector("#div-group").element.classes must not contain ("xforms-disabled")
+        liGroupElements foreach (_.classes should not contain ("xforms-disabled"))
+        cssSelector("#div-group").element.classes should not contain ("xforms-disabled")
 
         checkRelevantClasses(liGroupElements)
         checkRelevantClasses(divGroupElements)
 
         // Hide content again
         clickCheckbox()
-        liGroupElements foreach (_.classes must contain ("xforms-disabled-subsequent"))
-        cssSelector("#div-group").element.classes must contain ("xforms-disabled-subsequent")
+        liGroupElements foreach (_.classes should contain ("xforms-disabled-subsequent"))
+        cssSelector("#div-group").element.classes should contain ("xforms-disabled-subsequent")
 
         checkNonRelevantClasses(liGroupElements)
         checkNonRelevantClasses(divGroupElements)

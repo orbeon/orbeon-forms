@@ -13,26 +13,27 @@
  */
 package org.orbeon.oxf.client
 
-import org.openqa.selenium.chrome.ChromeDriverService
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.interactions.Actions
-import org.openqa.selenium.support.ui.Select
-
-import collection.JavaConverters._
 import java.net.URL
+
 import org.apache.commons.lang3.StringUtils
 import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium._
+import org.openqa.selenium.chrome.ChromeDriverService
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
+import org.openqa.selenium.support.ui.Select
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually._
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.time._
 
+import scala.collection.JavaConverters._
+
 // Basic client API
-trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
+trait OrbeonFormsOps extends WebBrowser with Matchers {
 
     type STElement = this.Element
 

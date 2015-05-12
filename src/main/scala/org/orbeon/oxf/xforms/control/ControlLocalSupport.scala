@@ -23,8 +23,9 @@ trait ControlLocalSupport {
 
     self: XFormsControl ⇒
 
-    private var initialLocal: XFormsControlLocal = null
-    private var currentLocal: XFormsControlLocal = null
+    // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
+    private[control] var initialLocal: XFormsControlLocal = null
+    private[control] var currentLocal: XFormsControlLocal = null
 
     /**
      * Serialize this control's information which cannot be reconstructed from instances. The result is empty if no

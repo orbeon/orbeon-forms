@@ -35,9 +35,10 @@
     <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
-            <pathelement location="lib/scala-compiler-2.10.3.jar"/>
-            <pathelement location="lib/scala-library-2.10.3.jar"/>
-            <pathelement location="lib/scala-reflect-2.10.3.jar"/>
+            <pathelement location="lib/scala-compiler-2.11.6.jar"/>
+            <pathelement location="lib/scala-library-2.11.6.jar"/>
+            <pathelement location="lib/scala-reflect-2.11.6.jar"/>
+            <pathelement location="lib/scala-xml_2.11-1.0.3.jar"/>
         </classpath>
     </taskdef>
 
@@ -77,7 +78,7 @@
 
     <fileset id="war.libs" dir="lib">
 
-        <include name="orbeon-errorified-20130923.jar"/>
+        <include name="orbeon-errorified-20150511.jar"/>
 
         <!-- These JARs are checked in. They can be rebuilt with the jarjar target -->
         <include name="xerces-2.11-orbeon.jar"/>
@@ -153,8 +154,9 @@
 
         <include name="ehcache-core-2.6.3.jar"/>
 
-        <include name="scala-library-2.10.3.jar"/>
-        <include name="sbinary_2.10-0.4.1.jar"/>
+        <include name="scala-library-2.11.6.jar"/>
+        <include name="scala-xml_2.11-1.0.3.jar"/>
+        <include name="sbinary_2.11-SNAPSHOT.jar"/>
 
         <include name="rhino-1.7R2.jar"/>
 
@@ -184,10 +186,10 @@
         <include name="xqj2-0.0.1.jar"/>
         <include name="exist-xqj-1.0.1.jar"/>
 
-        <!-- JSON -->
-        <include name="parboiled-core-1.1.4.jar"/>
-        <include name="parboiled-scala_2.10-1.1.4.jar"/>
-        <include name="spray-json_2.10-1.2.3.jar"/>
+        <!-- Parsing and JSON -->
+        <include name="parboiled-core-1.1.7.jar"/>
+        <include name="parboiled-scala_2.11-1.1.7.jar"/>
+        <include name="spray-json_2.11-1.3.2.jar"/>
 
     </fileset>
 
@@ -413,8 +415,8 @@
             -injars      lib/commons-io-2.0.1.jar
             -injars      lib/commons-lang3-3.1.jar
             -injars      lib/commons-codec-1.6.jar
-            -injars      lib/scala-library-2.10.3.jar
-            -injars      lib/orbeon-errorified-20130923.jar
+            -injars      lib/scala-library-2.11.6.jar
+            -injars      lib/orbeon-errorified-20150511.jar
             -injars      lib/httpclient-4.3.5.jar
             -injars      lib/httpclient-cache-4.3.5.jar
             -injars      lib/httpcore-4.3.2.jar
@@ -468,8 +470,9 @@
             -injars      lib/commons-io-2.0.1.jar
             -injars      lib/commons-lang3-3.1.jar
             -injars      lib/commons-codec-1.6.jar
-            -injars      lib/scala-library-2.10.3.jar
-            -injars      lib/orbeon-errorified-20130923.jar
+            -injars      lib/scala-library-2.11.6.jar
+            -injars      lib/scala-xml_2.11-1.0.3.jar
+            -injars      lib/orbeon-errorified-20150511.jar
             -injars      lib/httpclient-4.3.5.jar
             -injars      lib/httpclient-cache-4.3.5.jar
             -injars      lib/httpcore-4.3.2.jar
@@ -519,8 +522,8 @@
 
             -injars      lib/commons-io-2.0.1.jar
             -injars      lib/commons-lang3-3.1.jar
-            -injars      lib/scala-library-2.10.3.jar
-            -injars      lib/orbeon-errorified-20130923.jar
+            -injars      lib/scala-library-2.11.6.jar
+            -injars      lib/orbeon-errorified-20150511.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
 
@@ -794,8 +797,8 @@
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1.2.17.jar"/>
-                <pathelement location="lib/scala-library-2.10.3.jar"/>
-                <pathelement location="lib/orbeon-errorified-20130923.jar"/>
+                <pathelement location="lib/scala-library-2.11.6.jar"/>
+                <pathelement location="lib/orbeon-errorified-20150511.jar"/>
             </classpath>
         </taskdef>
 

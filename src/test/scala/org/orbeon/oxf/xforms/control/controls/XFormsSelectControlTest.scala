@@ -24,45 +24,45 @@ class XFormsSelectControlTest extends AssertionsForJUnit {
             val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
                 updateSelection(Set("a", "b", "c"), Set("a", "b"), Set("a"))
 
-            assert(Set() === newlySelectedValues)
-            assert(Set("b") === newlyDeselectedValues)
-            assert(Set("a", "c") === newInstanceValue)
+            assert(Set() == newlySelectedValues)
+            assert(Set("b") == newlyDeselectedValues)
+            assert(Set("a", "c") == newInstanceValue)
         }
 
         locally {
             val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
                 updateSelection(Set("a", "b", "c"), Set("a", "b"), Set("a", "b"))
 
-            assert(Set() === newlySelectedValues)
-            assert(Set() === newlyDeselectedValues)
-            assert(Set("a", "b", "c") === newInstanceValue)
+            assert(Set() == newlySelectedValues)
+            assert(Set() == newlyDeselectedValues)
+            assert(Set("a", "b", "c") == newInstanceValue)
         }
 
         locally {
             val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
                 updateSelection(Set("a", "b", "c"), Set("a", "b"), Set())
 
-            assert(Set() === newlySelectedValues)
-            assert(Set("a", "b") === newlyDeselectedValues)
-            assert(Set("c") === newInstanceValue)
+            assert(Set() == newlySelectedValues)
+            assert(Set("a", "b") == newlyDeselectedValues)
+            assert(Set("c") == newInstanceValue)
         }
 
         locally {
             val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
                 updateSelection(Set("a", "b", "c"), Set("a", "b", "d"), Set("a", "d"))
 
-            assert(Set("d") === newlySelectedValues)
-            assert(Set("b") === newlyDeselectedValues)
-            assert(Set("a", "c", "d") === newInstanceValue)
+            assert(Set("d") == newlySelectedValues)
+            assert(Set("b") == newlyDeselectedValues)
+            assert(Set("a", "c", "d") == newInstanceValue)
         }
 
         locally {
             val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
                 updateSelection(Set("a", "b", "c"), Set("d", "e"), Set("d", "e"))
 
-            assert(Set("d", "e") === newlySelectedValues)
-            assert(Set() === newlyDeselectedValues)
-            assert(Set("a", "b", "c", "d", "e") === newInstanceValue)
+            assert(Set("d", "e") == newlySelectedValues)
+            assert(Set() == newlyDeselectedValues)
+            assert(Set("a", "b", "c", "d", "e") == newInstanceValue)
         }
     }
 }

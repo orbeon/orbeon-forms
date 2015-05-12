@@ -14,11 +14,11 @@
 package org.orbeon.oxf.client.fr
 
 import org.junit.Test
-import org.scalatest.junit.MustMatchersForJUnit
 import org.orbeon.oxf.client.FormRunnerOps
+import org.scalatest.junit.AssertionsForJUnit
 
 
-trait Grid extends MustMatchersForJUnit with FormRunnerOps {
+trait Grid extends AssertionsForJUnit with FormRunnerOps {
     // See also: https://github.com/orbeon/orbeon-forms/issues/1431
     @Test def rowMenu(): Unit = {
 

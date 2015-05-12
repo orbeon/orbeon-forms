@@ -14,10 +14,10 @@
 package org.orbeon.oxf.client.fr
 
 import org.junit.Test
-import org.scalatest.junit.MustMatchersForJUnit
 import org.orbeon.oxf.client.FormRunnerOps
+import org.scalatest.junit.AssertionsForJUnit
 
-trait Currency extends MustMatchersForJUnit with FormRunnerOps {
+trait Currency extends AssertionsForJUnit with FormRunnerOps {
 
     // https://github.com/orbeon/orbeon-forms/issues/1026
     @Test def displayUpdateWhenNoXFormsUpdate(): Unit = {

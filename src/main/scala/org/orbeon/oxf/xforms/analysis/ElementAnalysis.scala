@@ -277,7 +277,8 @@ trait ElementEventHandlers {
         handlersForObserver(observer) exists (_.isPhantom)
 
     // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-    private def relevantObservers: List[ElementAnalysis] = {
+    // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug. 
+    private[analysis] def relevantObservers: List[ElementAnalysis] = {
 
         def observersInAncestorParts =
             part.elementInParent.toList flatMap (_.relevantObservers)

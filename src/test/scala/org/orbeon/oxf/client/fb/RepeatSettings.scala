@@ -14,7 +14,7 @@
 package org.orbeon.oxf.client.fb
 
 import org.junit.Test
-import org.orbeon.oxf.client.{XFormsOps, FormBuilderOps}
+import org.orbeon.oxf.client.{FormBuilderOps, XFormsOps}
 import org.scalatest.junit.AssertionsForJUnit
 
 

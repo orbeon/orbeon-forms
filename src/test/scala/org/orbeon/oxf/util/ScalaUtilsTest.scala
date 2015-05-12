@@ -68,10 +68,10 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     }
 
     @Test def testStringToSet(): Unit = {
-        assert(Set()                     === stringToSet(""))
-        assert(Set()                     === stringToSet("  "))
-        assert(Set("GET")                === stringToSet(" GET "))
-        assert(Set("GET", "POST", "PUT") === stringToSet(" GET  POST  PUT "))
+        assert(Set()                     == stringToSet(""))
+        assert(Set()                     == stringToSet("  "))
+        assert(Set("GET")                == stringToSet(" GET "))
+        assert(Set("GET", "POST", "PUT") == stringToSet(" GET  POST  PUT "))
     }
 
     @Test def testSplitQuery(): Unit = {

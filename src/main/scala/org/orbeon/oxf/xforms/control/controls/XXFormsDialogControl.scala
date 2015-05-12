@@ -86,12 +86,12 @@ class XXFormsDialogControl(
 
     override def getJavaScriptInitialization = getCommonJavaScriptInitialization
 
-    private def currentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
+    private def dialogCurrentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
 
-    def isVisible             = currentLocal.visible
+    def isVisible             = dialogCurrentLocal.visible
     def wasVisible            = getInitialLocal.asInstanceOf[XXFormsDialogControlLocal].visible
-    def neighborControlId     = currentLocal.neighborControlId orElse defaultNeighborControlId
-    def isConstrainToViewport = currentLocal.constrainToViewport
+    def neighborControlId     = dialogCurrentLocal.neighborControlId orElse defaultNeighborControlId
+    def isConstrainToViewport = dialogCurrentLocal.constrainToViewport
 
     override def performTargetAction(event: XFormsEvent): Unit = {
         super.performTargetAction(event)
@@ -136,7 +136,7 @@ class XXFormsDialogControl(
 
     override def serializeLocal = {
 
-        val local = currentLocal
+        val local = dialogCurrentLocal
         val result = new ju.HashMap[String, String](3)
 
         result.put("visible", local.visible.toString)

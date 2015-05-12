@@ -69,7 +69,7 @@ class XXFormsDialogControl(
             case Some(ControlState(_, _, keyValues)) ⇒
                 setLocal(XXFormsDialogControlLocal(
                     visible             = keyValues("visible") == "true",
-                    constrainToViewport = keyValues.get("constrain") exists (_ == "true"),
+                    constrainToViewport = keyValues.get("constrain") contains "true",
                     neighborControlId   = keyValues.get("neighbor")
                 ))
             case None if restoreState ⇒

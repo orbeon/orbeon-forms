@@ -19,9 +19,9 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
+    import Builder._
+    
     @Test def addGridsSectionsControls(): Unit = {
-
-        import Builder._
 
         val ControlsCount = 30 // change when we add/remove controls to toolbox (ideally would be known from source)
 
@@ -77,6 +77,22 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
 
                 _ ← setAndCheckNameOfControlInCell(1 + 2 * 1, 1 + 1, "my-input-in-repeated-grid") // adjust row/col in repeated grid
 
+                _ ← insertNewSection()
+                - ← assert(countSections == 2)
+            }()
+        }
+    }
+    
+    @Test def moveSections(): Unit = {
+        
+        onNewForm {
+            for {
+                - ← assert(countSections == 1) // the form has an initial section
+                - ← assert(countGrids == 1)    // the form has an initial grid
+
+                _ ← insertNewSection()
+                - ← assert(countSections == 2)
+                
                 _ ← insertNewSection()
                 - ← assert(countSections == 2)
             }()

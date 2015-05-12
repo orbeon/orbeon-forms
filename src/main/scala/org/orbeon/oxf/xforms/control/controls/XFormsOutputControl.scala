@@ -91,7 +91,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Image mediatype
                 // Use dummy image as default value so that client always has something to load
                 proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, mediatype)
-            } else if (mediatype exists (_ == "text/html")) {
+            } else if (mediatype contains "text/html") {
                 // HTML mediatype
                 internalValue
             } else {
@@ -196,7 +196,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             } else
                 // Empty value, return as is
                 externalValue
-        } else if (mediatype exists (_ == "text/html"))
+        } else if (mediatype contains "text/html")
             // Rewrite the HTML value with resolved @href and @src attributes
             XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
         else

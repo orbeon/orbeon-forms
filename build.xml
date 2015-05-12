@@ -366,7 +366,6 @@
             <src path="src/main/scala"/>
             <!-- Scala code bundled with XBL components -->
             <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns, and scalac doesn't support fileset child elements, only include/exclude -->
-            <src path="src/resources-packaged/xbl/orbeon/simple-captcha/src/scala"/>
             <exclude name="org/orbeon/oxf/common/Version.scala"/>
         </scalac>
 

@@ -34,13 +34,13 @@ import scala.collection.immutable
 
 object APISupport {
 
-    import org.orbeon.oxf.fr.embedding.APISupport.Private._
+    import Private._
 
     val Logger = LoggerFactory.getLogger("org.orbeon.embedding")
 
     val AllModes       = List(New, Edit, View)
     val AllModesByName = AllModes map (a ⇒ a.name → a) toMap
-    
+
     def proxyPage(
         baseURL     : String,
         path        : String,
@@ -58,7 +58,7 @@ object APISupport {
                 throw new UnsupportedOperationException
         }
     }
-    
+
     def proxyServletResources(
         req         : HttpServletRequest,
         res         : HttpServletResponse,
@@ -101,7 +101,7 @@ object APISupport {
         Logger.debug("proxying resource {}", requestDetails.url)
 
         val res = connectURL(requestDetails)
-        
+
         ctx.setStatusCode(res.statusCode)
         res.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
 
@@ -176,7 +176,7 @@ object APISupport {
         try body
         finally req.removeAttribute(SettingsKey)
     }
-    
+
     def withSettings[T](req: HttpServletRequest, writer: ⇒ Writer)(body: EmbeddingSettings ⇒ T): Unit =
         Option(req.getAttribute(SettingsKey).asInstanceOf[EmbeddingSettings]) match {
             case Some(settings) ⇒

@@ -50,7 +50,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                         handlerContext.isTemplate() || secretControl == null || secretControl.getExternalValue() == null ? "" : secretControl.getExternalValue());
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(attributes, containerAttributes);
+                handleAccessibilityAttributes(attributes, containerAttributes, secretControl);
 
                 // Output all extension attributes
                 if (isConcreteControl) {

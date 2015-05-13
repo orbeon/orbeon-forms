@@ -49,7 +49,7 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
         val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
 
         // Handle accessibility attributes on <span>
-        XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+        XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes, outputControl)
 
         withElement(handlerContext.findXHTMLPrefix, XHTML_NAMESPACE_URI, getContainingElementName, containerAttributes) {
             if (isConcreteControl) {
@@ -75,7 +75,7 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
         val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
 
         // Handle accessibility attributes on <div>
-        XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+        XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes, outputControl)
 
         withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, getContainingElementName, containerAttributes) {
             if (isConcreteControl) {
@@ -106,7 +106,7 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
         val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
         containerAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, if (srcValue ne null) srcValue else XFormsConstants.DUMMY_IMAGE_URI)
 
-        XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+        XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes, outputControl)
 
         element(xhtmlPrefix, XHTML_NAMESPACE_URI, "img", containerAttributes)
     }
@@ -180,7 +180,7 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
             }
 
             val aAttributes = anchorAttributes
-            XFormsBaseHandler.handleAccessibilityAttributes(attributes, aAttributes)
+            XFormsBaseHandler.handleAccessibilityAttributes(attributes, aAttributes, outputControl)
 
             withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "a", aAttributes) {
                 val labelValue             = Option(control) map (_.getLabel) orNull

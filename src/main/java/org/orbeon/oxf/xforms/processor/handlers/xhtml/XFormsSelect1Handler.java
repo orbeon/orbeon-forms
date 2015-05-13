@@ -116,7 +116,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple");
 
             // Handle accessibility attributes
-            handleAccessibilityAttributes(attributes, containerAttributes);
+            handleAccessibilityAttributes(attributes, containerAttributes, xformsControl);
 
             if (isHTMLDisabled(xformsControl))
                 outputDisabledAttribute(containerAttributes);
@@ -386,7 +386,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "checked", "checked", XMLReceiverHelper.CDATA, "checked");
 
                         if (isFirst)
-                            handleAccessibilityAttributes(attributes, reusableAttributes);
+                            handleAccessibilityAttributes(attributes, reusableAttributes, (XFormsControl) control);
                     }
 
                     if (baseHandler.isHTMLDisabled((XFormsControl) control))// cast because Java is not aware that XFormsValueControl extends XFormsControl

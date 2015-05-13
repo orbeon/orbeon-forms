@@ -50,7 +50,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(attributes, containerAttributes);
+                handleAccessibilityAttributes(attributes, containerAttributes, textareaControl);
 
                 // Output all extension attributes
                 if (isConcreteControl) {

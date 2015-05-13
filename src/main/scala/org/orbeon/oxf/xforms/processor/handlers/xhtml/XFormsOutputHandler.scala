@@ -25,7 +25,14 @@ import XMLReceiverHelper._
 import org.orbeon.oxf.xforms.XFormsConstants._
 
 trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSupport {
-    protected def getContainerAttributes(uri: String, localname: String, attributes: Attributes, effectiveId: String, outputControl: XFormsSingleNodeControl) = {
+
+    protected def getContainerAttributes(
+        uri           : String,
+        localname     : String,
+        attributes    : Attributes,
+        effectiveId   : String,
+        outputControl : XFormsSingleNodeControl
+    ) = {
         // Add custom class
         val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, outputControl, true)
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-output-output")
@@ -38,7 +45,15 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
 
 // Default xf:output handler
 class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+
+    protected def handleControlStart(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ): Unit = {
 
         implicit val xmlReceiver = handlerContext.getController.getOutput
 
@@ -64,7 +79,15 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
 
 // xf:output[@mediatype = 'text/html']
 class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+
+    protected def handleControlStart(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ): Unit = {
 
         implicit val xmlReceiver = handlerContext.getController.getOutput
 
@@ -91,7 +114,15 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
 
 // xf:output[starts-with(@appearance, 'image/')]
 class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+
+    protected def handleControlStart(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ): Unit = {
 
         implicit val xmlReceiver = handlerContext.getController.getOutput
 
@@ -114,7 +145,15 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
 
 // xf:output[@appearance = 'xxf:text']
 class XFormsOutputTextHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+
+    protected def handleControlStart(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ): Unit = {
 
         val outputControl = control.asInstanceOf[XFormsOutputControl]
         val isConcreteControl = outputControl ne null
@@ -134,7 +173,14 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
     // NOP because the label is output as the text within <a>
     protected override def handleLabel() = ()
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+    protected def handleControlStart(
+        uri         : String,
+        localname   : String,
+        qName       : String,
+        attributes  : Attributes,
+        effectiveId : String,
+        control     : XFormsControl
+    ): Unit = {
 
         implicit val context     = handlerContext
         implicit val xmlReceiver = context.getController.getOutput

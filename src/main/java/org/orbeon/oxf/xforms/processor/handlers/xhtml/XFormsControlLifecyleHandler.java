@@ -32,10 +32,10 @@ import org.xml.sax.helpers.AttributesImpl;
  * This class is a helper base class which handles the lifecycle of producing markup for a control. The following
  * phases are handled:
  *
- * o Give the handler a chance to do some prep work: prepareHandler()
- * o Get custom information: addCustomClasses()
- * o Check whether the control wants any output at all: isMustOutputControl()
- * o Output label, control, hint, help, and alert in order specified by properties
+ * - Give the handler a chance to do some prep work: prepareHandler()
+ * - Get custom information: addCustomClasses()
+ * - Check whether the control wants any output at all: isMustOutputControl()
+ * - Output label, control, hint, help, and alert in order specified by properties
  *
  * Outputting the control is split into two parts: handleControlStart() and handleControlEnd(). In most cases, only
  * handleControlStart() is used, but container controls will use handleControlEnd().
@@ -44,7 +44,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
 	private XFormsControlLifecycleHandlerDelegate xFormsControlLifecycleHandlerDelegate;
 	private Attributes attributes;
-    
+
     private String[] endConfig;
     private String containingElementQName;
 
@@ -68,7 +68,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         }
         return containingElementQName;
     }
-    
+
 	protected boolean isTemplate() {
 		return xFormsControlLifecycleHandlerDelegate.isTemplate();
 	}

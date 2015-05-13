@@ -81,15 +81,15 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
             select1Handler.init(uri, localname, qName, attributes, elementAnalysis)
             select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
         } else {
-            // Create xh:span
+            
             val xhtmlPrefix = handlerContext.findXHTMLPrefix
-            val enclosingElementLocalname = "span"
-            val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
 
             // Create xh:input
             if (! isStaticReadonly(inputControl)) {
                 // Regular read-write mode
 
+                val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
+                
                 // Main input field
                 {
                     val inputIdName = getFirstInputEffectiveId(effectiveId)
@@ -193,7 +193,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
                 // Output static read-only value
                 if (isRelevantControl) {
                     val atts = List("class" → "xforms-field")
-                    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, enclosingElementLocalname, atts) {
+                    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", atts) {
                         val outputValue = inputControl.getReadonlyValue
                         if (outputValue ne null)
                             xmlReceiver.characters(outputValue.toCharArray, 0, outputValue.length)

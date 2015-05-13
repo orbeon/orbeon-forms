@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -27,17 +28,16 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
-    private static final String ENCLOSING_ELEMENT_NAME = "div";
-    private static final String RANGE_BACKGROUND_CLASS = "xforms-range-background";
-    private static final String RANGE_THUMB_CLASS = "xforms-range-thumb";
-
     public XFormsRangeHandler() {
         super(false);
     }
 
+    private static final String RANGE_BACKGROUND_CLASS = "xforms-range-background";
+    private static final String RANGE_THUMB_CLASS      = "xforms-range-thumb";
+
     @Override
     protected String getContainingElementName() {
-        return ENCLOSING_ELEMENT_NAME;
+        return "div";
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
@@ -47,8 +47,9 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
         // Create nested xhtml:div elements
         {
-            final String divName = getContainingElementName();
-            final String divQName = getContainingElementQName();
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String divName     = "div";
+            final String divQName    = XMLUtils.buildQName(xhtmlPrefix, divName);
 
             final AttributesImpl backgroundAttributes = getBackgroundAttributes(uri, localname, attributes, effectiveId, rangeControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, backgroundAttributes);

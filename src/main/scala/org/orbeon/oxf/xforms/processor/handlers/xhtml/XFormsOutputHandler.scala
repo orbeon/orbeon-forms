@@ -38,9 +38,6 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-output-output")
         containerAttributes
     }
-
-    // Don't use @for as we ae not pointing to an HTML control
-    override def getForEffectiveId(effectiveId: String) = null
 }
 
 // Default xf:output handler
@@ -63,10 +60,10 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
 
         val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
 
-        // Handle accessibility attributes on <span>
+        // Handle accessibility attributes on control element
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
 
-        withElement(handlerContext.findXHTMLPrefix, XHTML_NAMESPACE_URI, getContainingElementName, containerAttributes) {
+        withElement(handlerContext.findXHTMLPrefix, XHTML_NAMESPACE_URI, "output", containerAttributes) {
             if (isConcreteControl) {
                 val mediatypeValue = attributes.getValue("mediatype")
                 val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
@@ -100,7 +97,7 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
         // Handle accessibility attributes on <div>
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
 
-        withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, getContainingElementName, containerAttributes) {
+        withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "div", containerAttributes) {
             if (isConcreteControl) {
                 val mediatypeValue = attributes.getValue("mediatype")
                 val htmlValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
@@ -108,6 +105,9 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
             }
         }
     }
+
+    // Don't use @for as we are not pointing to an HTML control
+    override def getForEffectiveId(effectiveId: String) = null
 
     protected override def getContainingElementName: String = "div"
 }
@@ -141,6 +141,9 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
 
         element(xhtmlPrefix, XHTML_NAMESPACE_URI, "img", containerAttributes)
     }
+
+    // Don't use @for as we are not pointing to an HTML control
+    override def getForEffectiveId(effectiveId: String) = null
 }
 
 // xf:output[@appearance = 'xxf:text']
@@ -165,6 +168,9 @@ class XFormsOutputTextHandler extends XFormsControlLifecyleHandler(false) with X
                 contentHandler.characters(externalValue.toCharArray, 0, externalValue.length)
         }
     }
+
+    // Don't use @for as we are not pointing to an HTML control
+    override def getForEffectiveId(effectiveId: String) = null
 }
 
 // xf:output[@appearance = 'xxf:download']
@@ -236,4 +242,6 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
         }
     }
 
+    // Don't use @for as we are not pointing to an HTML control
+    override def getForEffectiveId(effectiveId: String) = null
 }

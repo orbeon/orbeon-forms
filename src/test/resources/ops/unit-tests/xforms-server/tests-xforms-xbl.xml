@@ -3486,7 +3486,7 @@
             <controls>
                 <xh:span id="my-foo≡foo-group" class="xforms-group">
                     <xh:span id="my-foo≡my-output" class="xforms-control xforms-output">
-                        <xh:span id="my-foo≡my-output≡≡c" class="xforms-output-output">Hello</xh:span>
+                        <xh:output id="my-foo≡my-output≡≡c" class="xforms-output-output">Hello</xh:output>
                     </xh:span>
                 </xh:span>
             </controls>
@@ -3714,7 +3714,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="[ #316295 ] XBL: var/sequence in different scope does not resolve repeat properly" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316295&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
@@ -3758,7 +3758,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="Visibility of outer variable from XBL content" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -4501,7 +4501,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dynamic≡my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic≡my-bar">&lt;span id="my-dynamic≡my-bar≡output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output2≡≡c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic≡my-bar≡output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output1≡≡c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:inner-html>
+                        <xxf:inner-html id="my-dynamic≡my-bar">&lt;span id="my-dynamic≡my-bar≡output2" class="xforms-control xforms-output"&gt;&lt;output id="my-dynamic≡my-bar≡output2≡≡c" class="xforms-output-output"&gt;Hello!&lt;/output&gt;&lt;/span&gt; &lt;span id="my-dynamic≡my-bar≡output1" class="xforms-control xforms-output"&gt;&lt;output id="my-dynamic≡my-bar≡output1≡≡c" class="xforms-output-output"&gt;42&lt;/output&gt;&lt;/span&gt;</xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

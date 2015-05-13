@@ -1070,9 +1070,17 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
                 }
 
-                // Update for attribute
-                if (element.htmlFor)
-                    element.htmlFor = ORBEON.util.Utils.appendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+                // Update for attribute (which can be an DOMSettableTokenList underneath in the case of <output>)
+                var jElement = $(element);
+                var jFor = jElement.attr('for');
+                if (! _.isUndefined(jFor)) {
+                    jElement.attr(
+                        'for',
+                        _.map(jFor.trim().split(/\s+/), function(s) {
+                            return ORBEON.util.Utils.appendRepeatSuffix(s, idSuffixWithDepth);
+                        }).join(' ')
+                    );
+                }
 
                 // Update name attribute
                 if (element.name) {
@@ -1581,17 +1589,18 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 return ORBEON.xforms.Page.getControl(control).getValue();
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-static"))) {
                 // Output and static input
-                if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                    var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                    return image.src;
-                } else if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
-                    // Download link doesn't really have a value
-                    return null;
-                } else if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
-                    return control.innerHTML;
-                } else {
-                    var spanWithValue = control.getElementsByTagName("span")[0];
-                    return ORBEON.util.Dom.getStringValue(spanWithValue);
+                var jControl = $(control);
+                var output = jControl.children(".xforms-output-output, .xforms-field").first();
+                if (output.length > 0) {
+                    if (jControl.is(".xforms-mediatype-image")) {
+                        return output[0].src;
+                    } else if (jControl.is(".xforms-output-appearance-xxforms-download")) {
+                        return null;
+                    } else if (jControl.is(".xforms-mediatype-text-html")) {
+                        return output[0].innerHTML;// NOTE: Used to be control.innerHTML, which seems wrong.
+                    } else {
+                        return ORBEON.util.Dom.getStringValue(output[0]);
+                    }
                 }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-range")) {
                 var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;

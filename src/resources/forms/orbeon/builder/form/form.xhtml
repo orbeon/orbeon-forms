@@ -556,6 +556,22 @@
                                     </xf:dispatch>
                                     <xf:action ev:event="fr-positive" type="xpath">fbf:deleteGridById(event('context'))</xf:action>
                                 </xf:trigger>
+                                <!-- Move up -->
+                                <xf:trigger tabindex="-1" appearance="minimal" id="grid-move-up-trigger" class="fb-grid-move-up-trigger">
+                                    <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{$fb-resources/move-up-icon/label}" title="{$fb-resources/move-up-icon/label}"/></xf:label>
+                                    <!-- Move section up -->
+                                    <xf:action ev:event="DOMActivate" type="xpath">
+                                        fbf:moveSectionUp(fbf:containerById(event('grid-id')))
+                                    </xf:action>
+                                </xf:trigger>
+                                <!-- Move down -->
+                                <xf:trigger tabindex="-1" appearance="minimal" id="grid-move-down-trigger" class="fb-grid-move-down-trigger">
+                                    <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{$fb-resources/move-down-icon/label}" title="{$fb-resources/move-down-icon/label}"/></xf:label>
+                                    <!-- Move section down -->
+                                    <xf:action ev:event="DOMActivate" type="xpath">
+                                        fbf:moveSectionDown(fbf:containerById(event('grid-id')))
+                                    </xf:action>
+                                </xf:trigger>
                                 <!-- Grid details -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>

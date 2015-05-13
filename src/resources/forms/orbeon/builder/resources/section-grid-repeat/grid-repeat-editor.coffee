@@ -37,8 +37,10 @@ $ ->
         deleteIcon = $ '.fb-delete-grid-trigger'
         detailsIcon = $ '.fb-grid-details-trigger'
         detailsHeight = _.memoize -> f$.height detailsIcon
+        moveUpIcon = $ '.fb-grid-move-up-trigger'
+        moveDownIcon = $ '.fb-grid-move-down-trigger'
         Builder.currentContainerChanged gridsCache,
-            wasCurrent: -> _.each [deleteIcon, detailsIcon], (i) -> f$.hide i
+            wasCurrent: -> _.each [deleteIcon, detailsIcon, moveUpIcon, moveDownIcon], (i) -> f$.hide i
             becomesCurrent: (grid) ->
                 table = f$.find '.fr-grid', grid.el
                 if f$.is '.fb-can-delete-grid', table
@@ -54,6 +56,18 @@ $ ->
                         top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Builder.scrollTop()
                         left: grid.offset.left
                     f$.offset offset, detailsIcon
+                if true
+                    f$.show moveUpIcon
+                    offset =
+                        top:  grid.offset.top - Builder.scrollTop()
+                        left: grid.offset.left - 40
+                    f$.offset offset, moveUpIcon
+                if true
+                    f$.show moveDownIcon
+                    offset =
+                        top:  grid.offset.top - Builder.scrollTop()
+                        left: grid.offset.left - 20
+                    f$.offset offset, moveDownIcon
 
     # Position icons do add/remove columns/rows
     do ->

@@ -22,6 +22,7 @@ import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.webapp.SessionExpiredException;
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -717,7 +718,15 @@ public class XFormsServer extends ProcessorImpl {
                     } else if (afterFocusEffectiveId != null && ! afterFocusEffectiveId.equals(beforeFocusEffectiveId)) {
 
                         // There is a focused control and it is different from the focus as known by the client
-                        outputFocusInfo(ch, containingDocument, true, afterFocusEffectiveId);
+
+                        final boolean isComponentWithFocus =
+                            afterFocusedControl.staticControl() instanceof ComponentControl &&
+                                ((ComponentControl) afterFocusedControl.staticControl()).binding().abstractBinding().modeFocus();
+
+                        // Don't tell the client if we are a component which handles focus on its own
+                        // See https://github.com/orbeon/orbeon-forms/issues/1864
+                        if (! isComponentWithFocus)
+                            outputFocusInfo(ch, containingDocument, true, afterFocusEffectiveId);
                     }
                 }
 

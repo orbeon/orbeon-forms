@@ -123,10 +123,10 @@ public interface ExternalContext {
         /**
          * Set expiration headers for resources.
          *
-         * o If lastModified is > 0, Last-Modified is set to that value
-         * o If lastModified is <= 0, Last-Modified and Expires are set to the time of the response
-         * o If expires is > 0 and lastModified is > 0, Expires is set to that value
-         * o If expires is <= 0 , Expires is set using the default policy: 1/10 of the age of the resource
+         * - If lastModified is > 0, Last-Modified is set to that value
+         * - If lastModified is <= 0, Last-Modified and Expires are set to the time of the response
+         * - If expires is > 0 and lastModified is > 0, Expires is set to that value
+         * - If expires is <= 0 , Expires is set using the default policy: 1/10 of the age of the resource
          *
          * @param lastModified  last modification date of resource, or <= 0 if unknown
          * @param expires       requested expiration, or <=0 if unknown or to trigger default policy

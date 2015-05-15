@@ -264,7 +264,10 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             if (logger.isDebugEnabled) {
                 val astDocumentHandler = new ASTDocumentHandler
                 ast.walk(astDocumentHandler)
-                debug("created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + domToPrettyString(astDocumentHandler.getDocument))))
+                debug(
+                    "created PFC pipeline",
+                    Seq("path" → page.path, "pipeline" → ('\n' + domToPrettyString(astDocumentHandler.getDocument)))
+                )
             }
 
             PipelineProcessor.createConfigFromAST(ast)
@@ -380,41 +383,47 @@ object PageFlowControllerProcessor {
     sealed trait RouteElement { def id: Option[String]; def path: String; def pattern: Pattern }
 
     case class FileElement(
-            id: Option[String],
-            path: String,
-            pattern: Pattern,
-            mimeType: Option[String],
-            versioned: Boolean)
-        extends RouteElement
+        id                : Option[String],
+        path              : String,
+        pattern           : Pattern,
+        mimeType          : Option[String],
+        versioned         : Boolean
+    ) extends RouteElement
 
     case class PageOrServiceElement(
-            id: Option[String],
-            path: String,
-            pattern: Pattern,
-            defaultSubmission: Option[String],
-            model: Option[String],
-            view: Option[String],
-            element: Element,
-            publicMethods: String ⇒ Boolean,
-            isPage: Boolean)
-        extends RouteElement
+        id                : Option[String],
+        path              : String,
+        pattern           : Pattern,
+        defaultSubmission : Option[String],
+        model             : Option[String],
+        view              : Option[String],
+        element           : Element,
+        publicMethods     : String ⇒ Boolean,
+        isPage            : Boolean
+    ) extends RouteElement
 
     object FileElement {
         // id?, path-info?, matcher?, mime-type?, versioned?
         def apply(e: Element, defaultMatcher: QName, defaultVersioned: Boolean): FileElement = {
             val path = getPath(e)
             FileElement(
-                idAtt(e),
-                path,
-                compilePattern(e, path, defaultMatcher),
-                att(e, "mediatype") orElse att(e, "mime-type"), // @mime-type for backward compatibility
-                att(e, "versioned") map (_ == "true") getOrElse defaultVersioned)
+                id        = idAtt(e),
+                path      = path,
+                pattern   = compilePattern(e, path, defaultMatcher),
+                mimeType  = att(e, "mediatype") orElse att(e, "mime-type"), // @mime-type for backward compatibility
+                versioned = att(e, "versioned") map (_ == "true") getOrElse defaultVersioned
+            )
         }
     }
 
     object PageOrServiceElement {
         // id?, path-info, matcher?, default-submission?, model?, view?, public-methods?
-        def apply(e: Element, defaultMatcher: QName, defaultPagePublicMethods: Set[String], defaultServicePublicMethods: Set[String]): PageOrServiceElement = {
+        def apply(
+            e                           : Element,
+            defaultMatcher              : QName,
+            defaultPagePublicMethods    : Set[String],
+            defaultServicePublicMethods : Set[String]
+        ): PageOrServiceElement = {
 
             val isPage = e.getName == "page"
 
@@ -427,27 +436,40 @@ object PageFlowControllerProcessor {
 
             val path = getPath(e)
             PageOrServiceElement(
-                idAtt(e),
-                path,
-                compilePattern(e, path, defaultMatcher),
-                att(e, "default-submission"),
-                att(e, "model"),
-                att(e, "view"),
-                e,
-                localPublicMethods getOrElse defaultPublicMethods,
-                isPage)
+                id                = idAtt(e),
+                path              = path,
+                pattern           = compilePattern(e, path, defaultMatcher),
+                defaultSubmission = att(e, "default-submission"),
+                model             = att(e, "model"),
+                view              = att(e, "view"),
+                element           = e,
+                publicMethods     = localPublicMethods getOrElse defaultPublicMethods,
+                isPage            = isPage
+            )
         }
     }
 
     // Routes
     sealed trait Route {
         def routeElement: RouteElement
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, authorize: Boolean = true)(implicit logger: IndentedLogger)
+        def process(
+            pc            : PipelineContext,
+            ec            : ExternalContext,
+            matchResult   : MatchResult,
+            mustAuthorize : Boolean = true)(implicit
+            logger        : IndentedLogger
+        )
     }
 
     case class FileRoute(routeElement: FileElement) extends Route with Logging {
         // Serve a file by path
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, authorize: Boolean = true)(implicit logger: IndentedLogger) = {
+        def process(
+            pc            : PipelineContext,
+            ec            : ExternalContext,
+            matchResult   : MatchResult,
+            mustAuthorize : Boolean = true)(implicit
+            logger        : IndentedLogger
+        ) = {
             debug("processing route", Seq("route" → this.toString))
             if (ec.getRequest.getMethod == "GET")
                 ResourceServer.serveResource(ec.getRequest.getRequestPath, routeElement.versioned)
@@ -457,9 +479,10 @@ object PageFlowControllerProcessor {
     }
 
     case class PageOrServiceRoute(
-            routeElement: PageOrServiceElement,
-            compile: PageOrServiceElement ⇒ PipelineConfig)(implicit val propertySet: PropertySet)
-        extends Route with Authorization with Logging {
+        routeElement    : PageOrServiceElement,
+        compile         : PageOrServiceElement ⇒ PipelineConfig)(implicit
+        val propertySet : PropertySet
+    ) extends Route with Authorization with Logging {
 
         val isPage    = routeElement.isPage
         val isService = ! isPage
@@ -468,7 +491,13 @@ object PageFlowControllerProcessor {
         lazy val pipelineConfig = compile(routeElement)
 
         // Run a page
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, mustAuthorize: Boolean = true)(implicit logger: IndentedLogger) = {
+        def process(
+            pc            : PipelineContext,
+            ec            : ExternalContext,
+            matchResult   : MatchResult,
+            mustAuthorize : Boolean = true)(implicit
+            logger        : IndentedLogger
+        ) = {
 
             debug("processing route", Seq("route" → this.toString))
 
@@ -511,12 +540,13 @@ object PageFlowControllerProcessor {
     def unauthorized() = throw new HttpStatusCodeException(403)
 
     case class PageFlow(
-        routes: Seq[Route],
-        notFoundRoute: Option[PageOrServiceRoute],
-        unauthorizedRoute: Option[PageOrServiceRoute],
-        errorRoute: Option[PageOrServiceRoute],
-        pathMatchers: Seq[PathMatcher],
-        file: Option[String])
+        routes            : Seq[Route],
+        notFoundRoute     : Option[PageOrServiceRoute],
+        unauthorizedRoute : Option[PageOrServiceRoute],
+        errorRoute        : Option[PageOrServiceRoute],
+        pathMatchers      : Seq[PathMatcher],
+        file              : Option[String]
+    )
 
     def att(e: Element, name: String) = Option(e.attributeValue(name))
     def idAtt(e: Element) = att(e, "id")
@@ -529,5 +559,8 @@ object PageFlowControllerProcessor {
 
     // Compile and convert glob expression if needed
     def compilePattern(e: Element, path: String, default: QName) =
-        RegexpMatcher.compilePattern(path, glob = ! RegexpQNames(Option(extractAttributeValueQName(e, MatcherProperty)) getOrElse default))
+        RegexpMatcher.compilePattern(
+            path,
+            glob = ! RegexpQNames(Option(extractAttributeValueQName(e, MatcherProperty)) getOrElse default)
+        )
 }

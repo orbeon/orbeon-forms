@@ -25,9 +25,9 @@ import org.orbeon.oxf.util.DateUtils
 
 // Request wrapper for forwarding a request which simulates a server-side redirect.
 class ForwardServletRequestWrapper(
-        request: HttpServletRequest,
-        pathQuery: String)
-    extends BaseServletRequestWrapper(request)
+    request   : HttpServletRequest,
+    pathQuery : String
+) extends BaseServletRequestWrapper(request)
     with RequestPathQuery
     with RequestRemoveHeaders
     with RequestEmptyBody {

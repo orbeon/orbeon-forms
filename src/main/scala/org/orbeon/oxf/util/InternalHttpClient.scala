@@ -88,6 +88,10 @@ object InternalHttpClient extends HttpClient {
                 )
             )
 
+            // NOTE: It is unclear which headers should be passed upon redirect. For example, if we have a User-Agent
+            // header coming from the browser, it should be kept. But headers associated with content, such as
+            // Content-Type and Content-Length, must not be provided upon redirect. Possibly, only headers  coming from
+            // the incoming request should be passed, minus content headers.
             response.serverSideRedirect match {
                 case Some(location) ⇒ processRedirects(location, "GET", Map.empty, None)
                 case None           ⇒ response

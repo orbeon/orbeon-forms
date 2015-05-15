@@ -782,11 +782,6 @@
         <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>
     </processor>
 
-    <!-- Third-party processors -->
-    <processor name="tao:from-pdf-converter" xmlns:tao="http://www.taoconsulting.biz/ops/processors">
-        <class name="biz.taoconsulting.oxf.processor.converter.FromPdfConverter"/>
-    </processor>
-
     <!-- Include in the end so it's possible to override, see: https://github.com/orbeon/orbeon-forms/issues/447 -->
 
     <!-- Include user definitions. By default an empty file is present in packaged resources, and can be overridden. -->

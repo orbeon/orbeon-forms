@@ -21,6 +21,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.portlet.OrbeonPortlet
 import org.orbeon.oxf.servlet.OrbeonServlet
 
+import scala.annotation.tailrec
+
 // HTTP client for internal requests
 //
 // - no actual HTTP requests are performed
@@ -46,37 +48,53 @@ object InternalHttpClient extends HttpClient {
         val incomingExternalContext = NetUtils.getExternalContext
         val incomingRequest         = incomingExternalContext.getRequest
 
-        val request =
-            new LocalRequest(
-                incomingRequest         = incomingRequest,
-                contextPath             = incomingRequest.getContextPath,
-                pathQuery               = url,
-                methodUpper             = method,
-                headersMaybeCapitalized = headers,
-                content                 = content
+        @tailrec
+        def processRedirects(
+            pathQuery : String,
+            method    : String,
+            headers   : Map[String, List[String]],
+            content   : Option[StreamedContent]
+        ): LocalResponse = {
+
+            val request =
+                new LocalRequest(
+                    incomingRequest         = incomingRequest,
+                    contextPath             = incomingRequest.getContextPath,
+                    pathQuery               = pathQuery,
+                    methodUpper             = method,
+                    headersMaybeCapitalized = headers,
+                    content                 = content
+                )
+
+            // Honor Orbeon-Client header (see also ServletExternalContext)
+            val urlRewriter =
+                Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
+                    case Some(client) if EmbeddedClientValues(client) ⇒
+                        new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
+                    case Some(client) ⇒
+                        new ServletURLRewriter(request)
+                    case None ⇒
+                        incomingExternalContext.getResponse: URLRewriter
+                }
+
+            val response = new LocalResponse(urlRewriter)
+
+            currentServletPortlet.processorService.service(
+                new PipelineContext,
+                new LocalExternalContext(
+                    incomingExternalContext.getWebAppContext,
+                    request,
+                    response
+                )
             )
-        
-        // Honor Orbeon-Client header (see also ServletExternalContext)
-        val urlRewriter =
-            Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
-                case Some(client) if EmbeddedClientValues(client) ⇒
-                    new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
-                case Some(client) ⇒
-                    new ServletURLRewriter(request)
-                case None ⇒
-                    incomingExternalContext.getResponse: URLRewriter
+
+            response.serverSideRedirect match {
+                case Some(location) ⇒ processRedirects(location, "GET", Map.empty, None)
+                case None           ⇒ response
             }
+        }
 
-        val response = new LocalResponse(urlRewriter)
-
-        currentServletPortlet.processorService.service(
-            new PipelineContext,
-            new LocalExternalContext(
-                incomingExternalContext.getWebAppContext,
-                request,
-                response
-            )
-        )
+        val response = processRedirects(url, method, headers, content)
 
         new HttpResponse {
             lazy val statusCode   = response.statusCode

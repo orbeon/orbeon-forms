@@ -24,8 +24,9 @@ import scala.collection.mutable
 
 class LocalResponse(rewriter: URLRewriter) extends Response {
 
-    private var _statusCode  = 200
-    private var _lowerCaseHeaders = mutable.LinkedHashMap[String, List[String]]()
+    private var _statusCode                         = 200
+    private var _serverSideRedirect: Option[String] = None
+    private var _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
 
     private var _stringWriter: StringBuilderWriter        = null
     private var _printWriter : PrintWriter                = null
@@ -33,6 +34,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
     private var _inputStream : InputStream                = null
 
     def statusCode = _statusCode
+    def serverSideRedirect = _serverSideRedirect
 
     def capitalizedHeaders =
         _lowerCaseHeaders.toList map
@@ -101,7 +103,13 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
     def sendError(sc: Int): Unit =
         this._statusCode = sc
 
-    def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) = () // NIY
+    def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) =
+        if (isServerSide) {
+            this._serverSideRedirect = Some(location)
+        } else {
+            this._statusCode = 302
+            setHeader(Headers.LocationLower, location)
+        }
 
     def setPageCaching(lastModified: Long) = () // Q: Should set headers?
     def setResourceCaching(lastModified: Long, expires: Long) = () // Q: Should set headers?

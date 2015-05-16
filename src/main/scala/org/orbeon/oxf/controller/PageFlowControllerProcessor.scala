@@ -51,23 +51,23 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
         // Get or compile page flow
         val pageFlow = readCacheInputAsObject(pc, getInputByName(ControllerInput), new CacheableInputReader[PageFlow] {
-            def read(context: PipelineContext, input: ProcessorInput) = {
-                val configRoot = readInputAsDOM4J(pc, ControllerInput).getRootElement
-                val controllerValidity = ProcessorImpl.getInputValidity(pc, getInputByName(ControllerInput))
-                compile(configRoot, controllerValidity)
-            }
+            def read(context: PipelineContext, input: ProcessorInput) =
+                compile(
+                    configRoot         = readInputAsDOM4J(pc, ControllerInput).getRootElement,
+                    controllerValidity = ProcessorImpl.getInputValidity(pc, getInputByName(ControllerInput))
+                )
         })
 
         // Run it
-        val ec = NetUtils.getExternalContext
+        val ec      = NetUtils.getExternalContext
         val request = ec.getRequest
-        val path = request.getRequestPath
-        val method = request.getMethod
+        val path    = request.getRequestPath
+        val method  = request.getMethod
 
         lazy val logParams = Seq("controller" → pageFlow.file.orNull, "method" → method, "path" → path)
 
-        // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
-        // oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
+        // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g.
+        // by oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
         // actually know what a "resource" is.
         if (pageFlow.pathMatchers.nonEmpty) {
             Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[PathMatcher]]) match {
@@ -155,7 +155,13 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         }
 
         // Run the first matching entry if any
-        pageFlow.routes.iterator map (route ⇒ route → MatchResult(route.routeElement.pattern, path)) find (_._2.matches) match {
+        val routOpt = (
+            pageFlow.routes.iterator
+            map  (route ⇒ route → MatchResult(route.routeElement.pattern, path))
+            find (_._2.matches)
+        )
+
+        routOpt match {
             case Some((route: FileRoute, matchResult)) ⇒
                 // Run the given route and let the caller handle errors
                 debug("processing file", logParams)
@@ -166,12 +172,18 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 try route.process(pc, ec, matchResult)
                 catch { case NonFatal(t) ⇒
                     getRootThrowable(t) match {
-                        case e: HttpRedirectException                            ⇒ ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
-                        // We don't have a "deleted" route at this point, and thus run the not found route when we found a "resource" to be deleted
-                        case e: HttpStatusCodeException if Set(404, 410)(e.code) ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
-                        case e: ResourceNotFoundException                        ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-                        case e                                                   ⇒ if (route.isPage) runErrorRoute(t)          else sendError(t)
+                        case e: HttpRedirectException ⇒
+                            ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
+                        // We don't have a "deleted" route at this point, and thus run the not found route when we
+                        // found a "resource" to be deleted
+                        case e: HttpStatusCodeException if Set(404, 410)(e.code) ⇒
+                            if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒
+                            if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
+                        case e: ResourceNotFoundException ⇒
+                            if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                        case e ⇒
+                            if (route.isPage) runErrorRoute(t)          else sendError(t)
                     }
                 }
             case None ⇒
@@ -198,66 +210,105 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         def controllerProperty(name: String, default: Option[String] = None, allowEmpty: Boolean = false) =
             att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
 
-        def controllerPropertyQName(name: String, default: Option[QName] = None) =
-            Option(extractAttributeValueQName(configRoot, name)) orElse Option(properties.getQName(name, default.orNull))
+        def controllerPropertyQName(name: String, default: Option[QName]) =
+            Option(extractAttributeValueQName(configRoot, name)) orElse
+                Option(properties.getQName(name, default.orNull))
 
-        val defaultMatcher              = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
-        val defaultInstancePassing      = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
+        val defaultMatcher         = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
+        val defaultInstancePassing = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
 
         // For these, make sure setting the property to a blank value doesn't cause the default to be used
         // See: https://github.com/orbeon/orbeon-forms/issues/865
-        val defaultPagePublicMethods    = stringOptionToSet(controllerProperty(PagePublicMethodsProperty, Some(PagePublicMethods mkString " "), allowEmpty = true))
-        val defaultServicePublicMethods = stringOptionToSet(controllerProperty(ServicePublicMethodsProperty, Some(ServicePublicMethods mkString " "), allowEmpty = true))
+        val defaultPagePublicMethods =
+            stringOptionToSet(
+                controllerProperty(
+                    PagePublicMethodsProperty,
+                    Some(PagePublicMethods mkString " "),
+                    allowEmpty = true
+                )
+            )
+
+        val defaultServicePublicMethods =
+            stringOptionToSet(
+                controllerProperty(
+                    ServicePublicMethodsProperty,
+                    Some(ServicePublicMethods mkString " "),
+                    allowEmpty = true
+                )
+            )
 
         // NOTE: We use a global property, not an oxf:page-flow scoped one
         val defaultVersioned =
             att(configRoot, "versioned") map (_.toBoolean) getOrElse isResourcesVersioned
 
         // NOTE: We support a null epilogue value and the pipeline then uses a plain HTML serializer
-        val epilogueElement = configRoot.element("epilogue")
-        val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty)
+        val epilogueElement =
+            configRoot.element("epilogue")
+
+        val epilogueURL =
+            Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty)
 
         val topLevelElements = Dom4j.elements(configRoot)
 
          // Prepend a synthetic page for submissions if configured
-        val syntheticRoutes: Seq[RouteElement] =
+        val syntheticRoutes: List[RouteElement] =
             (controllerProperty(SubmissionPathProperty), controllerProperty(SubmissionModelProperty)) match {
                 case (Some(submissionPath), submissionModel @ Some(_)) ⇒
-                    Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), None, submissionModel, None, configRoot, SubmissionPublicMethods, isPage = true))
+                    List(
+                        PageOrServiceElement(
+                            id                = None,
+                            path              = submissionPath,
+                            pattern           = Pattern.compile(submissionPath),
+                            defaultSubmission = None,
+                            model             = submissionModel,
+                            view              = None,
+                            element           = configRoot,
+                            publicMethods     = SubmissionPublicMethods,
+                            isPage            = true
+                        )
+                    )
                 case _ ⇒
-                    Seq()
+                    Nil
             }
 
         val explicitRoutes: Seq[RouteElement] =
             for (e ← topLevelElements filter (e ⇒ Set("files", "page", "service")(e.getName)))
                 yield e.getName match {
-                    case "files"            ⇒ FileElement(e, defaultMatcher, defaultVersioned)
-                    case "page" | "service" ⇒ PageOrServiceElement(e, defaultMatcher, defaultPagePublicMethods, defaultServicePublicMethods)
+                    case "files" ⇒
+                        FileElement(e, defaultMatcher, defaultVersioned)
+                    case "page" | "service" ⇒
+                        PageOrServiceElement(e, defaultMatcher, defaultPagePublicMethods, defaultServicePublicMethods)
                 }
 
         val routeElements = syntheticRoutes ++ explicitRoutes
 
-        val pagesElementsWithIds = routeElements collect { case page: PageOrServiceElement if page.id.isDefined ⇒ page }
-        val pathIdToPath              = pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap
-        val pageIdToSetvaluesDocument = pagesElementsWithIds map (p ⇒ p.id.get → getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
+        val pagesElementsWithIds =
+            routeElements collect { case page: PageOrServiceElement if page.id.isDefined ⇒ page }
 
-        val pathMatchers =
-            routeElements collect
-            { case files: FileElement if files.versioned ⇒ files } map
-            (f ⇒ new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+        val pathIdToPath =
+            pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap
+
+        val pageIdToSetValuesDocument =
+            pagesElementsWithIds map (p ⇒ p.id.get → getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
+
+        val pathMatchers = (
+            routeElements
+            collect { case files: FileElement if files.versioned ⇒ files }
+            map     (f ⇒ new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+        )
 
         // Compile the pipeline for the given page element
         def compile(page: PageOrServiceElement) = {
             val ast = createPipelineAST(
-                page.element,
-                controllerValidity,
-                stepProcessorContext,
-                urlBase,
-                defaultInstancePassing,
-                epilogueURL,
-                epilogueElement,
-                pathIdToPath.asJava,
-                pageIdToSetvaluesDocument.asJava
+                element                   = page.element,
+                controllerValidity        = controllerValidity,
+                stepProcessorContext      = stepProcessorContext,
+                urlBase                   = urlBase,
+                globalInstancePassing     = defaultInstancePassing,
+                epilogueURL               = epilogueURL,
+                epilogueElement           = epilogueElement,
+                pageIdToPathInfo          = pathIdToPath.asJava,
+                pageIdToSetValuesDocument = pageIdToSetValuesDocument.asJava
             )
 
             // For debugging
@@ -283,8 +334,9 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
         // Find a handler route
         def handler(elementNames: Set[String]) =
-            topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
-                { pageId ⇒ routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id.contains(pageId) ⇒ page } }
+            topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap { pageId ⇒
+                routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id.contains(pageId) ⇒ page }
+            }
 
         PageFlow(
             routes,
@@ -297,15 +349,15 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     }
 
     def createPipelineAST(
-            element                  : Element,
-            controllerValidity       : AnyRef,
-            stepProcessorContext     : StepProcessorContext,
-            urlBase                  : String,
-            globalInstancePassing    : String,
-            epilogueURL              : Option[String],
-            epilogueElement          : Element,
-            pageIdToPathInfo         : JMap[String, String],
-            pageIdToSetvaluesDocument: JMap[String, Document]
+        element                   : Element,
+        controllerValidity        : AnyRef,
+        stepProcessorContext      : StepProcessorContext,
+        urlBase                   : String,
+        globalInstancePassing     : String,
+        epilogueURL               : Option[String],
+        epilogueElement           : Element,
+        pageIdToPathInfo          : JMap[String, String],
+        pageIdToSetValuesDocument : JMap[String, Document]
      ): ASTPipeline =
         new ASTPipeline {
 
@@ -329,7 +381,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 epilogueModelData,
                 epilogueInstance,
                 pageIdToPathInfo,
-                pageIdToSetvaluesDocument,
+                pageIdToSetValuesDocument,
                 globalInstancePassing
             )
 
@@ -525,13 +577,13 @@ object PageFlowControllerProcessor {
 
         self: PageOrServiceRoute ⇒
 
-        // Require authorization based on whether the request method is considered publicly accessible or not. If it is
-        // public, then authorization does not take place.
+        // Require authorization based on whether the request method is considered publicly accessible or not. If it
+        // is public, then authorization does not take place.
         def requireAuthorization(request: Request) =
             ! routeElement.publicMethods(request.getMethod)
 
-        // Authorize the incoming request. Throw an HttpStatusCodeException if the request requires authorization based
-        // on the request method, and is not authorized (with a token or via an authorizer service).
+        // Authorize the incoming request. Throw an HttpStatusCodeException if the request requires authorization
+        // based on the request method, and is not authorized (with a token or via an authorizer service).
         def authorize(ec: ExternalContext)(implicit logger: IndentedLogger) =
             if (requireAuthorization(ec.getRequest) && ! Authorizer.authorized(ec))
                 unauthorized()

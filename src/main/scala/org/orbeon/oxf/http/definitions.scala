@@ -22,20 +22,20 @@ import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.immutable.Seq
 
 trait Content {
-    def inputStream  : InputStream
-    def contentType  : Option[String]
-    def contentLength: Option[Long]
-    def title        : Option[String] // this is only for portlet and should be moved out
+    def inputStream   : InputStream
+    def contentType   : Option[String]
+    def contentLength : Option[Long]
+    def title         : Option[String] // this is only for portlet and should be moved out
 }
 
 sealed trait StreamedContentOrRedirect
 sealed trait BufferedContentOrRedirect
 
 case class StreamedContent(
-    inputStream  : InputStream,
-    contentType  : Option[String],
-    contentLength: Option[Long],
-    title        : Option[String]
+    inputStream   : InputStream,
+    contentType   : Option[String],
+    contentLength : Option[Long],
+    title         : Option[String]
 ) extends StreamedContentOrRedirect with Content {
     def close() = runQuietly(inputStream.close())
 }
@@ -67,9 +67,9 @@ object StreamedContent {
 }
 
 case class BufferedContent(
-    body         : Array[Byte],
-    contentType  : Option[String],
-    title        : Option[String]
+    body        : Array[Byte],
+    contentType : Option[String],
+    title       : Option[String]
 ) extends BufferedContentOrRedirect with Content {
     def inputStream   = new ByteArrayInputStream(body)
     def contentLength = Some(body.size)
@@ -88,28 +88,28 @@ case class Redirect(
 }
 
 case class HttpClientSettings(
-    staleCheckingEnabled: Boolean,
-    soTimeout           : Int,
-    chunkRequests       : Boolean,
+    staleCheckingEnabled : Boolean,
+    soTimeout            : Int,
+    chunkRequests        : Boolean,
 
-    proxyHost           : Option[String],
-    proxyPort           : Option[Int],
-    proxyExclude        : Option[String],
+    proxyHost            : Option[String],
+    proxyPort            : Option[Int],
+    proxyExclude         : Option[String],
 
-    sslHostnameVerifier : String,
-    sslKeystoreURI      : Option[String],
-    sslKeystorePassword : Option[String],
-    sslKeystoreType     : Option[String],
+    sslHostnameVerifier  : String,
+    sslKeystoreURI       : Option[String],
+    sslKeystorePassword  : Option[String],
+    sslKeystoreType      : Option[String],
 
-    proxySSL            : Boolean,
-    proxyUsername       : Option[String],
-    proxyPassword       : Option[String],
-    proxyNTLMHost       : Option[String],
-    proxyNTLMDomain     : Option[String]
+    proxySSL             : Boolean,
+    proxyUsername        : Option[String],
+    proxyPassword        : Option[String],
+    proxyNTLMHost        : Option[String],
+    proxyNTLMDomain      : Option[String]
 )
 
 object HttpClientSettings {
-    
+
     def apply(param: String ⇒ String): HttpClientSettings = {
 
         def booleanParamWithDefault(name: String, default: Boolean) =
@@ -135,12 +135,12 @@ object HttpClientSettings {
             proxyHost            = stringParam(ProxyHostProperty),
             proxyPort            = intParam(ProxyPortProperty),
             proxyExclude         = stringParam(ProxyExcludeProperty),
-  
+
             sslHostnameVerifier  = stringParamWithDefault(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
             sslKeystoreURI       = stringParam(SSLKeystoreURIProperty),
             sslKeystorePassword  = stringParam(SSLKeystorePasswordProperty),
             sslKeystoreType      = stringParam(SSLKeystoreTypeProperty),
-  
+
             proxySSL             = booleanParamWithDefault(ProxySSLProperty, ProxySSLPropertyDefault),
             proxyUsername        = stringParam(ProxyUsernameProperty),
             proxyPassword        = stringParam(ProxyPasswordProperty),
@@ -148,7 +148,7 @@ object HttpClientSettings {
             proxyNTLMDomain      = stringParam(ProxyNTLMDomainProperty)
         )
     }
-    
+
     val StaleCheckingEnabledProperty = "oxf.http.stale-checking-enabled"
     val SOTimeoutProperty            = "oxf.http.so-timeout"
     val ChunkRequestsProperty        = "oxf.http.chunk-requests"
@@ -164,7 +164,7 @@ object HttpClientSettings {
     val ProxyPasswordProperty        = "oxf.http.proxy.password"
     val ProxyNTLMHostProperty        = "oxf.http.proxy.ntlm.host"
     val ProxyNTLMDomainProperty      = "oxf.http.proxy.ntlm.domain"
-    
+
     val StaleCheckingEnabledDefault  = true
     val SOTimeoutPropertyDefault     = 0
     val ChunkRequestsDefault         = false
@@ -197,12 +197,12 @@ trait HttpResponse {
 
 trait HttpClient {
     def connect(
-        url        : String,
-        credentials: Option[Credentials],
-        cookieStore: org.apache.http.client.CookieStore,
-        method     : String,
-        headers    : Map[String, List[String]],
-        content    : Option[StreamedContent]
+        url         : String,
+        credentials : Option[Credentials],
+        cookieStore : org.apache.http.client.CookieStore,
+        method      : String,
+        headers     : Map[String, List[String]],
+        content     : Option[StreamedContent]
     ): HttpResponse
 
     def shutdown(): Unit

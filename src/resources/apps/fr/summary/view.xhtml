@@ -443,7 +443,17 @@
                     <xf:group class="fr-summary-search">
 
                         <!-- Search also when user presses "enter" in a field -->
-                        <xf:dispatch ev:event="DOMActivate" name="fr-reset-search" targetid="fr-form-model"/>
+                        <xf:dispatch
+                            ev:event="DOMActivate"
+                            name="fr-reset-search"
+                            targetid="fr-form-model"/>
+
+                        <!-- Search also when dropdown value changes -->
+                        <xf:dispatch
+                            ev:event="xforms-value-changed"
+                            ev:target="search-select1"
+                            name="fr-reset-search"
+                            targetid="fr-form-model"/>
 
                         <xf:switch id="search-switch">
                             <!-- Free-text search -->
@@ -532,7 +542,7 @@
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </xf:input>
                                             <!-- select1 -->
-                                            <xf:select1 ref=".[@control = 'select1']">
+                                            <xf:select1 ref=".[frf:isSingleSelectionControl(@control)]" id="search-select1">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                                 <xf:item>
                                                     <xf:label ref="$fr-resources/summary/labels/any"/>

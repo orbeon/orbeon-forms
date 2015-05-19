@@ -769,10 +769,20 @@
                 <exclude name="**/.git/**"/>
                 <exclude name="build"/>
                 <exclude name="build/**"/>
+                <exclude name="target"/>
+                <exclude name="target/**"/>
+                <exclude name="cache"/>
+                <exclude name="cache/**"/>
+                <exclude name="tmp"/>
+                <exclude name="tmp/**"/>
                 <exclude name="tools"/>
                 <exclude name="tools/**"/>
+                <exclude name="src/resources-local"/>
+                <exclude name="src/resources-local/**"/>
                 <!-- In case there were some temporary files left by the ProGuard tasks here -->
                 <exclude name="*.jar"/>
+                <!-- In case there are some leftover log files -->
+                <exclude name="*.log"/>
                 <!-- Not sure why JUnit outputs those here -->
                 <exclude name="junit*.properties"/>
                 <!-- Don't include a license with the source -->

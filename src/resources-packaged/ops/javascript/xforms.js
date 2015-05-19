@@ -1396,21 +1396,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
-             * Starts Firebug Lite if Firebug is not already available (as it is most of the time on Firefox)
-             */
-            startFirebugLite: function() {
-                if (! window.firebug) {
-                    var firebugScript = document.createElement("script");
-                    firebugScript.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');
-                    document.body.appendChild(firebugScript);
-                    (function(){
-                        if (window.firebug) firebug.init();
-                        else setTimeout(arguments.callee);
-                    })();
-                }
-            },
-
-            /**
              * Function to be call in every test to start the test when the page is loaded.
              *
              * You can pass one optional argument: the name of a test function (say 'testSomething'). If this argument is present, then

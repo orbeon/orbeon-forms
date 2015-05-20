@@ -15,6 +15,7 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
+    <xi:include href="oxf:/config/properties-internal.xml"/>
     <xi:include href="oxf:/config/properties-local.xml"/>
     <xi:include href="oxf:/config/properties-base.xml"/>
     <xi:include href="oxf:/config/properties-xforms.xml"/>

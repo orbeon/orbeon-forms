@@ -49,8 +49,6 @@
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
 
     <!-- XForms cache configuration -->
-    <property as="xs:string"  name="oxf.xforms.state-handling"                          value="server"/>
-    <property as="xs:boolean" name="oxf.xforms.cache.document"                          value="true"/>
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
@@ -89,14 +87,10 @@
     <property as="xs:string"  name="oxf.xforms.hint-element"                                value="span"/>
     <property as="xs:string"  name="oxf.xforms.help-element"                                value="span"/>
     <property as="xs:string"  name="oxf.xforms.alert-element"                               value="span"/>
-    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                            value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.local-submission-forward"                    value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.local-submission-include"                    value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.local-instance-include"                      value="false"/>
+
     <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="2000"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
-    <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
     <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="inline"/>
     <property as="xs:string"  name="oxf.xforms.help.appearance"                             value="dialog"/>
 
@@ -119,7 +113,6 @@
     <property as="xs:boolean" name="oxf.xforms.noscript"                                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.noscript-support"                            value="false"/>
     <property as="xs:string"  name="oxf.xforms.noscript-template"                           value="static"/>
-    <property as="xs:boolean" name="oxf.xforms.async-portlet-load"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
@@ -133,13 +126,8 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"        value="2000"/>
 
     <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                 value=""/>
-    <!-- default | deferred -->
-    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>
-    <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
-    <property as="xs:boolean" name="oxf.xforms.use-aria"                                    value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                               value="none"/>
 
@@ -147,51 +135,6 @@
     <property as="xs:string"  name="oxf.xforms.readonly-appearance.static.select1"          value="full"/>
 
     <property as="xs:string"  name="oxf.xforms.sanitize"                                    value=""/>
-
-    <!-- Whitespace handling for XForms documents -->
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                     value="normalize"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize">
-        xf|model,
-        xbl|xbl
-    </property>
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.preserve">
-        xf|instance > *,
-        xf|var,
-        xxf|var,
-        xf|variable,
-        xxf|variable,
-        exf|variable,
-        xf|setvalue,
-        xf|value,
-        xxf|sequence,
-        xxf|script,
-        xf|action[type=xpath],
-        xs|schema
-    </property>
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.collapse">
-        xf|label,
-        xf|help,
-        xf|hint,
-        xf|alert,
-        xf|message,
-        xbl|template,
-        xxbl|global
-    </property>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.default"                     value="normalize"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.normalize">
-        xh|html
-    </property>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.preserve">
-        xh|pre,
-        xh|textarea,
-        xh|script,
-        xh|style,
-        xh|template
-    </property>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.collapse">
-        xh|title,
-        xh|body
-    </property>
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
@@ -231,13 +174,12 @@
         http://orbeon.org/oxf/xml/form-runner
     </property>
 
-    <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
-    <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service">
         https://www.google.com/tbproxy/spell?lang=en&amp;hl=en
     </property>
 
-    <!--<property as="xs:NCName"  name="oxf.xforms.pipeline.trace.class"                        value="org.orbeon.oxf.processor.trace.StdOutTrace"/>-->
+    <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
+    <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
+    <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
 </properties>

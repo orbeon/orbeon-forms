@@ -64,23 +64,11 @@
     <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>
 
-    <!-- Properties to enable experimental MongoDB persistence -->
-    <!--<property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mongo"/>-->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.mongo.uri"                               value="/fr/service/mongo"/>
-
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
         /apps/fr/style/orbeon-navbar-logo.png
     </property>
-    <property as="xs:string"  name="oxf.fr.css.uri.*.*">
-        /apps/fr/style/form-runner-common.css
-        /apps/fr/style/form-runner-base.css
-        /apps/fr/style/form-runner-orbeon.css
-    </property>
     <property as="xs:string"  name="oxf.fr.css.custom.uri.*.*"                                  value=""/>
-    <property as="xs:string"  name="oxf.fr.js.uri.*.*">
-        /apps/fr/script/form-runner.js
-    </property>
     <property as="xs:string"  name="oxf.fr.js.custom.uri.*.*"                                   value=""/>
     <!-- "container" or "header" or empty -->
     <property as="xs:string"  name="oxf.fr.authentication.method"                               value=""/>
@@ -134,68 +122,6 @@
     <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                           value="5000"/>
     <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>
 
-    <!-- PDF template formatting -->
-    <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
-    <!-- NOTE: Can't use xxf:split() in these expressions yet (saxon:evaluate() doesn't find the functions). -->
-    <property as="xs:string"  name="oxf.fr.pdf.format.input-string">
-        .//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string()
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime">
-        string-join(.//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string(), ' ')
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.output-string">
-        .//*[tokenize(@class, '\s+') = 'xforms-output-output']/string()
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.textarea">
-        .//textarea/string()
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.select-label">
-        (.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)[1]/string()
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.select-value">
-        (.//option[@selected = 'selected'], .//input[@checked = 'checked'])[1]/@value/string()
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.select-labels-string">
-        string-join((.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)/string(), ' - ')
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.pdf.format.select-labels">
-        (.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)/string()
-    </property>
-    <property as="xs:string"  name="oxf.fr.pdf.format.select-values">
-        (.//option[@selected = 'selected'], .//input[@checked = 'checked'])/@value/string()
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.pdf.format.attachment-url">
-        (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-output' and not(tokenize(@class, '\s+') = 'xforms-disabled')]/
-           img[not(tokenize(@class, '\s+') = ('xforms-help', 'xforms-disabled')) and (tokenize(@class, '\s+') = 'xforms-output-output' or not(@id))]/@src)[1]/
-           string()[. != '/ops/images/xforms/spacer.gif']
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.pdf.format.attachment-metadata">
-        for $info in (.//*[@class = 'xforms-upload-info'])
-        return string-join($info/*[@class = ('xforms-upload-filename', 'xforms-upload-mediatype', 'xforms-upload-size')]/string()[normalize-space()], ', ')
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.pdf.format.fr-number">
-        .//*[tokenize(@class, '\s+') = 'xbl-fr-number-xforms-input']/input/@value/string()
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.*"                          value="input-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.date"                       value="input-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                       value="input-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.dateTime"                   value="input-dateTime"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.boolean"                    value="select-value"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-output.*"                         value="output-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-textarea.*"                       value="textarea"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                         value="select-labels-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                        value="select-label"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state"                             value="select-label"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"                    value="attachment-metadata"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"              value="attachment-url"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                             value="fr-number"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                           value="fr-number"/>
-
     <!-- PDF fonts -->
     <!-- Optional PDF font embedding. Specifying a family name is optional.
     <property as="xs:string"  name="oxf.fr.pdf.font.path.ID"                                    value=""/>
@@ -216,8 +142,6 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-xml.*.*"                                value="true"/>
 
     <!-- Configuration of built-in forms -->
-    <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                       value=""/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"            value="resource"/>
     <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="exist"/>
     <!-- Be specific, as user might change the default persistence layer -->
@@ -263,38 +187,6 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
-
-    <!-- Internal processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                      value='save'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"         value='abort'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*"       value='resume'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*">
-        save(draft = "true")
-    </property>
-
-    <!-- Reusable processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*"                      value='navigate("/")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*"                 value='navigate("/fr")'/>
-
-    <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*">
-        pending-uploads
-        recover (error-message("upload-in-progress") then success)
-    </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*">
-        visit-all
-        then captcha
-        then validate("error")
-        recover (visit-all then expand-all then error-message("form-validation-error") then success)
-    </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*">
-        validate("warning")
-        then validate("info")
-        recover (xf:show("fr-validation-dialog") then suspend)
-    </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.validate-all.*.*">
-        require-valid
-        then review-messages
-    </property>
 
     <!-- Button processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.home.*.*"                             value='orbeon-home'/>
@@ -386,59 +278,6 @@
     <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en es fr it de pt sv fi nl"/>
     <!-- For forms, don't restrict the list of languages by default: https://github.com/orbeon/orbeon-forms/issues/1223 -->
     <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="*"/>
-
-    <!-- Home page internal processes -->
-    <property as="xs:string"  name="oxf.fr.home.process.load-local">
-        xf:send("read-local-metadata")
-        then xf:dispatch("process-results")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.load-remote">
-        xf:send("read-remote-metadata")
-        then xf:dispatch("store-credentials")
-        recover ask-credentials
-        then load-local
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.ask-credentials">
-        xf:show("fr-credentials-dialog")
-        then suspend
-        then load-remote
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.credentials-ok">
-        resume
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.credentials-cancel">
-        abort then load-local
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.publish-local">
-        xf:dispatch("confirm-local-publish")    then suspend then xf:dispatch("local-publish")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.unpublish-local">
-        xf:dispatch("confirm-local-unpublish")  then suspend then xf:dispatch("local-unpublish")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.publish-remote">
-        xf:dispatch("confirm-remote-publish")   then suspend then xf:dispatch("remote-publish")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.unpublish-remote">
-        xf:dispatch("confirm-remote-unpublish") then suspend then xf:dispatch("remote-unpublish")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.local-to-remote">
-        xf:dispatch("confirm-local-to-remote")  then suspend then xf:dispatch("local-to-remote")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.remote-to-local">
-        xf:dispatch("confirm-remote-to-local")  then suspend then xf:dispatch("remote-to-local")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.upgrade-local">
-        xf:dispatch("confirm-local-upgrade")    then suspend then xf:dispatch("local-upgrade")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.upgrade-remote">
-        xf:dispatch("confirm-remote-upgrade")   then suspend then xf:dispatch("remote-upgrade")
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.confirmation-ok">
-        resume
-    </property>
-    <property as="xs:string"  name="oxf.fr.home.process.confirmation-cancel">
-        abort
-    </property>
 
     <!-- Service processes -->
     <property as="xs:string"  name="oxf.fr.service.duplicate.transform.*.*"                     value=""/>

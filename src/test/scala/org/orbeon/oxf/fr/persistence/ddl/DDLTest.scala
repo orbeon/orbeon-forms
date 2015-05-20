@@ -82,6 +82,8 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
                       |     FROM information_schema.columns
                       |    WHERE table_name = ?
                       | ORDER BY ordinal_position"""
+                case provider ⇒
+                    throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
             }
             Connect.getTableNames(provider, connection).map { tableName ⇒
                 val tableInfoResultSet = {

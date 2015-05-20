@@ -31,7 +31,7 @@ object DataMigration {
     def decodeMigrationsFromJSON(jsonMigrationMap: String): List[(String, String)] = {
 
         import spray.json._
-        val json = jsonMigrationMap.asJson
+        val json = jsonMigrationMap.parseJson
 
         val names =
             Iterator(json) collect {

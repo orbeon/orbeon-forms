@@ -62,7 +62,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
 
         def mySuccessAction(name: String)(params: ActionParams): Try[Any] = {
             _trace += name
-            Success()
+            Success(())
         }
     }
 

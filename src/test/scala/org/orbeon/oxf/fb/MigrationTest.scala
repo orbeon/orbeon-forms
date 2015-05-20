@@ -65,7 +65,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
             MigrationOps.buildGridMigrationMap(form, Some(toolbox), legacyGridsOnly = false)
 
         import spray.json._
-        assert(MigrationJSON.asJson === result.asJson)
+        assert(MigrationJSON.parseJson === result.parseJson)
     }
 
     val Data47: NodeInfo =

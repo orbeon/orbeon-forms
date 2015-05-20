@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.common
 
+import java.util.concurrent.ConcurrentHashMap
+
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
-import collection.mutable
+import java.{util ⇒ ju}
 
 class CEVersion extends Version {
 
@@ -28,9 +30,9 @@ class CEVersion extends Version {
 
     def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = {
         // Just warn the first time
-        if (featureRequested && ! WarnedFeatures(featureName)) {
+        if (featureRequested && ! WarnedFeatures.containsKey(featureName)) {
             logger.warn("Feature is not enabled in this version of the product: " + featureName)
-            WarnedFeatures.add(featureName)
+            WarnedFeatures.put(featureName, ())
         }
         false
     }
@@ -39,5 +41,5 @@ class CEVersion extends Version {
 }
 
 private object CEVersion {
-    val WarnedFeatures = new mutable.HashSet[String] with mutable.SynchronizedSet[String]
+    val WarnedFeatures: ju.Map[String, Unit] = new ConcurrentHashMap[String, Unit]
 }

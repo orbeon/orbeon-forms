@@ -265,7 +265,7 @@ trait ProcessInterpreter extends Logging {
     // Suspend the process
     def trySuspend(params: ActionParams): Try[Any] = Try {
         writeSuspendedProcess(serializeContinuation)
-        Success()
+        Success(())
     } flatMap
         (_ ⇒ trySuccess(EmptyActionParams))
 
@@ -286,7 +286,7 @@ trait ProcessInterpreter extends Logging {
 
     // Don't do anything
     def tryNop(params: ActionParams): Try[Any] =
-        Success()
+        Success(())
 
     def evaluateBoolean(expr: String, item: Item = xpathContext) =
         evaluateOne(

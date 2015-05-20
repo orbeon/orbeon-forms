@@ -29,7 +29,7 @@ object StringReplacer extends Logging {
         val mapping = nonEmptyOrNone(json) match {
             case Some(nonEmptyJSON) ⇒
                 try
-                    nonEmptyJSON.asJson match {
+                    nonEmptyJSON.parseJson match {
                         case JsObject(fields) ⇒
                             fields collect {
                                 case (k, v: JsString) ⇒ k → v.value

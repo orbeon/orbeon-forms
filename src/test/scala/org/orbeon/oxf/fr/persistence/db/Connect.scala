@@ -56,6 +56,8 @@ private[persistence] object Connect {
                 """SELECT table_name
                   |  FROM information_schema.tables
                   | WHERE table_name LIKE 'orbeon%'"""
+            case provider ⇒
+                throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
         }
         val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
         val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList

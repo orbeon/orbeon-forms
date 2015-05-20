@@ -41,14 +41,14 @@ trait ControlXMLDumpSupport extends DebugXML{
             "binding-position", bindingContext.position.toString,
             "scope", scope.scopeId
         ))
-        childrenActions foreach (_.toXML(helper, List.empty)())
+        childrenActions foreach (_.toXML(helper, List.empty)(()))
         content
         helper.endElement()
     }
 
     def toXML(helper: XMLReceiverHelper): Unit = {
         helper.startDocument()
-        toXML(helper, List.empty)()
+        toXML(helper, List.empty)(())
         helper.endDocument()
     }
 

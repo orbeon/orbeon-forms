@@ -52,7 +52,7 @@ trait XFormsContainerControl extends VisitableTrait {
     // Update this control's effective id and its descendants based on the parent's effective id
     override def updateEffectiveId(): Unit = {
         super.updateEffectiveId()
-        
+
         if (hasChildren)
             for (currentControl ← _children)
                 currentControl.updateEffectiveId()
@@ -90,7 +90,7 @@ trait XFormsContainerControl extends VisitableTrait {
 
     override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
         super.toXML(helper, attributes) {
-            children foreach (_.toXML(helper, List.empty)())
+            children foreach (_.toXML(helper, List.empty)(()))
         }
     }
 }

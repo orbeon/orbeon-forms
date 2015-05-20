@@ -97,8 +97,8 @@ public class UtilsTest extends TestCase {
 
             Document doc = result.getDocument();
             Element firstName = (Element) doc.createXPath("//firstname").selectNodes(doc).get(0);
-            assertEquals("Omar", firstName.getTextTrim());
-            assertEquals(17, ((LocationData) firstName.getData()).getLine());
+            assertEquals("Ada", firstName.getTextTrim());
+            assertEquals(4, ((LocationData) firstName.getData()).getLine());
 
             source = new LocationDocumentSource(doc);
             SAXResult saxResult = new SAXResult(new ForwardingXMLReceiver() {
@@ -112,7 +112,7 @@ public class UtilsTest extends TestCase {
 
                 public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
                     if ("firstname".equals(localname)) {
-                        assertEquals(17, locator.getLineNumber());
+                        assertEquals(4, locator.getLineNumber());
                         foundFirstName = true;
                     }
                 }
@@ -124,7 +124,7 @@ public class UtilsTest extends TestCase {
 
                 public void endElement(String uri, String localname, String qName) throws SAXException {
                     if ("firstname".equals(localname)) {
-                        assertEquals("Omar", buff.toString());
+                        assertEquals("Ada", buff.toString());
                     }
                 }
 

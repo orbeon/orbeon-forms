@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<group description="XPL" 
+<group description="XPL"
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
@@ -1122,8 +1122,8 @@
             <company>
                 <name>Orbeon</name>
                 <employee>
-                    <firstname>Omar</firstname>
-                    <lastname>Tazi</lastname>
+                    <firstname>Ada</firstname>
+                    <lastname>Lovelace</lastname>
                 </employee>
             </company>
         </output>
@@ -1190,7 +1190,7 @@
             <root>Hello, world!</root>
         </output>
     </test>
-    
+
     <test description="Redefinition of id in inner block" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -1241,7 +1241,7 @@
             <x/>
         </output>
     </test>
-    
+
     <test description="Output and serializer: pipeline, do read" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -1271,7 +1271,7 @@
             <x/>
         </output>
     </test>
-    
+
     <test description="Output and serializer: choose, no read" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -1297,7 +1297,7 @@
             <empty/>
         </output>
     </test>
-    
+
     <test description="Output and serializer: choose, do read" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">

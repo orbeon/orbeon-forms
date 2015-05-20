@@ -61,6 +61,6 @@ private[persistence] object Connect {
         }
         val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
         val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
-        tableNamesList ensuring (_.length > 0)
+        tableNamesList ensuring (_.nonEmpty)
     }
 }

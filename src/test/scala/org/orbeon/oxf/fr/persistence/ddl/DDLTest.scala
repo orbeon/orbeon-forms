@@ -99,7 +99,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
                     ColMeta(colName, colKeyVals)
                 }
                 val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
-                assert(colsMeta.length > 0)
+                assert(colsMeta.nonEmpty)
                 TableMeta(tableName, colsMeta)
             }.toSet
         }

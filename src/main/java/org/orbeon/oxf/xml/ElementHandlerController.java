@@ -43,7 +43,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     private final Map<String, List<HandlerMatcher>> handlerMatchers = new HashMap<String, List<HandlerMatcher>>();
     private final Map<String, String> uriHandlers = new HashMap<String, String>();
-    private final List<HandlerMatcher> plainMatchers = new ArrayList<HandlerMatcher>();
+    private final List<HandlerMatcher> customMatchers = new ArrayList<HandlerMatcher>();
 
     private final Stack<HandlerInfo> handlerInfos = new Stack<HandlerInfo>();
     private HandlerInfo currentHandlerInfo;
@@ -84,7 +84,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
     }
 
     public void registerHandler(String handlerClassName, Matcher matcher) {
-        plainMatchers.add(new HandlerMatcher(handlerClassName, matcher));
+        customMatchers.add(new HandlerMatcher(handlerClassName, matcher));
     }
 
     public void setElementHandlerContext(Object elementHandlerContext) {
@@ -498,19 +498,26 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
      * @return          handler if found
      */
     public ElementHandler getHandler(Element element) {
-        final HandlerInfo handlerInfo = 
+        final HandlerInfo handlerInfo =
             getHandler(
                 element.getNamespaceURI(),
                 XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
                 Dom4jUtils.getSAXAttributes(element)
             );
-        
+
         return (handlerInfo != null) ? handlerInfo.elementHandler : null;
     }
 
     private HandlerInfo getHandler(String uri, String explodedQName, Attributes attributes) {
 
-        // 1: Try full matchers
+        // 1: Try custom matchers
+        {
+            final HandlerInfo handlerInfo = runMatchers(customMatchers, explodedQName, attributes);
+            if (handlerInfo != null)
+                return handlerInfo;
+        }
+
+        // 2: Try full matchers
         final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(explodedQName);
         if (handlerMatchers != null) {
             final HandlerInfo handlerInfo = runMatchers(handlerMatchers, explodedQName, attributes);
@@ -518,17 +525,12 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 return handlerInfo;
         }
 
-        // 2: Try URI-based handler
+        // 3: Try URI-based handler
         final String uriHandlerClassName = uriHandlers.get(uri);
         if (uriHandlerClassName != null) {
             final ElementHandler elementHandler = getHandlerByClassName(uriHandlerClassName);
             return new HandlerInfo(level, explodedQName, elementHandler, attributes, null, this.locator);
         }
-
-        // 3: Try plain matchers
-        final HandlerInfo handlerInfo = runMatchers(plainMatchers, explodedQName, attributes);
-        if (handlerInfo != null)
-            return handlerInfo;
 
         return null;
     }
@@ -570,7 +572,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         public final Object matched;
 
         public final SAXStore saxStore;
-        
+
         public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Attributes attributes, Object matched, Locator locator) {
             this.level = level;
             this.explodedQName = explodedQName;

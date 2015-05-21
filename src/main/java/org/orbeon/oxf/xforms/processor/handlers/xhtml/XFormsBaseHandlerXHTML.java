@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -39,15 +40,9 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     protected XFormsBaseHandlerXHTML(boolean repeating, boolean forwarding) {
        super(repeating, forwarding);
     }
-    
+
     protected HandlerContext getHandlerContext() {
     	return this.handlerContext;
-    }
-
-    public static void outputDisabledAttribute(AttributesImpl newAttributes) {
-        // @disabled="disabled"
-        // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
-        newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled");
     }
 
     private void addConstraintClasses(StringBuilder sb, scala.Option<ValidationLevels.ValidationLevel> constraintLevel) {
@@ -60,7 +55,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         }
     }
 
-    public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
+    final public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
 
         // Output MIP classes
 
@@ -141,79 +136,84 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         }
     }
 
-    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control, boolean incrementalDefault) {
-        
+    final protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control, boolean incrementalDefault) {
+
         final StringBuilder sb = new StringBuilder(50);
+
         // User-defined classes go first
         appendControlUserClasses(controlAttributes, control, sb);
 
-        // Control classes based on the name for built-in controls
-        if (XFormsControlFactory.isBuiltinControl(controlURI, controlName)) {
-            if (sb.length() > 0)
-                sb.append(' ');
+        // Component control doesn't get xforms-control, xforms-[control name], incremental, mediatype, xforms-static
+        if (! (elementAnalysis instanceof ComponentControl)) {
 
-            // We only call xforms-control the actual controls as per the spec
-            // TODO: XForms 1.1 has core and container controls, but now we depend on xforms-control class in client
-            if (! XFormsControlFactory.isContainerControl(controlURI, controlName))
-                sb.append("xforms-control xforms-");
-            else
-                sb.append("xforms-");
-            sb.append(controlName);
-        }
-        {
-            // Class for incremental mode
-            final String value = controlAttributes.getValue("incremental");
-            // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
-            // default is incremental and the user did not explicitly set it to false
-            if ((!incrementalDefault && "true".equals(value)) || (incrementalDefault && !"false".equals(value))) {
+            {
                 if (sb.length() > 0)
                     sb.append(' ');
-                sb.append("xforms-incremental");
+
+                // We only call xforms-control the actual controls as per the spec
+                // NOTE: XForms 1.1 has core and container controls but our client depends on having `xforms-control`.
+                if (! XFormsControlFactory.isContainerControl(controlURI, controlName))
+                    sb.append("xforms-control xforms-");
+                else
+                    sb.append("xforms-");
+                sb.append(controlName);
             }
+            {
+                // Class for incremental mode
+                final String value = controlAttributes.getValue("incremental");
+                // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
+                // default is incremental and the user did not explicitly set it to false
+                if ((!incrementalDefault && "true".equals(value)) || (incrementalDefault && !"false".equals(value))) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-incremental");
+                }
+            }
+            {
+                // Class for mediatype
+                final String mediatypeValue = controlAttributes.getValue("mediatype");
+                if (mediatypeValue != null) {
+
+                    // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
+                    final int slashIndex = mediatypeValue.indexOf('/');
+                    if (slashIndex == -1)
+                        throw new ValidationException("Invalid mediatype attribute value: " + mediatypeValue, handlerContext.getLocationData());
+
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-mediatype-");
+                    if (mediatypeValue.endsWith("/*")) {
+                        // Add class with just type: "image/*" -> "xforms-mediatype-image"
+                        sb.append(mediatypeValue.substring(0, mediatypeValue.length() - 2));
+                    } else {
+                        // Add class with type and subtype: "text/html" -> "xforms-mediatype-text-html"
+                        sb.append(mediatypeValue.replace('/', '-'));
+                        // Also add class with just type: "image/jpeg" -> "xforms-mediatype-image"
+                        sb.append(" xforms-mediatype-");
+                        sb.append(mediatypeValue.substring(0, slashIndex));
+                    }
+                }
+            }
+
+            // Static read-only
+            if (isStaticReadonly(control))
+                sb.append(" xforms-static");
         }
+
         // Classes for appearances
         if (elementAnalysis instanceof AppearanceTrait)
             ((AppearanceTrait) elementAnalysis).encodeAndAppendAppearances(sb);
-        {
-            // Class for mediatype
-            final String mediatypeValue = controlAttributes.getValue("mediatype");
-            if (mediatypeValue != null) {
-
-                // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
-                final int slashIndex = mediatypeValue.indexOf('/');
-                if (slashIndex == -1)
-                    throw new ValidationException("Invalid mediatype attribute value: " + mediatypeValue, handlerContext.getLocationData());
-
-                if (sb.length() > 0)
-                    sb.append(' ');
-                sb.append("xforms-mediatype-");
-                if (mediatypeValue.endsWith("/*")) {
-                    // Add class with just type: "image/*" -> "xforms-mediatype-image"
-                    sb.append(mediatypeValue.substring(0, mediatypeValue.length() - 2));
-                } else {
-                    // Add class with type and subtype: "text/html" -> "xforms-mediatype-text-html"
-                    sb.append(mediatypeValue.replace('/', '-'));
-                    // Also add class with just type: "image/jpeg" -> "xforms-mediatype-image"
-                    sb.append(" xforms-mediatype-");
-                    sb.append(mediatypeValue.substring(0, slashIndex));
-                }
-            }
-        }
-
-        // Static read-only
-        if (isStaticReadonly(control))
-            sb.append(" xforms-static");
 
         return sb;
     }
 
-    protected StringBuilder appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
+    final protected StringBuilder appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
         // @class
         final String attributeValue = controlAttributes.getValue("class");
         final String value;
         if (attributeValue != null) {
 
-            if (!XFormsUtils.maybeAVT(attributeValue)) {
+            if (! XFormsUtils.maybeAVT(attributeValue)) {
                 // Definitely not an AVT
                 value = attributeValue;
             } else {
@@ -237,7 +237,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected void handleLabelHintHelpAlert(LHHAAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
+    final protected void handleLabelHintHelpAlert(LHHAAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
 
         final AttributesImpl staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element());
 
@@ -379,7 +379,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         }
     }
 
-    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
+    final protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
                                          String forEffectiveId, LHHAC lhha, String elementName, String labelValue,
                                          boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
         outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds);
@@ -387,7 +387,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         outputLabelForEnd(handlerContext, elementName);
     }
 
-    protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
+    final protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
                                               String forEffectiveId, LHHAC lhha, String elementName, boolean addIds) throws SAXException {
 
         assert lhha != null;
@@ -415,7 +415,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttribute);
     }
 
-    protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName) throws SAXException {
+    final protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName) throws SAXException {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
@@ -431,5 +431,11 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             else
                 xmlReceiver.characters(value.toCharArray(), 0, value.length());
         }
+    }
+
+    public static void outputDisabledAttribute(AttributesImpl newAttributes) {
+        // @disabled="disabled"
+        // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
+        newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled");
     }
 }

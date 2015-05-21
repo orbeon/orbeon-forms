@@ -213,7 +213,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             XFormsError.outputNoscriptErrorPanel(containingDocument, helper, htmlPrefix);
         }
     }
-    
+
     private abstract static class Matcher implements ElementHandlerController.Matcher<ElementAnalysis> {
 
         public String getPrefixedId(Attributes attributes, Object handlerContext) {
@@ -230,7 +230,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 return null;
             }
         }
-        
+
         public boolean hasAppearance(ElementAnalysis elementAnalysis, QName appearance) {
             return XFormsControl.jAppearances(elementAnalysis).contains(appearance);
         }
@@ -241,7 +241,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         abstract boolean doesMatch(Attributes attributes, Object handlerContext);
     }
-    
+
     private static class AppearanceMatcher extends Matcher {
         private final QName appearance;
         public AppearanceMatcher(QName appearance) {
@@ -262,6 +262,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
     public static final Matcher ANY_MATCHER = new AnyMatcher();
 
     public static void registerHandlers(final ElementHandlerController controller, final XFormsContainingDocument containingDocument) {
+
+        // Add handlers for custom components
+        final StaticStateGlobalOps ops = containingDocument.getStaticOps();
+        controller.registerHandler(XXFormsComponentHandler.class.getName(), new Matcher() {
+            public boolean doesMatch(Attributes attributes, Object handlerContext) {
+                return ops.getBinding(getPrefixedId(attributes, handlerContext)).isDefined();
+            }
+        });
 
         // xf:input
         controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input", ANY_MATCHER);
@@ -370,14 +378,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint", ANY_MATCHER);
         controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert", ANY_MATCHER);
 
-        // Add handlers for custom components
-        final StaticStateGlobalOps ops = containingDocument.getStaticOps();
-        controller.registerHandler(XXFormsComponentHandler.class.getName(), new Matcher() {
-            public boolean doesMatch(Attributes attributes, Object handlerContext) {
-                return ops.getBinding(getPrefixedId(attributes, handlerContext)).isDefined();
-            }
-        });
-
         // xxf:dynamic
         controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic", ANY_MATCHER);
     }
@@ -410,7 +410,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // Default
         return "/config/" + fileName;
     }
-    
+
     public static String getIncludedResourceURL(String requestPath, String fileName) {
         return "oxf:" + getIncludedResourcePath(requestPath, fileName);
     }

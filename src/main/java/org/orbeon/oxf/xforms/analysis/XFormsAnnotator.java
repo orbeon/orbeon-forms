@@ -117,7 +117,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         this.isGenerateIds = false;
         this.isTopLevel    = true;
         this.isRestore     = true;
-        
+
         metadata.initializeBindingLibraryIfNeeded();
     }
 
@@ -159,63 +159,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             }
             // Output element
             stackElement.startElement(uri, localname, qName, attributes);
-        } else if (stackElement.isXFormsOrBuiltinExtension()) {
-            // This is an XForms element
 
-            // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
-
-            // Create a new id and update the attributes if needed
-            attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
-            final String xformsElementId = reusableStringArray[0];
-
-            // Handle full update annotation
-            if (templateSAXStore != null) {
-                // Remember mark if xxf:update="full"
-                final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
-                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
-                    // Remember this subtree has a full update
-                    putMark(xformsElementId);
-                    // Add a class to help the client
-                    attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
-                }
-            }
-
-            // Rewrite elements / add appearances
-            if (inTitle && "output".equals(localname)) {
-                // Special case of xf:output within title, which produces an xxf:text control
-                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
-                startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                stackElement.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
-            } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
-                // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
-
-                // Append the new xxf:separator appearance
-                final String existingAppearance = attributes.getValue("appearance");
-                // See: https://github.com/orbeon/orbeon-forms/issues/418
-                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
-                        (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
-                stackElement.startElement(uri, localname, qName, attributes);
-            } else if (stackElement.isXForms() && "repeat".equals(localname)) {
-                // Add separator appearance
-                if (doesClosestXHTMLRequireSeparatorAppearance()) {
-                    final String existingAppearance = attributes.getValue("appearance");
-                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
-                            (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
-                }
-
-                // Start xf:repeat
-                stackElement.startElement(uri, localname, qName, attributes);
-
-                // Start xf:repeat-iteration
-                // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, xformsElementId + "~iteration");
-                final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, 0);
-                stackElement.startElement(uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
-            } else {
-                // Leave element untouched (except for the id attribute)
-                stackElement.startElement(uri, localname, qName, attributes);
-            }
         } else if (stackElement.isXBL()) {
             // This must be xbl:xbl (otherwise we will have isPreserve == true) or xbl:template
             assert localname.equals("xbl") || localname.equals("template") || localname.equals("handler");
@@ -258,6 +202,63 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 inPreserve = true;
                 inXBLBinding = true;
                 preserveLevel = level;
+            } else if (stackElement.isXFormsOrBuiltinExtension()) {
+                // This is an XForms element
+
+                // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
+
+                // Create a new id and update the attributes if needed
+                attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                final String xformsElementId = reusableStringArray[0];
+
+                // Handle full update annotation
+                if (templateSAXStore != null) {
+                    // Remember mark if xxf:update="full"
+                    final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
+                    if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                        // Remember this subtree has a full update
+                        putMark(xformsElementId);
+                        // Add a class to help the client
+                        attributes = SAXUtils.appendToClassAttribute(attributes, "xforms-update-full");
+                    }
+                }
+
+                // Rewrite elements / add appearances
+                if (inTitle && "output".equals(localname)) {
+                    // Special case of xf:output within title, which produces an xxf:text control
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
+                    startPrefixMapping2("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    stackElement.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
+                } else if (("group".equals(localname) || "switch".equals(localname)) && doesClosestXHTMLRequireSeparatorAppearance()) {
+                    // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
+
+                    // Append the new xxf:separator appearance
+                    final String existingAppearance = attributes.getValue("appearance");
+                    // See: https://github.com/orbeon/orbeon-forms/issues/418
+                    attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
+                            (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+                    stackElement.startElement(uri, localname, qName, attributes);
+                } else if (stackElement.isXForms() && "repeat".equals(localname)) {
+                    // Add separator appearance
+                    if (doesClosestXHTMLRequireSeparatorAppearance()) {
+                        final String existingAppearance = attributes.getValue("appearance");
+                        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
+                                (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+                    }
+
+                    // Start xf:repeat
+                    stackElement.startElement(uri, localname, qName, attributes);
+
+                    // Start xf:repeat-iteration
+                    // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, xformsElementId + "~iteration");
+                    final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, 0);
+                    stackElement.startElement(uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
+                } else {
+                    // Leave element untouched (except for the id attribute)
+                    stackElement.startElement(uri, localname, qName, attributes);
+                }
             } else {
                 // Non-XForms element without an XBL binding
 
@@ -442,36 +443,36 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     inHead = false;
                 } else if ("body".equals(localname)) {
                     // Exiting body
-    
+
                     // Add fr:xforms-inspector if requested by property AND if not already present
                     final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
                     final String frURI = "http://orbeon.org/oxf/xml/form-runner";
                     final String inspectorLocal = "xforms-inspector";
                     if (propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isByNameBindingInUse(frURI, inspectorLocal)) {
-    
+
                         // Register the fr:xforms-inspector binding
                         reusableAttributes.clear();
                         final scala.Option<IndexableBinding> inspectorBindingOpt =
                             metadata.findBindingForElement(frURI, inspectorLocal, reusableAttributes);
-    
+
                         if (inspectorBindingOpt.isDefined()) {
-    
+
                             final String inspectorPrefix = "fr";
                             final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
-    
+
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
                             final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
                             final String xformsElementId = reusableStringArray[0];
-    
+
                             metadata.mapBindingToElement(rewriteId(xformsElementId), inspectorBindingOpt.get());
-    
+
                             startPrefixMapping2(inspectorPrefix, frURI);
                             stackElement.element(frURI, inspectorLocal, inspectorQName, newAttributes);
                             endPrefixMapping2(inspectorPrefix);
                         }
                     }
-    
+
                     inBody = false;
                 }
             } else if (level == 2) {

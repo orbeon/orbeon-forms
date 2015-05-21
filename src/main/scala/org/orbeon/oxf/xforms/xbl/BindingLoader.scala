@@ -47,7 +47,7 @@ trait BindingLoader extends Logging {
         val (scripts, styles, checkedPaths) = {
 
             val propertySet = getPropertySet
-            
+
             val libraryProperty  = propertySet.getProperty(XBLLibraryProperty)
             val baselineProperty = propertySet.getProperty(XBLBaselineProperty)
 
@@ -115,7 +115,7 @@ trait BindingLoader extends Logging {
         }
 
         // If the index is unmodified, it might contain out-of-date bindings. If it is modified, it is guaranteed by
-        // evaluate() above to be a new index with up-to-date library bindings. 
+        // evaluate() above to be a new index with up-to-date library bindings.
         if (checkUpToDate && (originalOrUpdatedIndex eq index))
             originalOrUpdatedIndex = updateOutOfDateBindings(index, checkedPaths)
 

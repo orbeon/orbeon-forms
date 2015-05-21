@@ -23,11 +23,11 @@ abstract class XFormsAnnotatorBase(
     templateReceiver  : XMLReceiver,
     extractorReceiver : XMLReceiver
 ) extends XMLReceiverAdapter {
-    
+
     private val keepLocationData = XFormsProperties.isKeepLocation
     private var _documentLocator: Locator = null
     def documentLocator = _documentLocator
-    
+
     def isInXBLBinding: Boolean
     def isInPreserve: Boolean
 
@@ -43,7 +43,7 @@ abstract class XFormsAnnotatorBase(
         "ul",
         "dl"
     )
-    
+
     case class StackElement(parent: Option[StackElement], uri: String, localname: String) {
         val isXForms                   = uri == XFORMS_NAMESPACE_URI
         val isXXForms                  = uri == XXFORMS_NAMESPACE_URI
@@ -51,9 +51,9 @@ abstract class XFormsAnnotatorBase(
         val isXBL                      = uri == XBL_NAMESPACE_URI
         val isXFormsOrBuiltinExtension = isXForms || isXXForms || isEXForms
         def isXHTML                    = uri == XHTML_NAMESPACE_URI
-        
+
         private var endElementName: Option[(String, String, String)] = None
-        
+
         def startElement(uri: String, localname: String, qName: String, atts: Attributes): Unit = {
             endElementName = Some((uri, localname, qName))
             startElement2(uri, localname, qName, atts)
@@ -67,7 +67,7 @@ abstract class XFormsAnnotatorBase(
             startElement2(uri, localname, qName, atts)
             endElement2(uri, localname, qName)
         }
-        
+
         def ancestors =
             Iterator.iterate(parent.orNull)(_.parent.orNull) takeWhile (_ ne null)
     }
@@ -98,7 +98,7 @@ abstract class XFormsAnnotatorBase(
     }
 
     def doesClosestXHTMLRequireSeparatorAppearance =
-        currentStackElement.ancestors find (_.isXHTML) exists (p ⇒ SeparatorAppearanceElements(p.localname))
+        currentStackElement.ancestors find (_.isXHTML) exists (e ⇒ SeparatorAppearanceElements(e.localname))
 
     override def setDocumentLocator(locator: Locator): Unit = {
         this._documentLocator = locator

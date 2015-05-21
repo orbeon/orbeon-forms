@@ -32,7 +32,7 @@ trait BindingMetadata extends Logging {
     private var maxLastModified             = -1L
 
     // ==== Annotator/Extractor API
-    
+
     private var _xblIndex          : Option[BindingIndex[IndexableBinding]] = None
     private var _checkedPaths      : Set[String]= Set.empty
     private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
@@ -41,10 +41,10 @@ trait BindingMetadata extends Logging {
         if (_xblIndex.isEmpty) {
 
             debug("entering view")
-            
+
             val (newIndex, newCheckedPaths, scripts, styles) =
                 BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
-            
+
             var currentIndex = newIndex
 
             if (inlineBindingsRefs.nonEmpty) {
@@ -55,12 +55,12 @@ trait BindingMetadata extends Logging {
                 }
                 inlineBindingsRefs = Nil
             }
-            
+
             _xblIndex          = Some(currentIndex)
             _checkedPaths      = newCheckedPaths
             _baselineResources = (scripts, styles)
         }
-    
+
     def commitBindingIndex() =
         _xblIndex match {
             case Some(index) ⇒
@@ -119,7 +119,8 @@ trait BindingMetadata extends Logging {
 
     def prefixedIdHasBinding(prefixedId: String): Boolean =
         bindingsByControlPrefixedId.contains(prefixedId)
-    
+
+    // NOTE: Used for hooking up fr:xforms-inspector.
     def isByNameBindingInUse(uri: String, localname: String): Boolean = {
 
         val someURI = Some(uri)
@@ -141,7 +142,7 @@ trait BindingMetadata extends Logging {
     }
 
     // ==== XBLBindings API
-    
+
     def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit =
         _xblIndex foreach { index ⇒
 
@@ -188,8 +189,8 @@ trait BindingMetadata extends Logging {
         bindingsByControlPrefixedId -= controlPrefixedId
 
     // ==== Other API
-    
-    def baselineResources = _baselineResources 
+
+    def baselineResources = _baselineResources
 
     def allBindingsMaybeDuplicates = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
 

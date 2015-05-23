@@ -227,8 +227,17 @@ public class XBLTransformer {
                     final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                     // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                    final List<Object> nodeInfos = XPathCache.evaluate(boundElementInfo, xxblAttrString, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
-                            null, null, null, null, null, null);// TODO: locationData
+                    final List<Object> nodeInfos = XPathCache.evaluate(
+                        boundElementInfo,
+                        xxblAttrString,
+                        new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
+                        null,
+                        null, // library
+                        null,
+                        null,
+                        null,
+                        null  // locationData
+                    );
 
                     if (nodeInfos.size() > 0) {
                         for (Object nodeInfo: nodeInfos) {
@@ -246,8 +255,8 @@ public class XBLTransformer {
 
                 // NOTE: We could also do the prefixing in the handlers, when the page is output.
                 //
-                // * Benefit of prefixing here: done statically
-                // * Drawback of prefixing here: in the future if we try to reuse simple shadow trees this won't work
+                // - Benefit of prefixing here: done statically
+                // - Drawback of prefixing here: in the future if we try to reuse simple shadow trees this won't work
 
 //                    {
 //                        if (resultingNodes != null && resultingNodes.size() > 0) {

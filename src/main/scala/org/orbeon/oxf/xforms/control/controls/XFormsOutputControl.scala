@@ -36,9 +36,9 @@ import scala.util.control.NonFatal
  * Represents an xf:output control.
  */
 class XFormsOutputControl(
-    container : XBLContainer, 
-    parent    : XFormsControl, 
-    element   : Element, 
+    container : XBLContainer,
+    parent    : XFormsControl,
+    element   : Element,
     id        : String
 ) extends XFormsSingleNodeControl(container, parent, element, id)
     with XFormsValueControl

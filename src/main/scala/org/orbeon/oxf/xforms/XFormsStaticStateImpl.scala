@@ -95,7 +95,7 @@ class XFormsStaticStateImpl(
 
     def booleanPropertyMaybeAsExpression(name: String): Either[Boolean, CompiledExpression] =
         propertyMaybeAsExpression(name: String).left map (_.asInstanceOf[Boolean])
-    
+
     def intPropertyMaybeAsExpression(name: String): Either[Int, CompiledExpression] =
         propertyMaybeAsExpression(name: String).left map (_.asInstanceOf[Int])
 
@@ -171,9 +171,9 @@ object XFormsStaticStateImpl {
     // Create analyzed static state for the given XForms document.
     // Used by unit tests.
     def createFromDocument(formDocument: Document): (SAXStore, XFormsStaticState) = {
-        
+
         val startScope = new Scope(null, "")
-        
+
         def create(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
             val staticStateDocument = new StaticStateDocument(staticStateXML)
 
@@ -186,7 +186,7 @@ object XFormsStaticStateImpl {
                 staticStateDocument
             )
         }
-        
+
         createFromDocument(formDocument, startScope, create)
     }
 
@@ -201,7 +201,7 @@ object XFormsStaticStateImpl {
 
     // Used by xxf:dynamic and unit tests.
     private def createFromDocument[T](
-        formDocument : Document, 
+        formDocument : Document,
         startScope   : Scope,
         create       : (Document, String, Metadata, AnnotatedTemplate) ⇒ T
     ): (SAXStore, T) = {
@@ -327,9 +327,9 @@ object XFormsStaticStateImpl {
             } yield
                 (propertyName, propertyValue)
         } toMap
-        
+
         val isHTMLDocument = Option(staticStateElement.attributeValue("is-html")) contains "true"
-        
+
         def getOrComputeDigest(digest: Option[String]) =
             digest getOrElse {
                 val digestContentHandler = new DigestContentHandler
@@ -343,13 +343,13 @@ object XFormsStaticStateImpl {
 
             nonDefault getOrElse default
         }
-        
+
         // Get the encoded static state
         // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
         // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
         def asBase64 =
             XFormsUtils.encodeXML(xmlDocument, true, isClientStateHandling, true) // compress = true, encrypt = isClientStateHandling, location = true
-        
+
         def dump() =
             println(Dom4jUtils.domToPrettyString(xmlDocument))
     }

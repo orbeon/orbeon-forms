@@ -30,7 +30,6 @@ import java.util.Map;
 
 /**
  * Base XForms handler used as base class in both the xml and xhtml handlers.
- *
  */
 public abstract class XFormsBaseHandler extends ElementHandler {
 
@@ -47,17 +46,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         LHHAC_CODES.put(LHHAC.CONTROL, "c");
         // "i" is also used for help image
     }
-    
+
     private final boolean repeating;
     private final boolean forwarding;
-    
+
     protected HandlerContext handlerContext;
 
     protected ElementAnalysis elementAnalysis;
     protected XFormsContainingDocument containingDocument;
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
-    
+
     protected XFormsBaseHandler(boolean repeating, boolean forwarding) {
         this.repeating = repeating;
         this.forwarding = forwarding;
@@ -77,7 +76,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         super.setContext(context);
     }
-    
+
     public boolean isRepeating() {
         return repeating;
     }
@@ -88,7 +87,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     /**
      * Whether the control is disabled in the resulting HTML. Occurs when:
-     * 
+     *
      * o control is readonly but not static readonly
      *
      * @param control   control to check or null if no concrete control available
@@ -99,7 +98,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             && ((XFormsSingleNodeControl) control).isReadonly()
             && ! containingDocument.staticReadonly();
     }
-    
+
     public boolean isNonRelevant(XFormsControl control) {
         return control == null || ! control.isRelevant();
     }
@@ -167,7 +166,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         return reusableAttributes;
     }
-    
+
     public static boolean isStaticReadonly(XFormsControl control) {
         return control != null && control.isStaticReadonly();
     }
@@ -176,7 +175,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
         return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
     }
-    
+
     protected Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames) {
         final String prefixedId = handlerContext.getPrefixedId(attributes);
 

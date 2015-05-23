@@ -47,22 +47,32 @@ import org.orbeon.saxon.om.NodeInfo
  * In the future we want flexible model placement, so models should get out of this class.
  */
 class XBLContainer(
-        private var _effectiveId: String,       // effective id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar.1-2", etc.
-        val prefixedId: String,                 // prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.
-        val fullPrefix: String,                 // prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
-        val parentXBLContainer: XBLContainer,
-        val associatedControl: XFormsControl,   // null if this instanceof XFormsContainingDocument BUT could use a root control instead!
-        val innerScope: Scope)
-    extends ModelContainer
+    private var _effectiveId : String,        // effective id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar.1-2", etc.
+    val prefixedId           : String,        // prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.
+    val fullPrefix           : String,        // prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
+    val parentXBLContainer   : XBLContainer,
+    val associatedControl    : XFormsControl, // null if this instanceof XFormsContainingDocument BUT could use a root control instead!
+    val innerScope           : Scope
+) extends ModelContainer
     with RefreshSupport
     with ContainerResolver
     with XFormsObjectResolver {
 
     self ⇒
-    
-    protected def this(associatedControl: XFormsControl, parentXBLContainer: XBLContainer, innerScope: Scope) =
-        this(associatedControl.getEffectiveId, XFormsUtils.getPrefixedId(associatedControl.getEffectiveId), XFormsUtils.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentXBLContainer, associatedControl, innerScope)
-    
+
+    protected def this(
+        associatedControl  : XFormsControl,
+        parentXBLContainer : XBLContainer,
+        innerScope         : Scope
+    ) = this(
+            associatedControl.getEffectiveId,
+            XFormsUtils.getPrefixedId(associatedControl.getEffectiveId),
+            XFormsUtils.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR,
+            parentXBLContainer,
+            associatedControl,
+            innerScope
+        )
+
     // Tell parent it has a child
     if (parentXBLContainer ne null)
         parentXBLContainer.addChild(self)
@@ -103,14 +113,18 @@ class XBLContainer(
     def updateEffectiveId(effectiveId: String): Unit = {
         if (parentXBLContainer ne null)
             parentXBLContainer.removeChild(self)
-        
+
         _effectiveId = effectiveId
-        
+
         if (parentXBLContainer ne null)
             parentXBLContainer.addChild(self)
 
         for (currentModel ← models) {
-            val newModelEffectiveId = XFormsUtils.getPrefixedId(currentModel.getEffectiveId) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)
+
+            val newModelEffectiveId =
+                XFormsUtils.getPrefixedId(currentModel.getEffectiveId) +
+                    XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)
+
             currentModel.updateEffectiveId(newModelEffectiveId)
         }
     }
@@ -122,7 +136,7 @@ class XBLContainer(
 
         destroyModels()
     }
-    
+
     private def addChild(container: XBLContainer): Unit =
         _childrenXBLContainers += container
 
@@ -147,8 +161,8 @@ class XBLContainer(
         ancestorsIterator find (_.innerScope == scope) getOrElse
             (throw new OXFException("XBL resolution scope not found for scope id: " + scope.scopeId))
 
-    // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container control
-    // componentControl will be null if we are at the top-level
+    // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container
+    // control componentControl will be null if we are at the top-level
     def isRelevant: Boolean = (associatedControl eq null) || associatedControl.isRelevant
 }
 
@@ -216,7 +230,8 @@ trait ModelContainer {
             model.restoreInstances()
 
         // 2: Restore everything else
-        // NOTE: It's important to do this as a separate step, because variables which might refer to other models' instances.
+        // NOTE: It's important to do this as a separate step, because variables which might refer to other models'
+        // instances.
         for (model ← _models)
             model.restoreState(deferRRR)
     }
@@ -237,19 +252,19 @@ trait RefreshSupport {
 
     // This is fun. Say you have a single model requiring RRRR and you get here the first time:
     //
-    // * Model's rebuildRecalculateRevalidateIfNeeded() runs
-    // * Its rebuild runs
-    // * That dispatches xforms-rebuild as an outer event
-    // * The current method is then called again recursively
-    // * So RRR runs, recursively, then comes back here
+    // - Model's rebuildRecalculateRevalidateIfNeeded() runs
+    // - Its rebuild runs
+    // - That dispatches xforms-rebuild as an outer event
+    // - The current method is then called again recursively
+    // - So RRR runs, recursively, then comes back here
     //
     // We do not want to run refresh just after coming back from rebuildRecalculateRevalidateIfNeeded(), otherwise
     // because of recursion you might have RRR, then refresh, refresh again, instead of RRR, refresh, RRR, refresh,
     // etc. So:
     //
-    // * We first exhaust the possibility for RRR globally
-    // * Then we run refresh if possible
-    // * Then we check again, as refresh events might have changed things
+    // - We first exhaust the possibility for RRR globally
+    // - Then we run refresh if possible
+    // - Then we check again, as refresh events might have changed things
     //
     // TODO: We might want to implement some code to detect excessive loops/recursion
     def synchronizeAndRefresh(): Unit =
@@ -345,7 +360,11 @@ trait ContainerResolver {
     def resolveObjectByIdInScopeJava(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item) =
         resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId, Option(contextItem)).orNull
 
-    def resolveObjectByIdInScope(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Option[Item] = None): Option[XFormsObject] = {
+    def resolveObjectByIdInScope(
+        sourceEffectiveId  : String,
+        staticOrAbsoluteId : String,
+        contextItem        : Option[Item] = None
+    ): Option[XFormsObject] = {
         val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
         val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
 
@@ -355,7 +374,8 @@ trait ContainerResolver {
     /**
      * Resolve an object in the scope of this container.
      *
-     * @param sourceEffectiveId   effective id of the source (control, model, instance, submission, ...) (can be null only for absolute ids)
+     * @param sourceEffectiveId   effective id of the source (control, model, instance, submission, ...) (can be null
+     *                            only for absolute ids)
      * @param staticOrAbsoluteId  static or absolute id of the object
      * @param contextItem         context item, or null (used for bind resolution only)
      * @return                    object, or null if not found
@@ -398,7 +418,10 @@ trait ContainerResolver {
 
         // Find closest control
         val sourceControlEffectiveId = {
-            val tempModelObject = searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId), contextItem)
+
+            val tempModelObject =
+                searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId), contextItem)
+
             if (tempModelObject.isDefined) {
                 // Source is a model object, so get first control instead
                 val firstControlEffectiveId = getFirstControlEffectiveId
@@ -412,8 +435,12 @@ trait ContainerResolver {
         }
 
         // Resolve on controls
-        val controls = containingDocument.getControls
-        val result = controls.resolveObjectById(sourceControlEffectiveId, staticOrAbsoluteId, contextItem).asInstanceOf[XFormsControl]
+        val result =
+            containingDocument.getControls.resolveObjectById(
+                sourceControlEffectiveId,
+                staticOrAbsoluteId,
+                contextItem
+            ).asInstanceOf[XFormsControl]
 
         // If result is provided, make sure it is within the resolution scope of this container
         if (result != null && ! isEffectiveIdResolvableByThisContainer(result.getEffectiveId))

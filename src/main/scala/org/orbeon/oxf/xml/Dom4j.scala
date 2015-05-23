@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import dom4j.Dom4jUtils._
-import org.dom4j._
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List => JList, Map => JMap}
+
 import org.apache.commons.lang3.StringUtils._
-import collection.JavaConverters._
+import org.dom4j._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.value.Whitespace
-import collection.mutable.Buffer
-import annotation.tailrec
-import scala.xml.{XML, Elem}
+
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
+import scala.collection.mutable.Buffer
+import scala.xml.{Elem, XML}
 
 object Dom4j {
 

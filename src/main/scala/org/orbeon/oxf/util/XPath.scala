@@ -51,6 +51,10 @@ object XPath {
     type VariableResolver = (StructuredQName, XPathContext) ⇒ ValueRepresentation
 
     // Context accessible during XPath evaluation
+    // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
+    // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
+    // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
+    // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
     private val xpathContextDyn = new DynamicVariable[FunctionContext]
 
     def withFunctionContext[T](functionContext: FunctionContext)(thunk: ⇒ T): T = {
@@ -71,6 +75,7 @@ object XPath {
     // not going to be used by Saxon as such. But Saxon tests for external object model when looking for a JPConverter,
     // so it will find and use this for converting types from Java/Scala.
     private val GlobalDataConverter = new ExternalObjectModel {
+
         def getIdentifyingURI = "http://scala-lang.org/"
         def sendSource(source: Source, receiver: Receiver, pipe: PipelineConfiguration) = false
         def getDocumentBuilder(result: Result) = null
@@ -196,12 +201,23 @@ object XPath {
         avt              : Boolean)(implicit
         logger           : IndentedLogger
     ): CompiledExpression = {
-        val staticContext = new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary)
-        CompiledExpression(compileExpressionWithStaticContext(staticContext, xpathString, avt), xpathString, locationData)
+        CompiledExpression(
+            compileExpressionWithStaticContext(
+                new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary),
+                xpathString,
+                avt
+            ),
+            xpathString,
+            locationData
+        )
     }
 
     // Create and compile an expression
-    def compileExpressionWithStaticContext(staticContext: XPathStaticContext, xpathString: String, avt: Boolean): XPathExpression =
+    def compileExpressionWithStaticContext(
+        staticContext : XPathStaticContext,
+        xpathString   : String,
+        avt           : Boolean
+    ): XPathExpression =
         if (avt) {
             val tempExpression = AttributeValueTemplate.make(xpathString, -1, staticContext)
             prepareExpressionForAVT(staticContext, tempExpression)
@@ -237,13 +253,15 @@ object XPath {
     def functionContext = xpathContextDyn.value
 
     // Return either a NodeInfo for nodes, a native Java value for atomic values, or null
+    // 2 callers
     def evaluateSingle(
-            contextItems: JList[Item],
-            contextPosition: Int,
-            compiledExpression: CompiledExpression,
-            functionContext: FunctionContext,
-            variableResolver: VariableResolver)
-            (implicit reporter: Reporter) = {
+        contextItems        : JList[Item],
+        contextPosition     : Int,
+        compiledExpression  : CompiledExpression,
+        functionContext     : FunctionContext,
+        variableResolver    : VariableResolver)(implicit
+        reporter            : Reporter
+    ) = {
 
         withEvaluation(compiledExpression) { xpathExpression ⇒
 
@@ -254,9 +272,13 @@ object XPath {
                     (null, 0)
 
             val dynamicContext = xpathExpression.createDynamicContext(contextItem, position)
-            val xpathContext = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
+            val xpathContext   = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
 
-            xpathContext.getController.setUserData(classOf[ShareableXPathStaticContext].getName, "variableResolver", variableResolver)
+            xpathContext.getController.setUserData(
+                classOf[ShareableXPathStaticContext].getName,
+                "variableResolver",
+                variableResolver
+            )
 
             withFunctionContext(functionContext) {
                 val iterator = xpathExpression.iterate(dynamicContext)
@@ -275,13 +297,22 @@ object XPath {
     // TODO: Check what we do upon NodeInfo
     // NOTE: callers tend to use string(foo), so issue of null/NodeInfo should not occur
     def evaluateAsString(
-            contextItems: JList[Item],
-            contextPosition: Int,
-            compiledExpression: CompiledExpression,
-            functionContext: FunctionContext,
-            variableResolver: VariableResolver)
-            (implicit reporter: Reporter) =
-        Option(evaluateSingle(contextItems, contextPosition, compiledExpression, functionContext, variableResolver)) map (_.toString) orNull
+        contextItems        : JList[Item],
+        contextPosition     : Int,
+        compiledExpression  : CompiledExpression,
+        functionContext     : FunctionContext,
+        variableResolver    : VariableResolver)(implicit
+        reporter            : Reporter
+    ) =
+        Option(
+            evaluateSingle(
+                contextItems,
+                contextPosition,
+                compiledExpression,
+                functionContext,
+                variableResolver
+            )
+        ) map (_.toString) orNull
 
     private def withEvaluation[T](expression: CompiledExpression)(body: XPathExpression ⇒ T)(implicit reporter: Reporter): T =
         try {
@@ -296,12 +327,17 @@ object XPath {
             } else
                 body(expression.expression)
         } catch {
-            case NonFatal(t) ⇒ throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
+            case NonFatal(t) ⇒
+                throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
         }
 
     def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData) = {
+
         val validationException =
-            OrbeonLocationException.wrapException(t, new ExtendedLocationData(locationData, Option(description), List("expression" → xpathString)))
+            OrbeonLocationException.wrapException(
+                t,
+                new ExtendedLocationData(locationData, Option(description), List("expression" → xpathString))
+            )
 
         // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
         // so we need to explicitly add them.
@@ -317,7 +353,10 @@ object XPath {
                 // Saxon Document.makeDoc() changes the base to "" if it is null
                 // NOTE: We might use TransformerURIResolver/ExternalContext in the future (ThreadLocal)
                 val url = URLFactory.createURL(if (base == "") null else base, href)
-                new SAXSource(XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN), new InputSource(url.openStream))
+                new SAXSource(
+                    XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN),
+                    new InputSource(url.openStream)
+                )
             } catch {
                 case NonFatal(t) ⇒ throw new TransformerException(t)
             }
@@ -326,7 +365,20 @@ object XPath {
     // Whether the given string contains a well-formed XPath 2.0 expression.
     // NOTE: Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
     // NOTE: We should probably just do the parse and typeCheck parts and skip simplify and a few smaller operations
-    def isXPath2Expression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData)(implicit logger: IndentedLogger) =
+    def isXPath2Expression(
+        xpathString      : String,
+        namespaceMapping : NamespaceMapping,
+        locationData     : LocationData)(implicit
+        logger           : IndentedLogger
+    ) =
         isNotBlank(xpathString) &&
-        Try(compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt = false)).isSuccess
+        Try(
+            compileExpression(
+                xpathString      = xpathString,
+                namespaceMapping = namespaceMapping,
+                locationData     = locationData,
+                functionLibrary  = XFormsContainingDocument.getFunctionLibrary,
+                avt              = false
+            )
+        ).isSuccess
 }

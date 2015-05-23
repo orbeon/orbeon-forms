@@ -364,8 +364,8 @@
             <src path="${build.dir}/src"/> <!-- Location of the copy of Version.scala with the release/edition set -->
             <src path="src/main/java"/>
             <src path="src/main/scala"/>
-            <!-- Scala code bundled with XBL components -->
-            <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns, and scalac doesn't support fileset child elements, only include/exclude -->
+            <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns,
+                 and scalac doesn't support fileset child elements, only include/exclude. -->
             <exclude name="org/orbeon/oxf/common/Version.scala"/>
         </scalac>
 
@@ -576,7 +576,7 @@
 
         <basename file="${jar.file}" property="jar.name"/>
 
-        <jar destfile="${cli.jar.file}" compress="false"  >
+        <jar destfile="${cli.jar.file}" compress="false">
           <manifest>
             <attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>
             <attribute name="Class-Path" value="lib/${jar.name} lib/${project.name}-xforms-filter.jar lib/${project.name}-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>
@@ -800,7 +800,7 @@
 
         <!-- Ant task to compile CoffeeScript -->
         <!-- Defined here (instead of the beginning of this file) as CoffeeScriptTask needs to be compiled first -->
-        <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask" >
+        <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask">
             <classpath>
                 <pathelement location="build/classes"/>
                 <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->

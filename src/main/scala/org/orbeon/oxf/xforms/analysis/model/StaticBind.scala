@@ -17,10 +17,10 @@ import scala.util.Try
 
 // Represent a static <xf:bind> element
 class StaticBind(
-        bindTree  : BindTree,
-        element   : Element,
-        parent    : ElementAnalysis,
-        preceding : Option[ElementAnalysis]
+    bindTree  : BindTree,
+    element   : Element,
+    parent    : ElementAnalysis,
+    preceding : Option[ElementAnalysis]
 ) extends SimpleElementAnalysis(
     bindTree.model.staticStateContext,
     element,
@@ -217,7 +217,7 @@ class StaticBind(
 
         def attributeCustomMIP =
             for {
-                att           ← Dom4j.attributes(element).toList
+                att           ← Dom4j.attributes(element).iterator
                 if bindTree.isCustomMIP(att.getQName)
                 value         = att.getValue
                 customMIPName = buildCustomMIPName(att.getQualifiedName)
@@ -226,17 +226,17 @@ class StaticBind(
 
         // NOTE: We don't support custom MIP elements yet as those are pruned by the annotator/extractor. The following
         // function can be used to retrieve them once that is fixed.
-        def elementCustomMIPs =
-            for {
-                elem          ← Dom4j.elements(element).toList
-                if bindTree.isCustomMIP(elem.getQName)
-                value         ← Option(elem.attributeValue(VALUE_QNAME))
-                customMIPName = buildCustomMIPName(elem.getQualifiedName)
-            } yield
-                (getElementId(elem), customMIPName, value)
+        // def elementCustomMIPs =
+        //     for {
+        //         elem          ← Dom4j.elements(element).toList
+        //         if bindTree.isCustomMIP(elem.getQName)
+        //         value         ← Option(elem.attributeValue(VALUE_QNAME))
+        //         customMIPName = buildCustomMIPName(elem.getQualifiedName)
+        //     } yield
+        //         (getElementId(elem), customMIPName, value)
 
         for {
-            (name, idNameValue) ← attributeCustomMIP groupBy (_._2)
+            (name, idNameValue) ← attributeCustomMIP.to[List] groupBy (_._2)
             mips                = idNameValue flatMap {
                 case (id, _, value) ⇒
                     XPathMIP.createOrNone(id, name, ErrorLevel, value)
@@ -310,7 +310,7 @@ class StaticBind(
     def firstXPathMIP(mip: Model.XPathMIP)           = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
 
     def hasXPathMIP(mip: Model.XPathMIP) = firstXPathMIP(mip).isDefined
-    
+
     def hasDefault      = hasXPathMIP(Default)
     def hasCalculate    = hasXPathMIP(Calculate)
 
@@ -364,7 +364,7 @@ class StaticBind(
             }
 
         // Analyze children
-        val childrenSucceeded = (_children map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+        val childrenSucceeded = (_children map (_.analyzeXPathGather)).forall(identity)
 
         // Result
         refSucceeded && childrenSucceeded

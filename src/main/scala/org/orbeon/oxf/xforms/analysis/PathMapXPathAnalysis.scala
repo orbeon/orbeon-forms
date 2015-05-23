@@ -233,7 +233,7 @@ object PathMapXPathAnalysis {
                     reduceAncestorAxis(pathmap)
 
                     // DEBUG
-//                    dumpPathMap(staticState.getXPathConfiguration, xpathString, pathmap)
+//                    dumpPathMap(XPath.GlobalConfiguration, xpathString, pathmap)
 
                     // We use LinkedHashMap/LinkedHashSet in part to keep unit tests reproducible
                     val valueDependentPaths = new MapSet[String, String]
@@ -340,7 +340,9 @@ object PathMapXPathAnalysis {
                         compiledExpression.locationData,
                         Some("analysing XPath expression"),
                         List("expression" → xpathString),
-                        Option(element)))
+                        Option(element)
+                    )
+                )
         }
     }
 

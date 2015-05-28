@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.*;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.event.EventHandlerImpl;
 import org.orbeon.oxf.xml.NamespaceMapping;
@@ -25,10 +26,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class XBLTransformer {
 
@@ -41,9 +39,16 @@ public class XBLTransformer {
      *
      * NOTE: This mutates shadowTreeDocument.
      */
-    public static Document transform(final Document shadowTreeDocument, final Element boundElement, final boolean excludeNestedHandlers, final boolean excludeNestedLHHA) {
+    public static Document transform(
+        final Document shadowTreeDocument,
+        final Element boundElement,
+        final boolean excludeNestedHandlers,
+        final boolean excludeNestedLHHA,
+        final boolean supportAVTs
+    ) {
 
         final DocumentWrapper documentWrapper = new DocumentWrapper(boundElement.getDocument(), null, org.orbeon.oxf.util.XPath.GlobalConfiguration());
+        final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
         Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
 
@@ -224,8 +229,6 @@ public class XBLTransformer {
                     // Get attribute value
                     final String xxblAttrString = xxblAttr.getValue();
 
-                    final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
-
                     // TODO: don't use getNamespaceContext() as this is already computed for the bound element
                     final List<Object> nodeInfos = XPathCache.evaluate(
                         boundElementInfo,
@@ -251,6 +254,28 @@ public class XBLTransformer {
                     }
                 }
 
+                // Check for AVTs
+                if (supportAVTs) {
+                    for (final Attribute att : (List<Attribute>) element.attributes()) {
+                        final String attValue = att.getValue();
+                        if (XFormsUtils.maybeAVT(attValue)) {
+                            final String newValue =
+                                XPathCache.evaluateAsAvt(
+                                    boundElementInfo,
+                                    attValue,
+                                    new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
+                                    null,
+                                    null, // library
+                                    null,
+                                    null,
+                                    null,
+                                    null  // locationData
+                                );
+
+                            setAttribute(Collections.<Node>singletonList(element), att.getQName(), newValue, element);
+                        }
+                    }
+                }
                 // Prefix resulting xhtml:*/(@id |@for)
 
                 // NOTE: We could also do the prefixing in the handlers, when the page is output.

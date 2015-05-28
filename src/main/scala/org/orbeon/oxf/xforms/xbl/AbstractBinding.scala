@@ -102,6 +102,7 @@ case class AbstractBinding(
     ) toMap
 
     def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
+    def supportAVTs     = templateElement exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
 
     private def transformQNameOption = templateElement flatMap
         (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
@@ -134,7 +135,7 @@ case class AbstractBinding(
 
             generatedDocument
     }
-    
+
     def selectorsNamespaces =
         Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
 }

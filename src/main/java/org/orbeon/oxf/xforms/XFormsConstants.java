@@ -166,6 +166,7 @@ public class XFormsConstants {
     public static final String XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl";
     public static final Namespace XXBL_NAMESPACE = new Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI);
     public static final QName XXBL_TRANSFORM_QNAME = new QName("transform", XXBL_NAMESPACE);
+    public static final QName XXBL_AVT_QNAME = new QName("avt", XXBL_NAMESPACE);
     public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
     public static final QName XXBL_CONTAINER_QNAME = new QName("container", XXBL_NAMESPACE);
     public static final QName XXBL_GLOBAL_QNAME = new QName("global", XXBL_NAMESPACE);

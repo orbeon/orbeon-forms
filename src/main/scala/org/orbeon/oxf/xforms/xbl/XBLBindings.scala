@@ -51,15 +51,15 @@ class XBLBindings(
     // For unit test written in Java
     def this(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata) =
         this(indentedLogger, partAnalysis, metadata: Metadata, Seq.empty)
-    
+
     // We now know all inline XBL bindings, which we didn't in XFormsAnnotator. So
     // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
     // all XBL components. They would then have to be properly scoped.
     if (partAnalysis ne null) // for unit test which passes null in!
         metadata.extractInlineXBL(inlineXBL, partAnalysis.startScope)
-    
+
     private val logShadowTrees = false // whether to log shadow trees as they are built
-    
+
     /*
      * Notes about id generation
      *
@@ -321,7 +321,8 @@ class XBLBindings(
                         shadowTreeDocument,
                         boundElement,
                         abstractBinding.modeHandlers,
-                        abstractBinding.modeLHHA
+                        abstractBinding.modeLHHA,
+                        abstractBinding.supportAVTs
                     )
                 }
         }

@@ -713,6 +713,8 @@
         <antcall target="war">
             <param name="skip.compilation" value="true"/>
         </antcall>
+        <!-- web.xml creates a resource manager pointing to this directory and it must exist -->
+        <mkdir dir="src/resources-local"/>
         <antcall target="war-copy-descriptors">
             <param name="skip.compilation" value="true"/>
             <param name="target" value="devel"/>

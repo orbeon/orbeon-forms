@@ -48,7 +48,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value><xsl:value-of select="$build-root"/>/src/test/resources</param-value>
+                        <param-value><xsl:value-of select="$build-root"/>/src/resources</param-value>
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.2</param-name>
@@ -56,7 +56,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value><xsl:value-of select="$build-root"/>/src/resources</param-value>
+                        <param-value><xsl:value-of select="$build-root"/>/src/test/resources</param-value>
                     </context-param>
                 </xsl:with-param>
             </xsl:call-template>

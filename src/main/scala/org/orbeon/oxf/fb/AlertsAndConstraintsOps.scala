@@ -19,8 +19,11 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -72,7 +75,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             validationElemsSeq map (v ⇒ v → (v attValue "type")) flatMap {
                 case (e, Required.name)   ⇒ RequiredValidation.fromXML(e, idsIterator)
                 case (e, "datatype")      ⇒ DatatypeValidation.fromXML(e, idsIterator, inDoc, controlName)
-                case (e, Constraint.name) ⇒ ConstraintValidation.fromXML(e, idsIterator)
+                case (e, _)               ⇒ ConstraintValidation.fromXML(e, idsIterator)
             }
         }
 
@@ -420,11 +423,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     val builtinTypeString = builtinTypeStringOpt.get
 
                     // If a builtin type, we just have a local name
-                    val nsURI =
-                        if (XFormsTypeNames(builtinTypeString) || ! builtinTypeRequired && XFormsVariationTypeNames(builtinTypeString))
-                            XF
-                        else
-                            XS
+                    val nsURI = Model.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
 
                     // Namespace mapping must be in scope
                     val prefix = bind.nonEmptyPrefixesForURI(nsURI).sorted.head
@@ -466,14 +465,22 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
         def stringValue = expression
 
-        def toXML(forLang: String): sx.Elem =
+        def toXML(forLang: String): sx.Elem = {
+
+            val analyzed = ValidationFunction.analyzeKnownConstraint(expression)
+
             <validation
-                type="constraint"
+                type={analyzed map (_._1) getOrElse "formula"}
                 id={idOpt getOrElse ""}
                 level={level.name}
-                default-alert={alert.isEmpty.toString}><constraint expression={expression}/>{
-                alertOrPlaceholder(alert, forLang)
-            }</validation>
+                default-alert={alert.isEmpty.toString}>
+                <constraint
+                    expression={if (analyzed.isEmpty) expression else ""}
+                    argument={analyzed map (_._2) getOrElse ""}
+                />
+                {alertOrPlaceholder(alert, forLang)}
+            </validation>
+        }
     }
 
     object ConstraintValidation {
@@ -485,11 +492,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
             }
 
         def fromXML(validationElem: NodeInfo, newIds: Iterator[String]) = {
-            require(validationElem /@ "type" === Constraint.name)
 
-            val constraintExpressionOpt = (validationElem child Constraint.name attValue "expression" headOption) flatMap nonEmptyOrNone
+            def normalizedAttOpt(attName: String) =
+                (validationElem child Constraint.name attValue attName headOption) flatMap nonEmptyOrNone
 
-            constraintExpressionOpt map { expression ⇒
+            val constraintExpressionOpt = validationElem attValue "type" match {
+                case "formula"      ⇒ normalizedAttOpt("expression")
+                case validationName ⇒ normalizedAttOpt("argument") map (arg ⇒ s"xxf:$validationName($arg)")
+            }
+
+            constraintExpressionOpt map { expr ⇒
 
                 val level           = Validation.levelFromXML(validationElem)
                 val validationIdOpt = nonEmptyOrNone(validationElem.id) orElse Some(newIds.next())
@@ -497,7 +509,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 ConstraintValidation(
                     validationIdOpt,
                     level,
-                    expression,
+                    expr,
                     AlertDetails.fromValidationXML(validationElem, validationIdOpt)
                 )
             }
@@ -532,7 +544,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // - alerts returned are either global (no validation/level specified) or for a single specific validation
         def fromForm(inDoc: NodeInfo, controlName: String): Seq[AlertDetails] = {
 
-            val control                    = findControlByName(inDoc, controlName).get
+            val controlElem                = findControlByName(inDoc, controlName).get
             val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert")
 
             def alertFromElement(e: NodeInfo) = {
@@ -573,7 +585,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 canHandle option AlertDetails(forValidations.headOption, alertsByLang, isGlobal)
             }
 
-            control child "alert" flatMap alertFromElement toList
+            controlElem child "alert" flatMap alertFromElement toList
         }
 
         def fromXML(alertElem: NodeInfo, forValidationId: Option[String]) = {

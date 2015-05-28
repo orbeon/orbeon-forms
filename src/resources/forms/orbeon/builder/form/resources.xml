@@ -375,10 +375,19 @@
                 <item id="2">Formula</item>
             </required>
             <constraint>
-                <label>Constraint</label>
+                <item id="formula">Formula</item>
+                <item id="max-length">Has Maximum Length</item>
+                <item id="min-length">Has Minimum Length</item>
+            </constraint>
+            <formula>
+                <label>Formula</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>Boolean XPath expression</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label>Integer Value</label>
+                <alert>Incorrect Value</alert>
+            </integer-argument>
             <visibility>
                 <label>Visibility</label>
                 <alert>Incorrect XPath expression</alert>
@@ -1236,10 +1245,19 @@
                 <item id="2">Formule</item>
             </required>
             <constraint>
-                <label>Contrainte</label>
+                <item id="formula">Formule</item>
+                <item id="max-length">A longueur maximale</item>
+                <item id="min-length">A longueur minimale</item>
+            </constraint>
+            <formula>
+                <label>Formule</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath booléenne</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label>Nombre entier</label>
+                <alert>Valeur incorrecte</alert>
+            </integer-argument>
             <visibility>
                 <label>Visibilité</label>
                 <alert>Expression XPath incorrecte</alert>
@@ -2100,10 +2118,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Restriksjon</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>Boolsk XPath-uttrykk</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label>[Integer Value]</label>
+                <alert>[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Synlighet</label>
                 <alert>Galt XPath-uttrykk</alert>
@@ -2962,10 +2989,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Ограничение</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Настройки видимости</label>
                 <alert>Некорректное выражение XPath</alert>
@@ -3825,10 +3861,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Costrizione</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Espressione XPath non corretta</alert>
                 <hint>Espressione XPath booleana</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Visibiltà</label>
                 <alert>Espressione XPath non corretta</alert>
@@ -4680,10 +4725,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Einschränkung</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Sichtbarkeit</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
@@ -5538,10 +5592,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Rajoite</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Virheellinen XPath-lauseke</alert>
                 <hint>Boolean XPath-lauseke</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Näkyvyys</label>
                 <alert>Virheellinen XPath-lauseke</alert>
@@ -6394,10 +6457,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Restricción</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Expresión XPath incorrecta</alert>
                 <hint>Expresión XPath booleana</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Visibilidad</label>
                 <alert>Expresión XPath incorrecta</alert>
@@ -7257,10 +7329,19 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <label>Restrição</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Expressão de XPath incorrecta</alert>
                 <hint>Expressão XPath do tipo Boolean</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Visibilidade</label>
                 <alert>Expressão de XPath incorrecta</alert>
@@ -8119,10 +8200,19 @@
                 <item id="2">Formel</item>
             </required>
             <constraint>
-                <label>Villkor</label>
+                <item id="formula" todo="true">[Formula]</item>
+                <item id="max-length" todo="true">[Has Maximum Length]</item>
+                <item id="min-length" todo="true">[Has Minimum Length]</item>
+            </constraint>
+            <formula>
+                <label todo="true">[Formula]</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>Booleskt XPath-uttryck</hint>
-            </constraint>
+            </formula>
+            <integer-argument>
+                <label todo="true">[Integer Value]</label>
+                <alert todo="true">[Incorrect Value]</alert>
+            </integer-argument>
             <visibility>
                 <label>Synlighet</label>
                 <alert>Felaktigt XPath-uttryck</alert>

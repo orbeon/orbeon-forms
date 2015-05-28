@@ -53,6 +53,6 @@ public class XXFormsProperty extends XFormsFunction {
     public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
         // Default behavior: depend on arguments
         // We don't consider that a change to the properties should cause a reevaluation
-        return saxonAddToPathMap(pathMap, pathMapNodeSet);
+        return addSubExpressionsToPathMap(pathMap, pathMapNodeSet);
     }
 }

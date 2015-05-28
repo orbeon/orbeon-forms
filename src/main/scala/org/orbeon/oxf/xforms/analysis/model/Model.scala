@@ -371,6 +371,7 @@ object Model {
     val DEFAULT_VALID      = true
     val DEFAULT_CONSTRAINT = true
 
+    // NOTE: If changed, QName returned has an empty prefix.
     def getVariationTypeOrKeep(datatype: QName) =
         if (XFormsVariationTypeNames(datatype.getName))
             if (datatype.getNamespaceURI == XFORMS_NAMESPACE_URI)
@@ -381,6 +382,16 @@ object Model {
                 datatype
         else
             datatype
+
+    def uriForBuiltinTypeName(builtinTypeString: String, required: Boolean) =
+        if (XFormsTypeNames(builtinTypeString) || ! required && XFormsVariationTypeNames(builtinTypeString))
+            XFORMS_NAMESPACE_URI
+        else
+            XSD_URI
+
+    // NOTE: QName returned has an empty prefix.
+    def qNameForBuiltinTypeName(builtinTypeString: String, required: Boolean) =
+        QName.get(builtinTypeString, "", uriForBuiltinTypeName(builtinTypeString, required))
 
     val XFormsSchemaTypeNames = Set(
         "dayTimeDuration",

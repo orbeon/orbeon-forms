@@ -215,8 +215,8 @@
                 <xf:var name="i" value="instance()"/>
 
                 <xf:instance id="validation-constraint-template" xxf:exclude-result-prefixes="#all">
-                    <validation id="" type="constraint" level="error" default-alert="true">
-                        <constraint expression=""/>
+                    <validation id="" type="formula" level="error" default-alert="true">
+                        <constraint expression="" argument=""/>
                         <alert message=""/>
                     </validation>
                 </xf:instance>
@@ -257,17 +257,19 @@
                     <xf:bind ref="validation">
                         <xf:bind
                             ref="@type"
-                            readonly="true()"/>
+                            name="type"
+                            readonly=". = ('required', 'datatype')"/>
 
                         <xf:bind
                             ref="@level"
-                            readonly="../@type = ('required', 'datatype')"/>
+                            name="level"
+                            readonly="$type = ('required', 'datatype')"/>
 
                         <xf:bind
                             ref="@default-alert"
                             type="xs:boolean"
                             readonly="false()"
-                            calculate="if (../@type = 'constraint' and ../@level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
+                            calculate="if (not($type = ('required', 'datatype')) and $level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
 
                         <!-- Keep required in sync -->
                         <xf:bind
@@ -277,7 +279,15 @@
                         <xf:bind
                             ref="constraint/@expression"
                             type="xxf:xpath2"
-                            required="false()"/>
+                            required="false()"
+                            relevant="$type = 'formula'"/>
+
+                        <xf:bind
+                            ref="constraint/@argument"
+                            type="xf:integer"
+                            required="not($type = ('required', 'datatype', 'formula'))"
+                            constraint=". ge 0"
+                            relevant="not($type = ('required', 'datatype', 'formula'))"/>
 
                         <xf:bind
                             ref="required"
@@ -377,20 +387,20 @@
                         <fr:grid id="validations-grid" ref="validation" origin="instance('validation-constraint-template')" repeat="true" freeze="2">
                             <xh:tr>
                                 <xh:td>
-                                    <xf:select1 ref="@type" appearance="full">
+                                    <xf:select1 ref="@type" appearance="minimal">
                                         <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
-                                        <xf:item>
+                                        <xf:itemset ref=".[. = 'required']">
                                             <xf:label ref="$resources/dialog-control-details/required/label"/>
                                             <xf:value>required</xf:value>
-                                        </xf:item>
-                                        <xf:item>
+                                        </xf:itemset>
+                                        <xf:itemset ref=".[. = 'datatype']">
                                             <xf:label ref="$resources/dialog-control-details/types/label"/>
                                             <xf:value>datatype</xf:value>
-                                        </xf:item>
-                                        <xf:item>
-                                            <xf:label ref="$resources/dialog-control-details/constraint/label"/>
-                                            <xf:value>constraint</xf:value>
-                                        </xf:item>
+                                        </xf:itemset>
+                                        <xf:itemset ref="$resources/dialog-control-details/constraint/item">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="@id"/>
+                                        </xf:itemset>
                                     </xf:select1>
                                 </xh:td>
                                 <xh:td>
@@ -456,11 +466,16 @@
                                             </fr:dropdown-select1>
                                         </xf:group>
 
-                                        <xf:textarea ref=".[@type = 'constraint']/constraint/@expression">
-                                            <xf:label ref="$resources/dialog-control-details/constraint/label"/>
-                                            <xf:alert ref="$resources/dialog-control-details/constraint/alert"/>
-                                            <!--<xf:hint  ref="$resources/dialog-control-details/constraint/hint" appearance="minimal"/>-->
-                                        </xf:textarea>
+                                        <xf:group ref=".[not(@type = ('required', 'datatype'))]">
+                                            <xf:textarea ref="constraint/@expression">
+                                                <xf:label class="xforms-hidden" appearance="minimal" ref="$resources/dialog-control-details/formula/label"/>
+                                                <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
+                                            </xf:textarea>
+                                            <xf:input ref="constraint/@argument">
+                                                <xf:label appearance="minimal" ref="$resources/dialog-control-details/integer-argument/label"/>
+                                                <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                            </xf:input>
+                                        </xf:group>
                                     </xf:group>
 
                                 </xh:td>

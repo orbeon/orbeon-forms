@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.expr.{ExpressionTool, Expression, XPathContext}
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.value.{BooleanValue, StringValue}
+import org.orbeon.saxon.value.{Int64Value, IntegerValue, BooleanValue, StringValue}
 import collection.JavaConverters._
 import org.orbeon.scaxon.XML._
 
@@ -31,11 +31,20 @@ protected trait FunctionSupport extends XFormsFunction {
     def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
         arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
 
+    def stringValueArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+        itemArgumentsOpt(i) map (_.getStringValue)
+
     def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
         stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))
 
+    def longArgument(i: Int, default: Long)(implicit xpathContext: XPathContext) =
+        longArgumentOpt(i) getOrElse default
+
+    def longArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+        arguments.lift(i) flatMap evaluateAsLong
+
     def booleanArgument(i: Int, default: Boolean)(implicit xpathContext: XPathContext) =
-        arguments.lift(i) map effectiveBooleanValue getOrElse default
+        booleanArgumentOpt(i) getOrElse default
 
     def booleanArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
         arguments.lift(i) map effectiveBooleanValue
@@ -79,6 +88,13 @@ protected trait FunctionSupport extends XFormsFunction {
 
     def effectiveBooleanValue(e: Expression)(implicit xpathContext: XPathContext) =
         ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
+
+    def evaluateAsLong(e: Expression)(implicit xpathContext: XPathContext) =
+        Option(e.evaluateItem(xpathContext)) flatMap {
+            case v: Int64Value   ⇒ Some(v.longValue)
+            case v: IntegerValue ⇒ throw new IllegalArgumentException("integer value out of range for Long")
+            case v               ⇒ None
+        }
 
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)

@@ -102,5 +102,5 @@ class Property extends XFormsFunction with FunctionSupport {
     // Default behavior: depend on arguments
     // We don't consider that a change to the properties should cause a reevaluation
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
-        saxonAddToPathMap(pathMap, pathMapNodeSet)
+        addSubExpressionsToPathMap(pathMap, pathMapNodeSet)
 }

@@ -53,10 +53,10 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
     final val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
     final val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
-    
+
     // Whether this is the first rebuild for the associated XForms model
-    private var isFirstRebuild = containingDocument.isInitializing 
-    
+    private var isFirstRebuild = containingDocument.isInitializing
+
     // Iterate over all binds and for each one call the callback
     protected def iterateBinds(bindRunner: BindRunner): Unit =
         // Iterate over top-level binds
@@ -73,13 +73,13 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                         )
                     )
                 }
-    
+
     // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
     def rebuild(): Unit =
         withDebug("performing rebuild", List("model id" → model.getEffectiveId)) {
 
             // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
-    
+
             // Clear all instances that might have InstanceData
             // Only need to do this after the first rebuild
             if (! isFirstRebuild)
@@ -91,7 +91,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                     val instanceMightHaveMips =
                         dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId) ||
                         dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId)
-    
+
                     if (instanceMightBeSchemaValidated || instanceMightHaveMips)
                         DataModel.visitElement(instance.rootElement, InstanceData.clearState)
                 }
@@ -99,14 +99,14 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
             // Not ideal, but this state is updated when the bind tree is updated below
             singleNodeContextBinds.clear()
             iterationsForContextItem.clear()
-    
+
             // Iterate through all top-level bind elements to create new bind tree
             // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
             // Even before that, the bind tree could be modified more dynamically as is the case with controls
             _topLevelBinds =
                 for (staticBind ← staticModel.topLevelBinds)
                     yield new RuntimeBind(model, staticBind, null, true)
-    
+
             isFirstRebuild = false
         }
 
@@ -123,45 +123,24 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         // assigning validity to an enclosing element.
         // See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315821&group_id=168&atid=350207
 
-        if (InstanceData.getTypeValid(currentNode)) {
-            // Then bother checking constraints
+        // NOTE: 2015-05-27: We used to not run constraints if the datatype was not valid. This could cause a bug
+        // when the type would switch from valid to invalid and back. In addition, we do want to run constraints so
+        // that validation properties such as `max-length` are computed even when the datatype is not valid. So now we
+        // keep the list of constraints up to date even when the datatype is not valid.
 
-            // TODO: what about scenario:
-            // 1. value type valid
-            // 2. constraint fails
-            // 3. value no longer type valid
-            // 4. value type valid again but would cause constraint to succeed
-            // 5. dependency not recomputed?
-            // ⇒ TODO: if type becomes valid, must re-evaluate all constraints
-
-            for {
-                (level, mips) ← bindNode.staticBind.constraintsByLevel
-            } locally {
-                if (dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, Model.CONSTRAINT, level)) {
-                    // Re-evaluate and set
-                    val failedConstraints = failedConstraintMIPs(level, bindNode)
-                    if (failedConstraints.nonEmpty)
-                        bindNode.failedConstraints += level → failedConstraints
-                    else
-                        bindNode.failedConstraints -= level
-                } else {
-                    // Don't change list of failed constraints for this level
-                }
+        for {
+            (level, mips) ← bindNode.staticBind.constraintsByLevel
+        } locally {
+            if (dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, Model.CONSTRAINT, level)) {
+                // Re-evaluate and set
+                val failedConstraints = failedConstraintMIPs(mips, bindNode)
+                if (failedConstraints.nonEmpty)
+                    bindNode.failedConstraints += level → failedConstraints
+                else
+                    bindNode.failedConstraints -= level
+            } else {
+                // Don't change list of failed constraints for this level
             }
-        } else {
-            // Type is invalid and we consider that we don't need to run additional constraint checks on the node. We
-            // used to say that "we don't want to risk running an XPath expression against an invalid node type", but
-            // that wasn't a good reason, e.g. it made sense for:
-            //
-            //    <xf:bind type="xs:integer" constraint=". > 0"/>
-            //
-            // but not so much for:
-            //
-            //    <xf:bind type="xs:integer" constraint="../foo > 0"/>
-            //
-            // So we now have a better rationale for not evaluating constraints in that case, which has nothing to do
-            // with attempting to evaluate XPath expression against an invalid node type.
-            bindNode.failedConstraints = BindNode.EmptyValidations
         }
 
         // Remember invalid instances
@@ -171,31 +150,60 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         }
     }
 
-    private def evaluateSingleConstraintMIP(bindNode: BindNode, mip: StaticXPathMIP) =
-        try evaluateBooleanExpression(bindNode, mip)
-        catch {
-            case NonFatal(e) ⇒
-                handleMIPXPathException(e, bindNode, mip, "evaluating XForms constraint bind")
-                ! Model.DEFAULT_VALID
-        }
-
-    protected def failedConstraintMIPs(level: ValidationLevel, bindNode: BindNode): List[StaticXPathMIP] =
+    protected def failedConstraintMIPs(mips: List[StaticXPathMIP], bindNode: BindNode): List[StaticXPathMIP] =
         for {
-            mips   ← bindNode.staticBind.constraintsByLevel.get(level).toList
-            mip    ← mips
-            failed = ! evaluateSingleConstraintMIP(bindNode, mip)
-            if failed
+            mip       ← mips
+            succeeded = evaluateBooleanExpressionStoreProperties(bindNode, mip)
+            if ! succeeded
         } yield
             mip
 
+    protected def hasFailedErrorConstraintMIPs(bindNode: BindNode): Boolean =
+        bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to[List] flatMap { mips ⇒
+            failedConstraintMIPs(mips, bindNode)
+        } nonEmpty
+
+    protected def evaluateBooleanExpressionStoreProperties(
+        bindNode : BindNode,
+        xpathMIP : StaticXPathMIP
+    ): Boolean =
+        try {
+            // LATER: If we implement support for allowing binds to receive events, source must be bind id.
+            val functionContext =
+                model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode))
+
+            val result =
+                XPath.evaluateSingle(
+                    contextItems        = bindNode.parentBind.items,
+                    contextPosition     = bindNode.position,
+                    compiledExpression  = xpathMIP.compiledExpression,
+                    functionContext     = functionContext,
+                    variableResolver    = model.variableResolver
+                ).asInstanceOf[Boolean]
+
+            functionContext.properties foreach { propertiesMap ⇒
+                propertiesMap foreach {
+                    case (name, Some(l: Long)) ⇒ bindNode.setCustom(name, l.toString)
+                    case (name, None)          ⇒ bindNode.clearCustom(name)
+                    case _ ⇒
+                }
+            }
+
+            result
+        } catch {
+            case NonFatal(e) ⇒
+                handleMIPXPathException(e, bindNode, xpathMIP, "evaluating XForms constraint bind")
+                ! Model.DEFAULT_VALID
+        }
+
     protected def evaluateBooleanExpression(bindNode: BindNode, xpathMIP: StaticXPathMIP): Boolean =
-        // NOTE: When we implement support for allowing binds to receive events, source must be bind id.
+        // LATER: If we implement support for allowing binds to receive events, source must be bind id.
         XPath.evaluateSingle(
-            contextItems       = bindNode.parentBind.items,
-            contextPosition    = bindNode.position,
-            compiledExpression = xpathMIP.compiledExpression,
-            functionContext    = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
-            variableResolver   = model.variableResolver
+            contextItems        = bindNode.parentBind.items,
+            contextPosition     = bindNode.position,
+            compiledExpression  = xpathMIP.compiledExpression,
+            functionContext     = model.getContextStack.getFunctionContext(model.getEffectiveId, Some(bindNode)),
+            variableResolver    = model.variableResolver
         ).asInstanceOf[Boolean]
 
     protected def evaluateStringExpression(bindNode: BindNode, xpathMIP: StaticXPathMIP): String =
@@ -233,7 +241,9 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                         bindNode.locationData,
                         description = Option(message),
                         params      = List("expression" → xpathMIP.compiledExpression.string),
-                        element     = Some(bindNode.staticBind.element)))
+                        element     = Some(bindNode.staticBind.element)
+                    )
+                )
 
                 Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(model, ve.getMessage, ve))
         }
@@ -302,15 +312,15 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 null
         }
     }
-    
+
     def applyDefaultValueBindsIfNeeded(): Unit =
         if (staticModel.hasDefaultValueBind)
             applyCalculatedBindsUseOrderIfNeeded(Model.Default, staticModel.defaultValueOrder)
-    
+
     def applyCalculateBindsIfNeeded(): Unit =
         if (staticModel.hasCalculateBind)
             applyCalculatedBindsUseOrderIfNeeded(Model.Calculate, staticModel.recalculateOrder)
-    
+
     def applyCalculatedBindsUseOrderIfNeeded(mip: Model.StringMIP, orderOpt: Option[List[StaticBind]]): Unit =
         orderOpt match {
             case Some(order) ⇒
@@ -324,7 +334,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                         }
                 })
         }
-    
+
     def applyCalculatedBindsFollowDependencies(order: List[StaticBind], mip: Model.StringMIP): Unit = {
         order foreach { staticBind ⇒
             val logger = DependencyAnalyzer.Logger
@@ -347,12 +357,12 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     def evaluateAndSetCalculatedBind(bindNode: BindNode, mip: Model.StringMIP): Unit =
         evaluateCalculatedBind(bindNode, mip) foreach { stringResult ⇒
             DataModel.jSetValueIfChanged(
-                containingDocument = containingDocument, 
-                eventTarget        = model, 
-                locationData       = bindNode.locationData, 
-                nodeInfo           = bindNode.node, 
-                valueToSet         = stringResult, 
-                source             = mip.name, 
+                containingDocument = containingDocument,
+                eventTarget        = model,
+                locationData       = bindNode.locationData,
+                nodeInfo           = bindNode.node,
+                valueToSet         = stringResult,
+                source             = mip.name,
                 isCalculate        = true
             )
         }
@@ -367,7 +377,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                     Some("")
             }
         }
-    
+
     def jEvaluateCalculatedBind(bindNode: BindNode, mipName: String): String = {
         val mip = mipName match {
             case Model.Calculate.name ⇒ Model.Calculate
@@ -376,7 +386,6 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         }
         evaluateCalculatedBind(bindNode, mip).orNull
     }
-                
 }
 
 object XFormsModelBindsBase {

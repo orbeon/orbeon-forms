@@ -52,8 +52,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     @Test def warningConstraintAutomaticId() =
         withActionAndFBDoc(AlertsDoc) { doc ⇒
             val newValidation =
-                <validation type="constraint" id="" level="warning" default-alert="false">
-                    <constraint expression="string-length() gt 10"/>
+                <validation type="formula" id="" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10" argument=""/>
                     <alert message="Length must be greater than 10" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 10"/>
                     </alert>
@@ -62,8 +62,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
 
             val expected =
-                <validation type="constraint" id="validation-3-validation" level="warning" default-alert="false">
-                    <constraint expression="string-length() gt 10"/>
+                <validation type="formula" id="validation-3-validation" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10" argument=""/>
                     <alert message="Length must be greater than 10" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 10"/>
                     </alert>
@@ -75,8 +75,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     @Test def warningConstraintSpecifyId() =
         withActionAndFBDoc(AlertsDoc) { doc ⇒
             val newValidation =
-                <validation type="constraint" id="length-constraint" level="warning" default-alert="false">
-                    <constraint expression="string-length() gt 10"/>
+                <validation type="formula" id="length-constraint" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10" argument=""/>
                     <alert message="Length must be greater than 10" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 10"/>
                     </alert>
@@ -90,14 +90,14 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val newValidations = Array(
-                <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
-                    <constraint expression="string-length() gt 5"/>
+                <validation type="formula" id="length5-constraint" level="error" default-alert="false">
+                    <constraint expression="string-length() gt 5" argument=""/>
                     <alert message="Length must be greater than 5" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 5"/>
                     </alert>
                 </validation>,
-                <validation type="constraint" id="length10-constraint" level="warning" default-alert="false">
-                    <constraint expression="string-length() gt 10"/>
+                <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10" argument=""/>
                     <alert message="Length must be greater than 10" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 10"/>
                     </alert>
@@ -116,14 +116,14 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             locally {
 
                 val twoValidations = Array(
-                    <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
-                        <constraint expression="string-length() gt 5"/>
+                    <validation type="formula" id="length5-constraint" level="error" default-alert="false">
+                        <constraint expression="string-length() gt 5" argument=""/>
                         <alert message="Length must be greater than 5" global="false">
                             <message lang="fr" value="Longueur doit être plus grande que 5"/>
                         </alert>
                     </validation>,
-                    <validation type="constraint" id="length10-constraint" level="warning" default-alert="false">
-                        <constraint expression="string-length() gt 10"/>
+                    <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
+                        <constraint expression="string-length() gt 10" argument=""/>
                         <alert message="Length must be greater than 10" global="false">
                             <message lang="fr" value="Longueur doit être plus grande que 10"/>
                         </alert>
@@ -166,8 +166,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
             locally {
                 val oneValidation = Array(
-                    <validation type="constraint" id="length10-constraint" level="warning" default-alert="false">
-                        <constraint expression="string-length() gt 10"/>
+                    <validation type="formula" id="length10-constraint" level="warning" default-alert="false">
+                        <constraint expression="string-length() gt 10" argument=""/>
                         <alert message="Length must be greater than 10" global="false">
                             <message lang="fr" value="Longueur doit être plus grande que 10"/>
                         </alert>
@@ -229,16 +229,16 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val newValidation =
-                <validation type="constraint" id="length5-constraint" level="error" default-alert="true">
-                    <constraint expression="string-length() gt 5"/>
+                <validation type="formula" id="length5-constraint" level="error" default-alert="true">
+                    <constraint expression="string-length() gt 5" argument=""/>
                     <alert message="" global="false"/>
                 </validation>
 
             writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
 
             val expected =
-                <validation type="constraint" id="" level="error" default-alert="true">
-                    <constraint expression="string-length() gt 5"/>
+                <validation type="formula" id="" level="error" default-alert="true">
+                    <constraint expression="string-length() gt 5" argument=""/>
                     <alert message="" global="false"/>
                 </validation>
 
@@ -253,8 +253,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val newValidation =
-                <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
-                    <constraint expression="string-length() gt 5"/>
+                <validation type="formula" id="length5-constraint" level="error" default-alert="false">
+                    <constraint expression="string-length() gt 5" argument=""/>
                     <alert message="Length must be greater than 5" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 5"/>
                     </alert>
@@ -263,8 +263,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
 
             val expected =
-                <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
-                    <constraint expression="string-length() gt 5"/>
+                <validation type="formula" id="length5-constraint" level="error" default-alert="false">
+                    <constraint expression="string-length() gt 5" argument=""/>
                     <alert message="Length must be greater than 5" global="false">
                         <message lang="fr" value="Longueur doit être plus grande que 5"/>
                     </alert>

@@ -38,9 +38,9 @@ object XPathCache {
 
     private val XPathCacheName = "cache.xpath"
     private val XPathCacheDefaultSize = 200
-    
+
     private val Logger = LoggerFactory.createLogger(getClass)
-    
+
     case class XPathContext(
         namespaceMapping   : NamespaceMapping,
         variableToValueMap : JMap[String, ValueRepresentation],
@@ -618,20 +618,20 @@ object XPathCache {
         def makeObject: PooledXPathExpression = {
             if (Logger.isDebugEnabled)
                 Logger.debug("makeObject(" + xpathString + ")")
-            
+
             // Create context
             val independentContext = new IndependentContext(xpathConfiguration)
             independentContext.getConfiguration.setURIResolver(XPath.URIResolver)
-            
+
             // Set the base URI if specified
             if (baseURI ne null)
                 independentContext.setBaseURI(baseURI)
-            
+
             // Declare namespaces
             if (namespaceMapping ne null)
                 for ((prefix, uri) ← namespaceMapping.mapping.asScala)
                     independentContext.declareNamespace(prefix, uri)
-            
+
             // Declare variables (we don't use the values here, just the names)
             val variables =
                 if (variableNames ne null)
@@ -642,11 +642,11 @@ object XPathCache {
                         name → variable
                 else
                     Nil
-            
+
             // Add function library
             if (functionLibrary ne null)
                 independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
-            
+
             createPoolableXPathExpression(independentContext, xpathString, isAVT, pool, variables)
         }
 

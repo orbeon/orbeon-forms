@@ -205,9 +205,9 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             return (type.isDefined()) ? new QNameValue(type.get().getNamespacePrefix(), type.get().getNamespaceURI(), type.get().getName(), null) : null;
         } else if (mipType.equals(XFormsConstants.CONSTRAINT_QNAME)) {
             // Constraint
-            // TODO: Add support for other constraint levels.
+            // MAYBE: Add support for other constraint levels.
             if (bind.staticBind().constraintsByLevel().nonEmpty())
-                return BooleanValue.get(failedConstraintMIPs(ValidationLevels.jErrorLevel(), bindNode).isEmpty());
+                return BooleanValue.get(! hasFailedErrorConstraintMIPs(bindNode));
             else
                 return null;
         } else if (mipType.equals(XFormsConstants.CALCULATE_QNAME)) {

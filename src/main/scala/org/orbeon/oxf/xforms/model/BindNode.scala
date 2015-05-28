@@ -19,7 +19,7 @@ import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xforms.{XFormsModelBinds, InstanceData}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.oxf.xforms.analysis.model.Model.Required
+import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
@@ -101,6 +101,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
     def setRequiredValid(value: Boolean, mip: StaticBind#MIP) = this._requiredValidation    = if (! value) mip else null
 
     def setCustom(name: String, value: String) = _customMips += name → value
+    def clearCustom(name: String)             = _customMips -= name
 
     def relevant        = _relevant
     def readonly        = _readonly
@@ -135,19 +136,25 @@ object BindNode {
         else
             bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips)
 
-    private def prioritizeRequired(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
+    // - prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830. It
+    //   might be better to use another validation level, for example Missing, to handle this. But supporting this
+    //   would have more impact (Form Builder, Form Runner error summary) so we would need to investigate more. For
+    //   now, we consider that, for a control, required error validations take precedence over other validations.
+    // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
+    private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
         mipsForLevel match {
             case (ErrorLevel, mips) if mips exists (_.name == Required.name) ⇒
                 ErrorLevel → (mips filter (_.name == Required.name))
+            case (ErrorLevel, mips) if mips exists (_.name == Type.name) ⇒
+                ErrorLevel → (mips filter (_.name == Type.name))
             case validations ⇒
                 validations
         }
 
     // Get all failed constraints for all levels, combining BindNodes if needed.
-    // Also, prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830.
     // 2014-07-18: Used by XFormsModelSubmissionBase.annotateWithAlerts only.
     def failedValidationsForAllLevelsPrioritizeRequired(node: Node) =
-        failedValidationsForAllLevels(node) map prioritizeRequired
+        failedValidationsForAllLevels(node) map prioritizeValidations
 
     def failedValidationsForAllLevels(node: Node): Validations =
         collectFailedValidationsForAllLevels(
@@ -160,7 +167,7 @@ object BindNode {
         if (bindNodes.isEmpty)
             EmptyValidations
         else if (bindNodes.size == 1)
-            bindNodes(0).failedValidationsForAllLevels
+            bindNodes.head.failedValidationsForAllLevels
         else {
             // This is rather inefficient but hopefully rare
             val buildersByLevel =
@@ -180,13 +187,9 @@ object BindNode {
         }
 
     // Get all failed constraints for the highest level only, combining BindNodes if needed.
-    // Also, prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830. It
-    // might be better to use another validation level, for example Missing, to handle this. But supporting this would
-    // have more impact (Form Builder, Form Runner error summary) so we would need to investigate more. For now, we
-    // consider that, for a control, required error validations take precedence over other validations.
     // 2014-07-18: Used by XFormsSingleNodeControl only.
     def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: NodeInfo) =
-        failedValidationsForHighestLevel(nodeInfo) map prioritizeRequired
+        failedValidationsForHighestLevel(nodeInfo) map prioritizeValidations
 
     def failedValidationsForHighestLevel(nodeInfo: NodeInfo) =
         collectFailedValidationsForHighestLevel(
@@ -199,7 +202,7 @@ object BindNode {
         bindNodes : Seq[BindNode]
     ): Option[(ValidationLevel, List[StaticBind#MIP])] =
         collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
-    
+
     private def collectFailedValidationsForLevel(
         bindNodes : Seq[BindNode],
         findLevel : BindNode ⇒ Option[ValidationLevel]

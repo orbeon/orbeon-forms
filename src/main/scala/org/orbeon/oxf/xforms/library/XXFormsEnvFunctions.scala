@@ -47,11 +47,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("repeat-position", classOf[XXFormsRepeatPosition], 0, 0, INTEGER, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("context", classOf[XXFormsContext], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("repeat-items", classOf[XXFormsRepeatItems], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
@@ -60,18 +60,18 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("repeat-nodeset", classOf[XXFormsRepeatItems], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("evaluate-bind-property", classOf[XXFormsEvaluateBindProperty], 0, 2, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(ANY_ATOMIC, EXACTLY_ONE) // QName or String
         )
-    
+
         Fun("valid", classOf[XXFormsValid], 0, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
-    
+
         Fun("type", classOf[XXFormsType], 0, 0, QNAME, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
@@ -80,17 +80,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("invalid-binds", classOf[XXFormsInvalidBinds], 0, 0, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
-    
+
         Fun("if", classOf[If], 0, 3, STRING, EXACTLY_ONE,
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("binding", classOf[XXFormsBinding], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
@@ -107,61 +107,61 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("mutable-document", classOf[XXFormsMutableDocument], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, EXACTLY_ONE)
         )
-    
+
         Fun("component-context", classOf[XXFormsComponentContext], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-    
+
         Fun("instance", classOf[XXFormsInstance], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
-    
+
         Fun("index", classOf[XXFormsIndex], 0, 0, INTEGER, EXACTLY_ONE,
             Arg(STRING, ALLOWS_ZERO_OR_ONE)
         )
-    
+
         Fun("list-models", classOf[XXFormsListModels], 0, 0, STRING, ALLOWS_ZERO_OR_MORE)
-    
+
         Fun("list-instances", classOf[XXFormsListInstances], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("list-variables", classOf[XXFormsListVariables], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("get-variable", classOf[XXFormsGetVariable], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("itemset", classOf[XXFormsItemset], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
-    
+
         Fun("format-message", classOf[XXFormsFormatMessage], 0, 2, STRING, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
-    
+
         Fun("lang", classOf[XXFormsLang], 0, 0, STRING, ALLOWS_ZERO_OR_ONE)
 
         Fun("r", classOf[XXFormsResource], 0, 1, 2, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("pending-uploads", classOf[XXFormsPendingUploads], 0, 0, INTEGER, EXACTLY_ONE)
-    
+
         Fun("document-id", classOf[XXFormsDocumentId], 0, 0, STRING, EXACTLY_ONE)
-    
+
         Fun("create-document", classOf[XXFormsCreateDocument], 0, 0, Type.NODE_TYPE, EXACTLY_ONE)
-    
+
         Fun("label", classOf[XXFormsLHHA], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
@@ -190,17 +190,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("client-id", classOf[XXFormsClientId], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("control-element", classOf[XXFormsControlElement], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         Fun("extract-document", classOf[XXFormsExtractDocument], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
             Arg(Type.NODE_TYPE, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
-    
+
         // RFE: Support XSLT 2.0-features such as multiple sort keys
         Fun("sort", classOf[XXFormsSort], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
@@ -228,6 +228,15 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         // Now available in XForms 2.0
         Fun("bind", classOf[Bind], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
+        )
+
+        // Validation functions
+        Fun("max-length", classOf[MaxLengthValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+            Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
+        )
+
+        Fun("min-length", classOf[MinLengthValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+            Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
         )
     }
 }

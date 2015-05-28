@@ -22,6 +22,8 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.oxf.xforms.model.BindNode
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, XFormsModel, XFormsUtils}
+import org.orbeon.saxon.`type`.AtomicType
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.sxpath.IndependentContext
@@ -29,6 +31,7 @@ import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.XML
 
 import scala.collection.JavaConverters._
+import scala.collection.{mutable ⇒ m}
 
 /**
  * Base class for all XForms functions.
@@ -72,6 +75,9 @@ abstract class XFormsFunction extends SystemFunction {
 
     def getContainingDocument(implicit xpathContext: XPathContext) =
         Option(context) map (_.container.getContainingDocument) orNull
+
+    def setProperty(name: String, value: Any) =
+        context.setProperty(name, value)
 
     protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
 
@@ -152,16 +158,49 @@ abstract class XFormsFunction extends SystemFunction {
         }
     }
 
-    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
-        // By default, all XForms function invalidate the map. Subclasses can override this behavior. This ensures that
-        // we do not, by default, produce invalid maps.
+    // By default, all XForms function invalidate the map. Subclasses can override this behavior. This ensures that
+    // we do not, by default, produce invalid maps.
+    override def addToPathMap(
+        pathMap        : PathMap,
+        pathMapNodeSet : PathMapNodeSet
+    ): PathMapNodeSet = {
         pathMap.setInvalidated(true)
         null
     }
 
-    // Access to Saxon's default implementation
-    protected def saxonAddToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
-        super.addToPathMap(pathMap, pathMapNodeSet)
+    // Default implementation which adds child expressions (here function arguments) to the pathmap
+    protected def addSubExpressionsToPathMap(
+        pathMap        : PathMap,
+        pathMapNodeSet : PathMapNodeSet
+    ): PathMapNodeSet  = {
+
+        val attachmentPoint = pathMapAttachmentPoint(pathMap, pathMapNodeSet)
+
+        val result = new PathMapNodeSet
+        iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child ⇒
+            result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
+        }
+
+        val th = getExecutable.getConfiguration.getTypeHierarchy
+        if (getItemType(th).isInstanceOf[AtomicType])
+            null
+        else
+            result
+    }
+
+    protected def pathMapAttachmentPoint(
+        pathMap        : PathMap,
+        pathMapNodeSet : PathMapNodeSet
+    ): PathMapNodeSet  =
+        if ((getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0) {
+            Option(pathMapNodeSet) getOrElse {
+                val cie = new ContextItemExpression
+                cie.setContainer(getContainer)
+                new PathMapNodeSet(pathMap.makeNewRoot(cie))
+            }
+        } else {
+            null
+        }
 }
 
 object XFormsFunction {
@@ -173,7 +212,17 @@ object XFormsFunction {
         model             : XFormsModel,
         data              : Any
     ) extends XPath.FunctionContext {
+
         def containingDocument = container.containingDocument
+
+        private var _properties: Option[m.Map[String, Any]] = None
+        def properties = _properties
+
+        def setProperty(name: String, value: Any) = {
+            if (_properties.isEmpty)
+                _properties = Some(m.Map.empty[String, Any])
+            _properties foreach (_ += name → value)
+        }
     }
 
     def sourceElementAnalysis(pathMap: PathMap) =

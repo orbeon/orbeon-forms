@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
@@ -227,6 +227,15 @@ object XPath {
             evaluator.createExpression(xpathString)
         }
 
+    def compileExpressionMinimal(
+        staticContext : XPathStaticContext,
+        xpathString   : String
+    ): Expression = {
+        val exp = ExpressionTool.make(xpathString, staticContext, 0, -1, 1, false)
+        exp.setContainer(staticContext)
+        exp
+    }
+
     // Ideally: add this to Saxon XPathEvaluator
     private def prepareExpressionForAVT(staticContext: XPathStaticContext, expression: Expression): XPathExpression = {
         // Based on XPathEvaluator.createExpression()
@@ -373,12 +382,13 @@ object XPath {
     ) =
         isNotBlank(xpathString) &&
         Try(
-            compileExpression(
-                xpathString      = xpathString,
-                namespaceMapping = namespaceMapping,
-                locationData     = locationData,
-                functionLibrary  = XFormsContainingDocument.getFunctionLibrary,
-                avt              = false
+            compileExpressionMinimal(
+                staticContext = new ShareableXPathStaticContext(
+                    XPath.GlobalConfiguration,
+                    namespaceMapping,
+                    XFormsFunctionLibrary
+                ),
+                xpathString   = xpathString
             )
         ).isSuccess
 }

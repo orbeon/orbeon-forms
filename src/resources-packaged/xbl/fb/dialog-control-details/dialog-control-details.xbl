@@ -91,6 +91,12 @@
                     context="$validations"
                     origin="fbf:readValidationsAsXML($form, $i/control-name)"/>
 
+                <!--  Insert an empty `formula` validation in the end to make it more discoverable by the user -->
+                <xf:insert
+                    if="empty($validations/validation[not(@type = ('required', 'datatype'))])"
+                    ref="$validations/validation"
+                    origin="instance('validation-constraint-template')"/>
+
                 <!--
                     Force required if the datatype implies it.
 

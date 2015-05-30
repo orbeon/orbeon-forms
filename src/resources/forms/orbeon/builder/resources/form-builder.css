@@ -206,6 +206,9 @@ body {
 .orbeon .fb-toolbox .fb-toolbox-inside .fr-orbeon-version {
   color: white;
 }
+.orbeon .xforms-dialog .xforms-label:empty {
+  display: none;
+}
 .orbeon .xforms-dialog .xforms-label {
   margin-top: 5px;
 }
@@ -384,7 +387,8 @@ body {
   display: flex;
   display: -webkit-flex;
 }
-.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content .xforms-textarea {
+.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content .xforms-textarea,
+.orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content .xforms-input:not(.xforms-type-boolean) {
   flex-flow: column;
   -webkit-flex-flow: column;
   width: 100%;

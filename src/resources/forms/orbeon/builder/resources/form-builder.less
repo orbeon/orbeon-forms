@@ -218,6 +218,10 @@ body {
     // All dialogs
     .xforms-dialog {
 
+        .xforms-label:empty {
+            display: none;
+        }
+
         .xforms-label {
             margin-top: 5px;
 
@@ -369,7 +373,7 @@ body {
             td:nth-of-type(5) .fr-grid-content {
                 .flex();
 
-                .xforms-textarea {
+                .xforms-textarea, .xforms-input:not(.xforms-type-boolean) {
                     .flex-flow(column);
                     width: 100%;
                 }

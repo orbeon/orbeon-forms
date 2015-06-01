@@ -179,9 +179,10 @@
 }
 .orbeon .fr-buttons {
   display: block;
-  float: right;
+  text-align: right;
   padding-left: 10px;
   padding-right: 10px;
+  font-size: 0;
 }
 .orbeon .fr-buttons .fr-buttons-message div {
   display: inline;
@@ -192,6 +193,8 @@
 .orbeon .fr-buttons .xforms-trigger button,
 .orbeon .fr-buttons .xforms-trigger input {
   width: 9.5em;
+  margin-left: 4px;
+  margin-bottom: 4px;
 }
 .orbeon .fr-buttons .fr-collapse-all-button.xforms-trigger button,
 .orbeon .fr-buttons .fr-expand-all-button.xforms-trigger button,

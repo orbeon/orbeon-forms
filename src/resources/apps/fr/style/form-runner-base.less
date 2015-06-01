@@ -200,9 +200,10 @@
 
     .fr-buttons {
         display: block;
-        float: right;
+        text-align: right;
         padding-left: 10px;
         padding-right: 10px;
+        font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
 
         .fr-buttons-message div { display: inline }
 
@@ -211,7 +212,9 @@
         .xforms-trigger button img { margin-right: 10px }
 
         .xforms-trigger button, .xforms-trigger input {
-            width: 9.5em
+            width:         9.5em;
+            margin-left:   4px;
+            margin-bottom: 4px;
         }
 
         // Special sizing for expand/collapse/refresh buttons

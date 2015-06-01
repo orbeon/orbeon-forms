@@ -1,0 +1,27 @@
+.orbeon {
+
+    @media (max-width: 980px) {
+    
+        .fr-view {
+            width: inherit;
+        }
+
+        .span12 {
+            // Don't use fixed width
+            width: inherit;
+            // Isn't sized based on its container if floated
+            float: none;
+        }
+        
+        .fr-grid:not(.fr-repeat-table) {
+
+            // Instead of fixed, so each cell doesn't take 1/x of the width of the table
+            table-layout: inherit;
+
+            & > tbody > tr >  td {
+                // The main thing this CSS does: change table cells into blocks
+                display: block;
+            }
+        }
+    }
+}

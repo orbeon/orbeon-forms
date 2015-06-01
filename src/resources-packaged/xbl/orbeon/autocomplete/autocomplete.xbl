@@ -86,12 +86,12 @@
                     <xf:hint ref="$resources/dialog-actions/items/hint"/>
                 </xf:input>
                 <xf:input ref="xf:itemset/xf:label/@ref">
-                    <xf:label ref="$resources/dialog-actions/label/label"/>
-                    <xf:hint ref="$resources/dialog-actions/label/hint"/>
+                    <xf:label ref="$resources/dialog-actions/item-label/label"/>
+                    <xf:hint ref="$resources/dialog-actions/item-label/hint"/>
                 </xf:input>
                 <xf:input ref="xf:itemset/xf:value/@ref">
-                    <xf:label ref="$resources/dialog-actions/value/label"/>
-                    <xf:hint ref="$resources/dialog-actions/value/hint"/>
+                    <xf:label ref="$resources/dialog-actions/item-value/label"/>
+                    <xf:hint ref="$resources/dialog-actions/item-value/hint"/>
                 </xf:input>
             </control-details>
         </metadata>

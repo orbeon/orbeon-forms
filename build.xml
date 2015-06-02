@@ -789,6 +789,8 @@
                 <exclude name="junit*.properties"/>
                 <!-- Don't include a license with the source -->
                 <exclude name="**/license.xml"/>
+		<!--  No travis build -->
+		<exclude name=".travis.yml"/>
             </zipfileset>
         </zip>
     </target>

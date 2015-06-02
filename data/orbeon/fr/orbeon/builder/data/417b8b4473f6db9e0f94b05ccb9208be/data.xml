@@ -1,19 +1,21 @@
-<xh:html xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:saxon="http://saxon.sf.net/" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:noscript-support="false">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model" xxf:noscript-support="false">
             <xf:instance id="fr-form-instance">
                 <form>
                     <text-controls>
-                        <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
-
-The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.
-
-From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <htmlarea>&lt;div style="text-align: left;"&gt;
 &lt;p&gt;&lt;strong&gt;Giuseppe Fortunino Francesco Verdi&lt;/strong&gt;&amp;nbsp;(Italian:&amp;nbsp;&lt;a shape="rect" title="Help:IPA for Italian" href="https://en.wikipedia.org/wiki/Help:IPA_for_Italian"&gt;[d͡ʒuˈzɛppe ˈverdi]&lt;/a&gt;; 9 or 10 October 1813&amp;nbsp;– 27 January 1901) was an&amp;nbsp;&lt;a shape="rect" title="Italians" href="https://en.wikipedia.org/wiki/Italians"&gt;Italian&lt;/a&gt;&amp;nbsp;&lt;a shape="rect" title="Romantic music" href="https://en.wikipedia.org/wiki/Romantic_music"&gt;Romantic&lt;/a&gt;&amp;nbsp;composer primarily known for his operas. He is considered, together with&amp;nbsp;&lt;a shape="rect" title="Richard Wagner" href="https://en.wikipedia.org/wiki/Richard_Wagner"&gt;Richard Wagner&lt;/a&gt;, the preeminent opera composer of the nineteenth century.&amp;nbsp;Verdi dominated the Italian opera scene after the eras of&amp;nbsp;&lt;a shape="rect" title="Vincenzo Bellini" href="https://en.wikipedia.org/wiki/Vincenzo_Bellini"&gt;Bellini&lt;/a&gt;,&amp;nbsp;&lt;a shape="rect" title="Gaetano Donizetti" href="https://en.wikipedia.org/wiki/Gaetano_Donizetti"&gt;Donizetti&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a shape="rect" title="Gioachino Rossini" href="https://en.wikipedia.org/wiki/Gioachino_Rossini"&gt;Rossini&lt;/a&gt;. His works are frequently performed in opera houses throughout the world and, transcending the boundaries of the genre, some of his themes have long since taken root in popular culture, as "&lt;a shape="rect" title="La donna è mobile" href="https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile"&gt;La donna è mobile&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" class="mw-redirect" title="Rigoletto (opera)" href="https://en.wikipedia.org/wiki/Rigoletto_(opera)"&gt;Rigoletto&lt;/a&gt;&lt;/em&gt;, "&lt;a shape="rect" title="Libiamo ne' lieti calici" href="https://en.wikipedia.org/wiki/Libiamo_ne%27_lieti_calici"&gt;Libiamo ne' lieti calici&lt;/a&gt;" (The Drinking Song) from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="La traviata" href="https://en.wikipedia.org/wiki/La_traviata"&gt;La traviata&lt;/a&gt;&lt;/em&gt;, "&lt;a shape="rect" title="Va, pensiero" href="https://en.wikipedia.org/wiki/Va,_pensiero"&gt;Va, pensiero&lt;/a&gt;" (The Chorus of the Hebrew Slaves) from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Nabucco" href="https://en.wikipedia.org/wiki/Nabucco"&gt;Nabucco&lt;/a&gt;&lt;/em&gt;, the "Coro di zingari" (&lt;a shape="rect" title="Anvil Chorus" href="https://en.wikipedia.org/wiki/Anvil_Chorus"&gt;Anvil Chorus&lt;/a&gt;) from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Il trovatore" href="https://en.wikipedia.org/wiki/Il_trovatore"&gt;Il trovatore&lt;/a&gt;&lt;/em&gt;&amp;nbsp;and the "&lt;a shape="rect" title="Triumphal March" href="https://en.wikipedia.org/wiki/Triumphal_March"&gt;Grand March&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Aida" href="https://en.wikipedia.org/wiki/Aida"&gt;Aida&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
 &lt;p&gt;Moved by the death of compatriot&amp;nbsp;&lt;a shape="rect" title="Alessandro Manzoni" href="https://en.wikipedia.org/wiki/Alessandro_Manzoni"&gt;Alessandro Manzoni&lt;/a&gt;, Verdi wrote&amp;nbsp;&lt;em&gt;&lt;a shape="rect" title="Requiem (Verdi)" href="https://en.wikipedia.org/wiki/Requiem_(Verdi)"&gt;Messa da Requiem&lt;/a&gt;&lt;/em&gt;&amp;nbsp;in 1874 in Manzoni's honour, a work now regarded as a masterpiece of the&amp;nbsp;&lt;a shape="rect" title="Oratorio" href="https://en.wikipedia.org/wiki/Oratorio"&gt;oratorio&lt;/a&gt;&amp;nbsp;tradition and a testimony to his capacity outside the field of opera.&amp;nbsp;Visionary and politically engaged, he remains – alongside&amp;nbsp;&lt;a shape="rect" title="Giuseppe Garibaldi" href="https://en.wikipedia.org/wiki/Giuseppe_Garibaldi"&gt;Garibaldi&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a shape="rect" title="Camillo Benso, Count of Cavour" href="https://en.wikipedia.org/wiki/Camillo_Benso,_Count_of_Cavour"&gt;Cavour&lt;/a&gt;&amp;nbsp;– an emblematic figure of the reunification process of the&amp;nbsp;&lt;a shape="rect" class="mw-redirect" title="Italian peninsula" href="https://en.wikipedia.org/wiki/Italian_peninsula"&gt;Italian peninsula&lt;/a&gt;&amp;nbsp;(the&amp;nbsp;&lt;em&gt;&lt;a shape="rect" class="mw-redirect" title="Risorgimento" href="https://en.wikipedia.org/wiki/Risorgimento"&gt;Risorgimento&lt;/a&gt;&lt;/em&gt;).&lt;/p&gt;
 &lt;/div&gt;</htmlarea>
                         <input>Michelle</input>
+                        <input-counter>This must not be "too long"!</input-counter>
+                        <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
+
+The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.
+
+From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
+                        <textarea-counter>Let's write a Tweet. It must fit in 140 characters.</textarea-counter>
                         <output>Great love and great achievements involve great risk.</output>
                         <secret>42</secret>
                     </text-controls>
@@ -38,14 +40,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <single-list>cat</single-list>
                         <multiple-list>cat bird</multiple-list>
                         <boolean>false</boolean>
-                        <dynamic-data-dropdown/>
+                        <dynamic-data-dropdown itemset-empty="false"/>
                         <autocomplete label="United States">us</autocomplete>
                         <autocomplete-result/>
                     </selection-controls>
                     <attachment-controls>
                         <static-image filename="step.jpg" mediatype="image/jpeg" size="37401">oxf:/forms/orbeon/controls/form/step.jpg</static-image>
                         <image-attachment filename="crater.jpg" mediatype="image/jpeg" size="16952">oxf:/forms/orbeon/controls/form/crater.jpg</image-attachment>
-                        <image-annotation/>
+                        <image-annotation>
+                            <image filename="" mediatype="" size=""/>
+                            <annotation/>
+                        </image-annotation>
                         <file-attachment filename="" mediatype="" size=""/>
                     </attachment-controls>
                     <buttons>
@@ -60,16 +65,21 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <state>DC</state>
                         <zip>20500</zip>
                     </us-address>
-                    <us-address/>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="text-controls-bind" ref="text-controls" name="text-controls">
                     <xf:bind id="input-bind" ref="input" name="input"/>
-                    <xf:bind id="textarea-bind" ref="textarea" name="textarea"/>
-                    <xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"/>
-                    <xf:bind ref="output" id="output-bind" name="output"/>
                     <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"/>
+                    <xf:bind ref="output" id="output-bind" name="output"/>
+                    <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"/>
+                    <xf:bind id="input-counter-bind" ref="input-counter" name="input-counter">
+                        <xf:constraint id="validation-49-validation" value="xxf:max-length(30)"/>
+                    </xf:bind>
+                    <xf:bind id="textarea-bind" ref="textarea" name="textarea"/>
+                    <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
+                        <xf:constraint id="constraint-49-constraint" value="xxf:max-length(140)"/>
+                    </xf:bind>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
                     <xf:bind id="date-bind" ref="date" type="xf:date" name="date"/>
@@ -78,7 +88,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"/>
                     <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
                 </xf:bind>
-                <xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit', 'test')">
+                <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit', 'test')">
                     <xf:bind id="browser-button-bind" ref="browser-button" name="browser-button"/>
                     <xf:bind id="link-button-bind" ref="link-button" name="link-button"/>
                 </xf:bind>
@@ -91,7 +101,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="autocomplete-bind" ref="autocomplete" name="autocomplete"/>
                     <xf:bind id="boolean-bind" ref="boolean" type="xf:boolean" name="boolean"/>
                     <xf:bind name="dynamic-data-dropdown" id="dynamic-data-dropdown-bind" ref="dynamic-data-dropdown" type="xf:string"/>
-                    <xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" name="autocomplete-result" id="autocomplete-result-bind" ref="autocomplete-result" relevant="normalize-space($autocomplete)" calculate="$autocomplete"/>
+                    <xf:bind name="autocomplete-result" id="autocomplete-result-bind" ref="autocomplete-result" relevant="normalize-space($autocomplete)" calculate="$autocomplete"/>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
@@ -102,13 +112,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
                     <xf:bind ref="email" id="email-bind" type="xf:email" name="email"/>
                     <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
-                    <xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
+                    <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
                     <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
                     <xf:bind ref="us-state" id="us-state-bind" type="xf:string" name="us-state"/>
                 </xf:bind>
                 <xf:bind name="us-address" id="us-address-bind" ref="us-address"/>
             </xf:bind>
-            <xf:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxf:readonly="true" id="fr-form-metadata">
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>controls</form-name>
@@ -116,6 +126,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
                     <title xml:lang="fr">Contrôles de Form Builder</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
+                    <singleton>false</singleton>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
@@ -124,7 +135,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xf:instance>
-            <xf:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxf:readonly="true" id="fr-form-resources">
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
                         <static-image>
@@ -302,10 +313,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Fields Date</label>
                             <hint>Date selector with separate fields</hint>
                         </fields-date>
-                        <textarea>
-                            <label>Text Area</label>
-                            <hint>Standard text area</hint>
-                        </textarea>
                         <htmlarea>
                             <label>Formatted Text</label>
                             <hint>Rich text editor</hint>
@@ -320,6 +327,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Input Field</label>
                             <hint>Standard input field</hint>
                         </input>
+                        <input-counter>
+                            <label>Input Field with Character Counter</label>
+                            <hint/>
+                            <alert>30 characters maximum</alert>
+                        </input-counter>
+                        <textarea>
+                            <label>Text Area</label>
+                            <hint>Standard text area</hint>
+                        </textarea>
+                        <textarea-counter>
+                            <label>Text Area with Character counter</label>
+                            <hint/>
+                            <alert>140 characters at most</alert>
+                        </textarea-counter>
                         <output>
                             <label>Text Output</label>
                             <hint/>
@@ -526,10 +547,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Date avec champs</label>
                             <hint>Sélecteur de date avec champs séparés</hint>
                         </fields-date>
-                        <textarea>
-                            <label>Zone de texte</label>
-                            <hint>Zone de texte standard</hint>
-                        </textarea>
                         <htmlarea>
                             <label>Texte formatté</label>
                             <hint>Editeur de texte enrichi</hint>
@@ -544,6 +561,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Champ de texte</label>
                             <hint>Champ de texte standard</hint>
                         </input>
+                        <input-counter>
+                            <label>Champ de texte avec compteur de caractères</label>
+                            <hint/>
+                            <alert>30 caractères au plus</alert>
+                        </input-counter>
+                        <textarea>
+                            <label>Zone de texte</label>
+                            <hint>Zone de texte standard</hint>
+                        </textarea>
+                        <textarea-counter>
+                            <label>Zone de texte avec compteur de caractères</label>
+                            <hint/>
+                            <alert>140 caractères au plus</alert>
+                        </textarea-counter>
                         <output>
                             <label>Sortie texte</label>
                             <hint/>
@@ -587,15 +618,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <country-name>United States</country-name>
                 </instance>
             </xf:instance>
-            <xf:instance id="autocomplete-itemset-instance">
-                <country/>
+            <xf:instance id="autocomplete-itemset-instance"><countries xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"><country>
+        <name>United States</name>
+        <us-code>us</us-code>
+    </country></countries>
+
             </xf:instance>
             <xf:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')" validate="false" method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="autocomplete-itemset-instance"/>
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xf:label ref="$form-resources/text-controls/label"/>
                     <fr:grid columns="3">
@@ -606,6 +640,32 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                     <xf:hint ref="$form-resources/input/hint"/>
                                 </xf:input>
                             </xh:td>
+                            <xh:td>
+                                <xf:input id="input-counter-control" bind="input-counter-bind" appearance="character-counter">
+                                    <xf:label ref="$form-resources/input-counter/label"/>
+                                    <xf:hint ref="$form-resources/input-counter/hint"/>
+                                    <xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:textarea bind="textarea-bind" id="textarea-control">
+                                    <xf:label ref="$form-resources/textarea/label"/>
+                                    <xf:hint ref="$form-resources/textarea/hint"/>
+                                </xf:textarea>
+                            </xh:td>
+                            <xh:td>
+                                <xf:textarea id="textarea-counter-control" bind="textarea-counter-bind" appearance="character-counter">
+                                    <xf:label ref="$form-resources/textarea-counter/label"/>
+                                    <xf:hint ref="$form-resources/textarea-counter/hint"/>
+                                    <xf:alert ref="$form-resources/textarea-counter/alert" validation="constraint-49-constraint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:textarea>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
                             <xh:td>
                                 <xf:output bind="output-bind" id="output-control">
                                     <xf:label ref="$form-resources/output/label"/>
@@ -620,14 +680,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </xh:tr>
                     </fr:grid>
                     <fr:grid columns="1">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:textarea bind="textarea-bind" id="textarea-control">
-                                    <xf:label ref="$form-resources/textarea/label"/>
-                                    <xf:hint ref="$form-resources/textarea/hint"/>
-                                </xf:textarea>
-                            </xh:td>
-                        </xh:tr>
                         <xh:tr>
                             <xh:td>
                                 <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
@@ -730,8 +782,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <fr:grid columns="3">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em"
-                                            appearance="dropdown">
+                                <xf:select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em" appearance="dropdown">
                                     <xf:label ref="$form-resources/dropdown/label"/>
                                     <xf:hint ref="$form-resources/dropdown/hint"/>
                                     <xf:itemset ref="$form-resources/dropdown/item">
@@ -814,9 +865,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal"
-                                                      resource="/fr/service/custom/orbeon/controls/countries?all=true"
-                                                      bind="dynamic-data-dropdown-bind">
+                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-data-dropdown-bind">
                                     <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
                                     <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>

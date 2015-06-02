@@ -19,6 +19,7 @@
         oxf:/forms/orbeon/builder/xbl/text-controls.xbl
         oxf:/xbl/orbeon/tinymce/tinymce.xbl
         oxf:/xbl/orbeon/explanation/explanation.xbl
+        oxf:/xbl/orbeon/character-counter/character-counter.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*">

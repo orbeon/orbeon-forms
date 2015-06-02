@@ -119,7 +119,7 @@
                 <!-- Display localized name -->
                 <xh:legend><xf:output ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/></xh:legend>
 
-                <xf:repeat ref="xbl:binding" id="fb-components-template-repeat">
+                <xf:repeat ref="xbl:binding[not(fb:metadata/fb:toolbox[@show = 'false'])]" id="fb-components-template-repeat">
 
                     <xf:var name="binding" value="." as="element(xbl:binding)"/>
 

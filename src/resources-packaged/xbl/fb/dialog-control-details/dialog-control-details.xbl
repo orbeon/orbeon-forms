@@ -48,7 +48,7 @@
 
                 <!-- Copy XBL control-details from xbl:binding in local instance -->
                 <xf:delete ref="$i/fb:control-details"/>
-                <xf:insert ref="$i/*" origin="fbf:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
+                <xf:insert ref="$i/*" origin="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
 
                 <!-- Process the LHHA of each details control -->
                 <!-- LATER: Use xxf:dynamic for custom properties. -->
@@ -96,6 +96,11 @@
                     if="empty($validations/validation[not(@type = ('required', 'datatype'))])"
                     ref="$validations/validation"
                     origin="instance('validation-constraint-template')"/>
+
+                <!--  Read appearances -->
+                <xf:dispatch
+                    name="reload-appearances"
+                    targetid="model"/>
 
                 <!--
                     Force required if the datatype implies it.
@@ -161,7 +166,13 @@
 
                 <xf:action type="xpath">
                     (: Write alerts and constraints :)
-                    fbf:writeAlertsAndValidationsAsXML($form, $i/control-name, $i/default-alert/alert, $i/validations/validation),
+                    fbf:writeAlertsAndValidationsAsXML(
+                        $form,
+                        $i/control-name,
+                        $i/appearances/@selection,
+                        $i/default-alert/alert,
+                        $i/validations/validation
+                    ),
                     (: Write MIPs :)
                     for $mip in ('relevant', 'readonly', 'calculate', 'default') return
                         fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
@@ -188,6 +199,26 @@
         <xbl:implementation>
             <xf:model id="model">
 
+                <xf:action event="reload-appearances">
+                    <xf:var name="appearances" value="$i/appearances"/>
+                    <xf:delete ref="$appearances/node()"/>
+                    <xf:insert
+                        context="$appearances"
+                        origin="
+                            fbf:possibleAppearancesByControlNameAsXML(
+                                xxf:binding('fb-dialog-control-details'),
+                                $i/control-name,
+                                $i/validations/validation[@type = 'datatype']/builtin-type
+                            )"/>
+                    <!--  Assume there is only one active appearance at a given time for now. At the XForms level there
+                          can be multiple appearances. We do have fr:character-counter which could wrap a control with an
+                          appearance, for example we could have <xf:textarea appearance="fancy character-counter">, but we
+                          don't have a concrete case yet. -->
+                    <xf:setvalue
+                        ref="$appearances/@selection"
+                        value="($appearances/appearance[@current = 'true'], $appearances/appearance[1])[1]/value"/>
+                </xf:action>
+
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <local>
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
@@ -201,6 +232,7 @@
                             global-default-alert-message=""
                             readonly-alert-message=""/>
 
+                        <appearances selection=""/>
                         <validations/>
 
                         <relevant/>
@@ -248,6 +280,8 @@
                         ref="@readonly-alert-message"
                         calculate="bind('default-alert')"/>
                 </xf:bind>
+
+                <xf:bind ref="appearances/@selection" readonly="count(../appearance) le 1"/>
 
                 <xf:bind ref="validations">
 
@@ -329,25 +363,8 @@
                                         <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
                                         <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
                                     </xf:input>
-                                </xh:td>
-                                <xh:td rowspan="2">
-                                    <!-- Properties specific to this control defined in the XBL metadata -->
-                                    <xf:repeat ref="$i/fb:control-details/*" id="control-custom-input">
-                                        <xf:var name="position" value="position()"/>
-                                        <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
-                                        <xf:var name="xforms-control" value="."/>
-                                        <xf:input ref="if ($xforms-control/self::xf:input) then $bound-node else ()">
-                                            <xf:label ref="$xforms-control/xf:label"/>
-                                            <xf:hint ref="$xforms-control/xf:hint"/>
-                                            <xf:help ref="$xforms-control/xf:help"/>
-                                            <xf:alert ref="$xforms-control/xf:alert"/>
-                                        </xf:input>
-                                    </xf:repeat>
-                                </xh:td>
-                            </xh:tr>
-                            <xh:tr>
-                                <xh:td>
-                                    <!-- Classes -->
+
+                                    <!-- Options (predefined classes) -->
                                     <xf:select ref="$i/standard-classes" appearance="full">
                                         <xf:label ref="$resources/dialog-control-details/options/label"/>
                                         <xf:itemset ref="$resources/dialog-control-details/options/item">
@@ -355,9 +372,55 @@
                                             <xf:value ref="value"/>
                                         </xf:itemset>
                                     </xf:select>
+
+                                    <!-- Custom classes -->
                                     <xf:input ref="$i/custom-classes">
                                         <xf:label ref="$resources/classes/label"/>
                                     </xf:input>
+                                </xh:td>
+                                <xh:td>
+                                    <!-- Appearances -->
+                                    <xf:var
+                                        name="toggle"
+                                        value="
+                                            count($i/appearances/appearance[normalize-space(value) = '']) = 1
+                                            and count($i/appearances/appearance[normalize-space(value) != '']) = 1"/>
+
+                                    <!-- Propose a choice between multiple items -->
+                                    <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) ge 1]" appearance="full">
+                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                        <xf:itemset ref="$i/appearances/appearance">
+                                            <xf:label>
+                                                <xh:img src="{icon}" alt="" width="16" height="16"/>
+                                                <xf:output value="label"/>
+                                            </xf:label>
+                                            <xf:value ref="value"/>
+                                        </xf:itemset>
+                                    </xf:select1>
+                                    <!-- Simplified case where we just show a checkbox -->
+                                    <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
+                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                        <xf:itemset ref="$i/appearances/appearance[normalize-space(value) != '']">
+                                            <xf:label>
+                                                <xh:img src="{icon}" alt="" width="16" height="16"/>
+                                                <xf:output value="label"/>
+                                            </xf:label>
+                                            <xf:value ref="value"/>
+                                        </xf:itemset>
+                                    </xf:select>
+
+                                    <!-- Properties specific to this control defined in the XBL metadata -->
+                                    <xf:repeat ref="$i/fb:control-details/*" id="control-custom-input">
+                                        <xf:var name="position" value="position()"/>
+                                        <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
+                                        <xf:var name="xforms-control" value="."/>
+                                        <xf:input ref="if ($xforms-control/self::xf:input) then $bound-node else ()">
+                                            <xf:label ref="$xforms-control/xf:label"/>
+                                            <xf:hint ref="$xforms-control/xf:hint" appearance="minimal"/>
+                                            <xf:help ref="$xforms-control/xf:help"/>
+                                            <xf:alert ref="$xforms-control/xf:alert"/>
+                                        </xf:input>
+                                    </xf:repeat>
                                 </xh:td>
                             </xh:tr>
                         </fr:grid>
@@ -453,6 +516,11 @@
                                                     <xf:value ref="if (self::choices) then () else ."/>
                                                 </xf:itemset>
                                                 <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                                <!--  Update available appearances -->
+                                                <xf:dispatch
+                                                    event="xforms-value-changed"
+                                                    name="reload-appearances"
+                                                    targetid="model"/>
                                             </xf:select1>
                                             <!-- Schema type selection if applicable -->
                                             <fr:dropdown-select1 ref="schema-type[exists($schema)]">

@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
@@ -49,8 +49,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Return all validations as XML for the given control
     def readValidationsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
-        RequiredValidation.fromForm(inDoc, controlName) ::
-        DatatypeValidation.fromForm(inDoc, controlName) ::
+        RequiredValidation.fromForm(inDoc, controlName)                             ::
+        DatatypeValidation.fromForm(inDoc, controlName)                             ::
         ConstraintValidation.fromForm(inDoc, controlName) map
         (v ⇒ elemToNodeInfo(v.toXML(currentLang))) toArray
 
@@ -58,6 +58,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def writeAlertsAndValidationsAsXML(
         inDoc            : NodeInfo,
         controlName      : String,
+        newAppearance       : String,
         defaultAlertElem : NodeInfo,
         validationElems  : Array[NodeInfo]
     ): Unit = {
@@ -98,7 +99,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             case v: DatatypeValidation ⇒ v
         } foreach { v ⇒
 
-            v.renameControlIfNeeded(inDoc, controlName)
+            v.renameControlIfNeeded(inDoc, controlName, nonEmptyOrNone(newAppearance))
 
             writeValidations(
                 inDoc,
@@ -338,17 +339,25 @@ trait AlertsAndConstraintsOps extends ControlOps {
         def stringValue = XMLUtils.buildQName(datatypeQName.getNamespacePrefix, datatypeQName.getName)
 
         // Rename control element if needed when the datatype changes
-        def renameControlIfNeeded(inDoc: NodeInfo, controlName: String): Unit = {
+        def renameControlIfNeeded(inDoc: NodeInfo, controlName: String, newAppearanceOpt: Option[String]): Unit = {
             val newDatatype = datatypeQName
             for {
-                control        ← findControlByName(inDoc, controlName)
+                controlElem    ← findControlByName(inDoc, controlName)
                 oldDatatype    = DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
-                if oldDatatype != newDatatype
-                newElementName ← FormBuilder.newElementName(control.uriQualifiedName, oldDatatype, newDatatype, componentBindings)
+                oldAppearances = controlElem attTokens APPEARANCE_QNAME
+                (newElemName, newAppearanceAttOpt) ← BindingDescriptor.newElementName(
+                    controlElem.uriQualifiedName,
+                    oldDatatype,
+                    oldAppearances,
+                    newDatatype,
+                    newAppearanceOpt,
+                    componentBindings
+                )
             } locally {
-                // TODO: If binding changes, what about instance and bind templates? Should also be updated? Not a concrete
-                // case as of now, but can happen depending on which bindings are available.
-                rename(control, newElementName)
+                // Q: If binding changes, what about instance and bind templates? Should also be updated? Not a
+                // concrete case as of now, but can happen depending on which bindings are available.
+                val newControlElem = rename(controlElem, newElemName)
+                toggleAttribute(newControlElem, APPEARANCE_QNAME, newAppearanceAttOpt.get, newAppearanceAttOpt.isDefined)
             }
         }
 
@@ -376,7 +385,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     object DatatypeValidation {
 
         private val DefaultDataTypeValidation =
-            DatatypeValidation(None, Left(new QName("string") → false), None)
+            DatatypeValidation(None, Left(XMLConstants.XS_STRING_QNAME → false), None)
 
         // Create from a control name
         def fromForm(inDoc: NodeInfo, controlName: String): DatatypeValidation = {
@@ -392,7 +401,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 else
                     Right(qName)
             }
-            
+
             findMIPs(inDoc, controlName, Type).headOption map {
                 case (idOpt, _, value, alertOpt) ⇒
                     DatatypeValidation(idOpt, builtinOrSchemaType(value), alertOpt)
@@ -600,17 +609,17 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
             AlertDetails(forValidationId, (currentLang, messageAtt) :: messagesElems, isGlobal)
         }
-        
+
         def fromValidationXML(validationElem: NodeInfo, forValidationId: Option[String]) = {
-            
+
             val useDefaultAlert = validationElem /@ "default-alert" === "true"
-            
+
             def alertOpt = {
                 val alertElem = validationElem child "alert" headOption
-                
+
                 alertElem map (AlertDetails.fromXML(_, forValidationId))
             }
-            
+
             if (useDefaultAlert) None else alertOpt
         }
     }

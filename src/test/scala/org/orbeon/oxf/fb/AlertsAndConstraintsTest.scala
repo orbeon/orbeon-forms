@@ -59,7 +59,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </alert>
                 </validation>
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
 
             val expected =
                 <validation type="formula" id="validation-3-validation" level="warning" default-alert="false">
@@ -82,7 +82,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </alert>
                 </validation>
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
             assertAlertsXML(Array(newValidation), readConstraintValidationsAsXML(doc, Control1))
         }
 
@@ -104,7 +104,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                 </validation>
             )
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
             assertAlertsXML(newValidations, readConstraintValidationsAsXML(doc, Control1))
         }
 
@@ -130,7 +130,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, twoValidations map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", defaultAlertAsXML, twoValidations map elemToNodeInfo)
                 assertAlertsXML(twoValidations, readConstraintValidationsAsXML(doc, Control1))
 
                 val expectedResources: Document =
@@ -174,7 +174,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, oneValidation map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", defaultAlertAsXML, oneValidation map elemToNodeInfo)
                 assertAlertsXML(oneValidation, readConstraintValidationsAsXML(doc, Control1))
 
                 val expectedResources: Document =
@@ -214,13 +214,13 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
             // Local default alert
             locally {
-                writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, Array())
+                writeAlertsAndValidationsAsXML(doc, Control1, "", defaultAlertAsXML, Array())
                 assert("$form-resources/control-1/alert" === (getControlLHHA(doc, Control1, "alert") att "ref" stringValue))
             }
 
             // Global default alert
             locally {
-                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array())
+                writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array())
                 assert("$fr-resources/detail/labels/alert" === (getControlLHHA(doc, Control1, "alert") att "ref" stringValue))
             }
         }
@@ -234,7 +234,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     <alert message="" global="false"/>
                 </validation>
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
 
             val expected =
                 <validation type="formula" id="" level="error" default-alert="true">
@@ -260,7 +260,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </alert>
                 </validation>
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, Array(newValidation))
 
             val expected =
                 <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -296,7 +296,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
                 assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
@@ -320,7 +320,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
                 assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
                 assert(bind att "required" isEmpty)
@@ -343,7 +343,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
                 assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
                 assert("true()"     === (bind att "required" stringValue))
@@ -360,7 +360,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
                 assert(RequiredValidation(None, Right("../foo = 'bar'"), None) === RequiredValidation.fromForm(doc, Control1))
             }
@@ -383,7 +383,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                     </validation>
                 )
 
-                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
 
                 assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
@@ -437,7 +437,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                 </validation>
             )
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
             assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
             assert("true()"    === (bind att "required" stringValue))
@@ -467,7 +467,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                 </validation>
             )
 
-            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+            writeAlertsAndValidationsAsXML(doc, Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
             assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
             assert("true()" === (bind att "required" stringValue))

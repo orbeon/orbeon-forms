@@ -11,9 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<!--
-    This is the standard Form Builder standard controls library.
- -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -38,7 +35,7 @@
         <display-name lang="pt">Data e Hora</display-name>
     </metadata>
 
-    <xbl:binding id="fb-input-date" element="xf|input">
+    <xbl:binding id="fb-input-date" element="xf|input:xxf-type('xs:date')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
             <display-name lang="es">Fecha</display-name>
@@ -68,7 +65,7 @@
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-time" element="xf|input">
+    <xbl:binding id="fb-input-time" element="xf|input:xxf-type('xs:time')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Time</display-name>
             <display-name lang="es">Hora</display-name>
@@ -98,7 +95,7 @@
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-dateTime" element="xf|input">
+    <xbl:binding id="fb-input-dateTime" element="xf|input:xxf-type('xs:dateTime')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date and Time</display-name>
             <display-name lang="es">Fecha y Hora</display-name>

@@ -14,46 +14,123 @@
 package org.orbeon.oxf.fb
 
 import org.dom4j.QName
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
-import BindingDescriptor._
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 trait BindingOps {
 
-    // Return a new element name for the control if needed
-    // Examples:
-    //
-    // - fr:number: decimal → string  ⇒ xf:input
-    // - fr:number: string  → string  ⇒ fr:number
-    // - xf:input:  string  → string  ⇒ xf:string
-    // - xf:input:  string  → decimal ⇒ fr:number
-    def newElementName(oldControlName: QName, oldDatatype: QName, newDatatype: QName, bindings: Seq[NodeInfo]): Option[QName] = {
+    def possibleAppearancesByControlNameAsXML(
+        inDoc           : NodeInfo,
+        controlName     : String,
+        builtinDatatype : String
+    ): Array[NodeInfo] = {
 
-        val directToDatatypeMappings = createDirectToDatatypeMappingsForAllBindings(bindings)
+        val bindings    = FormBuilder.componentBindings
+        val descriptors = getAllRelevantDescriptors(bindings)
+        val lang        = FormBuilder.currentLang
 
-        // The old control name might be a direct binding, in which case we can find the old "virtual" name, that is the
-        // name the control would have had if we natively supported datatype bindings
-        val oldVirtualNameOpt =
+        // Compare the local name of the datatypes, assuming that at least the first datatype is a built-in datatype
+        def sameDatatypesIgnorePrefix(builtinDatatype: QName, otherDatatype: QName) =
+            builtinDatatype == otherDatatype || Model.getVariationTypeOrKeep(builtinDatatype) == otherDatatype
+
+        for {
+            controlElem                  ← findControlByName(inDoc, controlName).to[Array]
+            originalDatatype             = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
+            (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
+                    elemName    = controlElem.uriQualifiedName,
+                    datatype    = originalDatatype,
+                    appearances = controlElem attTokens APPEARANCE_QNAME,
+                    descriptors = descriptors
+                )
+            newDatatype                  = Model.qNameForBuiltinTypeName(builtinDatatype, required = false)
+            appearanceElem               ← possibleAppearancesWithLabelAsXML(
+                    elemName                = virtualName,
+                    builtinType             = newDatatype,
+                    // If the datatype hasn't changed between original and new, allow using the appearance to select
+                    // the current appearance. Otherwise, pass an empty set which means that only the default (empty)
+                    // appearance will match. Note that this means that the result might not necessarily have a
+                    // selected current appearance.
+                    appearancesForSelection = if (sameDatatypesIgnorePrefix(newDatatype, originalDatatype)) appearanceOpt.to[Set] else Set.empty,
+                    lang                    = lang,
+                    bindings                = bindings
+                )
+        } yield
+            appearanceElem
+    }
+
+    private def possibleAppearancesWithLabelAsXML(
+        elemName                : QName,
+        builtinType             : QName,
+        appearancesForSelection : Set[String],
+        lang                    : String,
+        bindings                : Seq[NodeInfo]
+    ): Array[NodeInfo] = {
+
+        def appearanceMatches(appearanceOpt: Option[String]) = appearanceOpt match {
+            case Some(appearance) ⇒ appearancesForSelection contains appearance
+            case None             ⇒ appearancesForSelection.isEmpty
+        }
+
+        val appearancesXML =
             for {
-                BindingDescriptor(elementNameOpt, datatypeOpt, _) ← directToDatatypeMappings.get(oldControlName)
-                datatype                                          ← datatypeOpt
-                if Set(datatype, Model.getVariationTypeOrKeep(datatype))(oldDatatype)
-                elementName                                       ← elementNameOpt
+                (valueOpt, label, icon) ← possibleAppearancesWithLabel(
+                        elemName,
+                        builtinType,
+                        lang,
+                        bindings
+                    )
             } yield
-                elementName
+                <appearance current={appearanceMatches(valueOpt).toString}>
+                    <label>{label}</label>
+                    <value>{valueOpt.getOrElse("")}</value>
+                    <icon>{icon}</icon>
+                </appearance>
 
-        val oldVirtualName =
-            oldVirtualNameOpt getOrElse oldControlName
+        appearancesXML map elemToNodeInfo toArray
+    }
 
-        // Using the old virtual control name and the new datatype, try to find a new direct binding
-        val newControlName =
-            findDirectBindingForDatatypeBinding(oldVirtualName, newDatatype, directToDatatypeMappings) getOrElse oldVirtualName
+    // Find the possible appearances and descriptions for the given control with the given datatype. Only return
+    // appearances which have metadata.
+    //
+    // - `None` represents no appearance (default appearance)
+    // - `Some(appearance)` represents a specific appearance
+    def possibleAppearancesWithLabel(
+        elemName : QName,
+        datatype : QName,
+        lang     : String,
+        bindings : Seq[NodeInfo]
+    ): Seq[(Option[String], String, String)] = {
 
-        // Only return Some if the name changes
-        oldControlName != newControlName option newControlName
+        def metadataOpt(bindingOpt: Option[NodeInfo]) =
+            bindingOpt.to[List] flatMap bindingMetadata headOption
+
+        possibleAppearancesWithBindings(elemName, datatype, bindings) map {
+            case (appearanceOpt, bindingOpt, _) ⇒
+                (appearanceOpt, metadataOpt(bindingOpt))
+        } collect {
+            case (appearanceOpt, Some(metadata)) ⇒
+
+                def findMetadata(elems: Seq[NodeInfo]) = {
+
+                    def fromLang  = elems find (_.attValue("lang") == lang)
+                    def fromFirst = elems.headOption
+
+                    fromLang orElse fromFirst map (_.stringValue) flatMap nonEmptyOrNone
+                }
+
+                val displayNames = metadata / "*:display-name"
+                val icons        = metadata / "*:icon" / "*:small-icon"
+
+                (appearanceOpt, findMetadata(displayNames), findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png")
+        } collect {
+            case (appearanceOpt, Some(displayName), icon) ⇒
+                (appearanceOpt, displayName, icon)
+        }
     }
 
     private def bindingMetadata(binding: NodeInfo) =
@@ -87,27 +164,35 @@ trait BindingOps {
     }
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-    // TODO: Get rid of this and use BindingDescriptor. For this, we need support for @appearance though.
-    def bindingForControlElement(controlElement: NodeInfo, bindings: Seq[NodeInfo]) =
-        bindings find (b ⇒
-            findViewTemplate(b) match {
-                case Some(viewTemplate) ⇒
-                    viewTemplate.uriQualifiedName              == controlElement.uriQualifiedName &&
-                    viewTemplate.att("appearance").stringValue == controlElement.att("appearance").stringValue
-                case _ ⇒ false
-            })
+    def bindingForControlElementOrEmpty(controlElement: NodeInfo) =
+        bindingForControlElement(controlElement, FormBuilder.componentBindings).orNull
+
+    // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
+    def bindingForControlElement(controlElem: NodeInfo, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
+
+        val elemName    = controlElem.uriQualifiedName
+        val appearances = controlElem attTokens APPEARANCE_QNAME
+        val descriptors = getAllRelevantDescriptors(bindings)
+
+        for {
+            descriptor      ← findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+            binding         ← descriptor.binding
+        } yield
+            binding
+    }
 
     // Finds if a control uses a particular type of editor (say "static-itemset")
-    // TODO: make `editor` something other than a string
-    def controlElementHasEditor(controlElement: NodeInfo, editor: String, bindings: Seq[NodeInfo]): Boolean =
-        bindingForControlElement(controlElement, bindings) exists {
-            binding ⇒
-                val staticItemsetAttribute = (bindingMetadata(binding) / "*:editors" /@ editor).headOption
-                staticItemsetAttribute match {
-                    case Some(a) ⇒ a.stringValue == "true"
-                    case _       ⇒ false
-                }
-        }
+    def controlElementHasEditor(controlElem: NodeInfo, editor: String, bindings: Seq[NodeInfo]): Boolean = {
+
+        val editorAttributeValueOpt =
+            for {
+                binding         ← bindingForControlElement(controlElem, bindings)
+                editorAttribute ← (bindingMetadata(binding) / "*:editors" /@ editor).headOption
+            } yield
+                editorAttribute.stringValue
+
+        editorAttributeValueOpt contains "true"
+    }
 
     // Create a new data holder given the new control name, using the instance template if found
     def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {

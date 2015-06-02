@@ -167,6 +167,7 @@
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library">
+        fr:dropdown-select1 fr:dropdown-date fr:fields-date fr:box-select
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->

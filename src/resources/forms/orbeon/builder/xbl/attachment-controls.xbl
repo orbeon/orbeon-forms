@@ -11,9 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<!--
-    This is the standard Form Builder standard controls library.
- -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -38,7 +35,7 @@
         <display-name lang="pt">Anexos</display-name>
     </metadata>
 
-    <xbl:binding id="fb-output-image" element="xf|output">
+    <xbl:binding id="fb-output-image" element="xf|output:xxf-type('xs:anyURI')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Image</display-name>
             <display-name lang="es">Imagen</display-name>

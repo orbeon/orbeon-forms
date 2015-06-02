@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
 trait ContainerOps extends ControlOps {
 
@@ -61,7 +62,7 @@ trait ContainerOps extends ControlOps {
     // A container can be removed if it's not the last one at that level
     def canDeleteContainer(container: NodeInfo): Boolean =
         container sibling FRContainerTest nonEmpty
-    
+
     // Delete the entire container and contained controls
     def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
         val container = containerById(containerId)
@@ -213,7 +214,7 @@ trait ContainerOps extends ControlOps {
         findControlByName(inDoc, controlName) foreach { control ⇒
 
             val wasRepeat = isRepeat(control)
-            
+
             val minOpt = minMaxForAttribute(min)
             val maxOpt = minMaxForAttribute(max)
 
@@ -276,10 +277,10 @@ trait ContainerOps extends ControlOps {
 
                 // Remove template
                 findTemplateInstance(inDoc, controlName) foreach (delete(_))
-                
+
                 // Update existing templates
                 updateTemplates(inDoc)
-                
+
             } else if (repeat) {
                 // Template should already exists an should have already been renamed if needed
                 // MAYBE: Ensure template just in case.
@@ -322,32 +323,32 @@ trait ContainerOps extends ControlOps {
         }
     }
 
-    def findCurrentBindingByName(inDoc: NodeInfo, controlName: String, descriptors: Seq[BindingDescriptor]) =
-        for {
-            controlElement ← findControlByName(inDoc, controlName)
-            datatype       = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
-            binding        ← findCurrentBinding(controlElement.uriQualifiedName, datatype, descriptors)
-        } yield
-            binding
-
     // Create an instance template based on a hierarchy of binds rooted at the given bind
     // This checks each control binding in case the control specifies a custom data holder.
     def createTemplateContentFromBind(bind: NodeInfo): NodeInfo = {
 
         val inDoc       = bind.getDocumentRoot
-        val descriptors = getAllDirectAndDatatypeDescriptors(componentBindings)
+        val descriptors = getAllRelevantDescriptors(componentBindings)
 
         def holderForBind(bind: NodeInfo): NodeInfo = {
 
             val controlName = getBindNameOrEmpty(bind)
 
-            val fromBinding =
-                findCurrentBindingByName(inDoc, controlName, descriptors) map
-                    (FormBuilder.newDataHolder(controlName, _))
+            def fromBinding =
+                for {
+                    controlElem ← findControlByName(inDoc, controlName)
+                    appearances = controlElem attTokens APPEARANCE_QNAME
+                    descriptor  ← findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
+                    binding     ← descriptor.binding
+                } yield
+                    FormBuilder.newDataHolder(controlName, binding)
 
-            val e = fromBinding getOrElse elementInfo(controlName)
-            insert(into = e, origin = bind / "*:bind" map holderForBind)
-            e
+            def fromPlainControlName =
+                elementInfo(controlName)
+
+            val elem = fromBinding getOrElse fromPlainControlName
+            insert(into = elem, origin = bind / "*:bind" map holderForBind)
+            elem
         }
 
         holderForBind(bind)

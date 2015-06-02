@@ -287,6 +287,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label>Control Appearance</label>
+            </control-appearance>
             <types>
                 <label>Data Type</label>
             </types>
@@ -1157,6 +1160,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label>Apparence du contrôle</label>
+            </control-appearance>
             <types>
                 <label>Type de donnée</label>
             </types>
@@ -2029,6 +2035,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Datatype</label>
             </types>
@@ -2901,6 +2910,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Тип данных</label>
             </types>
@@ -3773,6 +3785,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Tipi di dati</label>
             </types>
@@ -4637,6 +4652,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
            <types>
                 <label>Datentyp</label>
             </types>
@@ -5504,6 +5522,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Datatyyppi</label>
             </types>
@@ -6369,6 +6390,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Tipos de Datos</label>
             </types>
@@ -7241,6 +7265,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Tipo de Dados</label>
             </types>
@@ -8112,6 +8139,9 @@
                     <value>fr-email-subject</value>
                 </item>
             </options>
+            <control-appearance>
+                <label todo="true">[Control Appearance]</label>
+            </control-appearance>
             <types>
                 <label>Datatyp</label>
             </types>

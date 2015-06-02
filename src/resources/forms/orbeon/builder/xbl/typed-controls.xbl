@@ -11,9 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<!--
-    This is the standard Form Builder standard controls library.
- -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -38,7 +35,7 @@
         <display-name lang="pt">Controlos de Tipos</display-name>
     </metadata>
 
-    <xbl:binding id="fb-input-email" element="xf|input">
+    <xbl:binding id="fb-input-email" element="xf|input:xxf-type('xf:email')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Email Address</display-name>
             <display-name lang="es">Email</display-name>

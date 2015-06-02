@@ -11,9 +11,6 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<!--
-    This is the standard Form Builder standard controls library.
- -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -38,7 +35,7 @@
         <display-name lang="pt">Controlos de Selecção</display-name>
     </metadata>
 
-    <xbl:binding id="fb-input-select1-full" element="xf|select1">
+    <xbl:binding id="fb-input-select1-full" element="xf|select1[appearance ~= full]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons</display-name>
             <display-name lang="es">Botones de Opción</display-name>
@@ -73,7 +70,7 @@
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-select-full" element="xf|select">
+    <xbl:binding id="fb-input-select-full" element="xf|select[appearance ~= full]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Checkboxes</display-name>
             <display-name lang="es">Casillas de Verificación</display-name>
@@ -108,7 +105,7 @@
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-select1-compact" element="xf|select1">
+    <xbl:binding id="fb-input-select1-compact" element="xf|select1[appearance ~= compact]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Scrollable List</display-name>
             <display-name lang="es">Lista Desplegable</display-name>
@@ -142,7 +139,7 @@
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-boolean" element="xf|input">
+    <xbl:binding id="fb-input-boolean" element="xf|input:xxf-type('xs:boolean')">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Boolean Input</display-name>
             <display-name lang="es">Entrada Booleana</display-name>

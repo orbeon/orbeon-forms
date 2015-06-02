@@ -304,8 +304,7 @@
                                 </xf:input>
                             </xh:td>
                             <xh:td>
-                                <fr:dropdown-select1 bind="topic-bind"
-                                             id="topic-control">
+                                <xf:select1 bind="topic-bind" id="topic-control" appearance="dropdown">
                                     <xf:label ref="$form-resources/topic/label"/>
                                     <xf:hint ref="$form-resources/topic/hint"/>
                                     <xf:help ref="$form-resources/topic/help"/>
@@ -314,7 +313,7 @@
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                </fr:dropdown-select1>
+                                </xf:select1>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>

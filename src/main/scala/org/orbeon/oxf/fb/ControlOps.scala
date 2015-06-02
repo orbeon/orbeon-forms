@@ -125,7 +125,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
         // Insert bind container if needed
         val model = findModelElement(inDoc)
-        val topLevelBind = findTopLevelBind(inDoc).headOption match {
+        val topLevelBind = findTopLevelBind(inDoc) match {
             case Some(bind) ⇒
                 bind
             case None ⇒
@@ -454,13 +454,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def getAllControlsWithIds(inDoc: NodeInfo) =
         findFRBodyElement(inDoc) \\ * filter
             (e ⇒ isIdForControl(e.id))
-
-    // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-    // For XPath callers
-    // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a
-    // Option → List function?
-    def bindingOrEmpty(controlElement: NodeInfo) =
-        FormBuilder.bindingForControlElement(controlElement, componentBindings).orNull
 
     // Finds if a control uses a particular type of editor (say "static-itemset")
     def hasEditor(controlElement: NodeInfo, editor: String) =

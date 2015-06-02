@@ -730,14 +730,15 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <fr:grid columns="3">
                         <xh:tr>
                             <xh:td>
-                                <fr:dropdown-select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em">
+                                <xf:select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em"
+                                            appearance="dropdown">
                                     <xf:label ref="$form-resources/dropdown/label"/>
                                     <xf:hint ref="$form-resources/dropdown/hint"/>
                                     <xf:itemset ref="$form-resources/dropdown/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                </fr:dropdown-select1>
+                                </xf:select1>
                             </xh:td>
                             <xh:td>
                                 <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
@@ -772,7 +773,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:select1>
                             </xh:td>
                             <xh:td>
-                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" bind="multiple-list-bind" id="multiple-list-control">
+                                <xf:select bind="multiple-list-bind" id="multiple-list-control" appearance="scroll">
                                     <xf:label ref="$form-resources/multiple-list/label"/>
                                     <xf:hint ref="$form-resources/multiple-list/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -780,7 +781,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                </fr:box-select>
+                                </xf:select>
                             </xh:td>
                             <xh:td>
                                 <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="boolean-bind" id="boolean-control">

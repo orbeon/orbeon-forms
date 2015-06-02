@@ -374,6 +374,10 @@ body {
 .orbeon .fb-dialog-control-details .tab-pane > * {
   background-color: #ffffff;
 }
+.orbeon .fb-dialog-control-details label[class~=radio] img,
+.orbeon .fb-dialog-control-details label[class~=checkbox] img {
+  margin-top: -3px;
+}
 .orbeon .fb-dialog-control-details .fr-grid-validations .fr-grid-col-1 {
   width: 200px;
 }

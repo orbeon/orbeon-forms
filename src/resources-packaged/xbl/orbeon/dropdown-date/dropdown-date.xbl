@@ -27,7 +27,12 @@
     <!--
         Component to represent a date control based on drop-down menus.
      -->
-    <xbl:binding id="fr-dropdown-date-binding" element="fr|dropdown-date" xxbl:container="span" xxbl:mode="lhha binding value" xxbl:label-for="select1">
+    <xbl:binding
+        id="fr-dropdown-date-binding"
+        element="fr|dropdown-date, xf|input:xxf-type('xs:date')[appearance ~= dropdowns]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="select1">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

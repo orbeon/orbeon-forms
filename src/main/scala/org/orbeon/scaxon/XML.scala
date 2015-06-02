@@ -368,6 +368,7 @@ object XML {
         def attValue(attName: String) = /@(attName).stringValue
         def attValue(attName: QName)  = /@(attName).stringValue
         def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
+        def attTokens(attName: QName)  = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
         def id = attValue("id")
         def hasId = att("id").nonEmpty && attValue("id").trim != ""

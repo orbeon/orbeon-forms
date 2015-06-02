@@ -154,7 +154,7 @@ object XFormsAPI {
     // - if the name hasn't changed, don't do anything
     // - if the node is an element, its content is placed back into the renamed element
     // NOTE: This should be implemented as a core XForms action (see also XQuery updates)
-    def rename(nodeInfo: NodeInfo, newName: QName): Unit = {
+    def rename(nodeInfo: NodeInfo, newName: QName): NodeInfo = {
         require(nodeInfo ne null)
         require(Set(ELEMENT_NODE, ATTRIBUTE_NODE)(nodeInfo.getNodeKind.toShort))
 
@@ -166,8 +166,11 @@ object XFormsAPI {
                 case _ ⇒ throw new IllegalArgumentException
             }
 
-            insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo).head
+            val result = insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo).head
             delete(nodeInfo)
+            result
+        } else {
+            nodeInfo
         }
     }
 
@@ -206,7 +209,7 @@ object XFormsAPI {
     // NOTE: The value is by-name
     def toggleAttribute(element: NodeInfo, attName: QName, value: ⇒ String, set: Boolean): Unit =
         if (set)
-            ensureAttribute(element, attName, value.toString)
+            ensureAttribute(element, attName, value)
         else
             delete(element \@ attName)
 
@@ -223,7 +226,7 @@ object XFormsAPI {
     // 2013-04-03: Unsure if we still need this for mocking
     def topLevelModel(modelId: String) =
         containingDocument.models find (_.getId == modelId)
-    
+
     def context[T](xpath: String)(body: ⇒ T): T = ???
     def context[T](item: Item)(body: ⇒ T): T = ???
     def event[T](attributeName: String): Seq[Item] = ???

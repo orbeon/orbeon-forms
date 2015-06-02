@@ -362,6 +362,13 @@ body {
             .dialog-scrollable(500px);
         }
 
+        // Adjust so that images within radio/checkbox looks centered like it is in the toolbox
+        label[class ~= radio], label[class ~= checkbox] {
+            img {
+                margin-top: -3px
+            }
+        }
+
         // Narrower columns
         .fr-grid-validations .fr-grid-col-1 { width: 200px }
         .fr-grid-validations .fr-grid-col-3 { width: 110px }

@@ -661,7 +661,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Code postal</label>
                             <hint/>
                         </zip></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/><xf:action ev:event="xforms-model-construct-done"><xf:action if="empty(instance()/*)"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
-                            
+
                             <xf:rebuild/><xf:recalculate xxf:defauls="true"/><xf:revalidate/></xf:action></xf:action></xf:model></xbl:implementation><xbl:template><xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:group appearance="xxf:internal"><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
                         <xh:tr>
                             <xh:td>
@@ -849,14 +849,15 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <fr:grid columns="3">
                         <xh:tr>
                             <xh:td>
-                                <fr:dropdown-select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em">
+                                <xf:select1 bind="dropdown-bind" id="dropdown-control" class="fr-width-12em"
+                                            appearance="dropdown">
                                     <xf:label ref="$form-resources/dropdown/label"/>
                                     <xf:hint ref="$form-resources/dropdown/hint"/>
                                     <xf:itemset ref="$form-resources/dropdown/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                </fr:dropdown-select1>
+                                </xf:select1>
                             </xh:td>
                             <xh:td>
                                 <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
@@ -891,7 +892,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:select1>
                             </xh:td>
                             <xh:td>
-                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" bind="multiple-list-bind" id="multiple-list-control">
+                                <xf:select bind="multiple-list-bind" id="multiple-list-control" appearance="scroll">
                                     <xf:label ref="$form-resources/multiple-list/label"/>
                                     <xf:hint ref="$form-resources/multiple-list/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -899,7 +900,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
-                                </fr:box-select>
+                                </xf:select>
                             </xh:td>
                             <xh:td>
                                 <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="boolean-bind" id="boolean-control">

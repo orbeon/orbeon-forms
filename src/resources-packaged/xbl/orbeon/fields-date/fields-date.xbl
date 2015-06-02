@@ -25,7 +25,11 @@
     <!--
         Component to represent a date control based on separate fields.
      -->
-    <xbl:binding id="fr-fields-date-binding" element="fr|fields-date" xxbl:mode="lhha binding value" xxbl:label-for="input">
+    <xbl:binding
+        id="fr-fields-date-binding"
+        element="fr|fields-date, xf|input:xxf-type('xs:date')[appearance ~= fields]"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

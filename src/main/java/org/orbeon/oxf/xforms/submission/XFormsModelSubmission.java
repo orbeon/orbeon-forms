@@ -1177,7 +1177,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             // Evaluate destination node
             // "This attribute is evaluated only once a successful submission response has been received and if the replace
             // attribute value is "instance" or "text". The first node rule is applied to the result."
-            destinationObject = XPathCache.evaluateSingle(xpathContext, targetRefContextItem, targetref, containingDocument().getRequestStats().getReporter());
+            destinationObject = XPathCache.evaluateSingleWithContext(xpathContext, targetRefContextItem, targetref, containingDocument().getRequestStats().getReporter());
         }
 
         // TODO: Also detect readonly node/ancestor situation

@@ -224,7 +224,7 @@ object XPathCache {
 
     // Evaluate an XPath expression on the document
     // 2 external usages
-    def evaluateSingle(
+    def evaluateSingleWithContext(
         xpathContext : XPathContext,
         contextItem  : Item,
         xpathString  : String,

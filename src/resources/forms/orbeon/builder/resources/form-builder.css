@@ -712,10 +712,10 @@ body {
 }
 .orbeon .fr-messages .alert,
 .orbeon .fb-xpath-errors .alert {
-  display: inline;
+  display: inline-block;
   margin: 0;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  line-height: normal;
+  height: 30px;
 }
 .orbeon #fr-view {
   display: block;
@@ -739,6 +739,7 @@ body {
 }
 .orbeon .fb-bottom .fr-buttons {
   margin: 0;
+  vertical-align: top;
 }
 .orbeon .fr-container {
   top: 10px;

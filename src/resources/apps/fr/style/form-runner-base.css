@@ -178,7 +178,7 @@
   padding: 10px;
 }
 .orbeon .fr-buttons {
-  display: block;
+  display: inline-block;
   text-align: right;
   padding-left: 10px;
   padding-right: 10px;

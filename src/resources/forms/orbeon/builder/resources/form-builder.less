@@ -624,10 +624,10 @@ body {
     .fr-messages, .fb-xpath-errors {
         display: inline-block;
         .alert {
-            display: inline;
+            display: inline-block;
             margin: 0;
-            padding-top: 5px;
-            padding-bottom: 5px;
+            line-height: normal;
+            height: 30px;
         }
     }
 
@@ -652,6 +652,7 @@ body {
         .fr-status-icons { display: none }                                  // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
         .fr-buttons {
             margin: 0;
+            vertical-align: top;
         }
     }
 

@@ -357,6 +357,12 @@
   vertical-align: top;
   width: auto;
 }
+.orbeon .fr-grid:not(.fr-repeat) tbody tr {
+  height: 1px;
+}
+.orbeon .fr-grid:not(.fr-repeat) tbody tr:last-of-type {
+  height: auto;
+}
 .orbeon .fr-grid .xforms-help {
   float: left;
   margin-top: 4px;

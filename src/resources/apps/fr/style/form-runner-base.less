@@ -396,6 +396,19 @@
             // overflow: hidden
         }
 
+        // In non-repeated grids, make rows except the last one take the minimum possible amount of vertical space in
+        // case `rowspan`s are used. This is usually the intended layout, as opposed to rows taking proportionally more
+        // or less vertical space.
+        // NOTE: This should be extended to repeated grids as well, but they interleave `<tr>`s which makes it harder.
+        &:not(.fr-repeat) {
+            tbody tr {
+                height: 1px;
+            }
+            tbody tr:last-of-type {
+                height: auto;
+            }
+        }
+
         .xforms-help {
             float: left;
             margin-top: (@baseLineHeight - 14)/2 + 1;      // Vertically center help image on first line

@@ -208,7 +208,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 assert(hasIdValue(controlBind, bindId(newRepeatName)))
                 assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-                assert(findModelElement(doc) \ "*:instance" filter(hasIdValue(_, "grid-3-template")) nonEmpty)
+                assert(findModelElement(doc) \ "*:instance" exists (hasIdValue(_, "grid-3-template")))
             }
 
             // Insert a new control

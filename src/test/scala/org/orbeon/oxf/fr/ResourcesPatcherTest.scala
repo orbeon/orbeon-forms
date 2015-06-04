@@ -145,7 +145,13 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
                             s"duplicate names under `${left.name}`: ${duplicates mkString ", "}$commonMessageSuffix"
                         )
 
-                        assert(leftChildren.size === rightChildren.size, s"different sizes$commonMessageSuffix")
+                        def elemNames(elems: Seq[NodeInfo]) =
+                            elems map (_.name) mkString ("[", ", ", "]")
+
+                        def errorSuffix =
+                            s"$commonMessageSuffix (left=${elemNames(leftChildren)}, right=${elemNames(rightChildren)}"
+
+                        assert(leftChildren.size === rightChildren.size, s"different sizes$errorSuffix")
 
                         leftChildren.size == rightChildren.size && {
                             (leftChildren zip rightChildren) forall {

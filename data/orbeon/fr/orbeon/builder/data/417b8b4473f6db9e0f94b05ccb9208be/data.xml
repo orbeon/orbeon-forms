@@ -843,7 +843,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <fr:autocomplete bind="autocomplete-bind" labelref="@label" id="autocomplete-control" dynamic-itemset="true" max-results-displayed="5">
+                                <fr:autocomplete bind="autocomplete-bind" labelref="@label" id="autocomplete-control" dynamic-itemset="true" max-results-displayed="10">
                                     <xf:label ref="$form-resources/autocomplete/label"/>
                                     <xf:hint ref="$form-resources/autocomplete/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>

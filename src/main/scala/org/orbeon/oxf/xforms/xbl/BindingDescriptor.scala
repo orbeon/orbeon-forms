@@ -24,15 +24,27 @@ import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
 
-case class BindingAttributeDescriptor(name: QName, predicate: String, value: String)
-
-// Minimum amount of things we need to filter bindings
+// CSS selectors can be very complex but we only support a small subset of them for the purpose of binding controls to
+// elements. Namely, we can bind:
+//
+// - by element name only
+// - by element name and datatype (with the `xxf:type()` )
+// - by element name and a single `appearance` attribute
+// - by a single `appearance` attribute
+// - by element name, a datatype, and a single `appearance` attribute
+//
+// `BindingDescriptor` is a minimal CSS selector descriptor able to hold the combinations above. It can in fact hold
+// more than that, such as binding by datatype only, or binding via attributes which are not `appearance`, but
+// those are not used or supported as of 2015-06-05.
 case class BindingDescriptor(
     elementName : Option[QName],
     datatype    : Option[QName],
     att         : Option[BindingAttributeDescriptor])(
     val binding : Option[NodeInfo] // not part of the case-classiness
 )
+
+// Represent a single attribute biding
+case class BindingAttributeDescriptor(name: QName, predicate: String, value: String)
 
 object BindingDescriptor {
 

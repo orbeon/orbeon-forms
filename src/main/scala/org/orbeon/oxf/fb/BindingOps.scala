@@ -55,7 +55,10 @@ trait BindingOps {
                     // the current appearance. Otherwise, pass an empty set which means that only the default (empty)
                     // appearance will match. Note that this means that the result might not necessarily have a
                     // selected current appearance.
-                    appearancesForSelection = if (sameDatatypesIgnorePrefix(newDatatype, originalDatatype)) appearanceOpt.to[Set] else Set.empty,
+                    appearancesForSelection = if (sameDatatypesIgnorePrefix(newDatatype, originalDatatype))
+                                                  appearanceOpt.to[Set]
+                                              else
+                                                  Set.empty,
                     lang                    = lang,
                     bindings                = bindings
                 )
@@ -126,7 +129,10 @@ trait BindingOps {
                 val displayNames = metadata / "*:display-name"
                 val icons        = metadata / "*:icon" / "*:small-icon"
 
-                (appearanceOpt, findMetadata(displayNames), findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png")
+                val displayNameOpt = findMetadata(displayNames)
+                val icon           = findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png"
+
+                (appearanceOpt, displayNameOpt, icon)
         } collect {
             case (appearanceOpt, Some(displayName), icon) ⇒
                 (appearanceOpt, displayName, icon)
@@ -148,17 +154,21 @@ trait BindingOps {
 
         val allAttributes = {
             val metadata = bindingMetadata(binding)
-            val typeFromDatatype = QName.get("type") → ((metadata / "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
+
+            val typeFromDatatype =
+                QName.get("type") → ((metadata / "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
+
             val bindAttributes = {
                 val asNodeInfo = metadata / "*:templates" / "*:bind" /@ @*
                 asNodeInfo map (att ⇒ QName.get(att.getLocalPart, att.getPrefix, att.getURI) →  att.stringValue)
             }
+
             typeFromDatatype +: bindAttributes
         }
 
         for {
             (qname, value) ← allAttributes
-            if !(qname.getName == "type" && value == "xs:string") // TODO: assume literal 'xs:' prefix (should resolve namespace)
+            if !(qname.getName == "type" && value == "xs:string") // TODO: resolve and don't  literal 'xs:' prefix
         } yield
             attributeInfo(qname, value)
     }

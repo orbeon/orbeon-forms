@@ -357,7 +357,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 // Q: If binding changes, what about instance and bind templates? Should also be updated? Not a
                 // concrete case as of now, but can happen depending on which bindings are available.
                 val newControlElem = rename(controlElem, newElemName)
-                toggleAttribute(newControlElem, APPEARANCE_QNAME, newAppearanceAttOpt.get, newAppearanceAttOpt.isDefined)
+                toggleAttribute(newControlElem, APPEARANCE_QNAME, newAppearanceAttOpt)
             }
         }
 
@@ -423,9 +423,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
                 val bind = findBindByName(inDoc, controlName).get
 
-                val builtinTypeStringOpt = nonEmptyOrNone(validationElem / "builtin-type" stringValue)
-                val builtinTypeRequired  = nonEmptyOrNone(validationElem / "builtin-type-required" stringValue) contains "true"
-                val schemaTypeOpt        = nonEmptyOrNone(validationElem / "schema-type"  stringValue)
+                val builtinTypeStringOpt = nonEmptyOrNone(validationElem elemValue "builtin-type")
+                val builtinTypeRequired  = nonEmptyOrNone(validationElem elemValue "builtin-type-required") contains "true"
+                val schemaTypeOpt        = nonEmptyOrNone(validationElem elemValue "schema-type")
 
                 def builtinTypeQName: (QName, Boolean) = {
 
@@ -549,7 +549,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
         // Return supported alert details for the control
         //
-        // - return None if the alert message can't be found or if the alert/validation combination can't be handled by FB
+        // - None if the alert message can't be found or if the alert/validation combination can't be handled by FB
         // - alerts returned are either global (no validation/level specified) or for a single specific validation
         def fromForm(inDoc: NodeInfo, controlName: String): Seq[AlertDetails] = {
 
@@ -578,7 +578,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
                             _  map (_.toInt - 1) getOrElse 0
                         }
 
-                // Try to find an existing resource for the given index if present, otherwise assume a blank value for the language
+                // Try to find an existing resource for the given index if present, otherwise assume a blank value for
+                // the language
                 val alertsByLang = alertResourcesForAllLangs.to[List] map {
                     case (lang, alerts) ⇒ lang → (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
                 }
@@ -647,7 +648,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             (
                 nonEmptyOrNone(id),
                 nonEmptyOrNone(e attValue LEVEL_QNAME) map LevelByName getOrElse ErrorLevel,
-                if (mip == Type) e.getStringValue else e attValue VALUE_QNAME,
+                if (mip == Type) e.stringValue else e attValue VALUE_QNAME,
                 findAlertForId(id)
             )
         }

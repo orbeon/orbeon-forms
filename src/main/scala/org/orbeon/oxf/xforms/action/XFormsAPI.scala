@@ -206,12 +206,15 @@ object XFormsAPI {
             case Seq(att, _*) ⇒ setvalue(att, value)
         }
 
-    // NOTE: The value is by-name
+    // NOTE: The value is by-name and used only if needed
     def toggleAttribute(element: NodeInfo, attName: QName, value: ⇒ String, set: Boolean): Unit =
         if (set)
             ensureAttribute(element, attName, value)
         else
             delete(element \@ attName)
+
+    def toggleAttribute(element: NodeInfo, attName: QName, value: Option[String]): Unit =
+        toggleAttribute(element, attName, value.get, value.isDefined)
 
     // Return an instance's root element in the current action context as per xxf:instance()
     def instanceRoot(staticId: String): Option[NodeInfo] =

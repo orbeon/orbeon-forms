@@ -1,34 +1,33 @@
+.xbl-fr-autocomplete .fr-autocomplete-container {
+  display: table;
+}
+.xbl-fr-autocomplete .fr-autocomplete-container > div {
+  position: static;
+  display: table-row;
+}
+.xbl-fr-autocomplete .fr-autocomplete-container > div > .fr-autocomplete-search,
+.xbl-fr-autocomplete .fr-autocomplete-container > div > .fr-autocomplete-show-suggestions-button {
+  display: table-cell;
+}
+.xbl-fr-autocomplete .fr-autocomplete-search {
+  width: 100%;
+}
 .xbl-fr-autocomplete .xforms-input-input {
   position: static;
-  width: 140px;
-}
-.xbl-fr-autocomplete .yui-ac {
-  position: static;
+  width: 100%;
 }
 .xbl-fr-autocomplete .yui-ac-content {
-  width: 140px;
-  -moz-box-sizing: border-box;
+  width: auto;
+  min-width: 200px;
+  max-width: 400px;
+  overflow-y: auto;
+  max-height: 200px;
   -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.xbl-fr-autocomplete .yui-ac {
-  display: inline-block;
-  vertical-align: middle;
-}
-.xbl-fr-autocomplete .yui-ac {
-  white-space: nowrap;
-}
-.xbl-fr-autocomplete .xbl-fr-select1-button {
-  vertical-align: middle;
-  display: inline-block;
-}
-.xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button {
-  vertical-align: middle;
-}
-.xbl-fr-autocomplete input {
-  vertical-align: middle;
-}
 .xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button {
+  width: 40px;
   height: 28px;
   margin-left: 3px;
   padding-top: 0;

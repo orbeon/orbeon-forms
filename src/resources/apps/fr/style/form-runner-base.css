@@ -407,9 +407,6 @@
 .orbeon .fr-grid input[type="file"] {
   width: auto;
 }
-.orbeon .fr-grid .xbl-fr-autocomplete .xforms-input input {
-  width: 140px;
-}
 .orbeon .fr-grid .xbl-fr-inplace-input {
   width: 100%;
 }

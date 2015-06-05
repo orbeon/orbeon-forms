@@ -14,7 +14,7 @@
 
 .orbeon {
 
-    .xbl-fr-character-counter > div {
+    .xbl-fr-character-counter > .fr-charcounter-wrapper {
 
         // Position counter to the right of the field. With IE < 11, the counter is positioned under the field.
         .flex();
@@ -44,7 +44,7 @@
     }
 
     .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-        .xbl-fr-character-counter > div > .fr-charcounter-count {
+        .xbl-fr-character-counter > .fr-charcounter-wrapper > .fr-charcounter-count {
             display: none;
         }
     }

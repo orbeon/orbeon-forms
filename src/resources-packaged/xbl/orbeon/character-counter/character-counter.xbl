@@ -30,7 +30,8 @@
                 xf|secret[appearance ~= character-counter],
                 fr|tinymce[appearance ~= character-counter]"
             xxbl:mode="binding lhha"
-            xxbl:label-for="field">
+            xxbl:label-for="field"
+            xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Character Counter</display-name>
@@ -62,7 +63,7 @@
         </xbl:resources>
 
         <xbl:template xxbl:transform="oxf:xslt">
-            <xh:div xsl:version="2.0">
+            <xh:span xsl:version="2.0" class="fr-charcounter-wrapper">
 
                 <xf:var
                     name="binding"
@@ -84,7 +85,7 @@
                 </xsl:element>
 
                 <!-- Will appear below field for IE < 11 -->
-                <xh:div class="fr-charcounter-count">
+                <xh:span class="fr-charcounter-count">
                     <xf:output
                         value="if (empty($remaining)) then $current else abs($remaining)"
                         class="label fr-charcounter-{{
@@ -94,9 +95,9 @@
                             then 'remaining'
                             else 'over label-important'}}">
                     </xf:output>
-                </xh:div>
+                </xh:span>
 
-            </xh:div>
+            </xh:span>
         </xbl:template>
     </xbl:binding>
 

@@ -44,6 +44,11 @@
             text-align: center;
         }
 
+        // We can't use .table-striped, as xf:repeat adds delimiters, so we do our own zebra-striping
+        tbody tr:nth-child(4n+3) > td {
+            background-color: @tableBackgroundAccent;
+        }
+
         th {
             white-space: nowrap;
             min-width: 12px;

@@ -24,6 +24,9 @@
 .orbeon .fr-forms-table .fr-new {
   text-align: center;
 }
+.orbeon .fr-forms-table tbody tr:nth-child(4n+3) > td {
+  background-color: #f9f9f9;
+}
 .orbeon .fr-forms-table th {
   white-space: nowrap;
   min-width: 12px;

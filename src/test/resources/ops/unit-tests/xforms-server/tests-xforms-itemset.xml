@@ -1384,4 +1384,66 @@
         </output>
     </test>
 
+    <test description="#2250: context() returning unexpected result in xf:itemset" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/479 -->
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <html>
+                            <head>
+                                <xf:model>
+                                    <xf:instance id="selected-values" xmlns="">
+                                        <instance>
+                                            <pets>cat dog</pets>
+                                            <favorite/>
+                                        </instance>
+                                    </xf:instance>
+                                    <xf:instance id="pets" xmlns="">
+                                        <root>
+                                            <item name="Cat" value="cat"/>
+                                            <item name="Dog" value="dog"/>
+                                            <item name="Fish" value="fish"/>
+                                            <item name="Cobra" value="cobra"/>
+                                        </root>
+                                    </xf:instance>
+                                </xf:model>
+                            </head>
+                            <body>
+                                <xf:select1 ref="favorite" id="select1">
+                                    <xf:itemset>
+                                        <xf:label value="context()/local-name()"/>
+                                        <xf:value/>
+                                    </xf:itemset>
+                                    <xf:itemset ref="instance('pets')/item[@value = xxf:split(context()/../pets)]">
+                                        <xf:label ref="@name"/>
+                                        <xf:value ref="@value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="select1">0</xxf:control>
+                        <xxf:itemset id="select1">[{"label":"favorite","value":"0"},{"label":"Cat","value":"1"},{"label":"Dog","value":"2"}]</xxf:itemset>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+
 </group>

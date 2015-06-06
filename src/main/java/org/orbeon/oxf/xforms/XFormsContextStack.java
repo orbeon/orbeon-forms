@@ -196,7 +196,7 @@ public class XFormsContextStack {
     }
 
     public VariableNameValue scopeVariable(VariableAnalysisTrait staticVariable, String sourceEffectiveId, boolean handleNonFatal) {
-        
+
         // Create variable object
         final Variable variable = new Variable(staticVariable, containingDocument);
 
@@ -464,11 +464,11 @@ public class XFormsContextStack {
                             // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,
                             // static analysis of expressions might provide enough information to handle the two situations.
 
-                            // Provide context information for the context() function
-                            pushTemporaryContext(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItem());
-
-                            // Use updated binding context to set model
-                            final XFormsFunction.Context functionContext = getFunctionContext(sourceEffectiveId, evaluationContextBinding);
+                            final XFormsFunction.Context functionContext =
+                                getFunctionContext(
+                                    sourceEffectiveId,
+                                    updateBindingWithContextItem(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItem())
+                                );
 
                             List<Item> result;
                                 try {
@@ -494,8 +494,6 @@ public class XFormsContextStack {
 
                                 }
                             newNodeset = result;
-
-                            popBinding();
                         } else {
                             // Otherwise we consider we can't evaluate
                             newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
@@ -577,8 +575,24 @@ public class XFormsContextStack {
     }
 
     private void pushTemporaryContext(BindingContext parent, BindingContext base, Item contextItem) {
-        this.head = new BindingContext(parent, base.model(), null, base.nodeset(), base.position(), base.elementId(),
-                false, base.controlElement(), base.locationData(), false, contextItem, base.scope());
+        this.head = updateBindingWithContextItem(parent, base, contextItem);
+    }
+
+    private BindingContext updateBindingWithContextItem(BindingContext parent, BindingContext base, Item contextItem) {
+        return new BindingContext(
+            parent,
+            base.model(),
+            null,
+            base.nodeset(),
+            base.position(),
+            base.elementId(),
+            false,
+            base.controlElement(),
+            base.locationData(),
+            false,
+            contextItem,
+            base.scope()
+        );
     }
 
     /**

@@ -160,10 +160,10 @@
     <xsl:template match="fr:hidden-controls" name="fr-hidden-controls">
         <xh:span class="xforms-hidden">
             <!-- Hidden field to communicate to the client whether the data is safe -->
-            <xf:input
+            <xf:output
                     model="fr-persistence-model"
                     ref="instance('fr-persistence-instance')/data-safe"
-                    id="fr-data-safe-input"
+                    id="fr-data-safe"
                     class="xforms-hidden"/>
 
             <!-- Expose document id to JavaScript -->

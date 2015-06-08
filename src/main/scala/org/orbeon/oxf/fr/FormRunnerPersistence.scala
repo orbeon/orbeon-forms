@@ -189,10 +189,12 @@ trait FormRunnerPersistence {
     // Whether the form data is valid as per the error summary
     // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
     // reflected with the use of XBL components.
-    def dataValid = errorSummaryInstance.rootElement \ "valid" === "true"
+    def dataValid =
+        errorSummaryInstance.rootElement \ "valid" === "true"
 
     // Return the number of failed validations captured by the error summary for the given level
-    def countValidationsByLevel(level: ValidationLevel) = (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
+    def countValidationsByLevel(level: ValidationLevel) =
+        (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
 
     // Return all nodes which refer to data attachments
     def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String) =

@@ -45,11 +45,11 @@ object XFormsModelSubmissionBase {
     def prepareXML(xfcd: XFormsContainingDocument, ref: NodeInfo, prune: Boolean, annotateWith: String): Document =
         ref match {
             case virtualNode: VirtualNode ⇒
-                
+
                 // "A node from the instance data is selected, based on attributes on the submission
                 // element. The indicated node and all nodes for which it is an ancestor are considered for
                 // the remainder of the submit process. "
-                val copy = 
+                val copy =
                     virtualNode.getUnderlyingNode match {
                         case e: Element ⇒ Dom4jUtils.createDocumentCopyParentNamespaces(e)
                         case n: Node    ⇒ Dom4jUtils.createDocumentCopyElement(n.getDocument.getRootElement)
@@ -96,7 +96,11 @@ object XFormsModelSubmissionBase {
 
     // Annotate elements which have failed constraints with an xxf:error, xxf:warning or xxf:info attribute containing
     // the alert message. Only the levels passed in `annotate` are handled.
-    def annotateWithAlerts(xfcd: XFormsContainingDocument, doc: Document, levelsToAnnotate: Set[ValidationLevel]): Unit =
+    def annotateWithAlerts(
+        xfcd             : XFormsContainingDocument,
+        doc              : Document,
+        levelsToAnnotate : Set[ValidationLevel]
+    ): Unit =
         if (levelsToAnnotate.nonEmpty) {
 
             val elementsToAnnotate = mutable.Map[ValidationLevel, mutable.Map[Set[String], Element]]()
@@ -124,8 +128,10 @@ object XFormsModelSubmissionBase {
                 val relevantLevels = elementsToAnnotate.keySet
 
                 def controlsIterator =
-                    controls.iterator collect
-                        { case (_, control: XFormsSingleNodeControl) if control.isRelevant && control.alertLevel.toList.toSet.subsetOf(relevantLevels) ⇒ control }
+                    controls.iterator collect {
+                        case (_, control: XFormsSingleNodeControl)
+                            if control.isRelevant && control.alertLevel.toList.toSet.subsetOf(relevantLevels) ⇒ control
+                    }
 
                 var annotated = false
 
@@ -153,14 +159,15 @@ object XFormsModelSubmissionBase {
                 // Iterate all controls with warnings and try to annotate the associated element nodes
                 controlsIterator foreach annotateElementIfPossible
 
-                // If there is any annotation, make sure the attribute's namespace prefix is in scope on the root element
+                // If there is any annotation, make sure the attribute's namespace prefix is in scope on the root
+                // element
                 if (annotated)
                     addRootElementNamespace(doc)
             }
         }
 
     import XFormsSubmissionUtils._
-    
+
     def defaultSerialization(xformsMethod: String): Option[String] =
         nonEmptyOrNone(xformsMethod) collect {
             case "multipart-post"                             ⇒ "multipart/related"

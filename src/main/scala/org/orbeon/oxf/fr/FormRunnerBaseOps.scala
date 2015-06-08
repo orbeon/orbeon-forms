@@ -64,34 +64,43 @@ trait FormRunnerBaseOps {
     // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
     def findInViewTryIndex(inDoc: NodeInfo, id: String) =
         findTryIndex(inDoc, id, findFRBodyElement(inDoc), includeSelf = false)
-    
+
     def findInModelTryIndex(inDoc: NodeInfo, id: String) =
         findTryIndex(inDoc, id, findModelElement(inDoc), includeSelf = false)
-    
+
     def findInBindsTryIndex(inDoc: NodeInfo, id: String) =
         findTryIndex(inDoc, id, findTopLevelBind(inDoc).get, includeSelf = true)
-    
-    private def findTryIndex(inDoc: NodeInfo, id: String, under: NodeInfo, includeSelf: Boolean) = {
-        
+
+    private def findTryIndex(inDoc: NodeInfo, id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
+
         // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
         // only called from the functions above, which search in a form's view, model, or binds, which implies the
         // existence of a form model.
         val hasIndex = inDoc.getDocumentRoot.selectID("fr-form-model") ne null
-        
+
         def isUnder(node: NodeInfo) =
             if (includeSelf)
                 node ancestorOrSelf * contains under
             else
                 node ancestor * contains under
-        
-        if (hasIndex) {
-            Option(inDoc.getDocumentRoot.selectID(id)) filter isUnder
-        } else {
+
+        def fromSearch =
             if (includeSelf)
-                under descendantOrSelf * find (_.id == id) 
+                under descendantOrSelf * find (_.id == id)
             else
                 under descendant * find (_.id == id)
-        }
+
+        def fromIndex =
+            Option(inDoc.getDocumentRoot.selectID(id)) match {
+                case elemOpt @ Some(elem) if isUnder(elem) ⇒ elemOpt
+                case Some(elem)                            ⇒ fromSearch
+                case None                                  ⇒ None
+            }
+
+        if (hasIndex)
+            fromIndex
+        else
+            fromSearch
     }
 
     // Get the body element assuming the structure of an XHTML document, annotated or not, OR the structure of xbl:xbl.
@@ -133,7 +142,7 @@ trait FormRunnerBaseOps {
     def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
     private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
-    
+
     // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
     def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
         findModelElement(inDoc) \ "*:bind" find {

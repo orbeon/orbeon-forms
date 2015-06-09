@@ -25,7 +25,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
-    private static final String HIDDEN_PASSWORD = "********";
+    private static final String HIDDEN_PASSWORD = "••••••••";
 
     public XFormsSecretHandler() {
         super(false);

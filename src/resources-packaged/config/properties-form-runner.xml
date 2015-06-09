@@ -105,7 +105,7 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
-        refresh collapse-all expand-all summary clear pdf save-final review
+        refresh summary clear pdf save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->

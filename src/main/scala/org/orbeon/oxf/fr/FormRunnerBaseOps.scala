@@ -168,6 +168,7 @@ trait FormRunnerBaseOps {
 
     // Interrupt current processing and send an error code to the client.
     // NOTE: This could be done through ExternalContext
+    //@XPathFunction
     def sendError(code: Int) = throw new HttpStatusCodeException(code)
     def sendError(code: Int, resource: String) = throw new HttpStatusCodeException(code, Option(resource))
 
@@ -192,6 +193,7 @@ trait FormRunnerBaseOps {
     // Captcha support
     def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
     def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
+    //@XPathFunction
     def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
 
     def isNoscript    = containingDocument.noscript
@@ -215,12 +217,14 @@ trait FormRunnerBaseOps {
     }
 
     // Display a success message
+    //@XPathFunction
     def successMessage(message: String): Unit = {
         setvalue(persistenceInstance.rootElement \ "message", message)
         toggle("fr-message-success")
     }
 
     // Display an error message
+    //@XPathFunction
     def errorMessage(message: String): Unit =
         dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" → Some(message)))
 }

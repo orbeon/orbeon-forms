@@ -39,6 +39,7 @@ trait FormRunnerLang {
     def currentLang          = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("lang"))
     def currentFRLang        = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-lang"))
     def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
+    //@XPathFunction
     def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
     def allResources(resources: NodeInfo)  = resources child "resource"
 
@@ -50,6 +51,7 @@ trait FormRunnerLang {
     // List of available languages for the given form
     // Empty if the form doesn't have resources
     // If all of the form's resources are filtered via property, return the first language of the form, if any.
+    //@XPathFunction
     def getFormLangSelection(app: String, form: String, formLanguages: JList[String]): List[String] = {
 
         val appForm = getAppForm(app, form)
@@ -66,6 +68,7 @@ trait FormRunnerLang {
 
     // Find the best match for the current form language
     // Can be null (empty sequence) if there are no resources (or no allowed resources) in the form
+    //@XPathFunction
     def selectFormLang(app: String, form: String, requestedLang: String, formLangs: JList[String]): String = {
 
         val appForm = getAppForm(app, form)
@@ -78,6 +81,7 @@ trait FormRunnerLang {
 
     // Get the Form Runner language
     // If possible, try to match the form language, otherwise
+    //@XPathFunction
     def selectFormRunnerLang(app: String, form: String, requestedLang: String, formRunnerLangs: JList[String]): String = {
         val appForm = getAppForm(app, form)
         val actualRequestedLang = findRequestedLang(appForm, requestedLang) filter isAllowedLang(appForm)

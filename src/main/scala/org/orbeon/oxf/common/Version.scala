@@ -43,7 +43,7 @@ object Version {
 
     def versionStringIfAllowed =
         Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
-    
+
     // For XPath callers
     def versionStringIfAllowedOrEmpty =
         versionStringIfAllowed.orNull
@@ -81,5 +81,6 @@ object Version {
         fromContextClassLoaderOpt getOrElse fromName newInstance
     }
 
+    //@XPathFunction
     def isPE = Edition == "PE"
 }

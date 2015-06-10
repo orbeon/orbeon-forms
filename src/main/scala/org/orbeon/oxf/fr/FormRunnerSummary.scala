@@ -19,12 +19,15 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner._
 
 trait FormRunnerSummary {
+
     // Get a field's label in HTML for the Summary page
+    //@XPathFunction
     def htmlFieldLabel(name: String, htmlLabel: Boolean, resources: NodeInfo): String = {
         def resourceLabelOpt = (resources \ name \ "label" map (v ⇒ if (htmlLabel) v.stringValue else XMLUtils.escapeXMLMinimal(v.stringValue))).headOption
         resourceLabelOpt getOrElse '[' + name + ']'
     }
 
+    //@XPathFunction
     def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {
 
         val someFormVersion = Some(formVersion) // use the same form version as the data to clone

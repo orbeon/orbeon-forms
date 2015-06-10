@@ -52,9 +52,11 @@ trait FormRunnerPersistence {
     def isUploadedFileURL(value: String): Boolean =
         value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
+    //@XPathFunction
     def createFormDataBasePath(app: String, form: String, isDraft: Boolean, document: String): String =
         CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
 
+    //@XPathFunction
     def createFormDefinitionBasePath(app: String, form: String) =
         CRUDBasePath :: app :: form :: "form" :: "" :: Nil mkString "/"
 
@@ -79,12 +81,15 @@ trait FormRunnerPersistence {
     def providerPropertyAsBoolean(provider: String, property: String, default: Boolean) =
         properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
+    //@XPathFunction
     def autosaveSupported(app: String, form: String) =
         providerPropertyAsBoolean(findProvider(app, form, "data").get, "autosave", default = false)
 
+    //@XPathFunction
     def ownerGroupPermissionsSupported(app: String, form: String) =
         providerPropertyAsBoolean(findProvider(app, form, "data").get, "permissions", default = false)
 
+    //@XPathFunction
     def versioningSupported(app: String, form: String) =
         providerPropertyAsBoolean(findProvider(app, form, "data").get, "versioning", default = false)
 
@@ -197,6 +202,7 @@ trait FormRunnerPersistence {
         (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
 
     // Return all nodes which refer to data attachments
+    //@XPathFunction
     def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String) =
         collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true)._1.asJava
 

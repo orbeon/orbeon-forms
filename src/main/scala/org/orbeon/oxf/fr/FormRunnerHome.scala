@@ -90,63 +90,86 @@ trait FormRunnerHome {
     def isLocal(form: NodeInfo)  = Form(form).local.isDefined
     def isRemote(form: NodeInfo) = Form(form).remote.isDefined
 
+    //@XPathFunction
     def isLocalAvailable(form: NodeInfo)    = Form(form).local  exists(_.available)
+    //@XPathFunction
     def isRemoteAvailable(form: NodeInfo)   = Form(form).remote exists(_.available)
 
+    //@XPathFunction
     def isLocalUnavailable(form: NodeInfo)  = Form(form).local  exists(! _.available)
+    //@XPathFunction
     def isRemoteUnavailable(form: NodeInfo) = Form(form).remote exists(! _.available)
 
+    //@XPathFunction
     def isLocalNewer(form: NodeInfo) = Form(form).isLocalNewer
+    //@XPathFunction
     def isRemoteNewer(form: NodeInfo) = Form(form).isRemoteNewer
 
+    //@XPathFunction
     def canSelectUnpublishedLocal(selection: String, forms: SequenceIterator) =
         collectForms(forms) exists (f ⇒ f.isAdmin && f.isLocalUnavailable)
 
+    //@XPathFunction
     def canSelectPublishedLocal(selection: String, forms: SequenceIterator) =
         collectForms(forms) exists (f ⇒ f.isAdmin && f.isLocalAvailable)
 
+    //@XPathFunction
     def canSelectUnpublishedRemote(selection: String, forms: SequenceIterator) =
         collectForms(forms) exists (f ⇒ f.isAdmin && f.isRemoteUnavailable)
 
+    //@XPathFunction
     def canSelectPublishedRemote(selection: String, forms: SequenceIterator) =
         collectForms(forms) exists (f ⇒ f.isAdmin && f.isRemoteAvailable)
 
+    //@XPathFunction
     def canSelectLocalNewer(selection: String, forms: SequenceIterator) =
         collectForms(forms) exists (f ⇒ f.isAdmin && f.isLocalNewer)
 
+    //@XPathFunction
     def canSelectRemoteNewer(selection: String, forms: SequenceIterator) =
         collectForms(forms) exists (f ⇒ f.isAdmin && f.isRemoteNewer)
 
+    //@XPathFunction
     def canPublishLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalUnavailable)
 
+    //@XPathFunction
     def canUnpublishLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalAvailable)
 
+    //@XPathFunction
     def canPublishRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemoteUnavailable)
 
+    //@XPathFunction
     def canUnpublishRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemoteAvailable)
 
+    //@XPathFunction
     def canPublishLocalToRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocal)
 
+    //@XPathFunction
     def canPublishRemoteToLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemote)
 
+    //@XPathFunction
     def canNavigateSummary(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isSummaryAllowed)
 
+    //@XPathFunction
     def canNavigateNew(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) exists (f ⇒ f.isLocalAvailable && f.isNewAllowed)
 
+    //@XPathFunction
     def canUpgradeLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocal)
 
+    //@XPathFunction
     def canUpgradeRemote(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemote)
 
+    //@XPathFunction
     def publish(
         xhtml            : NodeInfo,
         toBaseURI        : String,
@@ -171,6 +194,7 @@ trait FormRunnerHome {
 
     // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
     // serialization. Here we juggle between XML and typed data.
+    //@XPathFunction
     def joinLocalAndRemoteMetadata(
         local              : SequenceIterator,
         remote             : SequenceIterator,
@@ -233,6 +257,7 @@ trait FormRunnerHome {
     // 2. Else try the JSON property (oxf.fr.home.remote-servers). If the property exists and is well-formed, return
     //    a flattened sequence of label/url pairs.
     // 3. Otherwise the empty sequence is returned.
+    //@XPathFunction
     def remoteServersXPath: SequenceIterator = {
 
         import FormRunnerHome._

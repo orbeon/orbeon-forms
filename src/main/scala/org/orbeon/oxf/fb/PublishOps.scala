@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 trait PublishOps {
 
     // Publish a form and its attachments
+    //@XPathFunction
     def publish(xhtml: NodeInfo, app: String, form: String, document: String, formVersion: String): Unit = {
 
         try {

@@ -30,12 +30,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     val LHHANames   = LHHAInOrder.to[Set]
 
     // Get the control name based on the control, bind, grid, section or template id
+    //@XPathFunction
     def controlNameFromId(controlOrBindId: String) =
         getStaticIdFromId(controlOrBindId) match {
             case ControlName(name, _) ⇒ name
             case _                    ⇒ null
         }
 
+    //@XPathFunction
     def controlNameFromIdOpt(controlOrBindId: String) =
         Option(controlNameFromId(controlOrBindId))
 
@@ -105,9 +107,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
         nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
 
+    //@XPathFunction
     def isSingleSelectionControl(localName: String) =
         localName == "select1" || localName.endsWith("-select1")
 
+    //@XPathFunction
     def isMultipleSelectionControl(localName: String) =
         localName == "select" || localName.endsWith("-select")
 
@@ -133,6 +137,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // - in the implementation below, the source can also directly refer to a bind
     // - if the source is not found, the target is resolved from the enclosing model
     //
+    //@XPathFunction
     def resolveTargetRelativeToActionSource(actionSourceAbsoluteId: String, targetControlName: String): ValueRepresentation = {
 
         val container = XFormsFunction.context.container
@@ -144,7 +149,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
                     absoluteIdToEffectiveId(actionSourceAbsoluteId),
                     controlId(targetControlName)
                 )
- 
+
             findControl collect {
                 case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
             } flatten
@@ -179,6 +184,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         fromControl orElse fromBind orNull
     }
 
+    //@XPathFunction
     def findRepeatedControlsForTarget(actionSourceAbsoluteId: String, targetControlName: String) = {
 
         val controls =

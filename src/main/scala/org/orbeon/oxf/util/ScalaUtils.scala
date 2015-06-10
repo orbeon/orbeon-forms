@@ -235,6 +235,7 @@ object ScalaUtils extends PathOps {
         builder.result()
     }
 
+    //@XPathFunction
     def truncateWithEllipsis(s: String, maxLength: Int, tolerance: Int): String =
         if (s.length <= maxLength + tolerance) {
             s

@@ -196,6 +196,7 @@ object SecureUtils {
     lazy val HexIdLength = randomHexId.size
 
     // Generate a random 128-bit value hashed to hex
+    //@XPathFunction
     def randomHexId: String = {
         // It's unclear whether there is a real benefit to re-seed once in a while:
         // http://stackoverflow.com/questions/295628/securerandom-init-once-or-every-time-it-is-needed

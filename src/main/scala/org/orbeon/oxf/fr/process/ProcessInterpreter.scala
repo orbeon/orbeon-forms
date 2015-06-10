@@ -218,12 +218,14 @@ trait ProcessInterpreter extends Logging {
         (throw new IllegalArgumentException(s"Non-existing process: $name in scope $scope"))
 
     // Main entry point for starting a process associated with a named button
+    //@XPathFunction
     def runProcessByName(scope: String, name: String): Unit =
         LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" → currentXFormsDocumentId, "scope" → scope, "name" → name)) {
             runProcess(scope, rawProcessByName(scope, name))
         }
 
     // Main entry point for starting a literal process
+    //@XPathFunction
     def runProcess(scope: String, process: String): Try[Any] = {
         withDebug("process: running", Seq("process" → process)) {
             // Scope the process (for suspend/resume)

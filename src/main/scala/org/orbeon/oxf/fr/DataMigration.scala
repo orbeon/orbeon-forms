@@ -71,9 +71,11 @@ object DataMigration {
 
     import org.orbeon.oxf.xforms.action.XFormsAPI._
 
+    //@XPathFunction
     def dataMaybeMigratedFrom(data: DocumentInfo, metadata: Option[DocumentInfo]) =
         dataMaybeMigratedFromTo(data, metadata, migrateDataFrom)
 
+    //@XPathFunction
     def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]) =
         dataMaybeMigratedFromTo(data, metadata, migrateDataTo)
 

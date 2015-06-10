@@ -40,6 +40,7 @@ trait FormRunnerPermissions {
      * can be tested with allAuthorizedOperations().
      * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
      */
+    //@XPathFunction
     def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
         if (permissionsElement eq null)
             Seq("*")                                                         // No permissions defined for this form, authorize any operation
@@ -57,6 +58,7 @@ trait FormRunnerPermissions {
                 .distinct                                                    // Remove duplicate operations
     }
 
+    //@XPathFunction
     def xpathAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
         def toOption(s: String) = if (s == null || s == "") None else Some(s)
         allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname))
@@ -98,6 +100,7 @@ trait FormRunnerPermissions {
      * you are the owner and a group member. It is used in the Form Runner home page to determine if it is even
      * worth linking to the summary page for a given form.
      */
+    //@XPathFunction
     def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
         val headers  = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
         val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption
@@ -166,6 +169,7 @@ trait FormRunnerPermissions {
     def orbeonRoles: Set[String] =
         NetUtils.getExternalContext.getRequest.getUserRoles.to[Set]
 
+    //@XPathFunction
     def orbeonRolesSequence: SequenceIterator =
         orbeonRoles.iterator map stringToStringValue
 }

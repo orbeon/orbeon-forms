@@ -38,6 +38,7 @@ trait FormRunnerErrorSummary {
     private def findErrorsInstance =
         findErrorSummaryModel map (_.getInstance("fr-errors-instance"))
 
+    //@XPathFunction
     def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
         Option(containingDocument.getControlByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
             control ⇒
@@ -50,6 +51,7 @@ trait FormRunnerErrorSummary {
         }
 
     // Return the subset of section names passed which contain errors in the global error summary
+    //@XPathFunction
     def topLevelSectionsWithErrors(sectionIds: String, onlyVisible: Boolean): Seq[String] =
         findErrorsInstance match {
             case Some(errorsInstance) ⇒
@@ -86,6 +88,7 @@ trait FormRunnerErrorSummary {
         }
 
     // Update the iteration in a control's absolute id
+    //@XPathFunction
     def updateIteration(absoluteId: String, repeatAbsoluteId: String, fromIterations: Array[Int], toIterations: Array[Int]): String = {
 
         val effectiveId = absoluteIdToEffectiveId(absoluteId)
@@ -118,6 +121,7 @@ trait FormRunnerErrorSummary {
     private val Digits = "0" * 5
 
     // Return a sorting string for the given control absolute id, taking repeats into account
+    //@XPathFunction
     def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
 
         val effectiveId = absoluteIdToEffectiveId(absoluteId)

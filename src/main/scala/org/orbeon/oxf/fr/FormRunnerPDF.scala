@@ -31,6 +31,7 @@ trait FormRunnerPDF {
     val PDFFileNameProperty = "oxf.fr.detail.pdf.filename"
 
     // Return mappings (formatName → expression) for all PDF formats in the properties
+    //@XPathFunction
     def getPDFFormats = {
 
         def propertiesStartingWith(prefix: String) =
@@ -48,6 +49,7 @@ trait FormRunnerPDF {
     }
 
     // Return the PDF formatting expression for the given parameters
+    //@XPathFunction
     def getPDFFormatExpression(pdfFormats: JMap[String, String], app: String, form: String, name: String, dataType: String) = {
 
         val propertyName = List("oxf.fr.pdf.map", app, form, name) ::: Option(dataType).toList mkString "."
@@ -63,6 +65,7 @@ trait FormRunnerPDF {
     }
 
     // Build a PDF control id from the given HTML control
+    //@XPathFunction
     def buildPDFFieldNameFromHTML(control: NodeInfo) = {
 
         def isContainer(e: NodeInfo) = {
@@ -88,10 +91,12 @@ trait FormRunnerPDF {
     import URLFinder._
 
     // Add http/https/mailto hyperlinks to a plain string
+    //@XPathFunction
     def hyperlinkURLs(s: String, hyperlinks: Boolean) =
         replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 
     // Custom PDF filename for the detail page if specified and if evaluates to a non-empty name
+    //@XPathFunction
     def pdfFilenameOrNull: String = (
         formRunnerProperty(PDFFileNameProperty)(FormRunnerParams())
         flatMap nonEmptyOrNone

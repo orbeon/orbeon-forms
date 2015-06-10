@@ -30,6 +30,7 @@ object MigrationOps {
 
     // Used for migrating the form definition's legacy grid repeats
     // The rest of the implementation is in annotate.xpl.
+    //@XPathFunction
     def findLegacyGridBindsAndTemplates(outerDocument: DocumentInfo): Seq[NodeInfo] = {
 
         val legacyGrids = findLegacyGridRepeats(outerDocument)
@@ -74,6 +75,7 @@ object MigrationOps {
     //   }
     // ]
     //
+    //@XPathFunction
     def buildGridMigrationMap(
         outerDocument        : DocumentInfo,
         availableXBLBindings : Option[DocumentInfo],

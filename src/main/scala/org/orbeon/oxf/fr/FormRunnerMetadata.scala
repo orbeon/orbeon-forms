@@ -29,6 +29,7 @@ import scala.xml.Elem
 
 trait FormRunnerMetadata {
 
+    //@XPathFunction
     def createFormMetadataDocument(data: NodeInfo): NodeInfo = {
 
         val doc = XFormsAPI.containingDocument

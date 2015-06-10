@@ -62,7 +62,7 @@ trait ValidSupport extends FunctionSupport {
 
     def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext) = {
 
-        val items = itemArgumentsOrContextOpt(0)
+        val items = itemsArgumentOrContextOpt(0)
 
         if (recurse)
             ! (asScalaIterator(items) exists (i ⇒ ! isTreeValid(i, pruneNonRelevant)))

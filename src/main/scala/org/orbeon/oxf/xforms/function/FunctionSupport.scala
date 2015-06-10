@@ -32,7 +32,7 @@ protected trait FunctionSupport extends XFormsFunction {
         arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
 
     def stringValueArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
-        itemArgumentsOpt(i) map (_.getStringValue)
+        itemsArgumentOpt(i) map (_.getStringValue)
 
     def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
         stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))
@@ -49,17 +49,17 @@ protected trait FunctionSupport extends XFormsFunction {
     def booleanArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
         arguments.lift(i) map effectiveBooleanValue
 
-    def itemArgumentsOpt(i: Int)(implicit xpathContext: XPathContext) =
+    def itemsArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
         arguments.lift(i) map (_.iterate(xpathContext))
 
     def itemArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
-        itemArgumentsOpt(i) map (_.next())
+        itemsArgumentOpt(i) map (_.next())
 
     def itemArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
         Option(itemArgumentOpt(i) getOrElse xpathContext.getContextItem)
 
-    def itemArgumentsOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
-        itemArgumentsOpt(i) getOrElse SingletonIterator.makeIterator(xpathContext.getContextItem)
+    def itemsArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+        itemsArgumentOpt(i) getOrElse SingletonIterator.makeIterator(xpathContext.getContextItem)
 
     // Resolve the relevant control by argument expression
     def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =

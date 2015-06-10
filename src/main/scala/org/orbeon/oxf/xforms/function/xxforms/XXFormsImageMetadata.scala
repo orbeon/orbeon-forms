@@ -30,7 +30,7 @@ class XXFormsImageMetadata extends XFormsFunction with FunctionSupport {
         implicit val ctx = xpathContext
 
         def argumentAsString =
-            nonEmptyOrNone(itemArgumentsOpt(0).get.next().getStringValue)
+            nonEmptyOrNone(itemsArgumentOpt(0).get.next().getStringValue)
 
         def createStream(content: String) =
             if (NetUtils.urlHasProtocol(content))

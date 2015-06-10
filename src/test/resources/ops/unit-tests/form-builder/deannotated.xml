@@ -44,6 +44,8 @@
                     </resource>
                 </resources>
             </xf:instance>
+            <xf:action ev:event="xforms-ready" xmlns:ev="http://www.w3.org/2001/xml-events"/>
+            <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
         </xf:model>
     </xh:head>
     <xh:body>

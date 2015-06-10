@@ -44,6 +44,8 @@
                     </resource>
                 </resources>
             </xf:instance>
+            <xf:action fb:event="xforms-ready"/>
+            <xf:action fb:event="xforms-model-construct-done"/>
             <xf:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
                 <xf:dispatch name="fb-xforms-model-construct" targetid="|fr-form-model|"/>
             </xf:action>

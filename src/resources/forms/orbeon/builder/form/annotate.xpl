@@ -74,7 +74,7 @@
                 </xsl:template>
 
                 <!-- Disable all event handlers at design time -->
-                <xsl:template match="@ev:event | @event">
+                <xsl:template match="@ev:event | @event" mode="#all">
                     <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
 
@@ -188,7 +188,7 @@
                             <xsl:attribute name="xxf:custom-mips"/>
                             <xsl:attribute name="fb:added-empty-custom-mips" select="'true'"/>
                         </xsl:if>
-                        
+
                         <xsl:apply-templates
                             select="(@* except (@xxf:custom-mips, @fb:added-empty-custom-mips)) | node()"
                             mode="within-model"/>
@@ -271,7 +271,7 @@
                               mode="within-body"/>
 
                 <!-- nodeset → ref -->
-                <xsl:template match="xf:*/@nodeset">
+                <xsl:template match="xf:*/@nodeset" mode="#all">
                     <xsl:attribute name="ref" select="."/>
                 </xsl:template>
 

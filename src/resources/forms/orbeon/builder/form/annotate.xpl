@@ -74,7 +74,7 @@
                 </xsl:template>
 
                 <!-- Disable all event handlers at design time -->
-                <xsl:template match="@ev:event | @event">
+                <xsl:template match="@ev:event | @event" mode="#all">
                     <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
 
@@ -262,7 +262,7 @@
                               mode="within-body"/>
 
                 <!-- nodeset → ref -->
-                <xsl:template match="xf:*/@nodeset">
+                <xsl:template match="xf:*/@nodeset" mode="#all">
                     <xsl:attribute name="ref" select="."/>
                 </xsl:template>
 

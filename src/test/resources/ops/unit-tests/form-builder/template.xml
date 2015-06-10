@@ -15,7 +15,7 @@
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" constraint="true()" xxf:default="42">
+                    <xf:bind id="control-1-bind" name="control-1" nodeset="control-1" constraint="true()" xxf:default="42">
                         <xf:constraint value="string-length() le 100"/>
                         <xxf:default value="43"/>
                     </xf:bind>
@@ -35,6 +35,8 @@
                     </resource>
                 </resources>
             </xf:instance>
+            <xf:action event="xforms-ready"/>
+            <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
         </xf:model>
     </xh:head>
     <xh:body>

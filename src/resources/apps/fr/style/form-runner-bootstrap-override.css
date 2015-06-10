@@ -33,6 +33,7 @@ body.orbeon {
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff555555', endColorstr='#ff222222', GradientType=0);
   border: none;
+  border-radius: 0;
 }
 .orbeon .navbar-inverse .navbar-inner .container {
   line-height: 40px;

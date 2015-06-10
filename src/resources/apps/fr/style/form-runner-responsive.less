@@ -4,13 +4,28 @@
     
         .fr-view {
             width: inherit;
+            // Add padding on the sides, so the content doesn't touch the border of the viewport
+            padding: 0 10px;
         }
 
+        .navbar-inner {
+            // Remove rounded borders
+            border-radius: 0;
+        }
+        
         .span12 {
             // Don't use fixed width
-            width: inherit;
+            width: initial;
             // Isn't sized based on its container if floated
             float: none;
+        }
+
+        .fr-buttons {
+            .xforms-trigger button {
+                // Each button takes the whole line
+                width: 100%;
+                margin-left: 0;
+            }
         }
         
         .fr-grid:not(.fr-repeat-table) {

@@ -746,6 +746,7 @@ body {
   display: none;
 }
 .orbeon .fb-bottom .fr-buttons {
+  display: inline-block;
   margin: 0;
   vertical-align: top;
 }

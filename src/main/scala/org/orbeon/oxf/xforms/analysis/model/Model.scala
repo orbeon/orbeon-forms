@@ -401,7 +401,7 @@ object Model {
 
     val jXFormsSchemaTypeNames = XFormsSchemaTypeNames.asJava
 
-    val XFormsVariationTypeNames = Set(
+    private val CoreXFormsVariationTypeNames = Set(
         "dateTime",
         "time",
         "date",
@@ -418,8 +418,10 @@ object Model {
         "decimal",
         "double",
         "anyURI",
-        "QName",
+        "QName"
+    )
 
+    private val SecondaryXFormsVariationTypeNames = Set(
         "normalizedString",
         "token",
         "language",
@@ -445,15 +447,24 @@ object Model {
         "positiveInteger"
     )
 
-    val XFormsTypeNames = Set(
+    val XFormsVariationTypeNames =
+        CoreXFormsVariationTypeNames ++ SecondaryXFormsVariationTypeNames
+
+    private val XForms11TypeNames = Set(
         "listItem",
         "listItems",
         "dayTimeDuration",
         "yearMonthDuration",
         "email",
-        "card-number",
-        "HTMLFragment" // XForms 2.0
+        "card-number"
     )
+
+    private val XForms20TypeNames = Set(
+        "HTMLFragment"
+    )
+
+    val XFormsTypeNames =
+        XForms11TypeNames ++ XForms20TypeNames
 
     val jXFormsVariationTypeNames = XFormsVariationTypeNames.asJava
 }

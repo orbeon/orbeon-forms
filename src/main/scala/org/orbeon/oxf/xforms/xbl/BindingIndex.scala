@@ -22,7 +22,11 @@ case class BindingIndex[+T](
     nameAndAttSelectors : List[(BindingDescriptor, T)],
     attOnlySelectors    : List[(BindingDescriptor, T)],
     nameOnlySelectors   : List[(BindingDescriptor, T)]
-)
+) {
+    // Index by name to make lookups faster
+    val byNameWithAtt = nameAndAttSelectors filter (_._1.elementName.isDefined) groupBy (_._1.elementName.get)
+    val byNameOnly    = nameOnlySelectors   filter (_._1.elementName.isDefined) groupBy (_._1.elementName.get)
+}
 
 // Implementation strategy: all the functions take an immutable index and return a new immutable index. The global index
 // can be retrieved and updated atomically. There is no lock on the index. This assumes that the index is only a cache
@@ -40,7 +44,7 @@ object BindingIndex {
         val somePath = Some(path)
         distinctBindings(index) collect { case binding if binding.path == somePath ⇒ binding }
     }
-    
+
     def distinctBindings(index: BindingIndex[IndexableBinding]): List[IndexableBinding] = {
 
         val builder = mutable.ListBuffer[IndexableBinding]()
@@ -128,9 +132,11 @@ object BindingIndex {
             }
 
         def fromNameAndAtt =
-            index.nameAndAttSelectors collectFirst {
-                case (BindingDescriptor(Some(`qName`), None, Some(attDesc)), binding) if attMatches(attDesc) ⇒
-                    (binding, false)
+            index.byNameWithAtt.get(qName) flatMap { indexedBindings ⇒
+                indexedBindings.collectFirst {
+                    case (BindingDescriptor(_, None, Some(attDesc)), binding) if attMatches(attDesc) ⇒
+                        (binding, false)
+                }
             }
 
         def fromAttOnly =
@@ -140,10 +146,7 @@ object BindingIndex {
             }
 
         def fromNameOnly =
-            index.nameOnlySelectors collectFirst {
-                case (BindingDescriptor(Some(`qName`), None, None), binding) ⇒
-                    (binding, true)
-            }
+            index.byNameOnly.get(qName) flatMap (_.headOption) map (_._2 → true)
 
         // Specificity: http://dev.w3.org/csswg/selectors-4/#specificity
         //
@@ -157,7 +160,7 @@ object BindingIndex {
 
     private val pathsPF: PartialFunction[(BindingDescriptor, IndexableBinding), (BindingDescriptor, AbstractBinding)] =
         { case (d, b: AbstractBinding) if b.path.isDefined ⇒  d → b }
-    
+
     def keepAbstractBindingsOnly(index: BindingIndex[IndexableBinding]): BindingIndex[AbstractBinding] =
         index.copy(
             nameAndAttSelectors = index.nameAndAttSelectors collect abstractPF,
@@ -179,7 +182,7 @@ object GlobalBindingIndex {
 
     // The immutable, shared index, which is updated atomically each time a form has completed compilation
     @volatile private var _index = Empty
-    
+
     def currentIndex = _index
     def updateIndex(index: BindingIndex[AbstractBinding]) = _index = index
 }

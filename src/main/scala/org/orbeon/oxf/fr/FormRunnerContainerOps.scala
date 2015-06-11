@@ -71,7 +71,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     // - https://github.com/orbeon/orbeon-forms/issues/2173
     // - https://github.com/orbeon/orbeon-forms/issues/1947
     def findContainerNamesForModel(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
-        
+
         val namesWithContainers =
             for {
                 container ← findAncestorContainers(descendant, includeSelf)
@@ -101,6 +101,9 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     // Find all ancestor repeats from leaf to root
     def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
         findAncestorContainers(descendantOrSelf, includeSelf) filter isRepeat
+
+    def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+        findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
 
     // Find all ancestor sections from leaf to root
     def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =

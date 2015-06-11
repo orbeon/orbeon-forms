@@ -78,7 +78,8 @@ object ToolboxOps {
                 val resourceHolders = {
                     val formLanguages = allLangs(formResourcesRoot)
                     formLanguages map { formLang ⇒
-                    // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
+
+                        // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
                         val lhhaResourceEls = {
                             val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
                             lhhaNames map (elementInfo(_))
@@ -134,7 +135,7 @@ object ToolboxOps {
                 insert(into = bind, origin = findBindAttributesTemplate(binding))
 
                 // This can impact templates
-                updateTemplates(doc)
+                updateTemplatesCheckContainers(doc, findAncestorRepeatNames(gridTd).to[Set])
 
                 debugDumpDocumentForGrids("insert new control", doc)
 
@@ -226,7 +227,7 @@ object ToolboxOps {
         val newGridElement = insert(into = into, after = after.toSeq, origin = gridTemplate).head
 
         // This can impact templates
-        updateTemplates(inDoc)
+        updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
         // Select first grid cell
         selectTd(newGridElement \\ "*:td" head)
@@ -281,7 +282,7 @@ object ToolboxOps {
         ensureBinds(inDoc, findContainerNamesForModel(newSectionElement, includeSelf = true))
 
         // This can impact templates
-        updateTemplates(inDoc)
+        updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
         // Select first grid cell
         if (withGrid)
@@ -493,7 +494,7 @@ object ToolboxOps {
                 }
 
                 // This can impact templates
-                updateTemplates(td)
+                updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
             }
         }
     }

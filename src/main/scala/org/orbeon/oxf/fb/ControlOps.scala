@@ -169,7 +169,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def deleteCellContent(td: NodeInfo, updateTemplates: Boolean = false): Unit = {
         td \ * flatMap controlElementsToDelete foreach (delete(_))
         if (updateTemplates)
-            self.updateTemplates(td)
+            self.updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
     }
 
     // Find all associated elements to delete for a given control element
@@ -206,7 +206,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             renameControl (inDoc, oldName, newName)
             renameTemplate(inDoc, oldName, newName)
 
-            updateTemplates(inDoc)
+            findControlByName(inDoc, newName) foreach { newControl ⇒
+                updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(newControl).to[Set])
+            }
         }
 
     // Rename a control's nested iteration if any

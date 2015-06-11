@@ -196,7 +196,7 @@ trait GridOps extends ContainerOps {
         delete(tr)
 
         // Update templates
-        updateTemplates(doc)
+        updateTemplatesCheckContainers(doc, findAncestorRepeatNames(tr).to[Set])
 
         // Adjust selected td if needed
         newTdToSelect foreach selectTd
@@ -298,7 +298,7 @@ trait GridOps extends ContainerOps {
         }
 
         // Update templates
-        updateTemplates(doc)
+        updateTemplatesCheckContainers(doc, findAncestorRepeatNames(firstRowTd).to[Set])
 
         // Adjust selected td if needed
         newTdToSelect foreach selectTd

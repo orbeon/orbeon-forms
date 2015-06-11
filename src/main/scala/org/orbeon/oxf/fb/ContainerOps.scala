@@ -103,8 +103,7 @@ trait ContainerOps extends ControlOps {
         controls flatMap controlElementsToDelete foreach (delete(_))
 
         // Update templates
-        // NOTE: Could skip if top-level repeat
-        updateTemplates(doc)
+        updateTemplatesCheckContainers(doc, findAncestorRepeatNames(container).to[Set])
 
         // Adjust selected td if needed
         newTdToSelect foreach selectTd
@@ -254,7 +253,7 @@ trait ContainerOps extends ControlOps {
 
                 // Update existing templates
                 // NOTE: Could skip if top-level repeat
-                updateTemplates(inDoc)
+                updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control).to[Set])
 
                 // Ensure new template rooted at iteration
                 ensureTemplateReplaceContent(inDoc, controlName, createTemplateContentFromBind(iterationBind.head))
@@ -279,7 +278,7 @@ trait ContainerOps extends ControlOps {
                 findTemplateInstance(inDoc, controlName) foreach (delete(_))
 
                 // Update existing templates
-                updateTemplates(inDoc)
+                updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control).to[Set])
 
             } else if (repeat) {
                 // Template should already exists an should have already been renamed if needed
@@ -359,6 +358,17 @@ trait ContainerOps extends ControlOps {
         for {
             templateInstance ← templateInstanceElements(inDoc)
             name             = controlNameFromId(templateInstance.id)
+            bind             ← findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name)
+        } locally {
+            ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
+        }
+
+    // Update templates but only those which might contain one of specified names
+    def updateTemplatesCheckContainers(inDoc: NodeInfo, ancestorContainerNames: Set[String]): Unit =
+        for {
+            templateInstance ← templateInstanceElements(inDoc)
+            name             = controlNameFromId(templateInstance.id)
+            if ancestorContainerNames(name)
             bind             ← findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name)
         } locally {
             ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))

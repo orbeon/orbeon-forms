@@ -29,6 +29,11 @@
     <property as="xs:string"  name="oxf.url-rewriting.wsrp.context"                  value=""/>
     <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>
 
+    <!-- HTTP client -->
+    <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
+    <property as="xs:string"  name="oxf.http.forward-headers.private"                value="Orbeon-Client"/>
+    <property as="xs:string"  name="oxf.http.forward-cookies.private"                value=""/>
+
     <!--
         Note on Cache-Control for HTTP responses:
 

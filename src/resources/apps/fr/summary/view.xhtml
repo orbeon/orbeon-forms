@@ -321,9 +321,10 @@
                     origin="index:findIndexedControlsAsXML(instance('fr-source-form-instance')/root())"/>
 
                 <!-- If requested to, only show drafts for never saved document -->
-                <xf:insert if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"
-                           context="instance('fr-search-instance')"
-                           origin="xxf:element('drafts', (xxf:attribute('for-never-saved-document', 'true'), 'only'))"/>
+                <xf:insert
+                    if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"
+                    context="instance('fr-search-instance')"
+                    origin="xxf:element('drafts', (xxf:attribute('for-never-saved-document', 'true'), 'only'))"/>
 
                 <!-- Query initial list of documents -->
                 <xf:send submission="search-submission"/>
@@ -601,7 +602,7 @@
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
                             <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
-                            <xf:var name="positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+                            <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
@@ -620,7 +621,7 @@
                                             </xh:th>
                                         </xf:repeat>
                                         <!-- Empty column if no summary fields looks nicer -->
-                                        <xf:repeat ref="if (empty($positions)) then '' else ()">
+                                        <xf:repeat ref="if (empty($detail-positions)) then '' else ()">
                                             <xh:th/>
                                         </xf:repeat>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
@@ -713,51 +714,49 @@
                                                     </xh:td>
                                                 </xf:repeat>
                                                 <!-- Empty column if no summary fields looks nicer -->
-                                                <xf:repeat ref="if (empty($positions)) then '' else ()">
+                                                <xf:repeat ref="if (empty($detail-positions)) then '' else ()">
                                                     <xh:td/>
                                                 </xf:repeat>
-                                                <!-- Iterate over positions so that repeat iterations are not recreated  -->
-                                                <xf:repeat ref="$positions" id="document-details-repeat">
-                                                    <!-- 1-based position in the current document-->
-                                                    <xf:var name="position" value="position()"/>
+                                                <!-- Iterate over detail-positions so that repeat iterations are not recreated  -->
+                                                <xf:repeat ref="$detail-positions" id="document-details-repeat">
+                                                    <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
-                                                    <xf:group context="$document/details/detail[$positions[$position]]" appearance="xxf:internal">
+                                                    <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
                                                         <xh:td>
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var name="detail" value="
-                                                                for $detail-position in $position return
-                                                                    for $query in instance('fr-search-instance')/query[$detail-position + 1] return
-                                                                        for $control in $query/@control return
-                                                                            if ($control = 'textarea') then
-                                                                                if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
-                                                                            else if (frf:isMultipleSelectionControl($control)) then
-                                                                                string-join(for $v in xxf:split() return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1], ', ')
-                                                                            else if (frf:isSingleSelectionControl($control)) then
-                                                                                for $v in . return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1]
-                                                                            else if ($control = 'secret') then
-                                                                                if (normalize-space(.) = '') then '' else '••••••••'
-                                                                            else
-                                                                                for $type in substring-after($query/@type, ':') return
-                                                                                    if ($type = 'date') then
-                                                                                        (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxf:lang(), (), ()) else .)
-                                                                                    else if ($type = 'time') then
-                                                                                        (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxf:lang(), (), ()) else .)
-                                                                                    else if ($type = 'dateTime') then
-                                                                                        (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxf:lang(), (), ()) else .)
-                                                                                    else if ($type = 'dayTimeDuration') then
-                                                                                        (
-                                                                                            if (. castable as xs:dayTimeDuration) then
-                                                                                                string-join(
-                                                                                                    (
-                                                                                                        if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
-                                                                                                        if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
-                                                                                                        if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
-                                                                                                        if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
-                                                                                                     ), ' '
-                                                                                                )
-                                                                                            else .
-                                                                                        )
-                                                                                    else ."/>
+                                                                for $query in instance('fr-search-instance')/query[$detail-position + 1] return
+                                                                    for $control in $query/@control return
+                                                                        if ($control = 'textarea') then
+                                                                            if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
+                                                                        else if (frf:isMultipleSelectionControl($control)) then
+                                                                            string-join(for $v in xxf:split() return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1], ', ')
+                                                                        else if (frf:isSingleSelectionControl($control)) then
+                                                                            for $v in . return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1]
+                                                                        else if ($control = 'secret') then
+                                                                            if (normalize-space(.) = '') then '' else '••••••••'
+                                                                        else
+                                                                            for $type in substring-after($query/@type, ':') return
+                                                                                if ($type = 'date') then
+                                                                                    (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxf:lang(), (), ()) else .)
+                                                                                else if ($type = 'time') then
+                                                                                    (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxf:lang(), (), ()) else .)
+                                                                                else if ($type = 'dateTime') then
+                                                                                    (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxf:lang(), (), ()) else .)
+                                                                                else if ($type = 'dayTimeDuration') then
+                                                                                    (
+                                                                                        if (. castable as xs:dayTimeDuration) then
+                                                                                            string-join(
+                                                                                                (
+                                                                                                    if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
+                                                                                                    if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
+                                                                                                    if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
+                                                                                                    if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
+                                                                                                 ), ' '
+                                                                                            )
+                                                                                        else .
+                                                                                    )
+                                                                                else ."/>
                                                             <xf:group ref=".[$edit-view != '']">
                                                                 <xh:a href="{$current-document-href}">
                                                                     <xf:output value="$detail"/>

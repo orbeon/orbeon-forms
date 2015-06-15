@@ -22,6 +22,17 @@
     var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
 
+    function childrenWithLocalName(node, name) {
+        var result = [];
+        _.each(node.childNodes, function(child) {
+            // Not using child.localName, as it isn't supported by IE8
+            var childLocalName = _.last(child.nodeName.split(':'));
+            if (childLocalName == name)
+                result.push(child);
+        });
+        return result;
+    }
+
     AjaxServer.Event = function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
         // If no form is provided, infer the form based on that targetId, if one is provided
         this.form = YAHOO.lang.isObject(form) ? form
@@ -730,22 +741,12 @@
             // Whether this response has triggered a load which will replace the current page.
             var newDynamicStateTriggersReplace = false;
 
-            var xmlNamespace = null; // xforms namespace
-            // Getting xforms namespace
-            for (var j = 0; j < responseRoot.attributes.length; j++) {
-                if (responseRoot.attributes[j].nodeValue == XXFORMS_NAMESPACE_URI) {
-                    var attrName = responseRoot.attributes[j].name;
-                    xmlNamespace = attrName.substr(attrName.indexOf(":") + 1);
-                    break;
-                }
-            }
-
             // If the last request was taking the form offline
             if (ORBEON.xforms.Offline.lastRequestIsTakeOnline) {
                 ORBEON.xforms.Offline.lastRequestIsTakeOnline = false;
                 // See if we are still offline (if there is a /xxf:event-response/xxf:action/xxf:offline)
-                var actionElements = ORBEON.util.Dom.getElementsByName(responseRoot, "action", xmlNamespace);
-                var offlineElements = ORBEON.util.Dom.getElementsByName(actionElements[0], "offline", xmlNamespace);
+                var actionElements = childrenWithLocalName(responseRoot, "action");
+                var offlineElements = childrenWithLocalName(actionElements[0], "offline");
                 if (offlineElements.length == 1) {
                     // Server is asking us to stay offline
                     ORBEON.xforms.Offline.isOnline = false;
@@ -778,7 +779,7 @@
 
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var copyRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "copy-repeat-template", xmlNamespace);
+                                var copyRepeatTemplateElements = childrenWithLocalName(controlValuesElement, "copy-repeat-template");
                                 var copyRepeatTemplateElementsLength = copyRepeatTemplateElements.length;
                                 for (var j = 0; j < copyRepeatTemplateElementsLength; j++) {
 
@@ -878,7 +879,7 @@
                                     ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                 }
 
-                                var deleteRepeatTemplateElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "delete-repeat-elements", xmlNamespace);
+                                var deleteRepeatTemplateElements = childrenWithLocalName(controlValuesElement, "delete-repeat-elements");
                                 var deleteRepeatTemplateElementsLength = deleteRepeatTemplateElements.length;
                                 for (var j = 0; j < deleteRepeatTemplateElementsLength; j++) {
 
@@ -1124,7 +1125,7 @@
                             // Update controls
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "control", xmlNamespace);
+                                var controlElements = childrenWithLocalName(controlValuesElement, "control");
                                 var controlElementsLength = controlElements.length;
                                 // Update control value and MIPs
                                 for (var j = 0; j < controlElementsLength; j++) {
@@ -1516,7 +1517,7 @@
                                 }
 
                                 // Handle innerHTML updates
-                                var innerElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "inner-html", xmlNamespace);
+                                var innerElements = childrenWithLocalName(controlValuesElement, "inner-html");
                                 var innerElementsLength = innerElements.length;
                                 for (var j = 0; j < innerElementsLength; j++) {
                                     var innerElement = innerElements[j];
@@ -1575,7 +1576,7 @@
                                 }
 
                                 // Handle updates to HTML attributes
-                                var attributeElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "attribute", xmlNamespace);
+                                var attributeElements = childrenWithLocalName(controlValuesElement, "attribute");
                                 var attributeElementslength = attributeElements.length;
                                 for (var j = 0; j < attributeElementslength; j++) {
                                     var attributeElement = attributeElements[j];
@@ -1589,7 +1590,7 @@
                                 }
 
                                 // Handle text updates
-                                var textElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "text", xmlNamespace);
+                                var textElements = childrenWithLocalName(controlValuesElement, "text");
                                 var textElementslength = textElements.length;
                                 for (var j = 0; j < textElementslength; j++) {
                                     var textElement = textElements[j];
@@ -1604,7 +1605,7 @@
                                 }
 
                                 // Model item properties on a repeat item
-                                var repeatIterationElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "repeat-iteration", xmlNamespace);
+                                var repeatIterationElements = childrenWithLocalName(controlValuesElement, "repeat-iteration");
                                 var repeatIterationElementslength = repeatIterationElements.length;
                                 for (var j = 0; j < repeatIterationElementslength; j++) {
                                     var repeatIterationElement = repeatIterationElements[j];
@@ -1618,7 +1619,7 @@
                                 }
 
                                 // "div" elements for xforms:switch and xxforms:dialog
-                                var divsElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "div", xmlNamespace);
+                                var divsElements = childrenWithLocalName(controlValuesElement, "div");
                                 var divElementsLength = divsElements.length;
                                 for (var j = 0; j < divElementsLength; j++) {
                                     var divElement = divsElements[j];
@@ -1903,8 +1904,8 @@
                             // Take form offline
                             case "offline": {
                                 var offlineElement = actionElement.childNodes[actionIndex];
-                                var eventsElements = ORBEON.util.Dom.getElementsByName(offlineElement, "events", xmlNamespace);
-                                var mappingsElements = ORBEON.util.Dom.getElementsByName(offlineElement, "mappings", xmlNamespace);
+                                var eventsElements = childrenWithLocalName(offlineElement, "events");
+                                var mappingsElements = childrenWithLocalName(offlineElement, "mappings");
                                 if (eventsElements.length != 0 && mappingsElements.length != 0) {
                                     var replayResponse = ORBEON.util.Dom.getStringValue(eventsElements[0]);
                                     var mappings = ORBEON.util.Dom.getStringValue(mappingsElements[0]);

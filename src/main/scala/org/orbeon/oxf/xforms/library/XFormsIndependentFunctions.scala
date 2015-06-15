@@ -27,20 +27,20 @@ trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
     val XFormsIndependentFunctionsNS: Seq[String]
 
     Namespace(XFormsIndependentFunctionsNS) {
-        Fun("digest", classOf[Digest], 0, 2, STRING, EXACTLY_ONE,
+        Fun("digest", classOf[Digest], op = 0, min = 2, STRING, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
 
-        Fun("hmac", classOf[Hmac], 0, 3, STRING, EXACTLY_ONE,
+        Fun("hmac", classOf[Hmac], op = 0, min = 3, STRING, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
 
-        Fun("random", classOf[Random], 0, 0, NUMERIC, EXACTLY_ONE,
+        Fun("random", classOf[Random], op = 0, min = 0, NUMERIC, EXACTLY_ONE,
             Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
         )
     }

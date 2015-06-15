@@ -27,19 +27,19 @@ trait XFormsFunnyFunctions extends OrbeonFunctionLibrary {
     val XFormsFunnyFunctionsNS: Seq[String]
 
     Namespace(XFormsFunnyFunctionsNS) {
-        Fun("boolean-from-string", classOf[BooleanFromString], 0, 1, BOOLEAN, EXACTLY_ONE,
+        Fun("boolean-from-string", classOf[BooleanFromString], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
 
-        Fun("is-card-number", classOf[IsCardNumber], 0, 1, BOOLEAN, EXACTLY_ONE,
+        Fun("is-card-number", classOf[IsCardNumber], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
 
-        Fun("count-non-empty", classOf[CountNonEmpty], 0, 1, INTEGER, EXACTLY_ONE,
+        Fun("count-non-empty", classOf[CountNonEmpty], op = 0, min = 1, INTEGER, EXACTLY_ONE,
             Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
         )
 
-        Fun("power", classOf[Power], 0, 2, NUMERIC, EXACTLY_ONE,
+        Fun("power", classOf[Power], op = 0, min = 2, NUMERIC, EXACTLY_ONE,
             Arg(NUMERIC, EXACTLY_ONE),
             Arg(NUMERIC, EXACTLY_ONE)
         )

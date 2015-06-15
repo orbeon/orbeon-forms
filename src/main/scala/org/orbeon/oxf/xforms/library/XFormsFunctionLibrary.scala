@@ -53,18 +53,18 @@ object XFormsFunctionLibrary extends {
     def instance = this
 
     // Saxon's last() function doesn't do what we need
-    Fun("last", classOf[Last], 0, 0, INTEGER, EXACTLY_ONE)
+    Fun("last", classOf[Last], op = 0, min = 0, INTEGER, EXACTLY_ONE)
 
     // Forward these to our own implementation so we can handle PathMap
-    Fun("count", classOf[org.orbeon.oxf.xforms.function.Aggregate], Aggregate.COUNT, 1, INTEGER, EXACTLY_ONE,
+    Fun("count", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.COUNT, min = 1, INTEGER, EXACTLY_ONE,
         Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE, IntegerValue.ZERO)
     )
 
-    Fun("avg", classOf[org.orbeon.oxf.xforms.function.Aggregate], Aggregate.AVG, 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+    Fun("avg", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.AVG, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
         Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE, EmptySequence.getInstance())
     )
 
-    Fun("sum", classOf[org.orbeon.oxf.xforms.function.Aggregate], Aggregate.SUM, 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+    Fun("sum", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.SUM, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
         Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE),
         Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE)
     )

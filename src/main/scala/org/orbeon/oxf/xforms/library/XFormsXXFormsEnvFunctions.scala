@@ -29,17 +29,17 @@ trait XFormsXXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Namespace(XFormsXXFormsEnvFunctionsNS) {
 
-        Fun("element", classOf[XFormsElement], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("element", classOf[XFormsElement], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(ANY_ATOMIC, EXACTLY_ONE),
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
 
-        Fun("attribute", classOf[XFormsAttribute], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("attribute", classOf[XFormsAttribute], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(ANY_ATOMIC, EXACTLY_ONE),
             Arg(ANY_ATOMIC, EXACTLY_ONE)
         )
 
-        Fun("case", classOf[XFormsCase], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("case", classOf[XFormsCase], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     }

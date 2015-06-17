@@ -290,7 +290,10 @@
 
     // Dialogs
     .xforms-dialog {
-        width: 500px;                   // wide enough for drafts dialogs, with buttons in French
+        // Keep the dialog fairly narrow to increase leasibility, but allow it to be narrower on phones
+        max-width: 500px;
+        // YUI puts a left: 10px, so add a corresponding margin on the right side
+        margin-right: 10px;
 
         .bd p {
             margin: .5em 0 .5em 0
@@ -310,10 +313,6 @@
             border-top: 2px solid @frBorderColor;
             clear: both
         }
-    }
-
-    .xforms-dialog.fr-submission-result-dialog {
-        width: 500px
     }
 
     // ***** Sections **************************************************************************************************

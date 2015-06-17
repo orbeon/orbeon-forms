@@ -256,7 +256,8 @@
   display: block;
 }
 .orbeon .xforms-dialog {
-  width: 500px;
+  max-width: 500px;
+  margin-right: 10px;
 }
 .orbeon .xforms-dialog .bd p {
   margin: 0.5em 0 0.5em 0;
@@ -273,9 +274,6 @@
   margin-top: 5px;
   border-top: 2px solid #ddddee;
   clear: both;
-}
-.orbeon .xforms-dialog.fr-submission-result-dialog {
-  width: 500px;
 }
 .orbeon .xbl-fr-section {
   display: block;

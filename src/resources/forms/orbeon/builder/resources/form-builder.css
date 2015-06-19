@@ -224,6 +224,7 @@ body {
 }
 .orbeon .fb-dialog-form-settings {
   width: 600px;
+  max-width: none;
 }
 .orbeon .fb-dialog-form-settings img {
   float: left;
@@ -256,6 +257,7 @@ body {
 }
 .orbeon .fb-dialog-itemsets {
   width: 600px;
+  max-width: none;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid {
   max-height: 450px;
@@ -298,6 +300,7 @@ body {
 }
 .orbeon #fb-service-dialog {
   width: 550px;
+  max-width: none;
 }
 .orbeon #fb-service-dialog .fb-service-dialog-error {
   border: 2px solid red;
@@ -320,6 +323,7 @@ body {
 }
 .orbeon #fb-action-dialog {
   width: 800px;
+  max-width: none;
 }
 .orbeon #fb-action-dialog .xforms-select1 {
   width: auto;
@@ -338,6 +342,7 @@ body {
 }
 .orbeon #fb-database-service-dialog {
   width: 550px;
+  max-width: none;
 }
 .orbeon #fb-database-service-dialog textarea {
   height: 10em;
@@ -356,6 +361,7 @@ body {
 }
 .orbeon .fb-dialog-control-details {
   width: 900px;
+  max-width: none;
 }
 .orbeon .fb-dialog-control-details .xforms-label {
   margin-top: 5px;
@@ -423,6 +429,7 @@ body {
 .orbeon #fb-source-editor-dialog,
 .orbeon .fb-custom-xml-dialog {
   width: 900px;
+  max-width: none;
 }
 .orbeon #fb-source-editor-dialog .CodeMirror,
 .orbeon .fb-custom-xml-dialog .CodeMirror {
@@ -496,6 +503,7 @@ body {
 }
 .orbeon .fb-test-dialog {
   width: 1000px;
+  max-width: none;
 }
 .orbeon .fb-test-dialog .xxforms-dialog-body .fb-dialog-remaining-height {
   overflow: hidden !important;

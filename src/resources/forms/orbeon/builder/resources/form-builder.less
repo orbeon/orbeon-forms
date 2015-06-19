@@ -247,6 +247,7 @@ body {
     // Metadata editor dialog
     .fb-dialog-form-settings {
         width: 600px;
+        max-width: none;
 
         img { float: left; margin: 1em 2em 0 1em; }
         .xforms-label { display: block; }
@@ -271,6 +272,7 @@ body {
     // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
     .fb-dialog-itemsets {
         width: 600px;
+        max-width: none;
 
         .xbl-fr-grid {
             .dialog-scrollable(450px);
@@ -297,6 +299,7 @@ body {
     // Submission editor dialog
     #fb-service-dialog {
         width: 550px;
+        max-width: none;
         .fb-service-dialog-error {
             border: 2px solid red; padding: .25em;
             select {
@@ -320,6 +323,7 @@ body {
     // Bindings editor dialog
     #fb-action-dialog {
         width: 800px;
+        max-width: none;
         .xforms-select1 { width: auto }
         .fr-repeat-table {
             .fb-parameters {
@@ -333,6 +337,7 @@ body {
 
     #fb-database-service-dialog {
         width: 550px;
+        max-width: none;
         textarea {
             height: 10em;
             font-family: @monoFontFamily;
@@ -356,6 +361,7 @@ body {
 
     .fb-dialog-control-details {
         width: 900px;
+        max-width: none;
         .xforms-label { margin-top: 5px; }
 
         .tab-pane {
@@ -408,6 +414,7 @@ body {
 
     #fb-source-editor-dialog, .fb-custom-xml-dialog {
         width: 900px;
+        max-width: none;
         .CodeMirror { font-size: 12px; height: 100% }            // Pick slightly smaller font size, default being 13px
         .xforms-alert.xforms-active { display: block }
     }
@@ -474,6 +481,7 @@ body {
     // Test dialog
     .fb-test-dialog {
         width: 1000px;                              // Space to fit the 940px layout (couldn't find a reasonable variable to use here)
+        max-width: none;                            
         .xxforms-dialog-body {
             .fb-dialog-remaining-height {
                 overflow: hidden !important;        // Override scroll above, to avoid 1px scroll (not why this is necessary, or how else to avoid this)

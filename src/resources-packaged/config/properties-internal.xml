@@ -197,13 +197,21 @@
         xf:send("read-remote-metadata")
         then xf:dispatch("store-credentials")
         recover ask-credentials
-        then load-local
     </property>
     <property as="xs:string"  name="oxf.fr.home.process.ask-credentials">
         xf:show("fr-credentials-dialog")
         then suspend
         then load-remote
     </property>
+    <property as="xs:string"  name="oxf.fr.home.process.load-start-with-remote">
+        load-remote
+        then load-local
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.load-start-with-credentials">
+        ask-credentials
+        then load-local
+    </property>
+
     <property as="xs:string"  name="oxf.fr.home.process.credentials-ok">
         resume
     </property>

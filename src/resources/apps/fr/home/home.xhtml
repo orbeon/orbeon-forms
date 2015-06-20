@@ -66,9 +66,9 @@
                     if (not(version:isPE()) or empty($remote-servers)) then
                         process:runProcessByName('oxf.fr.home.process', 'load-local')
                     else if ($has-remote) then
-                        process:runProcess('oxf.fr.home.process', 'load-remote')
+                        process:runProcess('oxf.fr.home.process', 'load-start-with-remote')
                     else
-                        process:runProcessByName('oxf.fr.home.process', 'ask-credentials')
+                        process:runProcessByName('oxf.fr.home.process', 'load-start-with-credentials')
                 </xf:action>
             </xf:action>
 

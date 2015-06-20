@@ -32,40 +32,68 @@
         <!-- This page needs access to Form Builder permission -->
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
         <!-- FR Home page XForms model -->
-        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
 
-            <!-- Entry point -->
-            <xf:action event="xforms-ready fr-initialize">
+            <!-- Initialize remote servers information -->
+            <xf:action event="xforms-model-construct-done">
 
                 <xf:var
                     name="remote-servers"
                     value="frf:remoteServersXPath()"/>
 
+                <!-- Set the available remote server label/URL when present. If we only have one item, it is
+                     just one URL. If we have two or more, it's one label, one URL, etc. -->
+                <xf:action iterate="1 to ((count($remote-servers) + 1) idiv 2)">
+                    <xf:var name="p" value="."/>
+                    <xf:insert
+                        context="instance()/remote-servers"
+                        ref="*"
+                        origin="
+                            xxf:element(
+                                'remote-server',
+                                (
+                                    xxf:element('label',    if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 1] else ''),
+                                    xxf:element('url',      if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 2] else $remote-servers[1]),
+                                    xxf:element('username', ''),
+                                    xxf:element('password', '')
+                                )
+                            )
+                        "
+                    />
+                </xf:action>
+
+                <!-- Set the current remote server (the first one) -->
+                <xf:setvalue
+                    ref="instance()/current-remote-server"
+                    value="if (exists($remote-servers)) then 1 else 0"/>
+
+            </xf:action>
+
+            <!-- Entry point -->
+            <xf:action event="xforms-ready fr-initialize">
+
                 <xf:var
-                    name="has-remote"
-                    value="normalize-space(instance()/remote-server/url)
-                       and normalize-space(instance()/remote-server/username)
-                       and normalize-space(instance()/remote-server/password)"/>
+                    name="remote-set"
+                    value="
+                        for $current-remote-server in data((instance()/current-remote-server))[1]
+                            return (
+                                $current-remote-server > 0 and (
+                                for $remote in (instance()/remote-servers/remote-server[$current-remote-server])[1]
+                                    return (
+                                        normalize-space($remote/url) != ''
+                                        and normalize-space($remote/username) != ''
+                                        and normalize-space($remote/password) != ''
+                                    )
+                                )
+                            )"
+                />
 
                 <xf:dispatch name="fr-clear" targetid="fr-form-model"/>
 
-                <xf:action if="exists($remote-servers)">
-                    <!-- Set the first available remote server label/URL when present. If we only have one item, it is
-                         just one URL. If we have two or more, it's one label, one URL, etc. -->
-                    <xf:setvalue
-                        if="count($remote-servers) ge 2"
-                        ref="instance()/remote-server/label"
-                        value="$remote-servers[1]"/>
-
-                    <xf:setvalue
-                        ref="instance()/remote-server/url"
-                        value="$remote-servers[if (count($remote-servers) ge 2) then 2 else 1]"/>
-                </xf:action>
-
                 <xf:action type="xpath" xmlns:version="java:org.orbeon.oxf.common.Version">
-                    if (not(version:isPE()) or empty($remote-servers)) then
+                    if (not(version:isPE()) or instance()/current-remote-server = 0) then
                         process:runProcessByName('oxf.fr.home.process', 'load-local')
-                    else if ($has-remote) then
+                    else if ($remote-set) then
                         process:runProcess('oxf.fr.home.process', 'load-start-with-remote')
                     else
                         process:runProcessByName('oxf.fr.home.process', 'load-start-with-credentials')
@@ -116,12 +144,21 @@
                     <local-newer-select/>
                     <remote-newer-select/>
 
-                    <remote-server>
-                        <label/>
-                        <url/>
-                        <username/>
-                        <password/>
-                    </remote-server>
+                    <current-remote-server/>
+
+                    <remote-servers>
+                        <!--
+
+                        Template:
+
+                        <remote-server>
+                            <label/>
+                            <url/>
+                            <username/>
+                            <password/>
+                        </remote-server>
+                        -->
+                    </remote-servers>
 
                 </ui>
             </xf:instance>
@@ -142,15 +179,18 @@
                 <xf:bind ref="new-action"              readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateNew(../selection, $forms))"/>
                 <xf:bind ref="local-upgrade-action"    readonly="not(exists($selection) and frf:canUpgradeLocal(../selection, $forms))"/>
                 <xf:bind ref="remote-upgrade-action"   readonly="not(exists($selection) and frf:canUpgradeRemote(../selection, $forms))"/>
-                
+
                 <xf:bind ref="local-unpublish-select"  readonly="not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
                 <xf:bind ref="local-publish-select"    readonly="not(frf:canSelectPublishedLocal(../selection, $forms))"/>
                 <xf:bind ref="remote-unpublish-select" readonly="not(frf:canSelectUnpublishedRemote(../selection, $forms))"/>
                 <xf:bind ref="remote-publish-select"   readonly="not(frf:canSelectPublishedRemote(../selection, $forms))"/>
                 <xf:bind ref="local-newer-select"      readonly="not(frf:canSelectLocalNewer(../selection, $forms))"/>
                 <xf:bind ref="remote-newer-select"     readonly="not(frf:canSelectRemoteNewer(../selection, $forms))"/>
+            </xf:bind>
 
-                <xf:bind ref="remote-server/username | remote-server/password" required="true()" calculate="normalize-space()" readonly="false()"/>
+            <xf:bind ref="instance('fr-form-instance')">
+                <xf:bind ref="current-remote-server"   type="xs:integer"/>
+                <xf:bind ref="remote-servers/remote-server/username | remote-servers/remote-server/password" required="true()" calculate="normalize-space()" readonly="false()"/>
             </xf:bind>
 
             <!-- Forms metadata -->
@@ -177,11 +217,11 @@
 
             <xf:submission
                 id="read-remote-metadata"
-                xxf:username="{instance()/remote-server/username}"
-                xxf:password="{instance()/remote-server/password}"
+                xxf:username="{instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username}"
+                xxf:password="{instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password}"
                 method="get"
                 serialization="none"
-                resource="{instance()/remote-server/url}/fr/service/persistence/form"
+                resource="{instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url}/fr/service/persistence/form"
                 replace="instance"
                 targetref="instance('fr-metadata-remote')">
                 <xf:insert event="xforms-submit" ref="instance('fr-metadata-remote')" origin="xxf:element('forms')"/>
@@ -217,8 +257,6 @@
 
                 <xf:setvalue ref="instance()/any-has-admin-permission" value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
             </xf:action>
-
-            <xf:instance id="fr-remote-metadata"><forms/></xf:instance>
 
             <!-- Scope variable with Form Runner resources -->
             <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
@@ -282,11 +320,11 @@
                     <xf:var name="form" value="xxf:split(., '/')[2]"/>
 
                     <xf:send submission="read-form">
-                        <xf:property name="base-uri" value="if ($local-read) then '' else instance()/remote-server/url"/>
+                        <xf:property name="base-uri" value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url"/>
                         <xf:property name="app"      value="$app"/>
                         <xf:property name="form"     value="$form"/>
-                        <xf:property name="username" value="if ($local-read) then '' else instance()/remote-server/username"/>
-                        <xf:property name="password" value="if ($local-read) then '' else instance()/remote-server/password"/>
+                        <xf:property name="username" value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username"/>
+                        <xf:property name="password" value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password"/>
                     </xf:send>
 
                     <xf:action if="instance()/error = ''">
@@ -359,11 +397,11 @@
                             return
                                 frf:publish(
                                     $form-maybe-upgraded,
-                                    if ($local-write) then '' else instance()/remote-server/url,
+                                    if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url,
                                     $app,
                                     $form,
-                                    if (not($local-write)) then instance()/remote-server/username else (),
-                                    if (not($local-write)) then instance()/remote-server/password else (),
+                                    if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username else (),
+                                    if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password else (),
                                     $force-attachments
                                 )
                         </xf:action>
@@ -605,6 +643,23 @@
                             <xf:dispatch event="DOMActivate" name="fr-initialize" targetid="fr-form-model"/>
                         </xf:trigger>
 
+                        <xh:div class="btn-group">
+                            <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
+                                <xf:select1 ref="instance()/current-remote-server">
+                                    <xf:label ref="$fr-resources/home/labels/remote-server" class="xforms-hidden"/>
+                                    <xf:itemset ref="instance()/remote-servers/remote-server">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="position()"/>
+                                    </xf:itemset>
+
+                                    <xf:action event="xforms-value-changed">
+                                        <xf:dispatch name="fr-initialize" targetid="fr-form-model"/>
+                                    </xf:action>
+
+                                </xf:select1>
+                            </xf:group>
+                        </xh:div>
+
                         <!--<xf:output ref="remote-server/label[normalize-space()]">-->
                             <!--<xf:label ref="$fr-resources/home/labels/remote-server"/>-->
                         <!--</xf:output>-->
@@ -843,39 +898,34 @@
             <xh:img src="/ops/images/xforms/warning_64.png" alt="" class="fr-dialog-icon"/>
             <xh:div class="fr-dialog-credentials-fields">
 
-                <xf:var name="remote-servers" value="frf:remoteServersXPath()"/>
+                <xf:var
+                    name="remote-server"
+                    value="instance()/remote-servers/remote-server[data(instance()/current-remote-server)]"/>
 
                 <fr:grid>
-                    <xf:group ref=".[count($remote-servers) gt 1]">
+                    <xf:group ref=".[count(instance()/remote-servers/remote-server) gt 1]">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="remote-server/url">
+                                <xf:select1 ref="instance()/current-remote-server">
                                     <xf:label ref="$fr-resources/home/labels/remote-server"/>
-                                    <xf:itemset ref="0 to (count($remote-servers) idiv 2 - 1)">
-                                        <xf:label ref="$remote-servers[context() * 2 + 1]"/>
-                                        <xf:value ref="$remote-servers[context() * 2 + 2]"/>
+                                    <xf:itemset ref="instance()/remote-servers/remote-server">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="position()"/>
                                     </xf:itemset>
-
-                                    <!-- Keep label in sync upon selection -->
-                                    <xf:setvalue
-                                        event="xforms-select"
-                                        ref="../label"
-                                        value="$remote-servers[index-of($remote-servers, event('xxf:item-value')) - 1]"/>
-
                                 </xf:select1>
                             </xh:td>
                         </xh:tr>
                     </xf:group>
                     <xh:tr>
                         <xh:td>
-                            <xf:input ref="remote-server/username">
+                            <xf:input ref="$remote-server/username">
                                 <xf:label ref="$fr-resources/home/labels/username"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
                         <xh:td>
-                            <xf:secret ref="remote-server/password">
+                            <xf:secret ref="$remote-server/password">
                                 <xf:label ref="$fr-resources/home/labels/password"/>
                             </xf:secret>
                         </xh:td>
@@ -895,12 +945,12 @@
                 <xf:action if="event('xxf:targetid') = 'cancel-button'">
                     <xxf:hide event="DOMActivate" dialog="fr-credentials-dialog"/>
                 </xf:action>
-                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and valid((remote-server/username, remote-server/password))">
+                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and valid(($remote-server/username, $remote-server/password))">
                     <xxf:hide dialog="fr-credentials-dialog">
                         <xf:property name="fr-connect" value="true()"/>
                     </xxf:hide>
                 </xf:action>
-                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and not(valid((remote-server/username, remote-server/password)))">
+                <xf:action if="not(event('xxf:targetid') = 'cancel-button') and not(valid(($remote-server/username, $remote-server/password)))">
                     <xxf:setvisited control="fr-credentials-dialog" recurse="true"/>
                 </xf:action>
             </xf:action>

@@ -20,4 +20,38 @@
   .orbeon .fr-grid:not(.fr-repeat-table) > tbody > tr > td {
     display: block;
   }
+  .orbeon .xbl-fr-wizard {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column-reverse;
+    -webkit-flex-direction: column-reverse;
+    width: 100%;
+  }
+  .orbeon .xbl-fr-wizard .fr-wizard-body {
+    width: 100%;
+    position: initial;
+    border: none;
+  }
+  .orbeon .xbl-fr-wizard .fr-wizard-toc {
+    position: initial;
+    width: 100%;
+  }
+  .orbeon select,
+  .orbeon textarea,
+  .orbeon input[type="text"],
+  .orbeon input[type="password"],
+  .orbeon input[type="datetime"],
+  .orbeon input[type="datetime-local"],
+  .orbeon input[type="date"],
+  .orbeon input[type="month"],
+  .orbeon input[type="time"],
+  .orbeon input[type="week"],
+  .orbeon input[type="number"],
+  .orbeon input[type="email"],
+  .orbeon input[type="url"],
+  .orbeon input[type="search"],
+  .orbeon input[type="tel"],
+  .orbeon input[type="color"] {
+    font-size: 16px;
+  }
 }

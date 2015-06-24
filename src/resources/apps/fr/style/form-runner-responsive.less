@@ -1,3 +1,5 @@
+@import (reference) "form-runner-common";
+
 .orbeon {
 
     @media (max-width: 980px) {
@@ -37,6 +39,45 @@
                 // The main thing this CSS does: change table cells into blocks
                 display: block;
             }
+        }
+
+        .xbl-fr-wizard {
+
+            // Use flex layout to get the TOC to show before the body
+            .flex();
+            .flex-direction(column-reverse);
+            
+            width: 100%;
+            .fr-wizard-body {
+                width: 100%;
+                position: initial;
+                // We don't need explicit borders, as they are added by the container .fr-border
+                border: none;
+            }
+            .fr-wizard-toc {
+                position: initial;
+                width: 100%;
+            }
+        }
+
+        // Prevent iOS from zooming when an input gets the focus
+        select,
+        textarea,
+        input[type="text"],
+        input[type="password"],
+        input[type="datetime"],
+        input[type="datetime-local"],
+        input[type="date"],
+        input[type="month"],
+        input[type="time"],
+        input[type="week"],
+        input[type="number"],
+        input[type="email"],
+        input[type="url"],
+        input[type="search"],
+        input[type="tel"],
+        input[type="color"] {
+            font-size: 16px;
         }
     }
 }

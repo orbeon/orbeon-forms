@@ -350,6 +350,7 @@
                 <xsl:template match="xf:model/xf:instance[generate-id() = $legacy-grid-binds-templates]"
                               mode="within-model">
                     <xsl:copy>
+                        <xsl:attribute name="xxf:exclude-result-prefixes" select="'#all'"/>
                         <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:variable
                             name="iteration-name"
@@ -389,6 +390,15 @@
                                 <xsl:apply-templates select="node()" mode="#current"/>
                             </xsl:otherwise>
                         </xsl:choose>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Ensure xxf:exclude-result-prefixes attribute on repeat templates -->
+                <xsl:template match="xf:model/xf:instance[ends-with(@id, '-template')]"
+                              mode="within-model">
+                    <xsl:copy>
+                        <xsl:attribute name="xxf:exclude-result-prefixes" select="'#all'"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 

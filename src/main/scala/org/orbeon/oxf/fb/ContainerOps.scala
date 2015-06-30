@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -315,8 +314,10 @@ trait ContainerOps extends ControlOps {
                 val template: NodeInfo =
                     <xf:instance xmlns:xf="http://www.w3.org/2002/xforms"
                                  xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
                                  id={templateInstanceId}
-                                 fb:readonly="true">{nodeInfoToElem(content)}</xf:instance>
+                                 fb:readonly="true"
+                                 xxf:exclude-result-prefixes="#all">{nodeInfoToElem(content)}</xf:instance>
 
                 insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
         }

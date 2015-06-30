@@ -281,6 +281,4 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
             Data47.root,
             DataMigration.migrateDataFrom(DataMigration.migrateDataTo(Data47.root, MigrationJSON), MigrationJSON)
         )
-
-    // TODO: annotate.xpl migrations
 }

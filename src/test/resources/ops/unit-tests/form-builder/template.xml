@@ -10,7 +10,20 @@
                 <form>
                     <section-1>
                         <control-1/>
+                         <grid-3>
+                            <control-5/>
+                        </grid-3>
+                        <grid-6>
+                            <grid-6-iteration>
+                                <control-8/>
+                            </grid-6-iteration>
+                        </grid-6>
                     </section-1>
+                    <section-9>
+                        <section-9-iteration>
+                            <control-10/>
+                        </section-9-iteration>
+                    </section-9>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -28,6 +41,20 @@
                         <xf:validation type="xf:string" id="validation-7-validation"/>
                         <xf:validation required="true()" id="validation-8-validation"/>
                     </xf:bind>
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="control-5-bind" ref="control-5" name="control-5"/>
+                    </xf:bind>
+                    <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
+                        <xf:bind id="grid-6-iteration-bind" ref="grid-6-iteration" name="grid-6-iteration">
+                            <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-9-bind" ref="section-9" name="section-9">
+                    <xf:bind id="section-9-iteration-bind" ref="section-9-iteration"
+                             name="section-9-iteration">
+                        <xf:bind id="control-10-bind" ref="control-10" name="control-10"/>
+                    </xf:bind>
                 </xf:bind>
             </xf:bind>
             <xf:instance id="fr-form-resources" xxf:readonly="false">
@@ -41,8 +68,39 @@
                             <hint/>
                             <alert/>
                         </control-1>
+                        <control-5>
+                            <label/>
+                            <hint/>
+                        </control-5>
+                        <control-8>
+                            <label/>
+                            <hint/>
+                        </control-8>
+                        <control-10>
+                            <label/>
+                            <hint/>
+                        </control-10>
+                        <section-9>
+                            <label/>
+                            <help/>
+                        </section-9>
                     </resource>
                 </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-3-template">
+                <grid-3-iteration>
+                    <control-5/>
+                </grid-3-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-6-template">
+                <grid-6-iteration>
+                    <control-8/>
+                </grid-6-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="section-9-template">
+                <section-9-iteration>
+                    <control-10/>
+                </section-9-iteration>
             </xf:instance>
             <xf:action event="xforms-ready"/>
             <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
@@ -65,6 +123,48 @@
                                 </xf:input>
                             </xh:td>
                             <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="true" min="1"
+                             template="instance('grid-3-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-5-control" bind="control-5-bind">
+                                    <xf:label ref="$form-resources/control-5/label"/>
+                                    <xf:hint ref="$form-resources/control-5/hint"/>
+
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid-6-grid" bind="grid-6-bind" repeat="content" min="1"
+                             template="instance('grid-6-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-8-control" bind="control-8-bind">
+                                    <xf:label ref="$form-resources/control-8/label"/>
+                                    <xf:hint ref="$form-resources/control-8/hint"/>
+
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-9-control" bind="section-9-bind" repeat="content" min="1"
+                            template="instance('section-9-template')">
+                    <xf:label ref="$form-resources/section-9/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-10-control" bind="control-10-bind">
+                                    <xf:label ref="$form-resources/control-10/label"/>
+                                    <xf:hint ref="$form-resources/control-10/hint"/>
+
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
                         </xh:tr>
                     </fr:grid>
                 </fr:section>

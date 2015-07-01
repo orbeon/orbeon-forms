@@ -39,12 +39,38 @@
         </xbl:handlers>
         <xbl:template>
             <xf:group id="outer" class="xbl-fr-code-mirror-editor-outer">
-                <xf:var name="script" value="not(exf:readonly(xxf:binding('fr-code-mirror')) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
+                <!--
+                    What happens here isn't clear:
+                    If $script is false, we don't run the scripts that initialize/update CodeMirror, and so CodeMirror won't show.
+                    We seem to want to do this if we're in static-readonly or if scripting is disabled.
+                    The latter is understandable, even if we could maybe not show CodeMirror in XSLT.
+                    But what is the purpose of the former?
+                -->
+                <xf:var name="script" value="not(
+                                                 (
+                                                     (
+                                                         xxf:binding('fr-code-mirror') instance of xs:string or
+                                                         exf:readonly(xxf:binding('fr-code-mirror'))
+                                                     )
+                                                     and
+                                                     property('xxf:readonly-appearance') = 'static'
+                                                 )
+                                                 or
+                                                 property('xxf:noscript')
+                                                 )"/>
                 <xf:textarea ref="xxf:binding('fr-code-mirror')" id="textarea">
-                    <xxf:script if="$script" ev:event="xforms-enabled xxforms-iteration-moved" id="xf-init" ev:target="#observer">YAHOO.xbl.fr.CodeMirror.instance(this).enabled();</xxf:script>
-                    <xxf:script if="$script" ev:event="xforms-value-changed" id="xf-value-changed">YAHOO.xbl.fr.CodeMirror.instance(this).xformsValueChanged();</xxf:script>
-                    <xxf:script if="$script" ev:event="xforms-readonly" id="xf-readonly">YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();</xxf:script>
-                    <xxf:script if="$script" ev:event="xforms-readwrite" id="xf-readwrite">YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadwrite();</xxf:script>
+                    <xxf:script if="$script" ev:event="xforms-enabled xxforms-iteration-moved" id="xf-init" ev:target="#observer">
+                        YAHOO.xbl.fr.CodeMirror.instance(this).enabled();
+                    </xxf:script>
+                    <xxf:script if="$script" ev:event="xforms-value-changed" id="xf-value-changed">
+                        YAHOO.xbl.fr.CodeMirror.instance(this).xformsValueChanged();
+                    </xxf:script>
+                    <xxf:script if="$script" ev:event="xforms-readonly" id="xf-readonly">
+                        YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();
+                    </xxf:script>
+                    <xxf:script if="$script" ev:event="xforms-readwrite" id="xf-readwrite">
+                        YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadwrite();
+                    </xxf:script>
                 </xf:textarea>
                 <xh:span id="inner" class="xbl-fr-code-mirror-editor-inner"/>
             </xf:group>

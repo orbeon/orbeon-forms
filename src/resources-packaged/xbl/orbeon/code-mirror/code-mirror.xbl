@@ -39,16 +39,12 @@
         </xbl:handlers>
         <xbl:template>
             <xf:group id="outer" class="xbl-fr-code-mirror-editor-outer">
-                <!--
-                    What happens here isn't clear:
-                    If $script is false, we don't run the scripts that initialize/update CodeMirror, and so CodeMirror won't show.
-                    We seem to want to do this if we're in static-readonly or if scripting is disabled.
-                    The latter is understandable, even if we could maybe not show CodeMirror in XSLT.
-                    But what is the purpose of the former?
-                -->
                 <xf:var name="script" value="not(
                                                  (
+                                                     (: We don't support the XForms Inspector in static-readonly mode,
+                                                        e.g. on the Form Runner review page. :)
                                                      (
+                                                         (: The test on the type won't be necessary once #2283 is closed :)
                                                          xxf:binding('fr-code-mirror') instance of xs:string or
                                                          exf:readonly(xxf:binding('fr-code-mirror'))
                                                      )

@@ -60,7 +60,12 @@ object InitUtils {
     }
 
     // Run a processor with an ExternalContext
-    def runProcessor(processor: Processor, externalContext: ExternalContext, pipelineContext: PipelineContext, logger: Logger): Unit = {
+    def runProcessor(
+        processor       : Processor,
+        externalContext : ExternalContext,
+        pipelineContext : PipelineContext,
+        logger          : Logger
+    ): Unit = {
 
         // Record start time for this request
         val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
@@ -200,14 +205,27 @@ object InitUtils {
 
         // Register processors from processors.xml and from custom properties
         val propertySet = Properties.instance.getPropertySet
+
         def fromProperty(s: String) = Option(propertySet.getString(s))
-        val processors =  fromProperty(ProcessorsProperty) orElse fromProperty(DeprecatedProcessorsProperty) getOrElse DefaultProcessors
+
+        val processors =
+            fromProperty(ProcessorsProperty)           orElse
+            fromProperty(DeprecatedProcessorsProperty) getOrElse
+            DefaultProcessors
 
         registerProcessors(processors)
     }
 
-    def getDefinitionFromServletContext(servletContext: ServletContext, uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
-        getDefinitionFromMap(new ServletContextInitMap(servletContext), uriNamePropertyPrefix, inputPropertyPrefix)
+    def getDefinitionFromServletContext(
+        servletContext        : ServletContext,
+        uriNamePropertyPrefix : String,
+        inputPropertyPrefix   : String
+    ) =
+        getDefinitionFromMap(
+            new ServletContextInitMap(servletContext),
+            uriNamePropertyPrefix,
+            inputPropertyPrefix
+        )
 
     def getDefinitionFromProperties(uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
         getDefinitionFromMap(PropertiesMap, uriNamePropertyPrefix, inputPropertyPrefix)

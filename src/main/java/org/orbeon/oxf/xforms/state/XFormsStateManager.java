@@ -143,7 +143,14 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             };
 
             // Add listener
-            session.addListener(listener);
+            try {
+                session.addListener(listener);
+            } catch (IllegalStateException e) {
+                indentedLogger.logInfo(LOG_TYPE, "Unable to add session listener: " + e.getMessage());
+                // NOTE: This will call onRemoved() on the document, and onRemovedFromCache() on XFormsStateManager
+                XFormsDocumentCache.instance().removeDocument(uuid); // remove immediately
+                throw e;
+            }
             // Remember, in session, mapping (UUID -> session listener)
             sessionAttributes.put(listenerSessionKey, listener);
         }

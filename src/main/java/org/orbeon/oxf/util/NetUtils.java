@@ -673,11 +673,17 @@ public class NetUtils {
         final ExternalContext externalContext = getExternalContext();
         final ExternalContext.Session session = externalContext.getSession(false);
         if (session != null) {
-            session.addListener(new ExternalContext.Session.SessionListener() {
-                public void sessionDestroyed() {
-                    deleteFileItem(fileItem, SESSION_SCOPE, logger);
-                }
-            });
+            try {
+                session.addListener(new ExternalContext.Session.SessionListener() {
+                    public void sessionDestroyed() {
+                        deleteFileItem(fileItem, SESSION_SCOPE, logger);
+                    }
+                });
+            } catch (IllegalStateException e) {
+                logger.info("Unable to add session listener: " + e.getMessage());
+                deleteFileItem(fileItem, SESSION_SCOPE, logger); // remove immediately
+                throw e;
+            }
         } else if (logger != null) {
             logger.debug("No existing session found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
         }
@@ -696,18 +702,6 @@ public class NetUtils {
                 deleteFileItem(fileItem, APPLICATION_SCOPE, logger);
             }
         });
-    }
-
-    private static void deleteFileItem(FileItem fileItem, int scope, Logger logger) {
-        if (logger != null && logger.isDebugEnabled() && fileItem instanceof DiskFileItem) {
-            final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
-            if (storeLocation != null) {
-                final String temporaryFileName = storeLocation.getAbsolutePath();
-                final String scopeString = (scope == REQUEST_SCOPE) ? "request" : (scope == SESSION_SCOPE) ? "session" : "application";
-                logger.debug("Deleting temporary " + scopeString + "-scoped file: " + temporaryFileName);
-            }
-        }
-        fileItem.delete();
     }
 
     /**
@@ -858,6 +852,38 @@ public class NetUtils {
         return (externalContext != null) ? externalContext.getSession(create) : null;
     }
 
+    private static void deleteFile(final File file, final Logger logger) {
+
+        final boolean success = file.delete();
+
+        if (logger != null && logger.isDebugEnabled()) {
+            try {
+                final String message =
+                    success
+                    ? "deleted temporary file upon session destruction: "
+                    : "could not delete temporary file upon session destruction: ";
+
+                logger.debug(message + file.getCanonicalPath());
+            } catch (IOException e) {
+                // NOP because as result of getCanonicalPath() and we don't care
+            }
+        }
+    }
+
+    private static void deleteFileItem(FileItem fileItem, int scope, Logger logger) {
+
+        fileItem.delete();
+
+        if (logger != null && logger.isDebugEnabled() && fileItem instanceof DiskFileItem) {
+            final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
+            if (storeLocation != null) {
+                final String temporaryFileName = storeLocation.getAbsolutePath();
+                final String scopeString = (scope == REQUEST_SCOPE) ? "request" : (scope == SESSION_SCOPE) ? "session" : "application";
+                logger.debug("deleting temporary " + scopeString + "-scoped file upon session destruction: " + temporaryFileName);
+            }
+        }
+    }
+
     public static File renameAndExpireWithSession(String existingFileURI, final Logger logger) {
 
         try {
@@ -883,17 +909,17 @@ public class NetUtils {
                 newFile.deleteOnExit();
                 final ExternalContext.Session session = getExternalContext().getSession(false);
                 if (session != null) {
-                    session.addListener(new ExternalContext.Session.SessionListener() {
-                        public void sessionDestroyed() {
-                            final boolean success = newFile.delete();
-                            try {
-                                final String message = success ? "deleted temporary file upon session destruction: " : "could not delete temporary file upon session destruction: ";
-                                logger.debug(message + newFile.getCanonicalPath());
-                            } catch (IOException e) {
-                                // NOP
+                    try {
+                        session.addListener(new ExternalContext.Session.SessionListener() {
+                            public void sessionDestroyed() {
+                                deleteFile(newFile, logger);
                             }
-                        }
-                    });
+                        });
+                    } catch (IllegalStateException e) {
+                        logger.info("Unable to add session listener: " + e.getMessage());
+                        deleteFile(newFile, logger); // remove immediately
+                        throw e;
+                    }
                 } else {
                     logger.debug("no existing session found so cannot register temporary file deletion upon session destruction: " + newFile.getCanonicalPath());
                 }
@@ -912,7 +938,7 @@ public class NetUtils {
         // Accept any success code (in particular "201 Resource Created")
         return code >= 200 && code < 300;
     }
-    
+
     public static boolean isRedirectCode(int code) {
         return (code >= 301 && code <= 303) || code == 307;
     }

@@ -654,10 +654,9 @@ public class ServletExternalContext implements ExternalContext  {
 
 
         public void addListener(SessionListener sessionListener) {
-            SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SessionListeners.SessionListenersKey());
+            final SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SessionListeners.SessionListenersKey());
             if (listeners == null) {
-                listeners = new SessionListeners();
-                httpSession.setAttribute(SessionListeners.SessionListenersKey(), listeners);
+                throw new IllegalStateException("SessionListeners object not found in session. OrbeonSessionListener might be missing from web.xml.");
             }
             listeners.addListener(sessionListener);
         }

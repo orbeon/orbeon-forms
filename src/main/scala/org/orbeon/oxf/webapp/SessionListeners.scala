@@ -14,30 +14,39 @@
 package org.orbeon.oxf.webapp
 
 import java.io.Serializable
-import java.{util ⇒ ju}
+import java.util.concurrent.ConcurrentLinkedQueue
 
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session.SessionListener
 
 class SessionListeners extends Serializable {
 
     @transient
-    private var listeners: ju.List[SessionListener] = null
+    private val listeners = new ConcurrentLinkedQueue[SessionListener]
 
-    def addListener(sessionListener: SessionListener): Unit = {
-        if (listeners == null) {
-            listeners = new ju.ArrayList[SessionListener]
-        }
-        listeners.add(sessionListener)
-    }
+    @volatile
+    private var closed = false
 
-    def removeListener(sessionListener: SessionListener): Unit =
-        if (listeners != null) listeners.remove(sessionListener)
-
-    def iterator: ju.Iterator[SessionListener] =
-        if (listeners ne null)
-            listeners.iterator
+    // 2015-07-02: called by:
+    // - NetUtils.{deleteFileOnSessionTermination, renameAndExpireWithSession}
+    // - XFormsStateManager.addCacheSessionListener
+    def addListener(sessionListener: SessionListener): Unit =
+        if (! closed)
+            listeners.add(sessionListener)
         else
-            ju.Collections.emptyList[SessionListener].iterator
+            throw new IllegalStateException("session already destroyed")
+
+    // 2015-07-02: called by:
+    // - XFormsStateManager.removeCacheSessionListener
+    def removeListener(sessionListener: SessionListener): Unit =
+        if (! closed)
+            listeners.remove(sessionListener)
+
+    // 2015-07-02: called by:
+    // - OrbeonSessionListener.sessionDestroyed
+    def iterateRemoveAndClose(): Iterator[SessionListener] = {
+        closed = true
+        Iterator.continually(listeners.poll()).takeWhile(_ ne null) // poll() retrieves and removes the head
+    }
 }
 
 object SessionListeners {

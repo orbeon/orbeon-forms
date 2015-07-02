@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
-import javax.servlet.http.HttpSessionEvent
-import javax.servlet.http.HttpSessionListener
-import collection.JavaConverters._
 import javax.servlet.ServletException
+import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
+
+import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.util.ScalaUtils._
+
 import scala.util.control.NonFatal
 
 // For backward compatibility
@@ -41,7 +41,13 @@ class OrbeonSessionListener extends HttpSessionListener {
 
     def sessionCreated(event: HttpSessionEvent): Unit =
         withRootException("session creation", new ServletException(_)) {
+
             val httpSession = event.getSession
+
+            // Immediately store SessionListeners into the session to avoid concurrency issues which can occur if we
+            // do this lazily in ServletExternalContext.addListener().
+            httpSession.setAttribute(SessionListeners.SessionListenersKey, new SessionListeners)
+
             val servletContext = httpSession.getServletContext
             runWithServletContext(servletContext, Some(httpSession), logger, logPrefix, "Session created.", InitProcessorPrefix, InitInputPrefix)
         }
@@ -50,16 +56,23 @@ class OrbeonSessionListener extends HttpSessionListener {
         withRootException("session destruction", new ServletException(_)) {
             val httpSession = event.getSession
             if (httpSession ne null) {
-                // Run processor
+
                 val servletContext = httpSession.getServletContext
                 runWithServletContext(servletContext, Some(httpSession), logger, logPrefix, "Session destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
 
-                // Run listeners if any
-                // One rationale for running this after the processor is that the processor might add new listeners
+                // Run listeners after the processor because processor might add new listeners
                 val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
-                Option(listeners).toList flatMap (_.iterator.asScala) foreach {
-                    // Run listener and ignore exceptions so we can continue running the remaining listeners
-                    listener ⇒ try listener.sessionDestroyed() catch { case NonFatal(t) ⇒ logger.error("Throwable caught when calling listener", t) }
+                for {
+                    listeners ← Option(listeners).iterator
+                    listener  ← listeners.iterateRemoveAndClose()
+                } locally {
+                    try {
+                        listener.sessionDestroyed()
+                    } catch {
+                        case NonFatal(t) ⇒
+                            // Catch so we can continue running the remaining listeners
+                            logger.error("Throwable caught when calling listener", t)
+                    }
                 }
             }
         }

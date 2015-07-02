@@ -103,7 +103,7 @@
             <display-name lang="de" todo="true">[With Resizing]</display-name>
             <display-name lang="it" todo="true">[With Resizing]</display-name>
             <display-name lang="nl" todo="true">[With Resizing]</display-name>
-            <display-name lang="sv" todo="true">[With Resizing]</display-name>
+            <display-name lang="sv">Med storleksändring</display-name>
             <display-name lang="pt" todo="true">[With Resizing]</display-name>
             <toolbox show="false"/>
         </metadata>

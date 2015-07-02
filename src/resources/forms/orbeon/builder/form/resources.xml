@@ -8140,7 +8140,7 @@
                 </item>
             </options>
             <control-appearance>
-                <label todo="true">[Control Appearance]</label>
+                <label>Kontrollens utseende</label>
             </control-appearance>
             <types>
                 <label>Datatyp</label>
@@ -8230,18 +8230,18 @@
                 <item id="2">Formel</item>
             </required>
             <constraint>
-                <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
+                <item id="formula">Formel</item>
+                <item id="max-length">Har största längd</item>
+                <item id="min-length">Har minsta längd</item>
             </constraint>
             <formula>
-                <label todo="true">[Formula]</label>
+                <label>Formel</label>
                 <alert>Felaktigt XPath-uttryck</alert>
                 <hint>Booleskt XPath-uttryck</hint>
             </formula>
             <integer-argument>
-                <label todo="true">[Integer Value]</label>
-                <alert todo="true">[Incorrect Value]</alert>
+                <label>Heltalsvärde</label>
+                <alert>Felaktigt värde</alert>
             </integer-argument>
             <visibility>
                 <label>Synlighet</label>
@@ -8469,8 +8469,8 @@
                 <label>Serialisering</label>
             </serialization>
             <soap-submission>
-                <label>Serviço SOAP</label>
-                <hint>Indica se é um serviço SOAP</hint>
+                <label>SOAP-tjänst</label>
+                <hint>Är detta en SOAP-tjänst?</hint>
             </soap-submission>
             <soap-action>
                 <label>SOAP</label>
@@ -8478,7 +8478,7 @@
             </soap-action>
             <http-authentication>
                 <label>Autentisering</label>
-                <hint>HTTP-autentisering</hint>
+                <hint>HTTP-autentisering?</hint>
             </http-authentication>
             <username>
                 <label>Användarnamn</label>

@@ -42,7 +42,7 @@
             <display-name lang="de" todo="true">[With Character Counter]</display-name>
             <display-name lang="it" todo="true">[With Character Counter]</display-name>
             <display-name lang="nl" todo="true">[With Character Counter]</display-name>
-            <display-name lang="sv" todo="true">[With Character Counter]</display-name>
+            <display-name lang="sv">Med teckenräknare</display-name>
             <display-name lang="pt" todo="true">[With Character Counter]</display-name>
             <toolbox show="false"/>
             <templates>

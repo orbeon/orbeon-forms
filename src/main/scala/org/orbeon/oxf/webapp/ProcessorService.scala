@@ -42,7 +42,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
             // NOTE: Should this just be available from the ExternalContext?
             pipelineContext.setAttribute(JNDIContext, jndiContext)
 
-            try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, Logger)
+            try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext)(Logger)
             catch {
                 case NonFatal(t) ⇒
                     // Log first
@@ -71,7 +71,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
             // NOTE: Should this just be available from the ExternalContext?
             pipelineContext.setAttribute(JNDIContext, jndiContext)
 
-            try InitUtils.runProcessor(processor, externalContext, pipelineContext, Logger)
+            try InitUtils.runProcessor(processor, externalContext, pipelineContext)(Logger)
             catch {
                 case NonFatal(t) ⇒
                     Logger.error(OrbeonFormatter.format(t))

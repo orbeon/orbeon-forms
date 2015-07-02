@@ -63,7 +63,7 @@ object InitUtils {
     def runProcessor(
         processor       : Processor,
         externalContext : ExternalContext,
-        pipelineContext : PipelineContext,
+        pipelineContext : PipelineContext)(implicit
         logger          : Logger
     ): Unit = {
 
@@ -157,11 +157,11 @@ object InitUtils {
     def runWithServletContext(
         servletContext         : ServletContext,
         session                : Option[HttpSession],
-        logger                 : Logger,
         logMessagePrefix       : String,
         message                : String,
         uriNamePropertyPrefix  : String,
-        processorInputProperty : String
+        processorInputProperty : String)(implicit
+        logger                 : Logger
     ): Unit = {
 
         require(servletContext ne null)
@@ -182,7 +182,7 @@ object InitUtils {
             val externalContext = new WebAppExternalContext(webAppContext, session)
 
             withPipelineContext { pipelineContext ⇒
-                runProcessor(processor, externalContext, pipelineContext, logger)
+                runProcessor(processor, externalContext, pipelineContext)
             }
         }
     }

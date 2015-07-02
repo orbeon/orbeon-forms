@@ -66,7 +66,7 @@ trait ServletPortlet {
 
             val processor = createProcessor(definition)
             val externalContext = new WebAppExternalContext(webAppContext)
-            runProcessor(processor, externalContext, new PipelineContext, Logger)
+            runProcessor(processor, externalContext, new PipelineContext)(Logger)
         }
     }
 

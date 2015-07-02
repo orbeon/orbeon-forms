@@ -51,7 +51,6 @@ class OrbeonSessionListener extends HttpSessionListener {
             runWithServletContext(
                 servletContext         = httpSession.getServletContext,
                 session                = Some(httpSession),
-                logger                 = logger,
                 logMessagePrefix       = logPrefix,
                 message                = "Session created.",
                 uriNamePropertyPrefix  = InitProcessorPrefix,
@@ -67,7 +66,6 @@ class OrbeonSessionListener extends HttpSessionListener {
                 runWithServletContext(
                     servletContext         = httpSession.getServletContext,
                     session                = Some(httpSession),
-                    logger                 = logger,
                     logMessagePrefix       = logPrefix,
                     message                = "Session destroyed.",
                     uriNamePropertyPrefix  = DestroyProcessorPrefix,

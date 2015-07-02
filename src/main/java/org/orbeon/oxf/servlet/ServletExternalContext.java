@@ -26,6 +26,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.webapp.SessionListeners;
 import org.orbeon.oxf.webapp.WebAppContext;
 
 import javax.servlet.ServletContext;
@@ -54,8 +55,6 @@ public class ServletExternalContext implements ExternalContext  {
     public static final String HTTP_RESOURCE_CACHE_HEADERS_PROPERTY = "oxf.http.resource.cache-headers";
     public static final String HTTP_NOCACHE_CACHE_HEADERS_DEFAULT   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0";
     public static final String HTTP_NOCACHE_CACHE_HEADERS_PROPERTY  = "oxf.http.nocache.cache-headers";
-
-    public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
 
     private static String defaultFormCharset;
     private static Map<String, String> pageCacheHeaders;
@@ -655,38 +654,18 @@ public class ServletExternalContext implements ExternalContext  {
 
 
         public void addListener(SessionListener sessionListener) {
-            SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SESSION_LISTENERS);
+            SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SessionListeners.SessionListenersKey());
             if (listeners == null) {
                 listeners = new SessionListeners();
-                httpSession.setAttribute(SESSION_LISTENERS, listeners);
+                httpSession.setAttribute(SessionListeners.SessionListenersKey(), listeners);
             }
             listeners.addListener(sessionListener);
         }
 
         public void removeListener(SessionListener sessionListener) {
-            final SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SESSION_LISTENERS);
+            final SessionListeners listeners = (SessionListeners) httpSession.getAttribute(SessionListeners.SessionListenersKey());
             if (listeners != null)
                 listeners.removeListener(sessionListener);
-        }
-    }
-
-    public static class SessionListeners implements Serializable {
-        // Store this class instead of the List directly, so we can have a transient member
-        private transient List<ExternalContext.Session.SessionListener> listeners;
-        public void addListener(ExternalContext.Session.SessionListener sessionListener) {
-            if (listeners == null) {
-                listeners = new ArrayList<ExternalContext.Session.SessionListener>();
-            }
-            listeners.add(sessionListener);
-        }
-
-        public void removeListener(ExternalContext.Session.SessionListener sessionListener) {
-            if (listeners != null)
-                listeners.remove(sessionListener);
-        }
-
-        public Iterator<ExternalContext.Session.SessionListener> iterator() {
-            return (listeners != null) ? listeners.iterator() : Collections.<ExternalContext.Session.SessionListener>emptyList().iterator();
         }
     }
 

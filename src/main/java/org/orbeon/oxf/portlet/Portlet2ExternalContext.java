@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.webapp.SessionListeners;
 import org.orbeon.oxf.webapp.WebAppContext;
 
 import javax.portlet.*;
@@ -388,16 +389,16 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public void addListener(SessionListener sessionListener) {
-            ServletExternalContext.SessionListeners listeners = (ServletExternalContext.SessionListeners) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
+            SessionListeners listeners = (SessionListeners) portletSession.getAttribute(SessionListeners.SessionListenersKey(), PortletSession.APPLICATION_SCOPE);
             if (listeners == null) {
-                listeners = new ServletExternalContext.SessionListeners();
-                portletSession.setAttribute(ServletExternalContext.SESSION_LISTENERS, listeners, PortletSession.APPLICATION_SCOPE);
+                listeners = new SessionListeners();
+                portletSession.setAttribute(SessionListeners.SessionListenersKey(), listeners, PortletSession.APPLICATION_SCOPE);
             }
             listeners.addListener(sessionListener);
         }
 
         public void removeListener(SessionListener sessionListener) {
-            final ServletExternalContext.SessionListeners listeners = (ServletExternalContext.SessionListeners) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
+            final SessionListeners listeners = (SessionListeners) portletSession.getAttribute(SessionListeners.SessionListenersKey(), PortletSession.APPLICATION_SCOPE);
             if (listeners != null)
                 listeners.removeListener(sessionListener);
         }
@@ -493,11 +494,11 @@ public class Portlet2ExternalContext implements ExternalContext {
         private PrintWriter printWriter;
         private ByteArrayOutputStream byteStream;
         private String title;
-        
+
         public BufferedResponse(ExternalContext.Request request) {
             super( request);
         }
-        
+
         public String getContentType() {
             return contentType;
         }

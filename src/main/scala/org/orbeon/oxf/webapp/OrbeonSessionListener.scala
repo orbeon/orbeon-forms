@@ -14,7 +14,6 @@
 package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
-import org.orbeon.oxf.servlet.ServletExternalContext
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
 import collection.JavaConverters._
@@ -57,7 +56,7 @@ class OrbeonSessionListener extends HttpSessionListener {
 
                 // Run listeners if any
                 // One rationale for running this after the processor is that the processor might add new listeners
-                val listeners = httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS).asInstanceOf[ServletExternalContext.SessionListeners]
+                val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
                 Option(listeners).toList flatMap (_.iterator.asScala) foreach {
                     // Run listener and ignore exceptions so we can continue running the remaining listeners
                     listener ⇒ try listener.sessionDestroyed() catch { case NonFatal(t) ⇒ logger.error("Throwable caught when calling listener", t) }

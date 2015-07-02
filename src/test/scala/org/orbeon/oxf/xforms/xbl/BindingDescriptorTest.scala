@@ -144,6 +144,8 @@ class BindingDescriptorTest extends DocumentTestBase with AssertionsForJUnit {
         assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "input"        , Some("character-counter")))
         assertVaryTypes(XF → "textarea"     , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "textarea"     , Some("character-counter")))
         assertVaryTypes(XF → "textarea"     , XS → "string" , Some("character-counter"), XS → "string" , None                     )(Some(XF → "textarea"     , None))
+
+        assertVaryTypes(XF → "input"        , XS → "string" , Some("character-counter"), XS → "double" , Some("character-counter"))(None)
     }
 
     @Test def testPossibleAppearancesWithLabel(): Unit = {

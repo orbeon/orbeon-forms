@@ -100,7 +100,9 @@
                 <!--  Read appearances -->
                 <xf:dispatch
                     name="reload-appearances"
-                    targetid="model"/>
+                    targetid="model">
+                    <xf:property name="is-initial-load" value="true()"/>
+                </xf:dispatch>
 
                 <!--
                     Force required if the datatype implies it.
@@ -200,7 +202,11 @@
             <xf:model id="model">
 
                 <xf:action event="reload-appearances">
-                    <xf:var name="appearances" value="$i/appearances"/>
+
+                    <xf:var name="appearances"        value="$i/appearances"/>
+                    <xf:var name="is-initial-load"    value="event('is-initial-load') = true()"/>
+                    <xf:var name="current-appearance" value="$appearances/@selection/string()"/>
+
                     <xf:delete ref="$appearances/node()"/>
                     <xf:insert
                         context="$appearances"
@@ -208,7 +214,9 @@
                             fbf:possibleAppearancesByControlNameAsXML(
                                 xxf:binding('fb-dialog-control-details'),
                                 $i/control-name,
-                                $i/validations/validation[@type = 'datatype']/builtin-type
+                                $is-initial-load,
+                                $i/validations/validation[@type = 'datatype']/builtin-type,
+                                $current-appearance
                             )"/>
                     <!--  Assume there is only one active appearance at a given time for now. At the XForms level there
                           can be multiple appearances. We do have fr:character-counter which could wrap a control with an
@@ -520,7 +528,9 @@
                                                 <xf:dispatch
                                                     event="xforms-value-changed"
                                                     name="reload-appearances"
-                                                    targetid="model"/>
+                                                    targetid="model">
+                                                    <xf:property name="is-initial-load" value="false()"/>
+                                                </xf:dispatch>
                                             </xf:select1>
                                             <!-- Schema type selection if applicable -->
                                             <fr:dropdown-select1 ref="schema-type[exists($schema)]">

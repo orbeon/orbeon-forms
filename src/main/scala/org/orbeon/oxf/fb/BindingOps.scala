@@ -25,18 +25,16 @@ import org.orbeon.scaxon.XML._
 trait BindingOps {
 
     def possibleAppearancesByControlNameAsXML(
-        inDoc           : NodeInfo,
-        controlName     : String,
-        builtinDatatype : String
+        inDoc             : NodeInfo,
+        controlName       : String,
+        isInitialLoad     : Boolean,
+        builtinDatatype   : String,
+        desiredAppearance : String    // relevant only if isInitialLoad == false
     ): Array[NodeInfo] = {
 
         val bindings    = FormBuilder.componentBindings
         val descriptors = getAllRelevantDescriptors(bindings)
         val lang        = FormBuilder.currentLang
-
-        // Compare the local name of the datatypes, assuming that at least the first datatype is a built-in datatype
-        def sameDatatypesIgnorePrefix(builtinDatatype: QName, otherDatatype: QName) =
-            builtinDatatype == otherDatatype || Model.getVariationTypeOrKeep(builtinDatatype) == otherDatatype
 
         for {
             controlElem                  ← findControlByName(inDoc, controlName).to[Array]
@@ -55,10 +53,7 @@ trait BindingOps {
                     // the current appearance. Otherwise, pass an empty set which means that only the default (empty)
                     // appearance will match. Note that this means that the result might not necessarily have a
                     // selected current appearance.
-                    appearancesForSelection = if (sameDatatypesIgnorePrefix(newDatatype, originalDatatype))
-                                                  appearanceOpt.to[Set]
-                                              else
-                                                  Set.empty,
+                    appearancesForSelection = if (isInitialLoad) appearanceOpt.to[Set] else Set(desiredAppearance),
                     lang                    = lang,
                     bindings                = bindings
                 )

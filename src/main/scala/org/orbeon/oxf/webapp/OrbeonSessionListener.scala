@@ -48,8 +48,15 @@ class OrbeonSessionListener extends HttpSessionListener {
             // do this lazily in ServletExternalContext.addListener().
             httpSession.setAttribute(SessionListeners.SessionListenersKey, new SessionListeners)
 
-            val servletContext = httpSession.getServletContext
-            runWithServletContext(servletContext, Some(httpSession), logger, logPrefix, "Session created.", InitProcessorPrefix, InitInputPrefix)
+            runWithServletContext(
+                servletContext         = httpSession.getServletContext,
+                session                = Some(httpSession),
+                logger                 = logger,
+                logMessagePrefix       = logPrefix,
+                message                = "Session created.",
+                uriNamePropertyPrefix  = InitProcessorPrefix,
+                processorInputProperty = InitInputPrefix
+            )
         }
 
     def sessionDestroyed(event: HttpSessionEvent): Unit =
@@ -57,11 +64,20 @@ class OrbeonSessionListener extends HttpSessionListener {
             val httpSession = event.getSession
             if (httpSession ne null) {
 
-                val servletContext = httpSession.getServletContext
-                runWithServletContext(servletContext, Some(httpSession), logger, logPrefix, "Session destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
+                runWithServletContext(
+                    servletContext         = httpSession.getServletContext,
+                    session                = Some(httpSession),
+                    logger                 = logger,
+                    logMessagePrefix       = logPrefix,
+                    message                = "Session destroyed.",
+                    uriNamePropertyPrefix  = DestroyProcessorPrefix,
+                    processorInputProperty = DestroyInputPrefix
+                )
 
                 // Run listeners after the processor because processor might add new listeners
-                val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
+                val listeners =
+                    httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
+
                 for {
                     listeners ← Option(listeners).iterator
                     listener  ← listeners.iterateRemoveAndClose()

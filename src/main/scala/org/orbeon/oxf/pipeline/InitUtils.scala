@@ -149,7 +149,15 @@ object InitUtils {
 
      // Run a processor based on definitions found in properties or the web app context. This is
      // useful for context/session listeners. Don't run if a definition is not found, no exception is thrown.
-    def runWithServletContext(servletContext: ServletContext, session: Option[HttpSession], logger: Logger, logMessagePrefix: String, message: String, uriNamePropertyPrefix: String, processorInputProperty: String): Unit = {
+    def runWithServletContext(
+        servletContext         : ServletContext,
+        session                : Option[HttpSession],
+        logger                 : Logger,
+        logMessagePrefix       : String,
+        message                : String,
+        uriNamePropertyPrefix  : String,
+        processorInputProperty : String
+    ): Unit = {
 
         require(servletContext ne null)
 

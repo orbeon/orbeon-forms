@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.webapp
 
-import java.io.Serializable
+import java.io.{ObjectInput, ObjectOutput, Externalizable, Serializable}
 import java.util.concurrent.ConcurrentLinkedQueue
 
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session.SessionListener
 
-class SessionListeners extends Serializable {
+class SessionListeners extends Externalizable {
 
-    @transient
-    private val listeners = new ConcurrentLinkedQueue[SessionListener]
+    private var listeners = new ConcurrentLinkedQueue[SessionListener]
 
     @volatile
     private var closed = false
@@ -46,6 +45,16 @@ class SessionListeners extends Serializable {
     def iterateRemoveAndClose(): Iterator[SessionListener] = {
         closed = true
         Iterator.continually(listeners.poll()).takeWhile(_ ne null) // poll() retrieves and removes the head
+    }
+
+    // Use custom serialization so we can set a non-null `listeners` fields
+    override def readExternal(objectInput: ObjectInput): Unit = {
+        listeners = new ConcurrentLinkedQueue[SessionListener]
+        closed = objectInput.readBoolean()
+    }
+
+    override def writeExternal(objectOutput: ObjectOutput): Unit = {
+        objectOutput.writeBoolean(closed)
     }
 }
 

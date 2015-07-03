@@ -49,10 +49,11 @@ trait BindingOps {
             appearanceElem               ← possibleAppearancesWithLabelAsXML(
                     elemName                = virtualName,
                     builtinType             = newDatatype,
-                    // If the datatype hasn't changed between original and new, allow using the appearance to select
-                    // the current appearance. Otherwise, pass an empty set which means that only the default (empty)
-                    // appearance will match. Note that this means that the result might not necessarily have a
-                    // selected current appearance.
+                    // Upon initial load, we want to select as current the original appearance. Later, we want to try
+                    // to keep the current appearance. For example, if dropdown has type `string`, and we change the
+                    // type to `date`, we don't want the appearance to reset, so we use the passed `desiredAppearance`.
+                    // If the appearance doesn't match, then no appearance is marked as current. The UI will pick the
+                    // first appearance listed as current.
                     appearancesForSelection = if (isInitialLoad) appearanceOpt.to[Set] else Set(desiredAppearance),
                     lang                    = lang,
                     bindings                = bindings

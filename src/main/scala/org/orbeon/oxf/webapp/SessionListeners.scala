@@ -47,7 +47,7 @@ class SessionListeners extends Externalizable {
         Iterator.continually(listeners.poll()).takeWhile(_ ne null) // poll() retrieves and removes the head
     }
 
-    // Use custom serialization so we can set a non-null `listeners` fields
+    // Use custom serialization so we can set a non-null `listeners` fields when Tomcat decides to restore a session
     override def readExternal(objectInput: ObjectInput): Unit = {
         listeners = new ConcurrentLinkedQueue[SessionListener]
         closed = objectInput.readBoolean()

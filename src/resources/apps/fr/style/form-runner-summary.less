@@ -64,6 +64,11 @@
             max-width: none;                                        // Because table can scrolls beyond size of container
         }
 
+        // We can't use .table-striped, as xf:repeat adds delimiters, so we do our own zebra-striping
+        tbody tr:nth-child(4n+3) > td {
+            background-color: @tableBackgroundAccent;
+        }
+
         tbody {
             a, a:hover { text-decoration: none; color: black; outline: 0 }   // Links in table must appear as normal text
         }

@@ -19,6 +19,7 @@
 }
 .orbeon .fr-forms-table {
   clear: both;
+  background-color: white;
 }
 .orbeon .fr-forms-table .fr-summary,
 .orbeon .fr-forms-table .fr-new {

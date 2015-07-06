@@ -36,6 +36,9 @@
   margin-bottom: 0;
   max-width: none;
 }
+.orbeon .fr-summary-table-div tbody tr:nth-child(4n+3) > td {
+  background-color: #f9f9f9;
+}
 .orbeon .fr-summary-table-div tbody a,
 .orbeon .fr-summary-table-div tbody a:hover {
   text-decoration: none;

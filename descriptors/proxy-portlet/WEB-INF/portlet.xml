@@ -40,6 +40,20 @@
             <value>false</value>
         </init-param>
 
+        <!-- Forwarding configuration -->
+        <init-param>
+            <name>forward-parameters</name>
+            <value></value>
+        </init-param>
+        <init-param>
+            <name>forward-headers</name>
+            <value></value>
+        </init-param>
+        <init-param>
+            <name>forward-properties</name>
+            <value></value>
+        </init-param>
+
         <!-- HTTP client configuration -->
         <init-param>
             <param-name>oxf.http.stale-checking-enabled</param-name>

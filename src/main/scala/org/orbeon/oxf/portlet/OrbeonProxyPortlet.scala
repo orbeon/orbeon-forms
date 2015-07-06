@@ -37,9 +37,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     import org.orbeon.oxf.portlet.OrbeonProxyPortlet._
 
     private case class PortletSettings(
-        forwardHeaders: Map[String, String], // lowercase name → original name
-        forwardParams : Set[String],
-        httpClient    : HttpClient
+        forwardHeaders    : Map[String, String], // lowercase name → original name
+        forwardParams     : Set[String],
+        forwardProperties : Map[String, String], // lowercase name → original name
+        httpClient        : HttpClient
      )
 
     // For BufferedPortlet
@@ -52,9 +53,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         super.init(config)
         settingsOpt = Some(
             PortletSettings(
-                forwardHeaders = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut),
-                forwardParams  = stringToSet(config.getInitParameter("forward-parameters")),
-                httpClient     = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
+                forwardHeaders    = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut),
+                forwardParams     = stringToSet(config.getInitParameter("forward-parameters")),
+                forwardProperties = stringToSet(config.getInitParameter("forward-properties")).map(name ⇒ name.toLowerCase → name)(breakOut),
+                httpClient        = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
             )
         )
     }
@@ -220,7 +222,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         val sendLanguage = getBooleanPreference(request, SendLiferayLanguage)
         val sendUser     = getBooleanPreference(request, SendLiferayUser)
 
-        val servletRequestHeaders =
+        val servletReqHeaders =
             findServletRequest(request).toList flatMap APISupport.requestHeaders
 
         import collection.JavaConverters._
@@ -232,7 +234,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             } yield
                 name → values
 
-        val portletRequestHeaders = portletRequestHeadersIt.to[List]
+        val portletReqHeaders = portletRequestHeadersIt.to[List]
 
         // Language information
         // NOTE: Format returned is e.g. "en_US" or "fr_FR".
@@ -250,13 +252,13 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             else
                 Map.empty[String, String]
 
-        APISupport.Logger.debug(s"incoming servlet request headers: $servletRequestHeaders")
-        APISupport.Logger.debug(s"incoming portlet request headers: $portletRequestHeaders")
+        APISupport.Logger.debug(s"incoming servlet request headers: $servletReqHeaders")
+        APISupport.Logger.debug(s"incoming portlet request headers: $portletReqHeaders")
 
         val headersToSet =
-            APISupport.headersToForward(servletRequestHeaders, settings.forwardHeaders).to[List] ++
-            APISupport.headersToForward(portletRequestHeaders, userHeadersToForward).to[List]    ++
-            languageHeader.to[List]
+            APISupport.headersToForward(servletReqHeaders, settings.forwardHeaders)                            ++
+            APISupport.headersToForward(portletReqHeaders, settings.forwardProperties ++ userHeadersToForward) ++
+            languageHeader
 
         val paramsToSet =
             for {
@@ -271,7 +273,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         RequestDetails(
             content = content,
             url     = url,
-            headers = headersToSet,
+            headers = headersToSet.to[List],
             params  = paramsToSet
         )
     }

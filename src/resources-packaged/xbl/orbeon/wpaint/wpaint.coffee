@@ -63,19 +63,26 @@ YAHOO.xbl.fr.WPaint.prototype =
                     drawDown : => @drawDown()
                     imageBg  : @imageEl.attr('src')
                     image    : if annotation == "" then null else annotation
+                # Update <annotation> right away, so annotation isn't empty until users draw something
+                @_updateAnnotation()
+
             # Re-register listener, as imagesLoaded() calls listener only once
             @imageEl.one('load', => @imageLoaded())
 
     drawDown: ->
         @wpaintElC.focus()
 
-    # When looses focus, send drawing to the server right away (incremental)
-    blur: ->
+    # Send the image data from wPaint to the server, which will put it in <annotation>
+    _updateAnnotation: ->
         annotationImgData = @wpaintElC.wPaint('image')
         OD.dispatchEvent
             targetId:  @container.id
             eventName: 'fr-update-annotation'
             properties: value: annotationImgData
+
+    # When looses focus, send drawing to the server right away (incremental)
+    blur: -> @_updateAnnotation()
+
 
     readonly:  ->
     readwrite: ->

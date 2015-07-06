@@ -22,29 +22,43 @@
             <name>oxf.error-processor.input.config</name>
             <value>oxf:/config/error.xpl</value>
         </init-param>
-        
+
         <supports>
             <mime-type>text/html</mime-type>
             <portlet-mode>view</portlet-mode>
         </supports>
-        
+
         <portlet-info>
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
     </portlet>
-    
-    <!--Add internal Orbeon-* headers for auth-->
+
+    <!-- Add Orbeon-Liferay-* headers -->
     <filter>
-        <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
-        <filter-class>org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter</filter-class>
+        <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
+        <filter-class>org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter</filter-class>
         <lifecycle>RENDER_PHASE</lifecycle>
         <lifecycle>ACTION_PHASE</lifecycle>
         <lifecycle>RESOURCE_PHASE</lifecycle>
         <lifecycle>EVENT_PHASE</lifecycle>
     </filter>
     <filter-mapping>
-        <filter-name>orbeon-form-runner-auth-portlet-filter</filter-name>
+        <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
         <portlet-name>orbeon-forms-portlet</portlet-name>
     </filter-mapping>
-    
+
+    <!-- Add Orbeon-* headers -->
+    <filter>
+        <filter-name>orbeon-add-orbeon-auth-headers-portlet-filter</filter-name>
+        <filter-class>org.orbeon.oxf.portlet.liferay.AddOrbeonAuthHeadersFilter</filter-class>
+        <lifecycle>RENDER_PHASE</lifecycle>
+        <lifecycle>ACTION_PHASE</lifecycle>
+        <lifecycle>RESOURCE_PHASE</lifecycle>
+        <lifecycle>EVENT_PHASE</lifecycle>
+    </filter>
+    <filter-mapping>
+        <filter-name>orbeon-add-orbeon-auth-headers</filter-name>
+        <portlet-name>orbeon-forms-portlet</portlet-name>
+    </filter-mapping>
+
 </portlet-app>

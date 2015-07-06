@@ -31,7 +31,9 @@ object LiferaySupport {
         "Orbeon-Liferay-User-Roles"       → (u ⇒ u.getRoles.asScala map (_.getName) toList)
     )
 
-    val AllHeaderNamesLower = HeaderNamesGetters map (_._1.toLowerCase) toSet
+    val AllHeaderNames                   = HeaderNamesGetters map (_._1) toSet
+    val AllHeaderNamesLower              = AllHeaderNames map (_.toLowerCase)
+    val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLower zip AllHeaderNames toMap
 
     // Return Liferay user, group and role information as headers. There can be multiple role headers.
     def userHeaders(user: User): List[(String, String)] =

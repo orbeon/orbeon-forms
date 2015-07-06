@@ -24,24 +24,51 @@ import org.orbeon.oxf.util.ScalaUtils
 
 import scala.collection.JavaConverters._
 
-class FormRunnerAuthFilter
+class AddOrbeonAuthHeadersFilter
     extends PortletFilter
        with RenderFilter
        with ActionFilter
        with ResourceFilter
        with EventFilter {
 
-    override def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain) =
-        chain.doFilter(FormRunnerAuthFilter.amendRequest(req), res)
+    import FormRunnerAuthFilter._
 
-    override def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain) =
-        chain.doFilter(FormRunnerAuthFilter.amendRequest(req), res)
+    def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain) =
+        chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-    override def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain) =
-        chain.doFilter(FormRunnerAuthFilter.amendRequest(req), res)
+    def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain) =
+        chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-    override def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain) =
-        chain.doFilter(FormRunnerAuthFilter.amendRequest(req), res)
+    def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain) =
+        chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
+
+    def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain) =
+        chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
+
+    def init(filterConfig: filter.FilterConfig) = ()
+    def destroy() = ()
+}
+
+class AddLiferayUserHeadersFilter
+    extends PortletFilter
+       with RenderFilter
+       with ActionFilter
+       with ResourceFilter
+       with EventFilter {
+
+    import FormRunnerAuthFilter._
+
+    def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain) =
+        chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
+
+    def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain) =
+        chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
+
+    def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain) =
+        chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
+
+    def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain) =
+        chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
     def init(filterConfig: filter.FilterConfig) = ()
     def destroy() = ()
@@ -49,28 +76,7 @@ class FormRunnerAuthFilter
 
 object FormRunnerAuthFilter {
 
-    // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to either
-    // userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the user.
-    def amendRequest[T <: PortletRequest](req: T): T =
-        PortalUtil.getUser(PortalUtil.getHttpServletRequest(req)) match {
-            case user: User ⇒ amendRequest(req, user)
-            case _          ⇒ req
-        }
-
-    // Public for unit tests
-    def amendRequest[T <: PortletRequest](req: T, user: User): T =
-        wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(req, user))
-
-    private def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: User): T = {
-
-        val liferayUserHeaders =
-            ScalaUtils.combineValues[String, String, Array](LiferaySupport.userHeaders(user)) map
-                { case (name, value) ⇒ name.toLowerCase → value } toMap
-
-        wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)
-    }
-
-    private def wrapWithOrbeonAuthHeaders[T <: PortletRequest](req: T): T = {
+    def wrapWithOrbeonAuthHeaders[T <: PortletRequest](req: T): T = {
 
         def getHeader(s: String) = req.getProperties(s).asScala.toArray match {
             case Array() ⇒ None
@@ -81,6 +87,23 @@ object FormRunnerAuthFilter {
             FormRunnerAuth.getUserGroupRolesAsHeaders(req, getHeader).toMap
 
         wrap(req, FormRunnerAuth.AllHeaderNamesLower, authHeaders)
+    }
+
+    // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to either
+    // userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the user.
+    def amendRequestWithUser[T <: PortletRequest](req: T)(amend: (T, User) ⇒ T): T =
+        PortalUtil.getUser(PortalUtil.getHttpServletRequest(req)) match {
+            case user: User ⇒ amend(req, user)
+            case _          ⇒ req
+        }
+
+    def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: User): T = {
+
+        val liferayUserHeaders =
+            ScalaUtils.combineValues[String, String, Array](LiferaySupport.userHeaders(user)) map
+                { case (name, value) ⇒ name.toLowerCase → value } toMap
+
+        wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)
     }
 
     private def wrap[T <: PortletRequest](req: T, remove: Set[String], prepend: Map[String, Array[String]]): T = {

@@ -31,7 +31,7 @@ import scala.collection.immutable.TreeMap
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
-    @Test def amendPortletRequest() {
+    @Test def amendPortletRequest(): Unit = {
 
         // Initial properties
         val initialProperties = Map("p1" → Seq("v1a", "v1b"))
@@ -62,7 +62,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         Mockito when mockUser.getRoles        thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
         Mockito when mockUser.getGroup        thenReturn mockGroup
 
-        val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest, mockUser)
+        import FormRunnerAuthFilter._
+
+        val amendedRequest =
+            wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(mockRequest, mockUser))
 
         val expectedProperties =
             initialProperties ++ Map(

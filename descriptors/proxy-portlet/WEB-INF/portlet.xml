@@ -101,7 +101,7 @@
             <param-name>oxf.http.proxy.ntlm.domain</param-name>
             <param-value/>
         </init-param>
-        
+
         <supports>
             <mime-type>text/html</mime-type>
             <portlet-mode>view</portlet-mode>
@@ -111,7 +111,21 @@
         <portlet-info>
             <title>Form Runner</title>
         </portlet-info>
-        
+
     </portlet>
+
+    <!-- Add Orbeon-Liferay-* headers -->
+    <filter>
+        <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
+        <filter-class>org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter</filter-class>
+        <lifecycle>RENDER_PHASE</lifecycle>
+        <lifecycle>ACTION_PHASE</lifecycle>
+        <lifecycle>RESOURCE_PHASE</lifecycle>
+        <lifecycle>EVENT_PHASE</lifecycle>
+    </filter>
+    <filter-mapping>
+        <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
+        <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
+    </filter-mapping>
 
 </portlet-app>

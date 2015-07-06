@@ -217,18 +217,22 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         url     : String
     ): RequestDetails = {
 
-        def clientHeaders =
-            findServletRequest(request).toList flatMap APISupport.requestHeaders
-
-        def paramsToSet =
-            for {
-                pair @ (name, _) ← portalQuery(request)
-                if settings.forwardParams(name)
-            } yield
-                pair
-
         val sendLanguage = getBooleanPreference(request, SendLiferayLanguage)
         val sendUser     = getBooleanPreference(request, SendLiferayUser)
+
+        val servletRequestHeaders =
+            findServletRequest(request).toList flatMap APISupport.requestHeaders
+
+        import collection.JavaConverters._
+
+        def portletRequestHeadersIt =
+            for {
+                name   ← request.getPropertyNames.asScala
+                values = request.getProperties(name).asScala.toList
+            } yield
+                name → values
+
+        val portletRequestHeaders = portletRequestHeadersIt.to[List]
 
         // Language information
         // NOTE: Format returned is e.g. "en_US" or "fr_FR".
@@ -239,25 +243,36 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 None
 
         // User information
-        def userHeaders =
+        // This assumes that the security filter sets Orbeon-* headers
+        def userHeadersToForward =
             if (sendUser)
-                for {
-                    request   ← findServletRequest(request).toList
-                    user      ← Option(PortalUtil.getUser(request)).toList
-                    nameValue ← LiferaySupport.userHeaders(user)
-                } yield
-                    nameValue
+                LiferaySupport.AllHeaderNamesLowerToCapitalized
             else
-                Nil
+                Map.empty[String, String]
 
-        def headersToSet =
-            APISupport.headersToForward(clientHeaders, settings.forwardHeaders).toList ++ languageHeader.toList ++ userHeaders
+        APISupport.Logger.debug(s"incoming servlet request headers: $servletRequestHeaders")
+        APISupport.Logger.debug(s"incoming portlet request headers: $portletRequestHeaders")
+
+        val headersToSet =
+            APISupport.headersToForward(servletRequestHeaders, settings.forwardHeaders).to[List] ++
+            APISupport.headersToForward(portletRequestHeaders, userHeadersToForward).to[List]    ++
+            languageHeader.to[List]
+
+        val paramsToSet =
+            for {
+                pair @ (name, _) ← portalQuery(request)
+                if settings.forwardParams(name)
+            } yield
+                pair
+
+        APISupport.Logger.debug(s"outgoing request headers: $headersToSet")
+        APISupport.Logger.debug(s"outgoing request parameters: $paramsToSet")
 
         RequestDetails(
-            content,
-            url,
-            headersToSet,
-            paramsToSet
+            content = content,
+            url     = url,
+            headers = headersToSet,
+            params  = paramsToSet
         )
     }
 

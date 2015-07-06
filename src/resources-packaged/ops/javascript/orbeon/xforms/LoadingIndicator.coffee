@@ -35,9 +35,15 @@ class LoadingIndicator
         Overlay.windowScrollEvent.subscribe => @_updateLoadingPosition()
         Overlay.windowResizeEvent.subscribe => @_updateLoadingPosition()
 
+        # Extract whether this is an upload from the object passed to the callback
+        # This, because we only want the loading indicator to show for Ajax request, not uploads,
+        # for which we have a different way of indicating the upload is in progress.
+        isUpload = (argument) -> _.isBoolean(argument.isUpload) and argument.isUpload
+
         # When an Ajax call starts, we might want to show the indicator
-        Connect.startEvent.subscribe =>
-            if @nextConnectShow
+        Connect.startEvent.subscribe (type, args) =>
+            isAjax = not isUpload(args[1])
+            if isAjax and @nextConnectShow
                 if @shownCounter == 0
                     # Show the indicator after a delay
                     afterDelay = =>
@@ -49,8 +55,9 @@ class LoadingIndicator
                     @shownCounter++
 
         # When an Ajax call ends, we might want to hide the indicator
-        requestEnded = =>
-            if @nextConnectShow
+        requestEnded = (argument) =>
+            isAjax = not isUpload(argument)
+            if isAjax and @nextConnectShow
                 # Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator
                 _.defer =>
                     @shownCounter--
@@ -58,8 +65,12 @@ class LoadingIndicator
                 # Reset show and message
                 @nextConnectShow = true
                 @nextConnectMessage = DEFAULT_LOADING_TEXT
-        Events.ajaxResponseProcessedEvent.subscribe requestEnded
-        Connect.failureEvent.subscribe requestEnded
+
+        Events.ajaxResponseProcessedEvent.subscribe (type, args) ->
+            requestEnded(args[0])
+        Connect.failureEvent.subscribe (type, args) ->
+            # Only called for Ajax requests; YUI Connect doesn't call `failure` function for uploads
+            requestEnded(args[0])
 
     setNextConnectProgressShown: (shown) ->
         @nextConnectShow = shown

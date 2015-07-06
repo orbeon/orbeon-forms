@@ -771,7 +771,7 @@
                 // Reset changes, as changes are included in this bach of events
                 ORBEON.xforms.Globals.changedIdsRequest = {};
                 // Notify listeners that we are done processing this request
-                ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
+                ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire(o.argument);
                 // Go ahead with next request, if any
                 ORBEON.xforms.Globals.requestDocument = "";
                 ORBEON.xforms.Globals.executeEventFunctionQueued++;

@@ -113,7 +113,10 @@
             upload: _.bind(this.uploadSuccess, this),
             // Failure isn't called; instead we detect if an upload is interrupted through the progress-state="interrupted" in the Ajax response
             failure: _.identity,
-            argument: { formId: this.processingEvent.form.id }
+            argument: {
+                isUpload: true,
+                formId: this.processingEvent.form.id
+            }
         });
         this.askForProgressUpdate();
         // Enable the controls we previously disabled

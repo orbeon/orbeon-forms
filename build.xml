@@ -428,6 +428,7 @@
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
             -libraryjars lib/slf4j-api-1.7.7.jar
+            -libraryjars lib/liferay-portal-service-6.1.1.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
@@ -487,6 +488,10 @@
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
+            <!-- Auth filter -->
+            -keep public class org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter {
+                public *;
+            }
             <!-- For HttpClient -->
             -keep public class org.apache.commons.logging.impl.LogFactoryImpl {
                 public *;
@@ -497,10 +502,16 @@
         </proguard>
         <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">
             <zipfileset src="${temp.jar}"/>
-            <rule pattern="org.orbeon.oxf.portlet.OrbeonProxyPortlet*" result="org.orbeon.oxf.portlet.OrbeonProxyPortlet@1"/>
-            <rule pattern="org.orbeon.**" result="org.orbeon.private.orbeon.@1"/>
-            <rule pattern="org.apache.**" result="org.orbeon.private.apache.@1"/>
-            <rule pattern="scala.**"      result="org.orbeon.private.scala.@1"/>
+            <rule pattern="org.orbeon.oxf.portlet.OrbeonProxyPortlet*"
+                  result="org.orbeon.oxf.portlet.OrbeonProxyPortlet@1"/>
+            <rule pattern="org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter*"
+                  result="org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter@1"/>
+            <rule pattern="org.orbeon.**"
+                  result="org.orbeon.private.orbeon.@1"/>
+            <rule pattern="org.apache.**"
+                  result="org.orbeon.private.apache.@1"/>
+            <rule pattern="scala.**"
+                  result="org.orbeon.private.scala.@1"/>
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>

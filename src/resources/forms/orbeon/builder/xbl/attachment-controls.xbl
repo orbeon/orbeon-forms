@@ -56,7 +56,7 @@
                 <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
                 <instance/>
                 <view>
-                    <xf:output id="" bind="" mediatype="image/*" class="fb-attachment" xmlns="">
+                    <xf:output id="" bind="" mediatype="image/*" xmlns="">
                         <xf:label ref=""/>
                         <xf:help ref=""/>
                         <!-- No hint? -->

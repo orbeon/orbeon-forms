@@ -44,7 +44,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // Whether the given id is for a control (given its reserved suffix)
     def isIdForControl(controlOrBindId: String) = controlNameFromId(controlOrBindId) ne null
 
-    // Whether the give node corresponds to a control
+    // Whether the given node corresponds to a control
     // TODO: should be more restrictive
     val IsControl: NodeInfo ⇒ Boolean = hasName
 
@@ -83,7 +83,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     // Find a bind by name
     def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
-        findInBindsTryIndex(inDoc, bindId(name)) orElse findBind(inDoc, isBindForName(_, name))
+        findInBindsTryIndex(inDoc, bindId(name)) orElse findBind(inDoc, isBindForName(_, name)) // Q: is findBind() still needed?
 
     // XForms callers: find a bind by name or null (the empty sequence)
     def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) =

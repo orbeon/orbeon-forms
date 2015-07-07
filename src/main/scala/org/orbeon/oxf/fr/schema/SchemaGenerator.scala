@@ -314,7 +314,7 @@ object SchemaGenerator {
                 def resolverForSectionComponent(sectionStaticId: String) = {
 
                     def asComponent(o: Option[XFormsObject]) =
-                        o collect { case c: XFormsComponentControl ⇒ c} get
+                        o collect { case c: XFormsComponentControl ⇒ c } get
 
                     // Find the concrete section component (fr:section)
                     val frSectionComponent = asComponent(resolve(sectionStaticId))

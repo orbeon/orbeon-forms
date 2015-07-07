@@ -13,33 +13,26 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.xforms.event.Dispatch.EventListener
-import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-
 import java.{util ⇒ ju}
-import org.orbeon.oxf.xforms.model.{BindNode, DataModel}
+
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._
-import scala.collection.JavaConverters._
-import org.orbeon.saxon.om.{StructuredQName, NodeInfo}
-import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
-import collection.mutable
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.xforms.model.{BindNode, DataModel}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om.StructuredQName
 
-abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: String, val staticModel: Model) extends Logging {
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
-    // Listeners
-    def addListener(eventName: String , listener: EventListener): Unit =
-        throw new UnsupportedOperationException
-
-    def removeListener(eventName: String , listener: EventListener): Unit =
-        throw new UnsupportedOperationException
-
-    def getListeners(eventName: String) = Seq.empty[EventListener]
+abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: String, val staticModel: Model)
+    extends Logging
+    with ListenersTrait {
 
     val containingDocument = container.getContainingDocument
     implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)

@@ -131,6 +131,7 @@ object Dispatch extends Logging {
                     }
                 } else {
                     // No handlers, try to do as little as possible
+                    event.currentPhase = Target
                     target.performTargetAction(event)
                     callNativeListeners(target)
                     if (! event.cancelable || performDefaultAction)

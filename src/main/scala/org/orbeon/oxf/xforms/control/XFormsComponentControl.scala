@@ -23,8 +23,8 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{XXFormsComponentRootControl, InstanceMirror}
-import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent}
-import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
+import org.orbeon.oxf.xforms.event.events.{XFormsReadyEvent, XFormsModelConstructDoneEvent, XFormsModelConstructEvent}
+import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent, Dispatch}
 import Dispatch.EventListener
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsInstance, BindingContext}
@@ -55,7 +55,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // If the component handles LHHA itself, they are considered under of the nested container
     override def lhhaContainer = nestedContainer
 
-    private var _listeners: Seq[(XFormsInstance, EventListener)] = Seq.empty
+    private var _listeners: Seq[(XFormsInstance, EventListener)] = Nil
 
     // Create nested container upon creation
     createNestedContainer()
@@ -110,10 +110,13 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
         super.onCreate(restoreState, state)
+
         if (Controls.isRestoringDynamicState)
             restoreModels()
         else
             initializeModels()
+
+        addEnabledListener()
     }
 
     // Attach a mirror listener if needed
@@ -146,7 +149,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
         // Set outer and inner listeners
 
-        _listeners = Seq(outerInstance → outerListener, mirrorInstance → innerListener)
+        _listeners = List(outerInstance → outerListener, mirrorInstance → innerListener)
 
         _listeners foreach { case (instance, listener) ⇒
             InstanceMirror.addListener(instance, listener)
@@ -160,10 +163,11 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
             InstanceMirror.removeListener(instance, listener)
         }
 
-        _listeners = Seq.empty
+        _listeners = Nil
     }
 
     override def onDestroy(): Unit = {
+        removeEnabledListener()
         destroyMirrorListenerIfNeeded()
         super.onDestroy()
     }
@@ -234,6 +238,32 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         }
     }
 
+    private var _enabledListener: Dispatch.EventListener = _
+
+    private def addEnabledListener() = {
+
+        assert(_enabledListener eq null)
+
+        // Logic: when the component control receives the `xforms-enabled` event (which occurs during refresh after
+        // the nested models have already been initialized) we dispatch `xforms-ready` to the nested models. This is
+        // for consistency with the top-level `xforms-ready` which occurs when the control tree has been initialized.
+        // We could have considered using another event, as the name `xforms-ready` does not fully reflect the
+        // meaning associated with the top-level. On the other hand, this makes it easier to translate a top-level
+        // model into a nested model.
+        _enabledListener = _ ⇒
+            for {
+                container ← _nestedContainer.iterator
+                model     ← nestedContainer.models
+            } locally {
+                Dispatch.dispatchEvent(new XFormsReadyEvent(model))
+            }
+
+        addListener(XFormsEvents.XFORMS_ENABLED, _enabledListener)
+    }
+
+    private def removeEnabledListener(): Unit =
+        _enabledListener = null
+
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
         super.onBindingUpdate(oldBinding, newBinding)
         val isNodesetChange = ! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
@@ -272,6 +302,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
             buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix),
             idSuffix  = idSuffix
         )
+
+
 
     // Get the control at the root of the inner scope of the component
     def innerRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get

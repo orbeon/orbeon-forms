@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import collection.Seq
+import collection.immutable
 import Dispatch.EventListener
 
 /**
@@ -22,5 +22,5 @@ import Dispatch.EventListener
 trait XFormsEventObserver extends XFormsEventTarget {
     def addListener(eventName: String, listener: EventListener)
     def removeListener(eventName: String, listener: EventListener)
-    def getListeners(eventName: String): Seq[EventListener]
+    def getListeners(eventName: String): immutable.Seq[EventListener]
 }

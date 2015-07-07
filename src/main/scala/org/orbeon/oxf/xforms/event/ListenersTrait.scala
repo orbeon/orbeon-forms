@@ -13,23 +13,23 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import collection.mutable.{Map, HashMap}
+import collection.{mutable,immutable}
 import Dispatch.EventListener
 
 // Support for adding/removing/getting event listeners.
 trait ListenersTrait {
-    
+
     // Not sure Vector is a good fit for small collections. Might use List and reverse upon getListeners.
     // Use var/null instead of lazy val so that getListeners() won't cause creation of the map
-    private var listeners: Map[String, Vector[EventListener]] = _
+    private var listeners: mutable.Map[String, Vector[EventListener]] = _
 
     // Add a listener for the given event name
     def addListener(eventName: String, listener: EventListener): Unit = {
         require(eventName ne null)
         require(listener ne null)
-        
+
         if (listeners eq null)
-            listeners = new HashMap[String, Vector[EventListener]]
+            listeners = new mutable.HashMap[String, Vector[EventListener]]
 
         val currentListeners = listeners.getOrElseUpdate(eventName, Vector.empty)
         listeners += eventName → (currentListeners :+ listener)
@@ -41,9 +41,10 @@ trait ListenersTrait {
 
     // Add a given listener (if provided) or all listeners for the given event name
     def removeListener(eventName: String, listener: Option[EventListener]): Unit = {
+
         require(eventName ne null)
         require(listener ne null)
-        
+
         if (listeners ne null)
             listeners.get(eventName) foreach {
                 currentListeners ⇒
@@ -62,7 +63,6 @@ trait ListenersTrait {
             }
     }
 
-    // API for Java callers
-    def getListeners(eventName: String): Seq[EventListener] =
-        if (listeners ne null) listeners.get(eventName) getOrElse Vector.empty else Vector.empty
+    def getListeners(eventName: String): immutable.Seq[EventListener] =
+        if (listeners ne null) listeners.getOrElse(eventName, Nil) else Nil
 }

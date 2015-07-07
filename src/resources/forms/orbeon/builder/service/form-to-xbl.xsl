@@ -114,11 +114,8 @@
         <xsl:attribute name="{name()}" select="concat('if ($fr-mode = (''new'', ''test'')) then (', ., ') else .')"/>
     </xsl:template>
 
-    <!-- When copying actions, update references to xforms-ready and fr-form-model -->
+    <!-- When copying actions, update references to fr-form-model (which gets a new id) -->
     <!-- The action implementation is handled in actions.xsl. -->
-    <xsl:template match="@*:event[p:split() = 'xforms-ready']" mode="filter-actions">
-        <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'xforms-ready'), 'xforms-model-construct-done')"/>
-    </xsl:template>
     <xsl:template match="@*:observer[p:split() = 'fr-form-model']" mode="filter-actions">
         <xsl:param name="model-id" tunnel="yes"/>
         <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'fr-form-model'), $model-id)"/>

@@ -15,14 +15,13 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
-import control.Controls.AncestorOrSelfIterator
-import event.events._
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventObserver}
-import Dispatch.EventListener
-import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
+import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsRepeatIterationControl}
+import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent, XFormsEventObserver}
 
-trait ControlEventSupport {
+trait ControlEventSupport extends ListenersTrait {
 
     self: XFormsControl ⇒
 
@@ -57,7 +56,7 @@ trait ControlEventSupport {
             // Focus on current control if possible
             event match {
                 case focusEvent: XFormsFocusEvent ⇒
-                    
+
                     // Try to update hidden xf:case controls
                     // NOTE: We don't allow this behavior when events come from the client in ClientEvents
                     // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
@@ -114,12 +113,4 @@ trait ControlEventSupport {
     }
 
     final def parentEventObserver: XFormsEventObserver = Option(parent) orNull
-
-    final def addListener(eventName: String, listener: EventListener): Unit =
-        throw new UnsupportedOperationException
-
-    final def removeListener(eventName: String, listener: EventListener): Unit =
-        throw new UnsupportedOperationException
-
-    final def getListeners(eventName: String): Seq[EventListener] = Seq()
 }

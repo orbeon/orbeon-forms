@@ -15,12 +15,10 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="input" name="data"/>
-    <p:param type="input" name="bindings"/>
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#data"/>
-        <p:input name="bindings" href="#bindings"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -29,12 +27,14 @@
                 xmlns:xh="http://www.w3.org/1999/xhtml"
                 xmlns:xf="http://www.w3.org/2002/xforms"
                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                xmlns:ev="http://www.w3.org/2001/xml-events">
+                xmlns:ev="http://www.w3.org/2001/xml-events"
+                xmlns:xbl="http://www.w3.org/ns/xbl">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:variable name="model"    select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
                 <xsl:variable name="instance" select="$model/xf:instance[@id  = 'fr-form-instance']"/>
+                <xsl:variable name="xbl-ids"  select="/*/xh:head/xbl:xbl/generate-id()"/>
 
                 <!-- Whether we have "many" controls -->
                 <xsl:variable name="many-controls"
@@ -67,15 +67,25 @@
                 </xsl:template>
 
                 <!-- Update namespace on actions and services so that they don't run at design time -->
-                <xsl:template match="xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] | xf:model/xf:action[ends-with(@id, '-binding')]" mode="within-model">
+                <!-- NOTE: We disable all event handlers below so this is probably not needed anymore, but Form Builder
+                     currently (2015-07-06) depends on the fb:* prefixes on the elements. -->
+                <xsl:template
+                        match="xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] | xf:model/xf:action[ends-with(@id, '-binding')]"
+                        mode="within-model">
                     <xsl:element name="fb:{local-name()}">
-                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
 
-                <!-- Disable all event handlers at design time -->
+                <!-- Disable all event handlers at design time... -->
                 <xsl:template match="@ev:event | @event" mode="#all">
                     <xsl:attribute name="fb:{local-name()}" select="."/>
+                </xsl:template>
+                <!--  ...except those under xbl:xbl which must be preserved -->
+                <xsl:template
+                        match="@event[../@class = 'fr-design-time-preserve']"
+                        mode="within-xbl">
+                    <xsl:copy-of select="."/>
                 </xsl:template>
 
                 <!--
@@ -219,6 +229,12 @@
                     <xf:group class="fr-buttons" ref="()">
                         <xsl:apply-templates select="node()"/>
                     </xf:group>
+                </xsl:template>
+
+                <xsl:template match="xbl:xbl[generate-id() = $xbl-ids]">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* | node()" mode="within-xbl"/>
+                    </xsl:copy>
                 </xsl:template>
 
                 <!-- ======== Upgrading form ========-->
@@ -450,15 +466,7 @@
 
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" id="annotated"/>
-    </p:processor>
-
-    <!-- Make sure XBL bindings for section templates are present -->
-    <p:processor name="oxf:pipeline">
-        <p:input  name="config"   href="add-template-bindings.xpl"/>
-        <p:input  name="data"     href="#annotated"/>
-        <p:input  name="bindings" href="#bindings"/>
-        <p:output name="data"     ref="data"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

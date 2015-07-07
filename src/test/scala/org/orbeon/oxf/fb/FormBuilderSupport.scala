@@ -96,13 +96,18 @@ trait FormBuilderSupport extends XFormsSupport {
                                 origin="
                                     xxf:call-xpl(
                                         'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                        (
-                                            'data',
-                                            'bindings'
-                                        ),
-                                        (
-                                            instance('fr-form-instance'),
-                                            instance('fb-components-instance')
+                                        'data',
+                                        xxf:call-xpl(
+                                            'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                                            (
+                                                'data',
+                                                'bindings'
+                                            ),
+                                            (
+                                                instance('fr-form-instance'),
+                                                instance('fb-components-instance')
+                                            ),
+                                            'data'
                                         ),
                                         'data'
                                     )"

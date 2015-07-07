@@ -372,14 +372,8 @@
                                                             'data',
                                                             xxf:call-xpl(
                                                                 'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                                                (
-                                                                    'data',
-                                                                    'bindings'
-                                                                ),
-                                                                (
-                                                                    instance('fr-form'),
-                                                                    xxf:element('components')
-                                                                ),
+                                                                'data',
+                                                                instance('fr-form'),
                                                                 'data'
                                                             ),
                                                             'data`'
@@ -962,5 +956,6 @@
             </xf:action>
 
         </xxf:dialog>
+        <!--<fr:xforms-inspector/>-->
     </xh:body>
 </xh:html>

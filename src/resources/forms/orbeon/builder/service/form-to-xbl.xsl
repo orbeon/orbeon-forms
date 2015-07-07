@@ -19,13 +19,9 @@
         xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
@@ -35,7 +31,7 @@
                   select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
 
     <!-- Global stuff -->
-    <xsl:variable name="fr-form-model"         select="/xh:html/xh:head//xf:model[@id = 'fr-form-model']" as="element(xf:model)*"/>
+    <xsl:variable name="fr-form-model"         select="/xh:html/xh:head//xf:model[@id = 'fr-form-model']"       as="element(xf:model)*"/>
     <xsl:variable name="fr-form-instance"      select="$fr-form-model/xf:instance[@id = 'fr-form-instance']"    as="element(xf:instance)"/>
     <xsl:variable name="fr-resources-instance" select="$fr-form-model/xf:instance[@id = 'fr-form-resources']"   as="element(xf:instance)"/>
     <xsl:variable name="fr-metadata-instance"  select="$fr-form-model/xf:instance[@id = 'fr-form-metadata']"    as="element(xf:instance)*"/>
@@ -118,7 +114,10 @@
     <!-- The action implementation is handled in actions.xsl. -->
     <xsl:template match="@*:observer[p:split() = 'fr-form-model']" mode="filter-actions">
         <xsl:param name="model-id" tunnel="yes"/>
-        <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'fr-form-model'), $model-id)"/>
+        <xsl:attribute
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            name="{name(.)}"
+            select="(fr:value-except(p:split(), 'fr-form-model'), $model-id)"/>
     </xsl:template>
 
     <!-- Generate one component per top-level section -->
@@ -264,7 +263,7 @@
                     <xsl:copy-of select="$fr-form-model/xs:schema"/>
 
                     <!-- Section becomes relevant -->
-                    <xf:action ev:event="xforms-model-construct-done">
+                    <xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
                         <!-- At this point, the outside instance has already been copied inside. If there are no child
                              elements, it means that the data has not yet been copied out (the section could also be
                              empty, but this is not allowed currently). See also:
@@ -303,7 +302,11 @@
 
                 <!-- Propagate readonly of containing section -->
                 <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
-                    <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)"/>
+                    <xf:setvalue
+                        event="xforms-enabled xforms-value-changed"
+                        ref="instance('readonly')"
+                        value="exf:readonly($context)"
+                        class="fr-design-time-preserve"/>
                 </xf:var>
 
                 <!-- Expose internally a variable pointing to Form Runner resources -->
@@ -315,8 +318,10 @@
                 <!-- NOTE: Put this in the view, as the variable doesn't update properly if in the model.
                      See: https://github.com/orbeon/orbeon-forms/issues/738 -->
                 <!-- NOTE: This won't be needed once all code uses xxf:r(). -->
-                <xf:var name="form-resources"
-                        value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
+                <xf:var
+                    name="form-resources"
+                    value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
+                    as="element(resource)"/>
 
                 <xf:group appearance="xxf:internal">
                     <!-- Copy section content -->

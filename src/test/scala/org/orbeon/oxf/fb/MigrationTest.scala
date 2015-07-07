@@ -29,23 +29,23 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
         """
           |[
           |  {
-          |    "path": "section-3/section-3-iteration/grid-4",
+          |    "path": "(section-3)/(section-3-iteration)/(grid-4)",
           |    "iteration-name": "grid-4-iteration"
           |  },
           |  {
-          |    "path": "section-13/grid-6",
+          |    "path": "(section-13)/(grid-6)",
           |    "iteration-name": "grid-6-iteration"
           |  },
           |  {
-          |    "path": "section-13/grid-14",
+          |    "path": "(section-13)/(grid-14)",
           |    "iteration-name": "grid-14-iteration"
           |  },
           |  {
-          |    "path": "section-8/grid-3",
+          |    "path": "(section-8)/(grid-3)",
           |    "iteration-name": "my-custom-grid-3-iteration"
           |  },
           |  {
-          |    "path": "section-23/grid-3",
+          |    "path": "(section-23)/(grid-3)",
           |    "iteration-name": "my-custom-grid-3-iteration"
           |  }
           |]

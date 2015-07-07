@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+
 import collection.JavaConverters._
 import collection.mutable
 import org.orbeon.oxf.cache.Cacheable
@@ -41,6 +43,7 @@ import XFormsContainingDocumentBase._
 abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
         extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
         with ContainingDocumentLogging
+        with ContainingDocumentMisc
         with ContainingDocumentTemplate
         with ContainingDocumentProperties
         with ContainingDocumentRequestStats
@@ -48,6 +51,20 @@ abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
         with XFormsDocumentLifecycle
         with Cacheable
         with XFormsObject
+
+trait ContainingDocumentMisc {
+
+    self: XBLContainer ⇒
+
+    protected def initializeModels(): Unit =
+        initializeModels(
+            List(
+                XFORMS_MODEL_CONSTRUCT,
+                XFORMS_MODEL_CONSTRUCT_DONE,
+                XFORMS_READY
+            )
+        )
+}
 
 trait ContainingDocumentTemplate extends Logging {
 
@@ -59,7 +76,7 @@ trait ContainingDocumentTemplate extends Logging {
 
     // The page template if available. Only for noscript mode.
     def getTemplate = _template
-    
+
     // Whether to keep the annotated template in the document itself (dynamic state)
     // See: http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-state-handling#TOC-Handling-of-the-HTML-template
     def setTemplateIfNeeded(template: AnnotatedTemplate): Unit = {
@@ -176,7 +193,7 @@ trait ContainingDocumentProperties {
             NO_UPDATES,
             _.toBoolean
         )
-    
+
     def isNoUpdatesStatic =
         getStaticState.propertyMaybeAsExpression(NO_UPDATES) match {
             case Left(value) ⇒ value.toString == "true"
@@ -246,16 +263,16 @@ trait ContainingDocumentLogging {
 }
 
 trait ContainingDocumentRequestStats {
-    
+
     private var _requestStats = RequestStatsImpl()
     def getRequestStats = _requestStats
-    
-    def clearRequestStats(): Unit = 
+
+    def clearRequestStats(): Unit =
         _requestStats = RequestStatsImpl()
 }
 
 trait ContainingDocumentRequest {
-    
+
     private var _deploymentType       : XFormsConstants.DeploymentType = null
     private var _requestContextPath   : String = null
     private var _requestPath          : String = null
@@ -264,7 +281,7 @@ trait ContainingDocumentRequest {
     private var _containerType        : String = null
     private var _containerNamespace   : String = null
     private var _versionedPathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
-    
+
     def getDeploymentType        = _deploymentType
     def getRequestContextPath    = _requestContextPath
     def getRequestPath           = _requestPath
@@ -274,7 +291,7 @@ trait ContainingDocumentRequest {
     def isPortletContainer       = _containerType == "portlet"
     def getContainerNamespace    = _containerNamespace // always "" for servlets.
     def getVersionedPathMatchers = _versionedPathMatchers
-    
+
     protected def initializeRequestInformation(): Unit =
         Option(NetUtils.getExternalContext.getRequest) match {
             case Some(request) ⇒
@@ -291,7 +308,7 @@ trait ContainingDocumentRequest {
                         case "integrated" ⇒ XFormsConstants.DeploymentType.integrated
                         case _            ⇒ XFormsConstants.DeploymentType.standalone
                     }
-                
+
                 // Try to get request context path
                 _requestContextPath = request.getClientContextPath("/")
 
@@ -309,7 +326,7 @@ trait ContainingDocumentRequest {
 
                 _containerType = request.getContainerType
                 _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
-            case None ⇒ 
+            case None ⇒
                 // Special case when we run outside the context of a request
                 _deploymentType = XFormsConstants.DeploymentType.standalone
                 _requestContextPath = ""
@@ -324,7 +341,7 @@ trait ContainingDocumentRequest {
         _versionedPathMatchers =
             Option(PipelineContext.get.getAttribute(PageFlowControllerProcessor.PathMatchers).asInstanceOf[ju.List[PathMatcher]]) getOrElse
                 ju.Collections.emptyList[PathMatcher]
-    
+
     protected def restoreRequestInformation(dynamicState: DynamicState): Unit =
         dynamicState.deploymentType match {
             case Some(_) ⇒
@@ -341,7 +358,7 @@ trait ContainingDocumentRequest {
                 // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
                 initializeRequestInformation()
         }
-    
+
     protected def restorePathMatchers(dynamicState: DynamicState): Unit =
         _versionedPathMatchers = dynamicState.decodePathMatchersJava
 }

@@ -171,9 +171,11 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         val childContainer = container.createChildContainer(this, partAnalysis)
 
         childContainer.addAllModels()
-        childContainer.initializeModels(Array(
-            XFORMS_MODEL_CONSTRUCT,
-            XFORMS_MODEL_CONSTRUCT_DONE)
+        childContainer.initializeModels(
+            List(
+                XFORMS_MODEL_CONSTRUCT,
+                XFORMS_MODEL_CONSTRUCT_DONE
+            )
         )
 
         // Add listener to the single outer instance

@@ -137,27 +137,36 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
 }
 
 object XXFormsUploadDoneEvent {
-    val StandardProperties = Map(XXFORMS_UPLOAD_DONE → Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower))
+    val StandardProperties = Map(
+        XXFORMS_UPLOAD_DONE → Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
+    )
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_UPLOAD_ERROR, target, XXFormsUploadErrorEvent.reasonToProperties(target).toMap orElse properties, bubbles = true, cancelable = true)
+    extends XFormsEvent(
+        name         = XXFORMS_UPLOAD_ERROR,
+        targetObject = target,
+        properties   = XXFormsUploadErrorEvent.reasonToProperties(target).toMap orElse properties,
+        bubbles      = true,
+        cancelable   = true
+    )
 
 object XXFormsUploadErrorEvent {
     // Attempt to retrieve a reason if any
-    def reasonToProperties(target: XFormsEventTarget): Seq[(String, Option[Any])] = (
-        ScalaUtils.collectByErasedType[XFormsUploadControl](target).toList
+    def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] = (
+        ScalaUtils.collectByErasedType[XFormsUploadControl](target).to[List]
         flatMap FileMetadata.progress
-        map {
+        flatMap {
             case UploadProgress(_, _, _, Interrupted(Some(SizeReason(permitted, actual)))) ⇒
-                Seq("error-type" → Some("size-error"),
+                List(
+                    "error-type" → Some("size-error"),
                     "permitted"  → Some(permitted),
-                    "actual"     → Some(actual))
+                    "actual"     → Some(actual)
+                )
             case _ ⇒
-                Seq("reason"    → Some("upload-error"))
+                List("reason"     → Some("upload-error"))
         }
-        flatten
     )
 }
 

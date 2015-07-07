@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import collection.JavaConverters._
 import collection.mutable
+import collection.immutable
 import java.util.{List ⇒ JList}
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
@@ -182,12 +183,9 @@ trait ModelContainer {
             } yield
                 new XFormsModel(self, modelEffectiveId, model)
 
-    protected def initializeModels(): Unit =
-        initializeModels(Array(XFORMS_MODEL_CONSTRUCT, XFORMS_MODEL_CONSTRUCT_DONE, XFORMS_READY))
-
-    def initializeModels(eventsToDispatch: Array[String]): Unit =
-        for ((eventName, index) ← eventsToDispatch.zipWithIndex){
-            if (index == 2) {
+    def initializeModels(eventsToDispatch: immutable.Seq[String]): Unit =
+        for (eventName ← eventsToDispatch){
+            if (eventName == XFORMS_READY) {
                 initializeNestedControls()
                 requireRefresh()
             }

@@ -19,6 +19,7 @@ object FormRunner
     extends FormRunnerPersistence
     with FormRunnerPermissions
     with FormRunnerPDF
+    with FormRunnerEmail
     with FormRunnerLang
     with FormRunnerErrorSummary
     with FormRunnerBaseOps

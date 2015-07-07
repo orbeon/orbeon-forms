@@ -20,7 +20,7 @@ import Model._
 import org.orbeon.oxf.xml.NamespaceMapping
 
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsControl}
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -54,11 +54,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Find data holders (there can be more than one with repeats)
     def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
-        findDataHoldersPathStatically(inDoc, controlName) map { case (bind, path) ⇒
-            // From bind, infer path by looking at ancestor-or-self binds
-            val bindRefs = (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail
+        findDataHoldersInDocument(inDoc, controlName, formInstanceRoot(inDoc))
 
-            val path = bindRefs map ("(" + _ + ")") mkString "/"
+    def findDataHoldersInDocument(inDoc: NodeInfo, controlName: String, contextItem: Item): Seq[NodeInfo] =
+        findBindAndPathStatically(inDoc, controlName) map { case (bind, path) ⇒
 
             // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
             // overridden along the way!)
@@ -66,22 +65,21 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
             // Evaluate path from instance root element
             eval(
-                item       = formInstanceRoot(inDoc),
+                item       = contextItem,
                 expr       = path,
                 namespaces = namespaces,
                 variables  = null,
                 reporter   = containingDocument.getRequestStats.addXPathStat
             ).asInstanceOf[Seq[NodeInfo]]
         } getOrElse
-            Seq.empty
+            Nil
 
-    def findDataHoldersPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, String)] = {
+    def buildBindPath(bind: NodeInfo) =
+        (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail map ("(" + _ + ")") mkString "/"
+
+    def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, String)] = {
         findBindByName(inDoc, controlName) map { bind ⇒
-
-            val bindRefsFromRootExcluded =
-                (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail
-
-            (bind, bindRefsFromRootExcluded mkString "/")
+            (bind, buildBindPath(bind))
         }
     }
 

@@ -14,11 +14,13 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.{Logging, UserAgent, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xml.TransformerUtils._
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
@@ -50,6 +52,16 @@ trait BaseOps extends Logging {
         val elementQName        = firstElementCSSName.replace('|', ':')
 
         binding.resolveURIQualifiedName(elementQName)
+    }
+
+    def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]) = {
+
+        val bindingsForSectionTemplates =
+            availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
+
+        bindingsForSectionTemplates map { binding ⇒
+            bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
+        } toMap
     }
 
     // Return fb-form-instance

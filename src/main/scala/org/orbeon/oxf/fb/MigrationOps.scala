@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.xml.TransformerUtils.extractAsMutableDocument
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
-import FormBuilder._
 
 object MigrationOps {
 
@@ -86,27 +85,18 @@ object MigrationOps {
             if (legacyGridsOnly) findLegacyGridRepeats(doc) else findAllGridRepeats(doc)
 
         // Process section templates only if bindings are provided
-        val (sectionsWithTemplates, xblBindingsByURIQualifiedName) =
-            if (availableXBLBindings.nonEmpty) {
-
-                val sectionsWithTemplates =
-                    findSectionsWithTemplates(findFRBodyElement(outerDocument))
-
-                val xblBindingsByURIQualifiedName = {
-
-                    val bindingsForSectionTemplates = availableXBLBindings.toList flatMap { bindings ⇒
-                        availableSectionTemplateXBLBindings(bindings.rootElement / XBLXBLTest / XBLBindingTest)
-                    }
-
-                    // NOTE: Detach binding because downstream functions assume they can search for the document root.
-                    bindingsForSectionTemplates map { binding ⇒
-                        bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
-                    } toMap
-                }
-
-                (sectionsWithTemplates, xblBindingsByURIQualifiedName)
-            } else
-                (Nil, Map.empty[(String, String), DocumentInfo])
+        val (sectionsWithTemplates, xblBindingsByURIQualifiedName) = availableXBLBindings match {
+            case Some(bindingsDocument) ⇒
+                (
+                    findSectionsWithTemplates(findFRBodyElement(outerDocument)),
+                    FormBuilder.sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
+                )
+            case None ⇒
+                (
+                    Nil,
+                    Map.empty[(String, String), DocumentInfo]
+                )
+        }
 
         def gridRepeatIterationName(grid: NodeInfo): String = {
             val controlName = getControlName(grid)
@@ -124,7 +114,7 @@ object MigrationOps {
 
             for {
                 (gridName, iterationName) ← names
-                (_, path)                 ← findDataHoldersPathStatically(doc, gridName)
+                (_, path)                 ← findBindAndPathStatically(doc, gridName)
             } yield
                 (path, iterationName)
         }
@@ -137,9 +127,9 @@ object MigrationOps {
 
             // NOTE: Don't use findDataHolders. We don't want current holders, as there might be none if there is are
             // currently no iterations around a section template, for example. We must find this statically.
-            val (_, holderPath) = findDataHoldersPathStatically(outerDocument, sectionName).head // bind must be found
+            val (_, holderPath) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
 
-            pathsForBinding(xblBinding) map {
+            pathsForBinding(xblBinding.root) map {
                 case (path, iterationName) ⇒ (holderPath + '/' + path, iterationName)
             }
         }

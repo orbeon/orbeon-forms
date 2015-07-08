@@ -28,12 +28,12 @@ class EmailTest extends DocumentTestBase with AssertionsForJUnit {
 
     @Test def testEmailExtraction(): Unit = {
 
-        val x = readURLAsImmutableXMLDocument(FormWithEmailControls)
+        val formDoc = readURLAsImmutableXMLDocument(FormWithEmailControls)
 
-        val head     = x.rootElement / (XH → "head") head
+        val head     = formDoc.rootElement / (XH → "head") head
         val model    = head / XFModelTest head
         val instance = model descendant XFInstanceTest filter (_.id == "fr-form-instance") head
-        val body     = x.rootElement / (XH → "body") head
+        val body     = formDoc.rootElement / (XH → "body") head
 
         val data =
             TransformerUtils.extractAsMutableDocument(instance child * head)
@@ -44,7 +44,7 @@ class EmailTest extends DocumentTestBase with AssertionsForJUnit {
         locally {
 
             val expectedForClassName = List(
-                "fr-email-recipient" → List("erik+toplevel@bruchez.org"),
+                "fr-email-recipient" → List("info+toplevel@orbeon.com"),
                 "fr-email-subject"   → List(),
                 "fr-attachment"      → List("attachment-13.bin", "attachment-14.bin")
             )
@@ -65,7 +65,7 @@ class EmailTest extends DocumentTestBase with AssertionsForJUnit {
         locally {
 
             val expectedForClassName = List(
-                "fr-email-recipient" → List("erik+0@bruchez.org", "erik+1@bruchez.org", "erik+2@bruchez.org"),
+                "fr-email-recipient" → List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"),
                 "fr-email-subject"   → List("Abc", "Def", "Ghi"),
                 "fr-attachment"      → List("attachment-10.bin", "attachment-11.bin")
             )

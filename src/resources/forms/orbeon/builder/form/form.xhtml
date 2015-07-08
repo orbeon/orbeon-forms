@@ -137,12 +137,12 @@
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Open the dialog in "edit" mode -->
                                     <xxf:show dialog="dialog-form-settings">
+                                        <xf:property name="mode"        value="'edit'"/>
                                         <xf:property name="app"         value="bind('application-name-bind')"/>
                                         <xf:property name="form"        value="bind('form-name-bind')"/>
                                         <xf:property name="title"       value="bind('title-bind')"/>
                                         <xf:property name="description" value="bind('description-bind')"/>
                                         <xf:property name="singleton"   value="bind('singleton-bind')"/>
-                                        <xf:property name="mode"        value="'edit'"/>
                                     </xxf:show>
                                 </xf:action>
                             </xf:trigger>

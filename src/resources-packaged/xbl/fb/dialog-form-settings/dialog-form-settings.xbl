@@ -14,9 +14,6 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -29,16 +26,44 @@
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog xxforms-dialog-open" phase="target">
+
                 <!-- Clear local values -->
                 <xf:setvalue iterate="*[not(*)]" ref="."/>
+
                 <!-- Save event context information in local instance -->
                 <xf:setvalue
                     iterate="'app', 'form', 'title', 'description', 'singleton', 'mode'"
-                    ref="instance()/*[name() = context()]" value="event(context())"/>
+                    ref="$i/*[name() = context()]"
+                    value="event(context())"/>
 
-                <!-- FIXME: Have caller pass the info instead? -->
-                <xf:setvalue if="$app-chooser = 'output'" ref="app" value="xxf:instance('fb-permissions')/app/@name"/>
+                <!--  Sanitize as caller might pass an initial app name which is not allowed by current permissions -->
+                <xf:action if="$has-roles and not($allowed-apps-if-has-roles = ('*', event('app')))">
+                    <xf:setvalue
+                        if="$app-chooser = 'output'"
+                        ref="app"
+                        value="$allowed-apps-if-has-roles[1]"/>
+                    <xf:setvalue
+                        if="$app-chooser = 'select1'"
+                        ref="app"
+                        value="''"/>
+                </xf:action>
+
                 <xxf:show dialog="dialog"/>
+
+                <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
+                <xf:action>
+                    <xf:var
+                        name="invalid-app-form"
+                        value="$i/(app, form)[normalize-space() and not(valid())]"/>
+
+                    <xxf:setvisited
+                        iterate="$invalid-app-form"
+                        control="fb-{name()}-name-input"/>
+                    <xf:setfocus
+                        iterate="$invalid-app-form[1]"
+                        control="fb-{name()}-name-input"/>
+                </xf:action>
+
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -54,18 +79,40 @@
                     </instance>
                 </xf:instance>
 
+                <xf:var
+                    name="i"
+                    value="instance()"/>
+
+                <xf:var
+                    name="has-roles"
+                    value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
+
+                <!-- NOTE: Can contain '*'. -->
+                <xf:var
+                    name="allowed-apps-if-has-roles"
+                    value="xxf:instance('fb-permissions')/app/@name/string()"/>
+
                 <!-- Control used for choosing the app name; value can be: 'input', 'output', or 'select1' -->
-                <xf:var name="app-chooser" value="
-                    if (xxf:instance('fb-permissions')[@has-roles = 'false' or app[@name = '*']]) then 'input'
-                    else if (count(xxf:instance('fb-permissions')/app) = 1) then 'output'
-                    else 'select1'"/>
+                <xf:var
+                    name="app-chooser"
+                    value="
+                        if (not($has-roles) or $allowed-apps-if-has-roles = '*') then
+                            'input'
+                        else if (count($allowed-apps-if-has-roles) = 1) then
+                            'output'
+                        else
+                            'select1'"
+                />
 
                 <xf:bind
                     ref="app | form"
                     required="true()"
-                    constraint="matches(., '^[A-Z|a-z|0-9\-_]+$')"
+                    constraint="matches(., '^[A-Za-z0-9\-_]+$')"
                     calculate="normalize-space()"
                     readonly="false()"/>
+                <xf:bind
+                    ref="app"
+                    constraint="not($has-roles and not($allowed-apps-if-has-roles = ('*', .)))"/>
                 <xf:bind
                     ref="singleton"
                     calculate="if (string() = '') then 'false' else ."
@@ -90,9 +137,17 @@
             <!-- Once AVTs are supported: close="{not($is-new-form)}"  -->
             <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
                 <!-- Dialog title -->
-                <xf:label value="$resources/dialog-form-settings/(if ($is-new-form) then ()
-                                                                  else if ($is-save-as) then save-as
-                                                                  else label)"/>
+                <xf:label
+                    value="
+                        $resources/dialog-form-settings/(
+                            if ($is-new-form) then
+                                ()
+                            else if ($is-save-as) then
+                                save-as
+                            else
+                                label
+                        )"/>
+
                 <xh:div>
                     <!-- IE warning -->
                     <xf:group ref=".[$is-new-form and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
@@ -112,10 +167,16 @@
                             <a href="mailto:info@orbeon.com?subject=Form Builder Internet Explorer Version">let us know</a>.
                         </xh:div>
                     </xf:group>
-
-                    <xf:var name="message" value="if ($is-new-form) then $resources/messages/new-metadata-output
-                                              else if ($is-save-as) then $resources/messages/save-as-metadata-output
-                                              else $resources/messages/edit-metadata-output"/>
+                    <xf:var
+                        name="message"
+                        value="
+                            if ($is-new-form) then
+                                $resources/messages/new-metadata-output
+                            else if ($is-save-as) then
+                                $resources/messages/save-as-metadata-output
+                            else
+                                $resources/messages/edit-metadata-output
+                    "/>
                     <xf:group ref=".[normalize-space($message)]" xxf:element="p">
                         <!-- Display message to user -->
                         <xf:output value="$message"/>
@@ -128,7 +189,7 @@
                             <!-- Application name -->
                             <!-- Use an input if app name is a wildcard -->
                             <xf:group ref=".[$app-chooser = 'input']">
-                                <xf:input ref="app" id="fb-application-name-input" xxf:autocomplete="off">
+                                <xf:input ref="app" id="fb-app-name-input" xxf:autocomplete="off">
                                     <xf:label ref="$resources/application-name/label"/>
                                     <xf:hint ref="$resources/application-name/hint"/>
                                     <xf:alert ref="$resources/application-name/alert"/>
@@ -138,9 +199,9 @@
                             <xf:group ref=".[$app-chooser = 'select1']">
                                 <fr:dropdown-select1 ref="app">
                                     <xf:label ref="$resources/application-name/label"/>
-                                    <xf:itemset ref="xxf:instance('fb-permissions')/app">
-                                        <xf:label ref="@name"/>
-                                        <xf:value ref="@name"/>
+                                    <xf:itemset ref="$allowed-apps-if-has-roles">
+                                        <xf:label ref="."/>
+                                        <xf:value ref="."/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>
                             </xf:group>
@@ -189,15 +250,23 @@
                             <!-- Stats -->
                             <xf:group ref=".[$is-form-settings]" class="fb-dialog-form-settings-stats">
                                 <xf:label value="$resources/dialog-form-settings/stats"/>
-                                <xf:var name="labels"
-                                        value="$resources/dialog-form-settings/(sections, repeats, grids, section-templates, controls, all)"/>
-                                <xf:var name="counts"
-                                        value="(fbf:countSections($body),
-                                                fbf:countRepeats($body),
-                                                fbf:countGrids($body),
-                                                fbf:countSectionTemplates($body),
-                                                fbf:countAllNonContainers($body),
-                                                fbf:countAllControls($body))"/>
+                                <xf:var
+                                    name="labels"
+                                    value="
+                                        $resources/dialog-form-settings/(
+                                            sections, repeats, grids, section-templates, controls, all
+                                        )
+                                "/>
+                                <xf:var
+                                    name="counts"
+                                    value="
+                                        fbf:countSections($body),
+                                        fbf:countRepeats($body),
+                                        fbf:countGrids($body),
+                                        fbf:countSectionTemplates($body),
+                                        fbf:countAllNonContainers($body),
+                                        fbf:countAllControls($body)
+                                "/>
                                 <xh:table>
                                     <xf:repeat ref="1 to count($labels)">
                                         <xf:var name="i" value="position()"/>
@@ -221,11 +290,15 @@
                         <xf:trigger appearance="minimal">
                             <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then close else cancel)/label"/>
                             <!-- Hide this dialog without saving -->
-                            <xxf:hide ev:event="DOMActivate" if="not($is-new-form)" dialog="dialog"/>
+                            <xxf:hide event="DOMActivate" if="not($is-new-form)" dialog="dialog"/>
                             <!-- Or go back to the summary -->
                             <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
                                  window.close() in the old home/back button. But it's a bit unclear what's best. -->
-                            <xf:action ev:event="DOMActivate" if="$is-new-form" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                            <xf:action
+                                event="DOMActivate"
+                                if="$is-new-form"
+                                type="xpath"
+                                xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                                 process:runProcessByName('oxf.fr.detail.process', 'close')
                             </xf:action>
                         </xf:trigger>
@@ -233,18 +306,18 @@
 
                     <!-- Event handler for 2 field and button -->
                     <xf:action
-                            ev:event="DOMActivate"
-                            ev:target="fb-application-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
-                            if="valid(instance())">
+                        event="DOMActivate"
+                        target="fb-app-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
+                        if="valid($i)">
 
                         <!-- Dispatch event with result -->
                         <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                            <xf:property name="app"         value="instance()/app"/>
-                            <xf:property name="form"        value="instance()/form"/>
-                            <xf:property name="title"       value="instance()/title"/>
-                            <xf:property name="description" value="instance()/description"/>
-                            <xf:property name="singleton"   value="instance()/singleton"/>
-                            <xf:property name="mode"        value="instance()/mode"/>
+                            <xf:property name="app"         value="$i/app"/>
+                            <xf:property name="form"        value="$i/form"/>
+                            <xf:property name="title"       value="$i/title"/>
+                            <xf:property name="description" value="$i/description"/>
+                            <xf:property name="singleton"   value="$i/singleton"/>
+                            <xf:property name="mode"        value="$i/mode"/>
                         </xf:dispatch>
 
                         <!-- Hide this dialog -->

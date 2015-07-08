@@ -40,6 +40,8 @@
     <xf:var name="form"       value="$parameters/form/string()"/>
     <xf:var name="mode"       value="$parameters/mode/string()"/>
 
+    <xf:var name="has-roles"  value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
+
     <!-- Public variable pointing to the current language -->
     <xf:var name="fb-lang" value="instance('fb-language-instance')"/>
 
@@ -186,7 +188,6 @@
         <!-- NOTE: $fb-lang has already been set by fr-annotate-data above -->
 
         <!-- Check permissions if there are roles -->
-        <xf:var name="has-roles" value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
         <xf:action if="$has-roles">
             <xf:var name="metadata-app"  value="bind('application-name-bind')"/>
             <xf:var name="metadata-form" value="bind('form-name-bind')"/>
@@ -267,12 +268,73 @@
 
     <!-- Form is ready -->
     <xf:action ev:event="xforms-ready">
-        <!-- Open form settings if mode is "new" -->
-        <xxf:show if="$mode = 'new'" dialog="dialog-form-settings">
-            <xf:property name="mode"        value="'new'"/>
-            <xf:property name="title"       value="bind('title-bind')"/>
-            <xf:property name="description" value="bind('description-bind')"/>
-        </xxf:show>
+        <!-- Open form settings if mode is "new" only -->
+        <xf:action if="$mode = 'new'">
+
+            <!-- NOTE: Can contain '*'. -->
+            <xf:var
+                name="allowed-apps-if-has-roles"
+                value="xxf:instance('fb-permissions')/app/@name/string()"/>
+
+            <!-- Check URL parameters -->
+            <xf:var
+                name="requested-app"
+                value="for $p in xxf:get-request-parameter('fr-app') return normalize-space($p)"/>
+
+            <xf:var
+                name="requested-form"
+                value="for $p in xxf:get-request-parameter('fr-form') return normalize-space($p)"/>
+
+            <xf:var
+                name="requested-title"
+                value="for $p in xxf:get-request-parameter('fr-title') return normalize-space($p)"/>
+
+            <xf:var
+                name="requested-description"
+                value="for $p in xxf:get-request-parameter('fr-description') return normalize-space($p)"/>
+
+            <xf:var
+                name="requested-singleton"
+                value="for $p in xxf:get-request-parameter('fr-singleton') return normalize-space($p)"/>
+
+            <!-- NOTE: Validation must match validation in dialog-form-settings.xbl. -->
+            <xf:var
+                name="valid-app-form-params"
+                value="
+                    exists($requested-app)                        and
+                    exists($requested-form)                       and
+                    matches($requested-app,  '^[A-Za-z0-9\-_]+$') and
+                    matches($requested-form, '^[A-Za-z0-9\-_]+$') and
+                    not($has-roles and not($allowed-apps-if-has-roles = ('*', $requested-app)))
+            "/>
+
+            <!-- If valid app/form were passed, skip showing the dialog -->
+            <xf:action if="$valid-app-form-params">
+
+                <xf:setvalue ref="bind('application-name-bind')" value="$requested-app"/>
+                <xf:setvalue ref="bind('form-name-bind')"        value="$requested-form"/>
+
+                <xf:setvalue
+                    if="exists($requested-title)"
+                    ref="bind('title-bind')"
+                    value="$requested-title"/>
+
+                <xf:setvalue
+                    if="exists($requested-description)"
+                    ref="bind('description-bind')"
+                    value="$requested-description"/>
+
+            </xf:action>
+
+            <xxf:show if="not($valid-app-form-params)" dialog="dialog-form-settings">
+                <xf:property name="mode"        value="'new'"/>
+                <xf:property name="app"         value="($requested-app,       bind('application-name-bind'))[1]"/>
+                <xf:property name="form"        value="($requested-form,      bind('form-name-bind'))[1]"/>
+                <xf:property name="title"       value="($requested-title,     bind('title-bind'))[1]"/>
+                <xf:property name="description" value="($requested-title,     bind('description-bind'))[1]"/>
+                <xf:property name="singleton"   value="($requested-singleton, bind('singleton-bind'))[1]"/>
+            </xxf:show>
+        </xf:action>
     </xf:action>
 
     <!-- Annotated form instance -->

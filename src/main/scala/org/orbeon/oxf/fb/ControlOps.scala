@@ -64,12 +64,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
 
             // Evaluate path from instance root element
+            // NOTE: Don't pass Reporter as not very useful and some tests don't have a containingDocument scoped.
             eval(
                 item       = contextItem,
                 expr       = path,
-                namespaces = namespaces,
-                variables  = null,
-                reporter   = containingDocument.getRequestStats.addXPathStat
+                namespaces = namespaces
             ).asInstanceOf[Seq[NodeInfo]]
         } getOrElse
             Nil

@@ -29,7 +29,7 @@
       <option name="myIgnoreVendorSpecificProperties" value="true" />
       <option name="myCustomPropertiesList">
         <value>
-          <list size="18">
+          <list size="19">
             <item index="0" class="java.lang.String" itemvalue="-webkit-box-sizing" />
             <item index="1" class="java.lang.String" itemvalue="-moz-box-sizing" />
             <item index="2" class="java.lang.String" itemvalue="behavior" />
@@ -48,6 +48,7 @@
             <item index="15" class="java.lang.String" itemvalue="-webkit-column-gap" />
             <item index="16" class="java.lang.String" itemvalue="-ms-column-gap" />
             <item index="17" class="java.lang.String" itemvalue="-o-column-gap" />
+            <item index="18" class="java.lang.String" itemvalue="-fs-fit-images-to-width" />
           </list>
         </value>
       </option>

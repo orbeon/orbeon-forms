@@ -26,8 +26,10 @@
 
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <xsl:template match="xh:body//fr:section[not(@editable = 'true')] | xbl:binding/xbl:template//fr:section[not(@editable = 'true')]">
-        <fr:section animate="{$is-animate-sections}" collapse="{$is-section-collapse}">
-            <xsl:apply-templates select="@* except (@animate, @collapse)"/>
+        <fr:section>
+            <xsl:if test="empty(@collapse)"><xsl:attribute name="collapse" select="$is-section-collapse"/></xsl:if>
+            <xsl:if test="empty(@animate) "><xsl:attribute name="animate"  select="$is-animate-sections"/></xsl:if>
+            <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()"/>
         </fr:section>
     </xsl:template>

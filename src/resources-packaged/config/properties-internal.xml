@@ -88,6 +88,7 @@
         /apps/fr/style/form-runner-common.css
         /apps/fr/style/form-runner-base.css
         /apps/fr/style/form-runner-orbeon.css
+        /apps/fr/style/form-runner-responsive.css
     </property>
 
     <property as="xs:string"  name="oxf.fr.js.uri.*.*">

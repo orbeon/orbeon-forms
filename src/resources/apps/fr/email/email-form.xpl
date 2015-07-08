@@ -18,11 +18,7 @@
           xmlns:xh="http://www.w3.org/1999/xhtml"
           xmlns:xf="http://www.w3.org/2002/xforms"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:saxon="http://saxon.sf.net/"
-          xmlns:xbl="http://www.w3.org/ns/xbl"
-          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-          xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- fr-form-instance -->
     <p:param type="input" name="instance"/>
@@ -73,7 +69,7 @@
         <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters-with-version">
             <config xsl:version="2.0">
                 <url>
-                    <xsl:value-of select="xpl:rewriteServiceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
+                    <xsl:value-of select="p:rewrite-service-uri(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
                 </url>
             </config>
         </p:input>
@@ -105,7 +101,7 @@
                 <xsl:for-each select="$attachment-holders[normalize-space() != '']">
                     <attachment filename="{@filename}" mediatype="{@mediatype}">
                         <!-- URL may be absolute or already point to persistence layer -->
-                        <xsl:value-of select="xpl:rewriteServiceURI(normalize-space(), true())"/>
+                        <xsl:value-of select="p:rewrite-service-uri(normalize-space(), true())"/>
                     </attachment>
                 </xsl:for-each>
             </attachments>
@@ -151,7 +147,7 @@
                                 (
                                     frf:searchHoldersForClassTopLevelOnly($xhtml/xh:body, $data, 'fr-email-recipient'),
                                     frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-email-recipient'),
-                                    xpl:property(string-join(('oxf.fr.email.to', $app, $form), '.'))
+                                    p:property(string-join(('oxf.fr.email.to', $app, $form), '.'))
                                 )
                             return
                                 for $raw-email in
@@ -184,28 +180,28 @@
 
                 <!-- SMTP outgoing server settings -->
                 <smtp-host>
-                    <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
+                    <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
                 </smtp-host>
-                <xsl:variable name="port" select="xpl:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
+                <xsl:variable name="port" select="p:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
                 <xsl:if test="normalize-space($port)">
                     <smtp-port><xsl:value-of select="$port"/></smtp-port>
                 </xsl:if>
                 <encryption>
-                    <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
+                    <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
                 </encryption>
                 <credentials>
                     <username>
-                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
+                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
                     </username>
                     <password>
-                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
+                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
                     </password>
                 </credentials>
 
                 <!-- Sender -->
                 <from>
                     <email>
-                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.from', $app, $form), '.'))"/>
+                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.from', $app, $form), '.'))"/>
                     </email>
                 </from>
                 <!-- Recipients -->
@@ -236,11 +232,11 @@
                         <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
                     </part>
                     <!-- XML attachment if needed -->
-                    <xsl:if test="xpl:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
+                    <xsl:if test="p:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
                         <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                     </xsl:if>
                     <!-- PDF attachment if needed -->
-                    <xsl:if test="xpl:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
+                    <xsl:if test="p:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
                         <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                     </xsl:if>
                     <!-- Other attachments if needed -->

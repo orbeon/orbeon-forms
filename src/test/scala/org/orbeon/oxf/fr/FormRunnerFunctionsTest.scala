@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.fr
 
-import FormRunner._
-import collection.JavaConverters._
 import org.dom4j.{Document ⇒ JDocument}
 import org.junit.Test
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+
+import scala.collection.JavaConverters._
 
 class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -79,7 +79,6 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         assert("en" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "en").asJava))
         assert("fr" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "es").asJava))
     }
-
 
     @Test def errorSummarySortString(): Unit = {
 

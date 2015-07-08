@@ -82,7 +82,7 @@ trait XFormsSupport extends MockitoSugar {
     def getControlValue(controlId: String) = getValueControl(controlId).getValue
     def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue
 
-    def setControlValue(controlId: String, value: String) {
+    def setControlValue(controlId: String, value: String): Unit = {
         // This stores the value without testing for readonly
         document.startOutermostActionHandler()
         getValueControl(controlId).storeExternalValue(value)

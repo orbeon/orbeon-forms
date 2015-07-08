@@ -81,7 +81,7 @@ trait FormRunnerEmail {
         inDoc       : NodeInfo,
         contextItem : NodeInfo,
         className   : String
-    ) = {
+    ): Seq[NodeInfo] =
         for {
             control       ← controls
             if control.attClasses(className)
@@ -90,7 +90,6 @@ trait FormRunnerEmail {
             holder        ← findDataHoldersInDocument(inDoc, bindName, contextItem)
         } yield
             holder
-    }
 
     private def bindingForSection(head: NodeInfo, section: NodeInfo) = {
         val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)

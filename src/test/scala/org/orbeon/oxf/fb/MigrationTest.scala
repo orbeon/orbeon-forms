@@ -53,13 +53,8 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
 
     @Test def buildGridMigrationMap(): Unit = {
 
-        def readTree(url: String) =
-            ScalaUtils.useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
-                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
-            }
-
-        val form    = readTree("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml")
-        val toolbox = readTree("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml")
+        val form    = readURLAsImmutableXMLDocument("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml")
+        val toolbox = readURLAsImmutableXMLDocument("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml")
 
         val result =
             MigrationOps.buildGridMigrationMap(form, Some(toolbox), legacyGridsOnly = false)

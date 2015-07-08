@@ -1,0 +1,366 @@
+<!--
+  Copyright (C) 2015 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <section-1>
+                        <control-1>erik+toplevel@bruchez.org</control-1>
+                        <control-12>attachment-12.bin</control-12>
+                        <control-13 filename="" mediatype="" size="">attachment-13.bin</control-13>
+                        <control-14 filename="" mediatype="" size="">attachment-14.bin</control-14>
+                    </section-1>
+                    <section-3>
+                        <control-1>erik+0@bruchez.org</control-1>
+                        <control-8>Abc</control-8>
+                        <control-9>attachment-9.bin</control-9>
+                        <control-10 filename="" mediatype="" size="">attachment-10.bin</control-10>
+                        <control-11 filename="" mediatype="" size="">attachment-11.bin</control-11>
+                        <section-3>
+                            <grid-4>
+                                <grid-4-iteration>
+                                    <control-6>erik+1@bruchez.org</control-6>
+                                    <control-7>Def</control-7>
+                                </grid-4-iteration>
+                                <grid-4-iteration>
+                                    <control-6>erik+2@bruchez.org</control-6>
+                                    <control-7>Ghi</control-7>
+                                </grid-4-iteration>
+                            </grid-4>
+                        </section-3>
+                    </section-3>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                    <xf:bind id="control-12-bind" ref="control-12" name="control-12" type="xf:anyURI"/>
+                    <xf:bind id="control-13-bind" ref="control-13" name="control-13" type="xf:anyURI"/>
+                    <xf:bind id="control-14-bind" ref="control-14" name="control-14" type="xf:anyURI"/>
+                </xf:bind>
+                <xf:bind id="section-3-bind" ref="section-3" name="section-3"/>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue2016</application-name>
+                    <form-name>test</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                    <singleton>false</singleton>
+                    <migration version="4.8.0">[{ "path": "(section-3)/(section-3)/(grid-4)", "iteration-name": "grid-4-iteration" }]</migration>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <!-- Don't make readonly by default in case a service modifies the resources -->
+            <xf:instance id="fr-form-resources" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1>
+                            <label>Untitled Section</label>
+                        </section-1>
+                        <section-3>
+                            <label/>
+                            <help/>
+                        </section-3>
+                        <control-1>
+                            <label>Email</label>
+                            <hint/>
+                        </control-1>
+                        <control-12>
+                            <label>Static</label>
+                        </control-12>
+                        <control-13>
+                            <label>Image attach</label>
+                            <hint/>
+                        </control-13>
+                        <control-14>
+                            <label>File attach</label>
+                            <hint/>
+                        </control-14>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+        <xbl:xbl
+                xmlns:xbl="http://www.w3.org/ns/xbl"
+                xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue2016/library">
+            <xbl:binding id="issue2016-section-1-component" element="component|section-1" class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="section-1-model">
+                        <xf:instance id="fr-form-instance" xxbl:mirror="true">
+                            <empty/>
+                        </xf:instance>
+                        <xf:instance id="fr-form-template">
+                            <section-1>
+                                <control-1>erik+0@bruchez.org</control-1>
+                                <control-8>Abc</control-8>
+                                <control-9>71b6342211b2a9e99c98e8807c31cc9bc6556b9f.bin</control-9>
+                                <control-10 filename="" mediatype="" size=""/>
+                                <control-11 filename="" mediatype="" size=""/>
+                                <section-3>
+                                    <grid-4>
+                                        <grid-4-iteration>
+                                            <control-6>erik+1@bruchez.org</control-6>
+                                            <control-7>Def</control-7>
+                                        </grid-4-iteration>
+                                        <grid-4-iteration>
+                                            <control-6>erik+2@bruchez.org</control-6>
+                                            <control-7>Ghi</control-7>
+                                        </grid-4-iteration>
+                                    </grid-4>
+                                </section-3>
+                            </section-1>
+                        </xf:instance>
+                        <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-4-template">
+                            <grid-4-iteration>
+                                <control-6/>
+                                <control-7/>
+                            </grid-4-iteration>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                            <xf:bind id="section-3-bind" ref="section-3" name="section-3">
+                                <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+                                    <xf:bind id="grid-4-iteration-bind" ref="grid-4-iteration" name="grid-4-iteration">
+                                        <xf:bind id="control-6-bind" ref="control-6" name="control-6" type="xf:email"/>
+                                        <xf:bind id="control-7-bind" ref="control-7" name="control-7"/>
+                                    </xf:bind>
+                                </xf:bind>
+                            </xf:bind>
+                            <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
+                            <xf:bind id="control-9-bind" ref="control-9" name="control-9" type="xf:anyURI"/>
+                            <xf:bind id="control-10-bind" ref="control-10" name="control-10" type="xf:anyURI"/>
+                            <xf:bind id="control-11-bind" ref="control-11" name="control-11" type="xf:anyURI"/>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <section-1>
+                                        <label>S1</label>
+                                    </section-1>
+                                    <control-1>
+                                        <label>Email</label>
+                                        <hint/>
+                                    </control-1>
+                                    <section-3>
+                                        <label>Nested</label>
+                                        <help/>
+                                    </section-3>
+                                    <control-6>
+                                        <label>Email 2</label>
+                                        <hint/>
+                                    </control-6>
+                                    <control-7>
+                                        <label>Subject</label>
+                                        <hint/>
+                                    </control-7>
+                                    <control-8>
+                                        <label>Subject</label>
+                                        <hint/>
+                                    </control-8>
+                                    <control-9>
+                                        <label>Static image</label>
+                                    </control-9>
+                                    <control-10>
+                                        <label>Image attachment</label>
+                                        <hint/>
+                                    </control-10>
+                                    <control-11>
+                                        <label>File attach</label>
+                                        <hint/>
+                                    </control-11>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="readonly">
+                            <readonly/>
+                        </xf:instance>
+                        <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
+                        <xf:var name="fr-mode" value="$fr-params/mode"/>
+                        <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
+                        <xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
+                            <xf:action if="empty(instance()/*)">
+                                <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
+
+                            <xf:rebuild/>
+                                <xf:recalculate xxf:defauls="true"/>
+                                <xf:revalidate/>
+                            </xf:action>
+                        </xf:action>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:var name="context" id="context" value="xxf:binding-context('issue2016-section-1-component')"/>
+                    <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
+                        <xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/>
+                    </xf:var>
+                    <xf:var name="fr-resources" as="element()?">
+                        <xxf:value value="$fr-resources" xxbl:scope="outer"/>
+                    </xf:var>
+                    <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
+                    <xf:group appearance="xxf:internal">
+                        <xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/section-1/label"/>
+                        <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                            <xh:tr>
+                                <xh:td>
+                                    <xf:input id="control-1-control" bind="control-1-bind" class="fr-email-recipient">
+                                        <xf:label ref="$form-resources/control-1/label"/>
+                                        <xf:hint ref="$form-resources/control-1/hint"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    </xf:input>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:input id="control-8-control" bind="control-8-bind" class="fr-email-subject">
+                                        <xf:label ref="$form-resources/control-8/label"/>
+                                        <xf:hint ref="$form-resources/control-8/hint"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    </xf:input>
+                                </xh:td>
+                            </xh:tr>
+                            <xh:tr>
+                                <xh:td>
+                                    <xf:output id="control-9-control" bind="control-9-bind" mediatype="image/*" class="fb-attachment">
+                                        <xf:label ref="$form-resources/control-9/label"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    </xf:output>
+                                </xh:td>
+                                <xh:td>
+                                    <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-10-control" class="fr-attachment" bind="control-10-bind">
+                                        <xf:label ref="$form-resources/control-10/label"/>
+                                        <xf:hint ref="$form-resources/control-10/hint"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                        <xf:filename ref="@filename"/>
+                                        <xf:mediatype ref="@mediatype"/>
+                                        <xxf:size ref="@size"/>
+                                    </fr:image-attachment>
+                                </xh:td>
+                            </xh:tr>
+                            <xh:tr>
+                                <xh:td>
+                                    <fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-11-control" class="fr-attachment" bind="control-11-bind">
+                                        <xf:label ref="$form-resources/control-11/label"/>
+                                        <xf:hint ref="$form-resources/control-11/hint"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                        <xf:filename ref="@filename"/>
+                                        <xf:mediatype ref="@mediatype"/>
+                                        <xxf:size ref="@size"/>
+                                    </fr:attachment>
+                                </xh:td>
+                                <xh:td/>
+                            </xh:tr>
+                        </fr:grid>
+                        <fr:section xmlns:oxf="http://www.orbeon.com/oxf/processors" id="section-3-control" bind="section-3-bind">
+                            <xf:label ref="$form-resources/section-3/label"/>
+                            <fr:grid id="grid-4-grid" bind="grid-4-bind" repeat="content" min="1" template="instance('grid-4-template')">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:input id="control-6-control" bind="control-6-bind" class="fr-email-recipient">
+                                            <xf:label ref="$form-resources/control-6/label"/>
+                                            <xf:hint ref="$form-resources/control-6/hint"/>
+                                            <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                        </xf:input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input id="control-7-control" bind="control-7-bind" class="fr-email-subject">
+                                            <xf:label ref="$form-resources/control-7/label"/>
+                                            <xf:hint ref="$form-resources/control-7/hint"/>
+                                            <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:section>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-control" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-1-control" bind="control-1-bind" class="fr-email-recipient">
+                                    <xf:label ref="$form-resources/control-1/label"/>
+                                    <xf:hint ref="$form-resources/control-1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:output id="control-12-control" bind="control-12-bind" mediatype="image/*">
+                                    <xf:label ref="$form-resources/control-12/label"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <fr:image-attachment id="control-13-control" class="fr-attachment" bind="control-13-bind">
+                                    <xf:label ref="$form-resources/control-13/label"/>
+                                    <xf:hint ref="$form-resources/control-13/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:image-attachment>
+                            </xh:td>
+                            <xh:td>
+                                <fr:attachment id="control-14-control" class="fr-attachment" bind="control-14-bind">
+                                    <xf:label ref="$form-resources/control-14/label"/>
+                                    <xf:hint ref="$form-resources/control-14/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:attachment>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-3-control" bind="section-3-bind">
+                    <xf:label ref="$form-resources/section-3/label"/>
+                    <component:section-1 xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue2016/library"/>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

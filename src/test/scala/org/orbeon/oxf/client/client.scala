@@ -223,7 +223,7 @@ trait FormBuilderOps extends FormRunnerOps {
 
             for {
                 _ ← loadOrbeonPage("/fr/orbeon/builder/new")
-                _ ← elementByStaticId("fb-application-name-input").replaceFieldText("a")
+                _ ← elementByStaticId("fb-app-name-input").replaceFieldText("a")
                 _ ← elementByStaticId("fb-form-name-input").replaceFieldText("a")
                 _ ← click on NewContinueButton
                 _ ← waitForAjaxResponse() // other way to test that dialog is hidden?

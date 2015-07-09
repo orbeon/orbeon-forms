@@ -20,7 +20,7 @@
 
     <p:param type="input" name="xforms-model"/>
     <p:param type="input" name="instance"/>
-    <p:param type="output" name="data" debug="apply-output-data"/>
+    <p:param type="output" name="data"/>
 
     <!-- Extract request parameters (app, form, document, and mode) from URL -->
     <p:processor name="oxf:pipeline">

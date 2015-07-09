@@ -414,6 +414,9 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 typeValid = true;
             } else if (isBuiltInXFormsType && "email".equals(typeLocalname)) {
                 typeValid = EmailValidatorNoDomainValidation$.MODULE$.isValid(nodeValue);
+            } else if (isBuiltInXFormsType && "HTMLFragment".equals(typeLocalname)) {
+                // Just a marker type
+                typeValid = true;
             } else if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames().contains(typeLocalname)) {
                 // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
                 if (xformsValidator == null) {

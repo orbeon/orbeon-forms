@@ -134,7 +134,7 @@ trait XForms extends AssertionsForJUnit with FormRunnerOps {
 
         def checkOutputs(outputs: Seq[(String, String)]) =
             outputs.foreach { case (cssClass, expected) ⇒
-                val actual = $("." + cssClass + " span").getText
+                val actual = $("." + cssClass + " output").getText
                 assertEquals(expected, actual)
             }
 

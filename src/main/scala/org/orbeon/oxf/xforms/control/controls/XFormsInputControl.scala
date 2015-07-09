@@ -34,10 +34,14 @@ import scala.util.matching.Regex
 /**
  * xf:input control
  */
-class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsSingleNodeControl(container, parent, element, id)
-        with XFormsValueControl
-        with FocusableTrait {
+class XFormsInputControl(
+    container : XBLContainer,
+    parent    : XFormsControl,
+    element   : Element,
+    id        : String
+) extends XFormsSingleNodeControl(container, parent, element, id)
+    with XFormsValueControl
+    with FocusableTrait {
 
     private def format   = Option(staticControl) flatMap (_.format)
     private def unformat = Option(staticControl) flatMap (_.unformat)
@@ -50,8 +54,13 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
     // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
     // have the placeholder appearance, and those are not really controls.
     override def getJavaScriptInitialization =
-        Option(getPlaceholderInfo(staticControl, this)) map
-            (p ⇒ (if (p.isLabelPlaceholder) "label" else "hint", Dom4jUtils.qNameToExplodedQName(XFORMS_MINIMAL_APPEARANCE_QNAME), getEffectiveId)) orNull
+        Option(getPlaceholderInfo(staticControl, this)) map { placeHolderInfo ⇒
+            (
+                if (placeHolderInfo.isLabelPlaceholder) "label" else "hint",
+                Dom4jUtils.qNameToExplodedQName(XFORMS_MINIMAL_APPEARANCE_QNAME),
+                getEffectiveId
+            )
+        } orNull
 
     override def evaluateExternalValue() : Unit = {
         assert(isRelevant)
@@ -66,9 +75,9 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
             if (typeName == "boolean")
                 // xs:boolean
 
-                // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
-                // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
-                // the encrypted value of "true". So we do not encrypt values.
+                // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also
+                // poses a problem since the server does not send an itemset for new booleans, therefore the client
+                // cannot know the encrypted value of "true". So we do not encrypt values.
                 normalizeBooleanString(internalValue)
             else
                 // Other types or no type
@@ -81,7 +90,8 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
 
     override def translateExternalValue(externalValue: String) = {
 
-        // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
+        // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date
+        // formatted value
         format foreach { _ ⇒
             markExternalValueDirty()
             containingDocument.getControls.markDirtySinceLastRequest(false)
@@ -172,7 +182,12 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 containingDocument.getTypeInputFormat(valueType) +
                 "', 'en', (), ()) else $v"
 
-            evaluateAsString(xpathExpression, Option(boundItem), XFormsValueControl.FormatNamespaceMapping, variables.asJava)
+            evaluateAsString(
+                xpathString        = xpathExpression,
+                contextItem        = Option(boundItem),
+                namespaceMapping   = XFormsValueControl.FormatNamespaceMapping,
+                variableToValueMap = variables.asJava
+            )
         }
     }
 
@@ -195,7 +210,11 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
         }
 
     // Add type attribute if needed
-    override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {
+    override def addAjaxAttributes(
+        attributesImpl        : AttributesImpl,
+        isNewlyVisibleSubtree : Boolean,
+        other                 : XFormsControl
+    ): Boolean = {
 
         var added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
 
@@ -203,7 +222,13 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
         val typeValue2 = typeExplodedQName
         if (isNewlyVisibleSubtree || typeValue1 != typeValue2) {
             val attributeValue = if (typeValue2 ne null) typeValue2 else ""
-            added |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree, attributeValue == "" || StringQNames(attributeValue))
+            added |= AjaxSupport.addOrAppendToAttributeIfNeeded(
+                attributesImpl,
+                "type",
+                attributeValue,
+                isNewlyVisibleSubtree,
+                attributeValue == "" || StringQNames(attributeValue)
+            )
         }
 
         added
@@ -213,7 +238,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
 object XFormsInputControl {
 
     val StringQNames = Set(XS_STRING_EXPLODED_QNAME, XFORMS_STRING_EXPLODED_QNAME)
-    
+
     // Anything but "true" is "false"
     private def normalizeBooleanString(s: String) = (s == "true").toString
 

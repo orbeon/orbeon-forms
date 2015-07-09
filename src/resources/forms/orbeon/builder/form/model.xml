@@ -306,20 +306,17 @@
 
             <!-- If valid app/form were passed, skip showing the dialog -->
             <xf:action if="$valid-app-form-params">
-
-                <xf:setvalue ref="bind('application-name-bind')" value="$requested-app"/>
-                <xf:setvalue ref="bind('form-name-bind')"        value="$requested-form"/>
-
-                <xf:setvalue
-                    if="exists($requested-title)"
-                    ref="bind('title-bind')"
-                    value="$requested-title"/>
-
-                <xf:setvalue
-                    if="exists($requested-description)"
-                    ref="bind('description-bind')"
-                    value="$requested-description"/>
-
+                <!-- Reuse existing logic of event handlers on dialog-form-settings -->
+                <xf:dispatch
+                        name="fb-update-metadata"
+                        targetid="dialog-form-settings">
+                    <xf:property name="mode"        value="'new'"/>
+                    <xf:property name="app"         value="$requested-app"/>
+                    <xf:property name="form"        value="$requested-form"/>
+                    <xf:property name="title"       value="($requested-title,       bind('title-bind'))[1]"/>
+                    <xf:property name="description" value="($requested-description, bind('description-bind'))[1]"/>
+                    <xf:property name="singleton"   value="''"/>
+                </xf:dispatch>
             </xf:action>
 
             <xxf:show if="not($valid-app-form-params)" dialog="dialog-form-settings">

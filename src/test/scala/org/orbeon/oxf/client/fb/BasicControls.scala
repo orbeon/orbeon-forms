@@ -20,10 +20,8 @@ import org.scalatest.junit.AssertionsForJUnit
 trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
     import Builder._
-    
-    @Test def addGridsSectionsControls(): Unit = {
 
-        val ControlsCount = 30 // change when we add/remove controls to toolbox (ideally would be known from source)
+    @Test def addGridsSectionsControls(): Unit = {
 
         def clickOnToolboxControlButtons(from: Int, to: Int) =
             executeScript(
@@ -82,9 +80,9 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
             }()
         }
     }
-    
+
     @Test def moveSections(): Unit = {
-        
+
         onNewForm {
             for {
                 - ← assert(countSections == 1) // the form has an initial section
@@ -92,7 +90,7 @@ trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOp
 
                 _ ← insertNewSection()
                 - ← assert(countSections == 2)
-                
+
                 _ ← insertNewSection()
                 - ← assert(countSections == 2)
             }()

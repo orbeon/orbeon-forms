@@ -216,6 +216,9 @@ trait FormRunnerOps extends OrbeonFormsOps {
 trait FormBuilderOps extends FormRunnerOps {
 
     object Builder {
+
+        val ControlsCount = 30 // change when we add/remove controls to toolbox (ideally would be known from source)
+
         val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
         val SaveButton        = cssSelector(".fr-save-button button")
 
@@ -242,6 +245,9 @@ trait FormBuilderOps extends FormRunnerOps {
                    |        "grid-id": "$gridEffectiveId"
                    |    }
                    |})""".stripMargin)
+
+        def openFormSettings() =
+            clickOn(cssSelector("#open-form-settings-trigger"))
 
         def insertNewSection() =
             clickOn(cssSelector("#insert-new-section-trigger"))

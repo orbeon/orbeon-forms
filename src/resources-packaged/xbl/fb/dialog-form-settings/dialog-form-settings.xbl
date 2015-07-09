@@ -231,7 +231,7 @@
                             </xf:input>
 
                             <!-- Description -->
-                            <xf:textarea ref="description" >
+                            <xf:textarea ref="description" id="fb-description-textarea">
                                 <xf:label ref="$resources/description/label"/>
                                 <xf:hint ref="$resources/description/hint"/>
                                 <xf:alert ref="$resources/description/alert"/>

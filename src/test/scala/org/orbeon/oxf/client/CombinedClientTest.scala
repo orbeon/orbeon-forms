@@ -32,3 +32,4 @@ class CombinedClientTest
     with Currency
     with Grid
     with BasicControls
+    with NewFormParams

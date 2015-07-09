@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2015 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent
+import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 
 /**
- * Extension xxf:show action.
+ * Extension xxf:hide action.
  */
-class XXFormsShowAction extends XFormsAction {
+class XXFormsHideAction extends XFormsAction {
     override def execute(actionContext: DynamicActionContext): Unit = {
 
         val interpreter   = actionContext.interpreter
@@ -30,19 +30,12 @@ class XXFormsShowAction extends XFormsAction {
 
         resolveControl("dialog")(actionContext) match {
             case Some(targetDialog: XFormsEventTarget) ⇒
-                val constrainToViewport = interpreter.resolveAVT(actionElement, "constrain") != "false"
-                val neighborEffectiveId = resolveControl("neighbor", required = false)(actionContext) map (_.getEffectiveId)
-                XXFormsShowAction.showDialog(
-                    targetDialog,
-                    neighborEffectiveId,
-                    constrainToViewport,
-                    XFormsAction.eventProperties(interpreter, actionElement)
-                )
+                XXFormsHideAction.hideDialog(targetDialog, XFormsAction.eventProperties(interpreter, actionElement))
             case _ ⇒
                 val indentedLogger = interpreter.indentedLogger
                 if (indentedLogger.isDebugEnabled)
                     indentedLogger.logDebug(
-                        "xxf:show",
+                        "xxf:hide",
                         "dialog does not refer to an existing xxf:dialog element, ignoring action",
                         "dialog id",
                         actionContext.element.attributeValue("dialog")
@@ -51,22 +44,18 @@ class XXFormsShowAction extends XFormsAction {
     }
 }
 
-object XXFormsShowAction {
+object XXFormsHideAction {
 
     import XFormsEvent._
 
-    def showDialog(
-        targetDialog        : XFormsEventTarget,
-        neighborEffectiveId : Option[String] = None,
-        constrainToViewport : Boolean        = true,
-        properties          : PropertyGetter = EmptyGetter
+    def hideDialog(
+        targetDialog : XFormsEventTarget,
+        properties   : PropertyGetter = EmptyGetter
     ): Unit =
         Dispatch.dispatchEvent(
-            new XXFormsDialogOpenEvent(
-                properties,
+            new XXFormsDialogCloseEvent(
                 targetDialog,
-                neighborEffectiveId.orNull,
-                constrainToViewport
+                properties
             )
         )
 }

@@ -759,7 +759,7 @@
                                                                                 else ."/>
                                                             <xf:group ref=".[$edit-view != '']">
                                                                 <xh:a href="{$current-document-href}">
-                                                                    <xf:output value="$detail"/>
+                                                                    <xf:output value="if ($detail != '') then $detail else codepoints-to-string((160))"/>
                                                                 </xh:a>
                                                             </xf:group>
                                                             <xf:group ref=".[$edit-view = '']">

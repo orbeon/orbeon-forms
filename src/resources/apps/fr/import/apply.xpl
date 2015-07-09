@@ -20,7 +20,7 @@
 
     <p:param type="input" name="xforms-model"/>
     <p:param type="input" name="instance"/>
-    <p:param type="output" name="data"/>
+    <p:param type="output" name="data" debug="apply-output-data"/>
 
     <!-- Extract request parameters (app, form, document, and mode) from URL -->
     <p:processor name="oxf:pipeline">
@@ -72,7 +72,7 @@
                         <row>
                             <xsl:for-each select="ms-main:c">
                                 <xsl:variable name="v" select="ms-main:v"/>
-                                <c><xsl:value-of select="if (exists(@t)) then $strings/*/ms-main:si[xs:integer($v) + 1]/ms-main:t else $v"/></c>
+                                <c><xsl:value-of select="if (@t = 's') then $strings/*/ms-main:si[xs:integer($v) + 1]/ms-main:t else $v"/></c>
                             </xsl:for-each>
                         </row>
                     </xsl:variable>

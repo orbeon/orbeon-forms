@@ -333,6 +333,11 @@ object XFormsAPI {
         resolveAs[XFormsEventTarget](dialogId) foreach
             (XXFormsShowAction.showDialog(_, properties = properties))
 
+    // xf:hide
+    def hide(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
+        resolveAs[XFormsEventTarget](dialogId) foreach
+            (XXFormsHideAction.hideDialog(_, properties = properties))
+
     // xf:load
     def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit =
         XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, url, target.orNull, null, false, false)

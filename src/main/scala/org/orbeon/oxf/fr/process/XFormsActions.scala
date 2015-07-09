@@ -28,6 +28,7 @@ trait XFormsActions {
         "xf:send"     → tryXFormsSend,
         "xf:dispatch" → tryXFormsDispatch,
         "xf:show"     → tryShowDialog,
+        "xf:hide"     → tryHideDialog,
         "xf:setvalue" → trySetvalue
     )
 
@@ -38,7 +39,7 @@ trait XFormsActions {
         }
 
     private val StandardDispatchParams = Set("name", "targetid")
-    private val StandardShowParams     = Set("dialog")
+    private val StandardDialogParams   = Set("dialog")
 
     private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]) = params.collect {
         case (Some(name), value) if ! standardParamNames(name) ⇒ name → Option(evaluateValueTemplate(value))
@@ -56,7 +57,14 @@ trait XFormsActions {
         Try {
             val dialogName = paramByNameOrDefault(params, "dialog")
 
-            dialogName foreach (show(_, properties = collectCustomProperties(params, StandardShowParams)))
+            dialogName foreach (show(_, properties = collectCustomProperties(params, StandardDialogParams)))
+        }
+
+    def tryHideDialog(params: ActionParams): Try[Any] =
+        Try {
+            val dialogName = paramByNameOrDefault(params, "dialog")
+
+            dialogName foreach (hide(_, properties = collectCustomProperties(params, StandardDialogParams)))
         }
 
     def trySetvalue(params: ActionParams): Try[Any] =

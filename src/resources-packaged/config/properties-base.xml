@@ -31,7 +31,7 @@
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
     <!-- HTTP client -->
-    <property as="xs:string"  name="oxf.http.forward-headers"                        value="Orbeon-Client"/>
+    <property as="xs:string"  name="oxf.http.forward-headers"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.forward-submission-headers"           value=""/>
     <property as="xs:string"  name="oxf.http.forward-cookies"                        value=""/>
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>

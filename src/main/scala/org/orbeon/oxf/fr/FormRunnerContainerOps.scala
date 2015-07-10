@@ -109,7 +109,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
         findAncestorContainers(descendantOrSelf, includeSelf) filter IsSection
 
-    // For XPath callers
+    //@XPathFunction
     def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =
         findRepeatIterationName(inDoc, controlName) getOrElse ""
 

@@ -238,7 +238,7 @@ trait ResourcesOps extends BaseOps {
         } yield
             holder
 
-    // Same for XPath callers
+    //@XPathFunction
     def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resources: NodeInfo): SequenceIterator =
         iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resources)
 

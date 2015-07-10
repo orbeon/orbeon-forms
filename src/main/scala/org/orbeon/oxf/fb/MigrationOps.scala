@@ -49,30 +49,7 @@ object MigrationOps {
     // - section templates are not nested (they could be in the future)
     // - repeated grids can have repeat="true|content"
     //
-    // The list of paths looks like:
-    //
-    // [
-    //   {
-    //     "path": "(section-3)/(section-3-iteration)/(grid-4)",
-    //     "iteration-name": "grid-4-iteration"
-    //   },
-    //   {
-    //     "path": "(section-13)/(grid-6)",
-    //     "iteration-name": "grid-6-iteration"
-    //   },
-    //   {
-    //     "path": "(section-13)/(grid-14)",
-    //     "iteration-name": "grid-14-iteration"
-    //   },
-    //   {
-    //     "path": "(section-8)/(grid-3)",
-    //     "iteration-name": "my-custom-grid-3-iteration"
-    //   },
-    //   {
-    //     "path": "(section-23)/(grid-3)",
-    //     "iteration-name": "my-custom-grid-3-iteration"
-    //   }
-    // ]
+    // For an example of JSON, see MigrationTest.
     //
     //@XPathFunction
     def buildGridMigrationMap(

@@ -114,7 +114,7 @@ class MaxLengthValidation extends ValidationFunction {
     val propertyName = "max-length"
 
     def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
-        case Some(constraint) ⇒ value.length <= constraint
+        case Some(constraint) ⇒ org.orbeon.saxon.value.StringValue.getStringLength(value) <= constraint
         case None             ⇒ true
     }
 }
@@ -124,7 +124,7 @@ class MinLengthValidation extends ValidationFunction {
     val propertyName = "min-length"
 
     def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
-        case Some(constraint) ⇒ value.length >= constraint
+        case Some(constraint) ⇒ org.orbeon.saxon.value.StringValue.getStringLength(value) >= constraint
         case None             ⇒ true
     }
 }

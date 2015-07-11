@@ -178,7 +178,7 @@
                     <!-- Upload XML Schema -->
                     <xf:trigger>
                         <xf:label>
-                            <xh:img src="/forms/orbeon/builder/images/schema.gif" alt=""/>
+                            <xh:img src="/apps/fr/style/images/other/schema-16.png" alt=""/>
                             <xh:span>
                                 <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
                             </xh:span>

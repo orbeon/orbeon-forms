@@ -14,32 +14,42 @@
 
 .orbeon {
 
-    .xbl-fr-character-counter > .fr-charcounter-wrapper {
+    .xbl-fr-character-counter {
 
-        // Position counter to the right of the field. With IE < 11, the counter is positioned under the field.
-        .flex();
-        .flex-flow(row);
+        display: inline-block;
+        width: 100%;
 
-        &> .fr-charcounter-count {
+        &> .fr-charcounter-wrapper {
 
-            display: block;
-            text-align: right;
-            margin-left: 4px;
-            margin-bottom: 3px;
+            // Use table layout as Flexbox doesn't work with IE < 11
+            display: table;
 
-            .xforms-output {
+            &> * {
+                display: table-cell;
+                vertical-align: top;
+            }
+
+            &> .fr-charcounter-count {
+
                 display: inline-block;
-                min-width: 28px; // try to fit 3 digits without widening
-                box-sizing: border-box;
+                text-align: right;
+                margin-left: 4px;
+                margin-bottom: 3px;
+
+                .xforms-output {
+                    display: inline-block;
+                    min-width: 28px; // try to fit 3 digits without widening
+                    box-sizing: border-box;
+                }
+
+                .fr-charcounter-over .xforms-output-output:before {
+                    content: "-"
+                }
             }
 
-            .fr-charcounter-over .xforms-output-output:before {
-                content: "-"
+            &> .xforms-input, &> .xforms-textarea, &> .xbl-fr-tinymce {
+                width: 100%;
             }
-        }
-
-        &> .xforms-input, &> .xforms-textarea, &> .xbl-fr-tinymce {
-            width: 100%;
         }
     }
 

@@ -1,11 +1,16 @@
+.orbeon .xbl-fr-character-counter {
+  display: inline-block;
+  width: 100%;
+}
 .orbeon .xbl-fr-character-counter > .fr-charcounter-wrapper {
-  display: flex;
-  display: -webkit-flex;
-  flex-flow: row;
-  -webkit-flex-flow: row;
+  display: table;
+}
+.orbeon .xbl-fr-character-counter > .fr-charcounter-wrapper > * {
+  display: table-cell;
+  vertical-align: top;
 }
 .orbeon .xbl-fr-character-counter > .fr-charcounter-wrapper > .fr-charcounter-count {
-  display: block;
+  display: inline-block;
   text-align: right;
   margin-left: 4px;
   margin-bottom: 3px;

@@ -163,9 +163,9 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * This is called indirectly when:
      *
-     * o the session expires, which calls the session listener above to remove the document from cache
-     * o upon takeValid()
-     * o nobody else is supposed to call remove() or removeAll() on the cache
+     * - the session expires, which calls the session listener above to remove the document from cache
+     * - upon takeValid()
+     * - nobody else is supposed to call remove() or removeAll() on the cache
      *
      * @param uuid
      */
@@ -515,7 +515,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
     /**
      * Return the dynamic state string to send to the client in the HTML page.
-     *
      *
      * @param containingDocument    containing document
      * @return                      encoded state

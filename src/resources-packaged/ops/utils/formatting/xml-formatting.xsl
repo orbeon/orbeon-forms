@@ -260,6 +260,14 @@
             <xsl:variable name="namespace-nodes"
                           select="namespace::*[name() != 'xml' and not(. = $current-element/ancestor::*/namespace::*)]"/>
 
+            <!--  See https://github.com/orbeon/orbeon-forms/issues/2279 -->
+            <xsl:variable name="namespace-nodes" as="item()*">
+                <xsl:for-each select="namespace::*[name() != 'xml']">
+                    <xsl:variable name="namespace-prefix" select="name()"/>
+                    <xsl:copy-of select=".[not(. = $current-element/ancestor::*/namespace::*[name() = $namespace-prefix])]"/>
+                </xsl:for-each>
+            </xsl:variable>
+
             <xsl:for-each select="$namespace-nodes">
                 <xsl:text> </xsl:text>
                 <xsl:choose>

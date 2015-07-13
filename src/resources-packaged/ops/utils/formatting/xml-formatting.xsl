@@ -257,8 +257,6 @@
             <!-- We can't know for sure what namespaces are actually newly declared on an element, so we use instead the
                  namespaces in scope except if the namespace was already decared on an ancestor element -->
             <xsl:variable name="current-element" select="."/>
-            <xsl:variable name="namespace-nodes"
-                          select="namespace::*[name() != 'xml' and not(. = $current-element/ancestor::*/namespace::*)]"/>
 
             <!--  See https://github.com/orbeon/orbeon-forms/issues/2279 -->
             <xsl:variable name="namespace-nodes" as="item()*">

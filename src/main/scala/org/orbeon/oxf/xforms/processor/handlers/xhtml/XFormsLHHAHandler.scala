@@ -76,7 +76,16 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                             else
                                 None
 
-                        handleLabelHintHelpAlert(lhhaAnalysis, targetControlEffectiveId, forEffectiveId.orNull, lhhaType, xformsControl.orNull, isTemplate, true)
+                        handleLabelHintHelpAlert(
+                            lhhaAnalysis,
+                            targetControlEffectiveId,
+                            forEffectiveId.orNull,
+                            lhhaType,
+                            null,
+                            xformsControl.orNull,
+                            isTemplate,
+                            true
+                        )
 
                     case _ ⇒
                         // Don't output markup for the LHHA

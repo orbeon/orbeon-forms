@@ -237,7 +237,16 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    final protected void handleLabelHintHelpAlert(LHHAAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
+    final protected void handleLabelHintHelpAlert(
+        LHHAAnalysis lhhaAnalysis,
+        String targetControlEffectiveId,
+        String forEffectiveId,
+        XFormsBaseHandler.LHHAC lhhaType,
+        String requestedElementName,
+        XFormsControl control,
+        boolean isTemplate,
+        boolean isExternal
+    ) throws SAXException {
 
         final AttributesImpl staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element());
 
@@ -296,7 +305,9 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
                 final String elementName;
                 {
-                    if (isLabel) {
+                    if (requestedElementName != null) {
+                        elementName = requestedElementName;
+                    } else if (isLabel) {
                         elementName = handlerContext.getLabelElementName();
                     } else if (isHelp) {
                         elementName = handlerContext.getHelpElementName();
@@ -373,22 +384,46 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
                 lhhaAnalysis.encodeAndAppendAppearances(classes);
 
-                outputLabelFor(handlerContext, getIdClassXHTMLAttributes(newAttributes, classes.toString(), null), targetControlEffectiveId,
-                        forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, isExternal);
+                outputLabelFor(
+                    handlerContext,
+                    getIdClassXHTMLAttributes(newAttributes, classes.toString(), null),
+                    targetControlEffectiveId,
+                    forEffectiveId,
+                    lhhaType,
+                    elementName,
+                    labelHintHelpAlertValue,
+                    mustOutputHTMLFragment,
+                    isExternal
+                );
             }
         }
     }
 
-    final protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
-                                         String forEffectiveId, LHHAC lhha, String elementName, String labelValue,
-                                         boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
+    final protected static void outputLabelFor(
+        HandlerContext handlerContext,
+        Attributes attributes,
+        String targetControlEffectiveId,
+        String forEffectiveId,
+        LHHAC lhha,
+        String elementName,
+        String labelValue,
+        boolean mustOutputHTMLFragment,
+        boolean addIds
+    ) throws SAXException {
         outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds);
         outputLabelText(handlerContext.getController().getOutput(), null, labelValue, handlerContext.findXHTMLPrefix(), mustOutputHTMLFragment);
         outputLabelForEnd(handlerContext, elementName);
     }
 
-    final protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
-                                              String forEffectiveId, LHHAC lhha, String elementName, boolean addIds) throws SAXException {
+    final protected static void outputLabelForStart(
+        HandlerContext handlerContext,
+        Attributes attributes,
+        String targetControlEffectiveId,
+        String forEffectiveId,
+        LHHAC lhha,
+        String elementName,
+        boolean addIds
+    ) throws SAXException {
 
         assert lhha != null;
         assert ! addIds || targetControlEffectiveId != null;

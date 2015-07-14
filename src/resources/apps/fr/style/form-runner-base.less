@@ -419,6 +419,7 @@
             margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
                                                         // than above the control to make the CSS more generally applicable to XBL components)
             overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
+            display: block;                             // Bootstrap does this on <label>, but can also have <span> labels
         }
 
         // Controls

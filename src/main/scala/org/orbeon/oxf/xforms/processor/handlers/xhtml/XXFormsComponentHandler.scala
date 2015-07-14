@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.xml.sax.{Locator, Attributes}
 import org.orbeon.oxf.xml._
 import java.lang.StringBuilder
@@ -27,8 +28,14 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def getContainingElementName = elementName
     protected override def getContainingElementQName = elementQName
 
-    private lazy val binding    = containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
-    private lazy val handleLHHA = binding.abstractBinding.modeLHHA && ! binding.abstractBinding.modeLHHACustom
+    private lazy val binding =
+        containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
+
+    private lazy val handleLHHA =
+        binding.abstractBinding.modeLHHA && ! binding.abstractBinding.modeLHHACustom
+
+    private def hasLabelFor =
+        binding.abstractBinding.labelFor.isDefined
 
     override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
         super.init(uri, localname, qName, attributes, matched)
@@ -71,7 +78,22 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
         control     : XFormsControl
     ) = handlerContext.popComponentContext()
 
-    protected override def handleLabel() = if (handleLHHA) super.handleLabel()
+    protected override def handleLabel() = {
+        if (handleLHHA && hasLabelFor)
+            super.handleLabel()
+        else if (handleLHHA)
+            handleLabelHintHelpAlert(
+                getStaticLHHA(getPrefixedId, LHHAC.LABEL),
+                getEffectiveId,
+                getForEffectiveId(getEffectiveId),
+                LHHAC.LABEL,
+                "span",
+                currentControlOrNull,
+                isTemplate,
+                false
+            )
+    }
+
     protected override def handleAlert() = if (handleLHHA) super.handleAlert()
     protected override def handleHint()  = if (handleLHHA) super.handleHint()
     protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
@@ -105,7 +127,7 @@ object XXFormsComponentHandler {
         controller.startBody()
 
         // Forward shadow content to handler
-        // TODO: would be better to handle inclusion and namespaces using XIncludeProcessor facilities instead of custom code
+        // TODO: Handle inclusion/namespaces with XIncludeProcessor instead of custom code.
         templateTree.replay(new EmbeddedDocumentXMLReceiver(controller) {
 
             var level = 0

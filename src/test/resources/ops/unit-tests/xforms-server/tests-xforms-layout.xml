@@ -2439,7 +2439,7 @@
             <controls>
                 <xh:span id="my-group" class="xforms-group">
                     <xh:span id="foo" class="xbl-component xbl-fr-foo">
-                        <xh:label class="xforms-label">Gaga label</xh:label>
+                        <xh:span class="xforms-label">Gaga label</xh:span>
                     </xh:span>
                     <xh:span id="bar" class="xbl-component xbl-fr-bar"/>
                     <xh:span id="baz" class="xbl-component xbl-fr-baz"/>

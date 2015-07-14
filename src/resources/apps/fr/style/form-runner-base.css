@@ -370,6 +370,7 @@
   margin-top: 2px;
   margin-bottom: 4px;
   overflow: hidden;
+  display: block;
 }
 .orbeon .fr-grid select,
 .orbeon .fr-grid textarea,

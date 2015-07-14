@@ -1,7 +1,7 @@
 (function() {
 
     var $ = ORBEON.jQuery;
-    var Events = ORBEON.xforms.Events
+    var Events = ORBEON.xforms.Events;
 
     var AutosizeSelector = '.xforms-textarea-appearance-xxforms-autosize textarea';
 
@@ -14,5 +14,5 @@
         tas.autosize();
         tas.trigger('resize');
     });
-    
+
 })();

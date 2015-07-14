@@ -108,7 +108,7 @@ public class ResourceServer extends ProcessorImpl {
                 }
 
                 // Lookup and set the content type
-                final String contentType = Mediatypes.findMediatypeJava(urlString);
+                final String contentType = Mediatypes.findMediatypeForPathJava(urlString);
                 if (contentType != null)
                     response.setContentType(contentType);
 

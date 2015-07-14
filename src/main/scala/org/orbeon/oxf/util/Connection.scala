@@ -82,7 +82,7 @@ class Connection(
                     if (scheme == "data") Option(urlConnection.getContentType) else None
 
                 def contentTypeFromPath =
-                    Option(url.getPath) flatMap Mediatypes.findMediatype
+                    Option(url.getPath) flatMap Mediatypes.findMediatypeForPath
 
                 def contentTypeHeader =
                     contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))

@@ -37,7 +37,7 @@ object Mediatypes {
         )
     }
 
-    def findMediatype(path: String): Option[String] =
+    def findMediatypeForPath(path: String): Option[String] =
         for {
             extension ← findExtension(path.toLowerCase)
             mappings  ← mappingsByExtension.get(extension)
@@ -45,10 +45,10 @@ object Mediatypes {
         } yield
             mapping.mediatype
 
-    def findMediatypeJava(path: String): String =
-        findMediatype(path).orNull
+    def findMediatypeForPathJava(path: String): String =
+        findMediatypeForPath(path).orNull
 
-    def extensionForMediatype(mediatype: String): Option[String] =
+    def findExtensionForMediatype(mediatype: String): Option[String] =
         for {
             mappings  ← mappingsByMediatype.get(mediatype)
             mapping   ← mappings.headOption

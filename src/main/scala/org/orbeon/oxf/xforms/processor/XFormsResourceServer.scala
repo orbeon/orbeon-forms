@@ -85,10 +85,10 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                         case Some(_) ⇒
                             filename
                         case None    ⇒
-                            resource.contentType             map
-                            NetUtils.getContentTypeMediaType flatMap
-                            Mediatypes.extensionForMediatype map
-                            (filename + "." +)               getOrElse
+                            resource.contentType                 map
+                            NetUtils.getContentTypeMediaType     flatMap
+                            Mediatypes.findExtensionForMediatype map
+                            (filename + "." +)                   getOrElse
                             filename
                     }
 

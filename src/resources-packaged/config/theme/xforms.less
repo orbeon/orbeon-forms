@@ -381,11 +381,6 @@
         }
     }
 
-    .yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
-        border: 0;                                  // Override border set in YUI's menu.css, which creates a thicker border around the menu bar titles on iOS
-        padding-top: 2px; padding-bottom: 2px;      // Compensate for the lost border by adding some padding
-    }
-
     .yui-tt-shadow { display: none }                // Remove shadow, which now looks tacky, and also for issue #581
 
     // ***** Indicators and messages ***********************************************************************************
@@ -460,27 +455,6 @@
         display: list-item;
         margin-left: 2em;
     }
-
-    // ***** Tree ******************************************************************************************************
-    // Fix for Firefox issue when clicking on the first "-" in span mode
-    // http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207
-    .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { display: block }
-
-    // Yellow highlight for selected item
-    .ygtvcontent {
-        .xforms-tree-label-selected,
-        .xforms-tree-label-selected:hover { background-color: #ff6 }
-    }
-    // Override YUI CSS which adds a light blue green background to "currently focused" label
-    .ygtvfocus .ygtvlabel,
-    .ygtvfocus .ygtvlabel:hover { background-color: transparent }
-
-    // In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link
-    a.ygtvlabel { cursor: pointer; }
-
-    // YUI sets this to a color, but it is hindering more than anything else
-    .ygtvfocus { background-color: transparent }
-    .xforms-select-appearance-xxforms-tree table, .xforms-select1-appearance-xxforms-tree table { margin: 0 }// as table style can be globally changed
 
     // Custom control widths
     #xforms-form {

@@ -336,11 +336,6 @@
   top: -7px;
   width: 25px;
 }
-.orbeon .yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
-  border: 0;
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
 .orbeon .yui-tt-shadow {
   display: none;
 }
@@ -407,28 +402,6 @@
   list-style: disc;
   display: list-item;
   margin-left: 2em;
-}
-.orbeon .xforms-select1-appearance-xxforms-tree,
-.orbeon .xforms-select-appearance-xxforms-tree {
-  display: block;
-}
-.orbeon .ygtvcontent .xforms-tree-label-selected,
-.orbeon .ygtvcontent .xforms-tree-label-selected:hover {
-  background-color: #ffff66;
-}
-.orbeon .ygtvfocus .ygtvlabel,
-.orbeon .ygtvfocus .ygtvlabel:hover {
-  background-color: transparent;
-}
-.orbeon a.ygtvlabel {
-  cursor: pointer;
-}
-.orbeon .ygtvfocus {
-  background-color: transparent;
-}
-.orbeon .xforms-select-appearance-xxforms-tree table,
-.orbeon .xforms-select1-appearance-xxforms-tree table {
-  margin: 0;
 }
 .orbeon #xforms-form .xforms-width-2em input.xforms-input-input,
 .orbeon #xforms-form .xforms-width-2em select {

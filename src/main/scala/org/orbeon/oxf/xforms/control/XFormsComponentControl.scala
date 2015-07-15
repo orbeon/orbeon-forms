@@ -41,6 +41,17 @@ class XFormsValueComponentControl(container: XBLContainer, parent: XFormsControl
 
     // Don't expose an external value
     override def evaluateExternalValue(): Unit = setExternalValue(null)
+
+    // Because of the above, `super.equalsExternal` returns `true`if just the value has changed, therefore it doesn't
+    // catch and send changes to the `empty` property. So we override and check whether `empty` has changed.
+    // See: https://github.com/orbeon/orbeon-forms/issues/2310
+    override def equalsExternal(other: XFormsControl): Boolean =
+        other match {
+            case other: XFormsValueComponentControl ⇒
+                isEmpty == other.isEmpty && super.equalsExternal(other)
+            case _ ⇒
+                super.equalsExternal(other)
+        }
 }
 
 // A component control with or without a value

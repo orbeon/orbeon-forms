@@ -26,9 +26,9 @@ import org.orbeon.oxf.util.NetUtils
 import scala.collection.JavaConverters._
 
 class ServletEmbeddingContext(
-    val namespace : String,
-    req           : HttpServletRequest,
-    val httpClient: HttpClient
+    val namespace  : String,
+    req            : HttpServletRequest,
+    val httpClient : HttpClient
 ) extends EmbeddingContext {
 
     private val session = req.getSession(true)
@@ -39,11 +39,11 @@ class ServletEmbeddingContext(
 }
 
 class ServletEmbeddingContextWithResponse(
-    req         : HttpServletRequest,
-    out         : Writer Either HttpServletResponse,
-    namespace   : String,
-    orbeonPrefix: String,
-    httpClient  : HttpClient
+    req          : HttpServletRequest,
+    out          : Writer Either HttpServletResponse,
+    namespace    : String,
+    orbeonPrefix : String,
+    httpClient   : HttpClient
 ) extends ServletEmbeddingContext(
     namespace,
     req,

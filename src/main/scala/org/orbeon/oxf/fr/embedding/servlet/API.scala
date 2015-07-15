@@ -27,10 +27,10 @@ object API {
 
     // Embed an Orbeon Forms page by path
     def embedPageJava(
-        req       : HttpServletRequest,
-        writer    : Writer,
-        path      : String,
-        headers   : ju.Map[String, String]
+        req        : HttpServletRequest,
+        writer     : Writer,
+        path       : String,
+        headers    : ju.Map[String, String]
      ): Unit =
         withSettings(req, writer) { settings ⇒
 
@@ -51,14 +51,14 @@ object API {
 
     // Embed a Form Runner form
     def embedFormJava(
-        req       : HttpServletRequest,
-        writer    : Writer,
-        app       : String,
-        form      : String,
-        mode      : String,
-        documentId: String,
-        query     : String,
-        headers   : ju.Map[String, String]
+        req        : HttpServletRequest,
+        writer     : Writer,
+        app        : String,
+        form       : String,
+        mode       : String,
+        documentId : String,
+        query      : String,
+        headers    : ju.Map[String, String]
      ): Unit =
         embedPageJava(
             req,
@@ -69,10 +69,10 @@ object API {
 
     // Embed an Orbeon Forms page by path
     def embedPage(
-        req       : HttpServletRequest,
-        out       : Writer Either HttpServletResponse,
-        path      : String,
-        headers   : Seq[(String, String)] = Nil
+        req        : HttpServletRequest,
+        out        : Writer Either HttpServletResponse,
+        path       : String,
+        headers    : Seq[(String, String)] = Nil
      ): Unit =
         withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
 
@@ -89,14 +89,14 @@ object API {
 
     // Embed a Form Runner form
     def embedForm(
-        req       : HttpServletRequest,
-        out       : Writer Either HttpServletResponse,
-        app       : String,
-        form      : String,
-        mode      : Mode,
-        documentId: Option[String] = None,
-        query     : Option[String] = None,
-        headers   : Seq[(String, String)] = Nil
+        req        : HttpServletRequest,
+        out        : Writer Either HttpServletResponse,
+        app        : String,
+        form       : String,
+        mode       : Mode,
+        documentId : Option[String] = None,
+        query      : Option[String] = None,
+        headers    : Seq[(String, String)] = Nil
     ): Unit =
         embedPage(
             req,

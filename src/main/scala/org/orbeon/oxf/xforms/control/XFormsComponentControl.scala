@@ -35,8 +35,13 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.analysis.model.Instance
 
 // A component control with native support for a value
-class XFormsValueComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-        extends XFormsComponentControl(container, parent, element, effectiveId) with XFormsValueControl {
+class XFormsValueComponentControl(
+    container   : XBLContainer,
+    parent      : XFormsControl,
+    element     : Element,
+    effectiveId : String
+) extends XFormsComponentControl(container, parent, element, effectiveId) with XFormsValueControl {
+
     override type Control <: ComponentControl with ValueControl
 
     // Don't expose an external value
@@ -55,8 +60,12 @@ class XFormsValueComponentControl(container: XBLContainer, parent: XFormsControl
 }
 
 // A component control with or without a value
-class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-        extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
+class XFormsComponentControl(
+    container   : XBLContainer,
+    parent      : XFormsControl,
+    element     : Element,
+    effectiveId : String
+) extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     override type Control <: ComponentControl
 

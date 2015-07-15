@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import javax.servlet.http.HttpSession
-import org.orbeon.oxf.util.URLRewriterUtils
-import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.common.OXFException
 import java.util.{Map ⇒ JMap}
+import javax.servlet.http.HttpSession
+
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.pipeline.InitUtils
+import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
 
 // External context which only exposes the web app, without request or response
@@ -38,9 +38,6 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
     def getRequest = null
     def getResponse = null
     def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = null
-
-    def rewriteServiceURL(urlString: String, rewriteMode: Int) =
-        URLRewriterUtils.rewriteServiceURL(getRequest, urlString, rewriteMode)
 
     private class SessionImpl(private val httpSession: HttpSession) extends ExternalContext.Session {
 
@@ -74,5 +71,4 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
         def removeListener(sessionListener: ExternalContext.Session.SessionListener) =
             throw new UnsupportedOperationException
     }
-
 }

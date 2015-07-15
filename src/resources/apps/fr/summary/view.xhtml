@@ -882,7 +882,7 @@
 
                     <!-- Directly iterate over the tokenized property -->
                     <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')))">
-                        <xh:span class="fr-button">
+                        <xh:span class="fr-button fr-{.}-button">
                             <!-- Home -->
                             <xf:group ref="if (. = 'home') then $enabled else ()">
                                 <xf:trigger ref=".">

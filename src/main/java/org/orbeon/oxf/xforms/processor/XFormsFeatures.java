@@ -50,6 +50,7 @@ public class XFormsFeatures {
             // jQuery
             new ResourceConfig("/ops/jquery/jquery-1.11.2.js", "/ops/jquery/jquery-1.11.2.min.js"),
             new ResourceConfig("/ops/jquery/jquery-migrate-1.2.1.js", "/ops/jquery/jquery-migrate-1.2.1.min.js"),
+            new ResourceConfig("/ops/jquery/jquery-browser-mobile.js", "/ops/jquery/jquery-browser-mobile.js"),
             new ResourceConfig("/apps/fr/style/bootstrap/js/bootstrap.js", "/apps/fr/style/bootstrap/js/bootstrap.min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/jquery-orbeon.js", "/ops/javascript/orbeon/util/jquery-orbeon-min.js"),
             new ResourceConfig("/ops/javascript/autosize/jquery.autosize.js", "/ops/javascript/autosize/jquery.autosize.min.js"),

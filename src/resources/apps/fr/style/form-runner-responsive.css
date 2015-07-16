@@ -36,22 +36,22 @@
     position: initial;
     width: 100%;
   }
-  .orbeon select,
-  .orbeon textarea,
-  .orbeon input[type="text"],
-  .orbeon input[type="password"],
-  .orbeon input[type="datetime"],
-  .orbeon input[type="datetime-local"],
-  .orbeon input[type="date"],
-  .orbeon input[type="month"],
-  .orbeon input[type="time"],
-  .orbeon input[type="week"],
-  .orbeon input[type="number"],
-  .orbeon input[type="email"],
-  .orbeon input[type="url"],
-  .orbeon input[type="search"],
-  .orbeon input[type="tel"],
-  .orbeon input[type="color"] {
+  .orbeon.xforms-mobile select,
+  .orbeon.xforms-mobile textarea,
+  .orbeon.xforms-mobile input[type="text"],
+  .orbeon.xforms-mobile input[type="password"],
+  .orbeon.xforms-mobile input[type="datetime"],
+  .orbeon.xforms-mobile input[type="datetime-local"],
+  .orbeon.xforms-mobile input[type="date"],
+  .orbeon.xforms-mobile input[type="month"],
+  .orbeon.xforms-mobile input[type="time"],
+  .orbeon.xforms-mobile input[type="week"],
+  .orbeon.xforms-mobile input[type="number"],
+  .orbeon.xforms-mobile input[type="email"],
+  .orbeon.xforms-mobile input[type="url"],
+  .orbeon.xforms-mobile input[type="search"],
+  .orbeon.xforms-mobile input[type="tel"],
+  .orbeon.xforms-mobile input[type="color"] {
     font-size: 16px;
   }
 }

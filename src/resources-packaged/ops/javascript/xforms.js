@@ -3764,9 +3764,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             // is embedded in an existing page (portlet-like), then the class will most likely not be there.
             YAHOO.util.Dom.addClass(document.body, "yui-skin-sam");
 
-            // Add the xforms-ios class on the body if we are on iOS
+            // Add the xforms-ios and/or xforms-mobile classes on the body
             if (YAHOO.env.ua.webkit && YAHOO.env.ua.mobile)
-                YAHOO.util.Dom.addClass(document.body, "xforms-ios");
+                $(document.body).addClass('xforms-ios');
+            if ($.browser.mobile)
+                $(document.body).addClass('xforms-mobile');
 
             // Initialize attributes on form
             for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {

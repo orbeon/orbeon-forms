@@ -37,7 +37,8 @@
     <xsl:template name="head">
         <xsl:apply-templates select="@*"/>
         <!-- Handle head elements except scripts -->
-        <xsl:apply-templates select="xh:meta | xh:link | xh:style"/>
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/2311 -->
+        <xsl:apply-templates select="xh:meta | xh:link | xh:style | comment()[contains(., 'IE 9')]"/>
         <!-- Title -->
         <xh:title>
             <xsl:apply-templates select="xh:title/@*"/>

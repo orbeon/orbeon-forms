@@ -69,12 +69,12 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         val isMinimal = XFormsProperties.isMinimalResources
         val isVersionedResources = URLRewriterUtils.isResourcesVersioned
 
-        // Include static XForms CSS
+        // Include static XForms CSS and JS
         val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
 
         helper.element("", XINCLUDE_URI, "include",
             Array(
-                "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css.xml"),
+                "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css-js.xml"),
                 "fixup-xml-base", "false"
             )
         )

@@ -1937,7 +1937,7 @@
                                 <xsl:apply-templates select="/xh:html/xh:head"/>
                             </xsl:template>
                             <xsl:template match="xh:link[not(@href)] | xh:script[not(@src)] | xh:style"/>
-                            <xsl:template match="@type | @media | @rel"/>
+                            <xsl:template match="@type | @media | @rel | comment()"/>
                         </xsl:transform>
                     </p:input>
                     <p:input name="data" href="#response"/>

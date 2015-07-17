@@ -25,7 +25,6 @@
     </property>
     <property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>
 
-    <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
     <property as="xs:string"  name="oxf.url-rewriting.wsrp.context"                  value=""/>
     <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>
 

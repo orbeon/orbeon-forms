@@ -65,7 +65,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(
+        String uri,
+        String localname,
+        String qName,
+        Attributes attributes,
+        String effectiveId,
+        XFormsControl control
+    ) throws SAXException {
         // Get items, dynamic or static, if possible
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) control;
 
@@ -75,12 +82,30 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final Itemset itemset = XFormsSelect1Control.getInitialItemset(containingDocument, xformsSelect1Control, getPrefixedId());
 
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
-        outputContent(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, appearanceTrait != null && appearanceTrait.isMultiple(), appearanceTrait != null && appearanceTrait.isFull(), false);
+        outputContent(
+            uri,
+            localname,
+            attributes,
+            effectiveId,
+            xformsSelect1Control,
+            itemset,
+            appearanceTrait != null && appearanceTrait.isMultiple(),
+            appearanceTrait != null && appearanceTrait.isFull(),
+            false
+        );
     }
 
-    public void outputContent(String uri, String localname, Attributes attributes, String effectiveId,
-                              final XFormsValueControl control, Itemset itemset,
-                              final boolean isMultiple, final boolean isFull, boolean isBooleanInput) throws SAXException {
+    public void outputContent(
+        String uri,
+        String localname,
+        Attributes attributes,
+        String effectiveId,
+        final XFormsValueControl control,
+        Itemset itemset,
+        final boolean isMultiple,
+        final boolean isFull,
+        boolean isBooleanInput
+    ) throws SAXException {
 
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
@@ -201,14 +226,33 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    private void outputFull(String uri, String localname, Attributes attributes, String effectiveId,
-                            XFormsValueControl control, Itemset itemset, boolean isMultiple, boolean isBooleanInput, boolean isStaticReadonly, boolean encode) throws SAXException {
+    private void outputFull(
+        String uri,
+        String localname,
+        Attributes attributes,
+        String effectiveId,
+        XFormsValueControl control,
+        Itemset itemset,
+        boolean isMultiple,
+        boolean isBooleanInput,
+        boolean isStaticReadonly,
+        boolean encode
+    ) throws SAXException {
 
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         final XFormsControl xformsControl = (XFormsControl) control; // cast because Java is not aware that XFormsValueControl extends XFormsControl
 
-        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, !(appearanceTrait != null && appearanceTrait.isFull()));
+        final AttributesImpl containerAttributes =
+            getEmptyNestedControlAttributesMaybeWithId(
+                uri,
+                localname,
+                attributes,
+                effectiveId,
+                xformsControl,
+                !(appearanceTrait != null && appearanceTrait.isFull())
+            );
+
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items"); // to help with styling
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
@@ -276,11 +320,20 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // NOTE: Templates for full items are output globally in XHTMLBodyHandler
     }
 
-    public static void outputItemFullTemplate(XFormsBaseHandlerXHTML baseHandler,
-                                              ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                              XFormsContainingDocument containingDocument,
-                                              AttributesImpl reusableAttributes, Attributes attributes, String templateId,
-                                              String itemName, boolean isMultiple, String fullItemType) throws SAXException {
+    public static void outputItemFullTemplate(
+        XFormsBaseHandlerXHTML baseHandler,
+        ContentHandler contentHandler,
+        String xhtmlPrefix,
+        String spanQName,
+        XFormsContainingDocument containingDocument,
+        AttributesImpl reusableAttributes,
+        Attributes attributes,
+        String templateId,
+        String itemName,
+        boolean isMultiple,
+        String fullItemType
+    ) throws SAXException {
+
         reusableAttributes.clear();
 //        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.containingDocument(), templateId));
         // Client queries template by id without namespace, so output that. Not ideal as all ids should be namespaced.
@@ -318,7 +371,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 
-    private void outputJSONTreeInfo(XFormsValueControl control, Itemset itemset, boolean encode, ContentHandler contentHandler) throws SAXException {
+    private void outputJSONTreeInfo(
+        XFormsValueControl control,
+        Itemset itemset,
+        boolean encode,
+        ContentHandler contentHandler
+    ) throws SAXException {
         if (control != null && ! handlerContext.isTemplate()) {
             // Produce a JSON fragment with hierarchical information
             final String result = itemset.getJSONTreeInfo(control.getValue(), encode, handlerContext.getLocationData());
@@ -328,11 +386,25 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    public static void handleItemFull(XFormsBaseHandlerXHTML baseHandler, ContentHandler contentHandler,
-                                      AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
-                                      XFormsContainingDocument containingDocument, XFormsValueControl control,
-                                      String itemName, String itemEffectiveId, boolean isMultiple, String type,
-                                      Item item, boolean isFirst, boolean isBooleanInput, boolean isStaticReadonly, boolean encode) throws SAXException {
+    public static void handleItemFull(
+        XFormsBaseHandlerXHTML baseHandler,
+        ContentHandler contentHandler,
+        AttributesImpl reusableAttributes,
+        Attributes attributes,
+        String xhtmlPrefix,
+        String spanQName,
+        XFormsContainingDocument containingDocument,
+        XFormsValueControl control,
+        String itemName,
+        String itemEffectiveId,
+        boolean isMultiple,
+        String type,
+        Item item,
+        boolean isFirst,
+        boolean isBooleanInput,
+        boolean isStaticReadonly,
+        boolean encode
+    ) throws SAXException {
 
         final HandlerContext handlerContext = baseHandler.getHandlerContext();
 
@@ -451,8 +523,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         return isSelected;
     }
 
-    private void handleItemCompact(ContentHandler contentHandler, String optionQName, XFormsValueControl xformsControl,
-                                   boolean isMultiple, Item item, boolean encode) throws SAXException {
+    private void handleItemCompact(
+        ContentHandler contentHandler,
+        String optionQName,
+        XFormsValueControl xformsControl,
+        boolean isMultiple,
+        Item item,
+        boolean encode
+    ) throws SAXException {
 
         final String itemClasses = getItemClasses(item, null);
         final AttributesImpl optionAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null);
@@ -502,7 +580,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     public static String getItemId(String effectiveId, String itemIndex) {
-        return XFormsUtils.appendToEffectiveId(effectiveId, "" + XFormsConstants.COMPONENT_SEPARATOR + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex);
+        return XFormsUtils.appendToEffectiveId(
+            effectiveId,
+            "" + XFormsConstants.COMPONENT_SEPARATOR + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex
+        );
     }
 
     @Override

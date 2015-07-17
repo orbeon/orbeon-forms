@@ -55,7 +55,7 @@ object Mediatypes {
         } yield
             mapping.extension
 
-    object Private {
+    private object Private {
 
         class MimeTypesContentHandler extends ForwardingXMLReceiver {
 

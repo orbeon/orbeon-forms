@@ -144,6 +144,17 @@ body.orbeon {
   margin-top: 3px;
   margin-top: 0px\9;
 }
+.orbeon .xforms-horizontal label.radio,
+.orbeon .xforms-horizontal label.checkbox {
+  display: inline-block;
+  padding-top: 5px;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+.orbeon .xforms-horizontal label.radio + label.radio,
+.orbeon .xforms-horizontal label.checkbox + label.checkbox {
+  margin-left: 10px;
+}
 .orbeon select[multiple],
 .orbeon .xforms-select1-appearance-compact select,
 .orbeon .xforms-select-appearance-compact select {

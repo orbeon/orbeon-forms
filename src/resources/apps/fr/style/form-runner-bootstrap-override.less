@@ -153,6 +153,19 @@ body.orbeon {
         }
     }
 
+    // Bootstrap requires .inline, .radio-inline or .checkbox-inline on each label, which is heavy
+    .xforms-horizontal {
+        label.radio, label.checkbox {
+          display: inline-block;
+          padding-top: 5px;
+          margin-bottom: 0;
+          vertical-align: middle;
+        }
+        label.radio + label.radio, label.checkbox + label.checkbox {
+          margin-left: 10px; // space out consecutive inline controls
+        }
+    }
+
     select[multiple],
     .xforms-select1-appearance-compact select,
     .xforms-select-appearance-compact select {

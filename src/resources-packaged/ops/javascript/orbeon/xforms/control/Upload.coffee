@@ -62,11 +62,13 @@ class Upload extends Control
     uploadDone: () ->
         ajaxResponseProcessed = () =>
             ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe ajaxResponseProcessed
-            # However, if we don't (thus the progress indicator is still shown), this means some XForms reset the file name
+            # If progress indicator is still shown, this means some XForms reset the file name
+            # NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
             if YD.hasClass this.container, "xforms-upload-state-progress"
                 # So switch back to the file selector, as we won't get a file name anymore
                 @setState "empty"
         # After the file is uploaded, in general at the next Ajax response, we get the file name
+        # NOTE: Not (always?) the case, see: https://github.com/orbeon/orbeon-forms/issues/2318
         ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe ajaxResponseProcessed
 
     # When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.

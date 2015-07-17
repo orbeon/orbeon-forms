@@ -1,13 +1,13 @@
 @media (max-width: 980px) {
   .orbeon .fr-view {
-    width: inherit;
+    width: auto;
     padding: 0 10px;
   }
   .orbeon .navbar-inner {
     border-radius: 0;
   }
   .orbeon .span12 {
-    width: initial;
+    width: auto;
     float: none;
   }
   .orbeon .fr-buttons .xforms-trigger button {

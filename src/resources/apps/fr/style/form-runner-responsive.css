@@ -30,11 +30,11 @@
   }
   .orbeon .xbl-fr-wizard .fr-wizard-body {
     width: 100%;
-    position: initial;
+    position: static;
     border: none;
   }
   .orbeon .xbl-fr-wizard .fr-wizard-toc {
-    position: initial;
+    position: static;
     width: 100%;
   }
   .orbeon.xforms-mobile select,

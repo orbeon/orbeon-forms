@@ -31,7 +31,8 @@
             element="
                 fr|number,
                 xf|input:xxf-type('xs:decimal')"
-            xxbl:mode="lhha binding value focus">
+            xxbl:mode="lhha binding value focus"
+            xxbl:label-for="html-input">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -161,6 +162,7 @@
                             <xh:span class="fr-width-10em {{(if ($prefix) then 'input-prepend' else (), if ($suffix) then 'input-append' else ())}}">
                                 <xf:group class="add-on" ref=".[$prefix]"><xf:output value="$prefix"/></xf:group>
                                 <xh:input
+                                    id="html-input"
                                     class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
                                     type="text"
                                     xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength"/>

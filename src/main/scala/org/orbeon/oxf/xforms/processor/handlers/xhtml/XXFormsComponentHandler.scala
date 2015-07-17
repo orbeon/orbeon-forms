@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import java.lang.StringBuilder
+
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
-import org.xml.sax.{Locator, Attributes}
 import org.orbeon.oxf.xml._
-import java.lang.StringBuilder
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.xml.sax.{Attributes, Locator}
 
 class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
@@ -99,24 +101,44 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
 
     // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
+    // TODO: Most of this should be done statically, not dynamically. See also `findTargetControlFor`.
     override def getForEffectiveId(effectiveId: String) = {
-        for {
-            labelForStaticId    ← binding.abstractBinding.labelFor
-            currentControl      ← currentControlOpt // can be missing if we are in template
-            labelForPrefixedId  ← binding.innerScope.prefixedIdForStaticIdOpt(labelForStaticId)
-            staticTarget        ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
-            targetControlFor    ← {
-                // Assume the target is within the same repeat iteration
-                val suffix              = XFormsUtils.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-                val labelForEffectiveId = labelForPrefixedId + suffix
 
-                // Push/pop component context so that handler resolution works
-                handlerContext.pushComponentContext(getPrefixedId)
-                try XFormsLHHAHandler.findTargetControlFor(handlerContext, staticTarget, labelForEffectiveId)
-                finally handlerContext.popComponentContext()
-            }
-        } yield
-            targetControlFor
+        val labelForStaticIdOpt = binding.abstractBinding.labelFor
+
+        val staticTargetAndLabelForPrefixedIdOpt =
+            for {
+                labelForStaticId   ← labelForStaticIdOpt
+                labelForPrefixedId ← binding.innerScope.prefixedIdForStaticIdOpt(labelForStaticId)
+                staticTarget       ← containingDocument.getStaticOps.findControlAnalysis(labelForPrefixedId)
+            } yield
+                (staticTarget, labelForPrefixedId)
+
+        staticTargetAndLabelForPrefixedIdOpt match {
+            case Some((staticTarget, labelForPrefixedId)) ⇒
+                // `label-for` is known statically
+                for {
+                    currentControl   ← currentControlOpt // can be missing if we are in template
+                    targetControlFor ← {
+                        // Assume the target is within the same repeat iteration
+                        val suffix              = getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
+                        val labelForEffectiveId = labelForPrefixedId + suffix
+
+                        // Push/pop component context so that handler resolution works
+                        handlerContext.pushComponentContext(getPrefixedId)
+                        try XFormsLHHAHandler.findTargetControlFor(handlerContext, staticTarget, labelForEffectiveId)
+                        finally handlerContext.popComponentContext()
+                    }
+                } yield
+                    targetControlFor
+            case None ⇒
+                // `label-for` is now known statically, assume it's a nested HTML element
+                for {
+                    labelForStaticId ← labelForStaticIdOpt
+                    currentControl   ← currentControlOpt // can be missing if we are in template
+                } yield
+                    getRelatedEffectiveId(currentControl.getEffectiveId + COMPONENT_SEPARATOR, labelForStaticId)
+        }
     } orNull
 }
 

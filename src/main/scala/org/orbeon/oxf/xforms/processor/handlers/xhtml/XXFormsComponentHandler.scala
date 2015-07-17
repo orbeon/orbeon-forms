@@ -126,7 +126,7 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
                         // Push/pop component context so that handler resolution works
                         handlerContext.pushComponentContext(getPrefixedId)
-                        try XFormsLHHAHandler.findTargetControlFor(handlerContext, staticTarget, labelForEffectiveId)
+                        try XFormsLHHAHandler.findTargetControlForEffectiveId(handlerContext, staticTarget, labelForEffectiveId)
                         finally handlerContext.popComponentContext()
                     }
                 } yield

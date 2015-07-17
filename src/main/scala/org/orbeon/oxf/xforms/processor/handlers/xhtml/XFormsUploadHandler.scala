@@ -44,7 +44,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
 
         // Enclosing xhtml:span
         withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", containerAttributes) {
-    
+
             // xhtml:input unless static readonly
             if (! XFormsBaseHandler.isStaticReadonly(control)) {
                 reusableAttributes.clear()
@@ -62,11 +62,11 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
                 // @accept
                 uploadControl flatMap (_.acceptValue) map mediatypeToAccept foreach
                     (accept ⇒ reusableAttributes.addAttribute("", "accept", "accept", XMLReceiverHelper.CDATA, accept))
-    
+
                 XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
                 element(xhtmlPrefix, XHTML_NAMESPACE_URI, "input", reusableAttributes)
             }
-    
+
             // Nested xhtml:span for xforms-upload-info
             reusableAttributes.clear()
             reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-info")
@@ -99,5 +99,8 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
     }
 
     override def getForEffectiveId(effectiveId: String) =
-        XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(getEffectiveId, XFormsConstants.COMPONENT_SEPARATOR + "xforms-input"))
+        XFormsUtils.namespaceId(
+            containingDocument,
+            XFormsUtils.appendToEffectiveId(getEffectiveId, XFormsConstants.COMPONENT_SEPARATOR + "xforms-input")
+        )
 }

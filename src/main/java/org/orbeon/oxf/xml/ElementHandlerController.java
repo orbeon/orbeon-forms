@@ -21,6 +21,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Tuple2;
 
 import java.util.*;
 
@@ -497,7 +498,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
      * @param element   element
      * @return          handler if found
      */
-    public ElementHandler getHandler(Element element) {
+    public Tuple2<ElementHandler, Object> getHandler(Element element) {
         final HandlerInfo handlerInfo =
             getHandler(
                 element.getNamespaceURI(),
@@ -505,7 +506,9 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 Dom4jUtils.getSAXAttributes(element)
             );
 
-        return (handlerInfo != null) ? handlerInfo.elementHandler : null;
+        return (handlerInfo != null)
+            ? new scala.Tuple2<ElementHandler, Object>(handlerInfo.elementHandler, handlerInfo.matched)
+            : null;
     }
 
     private HandlerInfo getHandler(String uri, String explodedQName, Attributes attributes) {

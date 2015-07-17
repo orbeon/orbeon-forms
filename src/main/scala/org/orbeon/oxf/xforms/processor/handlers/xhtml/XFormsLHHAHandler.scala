@@ -43,7 +43,7 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                         val isTemplate = handlerContext.isTemplate
 
                         // Find concrete control if possible, to retrieve the concrete LHHA values
-                        val xformsControl =
+                        val xformsControlOpt =
                             if (! isTemplate) {
                                 Option(containingDocument.getControls.resolveObjectById(lhhaEffectiveId, targetControl.staticId, null)) match {
                                     case Some(control: XFormsControl) ⇒ Some(control)
@@ -70,19 +70,19 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
 
                         val lhhaType = LHHAC.valueOf(localname.toUpperCase)
 
-                        val forEffectiveId =
+                        val forEffectiveIdOpt =
                             if (lhhaType == LHHAC.LABEL)
-                                XFormsLHHAHandler.findTargetControlFor(handlerContext, targetControl, targetControlEffectiveId)
+                                XFormsLHHAHandler.findTargetControlForEffectiveId(handlerContext, targetControl, targetControlEffectiveId)
                             else
                                 None
 
                         handleLabelHintHelpAlert(
                             lhhaAnalysis,
                             targetControlEffectiveId,
-                            forEffectiveId.orNull,
+                            forEffectiveIdOpt.orNull,
                             lhhaType,
                             null,
-                            xformsControl.orNull,
+                            xformsControlOpt.orNull,
                             isTemplate,
                             true
                         )
@@ -101,17 +101,26 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
 
 object XFormsLHHAHandler {
 
-    def findTargetControlFor(handlerContext: HandlerContext, targetControl: ElementAnalysis, targetControlEffectiveId: String): Option[String] = {
+    def findTargetControlForEffectiveId(
+        handlerContext           : HandlerContext,
+        targetControl            : ElementAnalysis,
+        targetControlEffectiveId : String
+    ): Option[String] = {
 
-        // NOTE: This is funky. We do this because for some controls, @for does not point to the standard foo$bar$$c.1-2-3
-        // id, but to another id. So we try to guess which handler is being used. However, this will not produce the
-        // correct result all the time as matching is not only based on QName! A much better solution would be to always
-        // use the foo$bar$$c.1-2-3 scheme for the @for id of a control. Also note that some controls don't support @for.
+        // The purpose of this code is to identity the id of the target of the `for` attribute for the given target
+        // control. In order to do that, we:
+        //
+        // - find which handler will process that control
+        // - instantiate that handler
+        // - so we can call `getForEffectiveId` on it
+        //
+        // NOTE: A possibly simpler better solution would be to always use the foo$bar$$c.1-2-3 scheme for the @for id
+        // of a control.
 
         val controlElement = targetControl.element
 
         handlerContext.getController.getHandler(controlElement) match {
-            case handler: XFormsControlLifecyleHandler ⇒
+            case (handler: XFormsControlLifecyleHandler, matched: AnyRef) ⇒
 
                 // Perform minimal handler initialization because we just want to use it to get the effective id
                 handler.setContext(handlerContext)
@@ -121,7 +130,8 @@ object XFormsLHHAHandler {
                     controlElement.getName,
                     XMLUtils.buildQName(controlElement.getNamespacePrefix, controlElement.getName),
                     Dom4jUtils.getSAXAttributes(controlElement),
-                    targetControl)
+                    matched
+                )
 
                 Some(handler.getForEffectiveId(targetControlEffectiveId))
             case _ ⇒

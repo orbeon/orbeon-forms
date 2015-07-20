@@ -579,7 +579,7 @@ object PageFlowControllerProcessor {
 
         // Require authorization based on whether the request method is considered publicly accessible or not. If it
         // is public, then authorization does not take place.
-        def requireAuthorization(request: Request) =
+        private def requireAuthorization(request: Request) =
             ! routeElement.publicMethods(request.getMethod)
 
         // Authorize the incoming request. Throw an HttpStatusCodeException if the request requires authorization

@@ -644,14 +644,45 @@
                                             <!-- Document name and href for edition -->
                                             <xf:var name="current-document-name" value="@name" as="xs:string"/>
                                             <!-- TODO: remove this once we can assume that all the persistence API implementations return @operations -->
-                                            <xf:var name="current-document-operations" value="if (exists(@operations)) then xxf:split(@operations) else $global-operations" as="xs:string*"/>
-                                            <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
-                                            <xf:var name="req-parameters" value="(
+                                            <xf:var
+                                                name="current-document-operations"
+                                                value="if (exists(@operations)) then xxf:split(@operations) else $global-operations" as="xs:string*"/>
+                                            <xf:var
+                                                name="edit-view"
+                                                value="
+                                                    if ($current-document-operations = ('*', 'update')) then
+                                                        'edit'
+                                                    else if ($current-document-operations = 'read') then
+                                                        'view'
+                                                    else
+                                                        ''"/>
+                                            <xf:var
+                                                name="req-parameters"
+                                                value="(
                                                     if (property('xxf:noscript')) then 'fr-noscript=true' else (),
                                                     if ($document/@draft = 'true') then 'draft=true' else ()
                                                 )"/>
-                                            <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/', $current-document-name,
-                                                    if (exists($req-parameters)) then concat('?', string-join($req-parameters, '&amp;')) else '')"/>
+                                            <xf:var
+                                                name="current-document-href"
+                                                value="
+                                                    concat(
+                                                        string-join(
+                                                            (
+                                                                '/fr',
+                                                                $app,
+                                                                $form,
+                                                                $edit-view,
+                                                                $current-document-name
+                                                            ),
+                                                            '/'
+                                                        ),
+                                                        if (exists($req-parameters)) then
+                                                            concat('?', string-join($req-parameters, '&amp;'))
+                                                        else
+                                                            ''
+                                                    )
+                                                    "
+                                            />
                                             <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                                 <xh:td class="fr-summary-repeat-selection-checkbox">
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">

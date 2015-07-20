@@ -156,7 +156,7 @@ trait FormRunnerPermissions {
                    || formEl.elemValue("available") == "false")   // Filter forms marked as not available
 
             // If kept, rewrite <form> to add operations="…" attribute
-            keepForm.list {
+            keepForm list {
                 val newFormEl = wrapper.wrap(element("form"))
                 val operationsAttr = attributeInfo("operations", operations mkString " ")
                 val newFormContent = operationsAttr +: formEl.child(*)

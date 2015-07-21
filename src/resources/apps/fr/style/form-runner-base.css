@@ -479,9 +479,17 @@
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
   width: 29px;
 }
+.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
+.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
+  width: 32px;
+}
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
   width: 43px;
+}
+.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
+.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
+  width: 54px;
 }
 .orbeon #fr-view .xforms-help-popover {
   font-size: 13px;

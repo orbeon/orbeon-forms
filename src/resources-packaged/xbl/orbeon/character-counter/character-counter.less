@@ -54,8 +54,18 @@
     }
 
     .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-        .xbl-fr-character-counter > .fr-charcounter-wrapper > .fr-charcounter-count {
-            display: none;
+        .xbl-fr-character-counter > .fr-charcounter-wrapper {
+
+            display: inline;
+
+            &> * {
+                display: inline;
+            }
+
+            &> .fr-charcounter-count {
+                display: none;
+            }
+
         }
     }
 }

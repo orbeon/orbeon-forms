@@ -482,7 +482,7 @@
                                             <xf:var name="true-or-false" value="$required = ('true()', 'false()')"/>
                                             <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
 
-                                            <xf:select1 ref="$required" appearance="full" class="xforms-horizontal">
+                                            <xf:select1 ref="$required" appearance="full xxf:horizontal">
                                                 <!--  Place "No" first as that is the default -->
                                                 <xf:itemset ref="$items[@id = 1], $items[@id = (0, 2)]">
                                                     <xf:label ref="."/>

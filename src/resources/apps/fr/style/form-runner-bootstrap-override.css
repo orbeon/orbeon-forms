@@ -144,15 +144,19 @@ body.orbeon {
   margin-top: 3px;
   margin-top: 0px\9;
 }
-.orbeon .xforms-horizontal label.radio,
-.orbeon .xforms-horizontal label.checkbox {
+.orbeon .xforms-select1-appearance-xxforms-horizontal label.radio,
+.orbeon .xforms-select-appearance-xxforms-horizontal label.radio,
+.orbeon .xforms-select1-appearance-xxforms-horizontal label.checkbox,
+.orbeon .xforms-select-appearance-xxforms-horizontal label.checkbox {
   display: inline-block;
   padding-top: 5px;
   margin-bottom: 0;
   vertical-align: middle;
 }
-.orbeon .xforms-horizontal label.radio + label.radio,
-.orbeon .xforms-horizontal label.checkbox + label.checkbox {
+.orbeon .xforms-select1-appearance-xxforms-horizontal label.radio + label.radio,
+.orbeon .xforms-select-appearance-xxforms-horizontal label.radio + label.radio,
+.orbeon .xforms-select1-appearance-xxforms-horizontal label.checkbox + label.checkbox,
+.orbeon .xforms-select-appearance-xxforms-horizontal label.checkbox + label.checkbox {
   margin-left: 10px;
 }
 .orbeon select[multiple],

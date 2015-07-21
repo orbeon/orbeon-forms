@@ -248,9 +248,10 @@ class XBLBindings(
                             baseURI
                         ),
                         metadata,
-                        false) {
-                        // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls
-                        // and shadow trees
+                        false
+                    ) {
+                        // Use prefixed id for marks and namespaces in order to avoid clashes between top-level
+                        // controls and shadow trees
                         protected override def rewriteId(id: String) = containerScope.fullPrefix + id
                     },
                     Whitespace.defaultHTMLPolicy,

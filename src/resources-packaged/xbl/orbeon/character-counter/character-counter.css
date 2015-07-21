@@ -28,6 +28,16 @@
 .orbeon .xbl-fr-character-counter > .fr-charcounter-wrapper > .xbl-fr-tinymce {
   width: 100%;
 }
+.orbeon .fr-mode-view .xbl-fr-character-counter > .fr-charcounter-wrapper,
+.orbeon .fr-mode-pdf .xbl-fr-character-counter > .fr-charcounter-wrapper,
+.orbeon .fr-mode-email .xbl-fr-character-counter > .fr-charcounter-wrapper {
+  display: inline;
+}
+.orbeon .fr-mode-view .xbl-fr-character-counter > .fr-charcounter-wrapper > *,
+.orbeon .fr-mode-pdf .xbl-fr-character-counter > .fr-charcounter-wrapper > *,
+.orbeon .fr-mode-email .xbl-fr-character-counter > .fr-charcounter-wrapper > * {
+  display: inline;
+}
 .orbeon .fr-mode-view .xbl-fr-character-counter > .fr-charcounter-wrapper > .fr-charcounter-count,
 .orbeon .fr-mode-pdf .xbl-fr-character-counter > .fr-charcounter-wrapper > .fr-charcounter-count,
 .orbeon .fr-mode-email .xbl-fr-character-counter > .fr-charcounter-wrapper > .fr-charcounter-count {

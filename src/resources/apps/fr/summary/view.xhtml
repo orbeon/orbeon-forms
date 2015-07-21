@@ -755,39 +755,94 @@
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
                                                         <xh:td>
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
-                                                            <xf:var name="detail" value="
-                                                                for $query in instance('fr-search-instance')/query[$detail-position + 1] return
+                                                            <xf:var
+                                                                name="detail"
+                                                                value="
+                                                                    for $raw     in . return
+                                                                    for $query   in instance('fr-search-instance')/query[$detail-position + 1] return
                                                                     for $control in $query/@control return
                                                                         if ($control = 'textarea') then
-                                                                            if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
+                                                                            if (string-length($raw) > 20) then
+                                                                                concat(substring($raw, 1, 20), '...')
+                                                                            else
+                                                                                $raw
                                                                         else if (frf:isMultipleSelectionControl($control)) then
-                                                                            string-join(for $v in xxf:split() return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1], ', ')
+                                                                            string-join(
+                                                                                for $code in xxf:split($raw) return
+                                                                                    ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1],
+                                                                                ', '
+                                                                            )
                                                                         else if (frf:isSingleSelectionControl($control)) then
-                                                                            for $v in . return ($form-resources/*[local-name() = $query/@name]/item[value = $v]/label, $v)[1]
+                                                                            for $code in $raw return
+                                                                                ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]
                                                                         else if ($control = 'secret') then
-                                                                            if (normalize-space(.) = '') then '' else '••••••••'
+                                                                            if (normalize-space($raw) = '') then
+                                                                                ''
+                                                                            else
+                                                                                '••••••••'
                                                                         else
                                                                             for $type in substring-after($query/@type, ':') return
                                                                                 if ($type = 'date') then
-                                                                                    (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxf:lang(), (), ()) else .)
+                                                                                    if ($raw castable as xs:date) then
+                                                                                        format-date(
+                                                                                            xs:date($raw),
+                                                                                            $fr-resources/summary/formats/date,
+                                                                                            xxf:lang(),
+                                                                                            (),
+                                                                                            ()
+                                                                                        )
+                                                                                    else
+                                                                                        $raw
                                                                                 else if ($type = 'time') then
-                                                                                    (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxf:lang(), (), ()) else .)
+                                                                                    if ($raw castable as xs:time) then
+                                                                                        format-time(
+                                                                                            xs:time($raw),
+                                                                                            $fr-resources/summary/formats/time,
+                                                                                            xxf:lang(),
+                                                                                            (),
+                                                                                            ()
+                                                                                        )
+                                                                                    else
+                                                                                        $raw
                                                                                 else if ($type = 'dateTime') then
-                                                                                    (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxf:lang(), (), ()) else .)
+                                                                                    if ($raw castable as xs:dateTime) then
+                                                                                        format-dateTime(
+                                                                                            xs:dateTime($raw),
+                                                                                            $fr-resources/summary/formats/dateTime,
+                                                                                            xxf:lang(),
+                                                                                            (),
+                                                                                            ()
+                                                                                        )
+                                                                                    else
+                                                                                        $raw
                                                                                 else if ($type = 'dayTimeDuration') then
-                                                                                    (
-                                                                                        if (. castable as xs:dayTimeDuration) then
-                                                                                            string-join(
-                                                                                                (
-                                                                                                    if (days-from-duration(.) = 0) then () else concat(days-from-duration(.), ' d'),
-                                                                                                    if (hours-from-duration(.) = 0) then () else concat(hours-from-duration(.), ' h'),
-                                                                                                    if (minutes-from-duration(.) = 0) then () else concat(minutes-from-duration(.), ' min'),
-                                                                                                    if (seconds-from-duration(.) = 0) then () else concat(seconds-from-duration(.), ' sec')
-                                                                                                 ), ' '
-                                                                                            )
-                                                                                        else .
-                                                                                    )
-                                                                                else ."/>
+                                                                                    if ($raw castable as xs:dayTimeDuration) then
+                                                                                        string-join(
+                                                                                            (
+                                                                                                if (days-from-duration($raw) = 0) then
+                                                                                                    ()
+                                                                                                else
+                                                                                                    concat(days-from-duration($raw), ' d'),
+                                                                                                if (hours-from-duration($raw) = 0) then
+                                                                                                    ()
+                                                                                                else
+                                                                                                    concat(hours-from-duration($raw), ' h'),
+                                                                                                if (minutes-from-duration($raw) = 0) then
+                                                                                                    ()
+                                                                                                else
+                                                                                                    concat(minutes-from-duration($raw), ' min'),
+                                                                                                if (seconds-from-duration($raw) = 0) then
+                                                                                                    ()
+                                                                                                else
+                                                                                                    concat(seconds-from-duration($raw), ' sec')
+                                                                                             ),
+                                                                                             ' '
+                                                                                        )
+                                                                                    else
+                                                                                        $raw
+                                                                                else
+                                                                                    $raw
+                                                            "/>
                                                             <xf:group ref=".[$edit-view != '']">
                                                                 <xh:a href="{$current-document-href}">
                                                                     <xf:output value="$detail"/>

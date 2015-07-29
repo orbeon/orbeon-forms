@@ -238,8 +238,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             }
         }
 
-        // Check @for attribute
-        for(String refIdAttributeName : refIdAttributeNames)
+        // Check @for or other attribute
+        for (String refIdAttributeName : refIdAttributeNames)
         {
             final String forAttribute = attributes.getValue(refIdAttributeName);
             if (forAttribute != null) {

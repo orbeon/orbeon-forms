@@ -7,6 +7,9 @@
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/lib/src" />
+      <root url="jar://$USER_HOME$/.ideaLibSources/httpclient-4.3.5-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.ideaLibSources/ehcache-core-2.6.3-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.ideaLibSources/scalatest_2.11-2.2.4-sources.jar!/" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/oracle" recursive="false" />

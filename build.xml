@@ -834,6 +834,24 @@
             <include name="**/*.coffee"/>
         </coffee-script>
 
+        <!-- Compile Scala.js -->
+        <if>
+            <isset property="skip.compilation"/>
+            <then>
+                <!-- This does in fact compile Scala.js files, but does not run the expensive optimizations -->
+                <exec executable="sbt">
+                    <arg value="project formBuilder"/>
+                    <arg value="fastOptJSToExplodedWar"/>
+                </exec>
+            </then>
+            <else>
+                <exec executable="sbt">
+                    <arg value="project formBuilder"/>
+                    <arg value="fullOptJSToExplodedWar"/>
+                </exec>
+            </else>
+        </if>
+
         <!-- Copy non-minimized CoffeeScript resources -->
         <copy todir="${war.dir}/WEB-INF/resources">
             <fileset dir="${build.dir}/js">

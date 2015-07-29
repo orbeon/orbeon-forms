@@ -1,4 +1,5 @@
 build/
+builder/target/
 tmp/
 target/
 build-local.properties

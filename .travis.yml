@@ -19,3 +19,6 @@ env:
     - secure: "oddq5H6A4CIOps7nZsDHWVNhjKoAZ7hbdIXHCgh1IS9dV5cb7kZFwnmRNTO1ZaTwrwpwzIZoQqfAfH7jdGVmSFiVlbT3iHjb9nfpTo8CcA5oVnIfGdkx4c55lA04yPP6AY7HGzPDdlH4STWPNz0W6ZPuaPK8cI84V/Z8UXfR0Qg="
 before_script:
   - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
+script:
+    # Force use of ant even if other build files are found
+    - ant test

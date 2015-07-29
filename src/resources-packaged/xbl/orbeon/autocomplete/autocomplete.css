@@ -1,12 +1,16 @@
+.xbl-fr-autocomplete {
+  display: inline-block;
+  width: 100%;
+}
 .xbl-fr-autocomplete .fr-autocomplete-container {
   display: table;
 }
-.xbl-fr-autocomplete .fr-autocomplete-container > div {
+.xbl-fr-autocomplete .fr-autocomplete-container > .yui-ac {
   position: static;
   display: table-row;
 }
-.xbl-fr-autocomplete .fr-autocomplete-container > div > .fr-autocomplete-search,
-.xbl-fr-autocomplete .fr-autocomplete-container > div > .fr-autocomplete-show-suggestions-button {
+.xbl-fr-autocomplete .fr-autocomplete-container > .yui-ac > .fr-autocomplete-search,
+.xbl-fr-autocomplete .fr-autocomplete-container > .yui-ac > .fr-autocomplete-show-suggestions-button {
   display: table-cell;
 }
 .xbl-fr-autocomplete .fr-autocomplete-search {

@@ -48,6 +48,11 @@ object InternalHttpClient extends HttpClient {
         val incomingExternalContext = NetUtils.getExternalContext
         val incomingRequest         = incomingExternalContext.getRequest
 
+        // NOTE: Only `oxf:redirect` calls `Response.sendRedirect` with `isServerSide = true`. In turn, `oxf:redirect`
+        // is only called from the PFC with action results, and only passes `isServerSide = true` if
+        // `instance-passing = "forward"`, which is not the default. Form Runner doesn't make use of this. Even in that
+        // case data is passed as a URL parameter called `$instance` instead of using a request body. However, one user
+        // has reported needing this to work as of 2015-05.
         @tailrec
         def processRedirects(
             pathQuery : String,

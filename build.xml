@@ -35,10 +35,10 @@
     <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
-            <pathelement location="lib/scala-compiler-2.11.6.jar"/>
-            <pathelement location="lib/scala-library-2.11.6.jar"/>
-            <pathelement location="lib/scala-reflect-2.11.6.jar"/>
-            <pathelement location="lib/scala-xml_2.11-1.0.3.jar"/>
+            <pathelement location="lib/scala-compiler-2.11.7.jar"/>
+            <pathelement location="lib/scala-library-2.11.7.jar"/>
+            <pathelement location="lib/scala-reflect-2.11.7.jar"/>
+            <pathelement location="lib/scala-xml_2.11-1.0.4.jar"/>
         </classpath>
     </taskdef>
 
@@ -154,8 +154,8 @@
 
         <include name="ehcache-core-2.6.3.jar"/>
 
-        <include name="scala-library-2.11.6.jar"/>
-        <include name="scala-xml_2.11-1.0.3.jar"/>
+        <include name="scala-library-2.11.7.jar"/>
+        <include name="scala-xml_2.11-1.0.4.jar"/>
         <include name="sbinary_2.11-SNAPSHOT.jar"/>
 
         <include name="rhino-1.7R2.jar"/>
@@ -414,7 +414,7 @@
             -injars      lib/commons-io-2.0.1.jar
             -injars      lib/commons-lang3-3.1.jar
             -injars      lib/commons-codec-1.6.jar
-            -injars      lib/scala-library-2.11.6.jar
+            -injars      lib/scala-library-2.11.7.jar
             -injars      lib/orbeon-errorified-20150511.jar
             -injars      lib/httpclient-4.3.5.jar
             -injars      lib/httpclient-cache-4.3.5.jar
@@ -470,8 +470,8 @@
             -injars      lib/commons-io-2.0.1.jar
             -injars      lib/commons-lang3-3.1.jar
             -injars      lib/commons-codec-1.6.jar
-            -injars      lib/scala-library-2.11.6.jar
-            -injars      lib/scala-xml_2.11-1.0.3.jar
+            -injars      lib/scala-library-2.11.7.jar
+            -injars      lib/scala-xml_2.11-1.0.4.jar
             -injars      lib/orbeon-errorified-20150511.jar
             -injars      lib/httpclient-4.3.5.jar
             -injars      lib/httpclient-cache-4.3.5.jar
@@ -532,7 +532,7 @@
 
             -injars      lib/commons-io-2.0.1.jar
             -injars      lib/commons-lang3-3.1.jar
-            -injars      lib/scala-library-2.11.6.jar
+            -injars      lib/scala-library-2.11.7.jar
             -injars      lib/orbeon-errorified-20150511.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
@@ -821,7 +821,7 @@
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1.2.17.jar"/>
-                <pathelement location="lib/scala-library-2.11.6.jar"/>
+                <pathelement location="lib/scala-library-2.11.7.jar"/>
                 <pathelement location="lib/orbeon-errorified-20150511.jar"/>
             </classpath>
         </taskdef>

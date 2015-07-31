@@ -38,19 +38,13 @@ object URLGeneratorBase {
     }
 
     def setIfModifiedIfNeeded(
-        headersOrNull      : Map[String, Array[String]], 
+        headersOrNull      : Map[String, Array[String]],
         lastModifiedOrNull : jl.Long
     ): ju.Map[String, Array[String]] = {
-        if (lastModifiedOrNull ne null) {
-            
-            val newHeader = "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModifiedOrNull))
-            
-            if (headersOrNull ne null)
-                headersOrNull + newHeader
-            else
-                Map(newHeader)
-        } else {
-            Map.empty[String, Array[String]]
-        }
+
+        val headersOrEmpty  = Option(headersOrNull) getOrElse Map.empty[String, Array[String]]
+        val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to[List]
+
+        headersOrEmpty ++ newHeaderAsList
     }.asJava
 }

@@ -252,6 +252,11 @@ body {
         img { float: left; margin: 1em 2em 0 1em; }
         .xforms-label { display: block; }
         .xforms-hint { margin-bottom: 1em; }
+
+        .tab-content {
+            padding: 10px 0;
+        }
+
         .fb-dialog-form-settings-fields {
             float: left;
             width: 475px;
@@ -262,6 +267,7 @@ body {
         }
 
         .fb-dialog-form-settings-stats {
+
             th { text-align: left }
             td { text-align: right; padding-left: .5em }
             &> .xforms-label { border-bottom: 1px solid #DDE }
@@ -481,7 +487,7 @@ body {
     // Test dialog
     .fb-test-dialog {
         width: 1000px;                              // Space to fit the 940px layout (couldn't find a reasonable variable to use here)
-        max-width: none;                            
+        max-width: none;
         .xxforms-dialog-body {
             .fb-dialog-remaining-height {
                 overflow: hidden !important;        // Override scroll above, to avoid 1px scroll (not why this is necessary, or how else to avoid this)

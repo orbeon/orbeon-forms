@@ -41,6 +41,12 @@
             <label>Logo</label>
             <hint>The logo appears at the top of your form</hint>
         </logo>
+        <general-settings>
+            <label>General Settings</label>
+        </general-settings>
+        <custom-settings>
+            <label>Custom Settings</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Cut</label>
@@ -249,7 +255,7 @@
             <label>Form Settings</label>
             <save-as>Save as…</save-as>
             <open><label>Form settings</label></open>
-            <stats>Form statistics</stats>
+            <stats>Form Statistics</stats>
             <sections>Sections</sections>
             <repeats>Repeats</repeats>
             <grids>Grids</grids>
@@ -914,6 +920,12 @@
             <label>Logo</label>
             <hint>Le logo apparaît au sommet de votre formulaire</hint>
         </logo>
+        <general-settings>
+            <label>Paramètres généraux</label>
+        </general-settings>
+        <custom-settings>
+            <label>Paramètres spécialisés</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Couper</label>
@@ -1789,6 +1801,12 @@
             <label>Logo</label>
             <hint>Logoen synes på toppen av skjemaene</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Klipp ut</label>
@@ -1997,7 +2015,7 @@
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form settings]</label></open>
-            <stats todo="true">[Form statistics</stats>
+            <stats todo="true">[Form Statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
             <grids todo="true">[Grids]</grids>
@@ -2664,6 +2682,12 @@
             <label>Логотип</label>
             <hint>Логотип отображается в верхней части формы</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Вырезать</label>
@@ -2872,7 +2896,7 @@
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form Settings]</label></open>
-            <stats todo="true">[Form statistics</stats>
+            <stats todo="true">[Form statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
             <grids todo="true">[Grids]</grids>
@@ -3539,6 +3563,12 @@
             <label>Logo</label>
             <hint>Il logo appare nella testa del modulo</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Taglia</label>
@@ -4406,6 +4436,12 @@
             <label>Logo</label>
             <hint>Das Logo erscheint oberhalb des Formulars</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Ausschneiden</label>
@@ -5275,6 +5311,12 @@
             <label>Logo</label>
             <hint>Logo näkyy lomakkeesi yläosassa</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Leikkaa</label>
@@ -6144,6 +6186,12 @@
             <label>Logo</label>
             <hint>El logo se desplega en la parte superior del formulario</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Cortar</label>
@@ -7019,6 +7067,12 @@
             <label>Logotipo</label>
             <hint>O logotipo que aparece to topo do formulário</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Cortar</label>
@@ -7893,6 +7947,12 @@
             <label>Logotyp</label>
             <hint>Bild som visas överst på formuläret</hint>
         </logo>
+        <general-settings>
+            <label todo="true">[General Settings]</label>
+        </general-settings>
+        <custom-settings>
+            <label todo="true">[Custom Settings]</label>
+        </custom-settings>
         <!-- Toolbox -->
         <cut>
             <label>Klipp ut</label>

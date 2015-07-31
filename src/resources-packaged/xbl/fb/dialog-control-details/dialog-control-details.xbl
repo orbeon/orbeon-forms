@@ -21,30 +21,33 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details" xxbl:mode="binding">
         <xbl:handlers>
             <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <xf:setvalue ref="original-control-name" value="fbf:controlNameFromId(event('control-id'))"/>
-                <xf:setvalue ref="control-name"          value="$i/original-control-name"/>
+                <xf:setvalue ref="$i/original-control-name" value="fbf:controlNameFromId(event('control-id'))"/>
+                <xf:setvalue ref="$i/control-name"          value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/control-names"      value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
+                <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllControlNamesXPath($form), ' ')"/>
 
-                <xf:var name="control"                   value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
-                <xf:var name="resources"                 value="frf:currentFormResources()"/>
+                <xf:var name="control"                      value="fbf:findControlByNameOrEmpty($form, $i/control-name)"/>
+                <xf:var name="resources"                    value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
-                <xf:var name="standard-classes"          value="$resources/dialog-control-details/options/item/value/string(), 'fr-attachment', 'fb-attachment'"/>
-                <xf:var name="control-classes"           value="xxf:split($control/@class)"/>
+                <xf:var name="standard-classes"             value="$resources/dialog-control-details/options/item/value/string(), 'fr-attachment', 'fb-attachment'"/>
+                <xf:var name="control-classes"              value="xxf:split($control/@class)"/>
 
-                <xf:setvalue ref="$i/standard-classes"   value="string-join($control-classes[. = $standard-classes], ' ')"/>
-                <xf:setvalue ref="$i/custom-classes"     value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
+                <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
+                <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <!-- Copy XBL control-details from xbl:binding in local instance -->
                 <xf:delete ref="$i/fb:control-details"/>
@@ -140,9 +143,27 @@
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <xxf:show dialog="dialog"/>
+
+                <!-- Tell custom settings to initialize -->
+                <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
+                    <xf:property name="form"                  value="$form/root()"/>
+                    <xf:property name="form-instance"         value="fbf:formInstanceRoot($form)"/>
+                    <xf:property name="metadata-instance"     value="fbf:metadataInstanceRoot($form)"/>
+                    <xf:property name="original-control-id"   value="event('control-id')"/>
+                    <xf:property name="original-control-name" value="$i/original-control-name"/>
+                    <xf:property name="data-holders"          value="fbf:findDataHolders($form, $i/original-control-name)"/>
+                </xf:dispatch>
+
             </xbl:handler>
-            <!-- Save data upon close unless the sub-form is not valid -->
-            <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and valid($i)" observer="dialog">
+            <!-- Save data upon close unless the sub-form is not valid. Do this upon capture phase so that we can
+                 process values, including custom control settings, before the dialog is actually closed and becomes
+                 non-relevant. -->
+            <xbl:handler
+                    event="xxforms-dialog-close"
+                    observer="group-around-dialog"
+                    phase="capture"
+                    if="event('fb-save') and valid($i)">
+
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
                 <xf:var name="old-name" value="$i/original-control-name/string()"/>
@@ -182,14 +203,36 @@
                     fbf:setControlHelp($i/control-name, $i/help),
                     fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
                 </xf:action>
+
+                <!-- Tell custom settings to apply changes -->
+                <xf:dispatch name="fb-apply" targetid="fb-custom-control-settings">
+                    <xf:property name="form"                  value="$form/root()"/>
+                    <xf:property name="form-instance"         value="fbf:formInstanceRoot($form)"/>
+                    <xf:property name="metadata-instance"     value="fbf:metadataInstanceRoot($form)"/>
+                    <xf:property name="control-name"          value="$i/control-name"/>
+                    <xf:property name="data-holders"          value="fbf:findDataHolders($form, $i/control-name)"/>
+                </xf:dispatch>
+
             </xbl:handler>
-            <xbl:handler event="DOMActivate" observer="control-name-input control-custom-input save-button">
-                <!-- Close and save if the data is valid-->
-                <xxf:hide if="valid($i)" dialog="dialog">
+            <!-- If valid, close and save... -->
+            <xbl:handler
+                event="DOMActivate"
+                observer="control-name-input control-custom-input save-button"
+                if="valid($i)">
+
+                <xxf:hide dialog="dialog">
                     <xf:property name="fb-save" value="true()"/>
                 </xxf:hide>
-                <!-- Mark all visited if the data is invalid -->
-                <xxf:setvisited if="not(valid($i))" control="dialog" recurse="true"/>
+
+            </xbl:handler>
+            <!-- ...else mark all visited so that errors show -->
+            <xbl:handler
+                event="DOMActivate"
+                observer="control-name-input control-custom-input save-button"
+                if="not(valid($i))" >
+
+                <xxf:setvisited control="dialog" recurse="true"/>
+
             </xbl:handler>
             <!-- Close and cancel upon DOMActivate -->
             <xbl:handler event="DOMActivate" observer="cancel-button">
@@ -345,321 +388,358 @@
 
             </xf:model>
         </xbl:implementation>
-        <xbl:template>
-            <!-- Bindings specified on control -->
-            <!-- LATER: Use xxf:r(). Need to find solution for itemset resources. -->
-            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xf:group xsl:version="2.0" id="group-around-dialog">
+                <!-- Bindings specified on control -->
+                <!-- LATER: Use xxf:r(). Need to find solution for itemset resources. -->
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
-            <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-details">
-                <xf:label ref="$resources/dialog-control-details/label"/>
+                <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-details">
+                    <xf:label ref="$resources/dialog-control-details/label"/>
 
-                <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
+                    <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
-                <!-- Figure out schema prefix if any -->
-                <xf:var name="schema"        value="fbf:findSchemaOrEmpty($form)"       as="xs:string?"/>
-                <xf:var name="schema-prefix" value="fbf:findSchemaPrefixOrEmpty($form)" as="xs:string?"/>
+                    <!-- Figure out schema prefix if any -->
+                    <xf:var name="schema"        value="fbf:findSchemaOrEmpty($form)"       as="xs:string?"/>
+                    <xf:var name="schema-prefix" value="fbf:findSchemaPrefixOrEmpty($form)" as="xs:string?"/>
 
-                <fr:tabbable id="fb-tabbable">
-                    <fr:tab id="base-tab">
-                        <fr:label ref="$resources/dialog-control-details/tab-base/label"/>
-                        <fr:grid id="fb-base-tab-grid">
-                            <xh:tr>
-                                <xh:td>
-                                    <!-- Control name -->
-                                    <xf:input ref="$i/control-name" incremental="true" id="control-name-input">
-                                        <xf:label ref="$resources/dialog-control-details/control-name/label"/>
-                                        <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
-                                    </xf:input>
-
-                                    <!-- Options (predefined classes) -->
-                                    <xf:select ref="$i/standard-classes" appearance="full">
-                                        <xf:label ref="$resources/dialog-control-details/options/label"/>
-                                        <xf:itemset ref="$resources/dialog-control-details/options/item">
-                                            <xf:label ref="label"/>
-                                            <xf:value ref="value"/>
-                                        </xf:itemset>
-                                    </xf:select>
-
-                                    <!-- Custom classes -->
-                                    <xf:input ref="$i/custom-classes">
-                                        <xf:label ref="$resources/classes/label"/>
-                                    </xf:input>
-                                </xh:td>
-                                <xh:td>
-                                    <!-- Appearances -->
-                                    <xf:var
-                                        name="toggle"
-                                        value="
-                                            count($i/appearances/appearance[normalize-space(value) = '']) = 1
-                                            and count($i/appearances/appearance[normalize-space(value) != '']) = 1"/>
-
-                                    <!-- Propose a choice between multiple items -->
-                                    <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) ge 1]" appearance="full">
-                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
-                                        <xf:itemset ref="$i/appearances/appearance">
-                                            <xf:label>
-                                                <xh:img src="{icon}" alt="" width="16" height="16"/>
-                                                <xf:output value="label"/>
-                                            </xf:label>
-                                            <xf:value ref="value"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                    <!-- Simplified case where we just show a checkbox -->
-                                    <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
-                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
-                                        <xf:itemset ref="$i/appearances/appearance[normalize-space(value) != '']">
-                                            <xf:label>
-                                                <xh:img src="{icon}" alt="" width="16" height="16"/>
-                                                <xf:output value="label"/>
-                                            </xf:label>
-                                            <xf:value ref="value"/>
-                                        </xf:itemset>
-                                    </xf:select>
-
-                                    <!-- Properties specific to this control defined in the XBL metadata -->
-                                    <xf:repeat ref="$i/fb:control-details/*" id="control-custom-input">
-                                        <xf:var name="position" value="position()"/>
-                                        <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
-                                        <xf:var name="xforms-control" value="."/>
-                                        <xf:input ref="if ($xforms-control/self::xf:input) then $bound-node else ()">
-                                            <xf:label ref="$xforms-control/xf:label"/>
-                                            <xf:hint ref="$xforms-control/xf:hint" appearance="minimal"/>
-                                            <xf:help ref="$xforms-control/xf:help"/>
-                                            <xf:alert ref="$xforms-control/xf:alert"/>
+                    <fr:tabbable id="fb-tabbable">
+                        <fr:tab id="base-tab">
+                            <fr:label ref="$resources/dialog-control-details/tab-base/label"/>
+                            <fr:grid id="fb-base-tab-grid">
+                                <xh:tr>
+                                    <xh:td>
+                                        <!-- Control name -->
+                                        <xf:input ref="$i/control-name" incremental="true" id="control-name-input">
+                                            <xf:label ref="$resources/dialog-control-details/control-name/label"/>
+                                            <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
                                         </xf:input>
-                                    </xf:repeat>
-                                </xh:td>
-                            </xh:tr>
-                        </fr:grid>
-                    </fr:tab>
-                    <fr:tab id="validations-tab" context="validations">
-                        <fr:label ref="$resources/dialog-control-details/tab-validations/label"/>
-                        <fr:grid>
-                            <xh:tr>
-                                <xh:td>
-                                    <xf:input bind="default-alert">
-                                        <xf:label ref="$resources/dialog-control-details/default-alert/label"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/default-hint/label"/>
-                                    </xf:input>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:input ref="$i/default-alert/alert/@global">
-                                        <xf:label ref="$resources/dialog-control-details/use-global-alert/label"/>
-                                        <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
-                                        <xf:action event="xforms-value-changed">
-                                            <xf:rebuild/><xf:recalculate/><xf:revalidate/>
-                                        </xf:action>
-                                    </xf:input>
-                                </xh:td>
-                            </xh:tr>
-                        </fr:grid>
 
-                        <fr:grid id="validations-grid" ref="validation" origin="instance('validation-constraint-template')" repeat="true" freeze="2">
-                            <xh:tr>
-                                <xh:td>
-                                    <xf:select1 ref="@type" appearance="minimal">
-                                        <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
-                                        <xf:itemset ref=".[. = 'required']">
-                                            <xf:label ref="$resources/dialog-control-details/required/label"/>
-                                            <xf:value>required</xf:value>
-                                        </xf:itemset>
-                                        <xf:itemset ref=".[. = 'datatype']">
-                                            <xf:label ref="$resources/dialog-control-details/types/label"/>
-                                            <xf:value>datatype</xf:value>
-                                        </xf:itemset>
-                                        <xf:itemset ref="$resources/dialog-control-details/constraint/item">
-                                            <xf:label ref="."/>
-                                            <xf:value ref="@id"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:group>
-                                        <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
-                                        <xf:group ref=".[@type = 'required']/required">
-                                            <xf:var name="required"      value="."/>
-                                            <xf:var name="true-or-false" value="$required = ('true()', 'false()')"/>
-                                            <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
+                                        <!-- Options (predefined classes) -->
+                                        <xf:select ref="$i/standard-classes" appearance="full">
+                                            <xf:label ref="$resources/dialog-control-details/options/label"/>
+                                            <xf:itemset ref="$resources/dialog-control-details/options/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </xf:select>
 
-                                            <xf:select1 ref="$required" appearance="full xxf:horizontal">
-                                                <!--  Place "No" first as that is the default -->
-                                                <xf:itemset ref="$items[@id = 1], $items[@id = (0, 2)]">
-                                                    <xf:label ref="."/>
-                                                    <!-- Tricky bits: map @id to XPath and handle case where we switch from
-                                                         true() or false() to XPath -->
-                                                    <xf:value ref="if (@id = 0)
-                                                                   then 'true()'
-                                                                   else if (@id = 1)
-                                                                   then 'false()'
-                                                                   else string($required[not($true-or-false)])"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                            <xf:input id="required-xpath" ref="$required[not($true-or-false)]">
+                                        <!-- Custom classes -->
+                                        <xf:input ref="$i/custom-classes">
+                                            <xf:label ref="$resources/classes/label"/>
+                                        </xf:input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <!-- Appearances -->
+                                        <xf:var
+                                            name="toggle"
+                                            value="
+                                                count($i/appearances/appearance[normalize-space(value) = '']) = 1
+                                                and count($i/appearances/appearance[normalize-space(value) != '']) = 1"/>
+
+                                        <!-- Propose a choice between multiple items -->
+                                        <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) ge 1]" appearance="full">
+                                            <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                            <xf:itemset ref="$i/appearances/appearance">
+                                                <xf:label>
+                                                    <xh:img src="{{icon}}" alt="" width="16" height="16"/>
+                                                    <xf:output value="label"/>
+                                                </xf:label>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                        <!-- Simplified case where we just show a checkbox -->
+                                        <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
+                                            <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                            <xf:itemset ref="$i/appearances/appearance[normalize-space(value) != '']">
+                                                <xf:label>
+                                                    <xh:img src="{{icon}}" alt="" width="16" height="16"/>
+                                                    <xf:output value="label"/>
+                                                </xf:label>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </xf:select>
+
+                                        <!-- Properties specific to this control defined in the XBL metadata -->
+                                        <xf:repeat ref="$i/fb:control-details/*" id="control-custom-input">
+                                            <xf:var name="position" value="position()"/>
+                                            <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
+                                            <xf:var name="xforms-control" value="."/>
+                                            <xf:input ref="if ($xforms-control/self::xf:input) then $bound-node else ()">
+                                                <xf:label ref="$xforms-control/xf:label"/>
+                                                <xf:hint ref="$xforms-control/xf:hint" appearance="minimal"/>
+                                                <xf:help ref="$xforms-control/xf:help"/>
+                                                <xf:alert ref="$xforms-control/xf:alert"/>
+                                            </xf:input>
+                                        </xf:repeat>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
+                        <fr:tab id="validations-tab" context="validations">
+                            <fr:label ref="$resources/dialog-control-details/tab-validations/label"/>
+                            <fr:grid>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:input bind="default-alert">
+                                            <xf:label ref="$resources/dialog-control-details/default-alert/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/default-hint/label"/>
+                                        </xf:input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="$i/default-alert/alert/@global">
+                                            <xf:label ref="$resources/dialog-control-details/use-global-alert/label"/>
+                                            <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:rebuild/><xf:recalculate/><xf:revalidate/>
+                                            </xf:action>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+
+                            <fr:grid id="validations-grid" ref="validation" origin="instance('validation-constraint-template')" repeat="true" freeze="2">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select1 ref="@type" appearance="minimal">
+                                            <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
+                                            <xf:itemset ref=".[. = 'required']">
                                                 <xf:label ref="$resources/dialog-control-details/required/label"/>
-                                                <!-- When the control appears and its value is empty, it means that the
-                                                     user just chose the "Formula" option. -->
-                                                <xf:setfocus
-                                                    event="xforms-enabled"
-                                                    if="normalize-space() = ''"
-                                                    control="required-xpath"/>
-                                            </xf:input>
+                                                <xf:value>required</xf:value>
+                                            </xf:itemset>
+                                            <xf:itemset ref=".[. = 'datatype']">
+                                                <xf:label ref="$resources/dialog-control-details/types/label"/>
+                                                <xf:value>datatype</xf:value>
+                                            </xf:itemset>
+                                            <xf:itemset ref="$resources/dialog-control-details/constraint/item">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="@id"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:group>
+                                            <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
+                                            <xf:group ref=".[@type = 'required']/required">
+                                                <xf:var name="required"      value="."/>
+                                                <xf:var name="true-or-false" value="$required = ('true()', 'false()')"/>
+                                                <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
+
+                                                <xf:select1 ref="$required" appearance="full xxf:horizontal">
+                                                    <!--  Place "No" first as that is the default -->
+                                                    <xf:itemset ref="$items[@id = 1], $items[@id = (0, 2)]">
+                                                        <xf:label ref="."/>
+                                                        <!-- Tricky bits: map @id to XPath and handle case where we switch from
+                                                             true() or false() to XPath -->
+                                                        <xf:value ref="if (@id = 0)
+                                                                       then 'true()'
+                                                                       else if (@id = 1)
+                                                                       then 'false()'
+                                                                       else string($required[not($true-or-false)])"/>
+                                                    </xf:itemset>
+                                                </xf:select1>
+                                                <xf:input id="required-xpath" ref="$required[not($true-or-false)]">
+                                                    <xf:label ref="$resources/dialog-control-details/required/label"/>
+                                                    <!-- When the control appears and its value is empty, it means that the
+                                                         user just chose the "Formula" option. -->
+                                                    <xf:setfocus
+                                                        event="xforms-enabled"
+                                                        if="normalize-space() = ''"
+                                                        control="required-xpath"/>
+                                                </xf:input>
+                                            </xf:group>
+
+                                            <!-- Built-in type -->
+                                            <xf:group ref=".[@type = 'datatype']">
+                                                <!-- Only keep reasonable types -->
+                                                <xf:var
+                                                    name="supported"
+                                                    value="'string', 'double', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email',
+                                                          builtin-type/string()"/><!-- add supported type only if already present in the data -->
+                                                <xf:select1 ref="builtin-type">
+                                                    <!-- Only show label if there is a schema -->
+                                                    <xf:label ref="$resources/dialog-control-details/builtin-type/label[exists($schema)]"/>
+                                                    <!-- Add placeholder if there is a schema type -->
+                                                    <xf:itemset ref=".[../schema-type != '']">
+                                                        <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
+                                                        <xf:value/>
+                                                    </xf:itemset>
+                                                    <xf:itemset ref="$resources/dialog-control-details/builtin-type/choices//(choices[exists(type[. = $supported])] | type[. = $supported])">
+                                                        <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then @label else ."/>
+                                                        <xf:value ref="if (self::choices) then () else ."/>
+                                                    </xf:itemset>
+                                                    <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                                    <!--  Update available appearances -->
+                                                    <xf:dispatch
+                                                        event="xforms-value-changed"
+                                                        name="reload-appearances"
+                                                        targetid="model">
+                                                        <xf:property name="is-initial-load" value="false()"/>
+                                                    </xf:dispatch>
+                                                </xf:select1>
+                                                <!-- Schema type selection if applicable -->
+                                                <fr:dropdown-select1 ref="schema-type[exists($schema)]">
+                                                    <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
+                                                    <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
+                                                    <xf:itemset ref="$schema/xs:simpleType">
+                                                        <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
+                                                        <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
+                                                    </xf:itemset>
+                                                    <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                                </fr:dropdown-select1>
+                                            </xf:group>
+
+                                            <xf:group ref=".[not(@type = ('required', 'datatype'))]">
+                                                <xf:textarea ref="constraint/@expression">
+                                                    <xf:label class="xforms-hidden" appearance="minimal" ref="$resources/dialog-control-details/formula/label"/>
+                                                    <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
+                                                </xf:textarea>
+                                                <xf:input ref="constraint/@argument">
+                                                    <xf:label appearance="minimal" ref="$resources/dialog-control-details/integer-argument/label"/>
+                                                    <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                                </xf:input>
+                                            </xf:group>
                                         </xf:group>
 
-                                        <!-- Built-in type -->
-                                        <xf:group ref=".[@type = 'datatype']">
-                                            <!-- Only keep reasonable types -->
-                                            <xf:var
-                                                name="supported"
-                                                value="'string', 'double', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email',
-                                                      builtin-type/string()"/><!-- add supported type only if already present in the data -->
-                                            <xf:select1 ref="builtin-type">
-                                                <!-- Only show label if there is a schema -->
-                                                <xf:label ref="$resources/dialog-control-details/builtin-type/label[exists($schema)]"/>
-                                                <!-- Add placeholder if there is a schema type -->
-                                                <xf:itemset ref=".[../schema-type != '']">
-                                                    <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
-                                                    <xf:value/>
-                                                </xf:itemset>
-                                                <xf:itemset ref="$resources/dialog-control-details/builtin-type/choices//(choices[exists(type[. = $supported])] | type[. = $supported])">
-                                                    <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then @label else ."/>
-                                                    <xf:value ref="if (self::choices) then () else ."/>
-                                                </xf:itemset>
-                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                                                <!--  Update available appearances -->
-                                                <xf:dispatch
-                                                    event="xforms-value-changed"
-                                                    name="reload-appearances"
-                                                    targetid="model">
-                                                    <xf:property name="is-initial-load" value="false()"/>
-                                                </xf:dispatch>
-                                            </xf:select1>
-                                            <!-- Schema type selection if applicable -->
-                                            <fr:dropdown-select1 ref="schema-type[exists($schema)]">
-                                                <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
-                                                <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                                                <xf:itemset ref="$schema/xs:simpleType">
-                                                    <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
-                                                    <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
-                                                </xf:itemset>
-                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                                            </fr:dropdown-select1>
-                                        </xf:group>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select1 ref="@level">
+                                            <xf:label ref="$resources/dialog-control-details/level/label"/>
+                                            <xf:item>
+                                                <xf:label>Error</xf:label>
+                                                <xf:value>error</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>Warning</xf:label>
+                                                <xf:value>warning</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>Info</xf:label>
+                                                <xf:value>info</xf:value>
+                                            </xf:item>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="if (@default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
+                                            <xf:label ref="$resources/dialog-control-details/alert/label"/>
+                                        </xf:input>
+                                        <xf:input ref=".[@level = 'error']/@default-alert">
+                                            <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
+                        <fr:tab id="formulas-tab">
+                            <fr:label ref="$resources/dialog-control-details/tab-formulas/label"/>
+                            <fr:grid>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:textarea ref="calculate">
+                                            <xf:label ref="$resources/dialog-control-details/calculate/label"/>
+                                            <xf:alert ref="$resources/dialog-control-details/calculate/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/calculate/hint" appearance="minimal"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:textarea ref="default">
+                                            <xf:label ref="$resources/dialog-control-details/default/label"/>
+                                            <xf:alert ref="$resources/dialog-control-details/default/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/default/hint" appearance="minimal"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:textarea ref="relevant">
+                                            <xf:label ref="$resources/dialog-control-details/visibility/label"/>
+                                            <xf:alert ref="$resources/dialog-control-details/visibility/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/visibility/hint" appearance="minimal"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:textarea ref="readonly">
+                                            <xf:label ref="$resources/dialog-control-details/readonly/label"/>
+                                            <xf:alert ref="$resources/dialog-control-details/readonly/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/readonly/hint" appearance="minimal"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
+                        <fr:tab id="help-tab">
+                            <fr:label ref="$resources/dialog-control-details/tab-help/label"/>
+                            <fr:grid id="help-grid">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select ref="help/@isHTML" appearance="full">
+                                            <xf:item>
+                                                <xf:value>true</xf:value>
+                                                <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                            </xf:item>
+                                        </xf:select>
+                                        <!-- Help message -->
+                                        <xf:var name="is-html" value="help/@isHTML = 'true'"/>
+                                        <fr:tinymce ref="help[$is-html]">
+                                            <xf:label ref="$resources/dialog-control-details/help/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
+                                        </fr:tinymce>
+                                        <xf:textarea ref="help[not($is-html)]">
+                                            <xf:label ref="$resources/dialog-control-details/help/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
+                        <!-- Custom control settings -->
+                        <xsl:variable
+                            xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                            name="custom-control-settings"
+                            as="xs:string?"
+                            select="normalize-space(p:property('oxf.fb.extension.control-settings'))[. != '']"/>
 
-                                        <xf:group ref=".[not(@type = ('required', 'datatype'))]">
-                                            <xf:textarea ref="constraint/@expression">
-                                                <xf:label class="xforms-hidden" appearance="minimal" ref="$resources/dialog-control-details/formula/label"/>
-                                                <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
-                                            </xf:textarea>
-                                            <xf:input ref="constraint/@argument">
-                                                <xf:label appearance="minimal" ref="$resources/dialog-control-details/integer-argument/label"/>
-                                                <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
-                                            </xf:input>
-                                        </xf:group>
-                                    </xf:group>
+                        <xsl:if test="$custom-control-settings">
 
-                                </xh:td>
-                                <xh:td>
-                                    <xf:select1 ref="@level">
-                                        <xf:label ref="$resources/dialog-control-details/level/label"/>
-                                        <xf:item>
-                                            <xf:label>Error</xf:label>
-                                            <xf:value>error</xf:value>
-                                        </xf:item>
-                                        <xf:item>
-                                            <xf:label>Warning</xf:label>
-                                            <xf:value>warning</xf:value>
-                                        </xf:item>
-                                        <xf:item>
-                                            <xf:label>Info</xf:label>
-                                            <xf:value>info</xf:value>
-                                        </xf:item>
-                                    </xf:select1>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:input ref="if (@default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
-                                        <xf:label ref="$resources/dialog-control-details/alert/label"/>
-                                    </xf:input>
-                                    <xf:input ref=".[@level = 'error']/@default-alert">
-                                        <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
-                                    </xf:input>
-                                </xh:td>
-                            </xh:tr>
-                        </fr:grid>
-                    </fr:tab>
-                    <fr:tab id="formulas-tab">
-                        <fr:label ref="$resources/dialog-control-details/tab-formulas/label"/>
-                        <fr:grid>
-                            <xh:tr>
-                                <xh:td>
-                                    <xf:textarea ref="calculate">
-                                        <xf:label ref="$resources/dialog-control-details/calculate/label"/>
-                                        <xf:alert ref="$resources/dialog-control-details/calculate/alert"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/calculate/hint" appearance="minimal"/>
-                                    </xf:textarea>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:textarea ref="default">
-                                        <xf:label ref="$resources/dialog-control-details/default/label"/>
-                                        <xf:alert ref="$resources/dialog-control-details/default/alert"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/default/hint" appearance="minimal"/>
-                                    </xf:textarea>
-                                </xh:td>
-                            </xh:tr>
-                            <xh:tr>
-                                <xh:td>
-                                    <xf:textarea ref="relevant">
-                                        <xf:label ref="$resources/dialog-control-details/visibility/label"/>
-                                        <xf:alert ref="$resources/dialog-control-details/visibility/alert"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/visibility/hint" appearance="minimal"/>
-                                    </xf:textarea>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:textarea ref="readonly">
-                                        <xf:label ref="$resources/dialog-control-details/readonly/label"/>
-                                        <xf:alert ref="$resources/dialog-control-details/readonly/alert"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/readonly/hint" appearance="minimal"/>
-                                    </xf:textarea>
-                                </xh:td>
-                            </xh:tr>
-                        </fr:grid>
-                    </fr:tab>
-                    <fr:tab id="help-tab">
-                        <fr:label ref="$resources/dialog-control-details/tab-help/label"/>
-                        <fr:grid id="help-grid">
-                            <xh:tr>
-                                <xh:td>
-                                    <xf:select ref="help/@isHTML" appearance="full">
-                                        <xf:item>
-                                            <xf:value>true</xf:value>
-                                            <xf:label ref="$resources/dialog-control-details/use-html"/>
-                                        </xf:item>
-                                    </xf:select>
-                                    <!-- Help message -->
-                                    <xf:var name="is-html" value="help/@isHTML = 'true'"/>
-                                    <fr:tinymce ref="help[$is-html]">
-                                        <xf:label ref="$resources/dialog-control-details/help/label"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
-                                    </fr:tinymce>
-                                    <xf:textarea ref="help[not($is-html)]">
-                                        <xf:label ref="$resources/dialog-control-details/help/label"/>
-                                        <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
-                                    </xf:textarea>
-                                </xh:td>
-                            </xh:tr>
-                        </fr:grid>
-                    </fr:tab>
-                </fr:tabbable>
-                <xh:div class="fr-dialog-buttons">
-                    <xf:trigger appearance="xxf:primary" id="save-button">
-                        <xf:label ref="$resources/apply/label"/>
-                    </xf:trigger>
-                    <xf:output value="$resources/or/label"/>
-                    <xf:trigger appearance="minimal" id="cancel-button">
-                        <xf:label ref="$resources/cancel/label"/>
-                    </xf:trigger>
-                </xh:div>
-            </xxf:dialog>
+                            <xsl:variable
+                                name="prefix"
+                                as="xs:string"
+                                select="substring-before($custom-control-settings, ':')"/>
+
+                            <xsl:variable
+                                xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                name="namespace-uri"
+                                as="xs:string"
+                                select="p:property(concat('oxf.xforms.xbl.mapping.', $prefix))"/>
+
+                            <fr:tab>
+                                <fr:label ref="$resources/custom-settings"/>
+                                <xsl:element name="{$custom-control-settings}" namespace="{$namespace-uri}">
+                                    <xsl:attribute name="id" select="'fb-custom-control-settings'"/>
+
+                                    <!--  Allow component to update datatype -->
+                                    <xf:setvalue
+                                        event="fb-update-datatype"
+                                        if="normalize-space(event('datatype')) != ''"
+                                        ref="$i/validations/validation[@type = 'datatype']/builtin-type"
+                                        value="event('datatype')"/>
+
+                                </xsl:element>
+                            </fr:tab>
+                        </xsl:if>
+                    </fr:tabbable>
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:trigger appearance="xxf:primary" id="save-button">
+                            <xf:label ref="$resources/apply/label"/>
+                        </xf:trigger>
+                        <xf:output value="$resources/or/label"/>
+                        <xf:trigger appearance="minimal" id="cancel-button">
+                            <xf:label ref="$resources/cancel/label"/>
+                        </xf:trigger>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

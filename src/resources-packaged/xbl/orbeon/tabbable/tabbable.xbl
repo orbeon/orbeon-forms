@@ -53,34 +53,48 @@
                             <xsl:for-each select="fr:tab">
                                 <xsl:variable name="pos" select="position()"/>
                                 <xsl:variable name="label" select="fr:label[1]"/>
-                                <xh:li class="{if (position() = 1) then 'active' else ''}">
-                                    <!-- Transform xf:label into xf:output -->
-                                    <xh:a href="#{{xxf:client-id('tab-pane-{$pos}')}}" data-toggle="tab">
-                                        <xsl:choose>
-                                            <!-- Static label, just copy content -->
-                                            <xsl:when test="empty($label/(@ref | @bind | @value))">
-                                                <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                    <xsl:copy-of select="$label/node()"/>
-                                                </xf:group>
-                                            </xsl:when>
-                                            <!-- Dynamic label, generate xf:output -->
-                                            <xsl:otherwise>
-                                                <!-- Put content in outer scope -->
-                                                <xf:output xxbl:scope="outer">
-                                                    <xsl:copy-of select="$label/(@model | @context | @ref | @bind | @value | node())"/>
-                                                </xf:output>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xh:a>
-                                </xh:li>
+                                <xf:group appearance="xxf:internal">
+
+                                    <!-- Whether the tab is visible -->
+                                    <xsl:if test="@visible">
+                                        <xf:var name="visible">
+                                            <xxf:value value="{@visible}" xxbl:scope="outer"/>
+                                        </xf:var>
+                                    </xsl:if>
+
+                                    <xh:li class="{if (position() = 1) then 'active' else (), if (@visible) then '{if ($visible) then '''' else ''xforms-hidden''}' else ()}">
+
+                                        <!-- Transform xf:label into xf:output -->
+                                        <xh:a href="#{{xxf:client-id('tab-pane-{$pos}')}}" data-toggle="tab">
+                                            <xsl:choose>
+                                                <!-- Static label, just copy content -->
+                                                <xsl:when test="empty($label/(@ref | @bind | @value))">
+                                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                        <xsl:copy-of select="$label/node()"/>
+                                                    </xf:group>
+                                                </xsl:when>
+                                                <!-- Dynamic label, generate xf:output -->
+                                                <xsl:otherwise>
+                                                    <!-- Put content in outer scope -->
+                                                    <xf:output xxbl:scope="outer">
+                                                        <xsl:copy-of select="$label/(@model | @context | @ref | @bind | @value | node())"/>
+                                                    </xf:output>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </xh:a>
+                                    </xh:li>
+                                </xf:group>
                             </xsl:for-each>
                         </xh:ul>
                         <!-- Tab content -->
                         <xh:div class="tab-content">
                             <xsl:for-each select="fr:tab">
                                 <!-- NOTE: Use xxf:control so that xxf:client-id() can resolve, as it needs a concrete control to work. -->
-                                <xh:div class="tab-pane{if (position() = 1) then ' active' else ''}" id="tab-pane-{position()}" xxf:control="true">
-                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                <xh:div class="tab-pane{if (position() = 1) then ' active' else '', @class}" id="tab-pane-{position()}" xxf:control="true">
+                                    <xf:group xxbl:scope="outer">
+                                        <xsl:if test="@visible">
+                                            <xsl:attribute name="ref" select="concat('.[boolean(', @visible, ')]')"/>
+                                        </xsl:if>
                                         <xsl:apply-templates select="@model | @context | @ref | @bind | node() except fr:label"/>
                                     </xf:group>
                                 </xh:div>

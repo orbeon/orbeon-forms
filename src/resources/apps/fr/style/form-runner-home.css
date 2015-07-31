@@ -86,11 +86,3 @@
   float: left;
   margin: 5px 10px 0 10px;
 }
-.orbeon .fr-credentials-dialog .fb-dialog-form-settings-fields {
-  float: left;
-  width: 110px;
-}
-.orbeon .fr-credentials-dialog .fb-dialog-form-settings-fields input,
-.orbeon .fr-credentials-dialog .fb-dialog-form-settings-fields textarea {
-  width: 100%;
-}

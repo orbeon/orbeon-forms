@@ -19,8 +19,15 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.model.DataModel
 
-class VariableControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends CoreControl(staticStateContext, element, parent, preceding, scope)
-        with OptionalSingleNode with VariableAnalysisTrait {
+class VariableControl(
+    staticStateContext : StaticStateContext,
+    element            : Element,
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
+    scope              : Scope
+) extends CoreControl(staticStateContext, element, parent, preceding, scope)
+    with OptionalSingleNode
+    with VariableAnalysisTrait {
+
     override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
 }

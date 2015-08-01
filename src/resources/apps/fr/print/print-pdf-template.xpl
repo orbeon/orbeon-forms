@@ -96,17 +96,36 @@
         <p:output name="data" id="form-document"/>
     </p:processor>
 
-    <!-- Call up persistence layer to obtain the PDF file -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" transform="oxf:unsafe-xslt" href="#form-document">
+    <p:processor name="oxf:xinclude">
+        <p:input name="config">
             <config xsl:version="2.0">
+
+                <xsl:variable name="form"   select="/*/*[1]"/>
+                <xsl:variable name="params" select="/*/*[2]"/>
+
                 <url>
-                    <xsl:value-of select="xpl:rewriteServiceURI(//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
+                    <xsl:value-of select="xpl:rewriteServiceURI($form//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
                 </url>
-                <!-- Produce binary so we do our own XML parsing -->
+
                 <mode>binary</mode>
+
+                <!-- Uses $params and exposes $use-document-id and $specific-form-version-requested -->
+                <xi:include href="../detail/versioning-headers.xml" xpointer="xpath(/*/*)"/>
+
             </config>
         </p:input>
+        <p:output name="data" id="xslt-config"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="config" href="#xslt-config"/>
+        <p:input  name="data"   href="aggregate('root', #form-document, #parameters)"/>
+        <p:output name="data"   id="url-generator-config"/>
+    </p:processor>
+
+    <!-- Call up persistence layer to obtain the PDF file -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="#url-generator-config"/>
         <p:output name="data" id="pdf-template"/>
     </p:processor>
 

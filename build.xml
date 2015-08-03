@@ -327,15 +327,6 @@
         </if>
     </target>
 
-    <target name="test-classpath" depends="classpath">
-        <path id="test.class.path">
-            <pathelement location="${build.classes.dir}"/>
-            <fileset dir="lib">
-                <include name="**/*.jar"/>
-            </fileset>
-        </path>
-    </target>
-
     <!-- Perform string replacement in Version.scala to set version and edition  -->
     <target name="set-version" depends="init">
         <mkdir dir="${build.dir}/src"/>
@@ -381,7 +372,7 @@
     </target>
 
     <!-- Compile test source -->
-    <target name="test-classes" depends="classes, test-classpath" unless="skip.compilation">
+    <target name="test-classes" depends="classes" unless="skip.compilation">
         <exec executable="sbt">
             <arg value="project core"/>
             <arg value="test:compile"/>
@@ -887,7 +878,7 @@
         </copy>
     </target>
 
-    <target name="test" depends="test-expand-war, test-classes, test-classpath">
+    <target name="test" depends="test-expand-war, test-classes">
 
         <property name="tomcat-version" value="6.0.36"/>
         <parallel failonany="true">

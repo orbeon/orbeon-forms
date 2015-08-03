@@ -1,5 +1,5 @@
 val BuildPath                     = "build"
-val ExplodedWarWebInf             = BuildPath + "/build/orbeon-war/WEB-INF"
+val ExplodedWarWebInf             = BuildPath + "/orbeon-war/WEB-INF"
 val ExplodedWarClassesPath        = ExplodedWarWebInf + "/classes"
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"

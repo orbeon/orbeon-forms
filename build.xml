@@ -382,21 +382,10 @@
 
     <!-- Compile test source -->
     <target name="test-classes" depends="classes, test-classpath" unless="skip.compilation">
-        <mkdir dir="${build.test-classes.dir}"/>
-
-        <scalac destdir="${build.test-classes.dir}"
-                classpathref="test.class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                logging="debug"
-                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="no">
-            <src path="src/test/scala"/>
-            <src path="src/test/java"/>
-        </scalac>
-
-        <javac srcdir="src/test/java" destdir="${build.test-classes.dir}"
-                classpathref="test.class.path" debug="on" optimize="off" target="1.5" source="1.5"
-                includes="**/*.java" encoding="utf-8">
-        </javac>
+        <exec executable="sbt">
+            <arg value="project core"/>
+            <arg value="test:compile"/>
+        </exec>
     </target>
 
     <target name="embedding-jar" depends="classes">

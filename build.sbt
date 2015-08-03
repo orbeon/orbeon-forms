@@ -1,7 +1,9 @@
-val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
+val BuildPath                     = "build"
+val ExplodedWarWebInf             = BuildPath + "/build/orbeon-war/WEB-INF"
 val ExplodedWarClassesPath        = ExplodedWarWebInf + "/classes"
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
+val BuildTestClasses              = BuildPath + "/test-classes"
 
 val ScalaJSFileNameFormat = "((.+)-(fastopt|opt)).js".r
 
@@ -90,7 +92,8 @@ lazy val core = (project in file(".")).
 
     unmanagedBase                := baseDirectory.value / "lib",
 
-    classDirectory    in Compile := baseDirectory.value / ExplodedWarClassesPath
+    classDirectory    in Compile := baseDirectory.value / ExplodedWarClassesPath,
+    classDirectory    in Test    := baseDirectory.value / BuildTestClasses
   )
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

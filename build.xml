@@ -1056,9 +1056,12 @@
                 	<sysproperty key="java.util.Arrays.useLegacyMergeSort" value="true"/>
 
                     <classpath>
-                        <path refid="test.class.path"/>
+                        <pathelement location="${build.classes.dir}"/>
                         <pathelement location="${build.test-classes.dir}"/>
                         <pathelement location="${resources-private.jar.file}"/>
+                        <fileset dir="lib">
+                            <include name="**/*.jar"/>
+                        </fileset>
                     </classpath>
                     <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
                 </junit>

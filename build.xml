@@ -917,36 +917,42 @@
                     <not><isset property="skip.selenium"/></not>
                     <then>
 
-                        <!-- Only keep the 10 most recent databases on SQL Server -->
-                        <!-- - Set delimiter to character we don't use, so the task doesn't spit the command on ';' -->
-                        <sql    driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}"
-                                userid="orbeon" password="${env.RDS_PASSWORD}"
-                                expandProperties="true" delimiter="~"
-                                autocommit="true">
-                            <classpath><pathelement location="${sqlserver.jar}"/></classpath>
-                            BEGIN
-                                DECLARE @qry nvarchar(max);
-                                SELECT @qry =
-                                    (
-                                        SELECT 'DROP DATABASE ' + to_drop.name + '; '
-                                        FROM
+                        <if>
+                            <isset property="include.sqlserver"/>
+                            <then>
+
+                                <!-- Only keep the 10 most recent databases on SQL Server -->
+                                <!-- - Set delimiter to character we don't use, so the task doesn't spit the command on ';' -->
+                                <sql    driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}"
+                                        userid="orbeon" password="${env.RDS_PASSWORD}"
+                                        expandProperties="true" delimiter="~"
+                                        autocommit="true">
+                                    <classpath><pathelement location="${sqlserver.jar}"/></classpath>
+                                    BEGIN
+                                        DECLARE @qry nvarchar(max);
+                                        SELECT @qry =
                                             (
-                                                SELECT all_dbs.name
+                                                SELECT 'DROP DATABASE ' + to_drop.name + '; '
                                                 FROM
                                                     (
-                                                        SELECT row_number() OVER (ORDER BY name DESC) AS row,
-                                                               name
-                                                        FROM   sys.databases
-                                                        WHERE  name LIKE 'orbeon_%_tomcat'
-                                                    ) all_dbs
-                                                WHERE all_dbs.row > 10
-                                            ) to_drop
-                                        WHERE name LIKE 'orbeon_%_tomcat'
-                                        FOR XML PATH('')
-                                    );
-                                EXEC sp_executesql @qry;
-                            END;
-                        </sql>
+                                                        SELECT all_dbs.name
+                                                        FROM
+                                                            (
+                                                                SELECT row_number() OVER (ORDER BY name DESC) AS row,
+                                                                       name
+                                                                FROM   sys.databases
+                                                                WHERE  name LIKE 'orbeon_%_tomcat'
+                                                            ) all_dbs
+                                                        WHERE all_dbs.row > 10
+                                                    ) to_drop
+                                                WHERE name LIKE 'orbeon_%_tomcat'
+                                                FOR XML PATH('')
+                                            );
+                                        EXEC sp_executesql @qry;
+                                    END;
+                                </sql>
+                            </then>
+                        </if>
 
                         <!-- Create schemas -->
                         <sql driver="${oracle.driver}" url="${env.ORACLE_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
@@ -961,10 +967,15 @@
                             <classpath><pathelement location="${mysql.jar}"/></classpath>
                             CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
-                        <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
-                            <classpath><pathelement location="${sqlserver.jar}"/></classpath>
-                            CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
-                        </sql>
+                        <if>
+                            <isset property="include.sqlserver"/>
+                            <then>
+                                <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                                    <classpath><pathelement location="${sqlserver.jar}"/></classpath>
+                                    CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                                </sql>
+                            </then>
+                        </if>
                         <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}/orbeon" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true" autocommit="true">
                             <classpath><pathelement location="${postgresql.jar}"/></classpath>
                             CREATE DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
@@ -1089,10 +1100,15 @@
                             <classpath><pathelement location="${mysql.jar}"/></classpath>
                             DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
                         </sql>
-                        <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
-                            <classpath><pathelement location="${sqlserver.jar}"/></classpath>
-                            DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
-                        </sql>
+                        <if>
+                            <isset property="include.sqlserver"/>
+                            <then>
+                                <sql driver="${sqlserver.driver}" url="${env.SQLSERVER_URL}" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true">
+                                    <classpath><pathelement location="${sqlserver.jar}"/></classpath>
+                                    DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;
+                                </sql>
+                            </then>
+                        </if>
                         <sql driver="${postgresql.driver}" url="${env.POSTGRESQL_URL}/orbeon" userid="orbeon" password="${env.RDS_PASSWORD}" expandProperties="true" autocommit="true">
                             <classpath><pathelement location="${postgresql.jar}"/></classpath>
                             DROP DATABASE orbeon_${env.TRAVIS_BUILD_NUMBER}_tomcat;

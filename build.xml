@@ -387,6 +387,7 @@
         <scalac destdir="${build.test-classes.dir}"
                 classpathref="test.class.path"
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
+                logging="debug"
                 addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="no">
             <src path="src/test/scala"/>
             <src path="src/test/java"/>

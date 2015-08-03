@@ -1066,6 +1066,9 @@
                     <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
                 	<sysproperty key="java.io.tmpdir" value="build/temp/test"/>
 
+                    <sysproperty key="org.orbeon.test.persistence.sqlserver" value="${include.sqlserver}"/>
+                    <sysproperty key="org.orbeon.test.persistence.db2"       value="${include.db2}"/>
+
                     <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitly -->
                 	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
                     <!-- Getting a JDK error, per http://stackoverflow.com/a/13575810/5295 -->

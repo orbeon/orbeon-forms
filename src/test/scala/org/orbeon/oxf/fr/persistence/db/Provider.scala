@@ -13,10 +13,15 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
+import org.orbeon.oxf.util.ScalaUtils._
+
 private[persistence] sealed abstract class Provider(val name: String)
 
 object Provider {
-    val ProvidersTestedAutomatically: List[Provider] = List(Oracle, MySQL, SQLServer, PostgreSQL)
+    val ProvidersTestedAutomatically: List[Provider] =
+        List(Oracle, MySQL, PostgreSQL)                                                        ++
+        (System.getProperty("org.orbeon.test.persistence.sqlserver") == "true" list SQLServer) ++
+        (System.getProperty("org.orbeon.test.persistence.db2")       == "true" list DB2)
 }
 
 private[persistence] case object Oracle     extends Provider("oracle")

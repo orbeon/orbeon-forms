@@ -374,8 +374,8 @@
     <!-- Compile test source -->
     <target name="test-classes" depends="classes" unless="skip.compilation">
         <exec executable="sbt">
-            <arg value="project core"/>
-            <arg value="test:compile"/>
+            <arg value="project test"/>
+            <arg value="compile"/>
         </exec>
     </target>
 

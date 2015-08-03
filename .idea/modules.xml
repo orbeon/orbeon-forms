@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-build.iml" filepath="$PROJECT_DIR$/.idea/modules/core-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test.iml" filepath="$PROJECT_DIR$/.idea/modules/test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-build.iml" filepath="$PROJECT_DIR$/.idea/modules/test-build.iml" />
     </modules>
   </component>
 </project>

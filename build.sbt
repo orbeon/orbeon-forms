@@ -3,6 +3,7 @@ val ExplodedWarWebInf             = BuildPath + "/orbeon-war/WEB-INF"
 val ExplodedWarClassesPath        = ExplodedWarWebInf + "/classes"
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
+val BuildClasses                  = BuildPath + "/classes"
 val BuildTestClasses              = BuildPath + "/test-classes"
 
 val ScalaJSFileNameFormat = "((.+)-(fastopt|opt)).js".r
@@ -74,7 +75,6 @@ lazy val formBuilder = (project in file("builder")).
   )
 
 lazy val core = (project in file(".")).
-  dependsOn(formBuilder).
   settings(
     organization                 := "org.orbeon",
     name                         := "orbeon-core",
@@ -86,14 +86,28 @@ lazy val core = (project in file(".")).
     javaSource        in Compile := baseDirectory.value / "src" / "main" / "java",
     resourceDirectory in Compile := baseDirectory.value / "src" / "main" / "resources",
 
-    scalaSource       in Test    := baseDirectory.value / "src" / "test" / "scala",
-    javaSource        in Test    := baseDirectory.value / "src" / "test" / "java",
-    resourceDirectory in Test    := baseDirectory.value / "src" / "test" / "resources",
+    unmanagedBase                := baseDirectory.value / "lib",
+
+    classDirectory    in Compile := baseDirectory.value / ExplodedWarClassesPath
+  )
+
+lazy val test = (project in file(".")).
+  settings(
+    organization                 := "org.orbeon",
+    name                         := "orbeon-test",
+    version                      := "4.11-SNAPSHOT",
+
+    scalaVersion                 := "2.11.7",
+
+    scalaSource       in Compile := baseDirectory.value / "src" / "test" / "scala",
+    javaSource        in Compile := baseDirectory.value / "src" / "test" / "java",
+    resourceDirectory in Compile := baseDirectory.value / "src" / "test" / "resources",
 
     unmanagedBase                := baseDirectory.value / "lib",
 
-    classDirectory    in Compile := baseDirectory.value / ExplodedWarClassesPath,
-    classDirectory    in Test    := baseDirectory.value / BuildTestClasses
+    unmanagedClasspath in Compile += baseDirectory.value / BuildClasses,
+
+    classDirectory    in Compile := baseDirectory.value / BuildTestClasses
   )
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

@@ -18,8 +18,12 @@ env:
     - secure: "L/Pra2kMGn3AZ1sJb8nvOgxRnpK9/LWY0a4FuYHoQnA6KkjOQfujABHFQRjht8gcc0n0cQttWKsRWT3phTIPGD6YmB25/KT/CI5uKXnbBCMpM1JxhweKRz0P5uOJFO5pVAlkmYq6DwMxP3U/AMs7r4R/9CRyNYEnGEsbr30qphU="
     # POSTGRESQL_URL
     - secure: "oddq5H6A4CIOps7nZsDHWVNhjKoAZ7hbdIXHCgh1IS9dV5cb7kZFwnmRNTO1ZaTwrwpwzIZoQqfAfH7jdGVmSFiVlbT3iHjb9nfpTo8CcA5oVnIfGdkx4c55lA04yPP6AY7HGzPDdlH4STWPNz0W6ZPuaPK8cI84V/Z8UXfR0Qg="
-before_script:
-  - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
+addons:
+  sauce_connect:
+    username: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
+      secure:
+    access_key:
+      secure: "bAgBFLf9R51upNAWfHJyBsByveotFRwCUAWFIiVTgCGxAE5mhWFMZl9HsAL0oiacjzmQ03u2toboOdTH/tfm2bohtQZknFleO0rDhLyW3ZmYI65vmFm1uYVrbyzMI0l7t/Ws4gZW9SC5cUl7m2GjTnB/qKg/O6uohPU7uqf8KEU="
 script:
     # Force use of ant even if other build files are found
     - ant test

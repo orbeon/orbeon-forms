@@ -26,7 +26,7 @@ cache:
     - $HOME/.sbt/boot/
 script:
   # Force use of ant even if other build files are found
-  - ant test
+  - ant test -Dskip.selenium=true
   # See http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm

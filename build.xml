@@ -881,13 +881,13 @@
         <parallel failonany="true">
 
             <property name="oracle.driver"     value="oracle.jdbc.OracleDriver"/>
-            <property name="oracle.jar"        value="lib/oracle/ojdbc6_g.jar"/>
+            <property name="oracle.jar"        value="lib/drivers/ojdbc6_g.jar"/>
             <property name="mysql.driver"      value="com.mysql.jdbc.Driver"/>
-            <property name="mysql.jar"         value="lib/mysql-connector-java-5.1.26-bin.jar"/>
-            <property name="sqlserver.driver"  value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-            <property name="sqlserver.jar"     value="lib/sqljdbc4.jar"/>
+            <property name="mysql.jar"         value="lib/drivers/mysql-connector-java-5.1.29-bin.jar"/>
+            <property name="sqlserver.driver"  value="com.microsoft.sqlserver.jdblib/c.SQLServerDriver"/>
+            <property name="sqlserver.jar"     value="lib/drivers/sqljdbc4.jar"/>
             <property name="postgresql.driver" value="org.postgresql.Driver"/>
-            <property name="postgresql.jar"    value="lib/postgresql-9.3-1102.jdbc4.jar"/>
+            <property name="postgresql.jar"    value="lib/drivers/postgresql-9.3-1102.jdbc4.jar"/>
 
             <!-- Run Tomcat -->
             <sequential>
@@ -965,7 +965,7 @@
                             <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
                         </if>
 
-                        <!-- Put database driver in Tomcat's lib -->
+                        <!-- Put database drivers in Tomcat's lib -->
                         <copy file="${mysql.jar}"      todir="build/apache-tomcat-${tomcat-version}/lib"/>
                         <copy file="${oracle.jar}"     todir="build/apache-tomcat-${tomcat-version}/lib"/>
                         <copy file="${sqlserver.jar}"  todir="build/apache-tomcat-${tomcat-version}/lib"/>

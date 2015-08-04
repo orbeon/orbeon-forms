@@ -1223,6 +1223,7 @@
         <property name="skip.selenium" value="true"/>
         <property name="skip.database" value="true"/>
     </target>
+
     <target name="teamcity-release" depends="skip-selenium-database, clean, test, orbeon-dist"/>
 
     <target name="exist-task" depends="classpath">

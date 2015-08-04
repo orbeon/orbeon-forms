@@ -30,3 +30,9 @@ script:
   # See http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+notifications:
+  email:
+    recipients:
+      - info@orbeon.com
+    on_success: change
+    on_failure: change

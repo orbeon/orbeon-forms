@@ -619,6 +619,7 @@
         </input>
     </test>
 
+    <!-- 2015-08-04: Curiously this test appears to cause the VM to exit on Travis CI. -->
     <test description="Simple Scope Bean" name="oxf:test-script" exclude="true">
         <input name="config">
             <script>

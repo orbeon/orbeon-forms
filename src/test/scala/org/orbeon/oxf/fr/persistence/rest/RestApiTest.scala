@@ -45,7 +45,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"
     private def metadataURL(provider: Provider) = s"form/${provider.name}/my-form"
 
-    private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T) {
+    private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T): Unit = {
         withDebug(message) {
             Provider.ProvidersTestedAutomatically.foreach { provider ⇒
                 withDebug("on database", List("provider" → provider.name)) {

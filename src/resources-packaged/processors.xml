@@ -605,6 +605,10 @@
         <class name="org.orbeon.oxf.processor.pdf.XHTMLToPDFProcessor"/>
     </processor>
 
+    <processor name="oxf:pdf-to-image">
+        <class name="org.orbeon.oxf.processor.pdf.PDFToImageProcessor"/>
+    </processor>
+
     <processor name="oxf:barcode-base">
         <class name="org.orbeon.oxf.processor.barcode.BarcodeProcessor"/>
     </processor>

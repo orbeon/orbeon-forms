@@ -166,6 +166,11 @@
         <include name="itext-bcmail-jdk14-138.jar"/>
         <include name="itext-bcprov-jdk14-138.jar"/>
 
+        <!-- oxf:pdf-to-image -->
+        <include name="icepdf-core-5.1.1.jar"/>
+        <include name="jai-imageio-core-1.3.1-SNAPSHOT.jar"/>
+        <include name="jai-core-1.1.3.jar"/>
+
         <include name="barcode4j-1.0.jar"/>
         <include name="simplecaptcha-1.2.1.jar"/>
 

@@ -37,15 +37,15 @@ import collection.mutable
  * ContentHandler able to serialize text or binary documents to an output stream.
  */
 class BinaryTextXMLReceiver(
-        output: Either[Response, OutputStream], // one of those is required
-        closeStream: Boolean,                   // whether to close the stream upon endDocument()
-        forceContentType: Boolean,
-        requestedContentType: Option[String],
-        ignoreDocumentContentType: Boolean,
-        forceEncoding: Boolean,
-        requestedEncoding: Option[String],
-        ignoreDocumentEncoding: Boolean)
-    extends XMLReceiverAdapter {
+    output                    : Either[Response, OutputStream], // one of those is required
+    closeStream               : Boolean,                        // whether to close the stream upon endDocument()
+    forceContentType          : Boolean,
+    requestedContentType      : Option[String],
+    ignoreDocumentContentType : Boolean,
+    forceEncoding             : Boolean,
+    requestedEncoding         : Option[String],
+    ignoreDocumentEncoding    : Boolean
+) extends XMLReceiverAdapter {
 
     require(! forceContentType || isNotBlank(requestedContentType.get))
     require(! forceEncoding    || isNotBlank(requestedEncoding.get))
@@ -60,15 +60,17 @@ class BinaryTextXMLReceiver(
     private var outputReceiver: XMLReceiver = null
 
     // For Java callers
-    def this(response: ExternalContext.Response,
-            outputStream: OutputStream,
-            closeStream: Boolean,
-            forceContentType: Boolean,
-            requestedContentType: String,
-            ignoreDocumentContentType: Boolean,
-            forceEncoding: Boolean,
-            requestedEncoding: String,
-            ignoreDocumentEncoding: Boolean) =
+    def this(
+        response                  : ExternalContext.Response,
+        outputStream              : OutputStream,
+        closeStream               : Boolean,
+        forceContentType          : Boolean,
+        requestedContentType      : String,
+        ignoreDocumentContentType : Boolean,
+        forceEncoding             : Boolean,
+        requestedEncoding         : String,
+        ignoreDocumentEncoding    : Boolean
+    ) =
         this(
             if (response ne null) Left(response) else Right(outputStream),
             closeStream,
@@ -77,8 +79,8 @@ class BinaryTextXMLReceiver(
             ignoreDocumentContentType,
             forceEncoding,
             nonEmptyOrNone(requestedEncoding),
-            ignoreDocumentEncoding)
-
+            ignoreDocumentEncoding
+        )
 
     // Simple constructor to write to a stream and close it
     def this(outputStream: OutputStream) =
@@ -103,7 +105,7 @@ class BinaryTextXMLReceiver(
             val (typePrefix, typeLocalName) = XML.parseQName(xsiType)
 
             val typeNamespaceURI =
-                prefixMappings.getOrElse(typePrefix, throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix))
+                prefixMappings.getOrElse(typePrefix, throw new OXFException(s"Undeclared prefix in xsi:type: $typePrefix"))
 
             val isBinaryInput = QName.get(typeLocalName, Namespace.get(typePrefix, typeNamespaceURI)) match {
                 case XS_BASE64BINARY_QNAME ⇒ true
@@ -131,7 +133,11 @@ class BinaryTextXMLReceiver(
                 response foreach { response ⇒
                     // Get content-type and encoding
 
-                    if (! forceContentType && ! ignoreDocumentContentType && ! forceEncoding && ! ignoreDocumentEncoding && contentTypeAttribute.isDefined) {
+                    if (! forceContentType          &&
+                        ! ignoreDocumentContentType &&
+                        ! forceEncoding             &&
+                        ! ignoreDocumentEncoding    &&
+                        contentTypeAttribute.isDefined) {
                         // Simple case where we just forward what's coming in
                         response.setContentType(contentTypeAttribute.get)
                     } else {
@@ -228,5 +234,6 @@ object BinaryTextXMLReceiver {
             None
     }
 
-    def isSerializerPI(target: String, data: String) = parseSerializerPI(target, data).isDefined
+    def isSerializerPI(target: String, data: String) =
+        parseSerializerPI(target, data).isDefined
 }

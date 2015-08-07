@@ -185,7 +185,7 @@
                                                then 'static'
                                                else 'dynamic'}}"
                 xxf:encrypt-item-values="{{for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                                           return not($mode = 'pdf' and normalize-space(xxf:instance('fr-form-attachments')/pdf) != '')}}"
+                                           return not($mode = ('pdf', 'email') and normalize-space(xxf:instance('fr-form-attachments')/pdf) != '')}}"
                 xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
                 xxf:order="{{if (property('xxf:noscript')) then 'label control alert hint help' else 'help label control alert hint'}}"
 
@@ -194,7 +194,7 @@
                     return if ($mode = 'controls') then 'xml' else 'xhtml'}}"
                 xxf:no-updates="{{
                     for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                    return if ($mode = ('controls', 'pdf')) then 'true' else 'false'}}"
+                    return if ($mode = ('controls', 'pdf', 'email')) then 'true' else 'false'}}"
 
                 xxf:noscript-support="{$is-noscript-support}"
                 xxf:external-events="{@xxf:external-events} fr-open-pdf"
@@ -212,6 +212,8 @@
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
             <xf:instance id="fr-parameters-instance" src="input:instance"/>
+            <!-- Internally, reduce `tiff` mode to `pdf` mode so as to avoid checking everywhere for a new mode -->
+            <xf:bind ref="instance('fr-parameters-instance')/mode" xxf:default="if (. = 'tiff') then 'pdf' else ."/>
 
         </xf:model>
 
@@ -279,7 +281,13 @@
             <xf:action event="fr-open-pdf" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                 xxf:instance('fr-form-instance')/process:runProcess(
                     'oxf.fr.detail.process',
-                    concat('open-pdf(lang = "', event('fr-language')[not(contains(., '"'))], '")')
+                    concat(
+                        'open-pdf(lang = "',
+                        event('fr-language')[not(contains(., '"'))],
+                        '", format = "',
+                        event('fr-format')[not(contains(., '"'))],
+                        '")'
+                    )
                 )
             </xf:action>
         </xf:model>

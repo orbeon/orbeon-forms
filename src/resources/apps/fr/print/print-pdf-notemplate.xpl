@@ -163,7 +163,7 @@
     </p:processor>
 
     <!-- Serialize HTML to PDF -->
-    <!-- RFE: Add content disposition. -->
+    <!-- Convert HTML to PDF -->
     <p:processor name="oxf:xhtml-to-pdf">
         <p:input name="data" href="#xhtml-data"/>
         <p:output name="data" ref="data"/>

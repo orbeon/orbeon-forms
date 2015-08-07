@@ -24,6 +24,7 @@
             <home>&lt;i class="icon-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Review</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Delete</delete>
             <import>&lt;i class="icon-upload"/&gt; Import</import>
             <new>&lt;i class="icon-plus"/&gt; New</new>
@@ -314,6 +315,7 @@
             <home>&lt;i class="icon-home"/&gt; Accueil</home>
             <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Supprimer</delete>
             <import>&lt;i class="icon-upload"/&gt; Importer</import>
             <new>&lt;i class="icon-plus"/&gt; Nouveau</new>
@@ -608,6 +610,7 @@
             <home>&lt;i class="icon-home"/&gt; Inicio</home>
             <review>&lt;i class="icon-eye-open"/&gt; Ver</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete>
             <import>&lt;i class="icon-upload"/&gt; Importar</import>
             <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
@@ -888,6 +891,7 @@
             <home>&lt;i class="icon-home"/&gt; Hjem</home>
             <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Slett</delete>
             <import>&lt;i class="icon-upload"/&gt; Importer</import>
             <new>&lt;i class="icon-plus"/&gt; Nytt skjema</new>
@@ -1166,6 +1170,7 @@
             <home>&lt;i class="icon-home"/&gt; На главную</home>
             <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Удалить</delete>
             <import>&lt;i class="icon-upload"/&gt; Импорт</import>
             <new>&lt;i class="icon-plus"/&gt; Новая</new>
@@ -1443,6 +1448,7 @@
             <home>&lt;i class="icon-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Recensione</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Cancella</delete>
             <import>&lt;i class="icon-upload"/&gt; Importa</import>
             <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
@@ -1732,6 +1738,7 @@
             <home>&lt;i class="icon-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Übersicht</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Löschen</delete>
             <import>&lt;i class="icon-upload"/&gt; Importieren</import>
             <new>&lt;i class="icon-plus"/&gt; Neu</new>
@@ -2021,6 +2028,7 @@
             <home>&lt;i class="icon-home"/&gt; Koti</home>
             <review>&lt;i class="icon-eye-open"/&gt; Käy läpi</review>
             <pdf>&lt;i class="icon-print"/&gt; Näytä PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Poista</delete>
             <import>&lt;i class="icon-upload"/&gt; Tuo</import>
             <new>&lt;i class="icon-plus"/&gt; Uusi</new>
@@ -2310,6 +2318,7 @@
             <home>&lt;i class="icon-home"/&gt; Start</home>
             <review>&lt;i class="icon-eye-open"/&gt; Granska</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Ta bort</delete>
             <import>&lt;i class="icon-upload"/&gt; Importera</import>
             <new>&lt;i class="icon-plus"/&gt; Skapa</new>
@@ -2599,6 +2608,7 @@
             <home>&lt;i class="icon-home"/&gt; Home</home>
             <review>&lt;i class="icon-eye-open"/&gt; Review</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Verwijderen</delete>
             <import>&lt;i class="icon-upload"/&gt; Importeren</import>
             <new>&lt;i class="icon-plus"/&gt; Nieuw</new>
@@ -2888,6 +2898,7 @@
             <home>&lt;i class="icon-home"/&gt; Início</home>
             <review>&lt;i class="icon-eye-open"/&gt; Rever</review>
             <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+            <tiff>&lt;i class="icon-picture"/&gt; TIFF</tiff>
             <delete>&lt;i class="icon-remove-sign"/&gt; Apagar</delete>
             <import>&lt;i class="icon-upload"/&gt; Importar</import>
             <new>&lt;i class="icon-plus"/&gt; Novo</new>

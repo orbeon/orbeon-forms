@@ -465,6 +465,7 @@
             <strict-submit/>
             <can-access-summary/>
             <pdf/>
+            <tiff/>
             <noscript/>
             <other/>
         </triggers>
@@ -489,6 +490,12 @@
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
                  relevant="normalize-space(xxf:instance('fr-form-attachments')/pdf) = '' or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
+                 readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
+                           and exf:readonly(../strict-submit)"/>
+
+        <!-- Don't show the TIFF button at all in CE version -->
+        <xf:bind ref="tiff"
+                 relevant="version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and exf:readonly(../strict-submit)"/>
 

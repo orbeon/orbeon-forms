@@ -25,6 +25,8 @@
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
+    <!-- 2015-08-07: This is probably here for backward compatibility only. -->
+
     <!-- Buttons that translate to fr:process-button -->
     <!-- NOTE: Lower priority so that rules below match. -->
     <!-- NOTE: Be sure to exclude existing fr:*-button XBL components. This is not ideal. Maybe we can skip this step
@@ -66,7 +68,7 @@
                         (
                             xxf:instance('fr-parameters-instance')/document/string(),
                             xxf:document-id(),
-                            frf:pdfFilenameOrNull()[. != '']
+                            frf:filenameOrNull('pdf')[. != '']
                         ),
                         '/'
                     )

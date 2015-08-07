@@ -112,12 +112,12 @@
              view="email/email-form.xpl"/>
 
     <!-- Create PDF directly from an XForms engine live document -->
-    <page path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf)/([^/^.]+)/([0-9A-Za-z\-]+)(?:/[^/]+)?\.pdf"
+    <page path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf|tiff)/([^/^.]+)/([0-9A-Za-z\-]+)(?:/[^/]+)?\.(?:pdf|tiff)"
           view="print/pdf-instant-view.xpl">
     </page>
 
     <!-- Create PDF from a stored document -->
-    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf)(/([^/^.]+))?"
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf|tiff)(/([^/^.]+))?"
              view="print/print-form.xpl"/>
 
     <!-- Generate HTML to be saved -->
@@ -184,7 +184,7 @@
     </page>
 
     <!-- View document as PDF (supports POST of XML, or GET) -->
-    <page path="/fr/([^/^.]+)/([^/^.]+)/(pdf)(/([^/^.]+))?"
+    <page path="/fr/([^/^.]+)/([^/^.]+)/(pdf|tiff)(/([^/^.]+))?"
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
 

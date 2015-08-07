@@ -987,18 +987,27 @@
                                     </xf:action>
                                 </xf:trigger>
                             </xf:group>
-                            <!-- PDF button
-                                 - don't show the PDF template button in CE (also on detail page)
+                            <!-- PDF and TIFF button
+                                 - don't show the PDF or TIFF button in CE if PDF template in use (also on detail page)
                                  - button not enabled when a draft is selected (not sure it makes sense to create a PDF
                                    for a draft and the PDF functionality right now doesn't support creating a PDF for a draft) -->
-                            <xf:group ref="if ($button-name = 'pdf' and not($has-pdf-template and not(version:isPE())))
-                                           then (if ($view-enabled and $selection-data-or-draft = 'data') then $enabled else $disabled)
-                                           else ()">
+                            <xf:group
+                                ref="
+                                    if ($button-name = ('pdf', 'tiff') and
+                                        not(($button-name = 'pdf' and $has-pdf-template or $button-name = 'tiff') and not(version:isPE()))) then
+                                        (
+                                            if ($view-enabled and $selection-data-or-draft = 'data') then
+                                                $enabled
+                                            else
+                                                $disabled
+                                        )
+                                    else
+                                        ()">
                                 <fr:href-button
                                         ref="."
-                                        href="/fr/{$app}/{$form}/pdf/{$selection-document-id}?fr-language={xxf:instance('fr-language-instance')}"
+                                        href="/fr/{$app}/{$form}/{$button-name}/{$selection-document-id}?fr-language={xxf:instance('fr-language-instance')}"
                                         class="fr-{$button-name}-button">
-                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/pdf"/>
+                                    <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
                                 </fr:href-button>
                             </xf:group>
                             <!-- Test button -->

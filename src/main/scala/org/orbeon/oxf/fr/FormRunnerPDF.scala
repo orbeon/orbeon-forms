@@ -28,8 +28,6 @@ import org.orbeon.scaxon.XML._
 
 trait FormRunnerPDF {
 
-    val PDFFileNameProperty = "oxf.fr.detail.pdf.filename"
-
     // Return mappings (formatName → expression) for all PDF formats in the properties
     //@XPathFunction
     def getPDFFormats = {
@@ -95,10 +93,10 @@ trait FormRunnerPDF {
     def hyperlinkURLs(s: String, hyperlinks: Boolean) =
         replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 
-    // Custom PDF filename for the detail page if specified and if evaluates to a non-empty name
+    // Custom filename (for PDF and TIFF output) for the detail page if specified and if evaluates to a non-empty name
     //@XPathFunction
-    def pdfFilenameOrNull: String = (
-        formRunnerProperty(PDFFileNameProperty)(FormRunnerParams())
+    def filenameOrNull(format: String): String = (
+        formRunnerProperty(s"oxf.fr.detail.$format.filename")(FormRunnerParams())
         flatMap nonEmptyOrNone
         flatMap (expr ⇒ nonEmptyOrNone(process.SimpleProcess.evaluateString(expr)))
         map     (EscapeURI.escape(_, "-_.~").toString)

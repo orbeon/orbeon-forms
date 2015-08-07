@@ -46,6 +46,7 @@
                 <!-- Event is authorized explicitly in view/edit modes -->
                 <xxf:action>
                     <xxf:event name="fr-open-pdf" source-control-id="fr-pdf-model">
+                        <xxf:property name="fr-format"><xsl:value-of select="/*/mode"/></xxf:property>
                         <xxf:property name="fr-language"><xsl:value-of select="p:get-request-parameter('fr-language')"/></xxf:property>
                     </xxf:event>
                 </xxf:action>

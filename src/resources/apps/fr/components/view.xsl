@@ -626,7 +626,7 @@
                     <xf:var
                         name="buttons-names"
                         value="
-                            if (normalize-space($buttons-property-override) = '' and $fr-mode = 'pdf') then
+                            if (normalize-space($buttons-property-override) = '' and $fr-mode = ('pdf', 'email')) then
                                 ()
                             else if (normalize-space($buttons-property-override) = '' and $fr-mode = 'test') then
                                 'validate'
@@ -642,6 +642,7 @@
                     <xf:repeat ref="$buttons-names">
                         <xf:var name="button-name" value="."/>
                         <xf:var name="pdf"         value="$button-name = 'pdf'"/>
+                        <xf:var name="tiff"        value="$button-name = 'tiff'"/>
                         <xf:var name="primary"     value="$highlight-primary and position() = last()"/>
 
                         <xf:var
@@ -672,6 +673,8 @@
                                                 'noscript'
                                             else if ($pdf) then
                                                 'pdf'
+                                            else if ($tiff) then
+                                                'tiff'
                                             else
                                                 'other'
                                         )]
@@ -681,11 +684,32 @@
                              changes to form-runner-bootstrap-override.less, which is not the best solution. Ideally,
                              we could find a dynamic way to set that class on the nested <button> so that standard
                              Bootstrap rules apply. -->
-                        <fr:process-button name="{{$button-name}}" ref="$ref[not($pdf)]" class="{{$class}}"/>
-                        <xsl:variable name="pdf-button" as="element()">
-                            <fr:pdf-button ref="$ref[$pdf]"  class="{{$class}}"/>
-                        </xsl:variable>
-                        <xsl:apply-templates select="$pdf-button"/>
+                        <fr:process-button name="{{$button-name}}" ref="$ref[not($pdf or $tiff)]" class="{{$class}}"/>
+                        <fr:href-button
+                            model="fr-persistence-model"
+                            ref="$ref[$pdf or $tiff]"
+                            class="{{$class}}"
+                            href=
+                                "/fr/service/{
+                                    $app
+                                }/{
+                                    $form
+                                }/{{
+                                    $button-name
+                                }}/{{
+                                    string-join(
+                                        (
+                                            xxf:instance('fr-parameters-instance')/document/string(),
+                                            xxf:document-id(),
+                                            frf:filenameOrNull($button-name)[. != '']
+                                        ),
+                                        '/'
+                                    )
+                                }}.{{
+                                    $button-name
+                                }}">
+                            <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
+                        </fr:href-button>
 
                     </xf:repeat>
 

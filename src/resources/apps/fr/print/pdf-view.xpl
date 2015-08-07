@@ -43,7 +43,7 @@
                 <p:input name="config" href="print-pdf-template.xpl"/>
                 <p:input name="xforms" href="#unrolled-form"/>
                 <p:input name="parameters" href="#instance"/>
-                <p:output name="data" ref="data"/>
+                <p:output name="data" id="pdf-data"/>
             </p:processor>
         </p:when>
         <p:otherwise>
@@ -52,6 +52,30 @@
                 <p:input name="config" href="print-pdf-notemplate.xpl"/>
                 <p:input name="xforms" href="#unrolled-form"/>
                 <p:input name="parameters" href="#instance"/>
+                <p:output name="data" id="pdf-data"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
+
+    <p:choose href="#instance">
+        <p:when test="/*/mode = 'pdf'">
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#pdf-data"/>
+                <p:output name="data" ref="data"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:pdf-to-image">
+                <p:input name="data" href="#pdf-data"/>
+                <p:input name="config">
+                    <config>
+                        <scale>3.0</scale>
+                        <format>tiff</format>
+                        <compression>
+                            <type>LZW</type>
+                        </compression>
+                    </config>
+                </p:input>
                 <p:output name="data" ref="data"/>
             </p:processor>
         </p:otherwise>

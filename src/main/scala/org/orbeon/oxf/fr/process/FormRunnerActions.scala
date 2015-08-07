@@ -381,6 +381,8 @@ trait FormRunnerActions {
         } flatMap
             tryChangeMode
 
+    private val SupportedRenderFormats = Set("pdf", "tiff")
+
     def tryOpenPDF(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
@@ -391,7 +393,14 @@ trait FormRunnerActions {
                 map     (lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang))
             )
 
-            recombineQuery(s"/fr/$app/$form/pdf/$document", requestedLangQuery getOrElse Nil)
+            val format = (
+                paramByName(params, "format")
+                flatMap   nonEmptyOrNone
+                filter    SupportedRenderFormats
+                getOrElse "pdf"
+            )
+
+            recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangQuery getOrElse Nil)
         } flatMap
             tryChangeMode
 

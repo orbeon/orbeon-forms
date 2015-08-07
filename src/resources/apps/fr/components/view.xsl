@@ -597,26 +597,42 @@
 
                     <xf:var
                         name="highlight-primary"
-                        value="if ($highlight-primary-override = '') then $fr-mode != 'test' else xs:boolean($highlight-primary-override)"/>
+                        value="
+                            if ($highlight-primary-override = '') then
+                                $fr-mode != 'test'
+                            else
+                                xs:boolean($highlight-primary-override)"
+                    />
+
                     <xf:var
                         name="inverse"
-                        value="if ($inverse-override = '')           then $fr-mode  = 'test' else xs:boolean($inverse-override)"/>
+                        value="
+                            if ($inverse-override = '') then
+                                $fr-mode  = 'test'
+                            else
+                                xs:boolean($inverse-override)"/>
 
                     <xf:var
                         name="buttons-property"
-                        value="if (normalize-space($buttons-property-override) != '')
-                               then $buttons-property-override
-                               else if ($fr-mode = 'view')
-                               then 'oxf.fr.detail.buttons.view'
-                               else 'oxf.fr.detail.buttons'"/>
+                        value="
+                            if (normalize-space($buttons-property-override) != '') then
+                                $buttons-property-override
+                            else if ($fr-mode = 'view') then
+                                'oxf.fr.detail.buttons.view'
+                            else
+                                'oxf.fr.detail.buttons'
+                    "/>
 
                     <xf:var
                         name="buttons-names"
-                        value="if (normalize-space($buttons-property-override) = '' and $fr-mode = 'pdf')
-                               then ()
-                               else if (normalize-space($buttons-property-override) = '' and $fr-mode = 'test')
-                               then 'validate'
-                               else xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.')))"/>
+                        value="
+                            if (normalize-space($buttons-property-override) = '' and $fr-mode = 'pdf') then
+                                ()
+                            else if (normalize-space($buttons-property-override) = '' and $fr-mode = 'test') then
+                                'validate'
+                            else
+                                xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.')))
+                    "/>
 
                     <!-- Message shown next to the buttons (empty by default) -->
                     <xh:span class="fr-buttons-message">
@@ -627,23 +643,39 @@
                         <xf:var name="button-name" value="."/>
                         <xf:var name="pdf"         value="$button-name = 'pdf'"/>
                         <xf:var name="primary"     value="$highlight-primary and position() = last()"/>
-                        <xf:var name="class"       value="concat('xforms-trigger-appearance-xxforms-',
-                                                                 if ($primary) then 'primary'
-                                                                 else if ($inverse) then 'inverse'
-                                                                 else 'default')"/>
+
+                        <xf:var
+                            name="class"
+                            value="
+                                concat(
+                                    'xforms-trigger-appearance-xxforms-',
+                                     if ($primary) then
+                                        'primary'
+                                     else if ($inverse) then
+                                        'inverse'
+                                     else
+                                        'default'
+                                )
+                        "/>
+
                         <xf:var name="ref"
-                                value="if ($button-name = 'wizard-prev')
-                                       then xxf:binding('fr-wizard-prev')
-                                       else if ($button-name = 'wizard-next')
-                                       then xxf:binding('fr-wizard-next')
-                                       else xxf:instance('fr-triggers-instance')/*[name() = (
-                                            if ($button-name = 'summary')
-                                            then 'can-access-summary'
-                                            else if ($button-name = 'refresh')
-                                            then 'noscript'
-                                            else if ($pdf)
-                                            then 'pdf'
-                                            else 'other')]"/>
+                                value="
+                                    if ($button-name = 'wizard-prev') then
+                                        xxf:binding('fr-wizard-prev')
+                                    else if ($button-name = 'wizard-next') then
+                                        xxf:binding('fr-wizard-next')
+                                    else
+                                        xxf:instance('fr-triggers-instance')/*[name() = (
+                                            if ($button-name = 'summary') then
+                                                'can-access-summary'
+                                            else if ($button-name = 'refresh') then
+                                                'noscript'
+                                            else if ($pdf) then
+                                                'pdf'
+                                            else
+                                                'other'
+                                        )]
+                        "/>
 
                         <!-- Because @appearance is static, use a CSS class instead for primary/inverse. This requires
                              changes to form-runner-bootstrap-override.less, which is not the best solution. Ideally,

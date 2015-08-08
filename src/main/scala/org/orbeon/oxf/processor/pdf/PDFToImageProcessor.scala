@@ -174,6 +174,8 @@ object PDFToImage {
 
                     val imageToWrite =
                         if (hasBlackAndWhiteCompressionType) {
+                            // This calls code from Apache FOP. If we don't want the entire FOP dependency we could
+                            // easily take over just a couple of files from Apache FOP.
                             val converter = new JAIMonochromeBitmapConverter |!> (_.setHint("quality", "true"))
                             val newImage = converter.convertToMonochrome(bufferedImage)
                             bufferedImage.flush() // unclear whether needed

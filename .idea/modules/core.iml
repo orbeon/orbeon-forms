@@ -106,6 +106,7 @@
           <root url="jar://$MODULE_DIR$/../../lib/flying-saucer-dependency-itext-2.1.7.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/typesafe-config-2.10.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/json-20090211.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jai-core-1.1.3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/ant-junit-1.7.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-jta-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/exist-xqj-1.0.1.jar!/" />
@@ -118,8 +119,10 @@
           <root url="jar://$MODULE_DIR$/../../lib/jtidy-8.0-20060801.131059-3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/dom4j-1_6_1-src.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-xmlrpc-server-3.1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jai-imageio-core-1.3.1-SNAPSHOT.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/ant-1_6_5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/jarjar-1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/icepdf-core-5.1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/ejb-2_0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/axis_1_2_1-saaj.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-lucene-core-2.9.2.jar!/" />

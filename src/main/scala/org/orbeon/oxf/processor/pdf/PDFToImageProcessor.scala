@@ -33,6 +33,21 @@ import org.orbeon.oxf.xml.XMLReceiver
 
 import scala.collection.JavaConverters._
 
+// This processor converts a PDF, provided as a binary document on its `data` input, into an image (possibly a
+// multi-page TIFF image) on its `data` output. It is configurable via its `config` input.
+//
+// The implementation relies on:
+//
+// - ICEpdf for the PDF-to-image conversion proper
+// - ImageIO for  writing the image (with the Java Advanced Imaging library jai-imageio-core for TIFF support)
+// - some FOP code for dithering as a shortcut (which in fact uses Java Advanced Imaging library jai-core)
+//
+// The main use case is to use TIFF as an output format, as that supports multi-page and a PDF file is often
+// multi-page. If the input is a single-page PDF, then other output formats make sense too.
+//
+// In the future one could imagine the processor producing a sequence of images as well, which could then be
+// combined into a ZIP file for example.
+
 class PDFToImageProcessor extends ProcessorImpl with Logging {
 
     import PDFToImage._
@@ -46,12 +61,12 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
 
     override def createOutput(outputName: String): ProcessorOutput =
         new ProcessorOutputImpl(PDFToImageProcessor.this, outputName) {
-            override protected def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+            override protected def readImpl(pc: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
                 implicit val logger = new IndentedLogger(Logger)
 
                 val config =
-                    readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader[Config] {
+                    readCacheInputAsObject(pc, getInputByName(INPUT_CONFIG), new CacheableInputReader[Config] {
                         override def read(pipelineContext: PipelineContext, input: ProcessorInput): Config = {
 
                             val configElem = readInputAsDOM4J(pipelineContext, input).getRootElement
@@ -63,7 +78,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
                                 elemValue(elem) map (_.toFloat)
 
                             val scale  = floatValue(configElem.element("scale")) getOrElse 1f
-                            val format = elemValue(configElem.element("format")) getOrElse "tiff"
+                            val format = elemValue(configElem.element("format")) getOrElse (throw new OXFException(s"No image format specified."))
 
                             val compression = Option(configElem.element("compression")) map { compressionElem ⇒
                                 val typ     = elemValue(compressionElem.element("type"))
@@ -81,7 +96,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
 
                 val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, Logger)
                 try {
-                    readInputAsSAX(pipelineContext, "data", new BinaryTextXMLReceiver(fileItem.getOutputStream))
+                    readInputAsSAX(pc, "data", new BinaryTextXMLReceiver(fileItem.getOutputStream))
                     convert(config, fileItem.asInstanceOf[DiskFileItem].getStoreLocation, outputStream)
                 } finally {
                     fileItem.delete()
@@ -96,7 +111,7 @@ object PDFToImage {
 
     // Reference
     //
-    // ImageIO.getWriterFormatNames returns:
+    // ImageIO.getWriterFormatNames returns, when jai-imageio-core is present:
     //
     // JPG, jpg, tiff, pcx, PCX, bmp, BMP, gif, GIF, WBMP, png, PNG, raw, RAW, JPEG, pnm, PNM, tif, TIF, TIFF,
     // wbmp, jpeg
@@ -108,7 +123,18 @@ object PDFToImage {
     case class Compression(typ: Option[String], quality: Option[Float])
     case class Config(scale: Float, format: String, compression: Option[Compression])
 
-    val KnownBlackAndWhiteCompressions = Set("CCITT RLE", "CCITT T.4", "CCITT T.6")
+    // The ImageIO API is supposed to allow discovery, but the results are inconsistent. We list below the formats we
+    // want to support explicitly based on experimentation.
+    val SupportedFormatCompressions = Map(
+        "gif"  → Set("LZW"),        // doesn't support disabling compression
+        "png"  → Set.empty[String], // uses DEFLATE, but API doesn't support setting it (`canWriteCompressed == false`)
+        "jpeg" → Set("JPEG"),       // doesn't support disabling compression
+        "tiff" → Set("CCITT RLE", "CCITT T.4", "CCITT T.6", "LZW", "JPEG", "ZLib", "PackBits", "Deflate", "EXIF JPEG") // supports disabling compression
+    )
+
+    val SupportedFormats = SupportedFormatCompressions.keySet
+
+    val KnownBlackAndWhiteTIFFCompressions = Set("CCITT RLE", "CCITT T.4", "CCITT T.6")
 
     // NOTE: Checked experimentally that invocations of getImageWritersByFormatName return separate instances.
     def findNewImageWriterForFormat(format: String) =
@@ -121,9 +147,11 @@ object PDFToImage {
         iceDocument.setFile(file.getAbsolutePath)
 
         try {
-            val imageWriter = findNewImageWriterForFormat(config.format).getOrElse(
-                throw new OXFException(s"No appropriate writer found for image format ${config.format}.")
-            )
+            if (! SupportedFormats(config.format))
+                throw new OXFException(s"Unsupported image format ${config.format}.")
+
+            val imageWriter = findNewImageWriterForFormat(config.format) getOrElse
+                (throw new OXFException(s"No image writer found for image format ${config.format}."))
 
             try {
                 val imageOutput = ImageIO.createImageOutputStream(outputStream)
@@ -132,24 +160,47 @@ object PDFToImage {
 
                 val params = {
                     val newParams = imageWriter.getDefaultWriteParam
-                    config.compression match {
-                        case Some(Compression(None, None)) ⇒
-                            newParams.setCompressionMode(ImageWriteParam.MODE_DEFAULT)
-                        case Some(Compression(typ, quality)) ⇒
-                            newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
-                            typ foreach newParams.setCompressionType
-                            quality foreach newParams.setCompressionQuality
-                        case None ⇒
-                            newParams.setCompressionMode(ImageWriteParam.MODE_DISABLED)
+
+                    // We can only call `setCompressionMode` if `canWriteCompressed == true`
+                    if (newParams.canWriteCompressed) {
+
+                        // GIF *requires* setting a compression
+                        def defaultCompressionIfAny = {
+                            val supportedCompressions = SupportedFormatCompressions(config.format)
+                            if (supportedCompressions.size == 1) {
+                                newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
+                                Some(supportedCompressions.head)
+                            }  else
+                                None
+                        }
+
+                        config.compression match {
+                            case None | Some(Compression(None, None)) ⇒
+                                defaultCompressionIfAny match {
+                                    case Some(default) ⇒
+                                        newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
+                                        newParams.setCompressionType(default)
+                                    case None ⇒
+                                        newParams.setCompressionMode(ImageWriteParam.MODE_DEFAULT)
+                                }
+                            case Some(Compression(Some("none"), _)) ⇒
+                                newParams.setCompressionMode(ImageWriteParam.MODE_DISABLED)
+                            case Some(Compression(typ, quality)) ⇒
+                                newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
+
+                                typ orElse defaultCompressionIfAny foreach newParams.setCompressionType
+
+                                quality foreach newParams.setCompressionQuality
+                        }
                     }
                     newParams
                 }
 
-                val hasBlackAndWhiteCompressionType =
-                    config.compression flatMap (_.typ) exists KnownBlackAndWhiteCompressions
+                val hasBlackAndWhiteTIFFCompressionType =
+                    config.compression flatMap (_.typ) exists KnownBlackAndWhiteTIFFCompressions
 
                 // If the writer doesn't support writing sequences, we only write one page at most, and we use a
-                // different API to write an individual image
+                // different API to write an individual image.
                 val canWriteSequence = imageWriter.canWriteSequence
 
                 val numberOfPagesToWrite =
@@ -173,9 +224,9 @@ object PDFToImage {
                         ).asInstanceOf[BufferedImage]
 
                     val imageToWrite =
-                        if (hasBlackAndWhiteCompressionType) {
+                        if (hasBlackAndWhiteTIFFCompressionType) {
                             // This calls code from Apache FOP. If we don't want the entire FOP dependency we could
-                            // easily take over just a couple of files from Apache FOP.
+                            // easily take over just a few files from Apache FOP.
                             val converter = new JAIMonochromeBitmapConverter |!> (_.setHint("quality", "true"))
                             val newImage = converter.convertToMonochrome(bufferedImage)
                             bufferedImage.flush() // unclear whether needed

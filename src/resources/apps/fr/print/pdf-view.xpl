@@ -67,13 +67,39 @@
         <p:otherwise>
             <p:processor name="oxf:pdf-to-image">
                 <p:input name="data" href="#pdf-data"/>
-                <p:input name="config">
-                    <config>
-                        <scale>3.0</scale>
+                <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
+                    <config xsl:version="2.0">
+
+                        <xsl:variable name="app"  select="/*/app/string()"/>
+                        <xsl:variable name="form" select="/*/form/string()"/>
+
+                        <xsl:variable
+                            name="compression-type"
+                            select="p:property(string-join(('oxf.fr.detail.tiff.compression.type', $app, $form), '.'))"/>
+
+                        <xsl:variable
+                            name="compression-quality"
+                            select="p:property(string-join(('oxf.fr.detail.tiff.compression.quality', $app, $form), '.'))"/>
+
+                        <xsl:variable
+                            name="scale"
+                            select="p:property(string-join(('oxf.fr.detail.tiff.scale', $app, $form), '.'))"/>
+
                         <format>tiff</format>
-                        <compression>
-                            <type>LZW</type>
-                        </compression>
+                        <xsl:if test="$compression-type or $compression-quality">
+                            <compression>
+                                <xsl:if test="$compression-type">
+                                    <type><xsl:value-of select="$compression-type"/></type>
+                                </xsl:if>
+                                <xsl:if test="$compression-quality">
+                                    <quality><xsl:value-of select="$compression-quality"/></quality>
+                                </xsl:if>
+                            </compression>
+                        </xsl:if>
+                        <xsl:if test="$scale">
+                            <scale><xsl:value-of select="$scale"/></scale>
+                        </xsl:if>
+
                     </config>
                 </p:input>
                 <p:output name="data" ref="data"/>

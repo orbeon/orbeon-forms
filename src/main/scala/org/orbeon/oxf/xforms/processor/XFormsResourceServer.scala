@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
 
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 /**
@@ -47,16 +48,14 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     }
 
     private def serveDynamicResource(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
-        val session = externalContext.getRequest.getSession(false)
-        if (session ne null) {
-            val filenameFromRequest = filename(requestPath)
-            val response = externalContext.getResponse
 
-            // Store mapping into session
-            val lookupKey = DynamicResourcesSessionKey + filenameFromRequest
-            // Use same session scope as proxyURI()
-            val resource = session.getAttributesMap(APPLICATION_SCOPE).get(lookupKey).asInstanceOf[DynamicResource]
-            if (resource ne null) {
+        val response = externalContext.getResponse
+
+        findDynamicResource(requestPath) match {
+            case Some(resource) ⇒
+
+                val digestFromPath = filename(requestPath)
+
                 // Found URL, stream it out
 
                 // Set caching headers
@@ -78,7 +77,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                 response.setContentType(resource.contentType getOrElse "application/octet-stream")
 
                 // File name visible by the user
-                val rawFilename = resource.filename getOrElse filenameFromRequest
+                val rawFilename = resource.filename getOrElse digestFromPath
 
                 def addExtensionIfNeeded(filename: String) =
                     findExtension(filename) match {
@@ -121,31 +120,30 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                 } catch {
                     case NonFatal(t) ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(t)))
                 }
-            } else {
-                // Not found
+
+            case None ⇒
                 response.setStatus(SC_NOT_FOUND)
-            }
         }
     }
 
     private def serveCSSOrJavaScript(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
 
-        val filenameFromRequest = filename(requestPath)
+        val filenameFromPath = filename(requestPath)
 
-        val isCSS = filenameFromRequest endsWith ".css"
-        val isJS  = filenameFromRequest endsWith ".js"
+        val isCSS = filenameFromPath endsWith ".css"
+        val isJS  = filenameFromPath endsWith ".js"
 
         val response = externalContext.getResponse
 
         // Eliminate funny requests
-        if (! isCSS && ! isJS && ! filenameFromRequest.startsWith("orbeon-")) {
+        if (! isCSS && ! isJS && ! filenameFromPath.startsWith("orbeon-")) {
             response.setStatus(SC_NOT_FOUND)
             return
         }
 
         val resources = {
             // New hash-based mechanism
-            val resourcesHash = filenameFromRequest.substring("orbeon-".length, filenameFromRequest.lastIndexOf("."))
+            val resourcesHash = filenameFromPath.substring("orbeon-".length, filenameFromPath.lastIndexOf("."))
             val cacheElement = Caches.resourcesCache.get(resourcesHash)
             if (cacheElement ne null) {
                 // Mapping found
@@ -240,10 +238,16 @@ object XFormsResourceServer {
 
         if (session ne null) {
 
-            // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
-            val serviceURI = new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE))
+            // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
+            // an absolute URI.
+            val serviceURI = new URI(
+                URLRewriterUtils.rewriteServiceURL(
+                    NetUtils.getExternalContext.getRequest,
+                    uri,
+                    URLRewriter.REWRITE_MODE_ABSOLUTE
+                )
+            )
 
-            // Store mapping into session
             val outgoingHeaders =
                 Connection.buildConnectionHeadersLowerIfNeeded(
                     scheme           = serviceURI.getScheme,
@@ -254,8 +258,10 @@ object XFormsResourceServer {
                     logger           = logger
                 )
 
-            val resource = DynamicResource(serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
+            val resource =
+                DynamicResource(digest, serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
 
+            // Store mapping into session
             session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)
         }
 
@@ -267,12 +273,49 @@ object XFormsResourceServer {
     def jProxyURI(uri: String, contentType: String) =
         proxyURI(uri, None, Option(contentType), -1, Map(), Set())(null)
 
+    // Try to remove a dynamic resource
+    //
+    // - do nothing if the session or resource are not found
+    // - if `removeFile == true` and the resource maps to a file, try to remove the file
+    // - remove the mapping from the session
+    def tryToRemoveDynamicResource(
+        requestPath     : String,
+        removeFile      : Boolean
+    ): Unit = {
+
+        implicit val externalContext = NetUtils.getExternalContext
+
+        findDynamicResource(requestPath) foreach { resource ⇒
+            Option(externalContext.getRequest.getSession(false)) foreach { session ⇒
+
+                if (removeFile)
+                    Try(new File(resource.uri)) foreach { file ⇒
+                        file.delete()
+                    }
+
+                session.getAttributesMap(APPLICATION_SCOPE).remove(DynamicResourcesSessionKey + resource.digest)
+            }
+        }
+    }
+
+    private def findDynamicResource(
+        requestPath     : String)(implicit
+        externalContext : ExternalContext
+    ): Option[DynamicResource] =
+        Option(externalContext.getRequest.getSession(false)) flatMap { session ⇒
+            val digestFromPath = filename(requestPath)
+            val lookupKey      = DynamicResourcesSessionKey + digestFromPath
+
+            Option(session.getAttributesMap(APPLICATION_SCOPE).get(lookupKey).asInstanceOf[DynamicResource])
+        }
+
     // For unit tests only (called from XSLT)
     def testGetResources(key: String)  =
         Option(Caches.resourcesCache.get(key)) map (_.getObjectValue.asInstanceOf[Array[String]]) orNull
 
     // Information about the resource, stored into the session
     case class DynamicResource(
+        digest       : String,
         uri          : URI,
         filename     : Option[String],
         contentType  : Option[String],
@@ -281,5 +324,6 @@ object XFormsResourceServer {
         headers      : Map[String, List[String]]
     )
 
-    private def filename(requestPath: String) = requestPath.substring(requestPath.lastIndexOf('/') + 1)
+    private def filename(requestPath: String) =
+        requestPath.substring(requestPath.lastIndexOf('/') + 1)
 }

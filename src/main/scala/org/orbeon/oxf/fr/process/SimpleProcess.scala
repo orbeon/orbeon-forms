@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer
 import org.orbeon.scaxon.XML._
 
 import scala.collection.mutable.ListBuffer
@@ -45,10 +46,20 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     def xpathFunctionLibrary = XFormsFunctionLibrary
     def xpathFunctionContext = XPath.functionContext.orNull
 
-    // NOTE: Clear the PDF URL *before* the process, because if we clear it after, it will be already cleared during the
-    // second pass of a two-pass submission.
-    // TODO: Delete temp file if any.
-    override def beforeProcess() = Try(setvalue(pdfURLInstanceRootElementOpt.toList, ""))
+    // NOTE: Clear the PDF/TIFF URL *before* the process, because if we clear it after, it will be already cleared
+    // during the second pass of a two-pass submission.
+    override def beforeProcess() = Try {
+        List("pdf", "tiff") foreach { mode ⇒
+
+            // Remove resource and temporary file if any
+            pdfTiffPathOpt(mode) foreach { path ⇒
+                XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
+            }
+
+            // Clear stored path
+            setvalue(pdfTiffPathInstanceRootElementOpt(mode).to[List], "")
+        }
+    }
 
     override def processError(t: Throwable) =
         tryErrorMessage(Map(Some("resource") → "process-error"))

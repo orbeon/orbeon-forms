@@ -181,12 +181,21 @@ trait FormRunnerActions {
 
     def trySendEmail(params: ActionParams): Try[Any] =
         Try {
-            // NOTE: As of 2013-05-15, email-form.xpl recreates the PDF anyway, which is wasteful
-//            implicit val formRunnerParams = FormRunnerParams()
-//            if (booleanFormRunnerProperty("oxf.fr.email.attach-pdf"))
-//                tryCreatePDFIfNeeded(EmptyActionParams).get
+            implicit val formRunnerParams = FormRunnerParams()
 
-            sendThrowOnError("fr-email-service-submission")
+            if (booleanFormRunnerProperty("oxf.fr.email.attach-pdf"))
+                tryCreatePdfOrTiffIfNeeded("pdf").get
+
+            if (booleanFormRunnerProperty("oxf.fr.email.attach-tiff"))
+                tryCreatePdfOrTiffIfNeeded("tiff").get
+
+            sendThrowOnError(
+                "fr-email-service-submission",
+                Map(
+                    "pdf"  → pdfTiffPathOpt("pdf"),
+                    "tiff" → pdfTiffPathOpt("tiff")
+                )
+            )
         }
 
     // Defaults except for `uri` and `serialization`
@@ -263,7 +272,11 @@ trait FormRunnerActions {
 
             // Create PDF if needed
             if (stringOptionToSet(evaluatedSendProperties("content")) exists Set("pdf", "pdf-url"))
-                tryCreatePDFIfNeeded(EmptyActionParams).get
+                tryCreatePdfOrTiffIfNeeded("pdf").get
+
+            // Create TIFF if needed
+            if (stringOptionToSet(evaluatedSendProperties("content")) exists Set("tiff", "tiff-url"))
+                tryCreatePdfOrTiffIfNeeded("tiff").get
 
             // TODO: Remove duplication once @replace is an AVT
             val replace = if (evaluatedSendProperties.get("replace") exists (_.contains("all"))) "all" else "none"
@@ -427,14 +440,17 @@ trait FormRunnerActions {
     def tryWizardNext(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
 
-    def pdfURLInstanceRootElementOpt = topLevelInstance(PersistenceModel, "fr-pdf-url-instance") map (_.rootElement)
+    def pdfTiffPathInstanceRootElementOpt(mode: String) =
+        topLevelInstance(PersistenceModel, s"fr-$mode-url-instance") map (_.rootElement)
 
-    def tryCreatePDFIfNeeded(params: ActionParams): Try[Any] =
+    def pdfTiffPathOpt(mode: String) =
+        pdfTiffPathInstanceRootElementOpt(mode) map (_.stringValue) flatMap nonEmptyOrNone
+
+    def tryCreatePdfOrTiffIfNeeded(mode: String): Try[Any] =
         Try {
-            pdfURLInstanceRootElementOpt foreach { pdfURLInstanceRootElement ⇒
-                // Only create if not available yet
-                if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
-                    sendThrowOnError("fr-pdf-service-submission")
+            pdfTiffPathOpt(mode) match {
+                case Some(_) ⇒ // nop
+                case None    ⇒ sendThrowOnError("fr-pdf-tiff-service-submission", Map("fr-mode" → Some(mode)))
             }
         }
 }

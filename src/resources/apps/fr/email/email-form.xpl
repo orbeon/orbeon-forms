@@ -239,6 +239,10 @@
                     <xsl:if test="p:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
                         <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                     </xsl:if>
+                    <!-- TIFF attachment if needed -->
+                    <xsl:if test="p:property(string-join(('oxf.fr.email.attach-tiff', $app, $form), '.'))">
+                        <part name="form-tiff" content-type="image/tiff" content-disposition="attachment; filename=&quot;form.tiff&quot;" src="input:form-tiff"/>
+                    </xsl:if>
                     <!-- Other attachments if needed -->
                     <xsl:for-each select="$attachments/attachment">
                         <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="attachment; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
@@ -250,17 +254,32 @@
     </p:processor>
 
     <!-- Obtain PDF data for attachment -->
-    <!-- TODO: add option to get PDF from temp file -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../detail/detail-model.xpl"/>
-        <p:input name="instance"><null xsi:nil="true"/></p:input>
-        <p:output name="data" id="xhtml"/>
-    </p:processor>
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../print/pdf-view.xpl"/>
-        <p:input name="instance" href="#parameters-with-version"/>
-        <p:input name="data" href="#xhtml"/>
+    <!-- This is read only if oxf.fr.email.attach-pdf is true -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#request">
+            <config xsl:version="2.0">
+                <!--<url><xsl:value-of select="p:rewrite-service-uri(/*/parameters/parameter[name = 'pdf']/value)"/></url>-->
+                <url><xsl:value-of select="p:rewrite-service-uri(/*/parameters/parameter[name = 'pdf']/value, true())"/></url>
+                <mode>binary</mode>
+                <content-type>application/pdf</content-type>
+                <force-content-type>true</force-content-type>
+            </config>
+        </p:input>
         <p:output name="data" id="form-pdf"/>
+    </p:processor>
+
+    <!-- Obtain TIFF data for attachment -->
+    <!-- This is read only if oxf.fr.email.attach-tiff is true -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#request">
+            <config xsl:version="2.0">
+                <url><xsl:value-of select="p:rewrite-service-uri(/*/parameters/parameter[name = 'tiff']/value, true())"/></url>
+                <mode>binary</mode>
+                <content-type>image/tiff</content-type>
+                <force-content-type>true</force-content-type>
+            </config>
+        </p:input>
+        <p:output name="data" id="form-tiff"/>
     </p:processor>
 
     <!-- Convert form data for attachment -->
@@ -273,9 +292,10 @@
     <!-- Connect attachments and send email -->
     <p:processor name="oxf:pipeline">
         <!-- Inputs to forward -->
-        <p:input name="message" href="#message"/>
-        <p:input name="form-xml" href="#form-xml"/>
-        <p:input name="form-pdf" href="#form-pdf"/>
+        <p:input name="message"   href="#message"/>
+        <p:input name="form-xml"  href="#form-xml"/>
+        <p:input name="form-pdf"  href="#form-pdf"/>
+        <p:input name="form-tiff" href="#form-tiff"/>
         <!-- Dynamically generate pipeline to dereference attachments and send email -->
         <p:input name="config" href="#attachments" transform="oxf:unsafe-xslt">
             <p:config xsl:version="2.0">
@@ -283,6 +303,7 @@
                 <p:param type="input" name="message"/>
                 <p:param type="input" name="form-xml"/>
                 <p:param type="input" name="form-pdf"/>
+                <p:param type="input" name="form-tiff"/>
                 <!-- Iterate over attachments -->
                 <xsl:for-each select="/*/attachment">
                     <xsl:variable name="uri" select="." as="xs:string"/>
@@ -305,8 +326,10 @@
                     <p:input name="data" href="#message"/>
                     <!-- The attachment contains the XML document -->
                     <p:input name="form-xml" href="#form-xml"/>
-                    <!-- The attachment contains the pdf document -->
+                    <!-- The attachment contains the PDF document -->
                     <p:input name="form-pdf" href="#form-pdf"/>
+                    <!-- The attachment contains the TIFF document -->
+                    <p:input name="form-tiff" href="#form-tiff"/>
                     <!-- Create one extra input per attachment -->
                     <xsl:for-each select="/*/attachment">
                         <p:input name="attachment-{position()}" href="#attachment-{position()}"/>

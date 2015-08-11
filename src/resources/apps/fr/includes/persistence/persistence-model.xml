@@ -509,24 +509,61 @@
 
     <!-- Call email service -->
     <xf:submission id="fr-email-service-submission"
-        resource="/fr/service/{$app}/{$form}/email/{$document}?data-format-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+        resource="
+            /fr/service/{
+                $app
+            }/{
+                $form
+            }/email/{
+                $document
+            }?pdf={
+                event('pdf')
+            }&amp;tiff={
+                event('tiff')
+            }&amp;data-format-version=edge&amp;fr-language={
+                xxf:instance('fr-language-instance')
+            }{
+                if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''
+            }"
         relevant="false"
         validate="false"
         method="post"
         ref="xxf:instance('fr-form-instance')"
         replace="none"/>
 
-    <!-- Call PDF service -->
-    <xf:submission id="fr-pdf-service-submission"
-        resource="/fr/service/{$app}/{$form}/pdf/{$document}?data-format-version=edge&amp;fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+    <!-- Call PDF or TIFF service -->
+    <xf:submission id="fr-pdf-tiff-service-submission"
+        resource=
+            "/fr/service/{
+                $app
+            }/{
+                $form
+            }/{
+                event('fr-mode')
+            }/{
+                $document
+            }?data-format-version=edge&amp;fr-language={
+                xxf:instance('fr-language-instance')
+            }{
+                if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''
+            }"
         relevant="false"
         validate="false"
         method="post"
         ref="xxf:instance('fr-form-instance')"
         replace="instance"
-        instance="fr-pdf-url-instance"/>
+        targetref="
+            if (event('fr-mode') = 'pdf') then
+                instance('fr-pdf-url-instance')
+            else
+                instance('fr-tiff-url-instance')"
+    />
 
     <xf:instance id="fr-pdf-url-instance">
+        <uri/>
+    </xf:instance>
+
+    <xf:instance id="fr-tiff-url-instance">
         <uri/>
     </xf:instance>
 

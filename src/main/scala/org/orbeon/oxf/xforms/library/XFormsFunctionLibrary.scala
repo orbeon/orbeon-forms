@@ -27,7 +27,8 @@ import org.orbeon.saxon.om.NamespaceConstant
  * Function library for XPath expressions in XForms.
  */
 object XFormsFunctionLibrary extends {
-    // Namespace the functions (we wish we had trait constructors!)
+    // Namespace the functions. We wish we had trait parameters, see:
+    // http://docs.scala-lang.org/sips/pending/trait-parameters.html
     val XFormsIndependentFunctionsNS  = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
     val XFormsEnvFunctionsNS          = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
     val XFormsXXFormsEnvFunctionsNS   = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)

@@ -13,17 +13,16 @@
  */
 package org.orbeon.oxf.processor.pipeline
 
-import org.orbeon.oxf.xforms.function.xxforms._
-import PipelineProcessor.PIPELINE_NAMESPACE_URI
-import org.orbeon.oxf.util.NetUtils
-import org.orbeon.saxon.sxpath.XPathEvaluator
 import org.orbeon.oxf.common.Version
-import org.w3c.dom.Node
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.library._
+import org.orbeon.oxf.processor.pipeline.PipelineProcessor.PIPELINE_NAMESPACE_URI
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.library._
 import org.orbeon.oxf.xforms.state.DynamicState
+import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om.{NamespaceConstant, NodeInfo}
+import org.orbeon.saxon.sxpath.XPathEvaluator
+import org.w3c.dom.Node
 
 // For backward compatibility
 object PipelineFunctionLibrary extends PipelineFunctionLibrary
@@ -38,7 +37,8 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
  * - then update XSLT stylesheets to use the p:* functions instead of direct Java calls
  */
 class PipelineFunctionLibrary extends {
-    // Namespace the functions (we wish we had trait constructors!)
+    // Namespace the functions. We wish we had trait parameters, see:
+    // http://docs.scala-lang.org/sips/pending/trait-parameters.html)
     val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
     val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
     val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
@@ -49,15 +49,18 @@ class PipelineFunctionLibrary extends {
     with XXFormsIndependentFunctions
     with XSLTFunctions {
 
-    // === Functions made accessible to XSLT via Java calls
+    // === Functions made accessible to XSLT/XPL via Java calls
 
     // Add these to XXFormsIndependentFunctions?
     def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML)
     def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)
     def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML // for unit tests only
     def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
+
     def isPE = Version.isPE
+
     def isPortlet = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType
+
     def setTitle(title: String): String = {
         NetUtils.getExternalContext.getResponse.setTitle(title)
         null

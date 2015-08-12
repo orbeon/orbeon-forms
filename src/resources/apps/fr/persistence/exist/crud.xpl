@@ -21,8 +21,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:exist="http://exist.sourceforge.net/NS/exist"
         xmlns:saxon="http://saxon.sf.net/"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <p:param type="input" name="instance"/>
 
@@ -233,7 +232,7 @@
                 <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
                     <config xsl:version="2.0">
                         <url>
-                            <xsl:value-of select="xpl:rewriteServiceURI(/*/resource-uri, true())"/>
+                            <xsl:value-of select="p:rewrite-service-uri(/*/resource-uri, true())"/>
                         </url>
                         <!-- Produce binary so we do our own XML parsing -->
                         <mode>binary</mode>

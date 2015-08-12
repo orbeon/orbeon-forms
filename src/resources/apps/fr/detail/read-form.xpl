@@ -20,8 +20,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- Parameters (app, form, form version, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -53,7 +52,7 @@
                             if ($use-document-id) then concat('?document=', $params/document) else ''
                         )"/>
                 <url>
-                    <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
+                    <xsl:value-of select="p:rewrite-service-uri($resource, true())"/>
                 </url>
                 <!-- Form definitions are always in XML format -->
                 <mode>xml</mode>

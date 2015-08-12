@@ -62,10 +62,4 @@ class PipelineFunctionLibrary extends {
         NetUtils.getExternalContext.getResponse.setTitle(title)
         null
     }
-
-    // These are already available in XXFormsIndependentFunctions
-    def property(name: String) = XXFormsProperty.property(name)
-    def propertiesStartsWith(name: String) = XXFormsPropertiesStartsWith.propertiesStartsWith(name)
-    def rewriteServiceURI(uri: String, absolute: Boolean) = XXFormsRewriteServiceURI.rewriteServiceURI(uri, absolute)
-    def rewriteResourceURI(uri: String, absolute: Boolean) = XXFormsRewriteResourceURI.rewriteResourceURI(uri, absolute)
 }

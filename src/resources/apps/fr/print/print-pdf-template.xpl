@@ -18,8 +18,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Unrolled XHTML+XForms -->
     <p:param type="input" name="xforms"/>
@@ -104,7 +103,7 @@
                 <xsl:variable name="params" select="/*/*[2]"/>
 
                 <url>
-                    <xsl:value-of select="xpl:rewriteServiceURI($form//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
+                    <xsl:value-of select="p:rewrite-service-uri($form//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
                 </url>
 
                 <mode>binary</mode>

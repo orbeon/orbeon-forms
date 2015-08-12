@@ -25,7 +25,6 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:saxon="http://saxon.sf.net/"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
         xmlns:map="java:java.util.Map"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
@@ -47,7 +46,7 @@
             <!-- Barcode -->
             <!-- NOTE: Code 39 only take uppercase letters, hence we upper-case(…) -->
             <xsl:variable name="barcode-value" select="upper-case($parameters/document)" as="xs:string?"/>
-            <xsl:if test="normalize-space($barcode-value) != '' and xpl:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
+            <xsl:if test="normalize-space($barcode-value) != '' and p:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
                 <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
                     <barcode left="80" top="800" height="15" value="'{$barcode-value}'"/>
                 </group>
@@ -55,7 +54,7 @@
 
             <xsl:variable name="pdfFormats" select="frf:getPDFFormats()"/>
 
-            <xsl:for-each select="p:split(xpl:property('oxf.fr.pdf.template.font.paths'))">
+            <xsl:for-each select="p:split(p:property('oxf.fr.pdf.template.font.paths'))">
                 <substitution-font font-family="{.}" embed="true"/>
             </xsl:for-each>
 
@@ -120,7 +119,7 @@
                                 <xsl:choose>
                                     <xsl:when test="$classes = $image-attachment-classes">
                                         <!-- Handle URL rewriting for image attachments -->
-                                        <image acro-field-name="'{$pdf-field-name}'" href="{xpl:rewriteResourceURI($value, true())}"/>
+                                        <image acro-field-name="'{$pdf-field-name}'" href="{p:rewrite-resource-uri($value, true())}"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>

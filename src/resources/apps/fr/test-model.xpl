@@ -19,8 +19,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Parameters (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -38,7 +37,7 @@
                 <xsl:variable name="resource" as="xs:string"
                               select="concat('/fr/service/persistence/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')"/>
                 <url>
-                    <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
+                    <xsl:value-of select="p:rewrite-service-uri($resource, true())"/>
                 </url>
                 <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>

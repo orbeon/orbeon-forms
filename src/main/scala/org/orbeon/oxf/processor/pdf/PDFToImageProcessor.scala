@@ -81,10 +81,10 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
                             val format = elemValue(configElem.element("format")) getOrElse (throw new OXFException(s"No image format specified."))
 
                             val compression = Option(configElem.element("compression")) map { compressionElem ⇒
-                                val typ     = elemValue(compressionElem.element("type"))
+                                val tpe     = elemValue(compressionElem.element("type"))
                                 val quality = floatValue(compressionElem.element("quality"))
 
-                                Compression(typ, quality)
+                                Compression(tpe, quality)
                             }
 
                             Config(scale, format, compression)
@@ -120,7 +120,7 @@ object PDFToImage {
     //
     // CCITT RLE, CCITT T.4, CCITT T.6, LZW, JPEG, ZLib, PackBits, Deflate, EXIF JPEG
 
-    case class Compression(typ: Option[String], quality: Option[Float])
+    case class Compression(tpe: Option[String], quality: Option[Float])
     case class Config(scale: Float, format: String, compression: Option[Compression])
 
     // The ImageIO API is supposed to allow discovery, but the results are inconsistent. We list below the formats we
@@ -185,10 +185,10 @@ object PDFToImage {
                                 }
                             case Some(Compression(Some("none"), _)) ⇒
                                 newParams.setCompressionMode(ImageWriteParam.MODE_DISABLED)
-                            case Some(Compression(typ, quality)) ⇒
+                            case Some(Compression(tpe, quality)) ⇒
                                 newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
 
-                                typ orElse defaultCompressionIfAny foreach newParams.setCompressionType
+                                tpe orElse defaultCompressionIfAny foreach newParams.setCompressionType
 
                                 quality foreach newParams.setCompressionQuality
                         }
@@ -197,7 +197,7 @@ object PDFToImage {
                 }
 
                 val hasBlackAndWhiteTIFFCompressionType =
-                    config.compression flatMap (_.typ) exists KnownBlackAndWhiteTIFFCompressions
+                    config.compression flatMap (_.tpe) exists KnownBlackAndWhiteTIFFCompressions
 
                 // If the writer doesn't support writing sequences, we only write one page at most, and we use a
                 // different API to write an individual image.

@@ -22,6 +22,7 @@
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
          xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
+         xmlns:version="java:org.orbeon.oxf.common.Version"
 
          lang="{xxf:instance('fr-fr-language-instance')}"
          xml:lang="{xxf:instance('fr-fr-language-instance')}">
@@ -35,7 +36,7 @@
         <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
 
             <!-- Initialize remote servers information -->
-            <xf:action event="xforms-model-construct-done">
+            <xf:action event="xforms-model-construct-done" if="version:isPE()">
 
                 <xf:var
                     name="remote-servers"
@@ -68,6 +69,11 @@
                     value="if (exists($remote-servers)) then 1 else 0"/>
 
             </xf:action>
+            <xf:action event="xforms-model-construct-done" if="not(version:isPE())">
+                <xf:setvalue
+                    ref="instance()/current-remote-server"
+                    value="0"/>
+            </xf:action>
 
             <!-- Entry point -->
             <xf:action event="xforms-ready fr-initialize">
@@ -90,7 +96,7 @@
 
                 <xf:dispatch name="fr-clear" targetid="fr-form-model"/>
 
-                <xf:action type="xpath" xmlns:version="java:org.orbeon.oxf.common.Version">
+                <xf:action type="xpath">
                     if (not(version:isPE()) or instance()/current-remote-server = 0) then
                         process:runProcessByName('oxf.fr.home.process', 'load-local')
                     else if ($remote-set) then

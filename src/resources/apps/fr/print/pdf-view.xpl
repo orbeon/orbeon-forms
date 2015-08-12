@@ -57,14 +57,11 @@
         </p:otherwise>
     </p:choose>
 
-    <p:choose href="#instance">
-        <p:when test="/*/mode = 'pdf'">
-            <p:processor name="oxf:identity">
-                <p:input name="data" href="#pdf-data"/>
-                <p:output name="data" ref="data"/>
-            </p:processor>
-        </p:when>
-        <p:otherwise>
+    <p:choose
+            href="#instance"
+            xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+            xmlns:version="java:org.orbeon.oxf.common.Version">
+        <p:when test="/*/mode = 'tiff' and (version:isPE() or frf:sendError(404))">
             <p:processor name="oxf:pdf-to-image">
                 <p:input name="data" href="#pdf-data"/>
                 <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
@@ -102,6 +99,13 @@
 
                     </config>
                 </p:input>
+                <p:output name="data" ref="data"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <!-- Just produce the PDF document -->
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#pdf-data"/>
                 <p:output name="data" ref="data"/>
             </p:processor>
         </p:otherwise>

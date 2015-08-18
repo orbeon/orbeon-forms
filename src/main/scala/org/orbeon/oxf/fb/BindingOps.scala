@@ -153,28 +153,35 @@ trait BindingOps {
     // They are obtained from the legacy datatype element or from templates/bind.
     def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
 
+        val metadata            = bindingMetadata(binding)
+        val datatypeMetadataOpt = metadata / "*:datatype" headOption
+        val bindMetadataOpt     = metadata / "*:templates" / "*:bind" headOption
+
         val allAttributes = {
 
-            val metadata = bindingMetadata(binding)
-
             val typeFromDatatype =
-                QName.get("type") → ((metadata / "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
+                for (elem ← datatypeMetadataOpt.to[List])
+                yield
+                    (elem, QName.get("type"), elem.stringValue)
 
             val bindAttributes = {
-                val asNodeInfo = metadata / "*:templates" / "*:bind" /@ @*
-                asNodeInfo map (att ⇒ QName.get(att.getLocalPart, att.getPrefix, att.getURI) →  att.stringValue)
+                for {
+                    elem ← bindMetadataOpt.to[List]
+                    att  ← elem /@ @*
+                } yield
+                    (elem, QName.get(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)
             }
 
-            typeFromDatatype +: bindAttributes
+            typeFromDatatype ::: bindAttributes
         }
 
         allAttributes collect {
-            case (qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
+            case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
                 // Some attributes must be prefixed before being inserted into the edited form
                 QName.get(qname.getName, "fb", FormBuilder.FB) → value
-            case tuple @ (qname, value) if !(qname.getName == "type" && binding.resolveQName(value).getName == "string") ⇒
+            case (elem, qname, value) if !(qname.getName == "type" && elem.resolveQName(value).getName == "string") ⇒
                 // Exclude `type="*:string"`
-                tuple
+                qname → value
         } map {
             case (qname, value) ⇒
                 attributeInfo(qname, value)

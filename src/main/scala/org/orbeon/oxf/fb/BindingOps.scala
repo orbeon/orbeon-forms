@@ -144,11 +144,17 @@ trait BindingOps {
         (((metadata / "*:template") ++ (metadata / "*:templates" / "*:view")) / *).headOption
     }
 
+    // In other words we leave Type and Required and custom MIPs as they are
+    // This must match what is done in annotate.xpl
+    private val BindTemplateAttributesToNamespace =
+        Set(Model.Relevant, Model.Readonly, Model.Constraint, Model.Calculate, Model.Default) map (_.aName)
+
     // From an <xbl:binding>, return all bind attributes
     // They are obtained from the legacy datatype element or from templates/bind.
     def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
 
         val allAttributes = {
+
             val metadata = bindingMetadata(binding)
 
             val typeFromDatatype =
@@ -162,11 +168,17 @@ trait BindingOps {
             typeFromDatatype +: bindAttributes
         }
 
-        for {
-            (qname, value) ← allAttributes
-            if !(qname.getName == "type" && value == "xs:string") // TODO: resolve and don't  literal 'xs:' prefix
-        } yield
-            attributeInfo(qname, value)
+        allAttributes collect {
+            case (qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
+                // Some attributes must be prefixed before being inserted into the edited form
+                QName.get(qname.getName, "fb", FormBuilder.FB) → value
+            case tuple @ (qname, value) if !(qname.getName == "type" && binding.resolveQName(value).getName == "string") ⇒
+                // Exclude `type="*:string"`
+                tuple
+        } map {
+            case (qname, value) ⇒
+                attributeInfo(qname, value)
+        }
     }
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>

@@ -63,6 +63,13 @@
 .orbeon .xforms-case-selected {
   position: static;
 }
+.orbeon div.xforms-case-deselected,
+.orbeon div.xforms-case-selected {
+  width: 100%;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
 .orbeon .xforms-hint {
   display: none;
 }
@@ -92,6 +99,8 @@
 }
 .orbeon .popover.xforms-help-popover .popover-content {
   overflow: auto;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   white-space: pre-wrap;
 }

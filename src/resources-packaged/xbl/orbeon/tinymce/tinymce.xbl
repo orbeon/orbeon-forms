@@ -91,7 +91,7 @@
             <xf:var name="binding"      value="xxf:binding('fr-tinymce')"/>
             <xf:var name="script"       value="not(exf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
 
-            <xf:group ref=".[$script]">
+            <xf:group ref=".[$script]" xxf:element="div">
                 <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
                     <xxf:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxf:script>

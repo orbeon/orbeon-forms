@@ -12,7 +12,14 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:exf="http://www.exforms.org/exf/1-0"
+            xmlns:xbl="http://www.w3.org/ns/xbl"
+            xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- ==== Internal base properties ============================================================================ -->
 
@@ -70,16 +77,79 @@
         we don't support anymore those requests being made over the network, so this property shouldn't be changed
         by users, and thus isn't listed in the documentation.
       -->
-    <property as="xs:string"  name="oxf.http.internal-paths"                         value="(?!/exist/)/.*(?&lt;!\.jsp)"/>
+    <property as="xs:string"  name="oxf.http.internal-paths"                              value="(?!/exist/)/.*(?&lt;!\.jsp)"/>
 
     <!-- Processor-specific properties -->
-    <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
-    <property as="xs:string"  processor-name="oxf:page-flow" name="submission-path"          value="/xforms-server-submit"/>
-    <property as="xs:anyURI"  processor-name="oxf:page-flow" name="submission-model"         value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"      value="redirect"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="submission-path"       value="/xforms-server-submit"/>
+    <property as="xs:anyURI"  processor-name="oxf:page-flow" name="submission-model"      value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
 
     <!-- ==== Internal XForms properties ========================================================================== -->
 
+     <!-- XForms cache configuration -->
+    <property as="xs:string"  name="oxf.xforms.state-handling"                            value="server"/>
+    <property as="xs:boolean" name="oxf.xforms.cache.document"                            value="true"/>
 
+    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                          value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.local-submission-forward"                  value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.local-submission-include"                  value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.local-instance-include"                    value="false"/>
+
+    <property as="xs:boolean" name="oxf.xforms.gzip-state"                                value="true"/>
+
+    <!-- default | deferred -->
+    <property as="xs:string"  name="oxf.xforms.client.events.mode"                        value="default"/>
+    <property as="xs:string"  name="oxf.xforms.client.events.filter"                      value=""/>
+
+    <!-- NOTE: This is only used client-side by dialogs. Unclear why it should default to false. -->
+    <property as="xs:boolean" name="oxf.xforms.use-aria"                                  value="false"/>
+
+    <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                           value="false"/>
+
+    <!-- Whitespace handling for XForms documents -->
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                   value="normalize"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize">
+        xf|model,
+        xbl|xbl
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.preserve">
+        xf|instance > *,
+        xf|var,
+        xxf|var,
+        xf|variable,
+        xxf|variable,
+        exf|variable,
+        xf|setvalue,
+        xf|value,
+        xxf|sequence,
+        xxf|script,
+        xf|action[type=xpath],
+        xs|schema
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.collapse">
+        xf|label,
+        xf|help,
+        xf|hint,
+        xf|alert,
+        xf|message,
+        xbl|template,
+        xxbl|global
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.default"                   value="normalize"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.normalize">
+        xh|html
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.preserve">
+        xh|pre,
+        xh|textarea,
+        xh|script,
+        xh|style,
+        xh|template
+    </property>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.collapse">
+        xh|title,
+        xh|body
+    </property>
 
     <!-- ==== Internal Form Runner properties ===================================================================== -->
 
@@ -141,32 +211,32 @@
         .//*[tokenize(@class, '\s+') = 'xbl-fr-number-xforms-input']/input/@value/string()
     </property>
 
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.*"                          value="input-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.date"                       value="input-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                       value="input-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.dateTime"                   value="input-dateTime"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.boolean"                    value="select-value"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-output.*"                         value="output-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-textarea.*"                       value="textarea"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                         value="select-labels-string"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                        value="select-label"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state"                             value="select-label"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"                    value="attachment-metadata"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"              value="attachment-url"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                             value="fr-number"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                           value="fr-number"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.*"                    value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.date"                 value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                 value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.dateTime"             value="input-dateTime"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.boolean"              value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-output.*"                   value="output-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-textarea.*"                 value="textarea"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                   value="select-labels-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                  value="select-label"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state"                       value="select-label"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"              value="attachment-metadata"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"        value="attachment-url"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="fr-number"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="fr-number"/>
 
      <!-- Internal processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                      value='save'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"         value='abort'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*"       value='resume'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value='save'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"   value='abort'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*" value='resume'/>
     <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*">
         save(draft = "true")
     </property>
 
     <!-- Reusable processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*"                      value='navigate("/")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*"                 value='navigate("/fr")'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*"                value='navigate("/")'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*"           value='navigate("/fr")'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*">
         pending-uploads
@@ -252,8 +322,8 @@
     <!-- ==== Internal Form Builder properties ==================================================================== -->
 
     <!-- In case somebody overrides with weaker properties -->
-    <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"       value="true"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form" value="resource"/>
-    <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"            value=""/>
+    <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"            value="true"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"      value="resource"/>
+    <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                 value=""/>
 
 </properties>

@@ -355,7 +355,8 @@ body {
   width: 98%;
   height: 12em;
 }
-.orbeon #fb-add-language-dialog {
+.orbeon #fb-add-language-dialog,
+.orbeon #fb-pdf-upload-dialog {
   width: 400px;
 }
 .orbeon .fb-dialog-control-details {

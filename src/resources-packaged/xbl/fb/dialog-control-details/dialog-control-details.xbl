@@ -442,7 +442,8 @@
                                         <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) ge 1]" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
                                             <xf:itemset ref="$i/appearances/appearance">
-                                                <xf:label>
+                                                <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
+                                                <xf:label xml:space="preserve">
                                                     <xh:img src="{{icon}}" alt="" width="16" height="16"/>
                                                     <xf:output value="label"/>
                                                 </xf:label>
@@ -453,7 +454,8 @@
                                         <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
                                             <xf:itemset ref="$i/appearances/appearance[normalize-space(value) != '']">
-                                                <xf:label>
+                                                <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
+                                                <xf:label xml:space="preserve">
                                                     <xh:img src="{{icon}}" alt="" width="16" height="16"/>
                                                     <xf:output value="label"/>
                                                 </xf:label>
@@ -729,7 +731,8 @@
                             </fr:tab>
                         </xsl:if>
                     </fr:tabbable>
-                    <xh:div class="fr-dialog-buttons">
+                    <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
+                    <xh:div class="fr-dialog-buttons" xml:space="preserve">
                         <xf:trigger appearance="xxf:primary" id="save-button">
                             <xf:label ref="$resources/apply/label"/>
                         </xf:trigger>

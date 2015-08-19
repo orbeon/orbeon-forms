@@ -6,6 +6,7 @@
 }
 .orbeon .fr-summary-search .fr-search-free {
   display: inline-block;
+  width: auto;
 }
 .orbeon .fr-summary-search .fr-search-free input {
   width: 25em;

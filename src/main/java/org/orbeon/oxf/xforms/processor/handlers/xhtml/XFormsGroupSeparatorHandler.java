@@ -37,7 +37,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
 
         final String xhtmlPrefix       = handlerContext.findXHTMLPrefix();
-        final String groupElementName  = "span";
+        final String groupElementName  = getContainingElementName();
         final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
 
         final ElementHandlerController controller = handlerContext.getController();

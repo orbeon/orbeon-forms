@@ -348,14 +348,13 @@ body {
   height: 10em;
   font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
 }
-.orbeon #fb-edit-help-dialog {
+.orbeon .fb-section-help-dialog {
   width: 400px;
 }
-.orbeon #fb-edit-help-dialog textarea {
+.orbeon .fb-section-help-dialog textarea {
   width: 98%;
   height: 12em;
 }
-.orbeon #fb-section-details-dialog,
 .orbeon #fb-add-language-dialog {
   width: 400px;
 }

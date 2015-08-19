@@ -76,7 +76,7 @@
                 <!-- Save data upon close -->
                 <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/@valid = 'true'">
 
-                    <xf:action type="xpath">    
+                    <xf:action type="xpath">
                         fbf:setControlHelp($local/control-name, $local/help)
                     </xf:action>
 
@@ -87,7 +87,7 @@
                 <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>
 
                 <!-- Actual dialog -->
-                <xxf:dialog id="dialog" appearance="full" level="modal">
+                <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-section-help-dialog">
                     <xf:label ref="$resources/dialog-help/label"/>
 
                     <xh:div>

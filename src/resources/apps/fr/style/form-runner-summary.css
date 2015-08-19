@@ -52,8 +52,6 @@
   width: 100%;
   height: 100%;
   display: inline-block;
-  *zoom: 1;
-  *display: inline;
   vertical-align: middle;
 }
 .orbeon .fr-summary-table-div th {

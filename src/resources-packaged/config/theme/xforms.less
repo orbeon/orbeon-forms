@@ -101,6 +101,13 @@
         position: static;
     }
 
+    // Fix for hidden switch/case with Chrome, see:
+    // https://github.com/orbeon/orbeon-forms/issues/2343
+    div.xforms-case-deselected, div.xforms-case-selected {
+        width: 100%;
+        -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    }
+
     // ***** Label, hint, help, alert **********************************************************************************
 
     .xforms-hint {
@@ -141,7 +148,7 @@
 
         .popover-content {
             overflow: auto;         // scrollbars when necessary
-            box-sizing: border-box; // so that height we set in JS is correct
+            -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; // so that height we set in JS is correct
             white-space: pre-wrap;  // newlines wrap, see https://github.com/orbeon/orbeon-forms/issues/1618
         }
     }

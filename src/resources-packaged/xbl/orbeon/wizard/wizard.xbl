@@ -57,7 +57,7 @@
                 <xsl:template match="/*">
                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
                         <xh:div class="fr-wizard-body">
-                            <xf:switch id="switch" xbl:attr="caseref=sectionref">
+                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" >
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <xxf:script ev:event="fr-section-scroll" ev:target="#observer">

@@ -330,14 +330,14 @@
 
             <xf:group ref=".[not(property('xxf:noscript'))]">
                 <xf:trigger appearance="minimal">
-                    <xf:label xml:space="preserve">
+                    <xf:label>
                         <xf:output value="$fr-resources/summary/labels/noscript"/>
                     </xf:label>
                 </xf:trigger>
             </xf:group>
             <xf:group ref=".[property('xxf:noscript')]">
                 <xf:trigger appearance="minimal">
-                    <xf:label xml:space="preserve">
+                    <xf:label>
                         <xf:output value="$fr-resources/summary/labels/script"/>
                     </xf:label>
                 </xf:trigger>

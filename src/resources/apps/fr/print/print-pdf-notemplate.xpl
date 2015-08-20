@@ -102,7 +102,17 @@
                 </xsl:template>
 
                 <!-- Hyperlink URLs in fields -->
-                <xsl:template match="*:pre[p:has-class('xforms-textarea', ..)] | *:span[p:has-class('xforms-field') and p:has-class('xforms-input', ..)]" mode="#all">
+                <xsl:template
+                    match="
+                        *:pre[
+                            p:has-class('xforms-textarea', ..)
+                        ]
+                        |
+                        *:span[
+                            p:has-class('xforms-field') and p:has-class('xforms-input', ..)
+                        ]"
+                    mode="#all">
+
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:apply-templates select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))" mode="#current"/>
@@ -118,7 +128,25 @@
 
                 <!-- Hide grid rows without visible controls -->
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/2135 -->
-                <xsl:template match="*:table[p:has-class('fr-grid')]/*:tbody/*:tr[empty(*:td/*:div[p:has-class('fr-grid-content')]/*[(p:has-class('xforms-control') or p:has-class('xbl-component')) and not(p:has-class('xforms-disabled'))])]" mode="in-grid">
+                <xsl:template
+                    match="
+                        *:table[
+                            p:has-class('fr-grid')
+                        ]/
+                        *:tbody/
+                        *:tr[
+                            empty(
+                                *:td/
+                                *:div[
+                                    p:has-class('fr-grid-content')
+                                ]/*[
+                                    (p:has-class('xforms-control') or p:has-class('xbl-component')) and
+                                    not(p:has-class('xforms-disabled'))
+                                ]
+                            )
+                        ]"
+                    mode="in-grid">
+
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@*" mode="#current"/>
                         <xsl:attribute name="class" select="'xforms-hidden'"/>

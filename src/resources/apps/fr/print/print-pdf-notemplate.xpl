@@ -173,6 +173,8 @@
                     </xsl:element>
                 </xsl:template>
 
+                <xsl:template match="*[p:has-class('xforms-disabled')]" mode="#all"/>
+
                 <!-- Remove all prefixes because Flying Saucer doesn't like them -->
                 <xsl:template match="*" mode="#all">
                     <xsl:element name="{local-name()}">

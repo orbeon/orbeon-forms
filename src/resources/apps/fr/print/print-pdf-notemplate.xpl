@@ -129,6 +129,14 @@
                  <!-- These are unneeded and can make iText choke (values too long) -->
                  <xsl:template match="*:input[@type = 'hidden']" mode="#all"/>
 
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/2347 -->
+                <xsl:template match="*:span[p:has-class('xforms-field') and empty(*) and normalize-space() = '']" mode="#all">
+                     <xsl:element name="{local-name()}">
+                         <xsl:apply-templates select="@*" mode="#current"/>
+                         <xsl:text>&#160;</xsl:text>
+                     </xsl:element>
+                 </xsl:template>
+
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
                 <xsl:template match="*:form" mode="#all">
                     <xsl:element name="{local-name()}">

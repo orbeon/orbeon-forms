@@ -22,8 +22,8 @@ object FormBuilderApp extends JSApp {
 
         println("Starting Form Builder...")
 
-        def initializeOnDomReady() = {
-            StaticUpload.initialize()
+        def initializeOnDomReady(): Unit = {
+            StaticUpload
         }
 
         $(initializeOnDomReady _)

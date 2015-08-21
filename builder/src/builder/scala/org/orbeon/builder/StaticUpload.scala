@@ -13,31 +13,22 @@
  */
 package org.orbeon.builder
 
-import org.scalajs.dom
-
-import scala.scalajs.js
-
 object StaticUpload {
 
     private val SpacerImagePath = "/ops/images/xforms/spacer.gif"
     private val PhotoImagePath  = "/apps/fr/style/images/silk/photo.png"
 
-    private val findAndReplaceAllSpacersWithImages = () ⇒ {
-
-        def replaceOne(index: js.Any, image: dom.Element): js.Any =
+    private def findAndReplaceAllSpacersWithImages() =
+        $(s"#fr-form-group .fb-upload img.xforms-output-output[src $$= '$SpacerImagePath']").toArray foreach { image ⇒
             $(image).attr("src") foreach { src ⇒
                 val prefix = src.substring(0, src.indexOf(SpacerImagePath))
                 $(image).attr("src", prefix + PhotoImagePath)
             }
+        }
 
-        $(s"#fr-form-group .fb-upload img.xforms-output-output[src $$= '$SpacerImagePath']").each(replaceOne _)
-    }
+    // Initial run when the form is first loaded
+    findAndReplaceAllSpacersWithImages()
 
-    def initialize() = {
-        // Initial run when the form is first loaded
-        findAndReplaceAllSpacersWithImages()
-
-        // Run again after every Ajax request
-        Events.ajaxResponseProcessedEvent.subscribe(findAndReplaceAllSpacersWithImages)
-    }
+    // Run again after every Ajax request
+    Events.ajaxResponseProcessedEvent.subscribe(findAndReplaceAllSpacersWithImages _)
 }

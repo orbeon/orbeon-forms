@@ -480,16 +480,37 @@ object ToolboxOps {
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
                 }
 
-                val alertsWithValidation = newControlElement / (XF → "alert") filter (_ att Validation nonEmpty)
-                val ids = nextIds(td, Constraint, alertsWithValidation.size).toIterator
+                // Rename nested element ids and alert ids
+                val nestedElemsWithId =
+                    for {
+                        nestedElem ← bind descendant *
+                        id         ← nestedElem.idOpt
+                    } yield
+                        nestedElem → id
+
+                val oldIdToNewId =
+                    nestedElemsWithId map (_._2) zip nextIds(td, Validation, nestedElemsWithId.size) toMap
+
+                // Update nested element ids, in particular xf:constraint/@id
+                nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
+                    setvalue(nestedElem att "id", oldIdToNewId(oldId))
+                }
+
+                val alertsWithValidationId =
+                    for {
+                        alertElem    ← newControlElement / (XF → "alert")
+                        validationId ← alertElem attValueOpt Validation
+                    } yield
+                        alertElem → validationId
 
                 // Update xf:alert/@validation and xf:constraint/@id
-                alertsWithValidation foreach { alertWithValidation ⇒
-                    val oldValidationId = alertWithValidation attValue Validation
-                    val newValidationId = ids.next()
+                alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
 
-                    setvalue(alertWithValidation att Validation,                                 newValidationId)
-                    setvalue(bind / (FB → Constraint) filter (_.id == oldValidationId) att "id", newValidationId)
+                    val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
+
+                    newValidationIdOpt foreach { newValidationId ⇒
+                        setvalue(alertWithValidation att Validation, newValidationId)
+                    }
                 }
 
                 // This can impact templates

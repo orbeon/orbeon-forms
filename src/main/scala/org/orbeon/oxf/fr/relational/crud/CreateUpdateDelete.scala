@@ -53,12 +53,11 @@ object RequestReader {
             case _  ⇒ false
         }
 
-    def requestInputStream(): InputStream = {
+    def requestInputStream(): InputStream =
         RequestGenerator.getRequestBody(PipelineContext.get) match {
             case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
             case _               ⇒ NetUtils.getExternalContext.getRequest.getInputStream
         }
-    }
 
     def bytes(): Array[Byte] = {
         val os = new ByteArrayOutputStream
@@ -117,6 +116,7 @@ object RequestReader {
         (dataWriter.toString, metadataWriterAndReceiver map (_._1.toString))
     }
 
+    // Used by FlatView
     def xmlDocument(): DocumentInfo =
         TransformerUtils.readTinyTree(XPath.GlobalConfiguration, requestInputStream(), "", false, false)
 }
@@ -413,7 +413,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 deleteDraft(connection, req)
 
             // Create flat view if needed
-            if (requestFlatView && Set("oracle", "db2", "postgresql")(req.provider) && req.forForm && ! req.forAttachment && ! delete && req.form != "library")
+            if (requestFlatView && FlatView.SupportedProviders(req.provider) && req.forForm && ! req.forAttachment && ! delete && req.form != "library")
                 FlatView.createFlatView(req, connection)
 
             // Inform caller of the form definition version used

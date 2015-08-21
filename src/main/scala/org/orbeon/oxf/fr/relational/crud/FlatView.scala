@@ -23,6 +23,8 @@ import RequestReader._
 
 private object FlatView {
 
+    val SupportedProviders = Set("oracle", "db2", "postgresql")
+
     case class Col(extractExpression: String, colName: String)
     val MetadataPairs           =
         List("document_id", "created", "last_modified_time", "last_modified_by")

@@ -68,8 +68,8 @@
             <xbl:handler event="xforms-enabled"  ><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).enabled  ();</xxf:script></xbl:handler>
             <xbl:handler event="xforms-readonly" ><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).readonly ();</xxf:script></xbl:handler>
             <xbl:handler event="xforms-readwrite"><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).readwrite();</xxf:script></xbl:handler>
-            <!-- Reset annotation when new image is uploaded -->
-            <xbl:handler event="xxforms-upload-done" observer="image"><xf:setvalue ref="annotation"/> </xbl:handler>
+            <!-- On upload, set annotation to be the image that was just uploaded -->
+            <xbl:handler event="xxforms-upload-done" observer="image"><xf:setvalue ref="annotation" value="../image"/></xbl:handler>
             <xbl:handler event="fr-update-annotation"><xf:setvalue ref="annotation" value="event('value')"/></xbl:handler>
         </xbl:handlers>
 

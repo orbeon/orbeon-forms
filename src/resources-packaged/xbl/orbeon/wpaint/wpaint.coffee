@@ -30,20 +30,20 @@ YAHOO.xbl.fr.WPaint.prototype =
         testCanvasEl = document.createElement('canvas');
         @canvasSupported = !!(testCanvasEl.getContext && testCanvasEl.getContext('2d'))
         if @canvasSupported
-            # Hide the canvas used just to show the canvas isn't supported and show the image selector
+            # Hide the canvas element used just to show the browser doesn't support the canvas feature, and show the image selector
             # NOTE: Don't remove it as it contains an `xf:output` which needs to be there in case the FR language changes.
             $(@container).find('.fr-wpaint-no-canvas').addClass('xforms-hidden')
             $(@container).find('.xforms-upload').removeClass('xforms-hidden')
             # Register events
-            @imageEl.imagesLoaded(=> @imageLoaded())
+            @imageEl.imagesLoaded(=> @backgroundImageChanged())
 
     enabled: ->
 
-    imageLoaded: ->
+    backgroundImageChanged: ->
         if @canvasSupported
             imageSrc = @imageEl.attr('src')
             imageIsEmpty = ! _.isNull(imageSrc.match(/spacer.gif$/))
-            if (imageIsEmpty)
+            if (@_imgIsEmpty(@imageEl))
                 @wpaintElA.addClass('xforms-hidden')
                 if not _.isNull(@wpaintElC)
                     @wpaintElC.detach()
@@ -59,30 +59,31 @@ YAHOO.xbl.fr.WPaint.prototype =
                 @wpaintElC.css('width',  @imageEl.width()  + 'px')
                 @wpaintElC.css('height', @imageEl.height() + 'px')
                 annotation = @annotationEl.attr('src')
-                @wpaintElC.wPaint
+                imgData = @wpaintElC.wPaint
                     drawDown : => @drawDown()
                     imageBg  : @imageEl.attr('src')
                     image    : if annotation == "" then null else annotation
-                # Update <annotation> right away, so annotation isn't empty until users draw something
-                @_updateAnnotation()
 
             # Re-register listener, as imagesLoaded() calls listener only once
-            @imageEl.one('load', => @imageLoaded())
+            @imageEl.one('load', => @backgroundImageChanged())
 
     drawDown: ->
         @wpaintElC.focus()
 
+    # When looses focus, send drawing to the server right away (incremental)
+    blur: -> @_sendAnnotationToServer()
+
+    _imgIsEmpty: (imgEl) ->
+        imgSrc = imgEl.attr('src')
+        ! _.isNull(imgSrc.match(/spacer.gif$/))
+
     # Send the image data from wPaint to the server, which will put it in <annotation>
-    _updateAnnotation: ->
+    _sendAnnotationToServer: ->
         annotationImgData = @wpaintElC.wPaint('image')
         OD.dispatchEvent
             targetId:  @container.id
             eventName: 'fr-update-annotation'
             properties: value: annotationImgData
-
-    # When looses focus, send drawing to the server right away (incremental)
-    blur: -> @_updateAnnotation()
-
 
     readonly:  ->
     readwrite: ->

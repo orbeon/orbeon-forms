@@ -316,7 +316,7 @@
             <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
             <!-- Custom XForms model content to include -->
-            <xsl:if test="normalize-space($custom-model)">
+            <xsl:if test="$is-detail and normalize-space($custom-model)">
                 <xsl:copy-of select="doc($custom-model)/*/node()"/>
             </xsl:if>
 

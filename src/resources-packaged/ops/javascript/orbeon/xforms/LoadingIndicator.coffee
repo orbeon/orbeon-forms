@@ -38,7 +38,7 @@ class LoadingIndicator
         # Extract whether this is an upload from the object passed to the callback
         # This, because we only want the loading indicator to show for Ajax request, not uploads,
         # for which we have a different way of indicating the upload is in progress.
-        isUpload = (argument) -> _.isBoolean(argument.isUpload) and argument.isUpload
+        isUpload = (argument) -> ! (_.isUndefined(argument)) and _.isBoolean(argument.isUpload) and argument.isUpload
 
         # When an Ajax call starts, we might want to show the indicator
         Connect.startEvent.subscribe (type, args) =>

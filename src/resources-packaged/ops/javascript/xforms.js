@@ -1076,7 +1076,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (! _.isUndefined(jFor)) {
                     jElement.attr(
                         'for',
-                        _.map(jFor.trim().split(/\s+/), function(s) {
+                        _.map($.trim(jFor).split(/\s+/), function(s) {
                             return ORBEON.util.Utils.appendRepeatSuffix(s, idSuffixWithDepth);
                         }).join(' ')
                     );

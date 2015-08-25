@@ -100,8 +100,8 @@
                     "/>
                 </resource-uri>
                 <for-data><xsl:value-of select="$matcher-groups[5] = 'data' or $delete-matcher-groups[4] = 'data'"/></for-data>
-                <app><xsl:value-of select="$matcher-groups[2]"/></app>
-                <form><xsl:value-of select="$matcher-groups[3]"/></form>
+                <app><xsl:value-of select="($matcher-groups[2], $delete-matcher-groups[2])[1]"/></app>
+                <form><xsl:value-of select="($matcher-groups[3], $delete-matcher-groups[3])[1]"/></form>
             </request-description>
         </p:input>
         <p:output name="data" id="request-description"/>

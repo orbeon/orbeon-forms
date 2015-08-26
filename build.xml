@@ -376,7 +376,7 @@
 
         <javac destdir="${build.classes.dir}"
                 classpathref="class.path"
-                debug="${build.debug}" optimize="off" target="1.5" source="1.5"
+                debug="${build.debug}" optimize="off" target="1.6" source="1.6"
                 fork="true" memoryInitialSize="128m" memoryMaximumSize="400m" encoding="utf-8">
             <src path="${build.dir}/src"/>
             <src path="src/main/java"/>
@@ -398,7 +398,7 @@
         </scalac>
 
         <javac srcdir="src/test/java" destdir="${build.test-classes.dir}"
-                classpathref="test.class.path" debug="on" optimize="off" target="1.5" source="1.5"
+                classpathref="test.class.path" debug="on" optimize="off" target="1.6" source="1.6"
                 includes="**/*.java" encoding="utf-8">
         </javac>
     </target>

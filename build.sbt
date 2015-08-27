@@ -51,7 +51,7 @@ lazy val formBuilder = (project in file("builder")).
     jsDependencies                 += RuntimeDOM,
 
     libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % "0.8.1",
-    libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % "0.8.1-SNAPSHOT",
+//    libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % "0.8.1-SNAPSHOT",
 
     // Temporary, until there is an 0.8.2 which fixes the jquery.js issue
     unmanagedBase                  := baseDirectory.value / "lib",

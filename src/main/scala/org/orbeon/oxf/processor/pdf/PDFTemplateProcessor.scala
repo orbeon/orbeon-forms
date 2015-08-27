@@ -223,24 +223,26 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                 // Acrobat field
                 val fieldName = context.evaluateAsString(fieldNameExpr)
 
-                Option(context.acroFields.getFieldItem(fieldName)) foreach { item ⇒
-                    // Field exists
-                    val exportValue = Option(context.att("export-value"))
-                    val valueExpr   = exportValue orElse Option(context.att("value")) getOrElse context.att("ref")
-                    val value       = context.evaluateAsString(valueExpr)
+                if (findFieldPage(context.acroFields, fieldName) contains context.pageNumber) {
+                    Option(context.acroFields.getFieldItem(fieldName)) foreach { item ⇒
+                        // Field exists
+                        val exportValue = Option(context.att("export-value"))
+                        val valueExpr   = exportValue orElse Option(context.att("value")) getOrElse context.att("ref")
+                        val value       = context.evaluateAsString(valueExpr)
 
-                    // NOTE: We can obtain the list of allowed values with:
-                    //
-                    //   context.acroFields.getAppearanceStates(fieldName)
-                    //
-                    // This also returns (sometimes? always?) an "Off" value.
+                        // NOTE: We can obtain the list of allowed values with:
+                        //
+                        //   context.acroFields.getAppearanceStates(fieldName)
+                        //
+                        // This also returns (sometimes? always?) an "Off" value.
 
-                    val fieldType = context.acroFields.getFieldType(fieldName)
+                        val fieldType = context.acroFields.getFieldType(fieldName)
 
-                    // export-value → set field types with values
-                    // value        → set field types without values
-                    if (exportValue.isDefined == FieldTypesWithValues(fieldType))
-                        context.acroFields.setField(fieldName, value)
+                        // export-value → set field types with values
+                        // value        → set field types without values
+                        if (exportValue.isDefined == FieldTypesWithValues(fieldType))
+                            context.acroFields.setField(fieldName, value)
+                    }
                 }
             case None ⇒
                 // Overlay text
@@ -294,7 +296,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     }
 
     def handleImage(context: ElementContext): Unit =  {
-        val image = {
+
+        lazy val image = {
             val hrefAttribute = context.att("href")
             Option(ProcessorImpl.getProcessorInputSchemeInputName(hrefAttribute)) match {
                 case Some(inputName) ⇒
@@ -338,12 +341,22 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             case Some(fieldNameStr) ⇒
                 // Acrobat field
                 val fieldName = context.evaluateAsString(fieldNameStr)
-                Option(context.acroFields.getFieldPositions(fieldName)) foreach { positions ⇒
-                    val rectangle = new Rectangle(positions(1), positions(2), positions(3), positions(4))
-                    image.scaleToFit(rectangle.getWidth, rectangle.getHeight)
-                    val yPosition = positions(2) + rectangle.getHeight - image.getScaledHeight
-                    image.setAbsolutePosition(positions(1) + (rectangle.getWidth - image.getScaledWidth) / 2, yPosition)
-                    context.contentByte.addImage(image)
+
+                if (findFieldPage(context.acroFields, fieldName) contains context.pageNumber) {
+                    Option(context.acroFields.getFieldPositions(fieldName)) foreach { positions ⇒
+
+                        val rectangle = new Rectangle(positions(1), positions(2), positions(3), positions(4))
+                        image.scaleToFit(rectangle.getWidth, rectangle.getHeight)
+
+                        val yPosition = positions(2) + rectangle.getHeight - image.getScaledHeight
+
+                        image.setAbsolutePosition(
+                            positions(1) + (rectangle.getWidth - image.getScaledWidth) / 2,
+                            yPosition
+                        )
+
+                        context.contentByte.addImage(image)
+                    }
                 }
             case None ⇒
                 // By position
@@ -519,4 +532,12 @@ object PDFTemplateProcessor {
         else
             BaseFont.IDENTITY_H
     }
+
+    def findFieldPage(acroFields: AcroFields, fieldName: String): Option[Int] =
+        for {
+            item ← Option(acroFields.getFieldItem(fieldName))
+            if item.size > 0
+            page = item.getPage(0).intValue
+        } yield
+            page
 }

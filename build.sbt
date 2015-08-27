@@ -8,7 +8,7 @@ val ScalaJSFileNameFormat = "((.+)-(fastopt|opt)).js".r
 val fastOptJSToExplodedWar   = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
 val fullOptJSToExplodedWar   = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
 
-def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File) = {
+def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
 
   val (prefix, optType) =
     sourceFile.name match { case ScalaJSFileNameFormat(_, prefix, optType) ⇒ prefix → optType }

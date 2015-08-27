@@ -49,7 +49,13 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
     protected def getDefaultContentType = "application/pdf"
 
-    protected def readInput(pipelineContext: PipelineContext, input: ProcessorInput, config: HttpSerializerBase.Config, outputStream: OutputStream): Unit =  {
+    protected def readInput(
+        pipelineContext : PipelineContext,
+        input           : ProcessorInput,
+        config          : HttpSerializerBase.Config,
+        outputStream    : OutputStream
+    ): Unit =  {
+
         val configDocument = readCacheInputAsDOM4J(pipelineContext, "model")// TODO: should we use "config"?
         val configRoot = configDocument.getRootElement
         val templateRoot = configRoot.element("template")
@@ -77,22 +83,23 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             // Initial context
             val initialContext =
                 ElementContext(
-                    pipelineContext,
-                    new IndentedLogger(Logger),
-                    null,
-                    stamper.getAcroFields,
-                    0,
-                    0,
-                    -1,
-                    Map(),
-                    configRoot,
-                    Seq(instanceDocumentInfo),
-                    1,
-                    0,
-                    0,
-                    "Courier",
-                    14,
-                    15.9f)
+                    pipelineContext = pipelineContext,
+                    logger          = new IndentedLogger(Logger),
+                    contentByte     = null,
+                    acroFields      = stamper.getAcroFields,
+                    pageWidth       = 0,
+                    pageHeight      = 0,
+                    pageNumber      = -1,
+                    variables       = Map(),
+                    element         = configRoot,
+                    contextSeq      = Seq(instanceDocumentInfo),
+                    contextPosition = 1,
+                    offsetX         = 0,
+                    offsetY         = 0,
+                    fontFamily      = "Courier",
+                    fontSize        = 14,
+                    fontPitch       = 15.9f
+                )
 
             // Add substitution fonts for Acrobat fields
             for (element ← Dom4jUtils.elements(configRoot, "substitution-font").asScala) {
@@ -127,7 +134,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     pageWidth   = pageSize.getWidth,
                     pageHeight  = pageSize.getHeight,
                     pageNumber  = pageNumber,
-                    variables   = variables)
+                    variables   = variables
+                )
 
                 handleElements(pageContext, Dom4jUtils.elements(configRoot).asScala)
 
@@ -266,13 +274,20 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     // Iterate over characters and print them
                     val len = math.min(text.length, Option(size) map (_.toInt) getOrElse Integer.MAX_VALUE)
                     for (j ←  0 to len - 1)
-                        context.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + j.toFloat * fontAttributes.fontPitch, yPosition, 0)
+                        context.contentByte.showTextAligned(
+                            PdfContentByte.ALIGN_CENTER,
+                            text.substring(j, j + 1),
+                            xPosition + j.toFloat * fontAttributes.fontPitch,
+                            yPosition,
+                            0
+                        )
                 }
 
                 context.contentByte.endText()
         }
 
     def handleBarcode(context: ElementContext): Unit =  {
+
         val value          = Option(context.att("value")) getOrElse context.att("ref")
         val barcodeType    = Option(context.att("type")) getOrElse "CODE39"
         val height         = Option(context.att("height")) map (_.toFloat) getOrElse 10.0f
@@ -437,22 +452,23 @@ object PDFTemplateProcessor {
     case class FontAttributes(fontPitch: Float, fontFamily: String, fontSize: Float, embed: Boolean)
 
     case class ElementContext(
-        pipelineContext: PipelineContext,
-        logger: IndentedLogger,
-        contentByte: PdfContentByte,
-        acroFields: AcroFields,
-        pageWidth: Float,
-        pageHeight: Float,
-        pageNumber: Int,
-        variables: Map[String, ValueRepresentation],
-        element: Element,
-        contextSeq: Seq[Item],
-        contextPosition: Int,
-        offsetX: Float,
-        offsetY: Float,
-        fontFamily: String,
-        fontSize: Float,
-        fontPitch: Float) {
+        pipelineContext : PipelineContext,
+        logger          : IndentedLogger,
+        contentByte     : PdfContentByte,
+        acroFields      : AcroFields,
+        pageWidth       : Float,
+        pageHeight      : Float,
+        pageNumber      : Int,
+        variables       : Map[String, ValueRepresentation],
+        element         : Element,
+        contextSeq      : Seq[Item],
+        contextPosition : Int,
+        offsetX         : Float,
+        offsetY         : Float,
+        fontFamily      : String,
+        fontSize        : Float,
+        fontPitch       : Float
+    ) {
 
         private def contextItem = contextSeq(contextPosition - 1)
         private def jVariables = variables.asJava
@@ -468,24 +484,63 @@ object PDFTemplateProcessor {
             Option(resolveAVT(name)) map
                 identity getOrElse current
 
-        def evaluateSingle(xpath: String): NodeInfo = {
-            val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            XPathCache.evaluateSingle(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null).asInstanceOf[NodeInfo]
-        }
+        def evaluateSingle(xpath: String): NodeInfo =
+            XPathCache.evaluateSingle(
+                contextSeq.asJava,
+                contextPosition,
+                xpath,
+                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+                jVariables,
+                functionLibrary,
+                null,
+                null,
+                element.getData.asInstanceOf[LocationData],
+                null
+            ).asInstanceOf[NodeInfo]
 
-        def evaluate(xpath: String): Seq[Item] = {
-            val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            XPathCache.evaluate(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null).asInstanceOf[JList[Item]].asScala
-        }
+        def evaluate(xpath: String): Seq[Item] =
+            XPathCache.evaluate(
+                contextSeq.asJava,
+                contextPosition,
+                xpath,
+                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+                jVariables,
+                functionLibrary,
+                null,
+                null,
+                element.getData.asInstanceOf[LocationData],
+                null
+            ).asInstanceOf[JList[Item]].asScala
 
-        def evaluateAsString(xpath: String): String = {
-            val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            XPathCache.evaluateAsString(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null)
-        }
+        def evaluateAsString(xpath: String): String =
+            XPathCache.evaluateAsString(
+                contextSeq.asJava,
+                contextPosition,
+                xpath,
+                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+                jVariables,
+                functionLibrary,
+                null,
+                null,
+                element.getData.asInstanceOf[LocationData],
+                null
+            )
 
         def resolveAVT(attributeName: String, otherAttributeName: String = null) =
             Option(att(attributeName)) orElse Option(Option(otherAttributeName) map att orNull) map
-                (XPathCache.evaluateAsAvt(contextItem, _, new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)), jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null)) orNull
+                (
+                    XPathCache.evaluateAsAvt(
+                        contextItem,
+                        _,
+                        new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+                        jVariables,
+                        functionLibrary,
+                        null,
+                        null,
+                        element.getData.asInstanceOf[LocationData],
+                        null
+                    )
+                ) orNull
 
         def getFontAttributes = {
             val newFontPitch  = Option(resolveAVT("font-pitch", "spacing")) map (_.toFloat) getOrElse fontPitch

@@ -179,5 +179,6 @@
         <JAVADOC />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="SBT: org.webjars:jquery:2.1.3:jar" level="project" />
   </component>
 </module>

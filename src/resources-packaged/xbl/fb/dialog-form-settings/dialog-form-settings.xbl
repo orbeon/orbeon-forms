@@ -159,7 +159,8 @@
                                     label
                             )"/>
 
-                    <xh:div>
+                    <!-- Expose mode to CSS -->
+                    <xh:div class="fb-settings-mode-{{mode}}">
                         <!-- IE warning -->
                         <xf:group ref=".[$is-new-form and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
                             <xf:var name="minimal-ie-version" value="xs:integer(xxf:instance('fb-user-agent-instance')/minimal-ie-version)"/>

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.relational
 
 import java.sql.{ResultSet, Connection, PreparedStatement}
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import javax.naming.{Context, InitialContext}
@@ -26,7 +27,10 @@ object RelationalUtils {
     def withConnection[T](block: Connection ⇒ T): T = {
         // Get connection to the database
         val dataSource = {
-            val datasource = NetUtils.getExternalContext.getRequest.getFirstHeader("orbeon-datasource").get
+            val datasource =
+                NetUtils.getExternalContext.getRequest.getFirstHeader("orbeon-datasource") getOrElse
+                    (throw new OXFException("Missing `orbeon-datasource` header"))
+
             val jndiContext = new InitialContext().lookup("java:comp/env/jdbc").asInstanceOf[Context]
             jndiContext.lookup(datasource).asInstanceOf[DataSource]
         }

@@ -733,15 +733,17 @@
                     <xf:group xxf:update="full">
                         <xh:table class="fr-forms-table table table-bordered table-condensed table-hover">
                             <xh:thead>
-                                <xh:tr>
-                                    <xf:group ref=".[$remote-successful]">
-                                        <xf:group ref=".[$any-has-admin-permission]">
-                                            <xh:th/>
-                                        </xf:group>
-                                        <xh:th colspan="{if ($any-has-admin-permission) then 2 else 1}"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
-                                        <xh:th colspan="{if ($any-has-admin-permission) then 2 else 1}"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
-                                        <xh:th colspan="3"><xf:output value="$fr-resources/home/titles/form-identification"/></xh:th>
-                                    </xf:group>
+								<xf:group ref=".[$remote-successful]">
+									<xh:tr>
+										<xf:group ref=".[$any-has-admin-permission]">
+											<xh:th/>
+										</xf:group>
+										<xh:th colspan="{if ($any-has-admin-permission) then 2 else 1}"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
+										<xh:th colspan="{if ($any-has-admin-permission) then 2 else 1}"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
+										<xh:th colspan="3"><xf:output value="$fr-resources/home/titles/form-identification"/></xh:th>
+									</xh:tr>
+								</xf:group>
+								<xh:tr>
                                     <xf:group ref=".[$any-has-admin-permission]">
                                         <xh:th/>
                                         <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
@@ -962,6 +964,6 @@
             </xf:action>
 
         </xxf:dialog>
-        <!--<fr:xforms-inspector/>-->
+        <fr:xforms-inspector/>
     </xh:body>
 </xh:html>

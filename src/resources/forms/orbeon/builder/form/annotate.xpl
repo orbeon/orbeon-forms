@@ -323,6 +323,14 @@
                     </fr:dropdown-select1>
                 </xsl:template>
 
+                <!-- Convert xf:output[@mediatype = 'image/*'] to fr:image -->
+                <xsl:template match="xf:output[@mediatype = 'image/*']"
+                              mode="within-body">
+                    <fr:image>
+                        <xsl:apply-templates select="@* except @mediatype | node()" mode="#current"/>
+                    </fr:image>
+                </xsl:template>
+
                 <!-- Convert constraint attributes to nested elements, see https://github.com/orbeon/orbeon-forms/issues/1829  -->
                 <xsl:template match="xf:bind[@constraint and @id = $ids-of-binds-with-constraint-attribute-and-custom-alert]"
                               mode="within-model">

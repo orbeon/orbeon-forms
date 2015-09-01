@@ -487,11 +487,6 @@
                     <xsl:variable name="control"        select="$controls[1]" as="element()?"/>
                     <xsl:variable name="has-control"    select="exists($control)"/>
 
-                    <!-- NOTE: Not all controls with fr-attachment require a separate upload button.
-                         For example, fr:attachment and fr:image-attachment already provide an upload
-                         button. So for now, we have only xf:output with an image mediatype. -->
-                    <xsl:variable name="has-upload"     select="exists($control/self::xf:output[starts-with(@mediatype, 'image/')])"/>
-
                     <xsl:if test="$is-editable">
                         <!-- Point to this td -->
                         <!-- Used by $control below and $td/@id -->
@@ -540,7 +535,7 @@
                                 <xsl:attribute name="xxf:control">true</xsl:attribute>
 
                                 <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
-                                <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
+                                <xh:div class="fr-grid-content{
                                         '{if (exists($control) and fbf:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}'}">
                                     <!-- Optimization: don't generate a group for empty cells -->
                                     <xsl:for-each select="$control">

@@ -22,7 +22,7 @@ YD = YAHOO.util.Dom
 relevanceRules = do ->
 
     isNotEmpty = (gridTd) -> $(gridTd).find('.fr-grid-content').children().length > 0
-    isUpload = (gridTd) -> isNotEmpty(gridTd) and $(gridTd).find('.fr-grid-content').hasClass('fb-upload')
+    isUpload = (gridTd) -> isNotEmpty(gridTd) and $(gridTd).find('.fr-grid-content > .xbl-component').hasClass('fb-upload')
     isEmptyUpload = (gridTd) ->
         # Check for presence of both spacer and photo placeholder, as both indicate an empty image and we are not sure which one will be shown
         # depending on whether the code replacing the spacer with the photo placeholder already ran or not
@@ -39,7 +39,7 @@ relevanceRules = do ->
                                             gridTr =$(gridTd).parent()                                                                      #   Based on number of following row with the same parity
                                             oddEvenClass = if gridTr.hasClass('yui-dt-even') then 'yui-dt-even' else 'yui-dt-odd'           #   Rows with a different parity belong to a different iteration
                                             gridTd.rowSpan <= gridTr.next('.' + oddEvenClass).length
-                                        else if grid.hasClass('fr-repeat-single-row') then false                                            # Repeat with single row: no expension possible
+                                        else if grid.hasClass('fr-repeat-single-row') then false                                            # Repeat with single row: no expansion possible
                                         else false                                                                                          # Catch all, which shouldn't happen
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
     'fb-delete-trigger':            isNotEmpty

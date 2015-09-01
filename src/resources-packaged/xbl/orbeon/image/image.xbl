@@ -1,0 +1,61 @@
+<!--
+  Copyright (C) 2015 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding id="fr-image" element="fr|image" xxbl:mode="binding lhha" xxbl:container="span" class="fb-upload">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Image</display-name>
+            <display-name lang="es">Imagen</display-name>
+            <display-name lang="fi">Kuva</display-name>
+            <display-name lang="fr">Image</display-name>
+            <display-name lang="ru">Изображение</display-name>
+            <display-name lang="de">Bild</display-name>
+            <display-name lang="it">Immagine</display-name>
+            <display-name lang="nl">Afbeelding</display-name>
+            <display-name lang="pt">Imagem</display-name>
+            <display-name lang="sv">Bild</display-name>
+            <icon lang="en">
+                <small-icon>/apps/fr/style/images/silk/photo.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>
+            </icon>
+            <templates>
+                <bind type="xf:anyURI"/>
+                <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
+                <view>
+                     <fr:image id="" ref="" class="fr-attachment">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:image>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xf:output ref="xxf:binding('fr-image')" mediatype="image/*">
+                <xf:header ref="xxf:instance('fr-parameters-instance')/form-version[normalize-space()]">
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+            </xf:output>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

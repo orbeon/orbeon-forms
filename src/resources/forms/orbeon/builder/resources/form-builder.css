@@ -670,8 +670,9 @@ body {
   padding-left: 32px;
   padding-right: 32px;
 }
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content.fb-upload {
-  padding-bottom: 32px;
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content > .fb-upload {
+  display: block;
+  margin-bottom: 32px;
 }
 .orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label input,
 .orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint input {

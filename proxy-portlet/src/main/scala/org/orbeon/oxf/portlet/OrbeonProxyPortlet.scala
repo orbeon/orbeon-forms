@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.breakOut
 import scala.util.control.NonFatal
+import scala.collection.JavaConverters._
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -166,14 +167,22 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       }
     }
 
-  private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref) =
+  private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref): Option[String] =
     if (getBooleanPreference(request, EnableURLParameters))
       portalQuery(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value}
     else
       None
 
+    private def preferenceFromPublicRenderParameter(request: PortletRequest, pref: Pref): Option[String] =
+      if (getBooleanPreference(request, EnablePublicRenderParameters))
+        publicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
+      else
+        None
+
   private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
-    preferenceFromPortalQuery(request, pref) getOrElse getPreference(request, pref)
+    preferenceFromPublicRenderParameter(request, pref) orElse
+      preferenceFromPortalQuery(request, pref)         getOrElse
+      getPreference(request, pref)
 
   private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
     // Determine URL based on preferences and request
@@ -225,6 +234,14 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def portalQuery(request: PortletRequest) =
     collectByErasedType[String](request.getAttribute("javax.servlet.forward.query_string")) map decodeSimpleQuery getOrElse Nil
+
+  private def publicRenderParametersIt(request: PortletRequest): Iterator[(String, String)] =
+    for {
+      (key, values) ← request.getPublicParameterMap.asScala.iterator
+      firstValue    ← values.headOption
+      nonBlankValue ← firstValue.trimAllToOpt
+    } yield
+      key → nonBlankValue
 
   private def newRequestDetails(
     settings: PortletSettings,

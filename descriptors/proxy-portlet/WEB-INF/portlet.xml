@@ -20,6 +20,10 @@
             <value>false</value>
         </init-param>
         <init-param>
+            <name>enable-public-render-parameters</name>
+            <value>false</value>
+        </init-param>
+        <init-param>
             <name>app-name</name>
             <value>orbeon</value>
         </init-param>
@@ -130,7 +134,29 @@
             <title>Form Runner</title>
         </portlet-info>
 
+        <supported-public-render-parameter>orbeon-app</supported-public-render-parameter>
+        <supported-public-render-parameter>orbeon-form</supported-public-render-parameter>
+        <supported-public-render-parameter>orbeon-document</supported-public-render-parameter>
+        <supported-public-render-parameter>orbeon-page</supported-public-render-parameter>
+
     </portlet>
+
+    <public-render-parameter>
+        <identifier>orbeon-app</identifier>
+        <qname xmlns:x="http://portlet.oxf.orbeon.org/orbeon-app">x:param1</qname>
+    </public-render-parameter>
+    <public-render-parameter>
+        <identifier>orbeon-form</identifier>
+        <qname xmlns:x="http://portlet.oxf.orbeon.org/orbeon-form">x:param2</qname>
+    </public-render-parameter>
+    <public-render-parameter>
+        <identifier>orbeon-document</identifier>
+        <qname xmlns:x="http://portlet.oxf.orbeon.org/orbeon-document">x:param3</qname>
+    </public-render-parameter>
+    <public-render-parameter>
+        <identifier>orbeon-page</identifier>
+        <qname xmlns:x="http://portlet.oxf.orbeon.org/orbeon-page">x:param4</qname>
+    </public-render-parameter>
 
     <!-- Add Orbeon-Liferay-* headers -->
     <filter>

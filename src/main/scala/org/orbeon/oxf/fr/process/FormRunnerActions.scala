@@ -186,7 +186,7 @@ trait FormRunnerActions {
 
             for (format ← SupportedRenderFormats)
                 if (booleanFormRunnerProperty(s"oxf.fr.email.attach-$format"))
-                    tryCreatePdfOrTiffIfNeeded(format).get
+                    tryCreatePdfOrTiffIfNeeded(params, format).get
 
             val pdfTiffParams =
                 for {
@@ -274,10 +274,13 @@ trait FormRunnerActions {
             // Create PDF and/or TIFF if needed
             for (format ← SupportedRenderFormats)
                 if (stringOptionToSet(evaluatedSendProperties("content")) exists Set(format, s"$format-url"))
-                    tryCreatePdfOrTiffIfNeeded(format).get
+                    tryCreatePdfOrTiffIfNeeded(params, format).get
 
             // TODO: Remove duplication once @replace is an AVT
-            val replace = if (evaluatedSendProperties.get("replace") exists (_.contains("all"))) "all" else "none"
+            val replace = evaluatedSendProperties.get("replace").flatten match {
+                case Some(value @ ("instance" | "all")) ⇒ value
+                case _                                  ⇒ "none"
+            }
 
             // Set data-safe-override as we know we are not losing data upon navigation. This happens:
             // - with changing mode (tryChangeMode)
@@ -297,8 +300,8 @@ trait FormRunnerActions {
     private val StateParamNames               = (StateParams map (_._1) toSet) + "form-version"
     private val ParamsToExcludeUponModeChange = StateParamNames + "data-format-version"
 
-    // Automatically prepend fr-noscript, fr-language and orbeon-embeddable based on their current value unless they are
-    // already specified in the given path.
+    // Automatically prepend `fr-noscript`, `fr-language` and `orbeon-embeddable` based on their current value unless
+    // they are already specified in the given path.
     //
     // Propagating these parameters is essential when switching modes and navigating between Form Runner pages, as they
     // are part of the state the user expects to be kept.
@@ -436,11 +439,26 @@ trait FormRunnerActions {
     def pdfOrTiffPathOpt(mode: String) =
         pdfTiffPathInstanceRootElementOpt(mode) map (_.stringValue) flatMap nonEmptyOrNone
 
-    def tryCreatePdfOrTiffIfNeeded(mode: String): Try[Any] =
+    def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[Any] =
         Try {
-            pdfOrTiffPathOpt(mode) match {
-                case Some(_) ⇒ // nop
-                case None    ⇒ sendThrowOnError("fr-pdf-tiff-service-submission", Map("fr-mode" → Some(mode)))
+            pdfOrTiffPathOpt(format) match {
+                case Some(_) ⇒
+                    // NOP: Path is already available.
+                case None    ⇒
+                    implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+
+                    val path = recombineQuery(s"/fr/service/$app/$form/$format/$document", requestedLangParams(params))
+
+                    def processSuccessResponse(param: Any) = {
+
+                        val response = topLevelInstance(FormModel, "fr-send-submission-response").get
+
+                        nonEmptyOrNone(response.rootElement.stringValue) foreach { path ⇒
+                            setvalue(pdfTiffPathInstanceRootElementOpt(format).to[List], path)
+                        }
+                    }
+
+                    tryChangeMode("instance")(path) foreach processSuccessResponse
             }
         }
 

@@ -100,7 +100,10 @@
                 frf:sendError(500)
             </xf:action>
 
+            <xi:include
+                href="../components/universal-submission.xml"
+                xpointer="xpath(/*/*)"
+                xxi:omit-xml-base="true"/>
         </xf:model>
-        <xi:include href="../components/universal-submission.xml" xxi:omit-xml-base="true"/>
     </xh:head>
 </xh:html>

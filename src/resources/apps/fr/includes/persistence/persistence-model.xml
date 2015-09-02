@@ -507,34 +507,6 @@
          information, so that the above binds are kept in sync. Ideally would need smart dependency system. -->
     <xf:recalculate event="xxforms-value-changed" observer="fr-error-summary-instance"/>
 
-    <!-- Call PDF or TIFF service -->
-    <xf:submission id="fr-pdf-tiff-service-submission"
-        resource=
-            "/fr/service/{
-                $app
-            }/{
-                $form
-            }/{
-                event('fr-mode')
-            }/{
-                $document
-            }?data-format-version=edge&amp;fr-language={
-                xxf:instance('fr-language-instance')
-            }{
-                if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''
-            }"
-        relevant="false"
-        validate="false"
-        method="post"
-        ref="xxf:instance('fr-form-instance')"
-        replace="instance"
-        targetref="
-            if (event('fr-mode') = 'pdf') then
-                instance('fr-pdf-url-instance')
-            else
-                instance('fr-tiff-url-instance')"
-    />
-
     <xf:instance id="fr-pdf-url-instance">
         <uri/>
     </xf:instance>

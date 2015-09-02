@@ -75,11 +75,44 @@
                )[1]"
         replace="none"/>
 
+    <xf:submission id="fr-send-submission-instance"
+        resource="{instance('fr-send-submission-params')/@uri}"
+        relevant="{instance('fr-send-submission-params')/@prune}"
+        validate="false"
+        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
+        method="{instance('fr-send-submission-params')/@method}"
+        serialization="{instance('fr-send-submission-params')/@serialization}"
+        ref="
+            if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then
+               xxf:instance('fr-pdf-url-instance')
+            else if (xxf:split(instance('fr-send-submission-params')/@content) = 'tiff-url') then
+               xxf:instance('fr-tiff-url-instance')
+            else if (xxf:split(instance('fr-send-submission-params')/@content) = 'metadata') then
+               frf:createFormMetadataDocument(xxf:instance('fr-form-instance'))
+            else
+               (
+                   if (instance('fr-send-submission-params')/@data-format-version != 'edge') then
+                       migration:dataMaybeMigratedFrom(
+                           xxf:instance('fr-form-instance')/root(),
+                           xxf:instance('fr-form-metadata')/root()
+                       )
+                   else
+                       (),
+                   xxf:instance('fr-form-instance')/root()
+               )[1]"
+        replace="instance"
+        instance="fr-send-submission-response"/>
+
+    <!-- Instance to store the result of the create/update submission -->
+    <xf:instance id="fr-send-submission-response">
+        <response xmlns=""/>
+    </xf:instance>
+
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
         <params uri="" prune="" annotate="" method="" content="" serialization="" data-format-version=""/>
     </xf:instance>
-    <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
+    <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none fr-send-submission-instance">
         <xf:setvalue
             iterate="instance('fr-send-submission-params')/@*"
             ref="."

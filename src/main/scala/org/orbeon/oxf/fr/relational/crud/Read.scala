@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.relational.crud
 
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.fr.relational.Version._
 import org.orbeon.oxf.fr.relational.{Next, Unspecified, RelationalUtils}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
@@ -101,7 +102,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 // Set form version header
                 locally {
                     val formVersion = resultSet.getInt("form_version")
-                    httpResponse.setHeader("Orbeon-Form-Definition-Version", formVersion.toString)
+                    httpResponse.setHeader(OrbeonFormDefinitionVersion, formVersion.toString)
                 }
 
                 // Write content (XML / file)

@@ -22,11 +22,11 @@ import org.orbeon.oxf.util.ScalaUtils._
 case class DataPart(isDraft: Boolean, documentId: String)
 
 case class Request(
-    provider : String, 
-    app      : String, 
-    form     : String, 
-    filename : Option[String], 
-    version  : Version, 
+    provider : String,
+    app      : String,
+    form     : String,
+    filename : Option[String],
+    version  : Version,
     dataPart : Option[DataPart]
 ) {
     def forForm       = dataPart.isEmpty
@@ -56,8 +56,10 @@ trait RequestResponse {
 
     def request: Request = {
 
+        import Version._
+
         val version =
-            Version(headerValue("orbeon-for-document-id"), headerValue("orbeon-form-definition-version"))
+            Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
 
         httpRequest.getRequestPath match {
             case CrudFormPath(provider, app, form, filename) ⇒

@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import java.net.URI
 
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.fr.relational.Version._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
@@ -287,7 +288,7 @@ trait FormRunnerPersistence {
             for {
                 done     ← saveData()
                 headers  ← done.headers
-                versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase "Orbeon-Form-Definition-Version" ⇒ values }
+                versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion ⇒ values }
                 version  ← versions.headOption
             } yield
                 version

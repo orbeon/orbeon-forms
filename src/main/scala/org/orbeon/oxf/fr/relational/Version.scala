@@ -7,6 +7,13 @@ case   class  Specific   (version: Int)       extends Version
 case   class  ForDocument(documentId: String) extends Version
 
 object Version {
+
+    val OrbeonForDocumentId              = "Orbeon-For-Document-Id"
+    val OrbeonFormDefinitionVersion      = "Orbeon-Form-Definition-Version"
+
+    val OrbeonForDocumentIdLower         = OrbeonForDocumentId.toLowerCase
+    val OrbeonFormDefinitionVersionLower = OrbeonFormDefinitionVersion.toLowerCase
+
     def apply(documentId: Option[String], version: Option[String]): Version =
         documentId match {
             case Some(id) ⇒ ForDocument(id)

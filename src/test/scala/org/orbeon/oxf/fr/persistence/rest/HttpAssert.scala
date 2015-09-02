@@ -55,7 +55,7 @@ private object HttpAssert extends XMLSupport {
                 val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
                 assert(expectedOperations === resultOperationsSet)
                 // Check form version
-                val resultFormVersion = headers.get("orbeon-form-definition-version").map(_.head).map(_.toInt)
+                val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
                 assert(expectedFormVersion === resultFormVersion)
             case ExpectedCode(expectedCode) ⇒
                 assert(resultCode === expectedCode)

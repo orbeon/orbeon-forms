@@ -20,6 +20,7 @@ import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.fr.FormRunner.{XF, XH}
+import org.orbeon.oxf.fr.relational.Version._
 import org.orbeon.oxf.fr.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -417,7 +418,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
                 FlatView.createFlatView(req, connection)
 
             // Inform caller of the form definition version used
-            httpResponse.setHeader("Orbeon-Form-Definition-Version", versionSet.toString)
+            httpResponse.setHeader(OrbeonFormDefinitionVersion, versionSet.toString)
 
             httpResponse.setStatus(if (delete) 204 else 201)
         }

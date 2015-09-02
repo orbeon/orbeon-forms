@@ -49,11 +49,13 @@ private object HttpRequest {
 
         val headers = {
 
+            import Version._
+
             val versionHeader = version match {
                 case Unspecified             ⇒ Nil
-                case Next                    ⇒ List("Orbeon-Form-Definition-Version" → List("next"))
-                case Specific(version)       ⇒ List("Orbeon-Form-Definition-Version" → List(version.toString))
-                case ForDocument(documentId) ⇒ List("Orbeon-For-Document-Id"         → List(documentId))
+                case Next                    ⇒ List(OrbeonFormDefinitionVersion → List("next"))
+                case Specific(version)       ⇒ List(OrbeonFormDefinitionVersion → List(version.toString))
+                case ForDocument(documentId) ⇒ List(OrbeonForDocumentId         → List(documentId))
             }
 
             val credentialHeaders = credentials.map(c ⇒ List(

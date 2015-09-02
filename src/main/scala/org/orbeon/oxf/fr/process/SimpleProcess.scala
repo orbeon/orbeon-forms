@@ -52,7 +52,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
         List("pdf", "tiff") foreach { mode ⇒
 
             // Remove resource and temporary file if any
-            pdfTiffPathOpt(mode) foreach { path ⇒
+            pdfOrTiffPathOpt(mode) foreach { path ⇒
                 XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
             }
 

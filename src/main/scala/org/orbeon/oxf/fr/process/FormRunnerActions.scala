@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import SimpleProcess._
 import FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
@@ -53,6 +52,8 @@ trait FormRunnerActions {
         "wizard-next"      → tryWizardNext,
         "set-data-status"  → trySetDataStatus
     )
+
+    private val SupportedRenderFormats = Set("pdf", "tiff")
 
     // Check whether there are pending uploads
     def tryPendingUploads(params: ActionParams): Try[Any] =
@@ -181,22 +182,22 @@ trait FormRunnerActions {
 
     def trySendEmail(params: ActionParams): Try[Any] =
         Try {
-            implicit val formRunnerParams = FormRunnerParams()
+            implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 
-            if (booleanFormRunnerProperty("oxf.fr.email.attach-pdf"))
-                tryCreatePdfOrTiffIfNeeded("pdf").get
+            for (format ← SupportedRenderFormats)
+                if (booleanFormRunnerProperty(s"oxf.fr.email.attach-$format"))
+                    tryCreatePdfOrTiffIfNeeded(format).get
 
-            if (booleanFormRunnerProperty("oxf.fr.email.attach-tiff"))
-                tryCreatePdfOrTiffIfNeeded("tiff").get
+            val pdfTiffParams =
+                for {
+                    format ← SupportedRenderFormats.to[List]
+                    path   ← pdfOrTiffPathOpt(format)
+                } yield
+                    format → path
 
-            sendThrowOnError(
-                "fr-email-service-submission",
-                Map(
-                    "pdf"  → pdfTiffPathOpt("pdf"),
-                    "tiff" → pdfTiffPathOpt("tiff")
-                )
-            )
-        }
+            recombineQuery(s"/fr/service/$app/$form/email/$document", pdfTiffParams ::: requestedLangParams(params))
+        } flatMap
+            tryChangeMode("none")
 
     // Defaults except for `uri` and `serialization`
     private val DefaultSendParameters = Map(
@@ -270,13 +271,10 @@ trait FormRunnerActions {
             val evaluatedSendProperties =
                 evaluatedPropertiesAsMap + ("serialization" → effectiveSerialization)
 
-            // Create PDF if needed
-            if (stringOptionToSet(evaluatedSendProperties("content")) exists Set("pdf", "pdf-url"))
-                tryCreatePdfOrTiffIfNeeded("pdf").get
-
-            // Create TIFF if needed
-            if (stringOptionToSet(evaluatedSendProperties("content")) exists Set("tiff", "tiff-url"))
-                tryCreatePdfOrTiffIfNeeded("tiff").get
+            // Create PDF and/or TIFF if needed
+            for (format ← SupportedRenderFormats)
+                if (stringOptionToSet(evaluatedSendProperties("content")) exists Set(format, s"$format-url"))
+                    tryCreatePdfOrTiffIfNeeded(format).get
 
             // TODO: Remove duplication once @replace is an AVT
             val replace = if (evaluatedSendProperties.get("replace") exists (_.contains("all"))) "all" else "none"
@@ -344,13 +342,13 @@ trait FormRunnerActions {
     private def tryNavigateTo(path: String): Try[Any] =
         Try(load(prependCommonFormRunnerParameters(path, optimize = true), progress = false))
 
-    private def tryChangeMode(path: String): Try[Any] =
+    private def tryChangeMode(replace: String)(path: String): Try[Any] =
         Try {
             Map[Option[String], String](
                 Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false)),
                 Some("method")              → "post",
                 Some("prune")               → "false",
-                Some("replace")             → "all",
+                Some("replace")             → replace,
                 Some("content")             → "xml",
                 Some("data-format-version") → "edge",
                 Some("parameters")          → "form-version data-format-version"
@@ -385,26 +383,18 @@ trait FormRunnerActions {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/view/$document"
         } flatMap
-            tryChangeMode
+            tryChangeMode("all")
 
     def tryNavigateToEdit(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/edit/$document"
         } flatMap
-            tryChangeMode
-
-    private val SupportedRenderFormats = Set("pdf", "tiff")
+            tryChangeMode("all")
 
     def tryOpenPDF(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
-
-            val requestedLangQuery = (
-                paramByName(params, "lang")
-                flatMap nonEmptyOrNone
-                map     (lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang))
-            )
 
             val format = (
                 paramByName(params, "format")
@@ -413,16 +403,16 @@ trait FormRunnerActions {
                 getOrElse "pdf"
             )
 
-            recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangQuery getOrElse Nil)
+            recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangParams(params))
         } flatMap
-            tryChangeMode
+            tryChangeMode("all")
 
     def tryToggleNoscript(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), mode) = FormRunnerParams()
             s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! isNoscript).toString}"
         } flatMap
-            tryChangeMode
+            tryChangeMode("all")
 
     // Visit/unvisit controls
     def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = ErrorSummaryModel))
@@ -443,14 +433,21 @@ trait FormRunnerActions {
     def pdfTiffPathInstanceRootElementOpt(mode: String) =
         topLevelInstance(PersistenceModel, s"fr-$mode-url-instance") map (_.rootElement)
 
-    def pdfTiffPathOpt(mode: String) =
+    def pdfOrTiffPathOpt(mode: String) =
         pdfTiffPathInstanceRootElementOpt(mode) map (_.stringValue) flatMap nonEmptyOrNone
 
     def tryCreatePdfOrTiffIfNeeded(mode: String): Try[Any] =
         Try {
-            pdfTiffPathOpt(mode) match {
+            pdfOrTiffPathOpt(mode) match {
                 case Some(_) ⇒ // nop
                 case None    ⇒ sendThrowOnError("fr-pdf-tiff-service-submission", Map("fr-mode" → Some(mode)))
             }
         }
+
+    def requestedLangParams(params: ActionParams): List[(String, String)] = (
+        paramByName(params, "lang")
+        flatMap   nonEmptyOrNone
+        map       (lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang))
+        getOrElse Nil
+    )
 }

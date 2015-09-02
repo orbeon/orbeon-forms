@@ -47,7 +47,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private val DataPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
     private val DataCollectionPath         = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
     private val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
-    private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(/([^/]+))?)?""".r
+    private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
 
     // Start the processor
     override def start(pipelineContext: PipelineContext): Unit = {
@@ -59,12 +59,12 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     def proxyRequest(request: Request, response: Response): Unit = {
         val incomingPath = request.getRequestPath
         incomingPath match {
-            case FormPath(path, app, form, _)                   ⇒ proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, _, _, _)             ⇒ proxyRequest(request, response, app, form, "data", path)
-            case DataCollectionPath(path, app, form)            ⇒ proxyRequest(request, response, app, form, "data", path)
-            case SearchPath(path, app, form)                    ⇒ proxyRequest(request, response, app, form, "data", path)
-            case PublishedFormsMetadataPath(path, app, _, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
-            case _ ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
+            case FormPath(path, app, form, _)                ⇒ proxyRequest(request, response, app, form, "form", path)
+            case DataPath(path, app, form, _, _, _)          ⇒ proxyRequest(request, response, app, form, "data", path)
+            case DataCollectionPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, "data", path)
+            case SearchPath(path, app, form)                 ⇒ proxyRequest(request, response, app, form, "data", path)
+            case PublishedFormsMetadataPath(path, app, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
+            case _                                           ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
         }
     }
 

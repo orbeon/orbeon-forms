@@ -95,8 +95,9 @@
         <p:output name="data" id="form-document"/>
     </p:processor>
 
-    <p:processor name="oxf:xinclude">
-        <p:input name="config">
+    <!-- Call up persistence layer to obtain the PDF file -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="aggregate('root', #form-document, #parameters)" transform="oxf:unsafe-xslt">
             <config xsl:version="2.0">
 
                 <xsl:variable name="form"   select="/*/*[1]"/>
@@ -108,23 +109,13 @@
 
                 <mode>binary</mode>
 
-                <!-- Uses $params and exposes $use-document-id and $specific-form-version-requested -->
-                <xi:include href="../detail/versioning-headers.xml" xpointer="xpath(/*/*)"/>
+                <header>
+                    <name>Orbeon-Form-Definition-Version</name>
+                    <value><xsl:value-of select="$params/form-version"/></value>
+                </header>
 
             </config>
         </p:input>
-        <p:output name="data" id="xslt-config"/>
-    </p:processor>
-
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input  name="config" href="#xslt-config"/>
-        <p:input  name="data"   href="aggregate('root', #form-document, #parameters)"/>
-        <p:output name="data"   id="url-generator-config"/>
-    </p:processor>
-
-    <!-- Call up persistence layer to obtain the PDF file -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#url-generator-config"/>
         <p:output name="data" id="pdf-template"/>
     </p:processor>
 

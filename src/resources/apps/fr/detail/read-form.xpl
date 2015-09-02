@@ -29,14 +29,36 @@
     <!-- Parameters, to which we added the form version -->
     <p:param type="output" name="instance"/>
 
-    <p:processor name="oxf:xinclude">
-        <p:input name="config">
+    <!-- Call up persistence layer to obtain XHTML+XForms -->
+    <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
+         oxf:url-generator again as it is much faster and is enough now that the persistence proxy is in place. -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="#instance" transform="oxf:unsafe-xslt">
             <config xsl:version="2.0">
 
                 <xsl:variable name="params" select="/*"/>
 
-                <!-- Uses $params and exposes $use-document-id and $specific-form-version-requested -->
-                <xi:include href="versioning-headers.xml" xpointer="xpath(/*/*)"/>
+                <!-- If we know the document id AND no data was POSTed to us, tell the persistence API, use the document
+                     id, otherwise pass the requested form version if there is one.
+
+                     The case where we have a document id and data was POSTed to us is the case of switching between
+                     modes or script/noscript. In that case, there is no data in the database and the persistence layer
+                     must use the version if any. -->
+                <xsl:variable name="use-document-id"                 select="$params/document     != '' and empty(p:get-request-attribute('fr-form-data'))"/>
+                <xsl:variable name="specific-form-version-requested" select="$params/form-version != ''"/>
+
+                <xsl:if test="$use-document-id">
+                    <header>
+                        <name>Orbeon-For-Document-Id</name>
+                        <value><xsl:value-of select="$params/document"/></value>
+                    </header>
+                </xsl:if>
+                <xsl:if test="not($use-document-id) and $specific-form-version-requested">
+                    <header>
+                        <name>Orbeon-Form-Definition-Version</name>
+                        <value><xsl:value-of select="$params/form-version"/></value>
+                    </header>
+                </xsl:if>
 
                 <!-- Create URI to persistence layer -->
                 <xsl:variable
@@ -66,20 +88,6 @@
 
             </config>
         </p:input>
-        <p:output name="data" id="xslt-config"/>
-    </p:processor>
-
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input  name="config" href="#xslt-config"/>
-        <p:input  name="data"   href="#instance"/>
-        <p:output name="data"   id="url-generator-config"/>
-    </p:processor>
-
-    <!-- Call up persistence layer to obtain XHTML+XForms -->
-    <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
-         oxf:url-generator again as it is much faster and is enough now that the persistence proxy is in place. -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#url-generator-config"/>
         <p:output name="data" id="document"/>
     </p:processor>
 

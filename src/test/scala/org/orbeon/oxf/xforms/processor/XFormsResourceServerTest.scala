@@ -19,14 +19,14 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    @Test def proxyURI() {
+    @Test def proxyURI(): Unit = {
 
-        val indentedLogger = ResourceManagerTestBase.newIndentedLogger
+        implicit val indentedLogger = ResourceManagerTestBase.newIndentedLogger
 
-        assert("/xforms-server/dynamic/cc104a4fe62471ecc02ae13e1233f31275cb68d6" ===
-            XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set())(indentedLogger))
+        assert("/xforms-server/dynamic/d696cd8de9f92d36e3f34151ca9eba1807b19e01" ===
+            XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set()))
 
-        assert("/xforms-server/dynamic/1dd011d51abc6f3d9003fabd2f5561943d066c73" ===
-            XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set())(indentedLogger))
+        assert("/xforms-server/dynamic/563ec01cad20b038a8109ba984daac278a350f72" ===
+            XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set()))
     }
 }

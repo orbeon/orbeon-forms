@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
@@ -229,43 +229,54 @@ object XFormsResourceServer {
         logger           : IndentedLogger
     ): String = {
 
-        // Create a digest, so that for a given URI we always get the same key
-        val digest = SecureUtils.digestString(uri, "hex")
-
         // Get session
         val externalContext = NetUtils.getExternalContext
         val session = externalContext.getRequest.getSession(true)
 
-        if (session ne null) {
+        require(session ne null, "proxyURI requires a session")
 
-            // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
-            // an absolute URI.
-            val serviceURI = new URI(
-                URLRewriterUtils.rewriteServiceURL(
-                    NetUtils.getExternalContext.getRequest,
-                    uri,
-                    URLRewriter.REWRITE_MODE_ABSOLUTE
-                )
+        // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
+        // an absolute URI.
+        val serviceURI = new URI(
+            URLRewriterUtils.rewriteServiceURL(
+                NetUtils.getExternalContext.getRequest,
+                uri,
+                URLRewriter.REWRITE_MODE_ABSOLUTE
+            )
+        )
+
+        val outgoingHeaders =
+            Connection.buildConnectionHeadersLowerIfNeeded(
+                scheme           = serviceURI.getScheme,
+                hasCredentials   = false,
+                customHeaders    = customHeaders,
+                headersToForward = headersToForward,
+                cookiesToForward = Connection.cookiesToForwardFromProperty)(
+                logger           = logger
             )
 
-            val outgoingHeaders =
-                Connection.buildConnectionHeadersLowerIfNeeded(
-                    scheme           = serviceURI.getScheme,
-                    hasCredentials   = false,
-                    customHeaders    = customHeaders,
-                    headersToForward = headersToForward,
-                    cookiesToForward = Connection.cookiesToForwardFromProperty)(
-                    logger           = logger
-                )
+        // Create a digest, so that for a given URI we always get the same key
+        //
+        // 2015-09-02: Also digest header name/values, as they matter for example if a resource includes a
+        // version number in a header. Headers will include headers explicitly set on `xf:output` with `xf:header`,
+        // as well as `Accept`, `User-Agent`, and `Orbeon-Token`.
+        // One question is what to do with `Orbeon-Token`. We could exclude it from the digest just in case, for
+        // security reasons, but 1) `digest()` should be safe and 2) after a restart, if the session is restored,
+        // the token will have changed anyway, so it's better if the digest does not include it as things won't
+        // work anyway. On the other hand, unit tests fail if `Orbeon-Token` keeps changing. Not sure what's the best
+        // here, but for now filtering out. In addition, that's what we used to do before.
 
-            val resource =
-                DynamicResource(digest, serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
+        // Just digest a key produced with `toString`, since we know that tuples, `List` and `Map` produce
+        // a reasonable output with `toString`.
+        val key    = (uri, outgoingHeaders filterNot (_._1.equalsIgnoreCase("Orbeon-Token"))).toString
+        val digest = SecureUtils.digestString(key, "hex")
 
-            // Store mapping into session
-            session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)
-        }
+        val resource =
+            DynamicResource(digest, serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
 
-        // Rewrite new URI to absolute path without the context
+        // Store mapping into session
+        session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)
+
         DynamicResourcesPath + digest
     }
 

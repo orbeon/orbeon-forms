@@ -297,7 +297,7 @@
         <p:input name="form-pdf"  href="#form-pdf"/>
         <p:input name="form-tiff" href="#form-tiff"/>
         <!-- Dynamically generate pipeline to dereference attachments and send email -->
-        <p:input name="config" href="#attachments" transform="oxf:unsafe-xslt">
+        <p:input name="config" href="aggregate('root', #attachments, #parameters-with-version)" transform="oxf:unsafe-xslt">
             <p:config xsl:version="2.0">
                 <!-- Forwarded inputs -->
                 <p:param type="input" name="message"/>
@@ -305,7 +305,7 @@
                 <p:param type="input" name="form-pdf"/>
                 <p:param type="input" name="form-tiff"/>
                 <!-- Iterate over attachments -->
-                <xsl:for-each select="/*/attachment">
+                <xsl:for-each select="/*/attachments/attachment">
                     <xsl:variable name="uri" select="." as="xs:string"/>
                     <!-- Create one URL generator per attachment -->
                     <p:processor name="oxf:url-generator">
@@ -315,6 +315,11 @@
                                 <!-- Force binary content type, as the data is stored that way -->
                                 <content-type>application/octet-stream</content-type>
                                 <force-content-type>true</force-content-type>
+
+                                <header>
+                                    <name>Orbeon-Form-Definition-Version</name>
+                                    <value><xsl:value-of select="/*/request/form-version"/></value>
+                                </header>
                             </config>
                         </p:input>
                         <p:output name="data" id="attachment-{position()}"/>
@@ -331,7 +336,7 @@
                     <!-- The attachment contains the TIFF document -->
                     <p:input name="form-tiff" href="#form-tiff"/>
                     <!-- Create one extra input per attachment -->
-                    <xsl:for-each select="/*/attachment">
+                    <xsl:for-each select="/*/attachments/attachment">
                         <p:input name="attachment-{position()}" href="#attachment-{position()}"/>
                     </xsl:for-each>
                 </p:processor>

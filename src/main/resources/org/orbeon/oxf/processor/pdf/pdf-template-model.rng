@@ -212,6 +212,18 @@
             <attribute name="href">
                 <data type="anyURI"/>
             </attribute>
+            <zeroOrMore>
+                <element name="header">
+                    <element name="name">
+                        <data type="string"/>
+                    </element>
+                    <oneOrMore>
+                        <element name="value">
+                            <data type="string"/>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </zeroOrMore>
         </element>
     </define>
 

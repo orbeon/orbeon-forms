@@ -23,6 +23,7 @@ import com.lowagie.text.pdf._
 import org.dom4j.Element
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
+import org.orbeon.oxf.processor.generator.URLGeneratorBase
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor._
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
@@ -323,6 +324,10 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
                     val url = new URI(hrefAttribute)
 
+                    val headerNameValues =
+                        URLGeneratorBase.extractHeaders(context.element) map
+                            { case (key, value) ⇒ key -> value.to[List] }
+
                     val cxr =
                         Connection(
                             httpMethodUpper = "GET",
@@ -332,7 +337,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                             headers         = Connection.buildConnectionHeadersLowerIfNeeded(
                                 scheme           = url.getScheme,
                                 hasCredentials   = false,
-                                customHeaders    = Map(),
+                                customHeaders    = headerNameValues,
                                 headersToForward = Connection.headersToForwardFromProperty,
                                 cookiesToForward = Connection.cookiesToForwardFromProperty)(
                                 logger           = context.logger

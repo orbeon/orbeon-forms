@@ -28,13 +28,28 @@
         xmlns:map="java:java.util.Map"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xsl:variable name="data" select="/*" as="element()"/>
+    <xsl:variable name="data"       select="/*" as="element()"/>
     <xsl:variable name="parameters" select="doc('input:parameters')/*" as="element()"/>
 
-    <xsl:variable name="is-not-a-control-classes" select="('xforms-trigger', 'xforms-disabled', 'xforms-group', 'xforms-case', 'xforms-switch', 'xforms-repeat')" as="xs:string*"/>
-    <xsl:variable name="control-classes"          select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')" as="xs:string*"/>
-    <xsl:variable name="image-attachment-classes" select="('xbl-fr-image-attachment')" as="xs:string*"/>
-    <xsl:variable name="attachment-classes"       select="('fr-attachment', $image-attachment-classes)" as="xs:string*"/>
+    <xsl:variable
+        name="is-not-a-control-classes"
+        select="('xforms-trigger', 'xforms-disabled', 'xforms-group', 'xforms-case', 'xforms-switch', 'xforms-repeat')"
+        as="xs:string*"/>
+
+    <xsl:variable
+        name="control-classes"
+        select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')"
+        as="xs:string*"/>
+
+    <xsl:variable
+        name="image-attachment-classes"
+        select="('xbl-fr-image-attachment')"
+        as="xs:string*"/>
+
+    <xsl:variable
+        name="form-version"
+        select="$parameters/form-version[normalize-space()]"
+        as="xs:string?"/>
 
     <xsl:variable name="ids" select="//*"/>
 
@@ -119,7 +134,14 @@
                                 <xsl:choose>
                                     <xsl:when test="$classes = $image-attachment-classes">
                                         <!-- Handle URL rewriting for image attachments -->
-                                        <image acro-field-name="'{$pdf-field-name}'" href="{p:rewrite-resource-uri($value, true())}"/>
+                                        <image acro-field-name="'{$pdf-field-name}'" href="{p:rewrite-resource-uri($value, true())}">
+                                            <xsl:if test="$form-version">
+                                                <header>
+                                                    <name>Orbeon-Form-Definition-Version</name>
+                                                    <value><xsl:value-of select="$form-version"/></value>
+                                                </header>
+                                            </xsl:if>
+                                        </image>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>

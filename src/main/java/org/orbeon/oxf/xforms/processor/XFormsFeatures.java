@@ -53,7 +53,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/jquery/jquery-browser-mobile.js", "/ops/jquery/jquery-browser-mobile.js"),
             new ResourceConfig("/apps/fr/style/bootstrap/js/bootstrap.js", "/apps/fr/style/bootstrap/js/bootstrap.min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/jquery-orbeon.js", "/ops/javascript/orbeon/util/jquery-orbeon-min.js"),
-            new ResourceConfig("/ops/javascript/autosize/jquery.autosize.js", "/ops/javascript/autosize/jquery.autosize.min.js"),
+            new ResourceConfig("/ops/javascript/autosize/autosize.js", "/ops/javascript/autosize/autosize.min.js"),
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),

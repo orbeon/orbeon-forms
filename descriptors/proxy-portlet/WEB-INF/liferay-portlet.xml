@@ -2,5 +2,6 @@
     <portlet>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
         <instanceable>true</instanceable>
+        <requires-namespaced-parameters>false</requires-namespaced-parameters>
     </portlet>
 </liferay-portlet-app>

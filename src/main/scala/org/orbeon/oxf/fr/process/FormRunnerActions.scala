@@ -276,7 +276,6 @@ trait FormRunnerActions {
                 if (stringOptionToSet(evaluatedSendProperties("content")) exists Set(format, s"$format-url"))
                     tryCreatePdfOrTiffIfNeeded(params, format).get
 
-            // TODO: Remove duplication once @replace is an AVT
             val replace = evaluatedSendProperties.get("replace").flatten match {
                 case Some(value @ ("instance" | "all")) ⇒ value
                 case _                                  ⇒ "none"
@@ -288,7 +287,7 @@ trait FormRunnerActions {
             if (replace == "all")
                 setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
 
-            sendThrowOnError(s"fr-send-submission-$replace", evaluatedSendProperties)
+            sendThrowOnError(s"fr-send-submission", evaluatedSendProperties)
         }
 
     private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](

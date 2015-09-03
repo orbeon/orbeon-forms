@@ -88,7 +88,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     private String avtStandalone;
 //    private String cdatasectionelements;
 
-    private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
+    private String avtReplace;
     private String replaceInstanceId;
     private String xxfReplaceInstanceId;
     private String avtSeparator = "&";// XForms 1.1 changes back the default to the ampersand as of February 2009
@@ -142,7 +142,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         return submissionElement;
     }
 
-
     public boolean isShowProgress() {
         return xxfShowProgress;
     }
@@ -155,14 +154,11 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         return urlType;
     }
 
-    public String getReplace() {
-        return replace;
-    }
-
     public String getTargetref() {
         return targetref;
     }
 
+    // Only set for replace="all" at the end of he first pass of the submission
     public String getResolvedXXFormsTarget() {
         return resolvedXXFormsTarget;
     }
@@ -210,14 +206,14 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
             // TODO
 //            cdatasectionelements = submissionElement.attributeValue("cdata-section-elements");
-            if (submissionElement.attributeValue("replace") != null) {
-                replace = submissionElement.attributeValue("replace");
 
-                if (replace.equals("instance")) {
-                    replaceInstanceId = submissionElement.attributeValue("instance");
-                    xxfReplaceInstanceId = submissionElement.attributeValue(XFormsConstants.XXFORMS_INSTANCE_QNAME);
-                }
-            }
+            avtReplace = submissionElement.attributeValue("replace");
+            if (avtReplace == null)
+                avtReplace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
+
+            replaceInstanceId = submissionElement.attributeValue("instance");
+            xxfReplaceInstanceId = submissionElement.attributeValue(XFormsConstants.XXFORMS_INSTANCE_QNAME);
+
             if (submissionElement.attributeValue("separator") != null) {
                 avtSeparator = submissionElement.attributeValue("separator");
             }
@@ -371,8 +367,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
                 /* ***** Handle deferred submission ********************************************************************* */
 
-                // Resolve the target AVT because XFormsServer requires it for deferred submission
-                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(containingDocument, p.xpathContext, p.refNodeInfo, avtXXFormsTarget);
 
                 // Deferred submission: end of the first pass
                 if (p.isDeferredSubmissionFirstPass) {
@@ -381,6 +375,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     if (p.serialize) {
                         createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant, p.resolvedXXFormsAnnotate);
                     }
+
+                    // Resolve the target AVT because XFormsServer requires it for deferred submission
+                    resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(containingDocument, p.xpathContext, p.refNodeInfo, avtXXFormsTarget);
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setActiveSubmissionFirstPass(this);
@@ -697,7 +694,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     } else if (p.isReplaceNone) {
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
-                        throw new XFormsSubmissionException(this, "xf:submission: invalid replace attribute: " + replace, "processing instance replacement",
+                        throw new XFormsSubmissionException(this, "xf:submission: invalid replace attribute: " + p.resolvedReplace, "processing instance replacement",
                                 new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), connectionResult));
                     }
                 } else {
@@ -719,7 +716,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
                 // Currently we don't know how to handle a redirect for replace != "all"
                 if (!p.isReplaceAll)
-                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", redirect code received with replace=\"" + replace + "\"", "processing submission response",
+                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", redirect code received with replace=\"" + p.resolvedReplace + "\"", "processing submission response",
                             new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
 
                 replacer = new RedirectReplacer(this, containingDocument);
@@ -739,10 +736,11 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     public class SubmissionParameters {
 
         // @replace attribute
-        final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
-        final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
-        final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
-        final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
+        final String resolvedReplace;
+        final boolean isReplaceAll;
+        final boolean isReplaceInstance;
+        final boolean isReplaceText;
+        final boolean isReplaceNone;
 
         // Current node for xf:submission and instance containing the node to submit
         NodeInfo refNodeInfo;
@@ -811,8 +809,15 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             }
 
             {
+                // Resolved replace AVT
+                resolvedReplace = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtReplace);
+                isReplaceAll      = resolvedReplace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
+                isReplaceInstance = resolvedReplace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
+                isReplaceText     = resolvedReplace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
+                isReplaceNone     = resolvedReplace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
+
                 // Resolved method AVT
-                final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtMethod);
+                final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtMethod);
                 resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, resolvedMethodQName, true));
 
                 // Get actual method based on the method attribute
@@ -831,21 +836,21 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 }
 
                 // Resolve validate and relevant AVTs
-                final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtValidate);
+                final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtValidate);
                 // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
                 resolvedValidate = serialize && !"false".equals(resolvedValidateString);
 
-                final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtRelevant);
+                final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtRelevant);
                 // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
                 resolvedRelevant = serialize && !"false".equals(resolvedRelevantString);
 
-                final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsCalculate);
+                final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtXXFormsCalculate);
                 resolvedXXFormsCalculate = serialize && !"false".equals(resolvedCalculateString);
 
-                final String resolvedUploadsString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsUploads);
+                final String resolvedUploadsString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtXXFormsUploads);
                 resolvedXXFormsUploads = serialize && !"false".equals(resolvedUploadsString);
 
-                final String resolvedAnnotateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsAnnotate);
+                final String resolvedAnnotateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtXXFormsAnnotate);
                 resolvedXXFormsAnnotate = serialize ? resolvedAnnotateString : null;
             }
 

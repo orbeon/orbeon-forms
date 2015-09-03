@@ -796,31 +796,20 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private static void outputSubmissionInfo(XMLReceiverHelper ch, XFormsModelSubmission activeSubmission) {
-        final String target;
 
         // activeSubmission submission can be null when are running as a portlet and handling an <xf:load>, which
         // when executed from within a portlet is ran as very much like the replace="all" submissions.
-        final String activeSubmissionReplace = activeSubmission == null ? "all" : activeSubmission.getReplace();
-        final String activeSubmissionResolvedXXFormsTarget = activeSubmission == null ? null : activeSubmission.getResolvedXXFormsTarget();
+        final String activeSubmissionTarget       = activeSubmission == null ? null : activeSubmission.getResolvedXXFormsTarget();
         final String activeSubmissionShowProgress = (activeSubmission == null || activeSubmission.isShowProgress()) ? null : "false";
-
-        if ("all".equals(activeSubmissionReplace)) {
-            // Replace all
-            // RFE: Set action ("action", clientSubmissionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
-            target = activeSubmissionResolvedXXFormsTarget;
-        } else {
-            // Replace instance
-            target = null;
-        }
 
         // Signal that we want a POST to the XForms server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
-                new String[]{
-                        "method", "POST",
-                        "show-progress", activeSubmissionShowProgress,
-                        (target != null) ? "target" : null, target
-                });
-    }
+            new String[]{
+                "method", "POST",
+                "show-progress", activeSubmissionShowProgress,
+                (activeSubmissionTarget != null) ? "target" : null, activeSubmissionTarget
+            });
+}
 
     private static void outputMessagesInfo(XMLReceiverHelper ch, List<XFormsContainingDocument.Message> messages) {
         for (XFormsContainingDocument.Message message: messages) {

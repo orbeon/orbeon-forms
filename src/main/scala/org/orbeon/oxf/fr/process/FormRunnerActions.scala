@@ -19,6 +19,7 @@ import FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.scaxon.XML._
@@ -197,14 +198,14 @@ trait FormRunnerActions {
 
             recombineQuery(s"/fr/service/$app/$form/email/$document", pdfTiffParams ::: requestedLangParams(params))
         } flatMap
-            tryChangeMode("none")
+            tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE)
 
     // Defaults except for `uri` and `serialization`
     private val DefaultSendParameters = Map(
         "method"              → "post",
         "prune"               → "true",
         "annotate"            → "",
-        "replace"             → "none",
+        "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
         "content"             → "xml",
         "data-format-version" → "4.0.0",
         "parameters"          → "app form form-version document valid language process data-format-version"
@@ -276,15 +277,10 @@ trait FormRunnerActions {
                 if (stringOptionToSet(evaluatedSendProperties("content")) exists Set(format, s"$format-url"))
                     tryCreatePdfOrTiffIfNeeded(params, format).get
 
-            val replace = evaluatedSendProperties.get("replace").flatten match {
-                case Some(value @ ("instance" | "all")) ⇒ value
-                case _                                  ⇒ "none"
-            }
-
             // Set data-safe-override as we know we are not losing data upon navigation. This happens:
             // - with changing mode (tryChangeMode)
             // - when navigating away using the "send" action
-            if (replace == "all")
+            if (evaluatedSendProperties.get("replace").flatten.contains(XFORMS_SUBMIT_REPLACE_ALL))
                 setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
 
             sendThrowOnError(s"fr-send-submission", evaluatedSendProperties)
@@ -385,14 +381,14 @@ trait FormRunnerActions {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/view/$document"
         } flatMap
-            tryChangeMode("all")
+            tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
     def tryNavigateToEdit(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
             s"/fr/$app/$form/edit/$document"
         } flatMap
-            tryChangeMode("all")
+            tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
     def tryOpenPDF(params: ActionParams): Try[Any] =
         Try {
@@ -407,14 +403,14 @@ trait FormRunnerActions {
 
             recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangParams(params))
         } flatMap
-            tryChangeMode("all")
+            tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
     def tryToggleNoscript(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, _, Some(document), mode) = FormRunnerParams()
             s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! isNoscript).toString}"
         } flatMap
-            tryChangeMode("all")
+            tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
     // Visit/unvisit controls
     def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = ErrorSummaryModel))
@@ -457,7 +453,7 @@ trait FormRunnerActions {
                         }
                     }
 
-                    tryChangeMode("instance")(path) foreach processSuccessResponse
+                    tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(path) foreach processSuccessResponse
             }
         }
 

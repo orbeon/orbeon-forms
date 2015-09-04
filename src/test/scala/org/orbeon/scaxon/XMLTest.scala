@@ -20,30 +20,30 @@ import org.orbeon.scaxon.XML._
 
 class XMLTest extends AssertionsForJUnit {
 
-    @Test def attributes(): Unit = {
-        val foo: NodeInfo = <foo a1="v1" a2="v2" my:a3="v3a" your:a3="v3b" xmlns:my="ns1" xmlns:your="ns2"/>
+  @Test def attributes(): Unit = {
+    val foo: NodeInfo = <foo a1="v1" a2="v2" my:a3="v3a" your:a3="v3b" xmlns:my="ns1" xmlns:your="ns2"/>
 
-        assert((foo \@ "a1" stringValue) === "v1")
-        assert((foo \@ "a2" stringValue) === "v2")
+    assert((foo \@ "a1" stringValue) === "v1")
+    assert((foo \@ "a2" stringValue) === "v2")
 
-        // NOTE: We sort values as Scala messes-up source attribute order
+    // NOTE: We sort values as Scala messes-up source attribute order
 
-        assert((foo \@ "a3" map (_.stringValue) sorted) === Seq("v3a", "v3b"))
-        assert((foo \@ "a3" size) === 2)
-        assert((foo \@ "*:a3" size) === 2)
+    assert((foo \@ "a3" map (_.stringValue) sorted) === Seq("v3a", "v3b"))
+    assert((foo \@ "a3" size) === 2)
+    assert((foo \@ "*:a3" size) === 2)
 
-        assert((foo \@ @* map (_.stringValue) sorted) === Seq("v1", "v2", "v3a", "v3b"))
+    assert((foo \@ @* map (_.stringValue) sorted) === Seq("v1", "v2", "v3a", "v3b"))
 
-        assert((foo \@ ("a1" || "a2") map (_.stringValue) sorted) === Seq("v1", "v2"))
+    assert((foo \@ ("a1" || "a2") map (_.stringValue) sorted) === Seq("v1", "v2"))
+  }
+
+
+  @Test def implicitStringToQName(): Unit = { // NOTE: This was called stringToQName and started failing with 2.10 (https://issues.scala-lang.org/browse/SI-4270)
+    // stringToQName must not accept a qualified name
+    intercept[AssertionError] {
+      attributeInfo("foo:bar", "")
     }
 
-
-    @Test def implicitStringToQName(): Unit = { // NOTE: This was called stringToQName and started failing with 2.10 (https://issues.scala-lang.org/browse/SI-4270)
-        // stringToQName must not accept a qualified name
-        intercept[AssertionError] {
-            attributeInfo("foo:bar", "")
-        }
-
-        attributeInfo("bar", "")
-    }
+    attributeInfo("bar", "")
+  }
 }

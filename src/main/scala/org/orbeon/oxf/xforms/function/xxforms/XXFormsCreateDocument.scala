@@ -20,7 +20,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.util.XPath
 
 class XXFormsCreateDocument extends XFormsFunction  {
-    // Create a new DocumentWrapper. If we use a global one, the first document ever created is wrongly returned!
-    override def evaluateItem(xpathContext: XPathContext) =
-        new DocumentWrapper(Dom4jUtils.createDocument, null, XPath.GlobalConfiguration)
+  // Create a new DocumentWrapper. If we use a global one, the first document ever created is wrongly returned!
+  override def evaluateItem(xpathContext: XPathContext) =
+    new DocumentWrapper(Dom4jUtils.createDocument, null, XPath.GlobalConfiguration)
 }

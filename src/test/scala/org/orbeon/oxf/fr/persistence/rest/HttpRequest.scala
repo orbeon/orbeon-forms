@@ -28,98 +28,98 @@ import scala.util.Try
 
 private object HttpRequest {
 
-    private val PersistenceBase = "http://localhost:8080/orbeon/fr/service/persistence/"
+  private val PersistenceBase = "http://localhost:8080/orbeon/fr/service/persistence/"
 
-    case class Credentials(username: String, roles: Set[String], group: String)
+  case class Credentials(username: String, roles: Set[String], group: String)
 
-    sealed trait Body
-    case class XML   (doc : Document   ) extends Body
-    case class Binary(file: Array[Byte]) extends Body
+  sealed trait Body
+  case class XML   (doc : Document   ) extends Body
+  case class Binary(file: Array[Byte]) extends Body
 
-    private def request(
-        path        : String,
-        method      : String,
-        version     : Version,
-        body        : Option[Body],
-        credentials : Option[Credentials])(implicit
-        logger      : IndentedLogger
-    ): ConnectionResult = {
+  private def request(
+    path        : String,
+    method      : String,
+    version     : Version,
+    body        : Option[Body],
+    credentials : Option[Credentials])(implicit
+    logger      : IndentedLogger
+  ): ConnectionResult = {
 
-        val documentURL = new URI(PersistenceBase + path)
+    val documentURL = new URI(PersistenceBase + path)
 
-        val headers = {
+    val headers = {
 
-            import Version._
+      import Version._
 
-            val versionHeader = version match {
-                case Unspecified             ⇒ Nil
-                case Next                    ⇒ List(OrbeonFormDefinitionVersion → List("next"))
-                case Specific(version)       ⇒ List(OrbeonFormDefinitionVersion → List(version.toString))
-                case ForDocument(documentId) ⇒ List(OrbeonForDocumentId         → List(documentId))
-            }
+      val versionHeader = version match {
+        case Unspecified             ⇒ Nil
+        case Next                    ⇒ List(OrbeonFormDefinitionVersion → List("next"))
+        case Specific(version)       ⇒ List(OrbeonFormDefinitionVersion → List(version.toString))
+        case ForDocument(documentId) ⇒ List(OrbeonForDocumentId         → List(documentId))
+      }
 
-            val credentialHeaders = credentials.map(c ⇒ List(
-                OrbeonUsernameHeaderName → List(c.username),
-                OrbeonGroupHeaderName    → List(c.group),
-                OrbeonRolesHeaderName    → c.roles.to[List]
-            )).to[List].flatten
+      val credentialHeaders = credentials.map(c ⇒ List(
+        OrbeonUsernameHeaderName → List(c.username),
+        OrbeonGroupHeaderName    → List(c.group),
+        OrbeonRolesHeaderName    → c.roles.to[List]
+      )).to[List].flatten
 
-            Connection.buildConnectionHeadersLowerIfNeeded(
-                scheme           = documentURL.getScheme,
-                hasCredentials   = false,
-                customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
-                headersToForward = Connection.headersToForwardFromProperty,
-                cookiesToForward = Connection.cookiesToForwardFromProperty
-            )
-        }
-
-        val contentType = body.map {
-            case XML   (_) ⇒ "application/xml"
-            case Binary(_) ⇒ "application/octet-stream"
-        }
-
-        val messageBody = body map {
-            case XML   (doc ) ⇒ Dom4jUtils.domToString(doc).getBytes
-            case Binary(file) ⇒ file
-        }
-
-        val content = messageBody map
-            (StreamedContent.fromBytes(_, contentType))
-
-        Connection(
-            httpMethodUpper = method,
-            url             = documentURL,
-            credentials     = None,
-            content         = content,
-            headers         = headers,
-            loadState       = true,
-            logBody         = false
-        ).connect(
-            saveState = true
-        )
+      Connection.buildConnectionHeadersLowerIfNeeded(
+        scheme           = documentURL.getScheme,
+        hasCredentials   = false,
+        customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
+        headersToForward = Connection.headersToForwardFromProperty,
+        cookiesToForward = Connection.cookiesToForwardFromProperty
+      )
     }
 
-    def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-        useAndClose(request(url, "PUT", version, Some(body), credentials))(_.statusCode)
+    val contentType = body.map {
+      case XML   (_) ⇒ "application/xml"
+      case Binary(_) ⇒ "application/octet-stream"
+    }
 
-    def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-        useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
+    val messageBody = body map {
+      case XML   (doc ) ⇒ Dom4jUtils.domToString(doc).getBytes
+      case Binary(file) ⇒ file
+    }
 
-    def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
-        useAndClose(request(url, "GET", version, None, credentials)) { cxr ⇒
+    val content = messageBody map
+      (StreamedContent.fromBytes(_, contentType))
 
-            val statusCode = cxr.statusCode
-            val headers    = cxr.headers
+    Connection(
+      httpMethodUpper = method,
+      url             = documentURL,
+      credentials     = None,
+      content         = content,
+      headers         = headers,
+      loadState       = true,
+      logBody         = false
+    ).connect(
+      saveState = true
+    )
+  }
 
-            val body =
-                useAndClose(cxr.content.inputStream) { inputStream ⇒
-                    Try {
-                        val outputStream = new ByteArrayOutputStream
-                        NetUtils.copyStream(inputStream, outputStream)
-                        outputStream.toByteArray
-                    }
-                }
+  def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+    useAndClose(request(url, "PUT", version, Some(body), credentials))(_.statusCode)
 
-            (statusCode, headers, body)
+  def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+    useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
+
+  def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
+    useAndClose(request(url, "GET", version, None, credentials)) { cxr ⇒
+
+      val statusCode = cxr.statusCode
+      val headers    = cxr.headers
+
+      val body =
+        useAndClose(cxr.content.inputStream) { inputStream ⇒
+          Try {
+            val outputStream = new ByteArrayOutputStream
+            NetUtils.copyStream(inputStream, outputStream)
+            outputStream.toByteArray
+          }
         }
+
+      (statusCode, headers, body)
+    }
 }

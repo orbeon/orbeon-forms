@@ -18,10 +18,10 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 class XXFormsSetindexEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_SETINDEX, target, properties, bubbles = true, cancelable = false) {
+  extends XFormsEvent(XXFORMS_SETINDEX, target, properties, bubbles = true, cancelable = false) {
 
-    def this(target: XFormsEventTarget, index: Int) =
-        this(target, Map("index" → Option(index)))
+  def this(target: XFormsEventTarget, index: Int) =
+    this(target, Map("index" → Option(index)))
 
-    def index = property[Int]("index").get
+  def index = property[Int]("index").get
 }

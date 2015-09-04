@@ -23,25 +23,25 @@ import org.orbeon.oxf.xforms.function.{Power, CountNonEmpty, IsCardNumber, Boole
  */
 trait XFormsFunnyFunctions extends OrbeonFunctionLibrary {
 
-    // Define in early definition of subclass
-    val XFormsFunnyFunctionsNS: Seq[String]
+  // Define in early definition of subclass
+  val XFormsFunnyFunctionsNS: Seq[String]
 
-    Namespace(XFormsFunnyFunctionsNS) {
-        Fun("boolean-from-string", classOf[BooleanFromString], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+  Namespace(XFormsFunnyFunctionsNS) {
+    Fun("boolean-from-string", classOf[BooleanFromString], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("is-card-number", classOf[IsCardNumber], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("is-card-number", classOf[IsCardNumber], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("count-non-empty", classOf[CountNonEmpty], op = 0, min = 1, INTEGER, EXACTLY_ONE,
-            Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("count-non-empty", classOf[CountNonEmpty], op = 0, min = 1, INTEGER, EXACTLY_ONE,
+      Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("power", classOf[Power], op = 0, min = 2, NUMERIC, EXACTLY_ONE,
-            Arg(NUMERIC, EXACTLY_ONE),
-            Arg(NUMERIC, EXACTLY_ONE)
-        )
-    }
+    Fun("power", classOf[Power], op = 0, min = 2, NUMERIC, EXACTLY_ONE,
+      Arg(NUMERIC, EXACTLY_ONE),
+      Arg(NUMERIC, EXACTLY_ONE)
+    )
+  }
 }

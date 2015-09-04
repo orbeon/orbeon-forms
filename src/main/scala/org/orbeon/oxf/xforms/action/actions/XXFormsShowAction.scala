@@ -21,52 +21,52 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
  * Extension xxf:show action.
  */
 class XXFormsShowAction extends XFormsAction {
-    override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext): Unit = {
 
-        val interpreter   = actionContext.interpreter
-        val actionElement = actionContext.element
+    val interpreter   = actionContext.interpreter
+    val actionElement = actionContext.element
 
-        synchronizeAndRefreshIfNeeded(actionContext)
+    synchronizeAndRefreshIfNeeded(actionContext)
 
-        resolveControl("dialog")(actionContext) match {
-            case Some(targetDialog: XFormsEventTarget) ⇒
-                val constrainToViewport = interpreter.resolveAVT(actionElement, "constrain") != "false"
-                val neighborEffectiveId = resolveControl("neighbor", required = false)(actionContext) map (_.getEffectiveId)
-                XXFormsShowAction.showDialog(
-                    targetDialog,
-                    neighborEffectiveId,
-                    constrainToViewport,
-                    XFormsAction.eventProperties(interpreter, actionElement)
-                )
-            case _ ⇒
-                val indentedLogger = interpreter.indentedLogger
-                if (indentedLogger.isDebugEnabled)
-                    indentedLogger.logDebug(
-                        "xxf:show",
-                        "dialog does not refer to an existing xxf:dialog element, ignoring action",
-                        "dialog id",
-                        actionContext.element.attributeValue("dialog")
-                    )
-        }
+    resolveControl("dialog")(actionContext) match {
+      case Some(targetDialog: XFormsEventTarget) ⇒
+        val constrainToViewport = interpreter.resolveAVT(actionElement, "constrain") != "false"
+        val neighborEffectiveId = resolveControl("neighbor", required = false)(actionContext) map (_.getEffectiveId)
+        XXFormsShowAction.showDialog(
+          targetDialog,
+          neighborEffectiveId,
+          constrainToViewport,
+          XFormsAction.eventProperties(interpreter, actionElement)
+        )
+      case _ ⇒
+        val indentedLogger = interpreter.indentedLogger
+        if (indentedLogger.isDebugEnabled)
+          indentedLogger.logDebug(
+            "xxf:show",
+            "dialog does not refer to an existing xxf:dialog element, ignoring action",
+            "dialog id",
+            actionContext.element.attributeValue("dialog")
+          )
     }
+  }
 }
 
 object XXFormsShowAction {
 
-    import XFormsEvent._
+  import XFormsEvent._
 
-    def showDialog(
-        targetDialog        : XFormsEventTarget,
-        neighborEffectiveId : Option[String] = None,
-        constrainToViewport : Boolean        = true,
-        properties          : PropertyGetter = EmptyGetter
-    ): Unit =
-        Dispatch.dispatchEvent(
-            new XXFormsDialogOpenEvent(
-                properties,
-                targetDialog,
-                neighborEffectiveId.orNull,
-                constrainToViewport
-            )
-        )
+  def showDialog(
+    targetDialog        : XFormsEventTarget,
+    neighborEffectiveId : Option[String] = None,
+    constrainToViewport : Boolean        = true,
+    properties          : PropertyGetter = EmptyGetter
+  ): Unit =
+    Dispatch.dispatchEvent(
+      new XXFormsDialogOpenEvent(
+        properties,
+        targetDialog,
+        neighborEffectiveId.orNull,
+        constrainToViewport
+      )
+    )
 }

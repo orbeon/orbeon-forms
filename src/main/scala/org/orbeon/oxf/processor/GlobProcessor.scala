@@ -17,6 +17,6 @@ import org.orbeon.oxf.processor.RegexpMatcher._
 
 
 class GlobProcessor extends RegexpProcessor {
-    override def regexpMatch(regexp: String, text: String) =
-        MatchResult(compilePattern(regexp, glob = true), text)
+  override def regexpMatch(regexp: String, text: String) =
+    MatchResult(compilePattern(regexp, glob = true), text)
 }

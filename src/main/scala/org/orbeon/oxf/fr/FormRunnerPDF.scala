@@ -28,78 +28,78 @@ import org.orbeon.scaxon.XML._
 
 trait FormRunnerPDF {
 
-    // Return mappings (formatName → expression) for all PDF formats in the properties
-    //@XPathFunction
-    def getPDFFormats = {
+  // Return mappings (formatName → expression) for all PDF formats in the properties
+  //@XPathFunction
+  def getPDFFormats = {
 
-        def propertiesStartingWith(prefix: String) =
-            XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).asScala map (_.getStringValue)
+    def propertiesStartingWith(prefix: String) =
+      XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).asScala map (_.getStringValue)
 
-        val formatPairs =
-            for {
-                formatPropertyName ← propertiesStartingWith("oxf.fr.pdf.format")
-                expression ← Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
-                formatName = formatPropertyName split '.' last
-            } yield
-                formatName → expression
+    val formatPairs =
+      for {
+        formatPropertyName ← propertiesStartingWith("oxf.fr.pdf.format")
+        expression ← Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
+        formatName = formatPropertyName split '.' last
+      } yield
+        formatName → expression
 
-        formatPairs.toMap.asJava
+    formatPairs.toMap.asJava
+  }
+
+  // Return the PDF formatting expression for the given parameters
+  //@XPathFunction
+  def getPDFFormatExpression(pdfFormats: JMap[String, String], app: String, form: String, name: String, dataType: String) = {
+
+    val propertyName = List("oxf.fr.pdf.map", app, form, name) ::: Option(dataType).toList mkString "."
+
+    val expressionOpt =
+      for {
+        format     ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
+        expression ← Option(pdfFormats.get(format))
+      } yield
+        expression
+
+    expressionOpt.orNull
+  }
+
+  // Build a PDF control id from the given HTML control
+  //@XPathFunction
+  def buildPDFFieldNameFromHTML(control: NodeInfo) = {
+
+    def isContainer(e: NodeInfo) = {
+      val classes = e.attClasses
+      classes("xbl-fr-section") || (classes("xbl-fr-grid") && (e \\ "table" exists (_.attClasses("fr-repeat"))))
     }
 
-    // Return the PDF formatting expression for the given parameters
-    //@XPathFunction
-    def getPDFFormatExpression(pdfFormats: JMap[String, String], app: String, form: String, name: String, dataType: String) = {
+    def findControlName(e: NodeInfo) =
+      nonEmptyOrNone(getStaticIdFromId(e.id)) flatMap FormRunner.controlNameFromIdOpt
 
-        val propertyName = List("oxf.fr.pdf.map", app, form, name) ::: Option(dataType).toList mkString "."
+    def ancestorContainers(e: NodeInfo) =
+      control ancestor * filter isContainer reverse
 
-        val expressionOpt =
-            for {
-                format     ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
-                expression ← Option(pdfFormats.get(format))
-            } yield
-                expression
+    def suffixAsList(id: String) =
+      nonEmptyOrNone(getEffectiveIdSuffix(id)).toList
 
-        expressionOpt.orNull
-    }
+    // This only makes sense if we are passed a control with a name
+    findControlName(control) map { controlName ⇒
+      ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString "$"
+     } orNull
+  }
 
-    // Build a PDF control id from the given HTML control
-    //@XPathFunction
-    def buildPDFFieldNameFromHTML(control: NodeInfo) = {
+  import URLFinder._
 
-        def isContainer(e: NodeInfo) = {
-            val classes = e.attClasses
-            classes("xbl-fr-section") || (classes("xbl-fr-grid") && (e \\ "table" exists (_.attClasses("fr-repeat"))))
-        }
+  // Add http/https/mailto hyperlinks to a plain string
+  //@XPathFunction
+  def hyperlinkURLs(s: String, hyperlinks: Boolean) =
+    replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 
-        def findControlName(e: NodeInfo) =
-            nonEmptyOrNone(getStaticIdFromId(e.id)) flatMap FormRunner.controlNameFromIdOpt
-
-        def ancestorContainers(e: NodeInfo) =
-            control ancestor * filter isContainer reverse
-
-        def suffixAsList(id: String) =
-            nonEmptyOrNone(getEffectiveIdSuffix(id)).toList
-
-        // This only makes sense if we are passed a control with a name
-        findControlName(control) map { controlName ⇒
-            ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString "$"
-         } orNull
-    }
-
-    import URLFinder._
-
-    // Add http/https/mailto hyperlinks to a plain string
-    //@XPathFunction
-    def hyperlinkURLs(s: String, hyperlinks: Boolean) =
-        replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
-
-    // Custom filename (for PDF and TIFF output) for the detail page if specified and if evaluates to a non-empty name
-    //@XPathFunction
-    def filenameOrNull(format: String): String = (
-        formRunnerProperty(s"oxf.fr.detail.$format.filename")(FormRunnerParams())
-        flatMap nonEmptyOrNone
-        flatMap (expr ⇒ nonEmptyOrNone(process.SimpleProcess.evaluateString(expr)))
-        map     (EscapeURI.escape(_, "-_.~").toString)
-        orNull
-    )
+  // Custom filename (for PDF and TIFF output) for the detail page if specified and if evaluates to a non-empty name
+  //@XPathFunction
+  def filenameOrNull(format: String): String = (
+    formRunnerProperty(s"oxf.fr.detail.$format.filename")(FormRunnerParams())
+    flatMap nonEmptyOrNone
+    flatMap (expr ⇒ nonEmptyOrNone(process.SimpleProcess.evaluateString(expr)))
+    map     (EscapeURI.escape(_, "-_.~").toString)
+    orNull
+  )
 }

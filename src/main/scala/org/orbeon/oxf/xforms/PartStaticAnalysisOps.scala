@@ -22,15 +22,15 @@ import xbl.Scope
 // Operations on a part that are used during static analysis
 trait PartStaticAnalysisOps {
 
-    def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping
+  def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping
 
-    def getModel(prefixedId: String): Model
-    def getDefaultModelForScope(scope: Scope): Option[Model]
-    def getModelByInstancePrefixedId(prefixedId: String): Model
-    def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
-    def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String
-    
-    def getControlAnalysis(prefixedId: String): ElementAnalysis
-    def scopeForPrefixedId(prefixedId: String): Scope
-    def searchResolutionScopeByPrefixedId(prefixedId: String): Scope
+  def getModel(prefixedId: String): Model
+  def getDefaultModelForScope(scope: Scope): Option[Model]
+  def getModelByInstancePrefixedId(prefixedId: String): Model
+  def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
+  def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String
+  
+  def getControlAnalysis(prefixedId: String): ElementAnalysis
+  def scopeForPrefixedId(prefixedId: String): Scope
+  def searchResolutionScopeByPrefixedId(prefixedId: String): Scope
 }

@@ -20,30 +20,30 @@ import org.orbeon.oxf.util.XPath.CompiledExpression
 
 trait XFormsStaticState {
 
-    def getIndentedLogger: IndentedLogger
+  def getIndentedLogger: IndentedLogger
 
-    def digest: String
-    def encodedState: String
-    def allowedExternalEvents: Set[String]
-    def template: Option[AnnotatedTemplate]
+  def digest: String
+  def encodedState: String
+  def allowedExternalEvents: Set[String]
+  def template: Option[AnnotatedTemplate]
 
-    def topLevelPart: PartAnalysis
+  def topLevelPart: PartAnalysis
 
-    def isCacheDocument: Boolean
-    def isClientStateHandling: Boolean
-    def isServerStateHandling: Boolean
-    def isHTMLDocument: Boolean
+  def isCacheDocument: Boolean
+  def isClientStateHandling: Boolean
+  def isServerStateHandling: Boolean
+  def isHTMLDocument: Boolean
 
-    def isXPathAnalysis: Boolean
-    def isCalculateDependencies: Boolean
-    
-    def sanitizeInput: String ⇒ String
+  def isXPathAnalysis: Boolean
+  def isCalculateDependencies: Boolean
+  
+  def sanitizeInput: String ⇒ String
 
-    def staticProperty(name: String): Any
-    def staticBooleanProperty(name: String): Boolean
-    def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression]
-    def clientNonDefaultProperties: Map[String, AnyRef]
+  def staticProperty(name: String): Any
+  def staticBooleanProperty(name: String): Boolean
+  def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression]
+  def clientNonDefaultProperties: Map[String, AnyRef]
 
-    def toXML(helper: XMLReceiverHelper)
-    def dumpAnalysis()
+  def toXML(helper: XMLReceiverHelper)
+  def dumpAnalysis()
 }

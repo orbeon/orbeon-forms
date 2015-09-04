@@ -20,66 +20,66 @@ import org.junit.Test
 
 class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsForJUnit {
 
-    @Test def formRunnerStaticCache(): Unit = {
+  @Test def formRunnerStaticCache(): Unit = {
 
-        val Id1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
-        val Id2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
+    val Id1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
+    val Id2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
 
-        def runAndAssert(form: String, mode: String, noscript: Boolean = false)(expectedInitialHit: Boolean, staticStateHoldsTemplate: Boolean) = {
+    def runAndAssert(form: String, mode: String, noscript: Boolean = false)(expectedInitialHit: Boolean, staticStateHoldsTemplate: Boolean) = {
 
-            def staticStateFoundOpt(events: List[CacheEvent]) =
-                events collectFirst { case StaticState(found, _) ⇒ found }
+      def staticStateFoundOpt(events: List[CacheEvent]) =
+        events collectFirst { case StaticState(found, _) ⇒ found }
 
-            def staticStateHasTemplateOpt(events: List[CacheEvent]) = (
-                events
-                collectFirst { case StaticState(_, digest) ⇒ digest}
-                flatMap XFormsStaticStateCache.findDocument
-                map (_.template.isDefined)
-            )
+      def staticStateHasTemplateOpt(events: List[CacheEvent]) = (
+        events
+        collectFirst { case StaticState(_, digest) ⇒ digest}
+        flatMap XFormsStaticStateCache.findDocument
+        map (_.template.isDefined)
+      )
 
-            // First time may or may not pass
-            val (_, events1) = runFormRunner("cache-test", form, mode, document = Id1, noscript = noscript, initialize = false)
-            assert(Some(expectedInitialHit) === staticStateFoundOpt(events1))
+      // First time may or may not pass
+      val (_, events1) = runFormRunner("cache-test", form, mode, document = Id1, noscript = noscript, initialize = false)
+      assert(Some(expectedInitialHit) === staticStateFoundOpt(events1))
 
-            // Second time with different document must always pass
-            val (_, events2) = runFormRunner("cache-test", form, mode, document = Id2, noscript = noscript, initialize = false)
-            assert(Some(true) === staticStateFoundOpt(events2))
+      // Second time with different document must always pass
+      val (_, events2) = runFormRunner("cache-test", form, mode, document = Id2, noscript = noscript, initialize = false)
+      assert(Some(true) === staticStateFoundOpt(events2))
 
-            assert(Some(staticStateHoldsTemplate) === staticStateHasTemplateOpt(events2))
-        }
-
-        locally {
-            val Form = "noscript-true-pdf-auto-wizard-false"
-            val staticStateHoldsTemplate = true
-            
-            runAndAssert(Form, "new")(expectedInitialHit = false, staticStateHoldsTemplate)
-
-            for (mode ← Seq("edit", "view", "pdf"))
-                runAndAssert(Form, mode)(expectedInitialHit = true, staticStateHoldsTemplate)
-
-            // Once #1712 is fixed, should return true
-            // See https://github.com/orbeon/orbeon-forms/issues/1712
-            runAndAssert(Form, "edit", noscript = true)(expectedInitialHit = false, staticStateHoldsTemplate)
-
-            // NOTE: Need to run schema.xpl or FR PFC for this to work
-            // See https://github.com/orbeon/orbeon-forms/issues/1731
-            // runAndAssert(Form, "schema")(expectedFound = false)
-        }
-
-        locally {
-            val Form = "noscript-false-pdf-template-wizard-true"
-            val staticStateHoldsTemplate = false
-
-            runAndAssert(Form, "new" )(expectedInitialHit = false, staticStateHoldsTemplate)
-            runAndAssert(Form, "edit")(expectedInitialHit = true,  staticStateHoldsTemplate)
-            runAndAssert(Form, "view")(expectedInitialHit = false, staticStateHoldsTemplate)
-            runAndAssert(Form, "pdf" )(expectedInitialHit = true,  staticStateHoldsTemplate)
-
-            runAndAssert(Form, "edit", noscript = true)(expectedInitialHit = true, staticStateHoldsTemplate)
-
-            // NOTE: Need to run schema.xpl or FR PFC for this to work
-            // See https://github.com/orbeon/orbeon-forms/issues/1731
-            // runAndAssert(Form, "schema")(expectedFound = false)
-        }
+      assert(Some(staticStateHoldsTemplate) === staticStateHasTemplateOpt(events2))
     }
+
+    locally {
+      val Form = "noscript-true-pdf-auto-wizard-false"
+      val staticStateHoldsTemplate = true
+      
+      runAndAssert(Form, "new")(expectedInitialHit = false, staticStateHoldsTemplate)
+
+      for (mode ← Seq("edit", "view", "pdf"))
+        runAndAssert(Form, mode)(expectedInitialHit = true, staticStateHoldsTemplate)
+
+      // Once #1712 is fixed, should return true
+      // See https://github.com/orbeon/orbeon-forms/issues/1712
+      runAndAssert(Form, "edit", noscript = true)(expectedInitialHit = false, staticStateHoldsTemplate)
+
+      // NOTE: Need to run schema.xpl or FR PFC for this to work
+      // See https://github.com/orbeon/orbeon-forms/issues/1731
+      // runAndAssert(Form, "schema")(expectedFound = false)
+    }
+
+    locally {
+      val Form = "noscript-false-pdf-template-wizard-true"
+      val staticStateHoldsTemplate = false
+
+      runAndAssert(Form, "new" )(expectedInitialHit = false, staticStateHoldsTemplate)
+      runAndAssert(Form, "edit")(expectedInitialHit = true,  staticStateHoldsTemplate)
+      runAndAssert(Form, "view")(expectedInitialHit = false, staticStateHoldsTemplate)
+      runAndAssert(Form, "pdf" )(expectedInitialHit = true,  staticStateHoldsTemplate)
+
+      runAndAssert(Form, "edit", noscript = true)(expectedInitialHit = true, staticStateHoldsTemplate)
+
+      // NOTE: Need to run schema.xpl or FR PFC for this to work
+      // See https://github.com/orbeon/orbeon-forms/issues/1731
+      // runAndAssert(Form, "schema")(expectedFound = false)
+    }
+  }
 }

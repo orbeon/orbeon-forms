@@ -23,19 +23,19 @@ import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl}
 
 
 class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsControl(container, parent, element, effectiveId) with XFormsEventHandler {
+  extends XFormsControl(container, parent, element, effectiveId) with XFormsEventHandler {
 
-    // Tell the parent about us if the parent is not a container
-    Option(parent) foreach {
-        case _: XFormsContainerControl ⇒
-        case nonContainer ⇒ nonContainer.addChildAction(this)
-    }
+  // Tell the parent about us if the parent is not a container
+  Option(parent) foreach {
+    case _: XFormsContainerControl ⇒
+    case nonContainer ⇒ nonContainer.addChildAction(this)
+  }
 
-    // Don't push the actual binding for actions because it's unnecessary at build/refresh time and the binding needs to
-    // be re-evaluated when the action runs anyway.
-    override def computeBinding(parentContext: BindingContext) = computeBindingCopy(parentContext)
+  // Don't push the actual binding for actions because it's unnecessary at build/refresh time and the binding needs to
+  // be re-evaluated when the action runs anyway.
+  override def computeBinding(parentContext: BindingContext) = computeBindingCopy(parentContext)
 
-    // Don't build any children, as in the view we don't support event handlers nested within event handlers, and nested
-    // actions are evaluated dynamically.
-    override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) = ()
+  // Don't build any children, as in the view we don't support event handlers nested within event handlers, and nested
+  // actions are evaluated dynamically.
+  override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) = ()
 }

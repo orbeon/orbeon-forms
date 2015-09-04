@@ -26,146 +26,146 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class BindingDescriptorTest extends DocumentTestBase with AssertionsForJUnit {
 
-    import BindingDescriptor._
+  import BindingDescriptor._
 
-    val ComponentsDocument: NodeInfo =
-        <components xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                    xmlns:xf="http://www.w3.org/2002/xforms"
-                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                    xmlns:xbl="http://www.w3.org/ns/xbl">
-            <xbl:xbl>
-                <xbl:binding element="xf|input">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Input Field</display-name>
-                    </metadata>
-                </xbl:binding>
+  val ComponentsDocument: NodeInfo =
+    <components xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:xbl="http://www.w3.org/ns/xbl">
+      <xbl:xbl>
+        <xbl:binding element="xf|input">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Input Field</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="xf|textarea">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Text Area</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="xf|textarea">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Text Area</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="fr|number, xf|input:xxf-type('xs:decimal')">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Number</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="fr|number, xf|input:xxf-type('xs:decimal')">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Number</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="xf|input:xxf-type('xs:date')">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Date</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="xf|input:xxf-type('xs:date')">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Date</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="fr|dropdown-date, xf|input:xxf-type('xs:date')[appearance ~= dropdowns]">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Dropdown Date</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="fr|dropdown-date, xf|input:xxf-type('xs:date')[appearance ~= dropdowns]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Dropdown Date</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="fr|fields-date, xf|input:xxf-type('xs:date')[appearance ~= fields]">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Fields Date</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="fr|fields-date, xf|input:xxf-type('xs:date')[appearance ~= fields]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Fields Date</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="xf|select1[appearance ~= full]">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Radio Buttons</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="xf|select1[appearance ~= full]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Radio Buttons</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding element="fr|dropdown-select1, xf|select1[appearance ~= dropdown]">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">Dropdown Menu</display-name>
-                    </metadata>
-                </xbl:binding>
+        <xbl:binding element="fr|dropdown-select1, xf|select1[appearance ~= dropdown]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Dropdown Menu</display-name>
+          </metadata>
+        </xbl:binding>
 
-                <xbl:binding
-                    element="
-                        fr|character-counter,
-                        xf|input[appearance ~= character-counter],
-                        xf|textarea[appearance ~= character-counter],
-                        xf|secret[appearance ~= character-counter],
-                        fr|tinymce[appearance ~= character-counter]">
-                    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                        <display-name lang="en">With Character Counter</display-name>
-                    </metadata>
-                </xbl:binding>
-            </xbl:xbl>
-        </components>
+        <xbl:binding
+          element="
+            fr|character-counter,
+            xf|input[appearance ~= character-counter],
+            xf|textarea[appearance ~= character-counter],
+            xf|secret[appearance ~= character-counter],
+            fr|tinymce[appearance ~= character-counter]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">With Character Counter</display-name>
+          </metadata>
+        </xbl:binding>
+      </xbl:xbl>
+    </components>
 
 
-    val XF  = XFORMS_NAMESPACE_URI
-    val XS  = XSD_URI
-    val XBL = XBL_NAMESPACE_URI
-    val FR  = "http://orbeon.org/oxf/xml/form-runner"
-    val FB  = "http://orbeon.org/oxf/xml/form-builder"
+  val XF  = XFORMS_NAMESPACE_URI
+  val XS  = XSD_URI
+  val XBL = XBL_NAMESPACE_URI
+  val FR  = "http://orbeon.org/oxf/xml/form-runner"
+  val FB  = "http://orbeon.org/oxf/xml/form-builder"
 
-    val Bindings = ComponentsDocument.rootElement child (XBL → "xbl") child (XBL → "binding")
+  val Bindings = ComponentsDocument.rootElement child (XBL → "xbl") child (XBL → "binding")
 
-    @Test def testNewElementName(): Unit = {
+  @Test def testNewElementName(): Unit = {
 
-        def assertVaryTypes(
-            oldControlName : QName,
-            oldDatatype    : QName,
-            oldAppearance  : Option[String],
-            newDatatype    : QName,
-            newAppearance  : Option[String])(
-            expected       : Option[(QName, Option[String])]
-        ) = {
-            for {
-                oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
-                newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
-            } locally {
-                assert(expected === newElementName(oldControlName, oldT, oldAppearance.to[Set], newT, newAppearance, Bindings))
-            }
-        }
-
-        assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "decimal", None                     )(Some((FR → "number"      , None)))
-        assertVaryTypes(FR → "number"       , XS → "string" , None                     , XS → "string" , None                     )(None)
-        assertVaryTypes(FR → "number"       , XS → "decimal", None                     , XS → "string" , None                     )(Some((XF → "input"       , None)))
-        assertVaryTypes(FR → "number"       , XS → "decimal", None                     , XS → "boolean", None                     )(Some((XF → "input"       , None)))
-        assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "boolean", None                     )(None)
-        assertVaryTypes(XF → "input"        , XS → "boolean", None                     , XS → "boolean", None                     )(None)
-
-        assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "date"   , None                     )(None)
-        assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "date"   , Some("dropdowns")        )(Some(FR → "dropdown-date", None))
-        assertVaryTypes(XF → "input"        , XS → "date"   , None                     , XS → "date"   , Some("dropdowns")        )(Some(FR → "dropdown-date", None))
-
-        assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "date"   , None                     )(Some(XF → "input"        , None))
-        assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "date"   , Some("fields")           )(Some(FR → "fields-date"  , None))
-        assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "string" , Some("fields")           )(Some(XF → "input"        , Some("fields")))
-
-        assertVaryTypes(XF → "select1"      , XS → "string" , Some("full")             , XS → "string" , Some("dropdown")         )(Some(XF → "select1"      , Some("dropdown")))
-        assertVaryTypes(XF → "select1"      , XS → "string" , Some("dropdown")         , XS → "string" , Some("full")             )(Some(XF → "select1"      , Some("full")))
-
-        assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "input"        , Some("character-counter")))
-        assertVaryTypes(XF → "textarea"     , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "textarea"     , Some("character-counter")))
-        assertVaryTypes(XF → "textarea"     , XS → "string" , Some("character-counter"), XS → "string" , None                     )(Some(XF → "textarea"     , None))
-
-        assertVaryTypes(XF → "input"        , XS → "string" , Some("character-counter"), XS → "double" , Some("character-counter"))(None)
+    def assertVaryTypes(
+      oldControlName : QName,
+      oldDatatype    : QName,
+      oldAppearance  : Option[String],
+      newDatatype    : QName,
+      newAppearance  : Option[String])(
+      expected       : Option[(QName, Option[String])]
+    ) = {
+      for {
+        oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
+        newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
+      } locally {
+        assert(expected === newElementName(oldControlName, oldT, oldAppearance.to[Set], newT, newAppearance, Bindings))
+      }
     }
 
-    @Test def testPossibleAppearancesWithLabel(): Unit = {
+    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "decimal", None                     )(Some((FR → "number"      , None)))
+    assertVaryTypes(FR → "number"       , XS → "string" , None                     , XS → "string" , None                     )(None)
+    assertVaryTypes(FR → "number"       , XS → "decimal", None                     , XS → "string" , None                     )(Some((XF → "input"       , None)))
+    assertVaryTypes(FR → "number"       , XS → "decimal", None                     , XS → "boolean", None                     )(Some((XF → "input"       , None)))
+    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "boolean", None                     )(None)
+    assertVaryTypes(XF → "input"        , XS → "boolean", None                     , XS → "boolean", None                     )(None)
 
-        def assertVaryTypes(
-            elemName : QName,
-            dataType : QName)(
-            expected : Seq[(Option[String], String)]
-        ) = {
-            for {
-                newT ← List(dataType, Model.getVariationTypeOrKeep(dataType))
-            } locally {
-                assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t ⇒ t._1 → t._2)))
-            }
-        }
+    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "date"   , None                     )(None)
+    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "date"   , Some("dropdowns")        )(Some(FR → "dropdown-date", None))
+    assertVaryTypes(XF → "input"        , XS → "date"   , None                     , XS → "date"   , Some("dropdowns")        )(Some(FR → "dropdown-date", None))
 
-        assertVaryTypes(XF → "input"   , XS → "string" )(Seq(None         → "Input Field"  , Some("character-counter") → "With Character Counter"))
-        assertVaryTypes(XF → "textarea", XS → "string" )(Seq(None         → "Text Area"    , Some("character-counter") → "With Character Counter"))
-        assertVaryTypes(XF → "input"   , XS → "decimal")(Seq(None         → "Number"))
-        assertVaryTypes(XF → "input"   , XS → "date"   )(Seq(None         → "Date"         , Some("dropdowns")         → "Dropdown Date"          , Some("fields") → "Fields Date"))
-        assertVaryTypes(XF → "select1" , XS → "string" )(Seq(Some("full") → "Radio Buttons", Some("dropdown")          → "Dropdown Menu"))
+    assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "date"   , None                     )(Some(XF → "input"        , None))
+    assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "date"   , Some("fields")           )(Some(FR → "fields-date"  , None))
+    assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "string" , Some("fields")           )(Some(XF → "input"        , Some("fields")))
+
+    assertVaryTypes(XF → "select1"      , XS → "string" , Some("full")             , XS → "string" , Some("dropdown")         )(Some(XF → "select1"      , Some("dropdown")))
+    assertVaryTypes(XF → "select1"      , XS → "string" , Some("dropdown")         , XS → "string" , Some("full")             )(Some(XF → "select1"      , Some("full")))
+
+    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "input"        , Some("character-counter")))
+    assertVaryTypes(XF → "textarea"     , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "textarea"     , Some("character-counter")))
+    assertVaryTypes(XF → "textarea"     , XS → "string" , Some("character-counter"), XS → "string" , None                     )(Some(XF → "textarea"     , None))
+
+    assertVaryTypes(XF → "input"        , XS → "string" , Some("character-counter"), XS → "double" , Some("character-counter"))(None)
+  }
+
+  @Test def testPossibleAppearancesWithLabel(): Unit = {
+
+    def assertVaryTypes(
+      elemName : QName,
+      dataType : QName)(
+      expected : Seq[(Option[String], String)]
+    ) = {
+      for {
+        newT ← List(dataType, Model.getVariationTypeOrKeep(dataType))
+      } locally {
+        assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t ⇒ t._1 → t._2)))
+      }
     }
+
+    assertVaryTypes(XF → "input"   , XS → "string" )(Seq(None         → "Input Field"  , Some("character-counter") → "With Character Counter"))
+    assertVaryTypes(XF → "textarea", XS → "string" )(Seq(None         → "Text Area"    , Some("character-counter") → "With Character Counter"))
+    assertVaryTypes(XF → "input"   , XS → "decimal")(Seq(None         → "Number"))
+    assertVaryTypes(XF → "input"   , XS → "date"   )(Seq(None         → "Date"         , Some("dropdowns")         → "Dropdown Date"          , Some("fields") → "Fields Date"))
+    assertVaryTypes(XF → "select1" , XS → "string" )(Seq(Some("full") → "Radio Buttons", Some("dropdown")          → "Dropdown Menu"))
+  }
 }

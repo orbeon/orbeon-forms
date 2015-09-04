@@ -16,17 +16,17 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.util.PathOps
 
 object FormRunner
-    extends FormRunnerPersistence
-    with FormRunnerPermissions
-    with FormRunnerPDF
-    with FormRunnerEmail
-    with FormRunnerLang
-    with FormRunnerErrorSummary
-    with FormRunnerBaseOps
-    with FormRunnerControlOps
-    with FormRunnerContainerOps
-    with FormRunnerSummary
-    with FormRunnerWizard
-    with FormRunnerHome
-    with FormRunnerMetadata
-    with PathOps
+  extends FormRunnerPersistence
+  with FormRunnerPermissions
+  with FormRunnerPDF
+  with FormRunnerEmail
+  with FormRunnerLang
+  with FormRunnerErrorSummary
+  with FormRunnerBaseOps
+  with FormRunnerControlOps
+  with FormRunnerContainerOps
+  with FormRunnerSummary
+  with FormRunnerWizard
+  with FormRunnerHome
+  with FormRunnerMetadata
+  with PathOps

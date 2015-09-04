@@ -36,181 +36,181 @@ import scala.util.control.NonFatal
 
 class PEVersion extends Version {
 
-    import org.orbeon.oxf.common.PEVersion._
-    import org.orbeon.oxf.common.Version._
+  import org.orbeon.oxf.common.PEVersion._
+  import org.orbeon.oxf.common.Version._
 
-    // Check license file during construction
-    // If the license doesn't pass, throw an exception so that processing is interrupted
-    locally {
+  // Check license file during construction
+  // If the license doesn't pass, throw an exception so that processing is interrupted
+  locally {
 
-        def licenseError(message: String, throwable: Option[Throwable] = None) = {
-            val fullMessage = VersionString + ": " + message + ". " + LicenseMessage
-            logger.error(fullMessage)
-            throw throwable getOrElse new OXFException(fullMessage)
-        }
-
-        val licenseInfo =
-            try tryReadLicense flatMap tryGetSignedData flatMap LicenseInfo.tryApply get
-            catch {
-                case NonFatal(t) ⇒
-                    Exceptions.getRootThrowable(t) match {
-                        case _: ResourceNotFoundException ⇒
-                            licenseError("License file not found")
-                        case _: SignatureException ⇒
-                            licenseError("Invalid license file signature")
-                        case NonFatal(t) ⇒
-                            licenseError("Error loading license file", Some(t))
-                    }
-            }
-
-        licenseInfo.formattedSubscriptionEnd match {
-            case Some(end) ⇒
-                // There is a subscription end date so we check that the build date is prior to that
-                // NOTE: Don't check against the current date as we don't want to depend on that for production licenses
-                if (licenseInfo.isBuildAfterSubscriptionEnd)
-                    licenseError(s"Subscription ended on: $end, Orbeon Forms build dates from: ${licenseInfo.formattedBuildDate.get}")
-            case None ⇒
-                // There is no subscription end date so we check against the version
-                if (licenseInfo.isBadVersion)
-                    licenseError(s"License version doesn't match. License version is: ${licenseInfo.version.get}, Orbeon Forms version is: $VersionNumber")
-        }
-
-        // Check expiration against the current date (for non-production licenses)
-        if (licenseInfo.isExpired)
-            licenseError(s"License has expired on ${licenseInfo.formattedExpiration.get}")
-
-        logger.info("This installation of " + VersionString + " is licensed to: " + licenseInfo.toString)
+    def licenseError(message: String, throwable: Option[Throwable] = None) = {
+      val fullMessage = VersionString + ": " + message + ". " + LicenseMessage
+      logger.error(fullMessage)
+      throw throwable getOrElse new OXFException(fullMessage)
     }
 
-    def requirePEFeature(featureName: String) = ()
+    val licenseInfo =
+      try tryReadLicense flatMap tryGetSignedData flatMap LicenseInfo.tryApply get
+      catch {
+        case NonFatal(t) ⇒
+          Exceptions.getRootThrowable(t) match {
+            case _: ResourceNotFoundException ⇒
+              licenseError("License file not found")
+            case _: SignatureException ⇒
+              licenseError("Invalid license file signature")
+            case NonFatal(t) ⇒
+              licenseError("Error loading license file", Some(t))
+          }
+      }
 
-    def isPEFeatureEnabled(featureRequested: Boolean, featureName: String) = featureRequested
-
-    def createUIDependencies(containingDocument: XFormsContainingDocument) = {
-        val requested = containingDocument.getStaticState.isXPathAnalysis
-        if (requested) new PathMapXPathDependencies(containingDocument) else new DumbXPathDependencies
+    licenseInfo.formattedSubscriptionEnd match {
+      case Some(end) ⇒
+        // There is a subscription end date so we check that the build date is prior to that
+        // NOTE: Don't check against the current date as we don't want to depend on that for production licenses
+        if (licenseInfo.isBuildAfterSubscriptionEnd)
+          licenseError(s"Subscription ended on: $end, Orbeon Forms build dates from: ${licenseInfo.formattedBuildDate.get}")
+      case None ⇒
+        // There is no subscription end date so we check against the version
+        if (licenseInfo.isBadVersion)
+          licenseError(s"License version doesn't match. License version is: ${licenseInfo.version.get}, Orbeon Forms version is: $VersionNumber")
     }
+
+    // Check expiration against the current date (for non-production licenses)
+    if (licenseInfo.isExpired)
+      licenseError(s"License has expired on ${licenseInfo.formattedExpiration.get}")
+
+    logger.info("This installation of " + VersionString + " is licensed to: " + licenseInfo.toString)
+  }
+
+  def requirePEFeature(featureName: String) = ()
+
+  def isPEFeatureEnabled(featureRequested: Boolean, featureName: String) = featureRequested
+
+  def createUIDependencies(containingDocument: XFormsContainingDocument) = {
+    val requested = containingDocument.getStaticState.isXPathAnalysis
+    if (requested) new PathMapXPathDependencies(containingDocument) else new DumbXPathDependencies
+  }
 }
 
 private object PEVersion {
 
-    import org.orbeon.oxf.common.Version._
+  import org.orbeon.oxf.common.Version._
 
-    val LicensePath        = "/config/license.xml"
-    val LicenseURL         = "oxf:" + LicensePath
-    val OrbeonPublicKeyURL = "oxf:/config/orbeon-public.xml"
-    val LicenseMessage     = "Please make sure a proper license file is placed under WEB-INF/resources" + LicensePath + '.'
+  val LicensePath        = "/config/license.xml"
+  val LicenseURL         = "oxf:" + LicensePath
+  val OrbeonPublicKeyURL = "oxf:/config/orbeon-public.xml"
+  val LicenseMessage     = "Please make sure a proper license file is placed under WEB-INF/resources" + LicensePath + '.'
 
-    def isVersionExpired(currentVersion: String, licenseVersion: String): Boolean =
-        (majorMinor(currentVersion), majorMinor(licenseVersion)) match {
-            case (Some((currentMajor, currentMinor)), Some((licenseMajor, licenseMinor))) ⇒
-                currentMajor > licenseMajor || (currentMajor == licenseMajor && currentMinor > licenseMinor)
-            case _ ⇒
-                true
-        }
-
-    def majorMinor(versionString: String): Option[(Int, Int)] = {
-        val ints = versionString.split('.') take 2 map (_.toInt)
-        if (ints.size == 2) Some(ints(0), ints(1)) else None
+  def isVersionExpired(currentVersion: String, licenseVersion: String): Boolean =
+    (majorMinor(currentVersion), majorMinor(licenseVersion)) match {
+      case (Some((currentMajor, currentMinor)), Some((licenseMajor, licenseMinor))) ⇒
+        currentMajor > licenseMajor || (currentMajor == licenseMajor && currentMinor > licenseMinor)
+      case _ ⇒
+        true
     }
 
-    private val MatchTimestamp = """(.*[^\d]|)(\d{4})(\d{2})(\d{2})\d{4}([^\d].*|)""".r
+  def majorMinor(versionString: String): Option[(Int, Int)] = {
+    val ints = versionString.split('.') take 2 map (_.toInt)
+    if (ints.size == 2) Some(ints(0), ints(1)) else None
+  }
 
-    def dateFromVersionNumber(currentVersion: String) = (
-        Some(currentVersion)
-        collect { case MatchTimestamp(_, year, month, day, _) ⇒ year + '-' + month + '-' + day }
-        map parseISODateOrDateTime
-    )
+  private val MatchTimestamp = """(.*[^\d]|)(\d{4})(\d{2})(\d{2})\d{4}([^\d].*|)""".r
 
-    case class LicenseInfo(
-            versionNumber: String,
-            licensor: String,
-            licensee: String,
-            organization: String,
-            email: String,
-            issued: String,
-            version: Option[String],
-            expiration: Option[Long],
-            subscriptionEnd: Option[Long]) {
+  def dateFromVersionNumber(currentVersion: String) = (
+    Some(currentVersion)
+    collect { case MatchTimestamp(_, year, month, day, _) ⇒ year + '-' + month + '-' + day }
+    map parseISODateOrDateTime
+  )
 
-        def isBadVersion                = version         exists (isVersionExpired(versionNumber, _))
-        def isExpired                   = expiration      exists (System.currentTimeMillis() > _)
-        def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end ⇒ dateFromVersionNumber(versionNumber) exists (_ > end))
+  case class LicenseInfo(
+      versionNumber: String,
+      licensor: String,
+      licensee: String,
+      organization: String,
+      email: String,
+      issued: String,
+      version: Option[String],
+      expiration: Option[Long],
+      subscriptionEnd: Option[Long]) {
 
-        def formattedExpiration      = expiration                           map DateNoZone.print
-        def formattedSubscriptionEnd = subscriptionEnd                      map DateNoZone.print
-        def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateNoZone.print
+    def isBadVersion                = version         exists (isVersionExpired(versionNumber, _))
+    def isExpired                   = expiration      exists (System.currentTimeMillis() > _)
+    def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end ⇒ dateFromVersionNumber(versionNumber) exists (_ > end))
 
-        override def toString = {
-            val versionString         = version                  map (" for version " + _) getOrElse ""
-            val subscriptionEndString = formattedSubscriptionEnd map (" with subscription ending on " + _) getOrElse ""
-            val expiresString         = formattedExpiration      map (" and expires on " + _) getOrElse ""
+    def formattedExpiration      = expiration                           map DateNoZone.print
+    def formattedSubscriptionEnd = subscriptionEnd                      map DateNoZone.print
+    def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateNoZone.print
 
-            licensee + " / " + organization + " / " + email + versionString + subscriptionEndString + expiresString
-        }
+    override def toString = {
+      val versionString         = version                  map (" for version " + _) getOrElse ""
+      val subscriptionEndString = formattedSubscriptionEnd map (" with subscription ending on " + _) getOrElse ""
+      val expiresString         = formattedExpiration      map (" and expires on " + _) getOrElse ""
+
+      licensee + " / " + organization + " / " + email + versionString + subscriptionEndString + expiresString
+    }
+  }
+
+  object LicenseInfo {
+    def apply(licenceDocument: Document): LicenseInfo = {
+
+      import org.orbeon.oxf.xml.XPathUtils.selectStringValueNormalize
+      def select(s: String) = selectStringValueNormalize(licenceDocument, "/license/" + s)
+
+      val licensor           = select("licensor")
+      val licensee           = select("licensee")
+      val organization       = select("organization")
+      val email              = select("email")
+      val issued             = select("issued")
+
+      val versionOpt         = nonEmptyOrNone(select("version"))
+      val expirationOpt      = nonEmptyOrNone(select("expiration"))       map parseISODateOrDateTime
+      val subscriptionEndOpt = nonEmptyOrNone(select("subscription-end")) map parseISODateOrDateTime
+
+      LicenseInfo(VersionNumber, licensor, licensee, organization, email, issued, versionOpt, expirationOpt, subscriptionEndOpt)
     }
 
-    object LicenseInfo {
-        def apply(licenceDocument: Document): LicenseInfo = {
+    def tryApply(licenceDocument: Document): Try[LicenseInfo] = Try(apply(licenceDocument))
+  }
 
-            import org.orbeon.oxf.xml.XPathUtils.selectStringValueNormalize
-            def select(s: String) = selectStringValueNormalize(licenceDocument, "/license/" + s)
+  def tryReadLicense: Try[Document] = {
 
-            val licensor           = select("licensor")
-            val licensee           = select("licensee")
-            val organization       = select("organization")
-            val email              = select("email")
-            val issued             = select("issued")
+    def fromResourceManager =
+      Try(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
 
-            val versionOpt         = nonEmptyOrNone(select("version"))
-            val expirationOpt      = nonEmptyOrNone(select("expiration"))       map parseISODateOrDateTime
-            val subscriptionEndOpt = nonEmptyOrNone(select("subscription-end")) map parseISODateOrDateTime
+    def fromHomeDirectory =
+      Try {
+        val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
 
-            LicenseInfo(VersionNumber, licensor, licensee, organization, email, issued, versionOpt, expirationOpt, subscriptionEndOpt)
+        useAndClose(new FileInputStream(new File(path))) { is ⇒
+          Dom4jUtils.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
         }
+      }
 
-        def tryApply(licenceDocument: Document): Try[LicenseInfo] = Try(apply(licenceDocument))
+    fromResourceManager orElse fromHomeDirectory
+  }
+
+  def tryGetSignedData(rawDocument: Document): Try[Document] =
+    Try {
+      val key = createURLGenerator(OrbeonPublicKeyURL)
+
+      // Remove blank spaces as that's the way it was signed
+      val inputLicenseDocument = Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(rawDocument))
+
+      // Connect pipeline
+      val serializer = {
+        val licence = new DOMGenerator(inputLicenseDocument, "license", DOMGenerator.ZeroValidity, LicenseURL)
+        val verifierProcessor = new SignatureVerifierProcessor
+        connect(licence, OUTPUT_DATA, verifierProcessor, INPUT_DATA)
+        connect(key,     OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
+        val result = new DOMSerializer
+        connect(verifierProcessor, OUTPUT_DATA, result, INPUT_DATA)
+        result
+      }
+
+      // Execute pipeline to obtain license document
+      withPipelineContext { pipelineContext ⇒
+        serializer.reset(pipelineContext)
+        serializer.runGetDocument(pipelineContext)
+      }
     }
-
-    def tryReadLicense: Try[Document] = {
-
-        def fromResourceManager =
-            Try(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
-
-        def fromHomeDirectory =
-            Try {
-                val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
-
-                useAndClose(new FileInputStream(new File(path))) { is ⇒
-                    Dom4jUtils.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
-                }
-            }
-
-        fromResourceManager orElse fromHomeDirectory
-    }
-
-    def tryGetSignedData(rawDocument: Document): Try[Document] =
-        Try {
-            val key = createURLGenerator(OrbeonPublicKeyURL)
-
-            // Remove blank spaces as that's the way it was signed
-            val inputLicenseDocument = Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(rawDocument))
-
-            // Connect pipeline
-            val serializer = {
-                val licence = new DOMGenerator(inputLicenseDocument, "license", DOMGenerator.ZeroValidity, LicenseURL)
-                val verifierProcessor = new SignatureVerifierProcessor
-                connect(licence, OUTPUT_DATA, verifierProcessor, INPUT_DATA)
-                connect(key,     OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
-                val result = new DOMSerializer
-                connect(verifierProcessor, OUTPUT_DATA, result, INPUT_DATA)
-                result
-            }
-
-            // Execute pipeline to obtain license document
-            withPipelineContext { pipelineContext ⇒
-                serializer.reset(pipelineContext)
-                serializer.runGetDocument(pipelineContext)
-            }
-        }
 }

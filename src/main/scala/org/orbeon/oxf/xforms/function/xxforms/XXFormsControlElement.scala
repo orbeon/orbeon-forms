@@ -19,10 +19,10 @@ import org.orbeon.saxon.om.NodeInfo
 
 class XXFormsControlElement extends XFormsFunction with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext): NodeInfo = {
-        implicit val ctx = xpathContext
-        relevantControl(0) flatMap { control ⇒
-            control.staticControl.part.controlElement(control.prefixedId)
-        } orNull
-    }
+  override def evaluateItem(xpathContext: XPathContext): NodeInfo = {
+    implicit val ctx = xpathContext
+    relevantControl(0) flatMap { control ⇒
+      control.staticControl.part.controlElement(control.prefixedId)
+    } orNull
+  }
 }

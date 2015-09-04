@@ -22,59 +22,59 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 
 
 class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsEvent(XFORMS_SUBMIT_ERROR, target, properties, bubbles = true, cancelable = false)
-        with SubmitResponseEvent {
+    extends XFormsEvent(XFORMS_SUBMIT_ERROR, target, properties, bubbles = true, cancelable = false)
+    with SubmitResponseEvent {
 
-    def this(target: XFormsEventTarget) = {
-        this(target, Map("error-type" → Some(XXFORMS_INTERNAL_ERROR.name)))
-        _errorType = XXFORMS_INTERNAL_ERROR
-    }
+  def this(target: XFormsEventTarget) = {
+    this(target, Map("error-type" → Some(XXFORMS_INTERNAL_ERROR.name)))
+    _errorType = XXFORMS_INTERNAL_ERROR
+  }
 
-    // Event can be dispatched before the resource URI is resolved so the resource URI is optional
-    def this(target: XFormsEventTarget, resourceURI: Option[String], errorType: ErrorType, statusCode: Int) = {
-        this(target, Map(
-            "error-type" → Some(errorType.name),
-            "resource-uri" → resourceURI,
-            "response-status-code" → Some(statusCode)))
-        _errorType = errorType
-    }
+  // Event can be dispatched before the resource URI is resolved so the resource URI is optional
+  def this(target: XFormsEventTarget, resourceURI: Option[String], errorType: ErrorType, statusCode: Int) = {
+    this(target, Map(
+      "error-type" → Some(errorType.name),
+      "resource-uri" → resourceURI,
+      "response-status-code" → Some(statusCode)))
+    _errorType = errorType
+  }
 
-    def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: ConnectionResult) = {
-        this(target, Map("error-type" → Some(errorType.name)))
-        _errorType = errorType
-        _connectionResult = Option(connectionResult)
-    }
+  def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: ConnectionResult) = {
+    this(target, Map("error-type" → Some(errorType.name)))
+    _errorType = errorType
+    _connectionResult = Option(connectionResult)
+  }
 
-    private[this] var _errorType: ErrorType = _
-    def errorType = _errorType
+  private[this] var _errorType: ErrorType = _
+  def errorType = _errorType
 
-    private[this] var _connectionResult: Option[ConnectionResult] = None
-    def connectionResult = _connectionResult
+  private[this] var _connectionResult: Option[ConnectionResult] = None
+  def connectionResult = _connectionResult
 
-    def logThrowable(throwable: Throwable): Unit =
-        if (errorType != VALIDATION_ERROR)
-            indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable))
+  def logThrowable(throwable: Throwable): Unit =
+    if (errorType != VALIDATION_ERROR)
+      indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable))
 }
 
 object XFormsSubmitErrorEvent {
 
-    sealed abstract class ErrorType(val name: String)
-    object SubmissionInProgress  extends ErrorType("submission-in-progress")
-    object NoData                extends ErrorType("no-data")
-    object ValidationError       extends ErrorType("validation-error")
-    object ResourceError         extends ErrorType("resource-error")
-    object ParseError            extends ErrorType("parse-error")
-    object TargetError           extends ErrorType("target-error")
-    object XXFormsPendingUploads extends ErrorType("xxforms-pending-uploads")
-    object XXFormsInternalError  extends ErrorType("xxforms-internal-error")
+  sealed abstract class ErrorType(val name: String)
+  object SubmissionInProgress  extends ErrorType("submission-in-progress")
+  object NoData                extends ErrorType("no-data")
+  object ValidationError       extends ErrorType("validation-error")
+  object ResourceError         extends ErrorType("resource-error")
+  object ParseError            extends ErrorType("parse-error")
+  object TargetError           extends ErrorType("target-error")
+  object XXFormsPendingUploads extends ErrorType("xxforms-pending-uploads")
+  object XXFormsInternalError  extends ErrorType("xxforms-internal-error")
 
-    // For Java callers
-    def SUBMISSION_IN_PROGRESS  = SubmissionInProgress
-    def NO_DATA                 = NoData
-    def VALIDATION_ERROR        = ValidationError
-    def RESOURCE_ERROR          = ResourceError
-    def PARSE_ERROR             = ParseError
-    def TARGET_ERROR            = TargetError
-    def XXFORMS_PENDING_UPLOADS = XXFormsPendingUploads
-    def XXFORMS_INTERNAL_ERROR  = XXFormsInternalError
+  // For Java callers
+  def SUBMISSION_IN_PROGRESS  = SubmissionInProgress
+  def NO_DATA                 = NoData
+  def VALIDATION_ERROR        = ValidationError
+  def RESOURCE_ERROR          = ResourceError
+  def PARSE_ERROR             = ParseError
+  def TARGET_ERROR            = TargetError
+  def XXFORMS_PENDING_UPLOADS = XXFormsPendingUploads
+  def XXFORMS_INTERNAL_ERROR  = XXFormsInternalError
 }

@@ -18,15 +18,15 @@ import org.orbeon.exception.OrbeonFormatter
 trait HttpStatusCode extends RuntimeException { def code: Int }
 
 case class HttpStatusCodeException(code: Int, resource: Option[String] = None, throwable: Option[Throwable] = None) extends HttpStatusCode {
-    override def toString = s"HttpStatusCodeException(code = $code, resource = $resource, throwable = ${throwable map OrbeonFormatter.message getOrElse ""})"
+  override def toString = s"HttpStatusCodeException(code = $code, resource = $resource, throwable = ${throwable map OrbeonFormatter.message getOrElse ""})"
 }
 
 case class HttpRedirectException(location: String, serverSide: Boolean = false, exitPortal: Boolean = false) extends HttpStatusCode {
-    val code = 302 // using 302 instead of 303 as 302 is still the de facto standard
-    override def toString = s"HttpRedirectException(location = $location, serverSide = $serverSide, exitPortal = $exitPortal)"
+  val code = 302 // using 302 instead of 303 as 302 is still the de facto standard
+  override def toString = s"HttpRedirectException(location = $location, serverSide = $serverSide, exitPortal = $exitPortal)"
 }
 
 case class SessionExpiredException(message: String) extends HttpStatusCode {
-    val code = 403
-    override def toString = s"SessionExpiredException(message= $message)"
+  val code = 403
+  override def toString = s"SessionExpiredException(message= $message)"
 }

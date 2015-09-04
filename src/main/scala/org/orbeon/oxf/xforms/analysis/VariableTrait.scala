@@ -15,6 +15,6 @@
 package org.orbeon.oxf.xforms.analysis
 
 trait VariableTrait {
-    def name: String
-    def variableAnalysis: Option[XPathAnalysis]
+  def name: String
+  def variableAnalysis: Option[XPathAnalysis]
 }

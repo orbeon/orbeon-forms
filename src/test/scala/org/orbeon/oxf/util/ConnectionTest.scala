@@ -30,104 +30,104 @@ import org.scalatest.mock.MockitoSugar
 import collection.mutable
 
 class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
+  
+  @Test def forwardHeaders(): Unit = {
     
-    @Test def forwardHeaders(): Unit = {
-        
-        // Custom headers
-        val customHeaderValuesMap = Map(
-            "my-stuff"   → List("my-value"),
-            "your-stuff" → List("your-value-1", "your-value-2")
-        )
-        
-        // Create request and wrapper
-        val incomingRequest = new RequestAdapter {
-            override val getHeaderValuesMap = mutable.LinkedHashMap(
-                "user-agent"    → Array("Mozilla 12.1"),
-                "authorization" → Array("xsifj1skf3"),
-                "host"          → Array("localhost"),
-                "cookie"        → Array("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C")
-            ).asJava
-        }
-
-        val webAppContext = Mockito.mock(classOf[WebAppContext])
-        Mockito when webAppContext.attributes thenReturn collection.mutable.Map[String, AnyRef]()
-
-        val externalContext = Mockito.mock(classOf[ExternalContext])
-        Mockito when externalContext.getRequest thenReturn incomingRequest
-        Mockito when externalContext.getWebAppContext thenReturn webAppContext
-        
-        // NOTE: Should instead use withExternalContext()
-        PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-        val headers =
-            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
-                scheme            = "http",
-                httpMethodUpper   = "GET",
-                hasCredentials    = false,
-                mediatype         = null,
-                encodingForSOAP   = "UTF-8",
-                customHeaders     = customHeaderValuesMap,
-                headersToForward  = Set("cookie", "authorization", "user-agent"))(
-                logger            = ResourceManagerTestBase.newIndentedLogger
-            )
-
-        val request =
-            new LocalRequest(
-                incomingRequest         = externalContext.getRequest,
-                contextPath             = "/orbeon",
-                pathQuery               = "/foo/bar",
-                methodUpper             = "GET",
-                headersMaybeCapitalized = headers,
-                content                 = None
-            )
-
-        // Test standard headers received
-        val headerValuesMap = request.getHeaderValuesMap.asScala
-
-        assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
-        assert("xsifj1skf3"                                  === headerValuesMap("authorization")(0))
-        assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" === headerValuesMap("cookie")(0))
-        assert(None                                          === headerValuesMap.get("host"))
-        assert(None                                          === headerValuesMap.get("foobar"))
-
-        // Test custom headers received
-        assert("my-value"                                    === headerValuesMap("my-stuff")(0))
-        assert("your-value-1"                                === headerValuesMap("your-stuff")(0))
-        assert("your-value-2"                                === headerValuesMap("your-stuff")(1))
+    // Custom headers
+    val customHeaderValuesMap = Map(
+      "my-stuff"   → List("my-value"),
+      "your-stuff" → List("your-value-1", "your-value-2")
+    )
+    
+    // Create request and wrapper
+    val incomingRequest = new RequestAdapter {
+      override val getHeaderValuesMap = mutable.LinkedHashMap(
+        "user-agent"    → Array("Mozilla 12.1"),
+        "authorization" → Array("xsifj1skf3"),
+        "host"          → Array("localhost"),
+        "cookie"        → Array("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C")
+      ).asJava
     }
 
-    @Test def combinedParameters(): Unit = {
+    val webAppContext = Mockito.mock(classOf[WebAppContext])
+    Mockito when webAppContext.attributes thenReturn collection.mutable.Map[String, AnyRef]()
 
-        val queryString = "name1=value1a&name2=value2a&name3=value3"
-        val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes("utf-8")
+    val externalContext = Mockito.mock(classOf[ExternalContext])
+    Mockito when externalContext.getRequest thenReturn incomingRequest
+    Mockito when externalContext.getWebAppContext thenReturn webAppContext
+    
+    // NOTE: Should instead use withExternalContext()
+    PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
+    val headers =
+      Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+        scheme            = "http",
+        httpMethodUpper   = "GET",
+        hasCredentials    = false,
+        mediatype         = null,
+        encodingForSOAP   = "UTF-8",
+        customHeaders     = customHeaderValuesMap,
+        headersToForward  = Set("cookie", "authorization", "user-agent"))(
+        logger            = ResourceManagerTestBase.newIndentedLogger
+      )
 
-        // POST configuration
-        val method = "POST"
-        val bodyMediaType = "application/x-www-form-urlencoded"
-        val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
+    val request =
+      new LocalRequest(
+        incomingRequest         = externalContext.getRequest,
+        contextPath             = "/orbeon",
+        pathQuery               = "/foo/bar",
+        methodUpper             = "GET",
+        headersMaybeCapitalized = headers,
+        content                 = None
+      )
 
-        val headers =
-            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
-                scheme            = "http",
-                httpMethodUpper   = method,
-                hasCredentials    = false,
-                mediatype         = bodyMediaType,
-                encodingForSOAP   = "UTF-8",
-                customHeaders     = explicitHeaders,
-                headersToForward  = Set())(
-                logger            = ResourceManagerTestBase.newIndentedLogger
-            )
+    // Test standard headers received
+    val headerValuesMap = request.getHeaderValuesMap.asScala
 
-        val wrapper =
-            new LocalRequest(
-                incomingRequest         = NetUtils.getExternalContext.getRequest,
-                contextPath             = "/orbeon",
-                pathQuery               = s"/foobar?$queryString",
-                methodUpper             = method,
-                headersMaybeCapitalized = headers,
-                content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
-            )
+    assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
+    assert("xsifj1skf3"                                  === headerValuesMap("authorization")(0))
+    assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" === headerValuesMap("cookie")(0))
+    assert(None                                          === headerValuesMap.get("host"))
+    assert(None                                          === headerValuesMap.get("foobar"))
 
-        val parameters = wrapper.getParameterMap
-        assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === NetUtils.encodeQueryString(parameters))
-    }
+    // Test custom headers received
+    assert("my-value"                                    === headerValuesMap("my-stuff")(0))
+    assert("your-value-1"                                === headerValuesMap("your-stuff")(0))
+    assert("your-value-2"                                === headerValuesMap("your-stuff")(1))
+  }
+
+  @Test def combinedParameters(): Unit = {
+
+    val queryString = "name1=value1a&name2=value2a&name3=value3"
+    val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes("utf-8")
+
+    // POST configuration
+    val method = "POST"
+    val bodyMediaType = "application/x-www-form-urlencoded"
+    val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
+
+    val headers =
+      Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+        scheme            = "http",
+        httpMethodUpper   = method,
+        hasCredentials    = false,
+        mediatype         = bodyMediaType,
+        encodingForSOAP   = "UTF-8",
+        customHeaders     = explicitHeaders,
+        headersToForward  = Set())(
+        logger            = ResourceManagerTestBase.newIndentedLogger
+      )
+
+    val wrapper =
+      new LocalRequest(
+        incomingRequest         = NetUtils.getExternalContext.getRequest,
+        contextPath             = "/orbeon",
+        pathQuery               = s"/foobar?$queryString",
+        methodUpper             = method,
+        headersMaybeCapitalized = headers,
+        content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
+      )
+
+    val parameters = wrapper.getParameterMap
+    assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === NetUtils.encodeQueryString(parameters))
+  }
 }

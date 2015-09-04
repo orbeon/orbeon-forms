@@ -17,8 +17,8 @@ import org.xml.sax.Locator
 
 // Locator which provides the given URL as system id
 class URLLocator(url: String) extends Locator {
-    def getColumnNumber = -1
-    def getLineNumber   = -1
-    def getPublicId     = null
-    def getSystemId     = url
+  def getColumnNumber = -1
+  def getLineNumber   = -1
+  def getPublicId     = null
+  def getSystemId     = url
 }

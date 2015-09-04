@@ -19,10 +19,10 @@ import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis, St
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class RepeatIterationControl (staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-    extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-    with RequiredSingleNode
-    with ChildrenBuilderTrait {
+  extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+  with RequiredSingleNode
+  with ChildrenBuilderTrait {
 
-    override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE
-    override val externalEvents              = externalEventsDef
+  override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE
+  override val externalEvents              = externalEventsDef
 }

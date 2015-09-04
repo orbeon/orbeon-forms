@@ -18,8 +18,8 @@ import org.orbeon.saxon.expr.XPathContext
 
 class XXFormsBindingContext extends FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext) =
-        relevantControl(0)(xpathContext) map (_.contextForBinding)
+  override def iterate(xpathContext: XPathContext) =
+    relevantControl(0)(xpathContext) map (_.contextForBinding)
 
-    // TODO: PathMap
+  // TODO: PathMap
 }

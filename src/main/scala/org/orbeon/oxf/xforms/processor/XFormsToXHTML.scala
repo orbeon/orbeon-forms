@@ -28,90 +28,90 @@ import scala.collection.JavaConverters._
  * translation from the source XForms + XHTML.
  */
 class XFormsToXHTML extends XFormsToSomething {
-    
-    import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
-    
-    protected def produceOutput(
-            pipelineContext      : PipelineContext,
-            outputName           : String,
-            externalContext      : ExternalContext,
-            indentedLogger       : IndentedLogger,
-            stage2CacheableState : XFormsToSomething.Stage2CacheableState,
-            containingDocument   : XFormsContainingDocument,
-            xmlReceiver          : XMLReceiver) =
-        if (outputName == "document")
-            outputResponseDocument(
-                externalContext,
-                indentedLogger,
-                stage2CacheableState.template,
-                containingDocument,
-                xmlReceiver
-            )
-        else
-            testOutputResponseState(
-                containingDocument,
-                indentedLogger,
-                xmlReceiver
-            )
+  
+  import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
+  
+  protected def produceOutput(
+      pipelineContext      : PipelineContext,
+      outputName           : String,
+      externalContext      : ExternalContext,
+      indentedLogger       : IndentedLogger,
+      stage2CacheableState : XFormsToSomething.Stage2CacheableState,
+      containingDocument   : XFormsContainingDocument,
+      xmlReceiver          : XMLReceiver) =
+    if (outputName == "document")
+      outputResponseDocument(
+        externalContext,
+        indentedLogger,
+        stage2CacheableState.template,
+        containingDocument,
+        xmlReceiver
+      )
+    else
+      testOutputResponseState(
+        containingDocument,
+        indentedLogger,
+        xmlReceiver
+      )
 }
 
 object XFormsToXHTML {
 
-    def outputResponseDocument(
-        externalContext    : ExternalContext,
-        indentedLogger     : IndentedLogger,
-        template           : AnnotatedTemplate,
-        containingDocument : XFormsContainingDocument,
-        xmlReceiver        : XMLReceiver
-    ): Unit = {
+  def outputResponseDocument(
+    externalContext    : ExternalContext,
+    indentedLogger     : IndentedLogger,
+    template           : AnnotatedTemplate,
+    containingDocument : XFormsContainingDocument,
+    xmlReceiver        : XMLReceiver
+  ): Unit = {
 
-        val nonJavaScriptLoads =
-            containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
+    val nonJavaScriptLoads =
+      containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
 
-        if (containingDocument.isGotSubmissionReplaceAll) {
-            // 1. Got a submission with replace="all"
-            // NOP: Response already sent out by a submission
-            indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
-        } else if (nonJavaScriptLoads.nonEmpty) {
-            // 2. Got at least one xf:load which is not a JavaScript call
+    if (containingDocument.isGotSubmissionReplaceAll) {
+      // 1. Got a submission with replace="all"
+      // NOP: Response already sent out by a submission
+      indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
+    } else if (nonJavaScriptLoads.nonEmpty) {
+      // 2. Got at least one xf:load which is not a JavaScript call
 
-            // Send redirect on first one
-            val location = nonJavaScriptLoads.head.getResource
-            indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
-            externalContext.getResponse.sendRedirect(location, false, false)
-            
-            // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-            SAXUtils.streamNullDocument(xmlReceiver)
-        } else {
-            // 3. Regular case: produce a document
-            containingDocument.hostLanguage match {
-                case "xhtml" ⇒
-                    XHTMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
-                case "xml" ⇒
-                    XMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
-                case unknown ⇒
-                    throw new OXFException(s"Unknown host language specified: $unknown")
-            }
-        }
-        containingDocument.afterInitialResponse()
+      // Send redirect on first one
+      val location = nonJavaScriptLoads.head.getResource
+      indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
+      externalContext.getResponse.sendRedirect(location, false, false)
+      
+      // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
+      SAXUtils.streamNullDocument(xmlReceiver)
+    } else {
+      // 3. Regular case: produce a document
+      containingDocument.hostLanguage match {
+        case "xhtml" ⇒
+          XHTMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+        case "xml" ⇒
+          XMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+        case unknown ⇒
+          throw new OXFException(s"Unknown host language specified: $unknown")
+      }
     }
+    containingDocument.afterInitialResponse()
+  }
 
-    def testOutputResponseState(
-        containingDocument : XFormsContainingDocument,
-        indentedLogger     : IndentedLogger,
-        xmlReceiver        : XMLReceiver
-    ): Unit =
-        if (! containingDocument.isGotSubmissionReplaceAll)
-            XFormsServer.outputAjaxResponse(
-                containingDocument,
-                indentedLogger,
-                null,
-                null,
-                null,
-                null,
-                null,
-                xmlReceiver,
-                false,
-                true
-            )
+  def testOutputResponseState(
+    containingDocument : XFormsContainingDocument,
+    indentedLogger     : IndentedLogger,
+    xmlReceiver        : XMLReceiver
+  ): Unit =
+    if (! containingDocument.isGotSubmissionReplaceAll)
+      XFormsServer.outputAjaxResponse(
+        containingDocument,
+        indentedLogger,
+        null,
+        null,
+        null,
+        null,
+        null,
+        xmlReceiver,
+        false,
+        true
+      )
 }

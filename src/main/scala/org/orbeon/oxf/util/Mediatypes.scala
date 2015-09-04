@@ -21,92 +21,92 @@ import scala.collection.mutable.ListBuffer
 
 object Mediatypes {
 
-    import Private._
+  import Private._
 
-    private val (mappingsByMediatype, mappingsByExtension) = {
+  private val (mappingsByMediatype, mappingsByExtension) = {
 
-        val list = {
-            val ch = new MimeTypesContentHandler
-            XMLParsing.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLParsing.ParserConfiguration.PLAIN, false)
-            ch.resultAsList
-        }
-
-        (
-            combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) ⇒ mediatype   → m }).toMap,
-            combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         ⇒ m.extension → m }).toMap
-        )
+    val list = {
+      val ch = new MimeTypesContentHandler
+      XMLParsing.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLParsing.ParserConfiguration.PLAIN, false)
+      ch.resultAsList
     }
 
-    def findMediatypeForPath(path: String): Option[String] =
-        for {
-            extension ← findExtension(path.toLowerCase)
-            mappings  ← mappingsByExtension.get(extension)
-            mapping   ← mappings.headOption
-        } yield
-            mapping.mediatype
+    (
+      combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) ⇒ mediatype   → m }).toMap,
+      combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         ⇒ m.extension → m }).toMap
+    )
+  }
 
-    def findMediatypeForPathJava(path: String): String =
-        findMediatypeForPath(path).orNull
+  def findMediatypeForPath(path: String): Option[String] =
+    for {
+      extension ← findExtension(path.toLowerCase)
+      mappings  ← mappingsByExtension.get(extension)
+      mapping   ← mappings.headOption
+    } yield
+      mapping.mediatype
 
-    def findExtensionForMediatype(mediatype: String): Option[String] =
-        for {
-            mappings  ← mappingsByMediatype.get(mediatype)
-            mapping   ← mappings.headOption
-        } yield
-            mapping.extension
+  def findMediatypeForPathJava(path: String): String =
+    findMediatypeForPath(path).orNull
 
-    private object Private {
+  def findExtensionForMediatype(mediatype: String): Option[String] =
+    for {
+      mappings  ← mappingsByMediatype.get(mediatype)
+      mapping   ← mappings.headOption
+    } yield
+      mapping.extension
 
-        class MimeTypesContentHandler extends ForwardingXMLReceiver {
+  private object Private {
 
-            import MimeTypesContentHandler._
+    class MimeTypesContentHandler extends ForwardingXMLReceiver {
 
-            private val builder = new java.lang.StringBuilder
+      import MimeTypesContentHandler._
 
-            private var state: State = DefaultState
-            private var name: String = null
+      private val builder = new java.lang.StringBuilder
 
-            private var buffer = ListBuffer[Mapping]()
+      private var state: State = DefaultState
+      private var name: String = null
 
-            def resultAsList = buffer.result()
+      private var buffer = ListBuffer[Mapping]()
 
-            private def extensionFromPattern(pattern: String) =
-                nonEmptyOrNone(pattern.toLowerCase) flatMap findExtension getOrElse ""
+      def resultAsList = buffer.result()
 
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
-                localname match {
-                    case NameElement    ⇒ state = NameState
-                    case PatternElement ⇒ state = PatternState
-                    case _              ⇒ state = DefaultState
-                }
+      private def extensionFromPattern(pattern: String) =
+        nonEmptyOrNone(pattern.toLowerCase) flatMap findExtension getOrElse ""
 
-            override def characters(chars: Array[Char], start: Int, length: Int): Unit =
-                if (state == NameState || state == PatternState)
-                    builder.append(chars, start, length)
-
-            override def endElement(uri: String, localname: String, qName: String): Unit = {
-                localname match {
-                    case NameElement     ⇒ name = builder.toString.trim
-                    case PatternElement  ⇒ buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
-                    case MimeTypeElement ⇒ name = null
-                    case _               ⇒
-                }
-                builder.setLength(0)
-            }
+      override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
+        localname match {
+          case NameElement    ⇒ state = NameState
+          case PatternElement ⇒ state = PatternState
+          case _              ⇒ state = DefaultState
         }
 
-        object MimeTypesContentHandler {
+      override def characters(chars: Array[Char], start: Int, length: Int): Unit =
+        if (state == NameState || state == PatternState)
+          builder.append(chars, start, length)
 
-            val MimeTypeElement = "mime-type"
-            val NameElement     = "name"
-            val PatternElement  = "pattern"
-
-            sealed trait State
-            case object DefaultState extends State
-            case object NameState    extends State
-            case object PatternState extends State
+      override def endElement(uri: String, localname: String, qName: String): Unit = {
+        localname match {
+          case NameElement     ⇒ name = builder.toString.trim
+          case PatternElement  ⇒ buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
+          case MimeTypeElement ⇒ name = null
+          case _               ⇒
         }
-
-        case class Mapping(extension: String, mediatype: String)
+        builder.setLength(0)
+      }
     }
+
+    object MimeTypesContentHandler {
+
+      val MimeTypeElement = "mime-type"
+      val NameElement     = "name"
+      val PatternElement  = "pattern"
+
+      sealed trait State
+      case object DefaultState extends State
+      case object NameState    extends State
+      case object PatternState extends State
+    }
+
+    case class Mapping(extension: String, mediatype: String)
+  }
 }

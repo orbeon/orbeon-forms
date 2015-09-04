@@ -28,111 +28,111 @@ import scala.collection.mutable
 // Currently only used with POST by URLSerializer. Should remove that use and then we can make this support only GET.
 class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends HttpURLConnection(url) {
 
-    private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
+  private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
 
-    private var _method      : Option[String]                = None
-    private var _os          : Option[ByteArrayOutputStream] = None
-    private var _httpResponse: Option[HttpResponse]          = None
+  private var _method      : Option[String]                = None
+  private var _os          : Option[ByteArrayOutputStream] = None
+  private var _httpResponse: Option[HttpResponse]          = None
 
-    override def setRequestMethod(methodName: String): Unit = {
+  override def setRequestMethod(methodName: String): Unit = {
 
-        if (_httpResponse.isDefined)
-            throw new ProtocolException("Can't reset method: already connected")
+    if (_httpResponse.isDefined)
+      throw new ProtocolException("Can't reset method: already connected")
 
-        _method = Some(methodName)
-    }
+    _method = Some(methodName)
+  }
 
-    override def getOutputStream: OutputStream =
-        _os getOrElse { val os = new ByteArrayOutputStream; _os = Some(os); os }
+  override def getOutputStream: OutputStream =
+    _os getOrElse { val os = new ByteArrayOutputStream; _os = Some(os); os }
 
-    def connect(): Unit = {
-        if (_httpResponse.isEmpty)
-            _httpResponse = {
+  def connect(): Unit = {
+    if (_httpResponse.isEmpty)
+      _httpResponse = {
 
-                def credentialsFromURL(url: URL) = {
-                    nonEmptyOrNone(url.getUserInfo) flatMap { userInfo ⇒
-                        // Set username and optional password specified on URL
-                        val separatorPosition = userInfo.indexOf(":")
+        def credentialsFromURL(url: URL) = {
+          nonEmptyOrNone(url.getUserInfo) flatMap { userInfo ⇒
+            // Set username and optional password specified on URL
+            val separatorPosition = userInfo.indexOf(":")
 
-                        val (username, password) =
-                            if (separatorPosition == -1)
-                                userInfo → ""
-                            else
-                                userInfo.substring(0, separatorPosition) → userInfo.substring(separatorPosition + 1)
+            val (username, password) =
+              if (separatorPosition == -1)
+                userInfo → ""
+              else
+                userInfo.substring(0, separatorPosition) → userInfo.substring(separatorPosition + 1)
 
-                        // If the username/password contain special character, those characters will be encoded, since
-                        // we are getting this from a URL. Now do the decoding.
+            // If the username/password contain special character, those characters will be encoded, since
+            // we are getting this from a URL. Now do the decoding.
 
-                        val usernameOpt = nonEmptyOrNone(username) map (URLDecoder.decode(_, "utf-8"))
-                        val passwordOpt = nonEmptyOrNone(password) map (URLDecoder.decode(_, "utf-8"))
+            val usernameOpt = nonEmptyOrNone(username) map (URLDecoder.decode(_, "utf-8"))
+            val passwordOpt = nonEmptyOrNone(password) map (URLDecoder.decode(_, "utf-8"))
 
-                        usernameOpt map { username ⇒
-                            Credentials(username, passwordOpt, preemptiveAuth = true, None)
-                        }
-                    }
-                }
-
-                val methodName = _method getOrElse "GET" toUpperCase
-                val body       = _os map (_.toByteArray) map (new ByteArrayInputStream(_))
-                val bodyLength = _os map (_.size.toLong)
-
-                Some(
-                    client.connect(
-                        url         = url.toExternalForm,
-                        credentials = credentialsFromURL(url),
-                        cookieStore = new BasicCookieStore,
-                        method      = methodName,
-                        headers     = _requestHeaders mapValues (_.toList) toMap,
-                        content     = body map (StreamedContent(_, Option(getRequestProperty(Headers.ContentType)), bodyLength, None))
-                    )
-                )
+            usernameOpt map { username ⇒
+              Credentials(username, passwordOpt, preemptiveAuth = true, None)
             }
-    }
-
-    override def setRequestProperty(key: String, value: String): Unit =
-        _requestHeaders.put(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer(value))
-
-    override def addRequestProperty(key: String, value: String): Unit =
-        _requestHeaders.getOrElseUpdate(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer()) += value
-
-    // NOTE: No caller in our code
-    override def getRequestProperty(key: String) =
-        _requestHeaders.get(Headers.capitalizeCommonOrSplitHeader(key)) flatMap (_.lastOption) orNull
-
-    // NOTE: No caller in our code
-    override def getRequestProperties =
-        (_requestHeaders mapValues (_.asJava) toMap) asJava
-
-    override def getInputStream =
-        withConnection(_.content.inputStream)
-
-    override def getHeaderField(name: String): String =
-        withConnection(_.headers.get(Headers.capitalizeCommonOrSplitHeader(name)) flatMap (_.lastOption) orNull)
-
-    override def getHeaderFields =
-        withConnection(_.headers mapValues (_.asJava) asJava)
-
-    override def getResponseCode =
-        withConnection(_.statusCode)
-
-    def disconnect() =
-        withConnection(_.disconnect())
-
-    override def getLastModified =
-        Option(getHeaderField(Headers.LastModifiedLower)) match {
-            case Some(_) ⇒ super.getLastModified
-            case None    ⇒ 0L
+          }
         }
 
-    private def withConnection[T](body: HttpResponse ⇒ T) = {
-        if (_httpResponse.isEmpty)
-            connect()
+        val methodName = _method getOrElse "GET" toUpperCase
+        val body       = _os map (_.toByteArray) map (new ByteArrayInputStream(_))
+        val bodyLength = _os map (_.size.toLong)
 
-        body(_httpResponse.get)
+        Some(
+          client.connect(
+            url         = url.toExternalForm,
+            credentials = credentialsFromURL(url),
+            cookieStore = new BasicCookieStore,
+            method      = methodName,
+            headers     = _requestHeaders mapValues (_.toList) toMap,
+            content     = body map (StreamedContent(_, Option(getRequestProperty(Headers.ContentType)), bodyLength, None))
+          )
+        )
+      }
+  }
+
+  override def setRequestProperty(key: String, value: String): Unit =
+    _requestHeaders.put(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer(value))
+
+  override def addRequestProperty(key: String, value: String): Unit =
+    _requestHeaders.getOrElseUpdate(Headers.capitalizeCommonOrSplitHeader(key), mutable.ListBuffer()) += value
+
+  // NOTE: No caller in our code
+  override def getRequestProperty(key: String) =
+    _requestHeaders.get(Headers.capitalizeCommonOrSplitHeader(key)) flatMap (_.lastOption) orNull
+
+  // NOTE: No caller in our code
+  override def getRequestProperties =
+    (_requestHeaders mapValues (_.asJava) toMap) asJava
+
+  override def getInputStream =
+    withConnection(_.content.inputStream)
+
+  override def getHeaderField(name: String): String =
+    withConnection(_.headers.get(Headers.capitalizeCommonOrSplitHeader(name)) flatMap (_.lastOption) orNull)
+
+  override def getHeaderFields =
+    withConnection(_.headers mapValues (_.asJava) asJava)
+
+  override def getResponseCode =
+    withConnection(_.statusCode)
+
+  def disconnect() =
+    withConnection(_.disconnect())
+
+  override def getLastModified =
+    Option(getHeaderField(Headers.LastModifiedLower)) match {
+      case Some(_) ⇒ super.getLastModified
+      case None    ⇒ 0L
     }
 
-    // Rarely used methods which we don't use and haven't implemented
-    override def usingProxy                = ???
-    override def getHeaderFieldKey(n: Int) = ???
-    override def getHeaderField(n: Int)    = ???
+  private def withConnection[T](body: HttpResponse ⇒ T) = {
+    if (_httpResponse.isEmpty)
+      connect()
+
+    body(_httpResponse.get)
+  }
+
+  // Rarely used methods which we don't use and haven't implemented
+  override def usingProxy                = ???
+  override def getHeaderFieldKey(n: Int) = ???
+  override def getHeaderField(n: Int)    = ???
 }

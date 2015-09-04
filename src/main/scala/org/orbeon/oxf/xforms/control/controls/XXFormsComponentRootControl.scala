@@ -19,6 +19,6 @@ import org.orbeon.oxf.xforms.control.{XFormsNoSingleNodeContainerControl, XForms
 
 // Control at the root of a shadow tree
 class XXFormsComponentRootControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
-    // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
+  extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
+  // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
 }

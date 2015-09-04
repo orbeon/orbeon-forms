@@ -21,38 +21,38 @@ import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
 
 class XXFormsItemset extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        def fromSelectionControl(control: XFormsSelect1Control): Item = {
+    def fromSelectionControl(control: XFormsSelect1Control): Item = {
 
-            val format   = stringArgument(1)
-            val selected = argument.lift(2) exists (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
+      val format   = stringArgument(1)
+      val selected = argument.lift(2) exists (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
 
-            val itemset = control.getItemset
-            val controlValueForSelection = if (selected) control.getValue else null
+      val itemset = control.getItemset
+      val controlValueForSelection = if (selected) control.getValue else null
 
-            if (format == "json")
-                // Return a string
-                itemset.getJSONTreeInfo(controlValueForSelection, control.mustEncodeValues, control.getLocationData)
-            else
-                // Return an XML document
-                itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, control.getLocationData)
-        }
-
-        // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
-        def fromComponentControl(control: XFormsComponentControl): Item = (
-            ControlsIterator(control, includeSelf = false)
-            collectFirst { case c: XFormsSelect1Control ⇒ c }
-            map fromSelectionControl
-            orNull
-        )
-
-        relevantControl(0) match {
-            case Some(control: XFormsSelect1Control)   ⇒ fromSelectionControl(control)
-            case Some(control: XFormsComponentControl) ⇒ fromComponentControl(control)
-            case _                                     ⇒ null
-        }
+      if (format == "json")
+        // Return a string
+        itemset.getJSONTreeInfo(controlValueForSelection, control.mustEncodeValues, control.getLocationData)
+      else
+        // Return an XML document
+        itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, control.getLocationData)
     }
+
+    // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
+    def fromComponentControl(control: XFormsComponentControl): Item = (
+      ControlsIterator(control, includeSelf = false)
+      collectFirst { case c: XFormsSelect1Control ⇒ c }
+      map fromSelectionControl
+      orNull
+    )
+
+    relevantControl(0) match {
+      case Some(control: XFormsSelect1Control)   ⇒ fromSelectionControl(control)
+      case Some(control: XFormsComponentControl) ⇒ fromComponentControl(control)
+      case _                                     ⇒ null
+    }
+  }
 }

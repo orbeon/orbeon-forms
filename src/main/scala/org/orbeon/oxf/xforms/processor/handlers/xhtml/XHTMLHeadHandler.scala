@@ -40,536 +40,536 @@ import scala.collection.mutable
 // Handler for <xh:head>
 class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
-    import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler._
+  import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler._
 
-    private var formattingPrefix: String = null
+  private var formattingPrefix: String = null
 
-    override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+  override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
-        val xmlReceiver = handlerContext.getController.getOutput
+    val xmlReceiver = handlerContext.getController.getOutput
 
-        // Register control handlers on controller
-        handlerContext.getController.registerHandler(
-            classOf[XXFormsTextHandler].getName,
-            XFormsConstants.XXFORMS_NAMESPACE_URI,
-            "text",
-            XHTMLBodyHandler.ANY_MATCHER
+    // Register control handlers on controller
+    handlerContext.getController.registerHandler(
+      classOf[XXFormsTextHandler].getName,
+      XFormsConstants.XXFORMS_NAMESPACE_URI,
+      "text",
+      XHTMLBodyHandler.ANY_MATCHER
+    )
+
+    // Declare xmlns:f
+    formattingPrefix = handlerContext.findFormattingPrefixDeclare
+
+    // Open head element
+    xmlReceiver.startElement(uri, localname, qName, attributes)
+
+    implicit val helper = new XMLReceiverHelper(xmlReceiver)
+    val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
+
+    // Create prefix for combined resources if needed
+    val isMinimal = XFormsProperties.isMinimalResources
+    val isVersionedResources = URLRewriterUtils.isResourcesVersioned
+
+    // Include static XForms CSS and JS
+    val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
+
+    helper.element("", XINCLUDE_URI, "include",
+      Array(
+        "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css-js.xml"),
+        "fixup-xml-base", "false"
+      )
+    )
+
+    val ops = containingDocument.getStaticOps
+
+    val (baselineScripts, baselineStyles) = ops.baselineResources
+    val (scripts, styles)                 = ops.bindingResources
+
+    // Stylesheets
+    val attributesImpl = new AttributesImpl
+    outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, styles, baselineStyles)
+
+    // Scripts
+    if (! handlerContext.isNoScript) {
+
+      // Main JavaScript resources
+      outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, scripts, baselineScripts)
+
+      // Configuration properties
+      outputConfigurationProperties(xhtmlPrefix, isVersionedResources)
+
+      outputScriptDeclarations(xhtmlPrefix)
+
+      // Store information about "special" controls that need JavaScript initialization
+      // Gather information about appearances of controls which use Script
+      // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
+      outputJavaScriptInitialData(xhtmlPrefix, gatherJavascriptControls(containingDocument))
+    }
+  }
+
+  override def end(uri: String, localname: String, qName: String): Unit = {
+    val xmlReceiver = handlerContext.getController.getOutput
+    xmlReceiver.endElement(uri, localname, qName)
+    handlerContext.findFormattingPrefixUndeclare(formattingPrefix)
+  }
+
+  // Output an element
+  private def outputElement(
+    xhtmlPrefix       : String,
+    attributesImpl    : AttributesImpl,
+    getElementDetails : (Option[String], Option[String]) ⇒ (String, Array[String]))(
+    resource          : Option[String],
+    cssClass          : Option[String],
+    content           : Option[String])(implicit
+    helper            : XMLReceiverHelper
+  ): Unit = {
+
+    val (elementName, attributes) = getElementDetails(resource, cssClass)
+
+    attributesImpl.clear()
+    XMLReceiverHelper.populateAttributes(attributesImpl, attributes)
+    helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, elementName, attributesImpl)
+    // Output content only if present
+    content foreach helper.text
+    helper.endElement()
+  }
+
+  private def outputCSSResources(
+    xhtmlPrefix       : String,
+    minimal           : Boolean,
+    attributesImpl    : AttributesImpl,
+    headElements      : List[HeadElement],
+    baselineResources : List[String])(implicit
+    helper            : XMLReceiverHelper
+  ): Unit = {
+
+    // Function to output either a <link> or <style> element
+    def outputCSSElement =
+      outputElement(
+        xhtmlPrefix,
+        attributesImpl,
+        (resource, cssClass) ⇒ resource match {
+          case Some(resource) ⇒
+            ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
+          case None ⇒
+            ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
+        }
+      )(_, _, _)
+
+    def getCSSResources(useDoc: Boolean) = {
+      val ops = if (useDoc) containingDocument.getStaticOps else null
+      XFormsFeatures.getCSSResources(ops).asScala
+    }
+
+    // Output all CSS
+    XBLResources.outputResources(
+      outputCSSElement,
+      getCSSResources,
+      headElements,
+      baselineResources,
+      minimal
+    )
+  }
+
+  private def outputJavaScriptResources(
+    xhtmlPrefix       : String,
+    minimal           : Boolean,
+    attributesImpl    : AttributesImpl,
+    headElements      : List[HeadElement],
+    baselineResources : List[String])(implicit
+    helper            : XMLReceiverHelper
+  ): Unit = {
+
+    // Function to output either a <script> element
+    def outputJSElement =
+      outputElement(
+        xhtmlPrefix,
+        attributesImpl,
+        (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
+      )(_, _, _)
+
+    def getJavaScriptResources(useDoc: Boolean) = {
+      val ops = if (useDoc) containingDocument.getStaticOps else null
+      XFormsFeatures.getJavaScriptResources(ops).asScala
+    }
+
+    // Output all JS
+    XBLResources.outputResources(
+      outputJSElement,
+      getJavaScriptResources,
+      headElements,
+      baselineResources,
+      minimal
+    )
+  }
+
+  private def outputConfigurationProperties(
+    xhtmlPrefix        : String,
+    versionedResources : Boolean)(implicit
+    helper             : XMLReceiverHelper
+  ): Unit = {
+
+    // Gather all static properties that need to be sent to the client
+    val staticProperties = containingDocument.getStaticState.clientNonDefaultProperties
+
+    val dynamicProperties = {
+
+      def dynamicProperty(p: ⇒ Boolean, name: String, value: Any) =
+        if (p) Some(name → value) else None
+
+      // Heartbeat delay is dynamic because it depends on session duration
+      def heartbeat = {
+        val propertyDefinition =
+          getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
+
+        val heartbeatDelay =
+          XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
+
+        dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[java.lang.Integer],
+          SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
+      }
+
+      // Help events are dynamic because they depend on whether the xforms-help event is used
+      // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
+      def help = dynamicProperty(
+        containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
+        HELP_HANDLER_PROPERTY,
+        true)
+
+      // Whether resources are versioned
+      def resourcesVersioned = dynamicProperty(
+        versionedResources != RESOURCES_VERSIONED_DEFAULT,
+        RESOURCES_VERSIONED_PROPERTY,
+        versionedResources
+      )
+
+      // Application version is not an XForms property but we want to expose it on the client
+      def resourcesVersion = dynamicProperty(
+        versionedResources && (getApplicationResourceVersion ne null),
+        RESOURCES_VERSION_NUMBER_PROPERTY,
+        getApplicationResourceVersion
+      )
+
+      // Gather all dynamic properties that are defined
+      List(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
+    }
+
+    // combine all static and dynamic properties
+    val clientProperties = staticProperties ++ dynamicProperties
+
+    if (clientProperties nonEmpty) {
+
+      val sb = new StringBuilder
+
+      for ((propertyName, propertyValue) ← clientProperties) {
+        if (sb isEmpty) {
+          // First iteration
+          sb append "var opsXFormsProperties = {"
+          helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+        } else
+          sb append ','
+
+        sb append '"'
+        sb append propertyName
+        sb append "\":"
+
+        propertyValue match {
+          case s: String ⇒
+            sb append '"'
+            sb append s
+            sb append '"'
+          case _ ⇒
+            sb append propertyValue.toString
+        }
+      }
+
+      sb append "};"
+      helper.text(sb.toString)
+      helper.endElement()
+    }
+  }
+
+  private def outputScriptDeclarations(xhtmlPrefix: String)(implicit helper: XMLReceiverHelper): Unit = {
+
+    val uniqueClientScripts = containingDocument.getStaticOps.uniqueClientScripts
+
+    val errorsToShow      = containingDocument.getServerErrors.asScala
+    val scriptsToRun      = containingDocument.getScriptsToRun.asScala
+    val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
+    val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
+
+    val dialogsToOpen = {
+
+      val dialogsMap = (
+        Option(containingDocument.getControls.getCurrentControlTree.getDialogControls)
+        map (_.asScala)
+        getOrElse Map.empty
+      )
+
+      for {
+        control       ← dialogsMap.values
+        dialogControl = control.asInstanceOf[XXFormsDialogControl]
+        if dialogControl.isVisible
+      } yield
+        dialogControl
+    }
+
+    val javascriptLoads =
+      containingDocument.getLoadsToRun.asScala filter (_.getResource.startsWith("javascript:"))
+
+    val hasScriptDefinitions =
+      uniqueClientScripts.nonEmpty
+
+    val mustRunAnyScripts =
+      errorsToShow.nonEmpty       ||
+      scriptsToRun.nonEmpty       ||
+      focusElementIdOpt.isDefined ||
+      messagesToRun.nonEmpty      ||
+      dialogsToOpen.nonEmpty      ||
+      javascriptLoads.nonEmpty
+
+    if (hasScriptDefinitions || mustRunAnyScripts) {
+      helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+
+      if (hasScriptDefinitions)
+        outputScripts(uniqueClientScripts)
+
+      if (mustRunAnyScripts) {
+        val sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ")
+
+        // NOTE: The order of xxf:script vs. javascript: loads should be preserved. It is not currently.
+
+        // Initial xxf:script executions if present
+        for (script ← scriptsToRun) {
+          val name     = script.functionName
+          val target   = namespaceId(containingDocument, script.targetEffectiveId)
+          val observer = namespaceId(containingDocument, script.observerEffectiveId)
+
+          sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer");"""
+        }
+
+        // javascript: loads
+        for (load ← javascriptLoads) {
+          val body = escapeJavaScript(load.getResource.substring("javascript:".size))
+          sb append s"""(function(){$body})();"""
+        }
+
+        // Initial modal xf:message to run if present
+        if (messagesToRun.nonEmpty) {
+          val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.getMessage)}"""")
+          quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
+        }
+
+        // Initial dialogs to open
+        for (dialogControl ← dialogsToOpen) {
+          val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
+          val neighbor = (
+            dialogControl.neighborControlId
+            map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
+            getOrElse "null"
+          )
+
+          sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
+        }
+
+        // Initial setfocus if present
+        // Seems reasonable to do this after dialogs as focus might be within a dialog
+        focusElementIdOpt foreach { id ⇒
+          sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
+        }
+
+        // Initial errors
+        if (errorsToShow.nonEmpty) {
+
+          val title   = "Non-fatal error"
+          val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
+          val formId  = XFormsUtils.getFormId(containingDocument)
+
+          sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
+        }
+
+        sb append " }"
+
+        helper.text(sb.toString)
+      }
+      helper.endElement()
+    }
+  }
+
+  private def outputJavaScriptInitialData(
+    xhtmlPrefix              : String,
+    jsControlsAppearancesMap : collection.Map[String, collection.Map[String, collection.Seq[String]]])(implicit
+    helper                   : XMLReceiverHelper
+  ): Unit = {
+
+    helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
+
+    // Produce JSON output
+    val hasPaths = true
+    val hasInitControls = jsControlsAppearancesMap.nonEmpty
+    val hasKeyListeners = containingDocument.getStaticOps.keypressHandlers.nonEmpty
+    val hasServerEvents = {
+      val delayedEvents = containingDocument.getDelayedEvents
+      delayedEvents.asScala.nonEmpty
+    }
+    val outputInitData = hasPaths || hasInitControls || hasKeyListeners || hasServerEvents
+
+    if (outputInitData) {
+      val sb = new java.lang.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
+      sb.append(XFormsUtils.getFormId(containingDocument))
+      sb.append("\"] = {")
+
+      val rewriteResource =
+        handlerContext.getExternalContext.getResponse.rewriteResourceURL(
+          _: String,
+          REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
         )
 
-        // Declare xmlns:f
-        formattingPrefix = handlerContext.findFormattingPrefixDeclare
-
-        // Open head element
-        xmlReceiver.startElement(uri, localname, qName, attributes)
-
-        implicit val helper = new XMLReceiverHelper(xmlReceiver)
-        val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
-
-        // Create prefix for combined resources if needed
-        val isMinimal = XFormsProperties.isMinimalResources
-        val isVersionedResources = URLRewriterUtils.isResourcesVersioned
-
-        // Include static XForms CSS and JS
-        val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
-
-        helper.element("", XINCLUDE_URI, "include",
-            Array(
-                "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css-js.xml"),
-                "fixup-xml-base", "false"
-            )
-        )
-
-        val ops = containingDocument.getStaticOps
-
-        val (baselineScripts, baselineStyles) = ops.baselineResources
-        val (scripts, styles)                 = ops.bindingResources
-
-        // Stylesheets
-        val attributesImpl = new AttributesImpl
-        outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, styles, baselineStyles)
-
-        // Scripts
-        if (! handlerContext.isNoScript) {
-
-            // Main JavaScript resources
-            outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, scripts, baselineScripts)
-
-            // Configuration properties
-            outputConfigurationProperties(xhtmlPrefix, isVersionedResources)
-
-            outputScriptDeclarations(xhtmlPrefix)
-
-            // Store information about "special" controls that need JavaScript initialization
-            // Gather information about appearances of controls which use Script
-            // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
-            outputJavaScriptInitialData(xhtmlPrefix, gatherJavascriptControls(containingDocument))
-        }
-    }
-
-    override def end(uri: String, localname: String, qName: String): Unit = {
-        val xmlReceiver = handlerContext.getController.getOutput
-        xmlReceiver.endElement(uri, localname, qName)
-        handlerContext.findFormattingPrefixUndeclare(formattingPrefix)
-    }
-
-    // Output an element
-    private def outputElement(
-        xhtmlPrefix       : String,
-        attributesImpl    : AttributesImpl,
-        getElementDetails : (Option[String], Option[String]) ⇒ (String, Array[String]))(
-        resource          : Option[String],
-        cssClass          : Option[String],
-        content           : Option[String])(implicit
-        helper            : XMLReceiverHelper
-    ): Unit = {
-
-        val (elementName, attributes) = getElementDetails(resource, cssClass)
-
-        attributesImpl.clear()
-        XMLReceiverHelper.populateAttributes(attributesImpl, attributes)
-        helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, elementName, attributesImpl)
-        // Output content only if present
-        content foreach helper.text
-        helper.endElement()
-    }
-
-    private def outputCSSResources(
-        xhtmlPrefix       : String,
-        minimal           : Boolean,
-        attributesImpl    : AttributesImpl,
-        headElements      : List[HeadElement],
-        baselineResources : List[String])(implicit
-        helper            : XMLReceiverHelper
-    ): Unit = {
-
-        // Function to output either a <link> or <style> element
-        def outputCSSElement =
-            outputElement(
-                xhtmlPrefix,
-                attributesImpl,
-                (resource, cssClass) ⇒ resource match {
-                    case Some(resource) ⇒
-                        ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
-                    case None ⇒
-                        ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
-                }
-            )(_, _, _)
-
-        def getCSSResources(useDoc: Boolean) = {
-            val ops = if (useDoc) containingDocument.getStaticOps else null
-            XFormsFeatures.getCSSResources(ops).asScala
-        }
-
-        // Output all CSS
-        XBLResources.outputResources(
-            outputCSSElement,
-            getCSSResources,
-            headElements,
-            baselineResources,
-            minimal
-        )
-    }
-
-    private def outputJavaScriptResources(
-        xhtmlPrefix       : String,
-        minimal           : Boolean,
-        attributesImpl    : AttributesImpl,
-        headElements      : List[HeadElement],
-        baselineResources : List[String])(implicit
-        helper            : XMLReceiverHelper
-    ): Unit = {
-
-        // Function to output either a <script> element
-        def outputJSElement =
-            outputElement(
-                xhtmlPrefix,
-                attributesImpl,
-                (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
-            )(_, _, _)
-
-        def getJavaScriptResources(useDoc: Boolean) = {
-            val ops = if (useDoc) containingDocument.getStaticOps else null
-            XFormsFeatures.getJavaScriptResources(ops).asScala
-        }
-
-        // Output all JS
-        XBLResources.outputResources(
-            outputJSElement,
-            getJavaScriptResources,
-            headElements,
-            baselineResources,
-            minimal
-        )
-    }
-
-    private def outputConfigurationProperties(
-        xhtmlPrefix        : String,
-        versionedResources : Boolean)(implicit
-        helper             : XMLReceiverHelper
-    ): Unit = {
-
-        // Gather all static properties that need to be sent to the client
-        val staticProperties = containingDocument.getStaticState.clientNonDefaultProperties
-
-        val dynamicProperties = {
-
-            def dynamicProperty(p: ⇒ Boolean, name: String, value: Any) =
-                if (p) Some(name → value) else None
-
-            // Heartbeat delay is dynamic because it depends on session duration
-            def heartbeat = {
-                val propertyDefinition =
-                    getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
-
-                val heartbeatDelay =
-                    XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
-
-                dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[java.lang.Integer],
-                    SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
-            }
-
-            // Help events are dynamic because they depend on whether the xforms-help event is used
-            // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
-            def help = dynamicProperty(
-                containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
-                HELP_HANDLER_PROPERTY,
-                true)
-
-            // Whether resources are versioned
-            def resourcesVersioned = dynamicProperty(
-                versionedResources != RESOURCES_VERSIONED_DEFAULT,
-                RESOURCES_VERSIONED_PROPERTY,
-                versionedResources
-            )
-
-            // Application version is not an XForms property but we want to expose it on the client
-            def resourcesVersion = dynamicProperty(
-                versionedResources && (getApplicationResourceVersion ne null),
-                RESOURCES_VERSION_NUMBER_PROPERTY,
-                getApplicationResourceVersion
-            )
-
-            // Gather all dynamic properties that are defined
-            List(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
-        }
-
-        // combine all static and dynamic properties
-        val clientProperties = staticProperties ++ dynamicProperties
-
-        if (clientProperties nonEmpty) {
-
-            val sb = new StringBuilder
-
-            for ((propertyName, propertyValue) ← clientProperties) {
-                if (sb isEmpty) {
-                    // First iteration
-                    sb append "var opsXFormsProperties = {"
-                    helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-                } else
-                    sb append ','
-
-                sb append '"'
-                sb append propertyName
-                sb append "\":"
-
-                propertyValue match {
-                    case s: String ⇒
-                        sb append '"'
-                        sb append s
-                        sb append '"'
-                    case _ ⇒
-                        sb append propertyValue.toString
-                }
-            }
-
-            sb append "};"
-            helper.text(sb.toString)
-            helper.endElement()
-        }
-    }
-
-    private def outputScriptDeclarations(xhtmlPrefix: String)(implicit helper: XMLReceiverHelper): Unit = {
-
-        val uniqueClientScripts = containingDocument.getStaticOps.uniqueClientScripts
-
-        val errorsToShow      = containingDocument.getServerErrors.asScala
-        val scriptsToRun      = containingDocument.getScriptsToRun.asScala
-        val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
-        val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
-
-        val dialogsToOpen = {
-
-            val dialogsMap = (
-                Option(containingDocument.getControls.getCurrentControlTree.getDialogControls)
-                map (_.asScala)
-                getOrElse Map.empty
-            )
-
-            for {
-                control       ← dialogsMap.values
-                dialogControl = control.asInstanceOf[XXFormsDialogControl]
-                if dialogControl.isVisible
-            } yield
-                dialogControl
-        }
-
-        val javascriptLoads =
-            containingDocument.getLoadsToRun.asScala filter (_.getResource.startsWith("javascript:"))
-
-        val hasScriptDefinitions =
-            uniqueClientScripts.nonEmpty
-
-        val mustRunAnyScripts =
-            errorsToShow.nonEmpty       ||
-            scriptsToRun.nonEmpty       ||
-            focusElementIdOpt.isDefined ||
-            messagesToRun.nonEmpty      ||
-            dialogsToOpen.nonEmpty      ||
-            javascriptLoads.nonEmpty
-
-        if (hasScriptDefinitions || mustRunAnyScripts) {
-            helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-
-            if (hasScriptDefinitions)
-                outputScripts(uniqueClientScripts)
-
-            if (mustRunAnyScripts) {
-                val sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ")
-
-                // NOTE: The order of xxf:script vs. javascript: loads should be preserved. It is not currently.
-
-                // Initial xxf:script executions if present
-                for (script ← scriptsToRun) {
-                    val name     = script.functionName
-                    val target   = namespaceId(containingDocument, script.targetEffectiveId)
-                    val observer = namespaceId(containingDocument, script.observerEffectiveId)
-
-                    sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer");"""
-                }
-
-                // javascript: loads
-                for (load ← javascriptLoads) {
-                    val body = escapeJavaScript(load.getResource.substring("javascript:".size))
-                    sb append s"""(function(){$body})();"""
-                }
-
-                // Initial modal xf:message to run if present
-                if (messagesToRun.nonEmpty) {
-                    val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.getMessage)}"""")
-                    quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
-                }
-
-                // Initial dialogs to open
-                for (dialogControl ← dialogsToOpen) {
-                    val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
-                    val neighbor = (
-                        dialogControl.neighborControlId
-                        map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
-                        getOrElse "null"
-                    )
-
-                    sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
-                }
-
-                // Initial setfocus if present
-                // Seems reasonable to do this after dialogs as focus might be within a dialog
-                focusElementIdOpt foreach { id ⇒
-                    sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
-                }
-
-                // Initial errors
-                if (errorsToShow.nonEmpty) {
-
-                    val title   = "Non-fatal error"
-                    val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
-                    val formId  = XFormsUtils.getFormId(containingDocument)
-
-                    sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
-                }
-
-                sb append " }"
-
-                helper.text(sb.toString)
-            }
-            helper.endElement()
-        }
-    }
-
-    private def outputJavaScriptInitialData(
-        xhtmlPrefix              : String,
-        jsControlsAppearancesMap : collection.Map[String, collection.Map[String, collection.Seq[String]]])(implicit
-        helper                   : XMLReceiverHelper
-    ): Unit = {
-
-        helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-
-        // Produce JSON output
-        val hasPaths = true
-        val hasInitControls = jsControlsAppearancesMap.nonEmpty
-        val hasKeyListeners = containingDocument.getStaticOps.keypressHandlers.nonEmpty
-        val hasServerEvents = {
-            val delayedEvents = containingDocument.getDelayedEvents
-            delayedEvents.asScala.nonEmpty
-        }
-        val outputInitData = hasPaths || hasInitControls || hasKeyListeners || hasServerEvents
-
-        if (outputInitData) {
-            val sb = new java.lang.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
-            sb.append(XFormsUtils.getFormId(containingDocument))
-            sb.append("\"] = {")
-
-            val rewriteResource =
-                handlerContext.getExternalContext.getResponse.rewriteResourceURL(
-                    _: String,
-                    REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
-                )
-
-            // Output path information
-            if (hasPaths) {
-                sb.append("\"paths\":{")
-                sb.append("\"xforms-server\": \"")
-                sb.append(rewriteResource("/xforms-server"))
-                sb.append("\",\"xforms-server-upload\": \"")
-                sb.append(rewriteResource("/xforms-server/upload"))
-
-                // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
-                // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
-                // for use in portlets. This should ideally be handled by a template and/or the server should provide
-                // the markup directly when needed.
-                val calendarImage = "/ops/images/xforms/calendar.png"
-                val rewrittenCalendarImage = rewriteResource(calendarImage)
-                sb.append("\",\"calendar-image\": \"")
-                sb.append(rewrittenCalendarImage)
+      // Output path information
+      if (hasPaths) {
+        sb.append("\"paths\":{")
+        sb.append("\"xforms-server\": \"")
+        sb.append(rewriteResource("/xforms-server"))
+        sb.append("\",\"xforms-server-upload\": \"")
+        sb.append(rewriteResource("/xforms-server/upload"))
+
+        // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
+        // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
+        // for use in portlets. This should ideally be handled by a template and/or the server should provide
+        // the markup directly when needed.
+        val calendarImage = "/ops/images/xforms/calendar.png"
+        val rewrittenCalendarImage = rewriteResource(calendarImage)
+        sb.append("\",\"calendar-image\": \"")
+        sb.append(rewrittenCalendarImage)
+        sb.append('"')
+        sb.append('}')
+      }
+
+      // Output controls initialization
+      if (hasInitControls) {
+        if (hasPaths)
+          sb.append(',')
+        sb.append("\"controls\":{")
+        locally {
+          val i = jsControlsAppearancesMap.iterator
+          while (i.hasNext) {
+            val (controlName, controlMap) = i.next()
+            sb.append("\"")
+            sb.append(controlName)
+            sb.append("\":{")
+            locally {
+              val j = controlMap.iterator
+              while (j.hasNext) {
+                val (controlAppearance, idsForAppearanceList) = j.next()
                 sb.append('"')
-                sb.append('}')
-            }
-
-            // Output controls initialization
-            if (hasInitControls) {
-                if (hasPaths)
-                    sb.append(',')
-                sb.append("\"controls\":{")
+                sb.append(if (controlAppearance ne null) controlAppearance else "")
+                sb.append("\":[")
                 locally {
-                    val i = jsControlsAppearancesMap.iterator
-                    while (i.hasNext) {
-                        val (controlName, controlMap) = i.next()
-                        sb.append("\"")
-                        sb.append(controlName)
-                        sb.append("\":{")
-                        locally {
-                            val j = controlMap.iterator
-                            while (j.hasNext) {
-                                val (controlAppearance, idsForAppearanceList) = j.next()
-                                sb.append('"')
-                                sb.append(if (controlAppearance ne null) controlAppearance else "")
-                                sb.append("\":[")
-                                locally {
-                                    val k = idsForAppearanceList.iterator
-                                    while (k.hasNext) {
-                                        val controlId = k.next()
-                                        sb.append('"')
-                                        sb.append(controlId)
-                                        sb.append('"')
-                                        if (k.hasNext)
-                                            sb.append(',')
-                                    }
-                                }
-                                sb.append(']')
-                                if (j.hasNext)
-                                    sb.append(',')
-                            }
-                        }
-                        sb.append("}")
-                        if (i.hasNext)
-                            sb.append(',')
-                    }
-                }
-                sb.append('}')
-            }
-
-            // Output key listener information
-            if (hasKeyListeners) {
-                if (hasPaths || hasInitControls)
-                    sb.append(',')
-                sb.append("\"keylisteners\":[")
-                var first = true
-                for (handler ← containingDocument.getStaticOps.keypressHandlers) {
-                    if (! first)
-                        sb.append(',')
-                    for (observer ← handler.observersPrefixedIds) {
-                        sb.append('{')
-                        sb.append("\"observer\":\"")
-                        sb.append(observer)
-                        sb.append('"')
-                        if (handler.getKeyModifiers ne null) {
-                            sb.append(",\"modifier\":\"")
-                            sb.append(handler.getKeyModifiers)
-                            sb.append('"')
-                        }
-                        if (handler.getKeyText ne null) {
-                            sb.append(",\"text\":\"")
-                            sb.append(handler.getKeyText)
-                            sb.append('"')
-                        }
-                        sb.append('}')
-                        first = false
-                    }
+                  val k = idsForAppearanceList.iterator
+                  while (k.hasNext) {
+                    val controlId = k.next()
+                    sb.append('"')
+                    sb.append(controlId)
+                    sb.append('"')
+                    if (k.hasNext)
+                      sb.append(',')
+                  }
                 }
                 sb.append(']')
+                if (j.hasNext)
+                  sb.append(',')
+              }
             }
-
-            // Output server events
-            if (hasServerEvents) {
-                if (hasPaths || hasInitControls || hasKeyListeners)
-                    sb.append(',')
-                sb.append("\"server-events\":[")
-                val currentTime = System.currentTimeMillis
-                var first = true
-                for (delayedEvent ← containingDocument.getDelayedEvents.asScala) {
-                    if (! first)
-                        sb.append(',')
-                    delayedEvent.toJSON(sb, currentTime)
-                    first = false
-                }
-                sb.append(']')
-            }
-            sb.append("};")
-            helper.text(sb.toString)
+            sb.append("}")
+            if (i.hasNext)
+              sb.append(',')
+          }
         }
-        helper.endElement()
+        sb.append('}')
+      }
+
+      // Output key listener information
+      if (hasKeyListeners) {
+        if (hasPaths || hasInitControls)
+          sb.append(',')
+        sb.append("\"keylisteners\":[")
+        var first = true
+        for (handler ← containingDocument.getStaticOps.keypressHandlers) {
+          if (! first)
+            sb.append(',')
+          for (observer ← handler.observersPrefixedIds) {
+            sb.append('{')
+            sb.append("\"observer\":\"")
+            sb.append(observer)
+            sb.append('"')
+            if (handler.getKeyModifiers ne null) {
+              sb.append(",\"modifier\":\"")
+              sb.append(handler.getKeyModifiers)
+              sb.append('"')
+            }
+            if (handler.getKeyText ne null) {
+              sb.append(",\"text\":\"")
+              sb.append(handler.getKeyText)
+              sb.append('"')
+            }
+            sb.append('}')
+            first = false
+          }
+        }
+        sb.append(']')
+      }
+
+      // Output server events
+      if (hasServerEvents) {
+        if (hasPaths || hasInitControls || hasKeyListeners)
+          sb.append(',')
+        sb.append("\"server-events\":[")
+        val currentTime = System.currentTimeMillis
+        var first = true
+        for (delayedEvent ← containingDocument.getDelayedEvents.asScala) {
+          if (! first)
+            sb.append(',')
+          delayedEvent.toJSON(sb, currentTime)
+          first = false
+        }
+        sb.append(']')
+      }
+      sb.append("};")
+      helper.text(sb.toString)
     }
+    helper.endElement()
+  }
 }
 
 object XHTMLHeadHandler {
 
-    def outputScripts(scripts: Iterable[(String, String)])(implicit helper: XMLReceiverHelper) =
-        for ((clientName, body) ← scripts) {
-            helper.text("\nfunction " + clientName + "(event) {\n")
-            helper.text(body)
-            helper.text("}\n")
-        }
-
-    def gatherJavascriptControls(
-        containingDocument : XFormsContainingDocument
-    ): collection.Map[String, collection.Map[String, collection.Seq[String]]] = {
-
-        // control name → appearance or mediatype → ids
-        val result = mutable.HashMap[String, mutable.HashMap[String, mutable.Buffer[String]]]()
-
-        val rootControl = containingDocument.getControls.getCurrentControlTree.getRoot
-
-        // NOTE: Don't run JavaScript initialization if the control is static readonly (could change in the
-        // future if some static readonly controls require JS initialization)
-        for {
-            control ← Controls.ControlsIterator(rootControl, includeSelf = false)
-            if ! control.isStaticReadonly
-            (localName, appearanceOrMediatype, effectiveId) ← control.javaScriptInitialization
-            appearanceToId = result.getOrElseUpdate(localName, mutable.HashMap[String, mutable.Buffer[String]]())
-            ids = appearanceToId.getOrElseUpdate(appearanceOrMediatype, mutable.Buffer[String]())
-        } locally {
-            ids += XFormsUtils.namespaceId(containingDocument, effectiveId)
-        }
-
-        result // TODO: work w/ immutable stuff
+  def outputScripts(scripts: Iterable[(String, String)])(implicit helper: XMLReceiverHelper) =
+    for ((clientName, body) ← scripts) {
+      helper.text("\nfunction " + clientName + "(event) {\n")
+      helper.text(body)
+      helper.text("}\n")
     }
+
+  def gatherJavascriptControls(
+    containingDocument : XFormsContainingDocument
+  ): collection.Map[String, collection.Map[String, collection.Seq[String]]] = {
+
+    // control name → appearance or mediatype → ids
+    val result = mutable.HashMap[String, mutable.HashMap[String, mutable.Buffer[String]]]()
+
+    val rootControl = containingDocument.getControls.getCurrentControlTree.getRoot
+
+    // NOTE: Don't run JavaScript initialization if the control is static readonly (could change in the
+    // future if some static readonly controls require JS initialization)
+    for {
+      control ← Controls.ControlsIterator(rootControl, includeSelf = false)
+      if ! control.isStaticReadonly
+      (localName, appearanceOrMediatype, effectiveId) ← control.javaScriptInitialization
+      appearanceToId = result.getOrElseUpdate(localName, mutable.HashMap[String, mutable.Buffer[String]]())
+      ids = appearanceToId.getOrElseUpdate(appearanceOrMediatype, mutable.Buffer[String]())
+    } locally {
+      ids += XFormsUtils.namespaceId(containingDocument, effectiveId)
+    }
+
+    result // TODO: work w/ immutable stuff
+  }
 }

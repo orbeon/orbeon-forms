@@ -24,24 +24,24 @@ import org.orbeon.oxf.xml.dom4j.LocationData
  * 10.1.6 The refresh Element
  */
 class XFormsRefreshAction extends XFormsAction {
-    override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext): Unit = {
 
-        val interpreter = context.interpreter
-        val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
+    val interpreter = context.interpreter
+    val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
 
-        if (model ne null) {
-            XFormsRefreshAction.refresh(model)
-        } else {
-            val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
-            throw new ValidationException("Invalid model id: " + modelId, context.element.getData.asInstanceOf[LocationData])
-        }
+    if (model ne null) {
+      XFormsRefreshAction.refresh(model)
+    } else {
+      val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
+      throw new ValidationException("Invalid model id: " + modelId, context.element.getData.asInstanceOf[LocationData])
     }
+  }
 }
 
 object XFormsRefreshAction {
-    def refresh(model: XFormsModel): Unit = {
-        // NOTE: We no longer need to force the refresh flag here because the refresh flag is global. If a change in any
-        // model occurred, then the flag will be already set and we are safe. Otherwise, it is safe not to do anything.
-        Dispatch.dispatchEvent(new XFormsRefreshEvent(model))
-    }
+  def refresh(model: XFormsModel): Unit = {
+    // NOTE: We no longer need to force the refresh flag here because the refresh flag is global. If a change in any
+    // model occurred, then the flag will be already set and we are safe. Otherwise, it is safe not to do anything.
+    Dispatch.dispatchEvent(new XFormsRefreshEvent(model))
+  }
 }

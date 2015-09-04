@@ -24,33 +24,33 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait XMLSupport extends AssertionsForJUnit {
 
-    def readURLAsImmutableXMLDocument(url: String) =
-        ScalaUtils.useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
-            TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
-        }
-
-    def assertXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Unit =
-        assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
-
-    def assertXMLDocumentsIgnoreNamespacesInScope(left: JDocument, right: JDocument): Unit = {
-
-        val result = Dom4j.compareDocumentsIgnoreNamespacesInScope(left, right)
-
-        // Produce a nicer message
-        if (! result) {
-            assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
-            assert(false)
-        }
+  def readURLAsImmutableXMLDocument(url: String) =
+    ScalaUtils.useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
     }
 
-    def assertXMLElementsIgnoreNamespacesInScopeCollapse(left: JElement, right: JElement): Unit = {
+  def assertXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Unit =
+    assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
 
-        val result = Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
+  def assertXMLDocumentsIgnoreNamespacesInScope(left: JDocument, right: JDocument): Unit = {
 
-        // Produce a nicer message
-        if (! result) {
-            assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
-            assert(false)
-        }
+    val result = Dom4j.compareDocumentsIgnoreNamespacesInScope(left, right)
+
+    // Produce a nicer message
+    if (! result) {
+      assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
+      assert(false)
     }
+  }
+
+  def assertXMLElementsIgnoreNamespacesInScopeCollapse(left: JElement, right: JElement): Unit = {
+
+    val result = Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
+
+    // Produce a nicer message
+    if (! result) {
+      assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
+      assert(false)
+    }
+  }
 }

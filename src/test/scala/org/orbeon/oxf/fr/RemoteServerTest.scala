@@ -19,38 +19,38 @@ import org.orbeon.oxf.fr.FormRunnerHome._
 
 class RemoteServerTest extends AssertionsForJUnit {
 
-    @Test def remoteServerPropertyParsing(): Unit = {
+  @Test def remoteServerPropertyParsing(): Unit = {
 
-        assert(Nil === tryRemoteServersFromString("[]").get)
+    assert(Nil === tryRemoteServersFromString("[]").get)
 
-        assert(
-            List(
-                "Prod 1" → "http://prod1.acme.org/orbeon",
-                "Prod 2" → "http://prod2.acme.org/orbeon",
-                "Prod 3" → "http://prod2.acme.org/orbeon"
-            ) === tryRemoteServersFromString(
-                """
-                [
-                    { "label": "Prod 1",   "url": "http://prod1.acme.org/orbeon" },
-                    { "label": "Prod 2",   "url": "http://prod2.acme.org/orbeon", "foo": 42, "bar": true },
-                    { "label": " Prod 3 ", "url": " http://prod2.acme.org/orbeon/ " }
-                ]
-                """
-            ).get
-        )
+    assert(
+      List(
+        "Prod 1" → "http://prod1.acme.org/orbeon",
+        "Prod 2" → "http://prod2.acme.org/orbeon",
+        "Prod 3" → "http://prod2.acme.org/orbeon"
+      ) === tryRemoteServersFromString(
+        """
+        [
+          { "label": "Prod 1",   "url": "http://prod1.acme.org/orbeon" },
+          { "label": "Prod 2",   "url": "http://prod2.acme.org/orbeon", "foo": 42, "bar": true },
+          { "label": " Prod 3 ", "url": " http://prod2.acme.org/orbeon/ " }
+        ]
+        """
+      ).get
+    )
 
-        val Failures = Seq(
-            "",
-            """[ { "label": "Prod 1", "url": "  " } ]""",
-            """[ { "label": "Prod 1", "url": "" } ]""",
-            """[ { "label": "Prod 1" } ]""",
-            """[ { "label": "  ", "url": "http://prod1.acme.org/orbeon" } ]""",
-            """[ { "label": "", "url": "http://prod1.acme.org/orbeon" } ]""",
-            """[ { "url": "http://prod1.acme.org/orbeon" } ]""",
-            """[ { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
-        )
+    val Failures = Seq(
+      "",
+      """[ { "label": "Prod 1", "url": "  " } ]""",
+      """[ { "label": "Prod 1", "url": "" } ]""",
+      """[ { "label": "Prod 1" } ]""",
+      """[ { "label": "  ", "url": "http://prod1.acme.org/orbeon" } ]""",
+      """[ { "label": "", "url": "http://prod1.acme.org/orbeon" } ]""",
+      """[ { "url": "http://prod1.acme.org/orbeon" } ]""",
+      """[ { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
+    )
 
-        for (json ← Failures)
-            assert(tryRemoteServersFromString(json).isFailure)
-    }
+    for (json ← Failures)
+      assert(tryRemoteServersFromString(json).isFailure)
+  }
 }

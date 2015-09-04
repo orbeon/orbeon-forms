@@ -25,189 +25,189 @@ import scala.collection.JavaConverters._
 
 trait BindingMetadata extends Logging {
 
-    private var inlineBindingsRefs          = List[InlineBindingRef]()
-    // NOTE: Multiple prefixed ids can point to the same AbstractBinding object.
-    private var bindingsByControlPrefixedId = Map[String, IndexableBinding]()
-    private var bindingsPaths               = Set[String]()
-    private var maxLastModified             = -1L
+  private var inlineBindingsRefs          = List[InlineBindingRef]()
+  // NOTE: Multiple prefixed ids can point to the same AbstractBinding object.
+  private var bindingsByControlPrefixedId = Map[String, IndexableBinding]()
+  private var bindingsPaths               = Set[String]()
+  private var maxLastModified             = -1L
 
-    // ==== Annotator/Extractor API
+  // ==== Annotator/Extractor API
 
-    private var _xblIndex          : Option[BindingIndex[IndexableBinding]] = None
-    private var _checkedPaths      : Set[String]= Set.empty
-    private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
+  private var _xblIndex          : Option[BindingIndex[IndexableBinding]] = None
+  private var _checkedPaths      : Set[String]= Set.empty
+  private var _baselineResources : (List[String], List[String]) = (Nil, Nil)
 
-    def initializeBindingLibraryIfNeeded(): Unit =
-        if (_xblIndex.isEmpty) {
+  def initializeBindingLibraryIfNeeded(): Unit =
+    if (_xblIndex.isEmpty) {
 
-            debug("entering view")
+      debug("entering view")
 
-            val (newIndex, newCheckedPaths, scripts, styles) =
-                BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
+      val (newIndex, newCheckedPaths, scripts, styles) =
+        BindingLoader.getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
 
-            var currentIndex = newIndex
+      var currentIndex = newIndex
 
-            if (inlineBindingsRefs.nonEmpty) {
-                debug(s"indexing ${inlineBindingsRefs.size} inline bindings")
+      if (inlineBindingsRefs.nonEmpty) {
+        debug(s"indexing ${inlineBindingsRefs.size} inline bindings")
 
-                inlineBindingsRefs foreach { inlineBinding ⇒
-                    currentIndex = BindingIndex.indexBinding(currentIndex, inlineBinding)
-                }
-                inlineBindingsRefs = Nil
-            }
-
-            _xblIndex          = Some(currentIndex)
-            _checkedPaths      = newCheckedPaths
-            _baselineResources = (scripts, styles)
+        inlineBindingsRefs foreach { inlineBinding ⇒
+          currentIndex = BindingIndex.indexBinding(currentIndex, inlineBinding)
         }
+        inlineBindingsRefs = Nil
+      }
 
-    def commitBindingIndex() =
-        _xblIndex match {
-            case Some(index) ⇒
-                val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
-                debug("committing global binding index", BindingIndex.stats(cleanIndex))
-                GlobalBindingIndex.updateIndex(cleanIndex)
-            case None ⇒
-                debug("no binding index to commit")
-        }
-
-    def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit = {
-        debug("registering inline binding", List("index" → _xblIndex.isDefined.toString, "element" → elementAtt, "prefixed id" → bindingPrefixedId))
-        val newBindingRef = InlineBindingRef(
-            bindingPrefixedId,
-            CSSSelectorParser.parseSelectors(elementAtt),
-            ns
-        )
-        _xblIndex match {
-            case Some(index) ⇒
-                // Case of restore, where `initializeBindingLibraryIfNeeded()` is called first
-                val newIndex = BindingIndex.indexBinding(index, newBindingRef)
-                if (index ne newIndex)
-                    _xblIndex = Some(newIndex)
-            case None ⇒
-                // Case of top-level initial analysis, where the library gets initialized once the body is found
-                // `inlineBindingsRefs` is processed during subsequent `initializeBindingLibraryIfNeeded()`
-                debug("registering inline binding", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
-                inlineBindingsRefs ::= newBindingRef
-        }
+      _xblIndex          = Some(currentIndex)
+      _checkedPaths      = newCheckedPaths
+      _baselineResources = (scripts, styles)
     }
 
-    def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
-        _xblIndex flatMap { index ⇒
+  def commitBindingIndex() =
+    _xblIndex match {
+      case Some(index) ⇒
+        val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
+        debug("committing global binding index", BindingIndex.stats(cleanIndex))
+        GlobalBindingIndex.updateIndex(cleanIndex)
+      case None ⇒
+        debug("no binding index to commit")
+    }
 
-        val (newIndex, newPaths, bindingOpt) =
-            BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), uri, localname, atts)
-
+  def registerInlineBinding(ns: Map[String, String], elementAtt: String, bindingPrefixedId: String): Unit = {
+    debug("registering inline binding", List("index" → _xblIndex.isDefined.toString, "element" → elementAtt, "prefixed id" → bindingPrefixedId))
+    val newBindingRef = InlineBindingRef(
+      bindingPrefixedId,
+      CSSSelectorParser.parseSelectors(elementAtt),
+      ns
+    )
+    _xblIndex match {
+      case Some(index) ⇒
+        // Case of restore, where `initializeBindingLibraryIfNeeded()` is called first
+        val newIndex = BindingIndex.indexBinding(index, newBindingRef)
         if (index ne newIndex)
-            _xblIndex = Some(newIndex)
+          _xblIndex = Some(newIndex)
+      case None ⇒
+        // Case of top-level initial analysis, where the library gets initialized once the body is found
+        // `inlineBindingsRefs` is processed during subsequent `initializeBindingLibraryIfNeeded()`
+        debug("registering inline binding", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
+        inlineBindingsRefs ::= newBindingRef
+    }
+  }
 
-        _checkedPaths = newPaths
+  def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
+    _xblIndex flatMap { index ⇒
 
-        if (debugEnabled)
-            bindingOpt foreach { binding ⇒
-                debug("found binding for", List("element" → s"Q{$uri}$localname"))
-            }
+    val (newIndex, newPaths, bindingOpt) =
+      BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), uri, localname, atts)
 
-        bindingOpt
+    if (index ne newIndex)
+      _xblIndex = Some(newIndex)
+
+    _checkedPaths = newPaths
+
+    if (debugEnabled)
+      bindingOpt foreach { binding ⇒
+        debug("found binding for", List("element" → s"Q{$uri}$localname"))
+      }
+
+    bindingOpt
+  }
+
+  def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding) = {
+    bindingsByControlPrefixedId += controlPrefixedId → binding
+    binding.path foreach (bindingsPaths += _)
+    maxLastModified = maxLastModified max binding.lastModified
+  }
+
+  def prefixedIdHasBinding(prefixedId: String): Boolean =
+    bindingsByControlPrefixedId.contains(prefixedId)
+
+  // NOTE: Used for hooking up fr:xforms-inspector.
+  def isByNameBindingInUse(uri: String, localname: String): Boolean = {
+
+    val someURI = Some(uri)
+
+    def hasByNameSelector(binding: IndexableBinding) = {
+
+      val ns = binding.selectorsNamespaces
+
+      binding.selectors collectFirst {
+        case s @ Selector(
+          ElementWithFiltersSelector(
+            Some(TypeSelector(Some(Some(prefix)), `localname`)),
+            Nil),
+          Nil) if ns.get(prefix) == someURI ⇒
+      } isDefined
     }
 
-    def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding) = {
-        bindingsByControlPrefixedId += controlPrefixedId → binding
-        binding.path foreach (bindingsPaths += _)
-        maxLastModified = maxLastModified max binding.lastModified
-    }
+    bindingsByControlPrefixedId.values exists hasByNameSelector
+  }
 
-    def prefixedIdHasBinding(prefixedId: String): Boolean =
-        bindingsByControlPrefixedId.contains(prefixedId)
+  // ==== XBLBindings API
 
-    // NOTE: Used for hooking up fr:xforms-inspector.
-    def isByNameBindingInUse(uri: String, localname: String): Boolean = {
+  def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit =
+    _xblIndex foreach { index ⇒
 
-        val someURI = Some(uri)
+      val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(index, inlineXBL)
 
-        def hasByNameSelector(binding: IndexableBinding) = {
+      debug("extracted inline XBL", List(
+        "elements" → inlineXBL.size.toString,
+        "bindings" → newBindings.size.toString
+      ))
 
-            val ns = binding.selectorsNamespaces
+      def replaceBindingRefs(mappings: Map[String, IndexableBinding], newBindings: List[AbstractBinding]) = {
 
-            binding.selectors collectFirst {
-                case s @ Selector(
-                    ElementWithFiltersSelector(
-                        Some(TypeSelector(Some(Some(prefix)), `localname`)),
-                        Nil),
-                    Nil) if ns.get(prefix) == someURI ⇒
-            } isDefined
+        var currentMappings = mappings
+
+        newBindings foreach { newBinding ⇒
+
+          val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
+
+          currentMappings foreach {
+            case (controlPrefixedId, ib @ InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
+              currentMappings += controlPrefixedId → newBinding
+            case _ ⇒
+          }
         }
 
-        bindingsByControlPrefixedId.values exists hasByNameSelector
+        currentMappings
+      }
+
+      // Replace in bindingsByControlPrefixedId
+      bindingsByControlPrefixedId = replaceBindingRefs(bindingsByControlPrefixedId, newBindings)
+
+      // Remove InlineBindingRef if any (AbstractBinding are added by extractAndIndexFromElements)
+      if (newIndex ne index)
+        _xblIndex = Some(BindingIndex.keepAbstractBindingsOnly(newIndex))
     }
 
-    // ==== XBLBindings API
-
-    def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit =
-        _xblIndex foreach { index ⇒
-
-            val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(index, inlineXBL)
-
-            debug("extracted inline XBL", List(
-                "elements" → inlineXBL.size.toString,
-                "bindings" → newBindings.size.toString
-            ))
-
-            def replaceBindingRefs(mappings: Map[String, IndexableBinding], newBindings: List[AbstractBinding]) = {
-
-                var currentMappings = mappings
-
-                newBindings foreach { newBinding ⇒
-
-                    val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
-
-                    currentMappings foreach {
-                        case (controlPrefixedId, ib @ InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
-                            currentMappings += controlPrefixedId → newBinding
-                        case _ ⇒
-                    }
-                }
-
-                currentMappings
-            }
-
-            // Replace in bindingsByControlPrefixedId
-            bindingsByControlPrefixedId = replaceBindingRefs(bindingsByControlPrefixedId, newBindings)
-
-            // Remove InlineBindingRef if any (AbstractBinding are added by extractAndIndexFromElements)
-            if (newIndex ne index)
-                _xblIndex = Some(BindingIndex.keepAbstractBindingsOnly(newIndex))
-        }
-
-    def findBindingByPrefixedId(controlPrefixedId: String): Option[AbstractBinding] =
-        bindingsByControlPrefixedId.get(controlPrefixedId) collect {
-            case binding: AbstractBinding ⇒ binding
-            case _                        ⇒ throw new IllegalStateException("missing binding")
-        }
-
-    def removeBindingByPrefixedId(controlPrefixedId: String): Unit =
-        bindingsByControlPrefixedId -= controlPrefixedId
-
-    // ==== Other API
-
-    def baselineResources = _baselineResources
-
-    def allBindingsMaybeDuplicates = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
-
-    def getBindingIncludesJava = bindingsPaths.asJava
-
-    private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
-        val last = rm.lastModified(path, true)
-        last != -1 && last <= this.maxLastModified
+  def findBindingByPrefixedId(controlPrefixedId: String): Option[AbstractBinding] =
+    bindingsByControlPrefixedId.get(controlPrefixedId) collect {
+      case binding: AbstractBinding ⇒ binding
+      case _                        ⇒ throw new IllegalStateException("missing binding")
     }
 
-    def bindingsIncludesAreUpToDate = {
-        implicit val rm = ResourceManagerWrapper.instance
-        bindingsPaths.iterator forall pathExistsAndIsUpToDate
-    }
+  def removeBindingByPrefixedId(controlPrefixedId: String): Unit =
+    bindingsByControlPrefixedId -= controlPrefixedId
 
-    def debugOutOfDateBindingsIncludesJava = {
-        implicit val rm = ResourceManagerWrapper.instance
-        bindingsPaths.iterator filterNot pathExistsAndIsUpToDate mkString ", "
-    }
+  // ==== Other API
+
+  def baselineResources = _baselineResources
+
+  def allBindingsMaybeDuplicates = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
+
+  def getBindingIncludesJava = bindingsPaths.asJava
+
+  private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
+    val last = rm.lastModified(path, true)
+    last != -1 && last <= this.maxLastModified
+  }
+
+  def bindingsIncludesAreUpToDate = {
+    implicit val rm = ResourceManagerWrapper.instance
+    bindingsPaths.iterator forall pathExistsAndIsUpToDate
+  }
+
+  def debugOutOfDateBindingsIncludesJava = {
+    implicit val rm = ResourceManagerWrapper.instance
+    bindingsPaths.iterator filterNot pathExistsAndIsUpToDate mkString ", "
+  }
 }

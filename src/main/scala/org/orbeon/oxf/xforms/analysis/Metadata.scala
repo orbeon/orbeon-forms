@@ -38,74 +38,74 @@ import scala.collection.{immutable, mutable}
  * Split into traits for modularity.
  */
 class Metadata(val idGenerator: IdGenerator) extends NamespaceMappings with BindingMetadata with Marks {
-    def this() = this(new IdGenerator)
+  def this() = this(new IdGenerator)
 }
 
 object Metadata {
-    // Restore a Metadata object from the given StaticStateDocument
-    def apply(staticStateDocument: StaticStateDocument, template: Option[AnnotatedTemplate]): Metadata = {
+  // Restore a Metadata object from the given StaticStateDocument
+  def apply(staticStateDocument: StaticStateDocument, template: Option[AnnotatedTemplate]): Metadata = {
 
-        // Restore generator with last id
-        val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId))
+    // Restore generator with last id
+    val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId))
 
-        // Restore namespace mappings and ids
-        TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata))
+    // Restore namespace mappings and ids
+    TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata))
 
-        // Restore marks if there is a template
-        template foreach { template ⇒
-            for (mark ← template.saxStore.getMarks.asScala)
-                metadata.putMark(mark)
-        }
-
-        metadata
+    // Restore marks if there is a template
+    template foreach { template ⇒
+      for (mark ← template.saxStore.getMarks.asScala)
+        metadata.putMark(mark)
     }
+
+    metadata
+  }
 }
 
 // Handling of template marks
 trait Marks {
-    private val marks = new mutable.HashMap[String, SAXStore#Mark]
+  private val marks = new mutable.HashMap[String, SAXStore#Mark]
 
-    def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
-    def getMark(prefixedId: String) = marks.get(prefixedId)
+  def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
+  def getMark(prefixedId: String) = marks.get(prefixedId)
 
-    private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsUtils.isTopLevelId(prefixedId) ⇒ mark }
-    def hasTopLevelMarks = topLevelMarks.nonEmpty
+  private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsUtils.isTopLevelId(prefixedId) ⇒ mark }
+  def hasTopLevelMarks = topLevelMarks.nonEmpty
 }
 
 // Handling of namespaces
 trait NamespaceMappings {
 
-    private val namespaceMappings = new mutable.HashMap[String, NamespaceMapping]
-    private val hashes = new mutable.LinkedHashMap[String, NamespaceMapping]
+  private val namespaceMappings = new mutable.HashMap[String, NamespaceMapping]
+  private val hashes = new mutable.LinkedHashMap[String, NamespaceMapping]
 
-    def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]): Unit = {
-        // Sort mappings by prefix
-        val sorted = immutable.TreeMap(mapping.asScala.toSeq: _*)
-        // Hash key/values
-        val hexHash = NamespaceMapping.hashMapping(sorted.asJava)
+  def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]): Unit = {
+    // Sort mappings by prefix
+    val sorted = immutable.TreeMap(mapping.asScala.toSeq: _*)
+    // Hash key/values
+    val hexHash = NamespaceMapping.hashMapping(sorted.asJava)
 
-        // Retrieve or create mapping object
-        val namespaceMapping = hashes.getOrElseUpdate(hexHash, {
-            val newNamespaceMapping = new NamespaceMapping(hexHash, sorted.asJava)
-            hashes += (hexHash → newNamespaceMapping)
-            newNamespaceMapping
-        })
+    // Retrieve or create mapping object
+    val namespaceMapping = hashes.getOrElseUpdate(hexHash, {
+      val newNamespaceMapping = new NamespaceMapping(hexHash, sorted.asJava)
+      hashes += (hexHash → newNamespaceMapping)
+      newNamespaceMapping
+    })
 
-        // Remember that id has this mapping
-        namespaceMappings += prefixedId → namespaceMapping
+    // Remember that id has this mapping
+    namespaceMappings += prefixedId → namespaceMapping
+  }
+
+  def removeNamespaceMapping(prefixedId: String): Unit =
+    namespaceMappings -= prefixedId
+
+  def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
+
+  def debugPrintNamespaces(): Unit = {
+    println("Number of different namespace mappings: " + hashes.size)
+    for ((key, value) ← hashes) {
+      println("   hash: " + key)
+      for ((prefix, uri) ← value.mapping.asScala)
+        println("     " + prefix + " → " + uri)
     }
-
-    def removeNamespaceMapping(prefixedId: String): Unit =
-        namespaceMappings -= prefixedId
-
-    def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
-
-    def debugPrintNamespaces(): Unit = {
-        println("Number of different namespace mappings: " + hashes.size)
-        for ((key, value) ← hashes) {
-            println("   hash: " + key)
-            for ((prefix, uri) ← value.mapping.asScala)
-                println("     " + prefix + " → " + uri)
-        }
-    }
+  }
 }

@@ -18,27 +18,27 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 // Static event handler
 trait EventHandler {
 
-    def staticId: String
-    def prefixedId: String
-    def locationData: LocationData
+  def staticId: String
+  def prefixedId: String
+  def locationData: LocationData
 
-    def isCapturePhaseOnly: Boolean
-    def isTargetPhase: Boolean
-    def isBubblingPhase: Boolean
+  def isCapturePhaseOnly: Boolean
+  def isTargetPhase: Boolean
+  def isBubblingPhase: Boolean
 
-    def isPropagate: Boolean
-    def isPerformDefaultAction: Boolean
+  def isPropagate: Boolean
+  def isPerformDefaultAction: Boolean
 
-    val isPhantom: Boolean
+  val isPhantom: Boolean
 
-    def observersPrefixedIds: Set[String]
-    def eventNames: Set[String]
+  def observersPrefixedIds: Set[String]
+  def eventNames: Set[String]
 
-    def isMatchByName(eventName: String): Boolean
-    def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean
+  def isMatchByName(eventName: String): Boolean
+  def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean
 
-    def getKeyModifiers: String
-    def getKeyText: String
+  def getKeyModifiers: String
+  def getKeyText: String
 
-    def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent)
+  def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent)
 }

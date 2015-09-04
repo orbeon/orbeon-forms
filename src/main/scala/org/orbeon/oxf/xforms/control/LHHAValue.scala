@@ -21,16 +21,16 @@ import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 case class LHHAValue(label: String, isHTML: Boolean) {
-    def streamAsHTML(ch: XMLReceiverHelper, locationData: LocationData): Unit =
-        if (isHTML)
-            streamHTMLFragment(ch.getXmlReceiver, label, locationData, "")
-        else
-            ch.text(StringUtils.defaultString(label))
+  def streamAsHTML(ch: XMLReceiverHelper, locationData: LocationData): Unit =
+    if (isHTML)
+      streamHTMLFragment(ch.getXmlReceiver, label, locationData, "")
+    else
+      ch.text(StringUtils.defaultString(label))
 
-    def javaScriptValue(locationData: LocationData) =
-        escapeJavaScript(
-            if (isHTML)
-                getEscapedHTMLValue(locationData, label)
-            else
-                escapeXMLMinimal(label))
+  def javaScriptValue(locationData: LocationData) =
+    escapeJavaScript(
+      if (isHTML)
+        getEscapedHTMLValue(locationData, label)
+      else
+        escapeXMLMinimal(label))
 }

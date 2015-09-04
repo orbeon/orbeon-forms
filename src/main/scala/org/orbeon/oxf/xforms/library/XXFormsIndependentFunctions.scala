@@ -25,164 +25,164 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 */
 trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
 
-    // Define in early definition of subclass
-    val XXFormsIndependentFunctionsNS: Seq[String]
+  // Define in early definition of subclass
+  val XXFormsIndependentFunctionsNS: Seq[String]
 
-    // Some functions are independent but support checking the XForms document first. This configures this behavior.
-    val tryXFormsDocument: Boolean
+  // Some functions are independent but support checking the XForms document first. This configures this behavior.
+  val tryXFormsDocument: Boolean
 
-    Namespace(XXFormsIndependentFunctionsNS) {
+  Namespace(XXFormsIndependentFunctionsNS) {
 
-        val tryXFormsDocumentOp = if (tryXFormsDocument) 1 else 0
+    val tryXFormsDocumentOp = if (tryXFormsDocument) 1 else 0
 
-        Fun("get-request-method", classOf[XXFormsGetRequestMethod], op = 0, min = 0, STRING, ALLOWS_ONE)
+    Fun("get-request-method", classOf[XXFormsGetRequestMethod], op = 0, min = 0, STRING, ALLOWS_ONE)
 
-        Fun("get-portlet-mode", classOf[XXFormsGetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
+    Fun("get-portlet-mode", classOf[XXFormsGetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
 
-        Fun("get-window-state", classOf[XXFormsGetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
+    Fun("get-window-state", classOf[XXFormsGetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
 
-        Fun("get-request-path", classOf[XXFormsGetRequestPath], op = tryXFormsDocumentOp, 0, STRING, ALLOWS_ONE)
+    Fun("get-request-path", classOf[XXFormsGetRequestPath], op = tryXFormsDocumentOp, 0, STRING, ALLOWS_ONE)
 
-        Fun("get-request-header", classOf[XXFormsGetRequestHeader], op = tryXFormsDocumentOp, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("get-request-header", classOf[XXFormsGetRequestHeader], op = tryXFormsDocumentOp, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("get-request-parameter", classOf[XXFormsGetRequestParameter], op = tryXFormsDocumentOp, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("get-request-parameter", classOf[XXFormsGetRequestParameter], op = tryXFormsDocumentOp, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("get-session-attribute", classOf[XXFormsGetSessionAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("get-session-attribute", classOf[XXFormsGetSessionAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("set-session-attribute", classOf[XXFormsSetSessionAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("set-session-attribute", classOf[XXFormsSetSessionAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("get-request-attribute", classOf[XXFormsGetRequestAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("get-request-attribute", classOf[XXFormsGetRequestAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("set-request-attribute", classOf[XXFormsSetRequestAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("set-request-attribute", classOf[XXFormsSetRequestAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("username"       , classOf[XXFormsUsername],  op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-        Fun("get-remote-user", classOf[XXFormsUsername],  op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-        Fun("user-group"     , classOf[XXFormsUserGroup], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-        Fun("user-roles"     , classOf[XXFormsUserRoles], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+    Fun("username"       , classOf[XXFormsUsername],  op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("get-remote-user", classOf[XXFormsUsername],  op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("user-group"     , classOf[XXFormsUserGroup], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("user-roles"     , classOf[XXFormsUserRoles], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
 
-        Fun("is-user-in-role", classOf[XXFormsIsUserInRole], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("is-user-in-role", classOf[XXFormsIsUserInRole], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("call-xpl", classOf[XXFormsCallXPL], op = 0, min = 4, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, ALLOWS_ZERO_OR_MORE),
-            Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(STRING, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("call-xpl", classOf[XXFormsCallXPL], op = 0, min = 4, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_MORE),
+      Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("evaluate", classOf[Evaluate], op = Evaluate.EVALUATE, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("evaluate", classOf[Evaluate], op = Evaluate.EVALUATE, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("evaluate-avt", classOf[XXFormsEvaluateAVT], op = 0, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("evaluate-avt", classOf[XXFormsEvaluateAVT], op = 0, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("serialize", classOf[Serialize], op = 0, min = 2, STRING, EXACTLY_ONE,
-            Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE),
-            Arg(ITEM_TYPE, EXACTLY_ONE)
-        )
+    Fun("serialize", classOf[Serialize], op = 0, min = 2, STRING, EXACTLY_ONE,
+      Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE),
+      Arg(ITEM_TYPE, EXACTLY_ONE)
+    )
 
-        Fun("property", classOf[XXFormsProperty], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("property", classOf[XXFormsProperty], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("properties-start-with", classOf[XXFormsPropertiesStartsWith], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("properties-start-with", classOf[XXFormsPropertiesStartsWith], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("decode-iso9075-14", classOf[XXFormsDecodeISO9075], op = 0, min = 1, STRING, ALLOWS_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("decode-iso9075-14", classOf[XXFormsDecodeISO9075], op = 0, min = 1, STRING, ALLOWS_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("encode-iso9075-14", classOf[XXFormsEncodeISO9075], op = 0, min = 1, STRING, ALLOWS_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("encode-iso9075-14", classOf[XXFormsEncodeISO9075], op = 0, min = 1, STRING, ALLOWS_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("doc-base64", classOf[XXFormsDocBase64], op = XXFormsDocBase64.DOC_BASE64, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-            Arg(STRING, ALLOWS_ZERO_OR_ONE)
-        )
+    Fun("doc-base64", classOf[XXFormsDocBase64], op = XXFormsDocBase64.DOC_BASE64, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
 
-        Fun("doc-base64-available", classOf[XXFormsDocBase64], op = XXFormsDocBase64.DOC_BASE64_AVAILABLE, min = 1, BOOLEAN, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("doc-base64-available", classOf[XXFormsDocBase64], op = XXFormsDocBase64.DOC_BASE64_AVAILABLE, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("form-urlencode", classOf[XXFormsFormURLEncode], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-            Arg(NODE_TYPE, EXACTLY_ONE)
-        )
+    Fun("form-urlencode", classOf[XXFormsFormURLEncode], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(NODE_TYPE, EXACTLY_ONE)
+    )
 
-        Fun("rewrite-resource-uri", classOf[XXFormsRewriteResourceURI], op = 0, min = 1, STRING, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(BOOLEAN, EXACTLY_ONE)
-        )
+    Fun("rewrite-resource-uri", classOf[XXFormsRewriteResourceURI], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE)
+    )
 
-        Fun("rewrite-service-uri", classOf[XXFormsRewriteServiceURI], op = 0, min = 1, STRING, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(BOOLEAN, EXACTLY_ONE)
-        )
+    Fun("rewrite-service-uri", classOf[XXFormsRewriteServiceURI], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE)
+    )
 
-        Fun("has-class", classOf[XXFormsHasClass], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("has-class", classOf[XXFormsHasClass], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("classes", classOf[XXFormsClasses], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
-            Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("classes", classOf[XXFormsClasses], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("split", classOf[XXFormsSplit], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
-            Arg(STRING, ALLOWS_ZERO_OR_MORE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("split", classOf[XXFormsSplit], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("forall", classOf[XXFormsForall], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, EXACTLY_ONE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("forall", classOf[XXFormsForall], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("exists", classOf[XXFormsExists], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, EXACTLY_ONE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("exists", classOf[XXFormsExists], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("image-metadata", classOf[XXFormsImageMetadata], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-            Arg(ITEM_TYPE, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
-    }
+    Fun("image-metadata", classOf[XXFormsImageMetadata], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(ITEM_TYPE, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+  }
 }

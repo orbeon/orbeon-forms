@@ -28,17 +28,17 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
  */
 class Context extends XFormsFunction with MatchSimpleAnalysis {
 
-    override def evaluateItem(xpathContext: XPathContext) =
-        bindingContext.contextItem
+  override def evaluateItem(xpathContext: XPathContext) =
+    bindingContext.contextItem
 
-    override def getIntrinsicDependencies =
-        StaticProperty.DEPENDS_ON_CONTEXT_ITEM
+  override def getIntrinsicDependencies =
+    StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 
-    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
-        pathMap.getPathMapContext match {
-            case context: SimpleElementAnalysis#SimplePathMapContext ⇒
-                // Handle context
-                matchSimpleAnalysis(pathMap, context.context)
-            case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-        }
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
+    pathMap.getPathMapContext match {
+      case context: SimpleElementAnalysis#SimplePathMapContext ⇒
+        // Handle context
+        matchSimpleAnalysis(pathMap, context.context)
+      case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+    }
 }

@@ -24,32 +24,32 @@ import scala.util.control.NonFatal
  */
 object Caches {
 
-    lazy val stateCache     = getCache("xforms.state")
-    lazy val resourcesCache = getCache("xforms.resources")
-    lazy val xblCache       = getCache("xforms.xbl")
+  lazy val stateCache     = getCache("xforms.state")
+  lazy val resourcesCache = getCache("xforms.resources")
+  lazy val xblCache       = getCache("xforms.xbl")
 
-    private val ehcachePath = "oxf:/config/ehcache.xml"
+  private val ehcachePath = "oxf:/config/ehcache.xml"
 
-    private lazy val cacheManager =
-        try {
-            // Read configuration from XML file in resources
-            val manager = new CacheManager(URLFactory.createURL(ehcachePath))
-            withMessage(manager, "initialized cache manager from " + ehcachePath)
-        } catch {
-            case NonFatal(t) ⇒
-                throw new OXFException("unable to read cache manager configuration from " + ehcachePath, t)
-        }
+  private lazy val cacheManager =
+    try {
+      // Read configuration from XML file in resources
+      val manager = new CacheManager(URLFactory.createURL(ehcachePath))
+      withMessage(manager, "initialized cache manager from " + ehcachePath)
+    } catch {
+      case NonFatal(t) ⇒
+        throw new OXFException("unable to read cache manager configuration from " + ehcachePath, t)
+    }
 
-    private def getCache(cacheName: String) =
-        cacheManager.getCache(cacheName) match {
-            case cache: Cache ⇒
-                withMessage(cache, "found cache configuration for " + cacheName)
-            case _ ⇒
-                throw new OXFException("Cache configuration not found for " + cacheName + ". Make sure an ehcache.xml file is in place.")
-        }
+  private def getCache(cacheName: String) =
+    cacheManager.getCache(cacheName) match {
+      case cache: Cache ⇒
+        withMessage(cache, "found cache configuration for " + cacheName)
+      case _ ⇒
+        throw new OXFException("Cache configuration not found for " + cacheName + ". Make sure an ehcache.xml file is in place.")
+    }
 
-    private val indentedLogger =
-        Loggers.getIndentedLogger("caches")
+  private val indentedLogger =
+    Loggers.getIndentedLogger("caches")
 
-    private def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
+  private def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
 }

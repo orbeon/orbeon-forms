@@ -18,14 +18,14 @@ import scala.scalajs.js.JSApp
 // Scala.js starting point for Form Builder
 object FormBuilderApp extends JSApp {
 
-    override def main(): Unit = {
+  override def main(): Unit = {
 
-        println("Starting Form Builder...")
+    println("Starting Form Builder...")
 
-        def initializeOnDomReady(): Unit = {
-            StaticUpload
-        }
-
-        $(initializeOnDomReady _)
+    def initializeOnDomReady(): Unit = {
+      StaticUpload
     }
+
+    $(initializeOnDomReady _)
+  }
 }

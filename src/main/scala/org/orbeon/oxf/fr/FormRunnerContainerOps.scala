@@ -19,106 +19,106 @@ import XMLNames._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
-    def isFBBody(node: NodeInfo) = (node self XFGroupTest) && node.attClasses("fb-body")
+  def isFBBody(node: NodeInfo) = (node self XFGroupTest) && node.attClasses("fb-body")
 
-    val RepeatContentToken       = "content"
-    val LegacyRepeatContentToken = "true"
+  val RepeatContentToken       = "content"
+  val LegacyRepeatContentToken = "true"
 
-    // Predicates
-    val IsGrid:    NodeInfo ⇒ Boolean = _ self FRGridTest
-    val IsSection: NodeInfo ⇒ Boolean = _ self FRSectionTest
+  // Predicates
+  val IsGrid:    NodeInfo ⇒ Boolean = _ self FRGridTest
+  val IsSection: NodeInfo ⇒ Boolean = _ self FRSectionTest
 
-    def isRepeatable(node: NodeInfo) =
-        IsGrid(node) || IsSection(node)
+  def isRepeatable(node: NodeInfo) =
+    IsGrid(node) || IsSection(node)
 
-    def isContentRepeat(node: NodeInfo) =
-        isRepeatable(node) && node.attValue("repeat") == RepeatContentToken
+  def isContentRepeat(node: NodeInfo) =
+    isRepeatable(node) && node.attValue("repeat") == RepeatContentToken
 
-    def isLegacyRepeat(node: NodeInfo) =
-        ! isContentRepeat(node) &&
-        isRepeatable(node)      && (
-            node.attValue("repeat") == LegacyRepeatContentToken ||
-            node.att("minOccurs").nonEmpty                      ||
-            node.att("maxOccurs").nonEmpty                      ||
-            node.att("min").nonEmpty                            ||
-            node.att("max").nonEmpty
-        )
+  def isLegacyRepeat(node: NodeInfo) =
+    ! isContentRepeat(node) &&
+    isRepeatable(node)      && (
+      node.attValue("repeat") == LegacyRepeatContentToken ||
+      node.att("minOccurs").nonEmpty                      ||
+      node.att("maxOccurs").nonEmpty                      ||
+      node.att("min").nonEmpty                            ||
+      node.att("max").nonEmpty
+    )
 
-    def isRepeat(node: NodeInfo) =
-        isContentRepeat(node) || isLegacyRepeat(node)
+  def isRepeat(node: NodeInfo) =
+    isContentRepeat(node) || isLegacyRepeat(node)
 
-    val IsContainer: NodeInfo ⇒ Boolean =
-        node ⇒ (node self FRContainerTest) || isFBBody(node)
+  val IsContainer: NodeInfo ⇒ Boolean =
+    node ⇒ (node self FRContainerTest) || isFBBody(node)
 
-    def controlRequiresNestedIterationElement(node: NodeInfo) =
-        isRepeat(node)
+  def controlRequiresNestedIterationElement(node: NodeInfo) =
+    isRepeat(node)
 
-    // Namespace URL a section template component must match
-    private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
+  // Namespace URL a section template component must match
+  private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
-    val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
-        container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
+  val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
+    container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
 
-    // XForms callers: get the name for a section or grid element or null (the empty sequence)
-    def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
+  // XForms callers: get the name for a section or grid element or null (the empty sequence)
+  def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull
 
-    // Find ancestor sections and grids (including non-repeated grids) from leaf to root
-    def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
-        (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
+  // Find ancestor sections and grids (including non-repeated grids) from leaf to root
+  def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
+    (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
-    // Find ancestor section and grid names from root to leaf
-    // Don't return non-repeated fr:grid until an enclosing element is needed. See:
-    // - https://github.com/orbeon/orbeon-forms/issues/2173
-    // - https://github.com/orbeon/orbeon-forms/issues/1947
-    def findContainerNamesForModel(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
+  // Find ancestor section and grid names from root to leaf
+  // Don't return non-repeated fr:grid until an enclosing element is needed. See:
+  // - https://github.com/orbeon/orbeon-forms/issues/2173
+  // - https://github.com/orbeon/orbeon-forms/issues/1947
+  def findContainerNamesForModel(descendant: NodeInfo, includeSelf: Boolean = false): Seq[String] = {
 
-        val namesWithContainers =
-            for {
-                container ← findAncestorContainers(descendant, includeSelf)
-                name      ← getControlNameOpt(container)
-                if ! (IsGrid(container) && ! isRepeat(container))
-            } yield
-                name → container
+    val namesWithContainers =
+      for {
+        container ← findAncestorContainers(descendant, includeSelf)
+        name      ← getControlNameOpt(container)
+        if ! (IsGrid(container) && ! isRepeat(container))
+      } yield
+        name → container
 
-        // Repeated sections add an intermediary iteration element
-        val namesFromLeaf =
-            namesWithContainers flatMap {
-                case (name, container) ⇒
-                    findRepeatIterationName(descendant, name).toList ::: name :: Nil
-            }
+    // Repeated sections add an intermediary iteration element
+    val namesFromLeaf =
+      namesWithContainers flatMap {
+        case (name, container) ⇒
+          findRepeatIterationName(descendant, name).toList ::: name :: Nil
+      }
 
-        namesFromLeaf.reverse
-    }
+    namesFromLeaf.reverse
+  }
 
-    // A container's children containers
-    def childrenContainers(container: NodeInfo) =
-        container \ * filter IsContainer
+  // A container's children containers
+  def childrenContainers(container: NodeInfo) =
+    container \ * filter IsContainer
 
-    // A container's children grids (including repeated grids)
-    def childrenGrids(container: NodeInfo) =
-        container \ * filter IsGrid
+  // A container's children grids (including repeated grids)
+  def childrenGrids(container: NodeInfo) =
+    container \ * filter IsGrid
 
-    // Find all ancestor repeats from leaf to root
-    def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter isRepeat
+  // Find all ancestor repeats from leaf to root
+  def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+    findAncestorContainers(descendantOrSelf, includeSelf) filter isRepeat
 
-    def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
+  def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+    findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
 
-    // Find all ancestor sections from leaf to root
-    def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter IsSection
+  // Find all ancestor sections from leaf to root
+  def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+    findAncestorContainers(descendantOrSelf, includeSelf) filter IsSection
 
-    //@XPathFunction
-    def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =
-        findRepeatIterationName(inDoc, controlName) getOrElse ""
+  //@XPathFunction
+  def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String) =
+    findRepeatIterationName(inDoc, controlName) getOrElse ""
 
-    def findRepeatIterationName(inDoc: NodeInfo, controlName: String): Option[String] =
-        for {
-            control       ← findControlByName(inDoc, controlName)
-            if controlRequiresNestedIterationElement(control)
-            bind          ← findBindByName(inDoc, controlName)
-            iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
-        } yield
-            getBindNameOrEmpty(iterationBind)
+  def findRepeatIterationName(inDoc: NodeInfo, controlName: String): Option[String] =
+    for {
+      control       ← findControlByName(inDoc, controlName)
+      if controlRequiresNestedIterationElement(control)
+      bind          ← findBindByName(inDoc, controlName)
+      iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
+    } yield
+      getBindNameOrEmpty(iterationBind)
 }

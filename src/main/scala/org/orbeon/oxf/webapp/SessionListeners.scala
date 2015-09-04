@@ -20,44 +20,44 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Session.SessionListener
 
 class SessionListeners extends Externalizable {
 
-    private var listeners = new ConcurrentLinkedQueue[SessionListener]
+  private var listeners = new ConcurrentLinkedQueue[SessionListener]
 
-    @volatile
-    private var closed = false
+  @volatile
+  private var closed = false
 
-    // 2015-07-02: called by:
-    // - NetUtils.{deleteFileOnSessionTermination, renameAndExpireWithSession}
-    // - XFormsStateManager.addCacheSessionListener
-    def addListener(sessionListener: SessionListener): Unit =
-        if (! closed)
-            listeners.add(sessionListener)
-        else
-            throw new IllegalStateException("session already destroyed")
+  // 2015-07-02: called by:
+  // - NetUtils.{deleteFileOnSessionTermination, renameAndExpireWithSession}
+  // - XFormsStateManager.addCacheSessionListener
+  def addListener(sessionListener: SessionListener): Unit =
+    if (! closed)
+      listeners.add(sessionListener)
+    else
+      throw new IllegalStateException("session already destroyed")
 
-    // 2015-07-02: called by:
-    // - XFormsStateManager.removeCacheSessionListener
-    def removeListener(sessionListener: SessionListener): Unit =
-        if (! closed)
-            listeners.remove(sessionListener)
+  // 2015-07-02: called by:
+  // - XFormsStateManager.removeCacheSessionListener
+  def removeListener(sessionListener: SessionListener): Unit =
+    if (! closed)
+      listeners.remove(sessionListener)
 
-    // 2015-07-02: called by:
-    // - OrbeonSessionListener.sessionDestroyed
-    def iterateRemoveAndClose(): Iterator[SessionListener] = {
-        closed = true
-        Iterator.continually(listeners.poll()).takeWhile(_ ne null) // poll() retrieves and removes the head
-    }
+  // 2015-07-02: called by:
+  // - OrbeonSessionListener.sessionDestroyed
+  def iterateRemoveAndClose(): Iterator[SessionListener] = {
+    closed = true
+    Iterator.continually(listeners.poll()).takeWhile(_ ne null) // poll() retrieves and removes the head
+  }
 
-    // Use custom serialization so we can set a non-null `listeners` fields when Tomcat decides to restore a session
-    override def readExternal(objectInput: ObjectInput): Unit = {
-        listeners = new ConcurrentLinkedQueue[SessionListener]
-        closed = objectInput.readBoolean()
-    }
+  // Use custom serialization so we can set a non-null `listeners` fields when Tomcat decides to restore a session
+  override def readExternal(objectInput: ObjectInput): Unit = {
+    listeners = new ConcurrentLinkedQueue[SessionListener]
+    closed = objectInput.readBoolean()
+  }
 
-    override def writeExternal(objectOutput: ObjectOutput): Unit = {
-        objectOutput.writeBoolean(closed)
-    }
+  override def writeExternal(objectOutput: ObjectOutput): Unit = {
+    objectOutput.writeBoolean(closed)
+  }
 }
 
 object SessionListeners {
-    val SessionListenersKey = "oxf.servlet.session-listeners"
+  val SessionListenersKey = "oxf.servlet.session-listeners"
 }

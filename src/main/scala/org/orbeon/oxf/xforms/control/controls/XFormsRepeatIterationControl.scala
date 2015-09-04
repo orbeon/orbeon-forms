@@ -32,86 +32,86 @@ import org.orbeon.oxf.xforms.BindingContext
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
 class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-        extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId)
-        with NoLHHATrait {
+    extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId)
+    with NoLHHATrait {
 
-    override type Control <: RepeatIterationControl
+  override type Control <: RepeatIterationControl
 
-    // Initialize based on the effective id
-    private var _iterationIndex = XFormsUtils.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
-    def iterationIndex = _iterationIndex
+  // Initialize based on the effective id
+  private var _iterationIndex = XFormsUtils.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
+  def iterationIndex = _iterationIndex
 
-    // Set a new iteration index. This will cause the nested effective ids to update.
-    // This is used to "shuffle" around repeat iterations when repeat nodesets change.
-    def setIterationIndex(iterationIndex: Int): Unit = {
-        if (_iterationIndex != iterationIndex) {
-            _iterationIndex = iterationIndex
-            updateEffectiveId()
-        }
+  // Set a new iteration index. This will cause the nested effective ids to update.
+  // This is used to "shuffle" around repeat iterations when repeat nodesets change.
+  def setIterationIndex(iterationIndex: Int): Unit = {
+    if (_iterationIndex != iterationIndex) {
+      _iterationIndex = iterationIndex
+      updateEffectiveId()
+    }
+  }
+
+  // Whether this iteration is the repeat's current iteration
+  def isCurrentIteration = iterationIndex == repeat.getIndex
+
+  // This iteration's parent repeat control
+  def repeat = parent.asInstanceOf[XFormsRepeatControl]
+
+  // Does not support refresh events for now (could make sense though)
+  override def supportsRefreshEvents = false
+  override def isStaticReadonly = false
+  override def valueType = null
+
+  override def supportFullAjaxUpdates = false
+
+  // Update this control's effective id and its descendants based on the parent's effective id.
+  override def updateEffectiveId(): Unit = {
+    // Update this iteration's effective id
+    setEffectiveId(XFormsUtils.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
+    children foreach (_.updateEffectiveId())
+  }
+
+  override def equalsExternal(other: XFormsControl): Boolean = {
+    if (other == null || ! other.isInstanceOf[XFormsRepeatIterationControl])
+      return false
+
+    if (this eq other)
+      return true
+
+    val otherRepeatIterationControl = other.asInstanceOf[XFormsRepeatIterationControl]
+
+    // Ad-hoc comparison, because we basically only care about relevance changes
+    ! mustSendIterationUpdate(otherRepeatIterationControl)
+  }
+
+  private def mustSendIterationUpdate(other: XFormsRepeatIterationControl) = {
+    // NOTE: We only care about relevance changes. We should care about moving iterations around, but that's not
+    // handled that way yet!
+
+    // NOTE: We output if we are NOT relevant as the client must mark non-relevant elements. Ideally, we should not
+    // have non-relevant iterations actually present on the client.
+    (other eq null) && ! isRelevant || (other ne null) && other.isRelevant != isRelevant
+  }
+
+  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
+    assert(attributesImpl.getLength == 0)
+    val repeatIterationControl1 = other.asInstanceOf[XFormsRepeatIterationControl]
+    if (mustSendIterationUpdate(repeatIterationControl1)) {
+      // Use the effective id of the parent repeat
+      attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
+
+      // Relevance
+      attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
+      attributesImpl.addAttribute("", "iteration", "iteration", XMLReceiverHelper.CDATA, iterationIndex.toString)
+      ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl)
     }
 
-    // Whether this iteration is the repeat's current iteration
-    def isCurrentIteration = iterationIndex == repeat.getIndex
+    // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
+  }
 
-    // This iteration's parent repeat control
-    def repeat = parent.asInstanceOf[XFormsRepeatControl]
-
-    // Does not support refresh events for now (could make sense though)
-    override def supportsRefreshEvents = false
-    override def isStaticReadonly = false
-    override def valueType = null
-
-    override def supportFullAjaxUpdates = false
-
-    // Update this control's effective id and its descendants based on the parent's effective id.
-    override def updateEffectiveId(): Unit = {
-        // Update this iteration's effective id
-        setEffectiveId(XFormsUtils.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
-        children foreach (_.updateEffectiveId())
-    }
-
-    override def equalsExternal(other: XFormsControl): Boolean = {
-        if (other == null || ! other.isInstanceOf[XFormsRepeatIterationControl])
-            return false
-
-        if (this eq other)
-            return true
-
-        val otherRepeatIterationControl = other.asInstanceOf[XFormsRepeatIterationControl]
-
-        // Ad-hoc comparison, because we basically only care about relevance changes
-        ! mustSendIterationUpdate(otherRepeatIterationControl)
-    }
-
-    private def mustSendIterationUpdate(other: XFormsRepeatIterationControl) = {
-        // NOTE: We only care about relevance changes. We should care about moving iterations around, but that's not
-        // handled that way yet!
-
-        // NOTE: We output if we are NOT relevant as the client must mark non-relevant elements. Ideally, we should not
-        // have non-relevant iterations actually present on the client.
-        (other eq null) && ! isRelevant || (other ne null) && other.isRelevant != isRelevant
-    }
-
-    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
-        assert(attributesImpl.getLength == 0)
-        val repeatIterationControl1 = other.asInstanceOf[XFormsRepeatIterationControl]
-        if (mustSendIterationUpdate(repeatIterationControl1)) {
-            // Use the effective id of the parent repeat
-            attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
-
-            // Relevance
-            attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
-            attributesImpl.addAttribute("", "iteration", "iteration", XMLReceiverHelper.CDATA, iterationIndex.toString)
-            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl)
-        }
-
-        // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
-    }
-
-    override def computeBinding(parentContext: BindingContext) = {
-        val contextStack = container.getContextStack
-        contextStack.setBinding(parentContext)
-        contextStack.pushIteration(iterationIndex)
-        contextStack.getCurrentBindingContext
-    }
+  override def computeBinding(parentContext: BindingContext) = {
+    val contextStack = container.getContextStack
+    contextStack.setBinding(parentContext)
+    contextStack.pushIteration(iterationIndex)
+    contextStack.getCurrentBindingContext
+  }
 }

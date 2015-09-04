@@ -19,27 +19,27 @@ import org.orbeon.scaxon.XML._
 
 trait SchemaOps {
 
-    def findSchema(inDoc: NodeInfo) =
-        findModelElement(inDoc) \ (XS → "schema") headOption
+  def findSchema(inDoc: NodeInfo) =
+    findModelElement(inDoc) \ (XS → "schema") headOption
 
-    def findSchemaOrEmpty(inDoc: NodeInfo) =
-        findSchema(inDoc).orNull
+  def findSchemaOrEmpty(inDoc: NodeInfo) =
+    findSchema(inDoc).orNull
 
-    def findSchemaNamespace(inDoc: NodeInfo) =
-        for {
-            schema          ← findSchema(inDoc)
-            targetNamespace ← (schema \@ "targetNamespace" map (_.stringValue)).headOption
-        } yield
-            targetNamespace
+  def findSchemaNamespace(inDoc: NodeInfo) =
+    for {
+      schema          ← findSchema(inDoc)
+      targetNamespace ← (schema \@ "targetNamespace" map (_.stringValue)).headOption
+    } yield
+      targetNamespace
 
-    def findSchemaPrefix(inDoc: NodeInfo) =
-        for {
-            schema          ← findSchema(inDoc)
-            targetNamespace ← findSchemaNamespace(inDoc)
-            prefix          ← schema.nonEmptyPrefixesForURI(targetNamespace).sorted.headOption
-        } yield
-            prefix
+  def findSchemaPrefix(inDoc: NodeInfo) =
+    for {
+      schema          ← findSchema(inDoc)
+      targetNamespace ← findSchemaNamespace(inDoc)
+      prefix          ← schema.nonEmptyPrefixesForURI(targetNamespace).sorted.headOption
+    } yield
+      prefix
 
-    def findSchemaPrefixOrEmpty(inDoc: NodeInfo) =
-        findSchemaPrefix(inDoc).orNull
+  def findSchemaPrefixOrEmpty(inDoc: NodeInfo) =
+    findSchemaPrefix(inDoc).orNull
 }

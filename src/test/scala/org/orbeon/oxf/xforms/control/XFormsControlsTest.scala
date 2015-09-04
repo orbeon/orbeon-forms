@@ -24,88 +24,88 @@ import org.xml.sax.helpers.AttributesImpl
 import org.scalatest.junit.AssertionsForJUnit
 
 class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit {
+  
+  // Mock just what's needed to make XFormsInputControl as used below happy
+  private def getContainingDocument(id: String): XFormsContainingDocument = {
+    val doc = Mockito.mock(classOf[XFormsContainingDocument])
+    Mockito.when(doc.getContainingDocument).thenReturn(doc)
     
-    // Mock just what's needed to make XFormsInputControl as used below happy
-    private def getContainingDocument(id: String): XFormsContainingDocument = {
-        val doc = Mockito.mock(classOf[XFormsContainingDocument])
-        Mockito.when(doc.getContainingDocument).thenReturn(doc)
-        
-        val elementAnalysis = Mockito.mock(classOf[ElementAnalysis])
-        Mockito.when(elementAnalysis.staticId).thenReturn(id)
-        Mockito.when(elementAnalysis.prefixedId).thenReturn(id)
-        
-        val partAnalysis = Mockito.mock(classOf[PartAnalysis])
-        Mockito.when(partAnalysis.getControlAnalysis(Matchers.anyString)).thenReturn(elementAnalysis)
-        Mockito.when(doc.getPartAnalysis).thenReturn(partAnalysis)
-        
-        doc
-    }
+    val elementAnalysis = Mockito.mock(classOf[ElementAnalysis])
+    Mockito.when(elementAnalysis.staticId).thenReturn(id)
+    Mockito.when(elementAnalysis.prefixedId).thenReturn(id)
+    
+    val partAnalysis = Mockito.mock(classOf[PartAnalysis])
+    Mockito.when(partAnalysis.getControlAnalysis(Matchers.anyString)).thenReturn(elementAnalysis)
+    Mockito.when(doc.getPartAnalysis).thenReturn(partAnalysis)
+    
+    doc
+  }
 
-    @Test def testDiffCustomMIPsChanges(): Unit = {
-        val attributes = new AttributesImpl
-        val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-            override val customMIPs = Map(
-                "name1" → "value1",
-                "name2" → "value2",
-                "name3" → "value3",
-                "name4" → "value4"
-            )
-        }
-        val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
+  @Test def testDiffCustomMIPsChanges(): Unit = {
+    val attributes = new AttributesImpl
+    val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+      override val customMIPs = Map(
+        "name1" → "value1",
+        "name2" → "value2",
+        "name3" → "value3",
+        "name4" → "value4"
+      )
+    }
+    val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
 
 //            setBindingContext(new BindingContext())
 
-            override val customMIPs = Map(
-                // leave as is
-                "name1" → "value1",
-                // remove name2
-                // change value
-                "name3" → "newvalue3",
-                // leave as is
-                "name4" → "value4"
-            )
-        }
-        XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, false, control1, control2)
-        assert("-name2-value2 -name3-value3 +name3-newvalue3" === attributes.getValue("class"))
+      override val customMIPs = Map(
+        // leave as is
+        "name1" → "value1",
+        // remove name2
+        // change value
+        "name3" → "newvalue3",
+        // leave as is
+        "name4" → "value4"
+      )
     }
+    XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, false, control1, control2)
+    assert("-name2-value2 -name3-value3 +name3-newvalue3" === attributes.getValue("class"))
+  }
 
-    @Test def testDiffCustomMIPsNew(): Unit = {
-        val attributes = new AttributesImpl
-        val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-            override val customMIPs = Map(
-                "name1" → "value1",
-                "name2" → "value2",
-                "name3" → "value3",
-                "name4" → "value4"
-            )
-        }
-        XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, true, null, control2)
-        assert("+name1-value1 +name2-value2 +name3-value3 +name4-value4" === attributes.getValue("class"))
+  @Test def testDiffCustomMIPsNew(): Unit = {
+    val attributes = new AttributesImpl
+    val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+      override val customMIPs = Map(
+        "name1" → "value1",
+        "name2" → "value2",
+        "name3" → "value3",
+        "name4" → "value4"
+      )
     }
+    XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, true, null, control2)
+    assert("+name1-value1 +name2-value2 +name3-value3 +name4-value4" === attributes.getValue("class"))
+  }
 
-    @Test def testDiffClassAVT(): Unit = {
-        val attributes = new AttributesImpl
-        val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-            override def extensionAttributeValue(attributeName: QName) = Some("foo bar gaga")
-        }
-        val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
-            override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
-        }
-        AjaxSupport.addAjaxClasses(attributes, false, control1, control2)
-        assert("-foo -gaga +toto" === attributes.getValue("class"))
+  @Test def testDiffClassAVT(): Unit = {
+    val attributes = new AttributesImpl
+    val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+      override def extensionAttributeValue(attributeName: QName) = Some("foo bar gaga")
     }
-
-    @Test def testDiffClassAVTNew(): Unit = {
-        val attributes = new AttributesImpl
-        val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-            override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
-        }
-        AjaxSupport.addAjaxClasses(attributes, false, null, control2)
-        assert("foo bar" === attributes.getValue("class"))
+    val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
+      override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
     }
+    AjaxSupport.addAjaxClasses(attributes, false, control1, control2)
+    assert("-foo -gaga +toto" === attributes.getValue("class"))
+  }
+
+  @Test def testDiffClassAVTNew(): Unit = {
+    val attributes = new AttributesImpl
+    val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+      override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
+    }
+    AjaxSupport.addAjaxClasses(attributes, false, null, control2)
+    assert("foo bar" === attributes.getValue("class"))
+  }
 
 
-    // NOTE: started writing this test, but just using an XFormsOutputControl without the context of an XFormsContainingDocument seems a dead-end!
+  // NOTE: started writing this test, but just using an XFormsOutputControl without the context of an XFormsContainingDocument seems a dead-end!
 //    @Test
 //    public void testOutputControlRewrite() {
 //

@@ -19,23 +19,23 @@ import org.orbeon.oxf.xforms._
 
 class XFormsModelAction(parent: XFormsEventObserver, eventHandler: EventHandlerImpl) extends XFormsEventHandler with XFormsObject {
 
-    val getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
-    def container = parent.container
-    def containingDocument = parent.containingDocument
+  val getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
+  def container = parent.container
+  def containingDocument = parent.containingDocument
 
-    // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
-    def bindingContext = parent match {
-        case model: XFormsModel ⇒
-            // Use the model's inner context
-            model.getDefaultEvaluationContext
-        case submission: XFormsModelSubmission ⇒
-            // Evaluate the binding of the submission element based on the model's inner context
-            // NOTE: When the submission actually starts processing, the binding will be re-evaluated
-            val contextStack = new XFormsContextStack(submission.container, submission.getModel.getDefaultEvaluationContext)
-            contextStack.pushBinding(submission.getSubmissionElement, submission.getEffectiveId, submission.getModel.getResolutionScope)
-            contextStack.getCurrentBindingContext
-        case _ ⇒
-            // We know we are either nested directly within the model, or within a submission
-            throw new IllegalStateException
-    }
+  // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
+  def bindingContext = parent match {
+    case model: XFormsModel ⇒
+      // Use the model's inner context
+      model.getDefaultEvaluationContext
+    case submission: XFormsModelSubmission ⇒
+      // Evaluate the binding of the submission element based on the model's inner context
+      // NOTE: When the submission actually starts processing, the binding will be re-evaluated
+      val contextStack = new XFormsContextStack(submission.container, submission.getModel.getDefaultEvaluationContext)
+      contextStack.pushBinding(submission.getSubmissionElement, submission.getEffectiveId, submission.getModel.getResolutionScope)
+      contextStack.getCurrentBindingContext
+    case _ ⇒
+      // We know we are either nested directly within the model, or within a submission
+      throw new IllegalStateException
+  }
 }

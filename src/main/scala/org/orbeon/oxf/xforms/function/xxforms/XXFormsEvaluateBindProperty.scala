@@ -19,14 +19,14 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 
 class XXFormsEvaluateBindProperty extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        val bindId   = stringArgument(0)
-        val mipQName = getQNameFromExpression(xpathContext, arguments(1))
+    val bindId   = stringArgument(0)
+    val mipQName = getQNameFromExpression(xpathContext, arguments(1))
 
-        XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, Option(bindingContext.getSingleItem)) collect
-            { case bind: RuntimeBind ⇒ bind.model.getBinds.evaluateBindByType(bind, 1, mipQName) } orNull
-    }
+    XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, Option(bindingContext.getSingleItem)) collect
+      { case bind: RuntimeBind ⇒ bind.model.getBinds.evaluateBindByType(bind, 1, mipQName) } orNull
+  }
 }

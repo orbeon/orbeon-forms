@@ -27,41 +27,41 @@ import org.orbeon.oxf.xforms.analysis.StaticStateContext
  * Single root container for a part, whether top-level or a nested part.
  */
 class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
-    extends ContainerControl(staticStateContext, element, None, None, scope)
-    with ChildrenBuilderTrait {
+  extends ContainerControl(staticStateContext, element, None, None, scope)
+  with ChildrenBuilderTrait {
 
-    override val staticId       = "#document"
-    override val prefixedId     = part.startScope.fullPrefix + staticId
-    override def containerScope = part.startScope
+  override val staticId       = "#document"
+  override val prefixedId     = part.startScope.fullPrefix + staticId
+  override def containerScope = part.startScope
 
-    override lazy val lang: Option[LangRef] = {
+  override lazy val lang: Option[LangRef] = {
 
-        // Assign a top-level lang based on the first xml:lang found on a top-level control. This allows
-        // xxbl:global controls to inherit that xml:lang. All other top-level controls already have an xml:lang
-        // placed by XFormsExtractor.
-        def fromChildElements = {
+    // Assign a top-level lang based on the first xml:lang found on a top-level control. This allows
+    // xxbl:global controls to inherit that xml:lang. All other top-level controls already have an xml:lang
+    // placed by XFormsExtractor.
+    def fromChildElements = {
 
-            val firstChildXMLLang = Dom4j.elements(element) collectFirst {
-                case e if e.attribute(XML_LANG_QNAME) ne null ⇒ e.attributeValue(XML_LANG_QNAME)
-            }
+      val firstChildXMLLang = Dom4j.elements(element) collectFirst {
+        case e if e.attribute(XML_LANG_QNAME) ne null ⇒ e.attributeValue(XML_LANG_QNAME)
+      }
 
-            firstChildXMLLang flatMap extractXMLLang
-        }
-
-        // Ask the parent part
-        def fromParentPart =
-            part.elementInParent flatMap (_.lang)
-
-        fromChildElements orElse fromParentPart
+      firstChildXMLLang flatMap extractXMLLang
     }
 
-    // Ignore <xbl:xbl> elements that can be at the top-level, as the static state document produced by the extractor.
-    // Also ignore <properties> and <last-id> elements
-    // might place them there.
-    override def findRelevantChildrenElements =
-        findAllChildrenElements filterNot
-            { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LAST_ID_QNAME)(e.getQName) }
+    // Ask the parent part
+    def fromParentPart =
+      part.elementInParent flatMap (_.lang)
 
-    override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
-    override val externalEvents              = externalEventsDef
+    fromChildElements orElse fromParentPart
+  }
+
+  // Ignore <xbl:xbl> elements that can be at the top-level, as the static state document produced by the extractor.
+  // Also ignore <properties> and <last-id> elements
+  // might place them there.
+  override def findRelevantChildrenElements =
+    findAllChildrenElements filterNot
+      { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LAST_ID_QNAME)(e.getQName) }
+
+  override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
+  override val externalEvents              = externalEventsDef
 }

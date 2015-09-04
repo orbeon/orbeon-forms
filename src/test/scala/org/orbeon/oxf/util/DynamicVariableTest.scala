@@ -19,19 +19,19 @@ import org.junit.Test
 
 class DynamicVariableTest extends AssertionsForJUnit {
 
-    @Test def basicUsage() {
-        val v1 =  new DynamicVariable[String]
-        assert(v1.value === None)
+  @Test def basicUsage() {
+    val v1 =  new DynamicVariable[String]
+    assert(v1.value === None)
 
-        v1.withValue("foo") {
-            assert(v1.value === Some("foo"))
+    v1.withValue("foo") {
+      assert(v1.value === Some("foo"))
 
-            v1.withValue("bar") {
-                assert(v1.value === Some("bar"))
-            }
+      v1.withValue("bar") {
+        assert(v1.value === Some("bar"))
+      }
 
-            assert(v1.value === Some("foo"))
-        }
-        assert(v1.value === None)
+      assert(v1.value === Some("foo"))
     }
+    assert(v1.value === None)
+  }
 }

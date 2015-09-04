@@ -18,8 +18,8 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 // This servlet just returns an ok response when accessed
 class AuthorizerServlet extends HttpServlet {
 
-    override def service(request: HttpServletRequest, response: HttpServletResponse): Unit = {
-        response.setStatus(200)
-        response.setContentType("text/plain")
-    }
+  override def service(request: HttpServletRequest, response: HttpServletResponse): Unit = {
+    response.setStatus(200)
+    response.setContentType("text/plain")
+  }
 }

@@ -24,66 +24,66 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
  */
 class XFormsSetvalueAction extends XFormsAction {
 
-    override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext): Unit = {
 
-        val actionInterpreter = actionContext.interpreter
-        val actionElement = actionContext.element
+    val actionInterpreter = actionContext.interpreter
+    val actionElement = actionContext.element
 
-        val indentedLogger = actionInterpreter.indentedLogger
-        val containingDocument = actionInterpreter.containingDocument
-        val contextStack = actionInterpreter.actionXPathContext
-        
-        val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
+    val indentedLogger = actionInterpreter.indentedLogger
+    val containingDocument = actionInterpreter.containingDocument
+    val contextStack = actionInterpreter.actionXPathContext
+    
+    val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
 
-        // Determine value to set
-        val valueToSet =
-            valueExpression match {
-                case Some(valueExpression) ⇒
-                    // Value to set is computed with an XPath expression
-                    actionInterpreter.evaluateAsString(
-                        actionElement,
-                        contextStack.getCurrentBindingContext.nodeset,
-                        contextStack.getCurrentBindingContext.position,
-                        valueExpression
-                    )
-                case None ⇒
-                    // Value to set is static content
-                    actionElement.getStringValue
-            }
-        
-        assert(valueToSet ne null)
+    // Determine value to set
+    val valueToSet =
+      valueExpression match {
+        case Some(valueExpression) ⇒
+          // Value to set is computed with an XPath expression
+          actionInterpreter.evaluateAsString(
+            actionElement,
+            contextStack.getCurrentBindingContext.nodeset,
+            contextStack.getCurrentBindingContext.position,
+            valueExpression
+          )
+        case None ⇒
+          // Value to set is static content
+          actionElement.getStringValue
+      }
+    
+    assert(valueToSet ne null)
 
-        // Set the value on target node if possible
-        contextStack.getCurrentBindingContext.getSingleItem match {
-            case nodeInfo: NodeInfo ⇒
-                // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot
-                // be written to. But because of the way we now handle errors in actions, we throw an exception instead
-                // and action processing is interrupted.
-                DataModel.setValueIfChanged(
-                    nodeInfo,
-                    valueToSet,
-                    oldValue ⇒ DataModel.logAndNotifyValueChange(
-                        containingDocument = containingDocument,
-                        source             = "setvalue",
-                        nodeInfo           = nodeInfo,
-                        oldValue           = oldValue,
-                        newValue           = valueToSet,
-                        isCalculate        = false)(
-                        logger             = indentedLogger
-                    ),
-                    reason ⇒ throw new OXFException(reason.message)
-                )
-            case _ ⇒
-                // Node doesn't exist: NOP
-                if (indentedLogger.isDebugEnabled)
-                    indentedLogger.logDebug(
-                        "xf:setvalue",
-                        "not setting instance value",
-                        "reason",
-                        "destination node not found",
-                        "value",
-                        valueToSet
-                    )
-        }
+    // Set the value on target node if possible
+    contextStack.getCurrentBindingContext.getSingleItem match {
+      case nodeInfo: NodeInfo ⇒
+        // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot
+        // be written to. But because of the way we now handle errors in actions, we throw an exception instead
+        // and action processing is interrupted.
+        DataModel.setValueIfChanged(
+          nodeInfo,
+          valueToSet,
+          oldValue ⇒ DataModel.logAndNotifyValueChange(
+            containingDocument = containingDocument,
+            source             = "setvalue",
+            nodeInfo           = nodeInfo,
+            oldValue           = oldValue,
+            newValue           = valueToSet,
+            isCalculate        = false)(
+            logger             = indentedLogger
+          ),
+          reason ⇒ throw new OXFException(reason.message)
+        )
+      case _ ⇒
+        // Node doesn't exist: NOP
+        if (indentedLogger.isDebugEnabled)
+          indentedLogger.logDebug(
+            "xf:setvalue",
+            "not setting instance value",
+            "reason",
+            "destination node not found",
+            "value",
+            valueToSet
+          )
     }
+  }
 }

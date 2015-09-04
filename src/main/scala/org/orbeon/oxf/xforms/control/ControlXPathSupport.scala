@@ -24,131 +24,131 @@ import scala.util.control.NonFatal
 
 trait ControlXPathSupport {
 
-    self: XFormsControl ⇒
+  self: XFormsControl ⇒
 
-    private def getNamespaceMappings =
-        if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
+  private def getNamespaceMappings =
+    if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
 
-    def evaluateBooleanAvt(attributeValue: String) =
-        evaluateAvt(attributeValue) == "true"
+  def evaluateBooleanAvt(attributeValue: String) =
+    evaluateAvt(attributeValue) == "true"
 
-    /**
-     * Evaluate an attribute of the control as an AVT.
-     *
-     * @param attributeValue    value of the attribute
-     * @return                  value of the AVT or null if cannot be computed
-     */
-    def evaluateAvt(attributeValue: String) = {
+  /**
+   * Evaluate an attribute of the control as an AVT.
+   *
+   * @param attributeValue    value of the attribute
+   * @return                  value of the AVT or null if cannot be computed
+   */
+  def evaluateAvt(attributeValue: String) = {
 
-        assert(isRelevant)
+    assert(isRelevant)
 
-        if (! XFormsUtils.maybeAVT(attributeValue))
-            // Definitely not an AVT
-            attributeValue
-        else {
-            // Possible AVT
+    if (! XFormsUtils.maybeAVT(attributeValue))
+      // Definitely not an AVT
+      attributeValue
+    else {
+      // Possible AVT
 
-            // NOTE: the control may or may not be bound, so don't use getBoundItem()
-            val bc = bindingContext
-            val contextNodeset = bc.nodeset
-            if (contextNodeset.size == 0)
-                null // TODO: in the future we should be able to try evaluating anyway
-            else {
-                try
-                    XPathCache.evaluateAsAvt(
-                        contextNodeset, 
-                        bc.position, 
-                        attributeValue, 
-                        getNamespaceMappings,
-                        bc.getInScopeVariables, 
-                        XFormsContainingDocument.getFunctionLibrary, 
-                        newFunctionContext,
-                        null, 
-                        getLocationData,
-                        containingDocument.getRequestStats.addXPathStat
-                    )
-                catch {
-                    case NonFatal(t) ⇒
-                        XFormsError.handleNonFatalXPathError(container, t)
-                        null
-                }
-            }
+      // NOTE: the control may or may not be bound, so don't use getBoundItem()
+      val bc = bindingContext
+      val contextNodeset = bc.nodeset
+      if (contextNodeset.size == 0)
+        null // TODO: in the future we should be able to try evaluating anyway
+      else {
+        try
+          XPathCache.evaluateAsAvt(
+            contextNodeset, 
+            bc.position, 
+            attributeValue, 
+            getNamespaceMappings,
+            bc.getInScopeVariables, 
+            XFormsContainingDocument.getFunctionLibrary, 
+            newFunctionContext,
+            null, 
+            getLocationData,
+            containingDocument.getRequestStats.addXPathStat
+          )
+        catch {
+          case NonFatal(t) ⇒
+            XFormsError.handleNonFatalXPathError(container, t)
+            null
         }
+      }
     }
+  }
 
-    // Evaluate an XPath expression as a string in the context of this control.
-    // TODO: Remove duplication between this and following method. Check callers.
-    // 3 usages
-    def evaluateAsString(
-        xpathString     : String,
-        contextItems    : Seq[Item],
-        contextPosition : Int
-    ): Option[String] = {
+  // Evaluate an XPath expression as a string in the context of this control.
+  // TODO: Remove duplication between this and following method. Check callers.
+  // 3 usages
+  def evaluateAsString(
+    xpathString     : String,
+    contextItems    : Seq[Item],
+    contextPosition : Int
+  ): Option[String] = {
 
-        assert(isRelevant)
+    assert(isRelevant)
 
-        // NOTE: the control may or may not be bound, so don't use getBoundNode()
-        if (contextItems.isEmpty)
+    // NOTE: the control may or may not be bound, so don't use getBoundNode()
+    if (contextItems.isEmpty)
+      None
+    else {
+      // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+      // Reason is that XPath functions might use the context stack to get the current model, etc.
+      try
+        Option(
+          XPathCache.evaluateAsString(
+            contextItems.asJava,
+            contextPosition,
+            xpathString,
+            getNamespaceMappings,
+            bindingContext.getInScopeVariables,
+            XFormsContainingDocument.getFunctionLibrary,
+            newFunctionContext,
+            null,
+            getLocationData,
+            containingDocument.getRequestStats.addXPathStat
+          )
+        )
+      catch {
+        case NonFatal(t) ⇒
+          XFormsError.handleNonFatalXPathError(container, t)
+          None
+      }
+    }
+  }
+
+  // Evaluate an XPath expression as a string in the context of this control.
+  // 2 usages
+  def evaluateAsString(
+    xpathString        : String,
+    contextItem        : Option[Item],
+    namespaceMapping   : NamespaceMapping,
+    variableToValueMap : JMap[String, ValueRepresentation]
+  ): Option[String] =
+    contextItem match {
+      case None ⇒ None
+      case Some(contextItem) ⇒
+        try
+          Option(
+            XPathCache.evaluateAsString(
+              contextItem,
+              xpathString,
+              namespaceMapping,
+              variableToValueMap,
+              XFormsContainingDocument.getFunctionLibrary,
+              newFunctionContext,
+              null,
+              getLocationData,
+              containingDocument.getRequestStats.addXPathStat
+            )
+          )
+        catch {
+          case NonFatal(t) ⇒
+            XFormsError.handleNonFatalXPathError(container, t)
             None
-        else {
-            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-            // Reason is that XPath functions might use the context stack to get the current model, etc.
-            try
-                Option(
-                    XPathCache.evaluateAsString(
-                        contextItems.asJava,
-                        contextPosition,
-                        xpathString,
-                        getNamespaceMappings,
-                        bindingContext.getInScopeVariables,
-                        XFormsContainingDocument.getFunctionLibrary,
-                        newFunctionContext,
-                        null,
-                        getLocationData,
-                        containingDocument.getRequestStats.addXPathStat
-                    )
-                )
-            catch {
-                case NonFatal(t) ⇒
-                    XFormsError.handleNonFatalXPathError(container, t)
-                    None
-            }
         }
     }
 
-    // Evaluate an XPath expression as a string in the context of this control.
-    // 2 usages
-    def evaluateAsString(
-        xpathString        : String,
-        contextItem        : Option[Item],
-        namespaceMapping   : NamespaceMapping,
-        variableToValueMap : JMap[String, ValueRepresentation]
-    ): Option[String] =
-        contextItem match {
-            case None ⇒ None
-            case Some(contextItem) ⇒
-                try
-                    Option(
-                        XPathCache.evaluateAsString(
-                            contextItem,
-                            xpathString,
-                            namespaceMapping,
-                            variableToValueMap,
-                            XFormsContainingDocument.getFunctionLibrary,
-                            newFunctionContext,
-                            null,
-                            getLocationData,
-                            containingDocument.getRequestStats.addXPathStat
-                        )
-                    )
-                catch {
-                    case NonFatal(t) ⇒
-                        XFormsError.handleNonFatalXPathError(container, t)
-                        None
-                }
-        }
-
-    // Return an XPath function context having this control as source control.
-    def newFunctionContext =
-        XFormsFunction.Context(container, bindingContext, getEffectiveId, bindingContext.model, null)
+  // Return an XPath function context having this control as source control.
+  def newFunctionContext =
+    XFormsFunction.Context(container, bindingContext, getEffectiveId, bindingContext.model, null)
 }

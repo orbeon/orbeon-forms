@@ -20,23 +20,23 @@ import org.orbeon.saxon.om.NodeInfo
 import org.w3c.dom.Node._
 
 class XXFormsClasses extends XFormsFunction with FunctionSupport with ClassSupport {
-    override def iterate(xpathContext: XPathContext) =
-        asIterator(classes(0)(xpathContext).toList)
+  override def iterate(xpathContext: XPathContext) =
+    asIterator(classes(0)(xpathContext).toList)
 
-    // Needed otherwise xpathContext.getContextItem doesn't return the correct value
-    override def getIntrinsicDependencies =
-        if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
+  // Needed otherwise xpathContext.getContextItem doesn't return the correct value
+  override def getIntrinsicDependencies =
+    if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }
 
 protected trait ClassSupport extends FunctionSupport {
-    def classes(i: Int)(implicit xpathContext: XPathContext): Set[String] =
-        itemArgumentOrContextOpt(i) match {
-            case Some(node: NodeInfo) if node.getNodeKind == ELEMENT_NODE ⇒
-                val classCode = xpathContext.getNamePool.allocate("", "", "class")
-                val value     = node.getAttributeValue(classCode)
+  def classes(i: Int)(implicit xpathContext: XPathContext): Set[String] =
+    itemArgumentOrContextOpt(i) match {
+      case Some(node: NodeInfo) if node.getNodeKind == ELEMENT_NODE ⇒
+        val classCode = xpathContext.getNamePool.allocate("", "", "class")
+        val value     = node.getAttributeValue(classCode)
 
-                stringToSet(value)
-            case _ ⇒
-                Set()
-        }
+        stringToSet(value)
+      case _ ⇒
+        Set()
+    }
 }

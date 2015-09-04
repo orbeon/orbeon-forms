@@ -22,34 +22,34 @@ import org.orbeon.oxf.xml.XMLReceiver
 
 class TagSoupProcessor extends ProcessorImpl {
 
-    addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
-    addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
+  addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
+  addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
-    val TAGSOUP_HTML_SCHEMA = new HTMLSchema()
+  val TAGSOUP_HTML_SCHEMA = new HTMLSchema()
 
-    override def createOutput(name: String) =
-        addOutput(name, new ProcessorOutputImpl(this, name) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+  override def createOutput(name: String) =
+    addOutput(name, new ProcessorOutputImpl(this, name) {
+      def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-                // Read input as binary document in byte array
-                val inputValue = {
-                    val writer = new StringWriter
-                    readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, new TextXMLReceiver(writer))
-                    writer.getBuffer.toString
-                }
+        // Read input as binary document in byte array
+        val inputValue = {
+          val writer = new StringWriter
+          readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, new TextXMLReceiver(writer))
+          writer.getBuffer.toString
+        }
 
-                // Create TagSoup reader
-                val tagSoupReader = new org.ccil.cowan.tagsoup.Parser
-                tagSoupReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TAGSOUP_HTML_SCHEMA)
-                tagSoupReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true)
+        // Create TagSoup reader
+        val tagSoupReader = new org.ccil.cowan.tagsoup.Parser
+        tagSoupReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TAGSOUP_HTML_SCHEMA)
+        tagSoupReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true)
 
-                // Connect to input
-                val inputSource = new InputSource
-                inputSource.setCharacterStream(new StringReader(inputValue))
-                // Connect to output
-                tagSoupReader.setContentHandler(xmlReceiver)
-                // Do the TagSoup parsing
-                tagSoupReader.parse(inputSource)
-            }
-        })
+        // Connect to input
+        val inputSource = new InputSource
+        inputSource.setCharacterStream(new StringReader(inputValue))
+        // Connect to output
+        tagSoupReader.setContentHandler(xmlReceiver)
+        // Do the TagSoup parsing
+        tagSoupReader.parse(inputSource)
+      }
+    })
 }

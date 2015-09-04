@@ -22,19 +22,19 @@ import org.orbeon.oxf.xforms.XFormsObject
  * XFormsEventTarget is implemented by classes that support dispatching of events.
  */
 trait XFormsEventTarget extends XFormsObject {
-    def scope: Scope
-    def container: XBLContainer
+  def scope: Scope
+  def container: XBLContainer
 
-    def getId: String
-    def getPrefixedId: String
-    def getEffectiveId: String
+  def getId: String
+  def getPrefixedId: String
+  def getEffectiveId: String
 
-    def getLocationData: LocationData
+  def getLocationData: LocationData
 
-    def parentEventObserver: XFormsEventObserver
+  def parentEventObserver: XFormsEventObserver
 
-    def performTargetAction(event: XFormsEvent)
-    def performDefaultAction(event: XFormsEvent)
+  def performTargetAction(event: XFormsEvent)
+  def performDefaultAction(event: XFormsEvent)
 
-    def allowExternalEvent(eventName: String): Boolean
+  def allowExternalEvent(eventName: String): Boolean
 }

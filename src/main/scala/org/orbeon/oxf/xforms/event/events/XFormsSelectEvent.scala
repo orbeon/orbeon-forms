@@ -19,21 +19,21 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 
 class XFormsSelectEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsUIEvent(XFORMS_SELECT, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = false) {
+    extends XFormsUIEvent(XFORMS_SELECT, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = false) {
 
-    import XFormsSelectEvent._
+  import XFormsSelectEvent._
 
-    def this(target: XFormsEventTarget, itemValue: String) =
-        this(target, Map(XFormsSelectEvent.ItemValueProperty → Option(itemValue)))
+  def this(target: XFormsEventTarget, itemValue: String) =
+    this(target, Map(XFormsSelectEvent.ItemValueProperty → Option(itemValue)))
 
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 
-    def itemValue = property[String](ItemValueProperty).get
+  def itemValue = property[String](ItemValueProperty).get
 }
 
 private object XFormsSelectEvent {
 
-    import XFormsEvent._
+  import XFormsEvent._
 
-    val ItemValueProperty = xxformsName("item-value")
+  val ItemValueProperty = xxformsName("item-value")
 }

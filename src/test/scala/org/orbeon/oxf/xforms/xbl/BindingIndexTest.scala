@@ -23,108 +23,108 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class BindingIndexTest extends AssertionsForJUnit {
 
-    case class TestBinding(
-        selectors           : List[Selector],
-        selectorsNamespaces : Map[String, String]
-    ) extends IndexableBinding {
-        val path         = None
-        val lastModified = -1L
+  case class TestBinding(
+    selectors           : List[Selector],
+    selectorsNamespaces : Map[String, String]
+  ) extends IndexableBinding {
+    val path         = None
+    val lastModified = -1L
+  }
+
+  val FooURI     = "http://orbeon.org/oxf/xml/foo"
+  val Namespaces = Map("foo" → FooURI)
+
+  val AllSelectors =
+    CSSSelectorParser.parseSelectors(
+      """
+        foo|bar,
+        foo|baz,
+        [appearance ~= baz],
+        [appearance  = gaga],
+        [appearance ~= gaga],
+        [appearance |= gaga],
+        [appearance ^= gaga],
+        [appearance $= gaga],
+        [appearance *= gaga],
+        foo|bar[appearance ~= baz]
+      """.trim
+    )
+
+  val AllBindings =
+    AllSelectors map (s ⇒ TestBinding(List(s), Namespaces))
+
+  val (
+      fooBarBinding                   ::
+      fooBazBinding                   ::
+      appearanceTokenBazBinding       ::
+      appearanceIsGagaBinding         ::
+      appearanceTokenGagaBinding      ::
+      appearancePrefixGagaBinding     ::
+      appearanceStartsWithGagaBinding ::
+      appearanceEndsWithGagaBinding   ::
+      appearanceContainsGagaBinding   ::
+      fooBarAppearanceBazBinding      ::
+      Nil
+    ) = AllBindings
+
+  def indexWithAllBindings = {
+    var currentIndex: BindingIndex[IndexableBinding] = GlobalBindingIndex.Empty
+
+    // We wrote the attribute bindings above from more specific to least specific, and the index prepends new
+    // bindings as we index, so newer bindings are found first. To help with testing matching by attribute, we
+    // index in reverse order, so that e.g. [appearance ~= baz] is found before [appearance *= gaga].
+    AllBindings.reverse foreach { binding ⇒
+      currentIndex = BindingIndex.indexBinding(currentIndex, binding)
     }
 
-    val FooURI     = "http://orbeon.org/oxf/xml/foo"
-    val Namespaces = Map("foo" → FooURI)
+    currentIndex
+  }
 
-    val AllSelectors =
-        CSSSelectorParser.parseSelectors(
-            """
-                foo|bar,
-                foo|baz,
-                [appearance ~= baz],
-                [appearance  = gaga],
-                [appearance ~= gaga],
-                [appearance |= gaga],
-                [appearance ^= gaga],
-                [appearance $= gaga],
-                [appearance *= gaga],
-                foo|bar[appearance ~= baz]
-            """.trim
-        )
+  def parseXMLElemWithNamespaces(xmlElem: String): Element = {
 
-    val AllBindings =
-        AllSelectors map (s ⇒ TestBinding(List(s), Namespaces))
+    val namespacesString =
+      Namespaces map { case (prefix, uri) ⇒ s"""xmlns:$prefix="$uri"""" } mkString " "
 
-    val (
-            fooBarBinding                   ::
-            fooBazBinding                   ::
-            appearanceTokenBazBinding       ::
-            appearanceIsGagaBinding         ::
-            appearanceTokenGagaBinding      ::
-            appearancePrefixGagaBinding     ::
-            appearanceStartsWithGagaBinding ::
-            appearanceEndsWithGagaBinding   ::
-            appearanceContainsGagaBinding   ::
-            fooBarAppearanceBazBinding      ::
-            Nil
-        ) = AllBindings
+    val encapsulated =
+      s"""<root $namespacesString>$xmlElem</root>"""
 
-    def indexWithAllBindings = {
-        var currentIndex: BindingIndex[IndexableBinding] = GlobalBindingIndex.Empty
+    Dom4j.elements(Dom4jUtils.readDom4j(encapsulated).getRootElement).head
+  }
 
-        // We wrote the attribute bindings above from more specific to least specific, and the index prepends new
-        // bindings as we index, so newer bindings are found first. To help with testing matching by attribute, we
-        // index in reverse order, so that e.g. [appearance ~= baz] is found before [appearance *= gaga].
-        AllBindings.reverse foreach { binding ⇒
-            currentIndex = BindingIndex.indexBinding(currentIndex, binding)
-        }
+  def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding) = {
 
-        currentIndex
-    }
+    val elem = parseXMLElemWithNamespaces(xmlElem)
+    val atts = Dom4j.attributes(elem) map (a ⇒ a.getQName → a.getValue)
 
-    def parseXMLElemWithNamespaces(xmlElem: String): Element = {
+    val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, atts)
 
-        val namespacesString =
-            Namespaces map { case (prefix, uri) ⇒ s"""xmlns:$prefix="$uri"""" } mkString " "
+    assert(Some(binding) === (found map (_._1)))
+  }
 
-        val encapsulated =
-            s"""<root $namespacesString>$xmlElem</root>"""
+  @Test def testSelectorPriority(): Unit = {
 
-        Dom4j.elements(Dom4jUtils.readDom4j(encapsulated).getRootElement).head
-    }
+    val currentIndex = indexWithAllBindings
 
-    def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding) = {
+    assertElemMatched(currentIndex, """<foo:bar/>""",                            fooBarBinding)
+    assertElemMatched(currentIndex, """<foo:baz/>""",                            fooBazBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="bar"/>""",           fooBarBinding)
+    assertElemMatched(currentIndex, """<foo:baz appearance="bar"/>""",           fooBazBinding)
+    assertElemMatched(currentIndex, """<foo:baz appearance="baz"/>""",           appearanceTokenBazBinding)
+    assertElemMatched(currentIndex, """<foo:baz appearance="fuzz baz toto"/>""", appearanceTokenBazBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",           fooBarAppearanceBazBinding)
+  }
 
-        val elem = parseXMLElemWithNamespaces(xmlElem)
-        val atts = Dom4j.attributes(elem) map (a ⇒ a.getQName → a.getValue)
+  @Test def testMatchingByAttribute(): Unit = {
 
-        val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, atts)
+    val currentIndex = indexWithAllBindings
 
-        assert(Some(binding) === (found map (_._1)))
-    }
-
-    @Test def testSelectorPriority(): Unit = {
-
-        val currentIndex = indexWithAllBindings
-
-        assertElemMatched(currentIndex, """<foo:bar/>""",                            fooBarBinding)
-        assertElemMatched(currentIndex, """<foo:baz/>""",                            fooBazBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="bar"/>""",           fooBarBinding)
-        assertElemMatched(currentIndex, """<foo:baz appearance="bar"/>""",           fooBazBinding)
-        assertElemMatched(currentIndex, """<foo:baz appearance="baz"/>""",           appearanceTokenBazBinding)
-        assertElemMatched(currentIndex, """<foo:baz appearance="fuzz baz toto"/>""", appearanceTokenBazBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",           fooBarAppearanceBazBinding)
-    }
-
-    @Test def testMatchingByAttribute(): Unit = {
-
-        val currentIndex = indexWithAllBindings
-
-        assertElemMatched(currentIndex, """<foo:bar appearance="gaga"/>""",           appearanceIsGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="fuzz gaga toto"/>""", appearanceTokenGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="gaga toto"/>""",      appearanceTokenGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="fuzz gaga"/>""",      appearanceTokenGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="gaga-en"/>""",        appearancePrefixGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="gagaba"/>""",         appearanceStartsWithGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="bagaga"/>""",         appearanceEndsWithGagaBinding)
-        assertElemMatched(currentIndex, """<foo:bar appearance="bagagada"/>""",       appearanceContainsGagaBinding)
-    }
+    assertElemMatched(currentIndex, """<foo:bar appearance="gaga"/>""",           appearanceIsGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="fuzz gaga toto"/>""", appearanceTokenGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="gaga toto"/>""",      appearanceTokenGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="fuzz gaga"/>""",      appearanceTokenGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="gaga-en"/>""",        appearancePrefixGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="gagaba"/>""",         appearanceStartsWithGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="bagaga"/>""",         appearanceEndsWithGagaBinding)
+    assertElemMatched(currentIndex, """<foo:bar appearance="bagagada"/>""",       appearanceContainsGagaBinding)
+  }
 }

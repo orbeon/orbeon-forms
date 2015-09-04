@@ -24,83 +24,83 @@ import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
 // xxf:get-request-method() as xs:string
 class XXFormsGetRequestMethod extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-        NetUtils.getExternalContext.getRequest.getMethod
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    NetUtils.getExternalContext.getRequest.getMethod
 }
 
 // xxf:get-portlet-mode() as xs:string
 class XXFormsGetPortletMode extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-        NetUtils.getExternalContext.getRequest.getPortletMode
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    NetUtils.getExternalContext.getRequest.getPortletMode
 }
 
 // xxf:get-window-state() as xs:string
 class XXFormsGetWindowState extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-        NetUtils.getExternalContext.getRequest.getWindowState
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    NetUtils.getExternalContext.getRequest.getWindowState
 }
 
 // xxf:get-request-parameter($a as xs:string) as xs:string*
 class XXFormsGetRequestParameter extends RequestFunction {
 
-    def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
-        containingDocument.getRequestParameters.get(name)
+  def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
+    containingDocument.getRequestParameters.get(name)
 
-    def fromRequest(request: Request, name: String) =
-        Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
+  def fromRequest(request: Request, name: String) =
+    Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
 }
 
 // xxf:get-request-header($a as xs:string) as xs:string*
 class XXFormsGetRequestHeader extends RequestFunction {
 
-    def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
-        containingDocument.getRequestHeaders.get(name.toLowerCase)
+  def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
+    containingDocument.getRequestHeaders.get(name.toLowerCase)
 
-    def fromRequest(request: Request, name: String) =
-        Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
+  def fromRequest(request: Request, name: String) =
+    Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
 }
 
 trait RequestFunction extends XFormsFunction with FunctionSupport {
 
-    def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[List[String]]
-    def fromRequest(request: Request, name: String): Option[List[String]]
+  def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[List[String]]
+  def fromRequest(request: Request, name: String): Option[List[String]]
 
-    override def iterate(xpathContext: XPathContext): SequenceIterator = {
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
-        val name = stringArgument(0)(xpathContext)
+    val name = stringArgument(0)(xpathContext)
 
-        // Ask XForms document if supported and present, request otherwise
-        val containingDocument = functionOperation == 1 option getContainingDocument(xpathContext)
+    // Ask XForms document if supported and present, request otherwise
+    val containingDocument = functionOperation == 1 option getContainingDocument(xpathContext)
 
-        val values =
-            containingDocument map
-            (fromDocument(_, name)) getOrElse
-            fromRequest(NetUtils.getExternalContext.getRequest, name)
+    val values =
+      containingDocument map
+      (fromDocument(_, name)) getOrElse
+      fromRequest(NetUtils.getExternalContext.getRequest, name)
 
-        values map asIterator getOrElse EmptyIterator.getInstance
-    }
+    values map asIterator getOrElse EmptyIterator.getInstance
+  }
 }
 
 // xxf:username()  as xs:string? and xxf:get-remote-user() as xs:string?
 class XXFormsUsername extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-        Option(NetUtils.getExternalContext.getRequest.getUsername)
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    Option(NetUtils.getExternalContext.getRequest.getUsername)
 }
 
 // xxf:user-group() as xs:string?
 class XXFormsUserGroup extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-        Option(NetUtils.getExternalContext.getRequest.getUserGroup)
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    Option(NetUtils.getExternalContext.getRequest.getUserGroup)
 }
 
 // xxf:user-roles() as xs:string*
 class XXFormsUserRoles extends XFormsFunction with FunctionSupport {
-    override def iterate(xpathContext: XPathContext): SequenceIterator =
-        asIterator(NetUtils.getExternalContext.getRequest.getUserRoles)
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    asIterator(NetUtils.getExternalContext.getRequest.getUserRoles)
 }
 
 // xxf:is-user-in-role(xs:string) as xs:boolean
 class XXFormsIsUserInRole extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-        NetUtils.getExternalContext.getRequest.isUserInRole(stringArgument(0)(xpathContext))
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+    NetUtils.getExternalContext.getRequest.isUserInRole(stringArgument(0)(xpathContext))
 }

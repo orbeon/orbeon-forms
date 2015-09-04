@@ -21,22 +21,22 @@ import org.orbeon.oxf.util.ScalaUtils
 
 class XXFormsAVTValue extends FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext): StringValue = {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        val forId   = stringArgument(0)
-        val attName = stringArgument(1)
-        // TODO: handle also absolute id
-        for {
-            forPrefixedId      ← sourceScope.prefixedIdForStaticIdOpt(forId)
-            attControlAnalysis ← Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
-            control            ← relevantControl(attControlAnalysis.staticId)
-            attControl         ← ScalaUtils.collectByErasedType[XXFormsAttributeControl](control)
-        } yield
-            attControl.getValue
-    }
+    val forId   = stringArgument(0)
+    val attName = stringArgument(1)
+    // TODO: handle also absolute id
+    for {
+      forPrefixedId      ← sourceScope.prefixedIdForStaticIdOpt(forId)
+      attControlAnalysis ← Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
+      control            ← relevantControl(attControlAnalysis.staticId)
+      attControl         ← ScalaUtils.collectByErasedType[XXFormsAttributeControl](control)
+    } yield
+      attControl.getValue
+  }
 
 
-    // TODO: PathMap
+  // TODO: PathMap
 }

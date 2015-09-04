@@ -19,31 +19,31 @@ object PropertiesApacheHttpClient extends ApacheHttpClient(PropertiesConnectionS
 
 object PropertiesConnectionSettings {
 
-    def apply: HttpClientSettings = {
+  def apply: HttpClientSettings = {
 
-        val props = Properties.instance.getPropertySet
+    val props = Properties.instance.getPropertySet
 
-        import HttpClientSettings._
+    import HttpClientSettings._
 
-        HttpClientSettings(
-            staleCheckingEnabled = props.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
-            soTimeout            = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
-            chunkRequests        = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
+    HttpClientSettings(
+      staleCheckingEnabled = props.getBoolean(StaleCheckingEnabledProperty, StaleCheckingEnabledDefault),
+      soTimeout            = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
+      chunkRequests        = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
 
-            proxyHost            = Option(props.getString(ProxyHostProperty)),
-            proxyPort            = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
-            proxyExclude         = Option(props.getString(ProxyExcludeProperty)),
+      proxyHost            = Option(props.getString(ProxyHostProperty)),
+      proxyPort            = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
+      proxyExclude         = Option(props.getString(ProxyExcludeProperty)),
 
-            sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
-            sslKeystoreURI       = Option(props.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
-            sslKeystorePassword  = Option(props.getString(SSLKeystorePasswordProperty)),
-            sslKeystoreType      = Option(props.getString(SSLKeystoreTypeProperty)),
+      sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
+      sslKeystoreURI       = Option(props.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
+      sslKeystorePassword  = Option(props.getString(SSLKeystorePasswordProperty)),
+      sslKeystoreType      = Option(props.getString(SSLKeystoreTypeProperty)),
 
-            proxySSL             = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
-            proxyUsername        = Option(props.getString(ProxyUsernameProperty)),
-            proxyPassword        = Option(props.getString(ProxyPasswordProperty)),
-            proxyNTLMHost        = Option(props.getString(ProxyNTLMHostProperty)),
-            proxyNTLMDomain      = Option(props.getString(ProxyNTLMDomainProperty))
-        )
-    }
+      proxySSL             = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
+      proxyUsername        = Option(props.getString(ProxyUsernameProperty)),
+      proxyPassword        = Option(props.getString(ProxyPasswordProperty)),
+      proxyNTLMHost        = Option(props.getString(ProxyNTLMHostProperty)),
+      proxyNTLMDomain      = Option(props.getString(ProxyNTLMDomainProperty))
+    )
+  }
 }

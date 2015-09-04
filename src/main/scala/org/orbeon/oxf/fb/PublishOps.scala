@@ -23,33 +23,33 @@ import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 
 trait PublishOps {
 
-    // Publish a form and its attachments
-    //@XPathFunction
-    def publish(xhtml: NodeInfo, app: String, form: String, document: String, formVersion: String): Unit = {
+  // Publish a form and its attachments
+  //@XPathFunction
+  def publish(xhtml: NodeInfo, app: String, form: String, document: String, formVersion: String): Unit = {
 
-        try {
-            val (beforeURLs, _, publishedVersion) =
-                putWithAttachments(
-                    data              = xhtml.root,
-                    toBaseURI         = "", // local publish
-                    fromBasePath      = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
-                    toBasePath        = createFormDefinitionBasePath(app, form),
-                    filename          = "form.xhtml",
-                    commonQueryString = encodeSimpleQuery(List("document" → document)),
-                    forceAttachments  = false,
-                    // Using "next" for attachments works as attachments are saved first, and the persistence layer
-                    // uses the latest version of the published forms (not attachments) to figure what the next
-                    // version is
-                    formVersion       = nonEmptyOrNone(formVersion)
-                )
-            setvalue(instanceRoot("fb-publish-instance").get / "published-attachments", beforeURLs.size.toString)
-            setvalue(instanceRoot("fb-publish-instance").get / "published-version",     publishedVersion.toString)
-            toggle("fb-publish-dialog-success")
-        } catch {
-            case NonFatal(t) ⇒
-                toggle("fb-publish-dialog-error")
-        }
-
-        setfocus("fb-publish-dialog")
+    try {
+      val (beforeURLs, _, publishedVersion) =
+        putWithAttachments(
+          data              = xhtml.root,
+          toBaseURI         = "", // local publish
+          fromBasePath      = createFormDataBasePath("orbeon", "builder", isDraft = false, document),
+          toBasePath        = createFormDefinitionBasePath(app, form),
+          filename          = "form.xhtml",
+          commonQueryString = encodeSimpleQuery(List("document" → document)),
+          forceAttachments  = false,
+          // Using "next" for attachments works as attachments are saved first, and the persistence layer
+          // uses the latest version of the published forms (not attachments) to figure what the next
+          // version is
+          formVersion       = nonEmptyOrNone(formVersion)
+        )
+      setvalue(instanceRoot("fb-publish-instance").get / "published-attachments", beforeURLs.size.toString)
+      setvalue(instanceRoot("fb-publish-instance").get / "published-version",     publishedVersion.toString)
+      toggle("fb-publish-dialog-success")
+    } catch {
+      case NonFatal(t) ⇒
+        toggle("fb-publish-dialog-error")
     }
+
+    setfocus("fb-publish-dialog")
+  }
 }

@@ -19,17 +19,17 @@ import org.xml.sax._
 // correctly report location information of the included documents.
 class OutputLocator extends Locator {
 
-    private var locators: List[Locator] = Nil
-    private def currentLocator = locators.headOption flatMap Option.apply
+  private var locators: List[Locator] = Nil
+  private def currentLocator = locators.headOption flatMap Option.apply
 
-    // locator can be null
-    def push(locator: Locator): Unit = locators ::= locator
-    def pop(): Unit                  = locators = locators.tail
+  // locator can be null
+  def push(locator: Locator): Unit = locators ::= locator
+  def pop(): Unit                  = locators = locators.tail
 
-    def getPublicId     = currentLocator map (_.getPublicId)     orNull
-    def getSystemId     = currentLocator map (_.getSystemId)     orNull
-    def getLineNumber   = currentLocator map (_.getLineNumber)   getOrElse -1
-    def getColumnNumber = currentLocator map (_.getColumnNumber) getOrElse -1
+  def getPublicId     = currentLocator map (_.getPublicId)     orNull
+  def getSystemId     = currentLocator map (_.getSystemId)     orNull
+  def getLineNumber   = currentLocator map (_.getLineNumber)   getOrElse -1
+  def getColumnNumber = currentLocator map (_.getColumnNumber) getOrElse -1
 
-    def size = locators.size
+  def size = locators.size
 }

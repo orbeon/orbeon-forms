@@ -27,48 +27,48 @@ import org.orbeon.scaxon.XML._
 // Functions to extract image metadata from a stream
 object ImageMetadata {
 
-    // Given a name in KnownNames, try to extract its value and return it as a Saxon Item
-    def findKnownMetadata(content: InputStream, name: String): Option[Item] =
-        KnownNamesToMetadataExtractorNames.get(name) flatMap (findMetadata(content, _)) map anyToItem
+  // Given a name in KnownNames, try to extract its value and return it as a Saxon Item
+  def findKnownMetadata(content: InputStream, name: String): Option[Item] =
+    KnownNamesToMetadataExtractorNames.get(name) flatMap (findMetadata(content, _)) map anyToItem
 
-    // Try to find the type of the image
-    def findImageMediatype(content: InputStream) = {
-        val metadata = useAndClose(content)(ImageMetadataReader.readMetadata)
+  // Try to find the type of the image
+  def findImageMediatype(content: InputStream) = {
+    val metadata = useAndClose(content)(ImageMetadataReader.readMetadata)
 
-        // Support formats thar are supported by web browsers only
-        // http://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
-        metadata.getDirectories.asScala.iterator collectFirst {
-            case _: JpegDirectory      ⇒ "image/jpeg"
-            case _: PngDirectory       ⇒ "image/png"
-            case _: GifHeaderDirectory ⇒ "image/gif"
-            case _: BmpHeaderDirectory ⇒ "image/bmp"
-        }
+    // Support formats thar are supported by web browsers only
+    // http://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
+    metadata.getDirectories.asScala.iterator collectFirst {
+      case _: JpegDirectory      ⇒ "image/jpeg"
+      case _: PngDirectory       ⇒ "image/png"
+      case _: GifHeaderDirectory ⇒ "image/gif"
+      case _: BmpHeaderDirectory ⇒ "image/bmp"
     }
+  }
 
-    // Try to extract the value of the given metadata item
-    def findMetadata(content: InputStream, name: String): Option[AnyRef] = {
+  // Try to extract the value of the given metadata item
+  def findMetadata(content: InputStream, name: String): Option[AnyRef] = {
 
-        val metadata = useAndClose(content)(ImageMetadataReader.readMetadata)
+    val metadata = useAndClose(content)(ImageMetadataReader.readMetadata)
 
-        val directoryIterator =
-            for {
-                directory ← metadata.getDirectories.asScala.iterator
-                tags      = for (tag ← directory.getTags.asScala)
-                                yield
-                                    tag.getTagName → tag.getTagType
-            } yield
-                directory → tags.toMap
+    val directoryIterator =
+      for {
+        directory ← metadata.getDirectories.asScala.iterator
+        tags      = for (tag ← directory.getTags.asScala)
+                yield
+                  tag.getTagName → tag.getTagType
+      } yield
+        directory → tags.toMap
 
-        directoryIterator collectFirst {
-            case (directory, map) if map.contains(name) ⇒ directory.getObject(map(name))
-        }
+    directoryIterator collectFirst {
+      case (directory, map) if map.contains(name) ⇒ directory.getObject(map(name))
     }
+  }
 
-    private val KnownNamesToMetadataExtractorNames = Map(
-        "width"  → "Image Width",
-        "height" → "Image Height"
-    )
+  private val KnownNamesToMetadataExtractorNames = Map(
+    "width"  → "Image Width",
+    "height" → "Image Height"
+  )
 
-    // All known names
-    val KnownNames = KnownNamesToMetadataExtractorNames.keySet
+  // All known names
+  val KnownNames = KnownNamesToMetadataExtractorNames.keySet
 }

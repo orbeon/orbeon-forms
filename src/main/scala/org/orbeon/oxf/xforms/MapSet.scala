@@ -22,56 +22,56 @@ import collection.generic.Growable
  */
 class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
 
-    private val map = new LinkedHashMap[A, LinkedHashSet[B]]
+  private val map = new LinkedHashMap[A, LinkedHashSet[B]]
 
-    def put(a: A, b: B): Unit = {
-        (map.get(a) match {
-            case Some(set) ⇒ set
-            case None ⇒
-                val newSet = new LinkedHashSet[B]
-                map.put(a, newSet)
-                newSet
-        }) += b
-    }
+  def put(a: A, b: B): Unit = {
+    (map.get(a) match {
+      case Some(set) ⇒ set
+      case None ⇒
+        val newSet = new LinkedHashSet[B]
+        map.put(a, newSet)
+        newSet
+    }) += b
+  }
 
-    def intersects(other: MapSet[A, B]): Boolean = {
+  def intersects(other: MapSet[A, B]): Boolean = {
 
-        val intersection = map.keySet & other.map.keySet
+    val intersection = map.keySet & other.map.keySet
 
-        if (intersection.isEmpty)
-            return false
+    if (intersection.isEmpty)
+      return false
 
-        for (key ← intersection)
-            if ((map.get(key).get & other.map.get(key).get).nonEmpty)
-                return true
+    for (key ← intersection)
+      if ((map.get(key).get & other.map.get(key).get).nonEmpty)
+        return true
 
-        false
-    }
+    false
+  }
 
-    def keys = map.keys
+  def keys = map.keys
 
-    // NOTE: should use ++ operator, but harder to implement properly
-    def combine(other: MapSet[A, B]): MapSet[A, B] = {
-        val result = new MapSet[A, B]
-        this foreach (entry ⇒ result.put(entry._1, entry._2))
-        other foreach (entry ⇒ result.put(entry._1, entry._2))
-        result
-    }
+  // NOTE: should use ++ operator, but harder to implement properly
+  def combine(other: MapSet[A, B]): MapSet[A, B] = {
+    val result = new MapSet[A, B]
+    this foreach (entry ⇒ result.put(entry._1, entry._2))
+    other foreach (entry ⇒ result.put(entry._1, entry._2))
+    result
+  }
 
-    // TraversableLike
-    // Iterate over all (A, B) tuples
-    def foreach[U](f: ((A, B)) ⇒ U) = map foreach (mapEntry ⇒ mapEntry._2 foreach (setEntry ⇒ f((mapEntry._1, setEntry))))
+  // TraversableLike
+  // Iterate over all (A, B) tuples
+  def foreach[U](f: ((A, B)) ⇒ U) = map foreach (mapEntry ⇒ mapEntry._2 foreach (setEntry ⇒ f((mapEntry._1, setEntry))))
 
-    // Growable
-    def +=(elem: (A, B)) = {put(elem._1, elem._2); this}
-    def clear(): Unit = map.clear()
+  // Growable
+  def +=(elem: (A, B)) = {put(elem._1, elem._2); this}
+  def clear(): Unit = map.clear()
 }
 
 object MapSet {
-    // TODO: This should be immutable instead of checking an exception at runtime!
-    private object EmptyMapSet extends MapSet[Any, Any] {
-        override def put(a: Any, b: Any) = throw new OXFException("Can't add items to empty MapSet")
-    }
+  // TODO: This should be immutable instead of checking an exception at runtime!
+  private object EmptyMapSet extends MapSet[Any, Any] {
+    override def put(a: Any, b: Any) = throw new OXFException("Can't add items to empty MapSet")
+  }
 
-    def empty[A, B] = EmptyMapSet.asInstanceOf[MapSet[A, B]]
+  def empty[A, B] = EmptyMapSet.asInstanceOf[MapSet[A, B]]
 }

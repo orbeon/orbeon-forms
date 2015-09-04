@@ -31,71 +31,71 @@ import org.orbeon.scaxon.XML._
 // increased too much and readability would have suffered so we rewrote in Scala.
 class ResourcesPatcher extends SimpleProcessor  {
 
-    def generateData(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+  def generateData(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-        // Read inputs
-        val resourcesDocument = readInputAsDOM4J(pipelineContext, "data")
-        val instanceElement   = new DocumentWrapper(readInputAsDOM4J(pipelineContext, "instance"), null, XPath.GlobalConfiguration) \ *
+    // Read inputs
+    val resourcesDocument = readInputAsDOM4J(pipelineContext, "data")
+    val instanceElement   = new DocumentWrapper(readInputAsDOM4J(pipelineContext, "instance"), null, XPath.GlobalConfiguration) \ *
 
-        val app  = instanceElement \ "app"  stringValue
-        val form = instanceElement \ "form" stringValue
+    val app  = instanceElement \ "app"  stringValue
+    val form = instanceElement \ "form" stringValue
 
-        // Transform and write out the document
-        ResourcesPatcher.transform(resourcesDocument, app, form)(Properties.instance.getPropertySet)
-        TransformerUtils.writeDom4j(resourcesDocument, xmlReceiver)
-    }
+    // Transform and write out the document
+    ResourcesPatcher.transform(resourcesDocument, app, form)(Properties.instance.getPropertySet)
+    TransformerUtils.writeDom4j(resourcesDocument, xmlReceiver)
+  }
 }
 
 object ResourcesPatcher {
 
-    def transform(resourcesDocument: Document, app: String, form: String)(implicit properties: PropertySet): Unit = {
+  def transform(resourcesDocument: Document, app: String, form: String)(implicit properties: PropertySet): Unit = {
 
-        val resourcesElement = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration) \ *
+    val resourcesElement = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration) \ *
 
-        val propertyNames = properties.propertiesStartsWith("oxf.fr.resource" :: app :: form :: Nil mkString ".")
+    val propertyNames = properties.propertiesStartsWith("oxf.fr.resource" :: app :: form :: Nil mkString ".")
 
-        // In 4.6 summary/detail buttons are at the top level
-        def filterPathForBackwardCompatibility(path: Seq[String]) = path take 2 match {
-            case Seq("detail" | "summary", "buttons") ⇒ path drop 1
-            case _                                    ⇒ path
-        }
-
-        val langPathValue =
-            for {
-                name   ← propertyNames
-                tokens = name split """\."""
-                lang   = tokens(5)
-                path   = filterPathForBackwardCompatibility(tokens drop 6) mkString "/"
-                value  = properties.getString(name)
-                if value ne null // got one case where this happened
-            } yield
-                (lang, path, value)
-
-        // Return all languages or the language specified if it exists
-        // For now we don't support creating new top-level resource elements for new languages.
-        def findConcreteLanguages(langOrWildcard: String) = {
-            val allLanguages =
-                eval(resourcesElement, "resource/@xml:lang/string()").asInstanceOf[Seq[String]]
-
-            val filtered =
-                if (langOrWildcard == "*")
-                    allLanguages
-                else
-                    allLanguages filter (_ == langOrWildcard)
-
-            filtered.distinct // there *shouldn't* be duplicate languages in the source
-        }
-
-        def resourceElementsForLang(lang: String) =
-            eval(resourcesElement, s"resource[@xml:lang = '$lang']").asInstanceOf[Seq[NodeInfo]] map unwrapElement
-
-        // Update or create elements and set values
-        for {
-            (langOrWildcard, path, value) ← langPathValue
-            lang                          ← findConcreteLanguages(langOrWildcard)
-            rootForLang                   ← resourceElementsForLang(lang)
-        } locally {
-            Dom4j.ensurePath(rootForLang, path split "/" map QName.get).setText(value)
-        }
+    // In 4.6 summary/detail buttons are at the top level
+    def filterPathForBackwardCompatibility(path: Seq[String]) = path take 2 match {
+      case Seq("detail" | "summary", "buttons") ⇒ path drop 1
+      case _                                    ⇒ path
     }
+
+    val langPathValue =
+      for {
+        name   ← propertyNames
+        tokens = name split """\."""
+        lang   = tokens(5)
+        path   = filterPathForBackwardCompatibility(tokens drop 6) mkString "/"
+        value  = properties.getString(name)
+        if value ne null // got one case where this happened
+      } yield
+        (lang, path, value)
+
+    // Return all languages or the language specified if it exists
+    // For now we don't support creating new top-level resource elements for new languages.
+    def findConcreteLanguages(langOrWildcard: String) = {
+      val allLanguages =
+        eval(resourcesElement, "resource/@xml:lang/string()").asInstanceOf[Seq[String]]
+
+      val filtered =
+        if (langOrWildcard == "*")
+          allLanguages
+        else
+          allLanguages filter (_ == langOrWildcard)
+
+      filtered.distinct // there *shouldn't* be duplicate languages in the source
+    }
+
+    def resourceElementsForLang(lang: String) =
+      eval(resourcesElement, s"resource[@xml:lang = '$lang']").asInstanceOf[Seq[NodeInfo]] map unwrapElement
+
+    // Update or create elements and set values
+    for {
+      (langOrWildcard, path, value) ← langPathValue
+      lang                          ← findConcreteLanguages(langOrWildcard)
+      rootForLang                   ← resourceElementsForLang(lang)
+    } locally {
+      Dom4j.ensurePath(rootForLang, path split "/" map QName.get).setText(value)
+    }
+  }
 }

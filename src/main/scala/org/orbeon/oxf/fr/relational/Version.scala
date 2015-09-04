@@ -8,20 +8,20 @@ case   class  ForDocument(documentId: String) extends Version
 
 object Version {
 
-    val OrbeonForDocumentId              = "Orbeon-For-Document-Id"
-    val OrbeonFormDefinitionVersion      = "Orbeon-Form-Definition-Version"
+  val OrbeonForDocumentId              = "Orbeon-For-Document-Id"
+  val OrbeonFormDefinitionVersion      = "Orbeon-Form-Definition-Version"
 
-    val OrbeonForDocumentIdLower         = OrbeonForDocumentId.toLowerCase
-    val OrbeonFormDefinitionVersionLower = OrbeonFormDefinitionVersion.toLowerCase
+  val OrbeonForDocumentIdLower         = OrbeonForDocumentId.toLowerCase
+  val OrbeonFormDefinitionVersionLower = OrbeonFormDefinitionVersion.toLowerCase
 
-    def apply(documentId: Option[String], version: Option[String]): Version =
-        documentId match {
-            case Some(id) ⇒ ForDocument(id)
-            case None     ⇒
-                version match {
-                    case None         ⇒ Unspecified
-                    case Some("next") ⇒ Next
-                    case Some(v)      ⇒ Specific(v.toInt)
-                }
+  def apply(documentId: Option[String], version: Option[String]): Version =
+    documentId match {
+      case Some(id) ⇒ ForDocument(id)
+      case None     ⇒
+        version match {
+          case None         ⇒ Unspecified
+          case Some("next") ⇒ Next
+          case Some(v)      ⇒ Specific(v.toInt)
         }
+    }
 }

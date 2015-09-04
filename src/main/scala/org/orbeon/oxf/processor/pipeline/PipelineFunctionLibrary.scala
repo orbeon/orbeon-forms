@@ -37,32 +37,32 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
  * - then update XSLT stylesheets to use the p:* functions instead of direct Java calls
  */
 class PipelineFunctionLibrary extends {
-    // Namespace the functions. We wish we had trait parameters, see:
-    // http://docs.scala-lang.org/sips/pending/trait-parameters.html)
-    val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
-    val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
-    val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
-    val tryXFormsDocument             = false
+  // Namespace the functions. We wish we had trait parameters, see:
+  // http://docs.scala-lang.org/sips/pending/trait-parameters.html)
+  val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
+  val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
+  val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
+  val tryXFormsDocument             = false
 }
-    with OrbeonFunctionLibrary
-    with XFormsIndependentFunctions
-    with XXFormsIndependentFunctions
-    with XSLTFunctions {
+  with OrbeonFunctionLibrary
+  with XFormsIndependentFunctions
+  with XXFormsIndependentFunctions
+  with XSLTFunctions {
 
-    // === Functions made accessible to XSLT/XPL via Java calls
+  // === Functions made accessible to XSLT/XPL via Java calls
 
-    // Add these to XXFormsIndependentFunctions?
-    def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML)
-    def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)
-    def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML // for unit tests only
-    def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
+  // Add these to XXFormsIndependentFunctions?
+  def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML)
+  def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)
+  def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML // for unit tests only
+  def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
 
-    def isPE = Version.isPE
+  def isPE = Version.isPE
 
-    def isPortlet = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType
+  def isPortlet = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType
 
-    def setTitle(title: String): String = {
-        NetUtils.getExternalContext.getResponse.setTitle(title)
-        null
-    }
+  def setTitle(title: String): String = {
+    NetUtils.getExternalContext.getResponse.setTitle(title)
+    null
+  }
 }

@@ -22,36 +22,36 @@ import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 
 trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
 
-    def getIndentedLogger: IndentedLogger
+  def getIndentedLogger: IndentedLogger
 
-    def isTopLevel: Boolean
-    val parent: Option[PartAnalysis]
+  def isTopLevel: Boolean
+  val parent: Option[PartAnalysis]
 
-    def ancestorIterator: Iterator[PartAnalysis]
-    def ancestorOrSelfIterator: Iterator[PartAnalysis]
+  def ancestorIterator: Iterator[PartAnalysis]
+  def ancestorOrSelfIterator: Iterator[PartAnalysis]
 
-    def startScope: Scope
+  def startScope: Scope
 
-    def isExposeXPathTypes: Boolean
+  def isExposeXPathTypes: Boolean
 
-    def getEventHandlers(observerPrefixedId: String): Seq[EventHandler]
-    def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
+  def getEventHandlers(observerPrefixedId: String): Seq[EventHandler]
+  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
 
-    def hasControls: Boolean
-    def getTopLevelControls: Seq[ElementAnalysis]
-    def getTopLevelControlElements: JList[Element]
+  def hasControls: Boolean
+  def getTopLevelControls: Seq[ElementAnalysis]
+  def getTopLevelControlElements: JList[Element]
 
-    def staticState: XFormsStaticState
+  def staticState: XFormsStaticState
 
-    def metadata: Metadata
-    def xblBindings: XBLBindings
+  def metadata: Metadata
+  def xblBindings: XBLBindings
 
-    def dumpAnalysis()
+  def dumpAnalysis()
 
-    // The element in our parent that created the current part
-    def elementInParent =
-        parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // .init removes the trailing component separator
+  // The element in our parent that created the current part
+  def elementInParent =
+    parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // .init removes the trailing component separator
 
-    def repeatDepthAcrossParts =
-        if (repeats.isEmpty) 0 else (repeats map (_.ancestorRepeatsAcrossParts.size)).max + 1
+  def repeatDepthAcrossParts =
+    if (repeats.isEmpty) 0 else (repeats map (_.ancestorRepeatsAcrossParts.size)).max + 1
 }

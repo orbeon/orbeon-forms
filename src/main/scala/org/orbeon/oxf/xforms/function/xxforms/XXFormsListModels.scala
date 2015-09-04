@@ -19,11 +19,11 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 
 class XXFormsListModels extends XFormsFunction with FunctionSupport {
-    override def iterate(xpathContext: XPathContext): SequenceIterator =
-        for {
-            model       ← getContainingDocument(xpathContext).allModels
-            effectiveId = model.getEffectiveId
-            absoluteId  = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
-        } yield
-            absoluteId
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    for {
+      model       ← getContainingDocument(xpathContext).allModels
+      effectiveId = model.getEffectiveId
+      absoluteId  = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
+    } yield
+      absoluteId
 }

@@ -28,102 +28,102 @@ import scala.util.control.NonFatal
 
 class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProcessorDefinition: Option[ProcessorDefinition]) {
 
-    val jndiContext    = new InitialContext
-    val mainProcessor  = InitUtils.createProcessor(mainProcessorDefinition)
-    val errorProcessor = errorProcessorDefinition map InitUtils.createProcessor
+  val jndiContext    = new InitialContext
+  val mainProcessor  = InitUtils.createProcessor(mainProcessorDefinition)
+  val errorProcessor = errorProcessorDefinition map InitUtils.createProcessor
 
-    // Run
-    def service(pipelineContext: PipelineContext, externalContext: ExternalContext): Unit = {
+  // Run
+  def service(pipelineContext: PipelineContext, externalContext: ExternalContext): Unit = {
 
-        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
+    pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
 
-        LifecycleLogger.withEventAssumingRequest("service", "handle", Nil) {
+    LifecycleLogger.withEventAssumingRequest("service", "handle", Nil) {
 
-            // NOTE: Should this just be available from the ExternalContext?
-            pipelineContext.setAttribute(JNDIContext, jndiContext)
+      // NOTE: Should this just be available from the ExternalContext?
+      pipelineContext.setAttribute(JNDIContext, jndiContext)
 
-            try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext)(Logger)
-            catch {
-                case NonFatal(t) ⇒
-                    // Log first
-                    Logger.error(OrbeonFormatter.format(t))
+      try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext)(Logger)
+      catch {
+        case NonFatal(t) ⇒
+          // Log first
+          Logger.error(OrbeonFormatter.format(t))
 
-                    // Try to start the error pipeline if the response has not been committed yet
-                    Option(externalContext.getResponse) foreach  { response ⇒
-                        if (! response.isCommitted) {
-                            response.reset()
-                            serviceError(externalContext, t)
-                        } else
-                            serviceStaticError(externalContext, t)
-                    }
-            }
-        }
+          // Try to start the error pipeline if the response has not been committed yet
+          Option(externalContext.getResponse) foreach  { response ⇒
+            if (! response.isCommitted) {
+              response.reset()
+              serviceError(externalContext, t)
+            } else
+              serviceStaticError(externalContext, t)
+          }
+      }
     }
+  }
 
-    private def serviceError(externalContext: ExternalContext, throwable: Throwable): Unit = errorProcessor match {
-        case Some(processor) ⇒
-            val pipelineContext = new PipelineContext
+  private def serviceError(externalContext: ExternalContext, throwable: Throwable): Unit = errorProcessor match {
+    case Some(processor) ⇒
+      val pipelineContext = new PipelineContext
 
-            // Put top-level throwable so that the exception page can show the Orbeon Forms call stack if available
-            if (showExceptions)
-                pipelineContext.setAttribute(Throwable, throwable)
+      // Put top-level throwable so that the exception page can show the Orbeon Forms call stack if available
+      if (showExceptions)
+        pipelineContext.setAttribute(Throwable, throwable)
 
-            // NOTE: Should this just be available from the ExternalContext?
-            pipelineContext.setAttribute(JNDIContext, jndiContext)
+      // NOTE: Should this just be available from the ExternalContext?
+      pipelineContext.setAttribute(JNDIContext, jndiContext)
 
-            try InitUtils.runProcessor(processor, externalContext, pipelineContext)(Logger)
-            catch {
-                case NonFatal(t) ⇒
-                    Logger.error(OrbeonFormatter.format(t))
-                    serviceStaticError(externalContext, throwable)
-            }
-        case None ⇒
-            serviceStaticError(externalContext, throwable)
-    }
+      try InitUtils.runProcessor(processor, externalContext, pipelineContext)(Logger)
+      catch {
+        case NonFatal(t) ⇒
+          Logger.error(OrbeonFormatter.format(t))
+          serviceStaticError(externalContext, throwable)
+      }
+    case None ⇒
+      serviceStaticError(externalContext, throwable)
+  }
 
-    private def serviceStaticError(externalContext: ExternalContext, throwable: Throwable): Unit = {
-        val sb = new StringBuilder
-        val response  = externalContext.getResponse
-        if (! response.isCommitted) {
-            // Send new headers and HTML prologue
-            response.reset()
-            response.setContentType("text/html")
-            response.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR)
-        } else
-            // Try to close table that may still be open
-            sb.append("</p></table></table></table></table></table>")
+  private def serviceStaticError(externalContext: ExternalContext, throwable: Throwable): Unit = {
+    val sb = new StringBuilder
+    val response  = externalContext.getResponse
+    if (! response.isCommitted) {
+      // Send new headers and HTML prologue
+      response.reset()
+      response.setContentType("text/html")
+      response.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR)
+    } else
+      // Try to close table that may still be open
+      sb.append("</p></table></table></table></table></table>")
 
-        // HTML doc
-        sb.append("<html><head><title>Orbeon Forms Error</title></head><body>")
-        if (showExceptions) {
-            // Show details only if allowed
-            sb.append("<pre>")
-            sb.append(OrbeonFormatter.format(throwable))
-            sb.append("</pre>")
-        } else
-            sb.append("<p>An error has occurred while processing the request.</p>")
+    // HTML doc
+    sb.append("<html><head><title>Orbeon Forms Error</title></head><body>")
+    if (showExceptions) {
+      // Show details only if allowed
+      sb.append("<pre>")
+      sb.append(OrbeonFormatter.format(throwable))
+      sb.append("</pre>")
+    } else
+      sb.append("<p>An error has occurred while processing the request.</p>")
 
-        sb.append("</body></html>")
+    sb.append("</body></html>")
 
-        val writer =
-            try response.getWriter
-            catch { case e: IllegalStateException ⇒ new PrintWriter(response.getOutputStream) } // this uses the platform's default encoding, which is not good
+    val writer =
+      try response.getWriter
+      catch { case e: IllegalStateException ⇒ new PrintWriter(response.getOutputStream) } // this uses the platform's default encoding, which is not good
 
-        writer.print(sb.toString)
-    }
+    writer.print(sb.toString)
+  }
 }
 
 object ProcessorService {
 
-    private val HTTPExceptionsProperty = "oxf.http.exceptions"
-    private val DefaultHTTPExceptions  = false
+  private val HTTPExceptionsProperty = "oxf.http.exceptions"
+  private val DefaultHTTPExceptions  = false
 
-    val JNDIContext = "orbeon.jndi-context"
-    val Throwable   = "orbeon.throwable"
+  val JNDIContext = "orbeon.jndi-context"
+  val Throwable   = "orbeon.throwable"
 
-    val Logger = LoggerFactory.createLogger(classOf[ProcessorService])
+  val Logger = LoggerFactory.createLogger(classOf[ProcessorService])
 
-    // Whether to show exceptions to the client
-    def showExceptions =
-        Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
+  // Whether to show exceptions to the client
+  def showExceptions =
+    Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
 }

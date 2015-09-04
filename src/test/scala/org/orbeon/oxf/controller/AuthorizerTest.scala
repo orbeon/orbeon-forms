@@ -24,31 +24,31 @@ import org.orbeon.oxf.webapp.WebAppContext
 
 class AuthorizerTest extends AssertionsForJUnit with MockitoSugar {
 
-    import Authorizer._
+  import Authorizer._
 
-    @Test def testAuthorizedWithToken(): Unit = {
+  @Test def testAuthorizedWithToken(): Unit = {
 
-        val appAttributes     = collection.mutable.Map[String, AnyRef]()
-        val requestAttributes = collection.mutable.Map[String, Array[String]]()
+    val appAttributes     = collection.mutable.Map[String, AnyRef]()
+    val requestAttributes = collection.mutable.Map[String, Array[String]]()
 
-        val ec = mock[ExternalContext]
-        val webAppContext = mock[WebAppContext]
-        val request = mock[ExternalContext.Request]
+    val ec = mock[ExternalContext]
+    val webAppContext = mock[WebAppContext]
+    val request = mock[ExternalContext.Request]
 
-        Mockito when ec.getRequest thenReturn request
-        Mockito when ec.getWebAppContext thenReturn webAppContext
-        Mockito when webAppContext.attributes thenReturn appAttributes
-        Mockito when request.getHeaderValuesMap thenReturn requestAttributes.asJava
+    Mockito when ec.getRequest thenReturn request
+    Mockito when ec.getWebAppContext thenReturn webAppContext
+    Mockito when webAppContext.attributes thenReturn appAttributes
+    Mockito when request.getHeaderValuesMap thenReturn requestAttributes.asJava
 
-        assert(! authorizedWithToken(ec))
+    assert(! authorizedWithToken(ec))
 
-        appAttributes += OrbeonTokenLower → "1234567890"
-        assert(! authorizedWithToken(ec))
+    appAttributes += OrbeonTokenLower → "1234567890"
+    assert(! authorizedWithToken(ec))
 
-        requestAttributes += OrbeonTokenLower → Array("abcdefghij")
-        assert(! authorizedWithToken(ec))
+    requestAttributes += OrbeonTokenLower → Array("abcdefghij")
+    assert(! authorizedWithToken(ec))
 
-        requestAttributes += OrbeonTokenLower → Array("1234567890")
-        assert(authorizedWithToken(ec))
-    }
+    requestAttributes += OrbeonTokenLower → Array("1234567890")
+    assert(authorizedWithToken(ec))
+  }
 }

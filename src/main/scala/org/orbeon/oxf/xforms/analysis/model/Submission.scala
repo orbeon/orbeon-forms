@@ -18,8 +18,8 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.analysis.{ChildrenActionsTrait, StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 
 class Submission(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-        with ChildrenActionsTrait {
+    extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+    with ChildrenActionsTrait {
 
-    // TODO: attributes
+  // TODO: attributes
 }

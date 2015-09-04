@@ -18,24 +18,24 @@ import org.junit.Test
 
 class XBLTransformerTest extends AssertionsForJUnit {
 
-    @Test def testCSSToXPath(): Unit = {
+  @Test def testCSSToXPath(): Unit = {
 
-        val expected = Seq(
-            "foo|a"                                     → "descendant-or-self::foo:a",
-            "foo|a foo|b"                               → "descendant-or-self::foo:a//foo:b",
-            "foo|a foo|b, bar|a bar|b"                  → "descendant-or-self::foo:a//foo:b|descendant-or-self::bar:a//bar:b",
-            "foo|a > foo|b"                             → "descendant-or-self::foo:a/foo:b",
-            "foo|a > foo|b, bar|a > bar|b"              → "descendant-or-self::foo:a/foo:b|descendant-or-self::bar:a/bar:b",
-            "> foo|a"                                   → "./foo:a",
-            ":root foo|a"                               → ".//foo:a",
-            "*:root foo|a"                              → ".//foo:a",
-            ":root > foo|a"                             → "./foo:a",
-            ":root > xf|label, :root > xf|help"         → "./xf:label|./xf:help"
-            // NOTE: We can't support this as we would need current() (root() won't work from XBLTransformer)
-            // ":root :root foo|a"                         → "current()//current()//foo:a"
-        )
+    val expected = Seq(
+      "foo|a"                                     → "descendant-or-self::foo:a",
+      "foo|a foo|b"                               → "descendant-or-self::foo:a//foo:b",
+      "foo|a foo|b, bar|a bar|b"                  → "descendant-or-self::foo:a//foo:b|descendant-or-self::bar:a//bar:b",
+      "foo|a > foo|b"                             → "descendant-or-self::foo:a/foo:b",
+      "foo|a > foo|b, bar|a > bar|b"              → "descendant-or-self::foo:a/foo:b|descendant-or-self::bar:a/bar:b",
+      "> foo|a"                                   → "./foo:a",
+      ":root foo|a"                               → ".//foo:a",
+      "*:root foo|a"                              → ".//foo:a",
+      ":root > foo|a"                             → "./foo:a",
+      ":root > xf|label, :root > xf|help"         → "./xf:label|./xf:help"
+      // NOTE: We can't support this as we would need current() (root() won't work from XBLTransformer)
+      // ":root :root foo|a"                         → "current()//current()//foo:a"
+    )
 
-        for ((css, xpath) ← expected)
-            assert(xpath === CSSParser.toXPath(css))
-    }
+    for ((css, xpath) ← expected)
+      assert(xpath === CSSParser.toXPath(css))
+  }
 }

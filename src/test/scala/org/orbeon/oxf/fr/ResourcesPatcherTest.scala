@@ -27,149 +27,149 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def patchingScenarios(): Unit = {
+  @Test def patchingScenarios(): Unit = {
 
-        val propertySet = {
-            val properties: Document =
-                <properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.en.detail.buttons.existing" value="Existing"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.fr.detail.buttons.existing" value="Existant"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.de.detail.buttons.existing" value="Vorhanden"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.en.detail.labels.missing"   value="Missing"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.fr.detail.labels.missing"   value="Manquant"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.de.detail.labels.missing"   value="Vermisst"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.buttons.acme"      value="Acme Existing"/>
-                    <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.labels.acme"       value="Acme Missing"/>
-                </properties>
+    val propertySet = {
+      val properties: Document =
+        <properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <property as="xs:string"  name="oxf.fr.resource.*.*.en.detail.buttons.existing" value="Existing"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.fr.detail.buttons.existing" value="Existant"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.de.detail.buttons.existing" value="Vorhanden"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.en.detail.labels.missing"   value="Missing"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.fr.detail.labels.missing"   value="Manquant"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.de.detail.labels.missing"   value="Vermisst"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.buttons.acme"      value="Acme Existing"/>
+          <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.labels.acme"       value="Acme Missing"/>
+        </properties>
 
-            new PropertyStore(properties).getGlobalPropertySet
-        }
-
-        def newDoc: Document =
-            <resources>
-                <resource xml:lang="en">
-                    <buttons>
-                        <existing>OVERRIDE ME</existing>
-                        <acme>OVERRIDE ME</acme>
-                    </buttons>
-                </resource>
-                <resource xml:lang="fr">
-                    <buttons>
-                        <existing>OVERRIDE ME</existing>
-                        <acme>OVERRIDE ME</acme>
-                    </buttons>
-                </resource>
-            </resources>
-
-        val expected: Document =
-            <resources>
-                <resource xml:lang="en">
-                    <buttons>
-                        <existing>Existing</existing>
-                        <acme>Acme Existing</acme>
-                    </buttons>
-                    <detail>
-                        <labels>
-                            <missing>Missing</missing>
-                            <acme>Acme Missing</acme>
-                        </labels>
-                    </detail>
-                </resource>
-                <resource xml:lang="fr">
-                    <buttons>
-                        <existing>Existant</existing>
-                        <acme>Acme Existing</acme>
-                    </buttons>
-                    <detail>
-                        <labels>
-                            <missing>Manquant</missing>
-                            <acme>Acme Missing</acme>
-                        </labels>
-                    </detail>
-                </resource>
-            </resources>
-
-        val initial = newDoc
-
-        ResourcesPatcher.transform(initial, "*", "*")(propertySet)
-
-        assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
+      new PropertyStore(properties).getGlobalPropertySet
     }
 
-    @Test def testResourcesConsistency(): Unit = {
+    def newDoc: Document =
+      <resources>
+        <resource xml:lang="en">
+          <buttons>
+            <existing>OVERRIDE ME</existing>
+            <acme>OVERRIDE ME</acme>
+          </buttons>
+        </resource>
+        <resource xml:lang="fr">
+          <buttons>
+            <existing>OVERRIDE ME</existing>
+            <acme>OVERRIDE ME</acme>
+          </buttons>
+        </resource>
+      </resources>
 
-        import org.orbeon.scaxon.XML._
+    val expected: Document =
+      <resources>
+        <resource xml:lang="en">
+          <buttons>
+            <existing>Existing</existing>
+            <acme>Acme Existing</acme>
+          </buttons>
+          <detail>
+            <labels>
+              <missing>Missing</missing>
+              <acme>Acme Missing</acme>
+            </labels>
+          </detail>
+        </resource>
+        <resource xml:lang="fr">
+          <buttons>
+            <existing>Existant</existing>
+            <acme>Acme Existing</acme>
+          </buttons>
+          <detail>
+            <labels>
+              <missing>Manquant</missing>
+              <acme>Acme Missing</acme>
+            </labels>
+          </detail>
+        </resource>
+      </resources>
 
-        def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == "en"
+    val initial = newDoc
 
-        val urls = Seq(
-            "oxf:/apps/fr/i18n/resources.xml",
-            "oxf:/forms/orbeon/builder/form/resources.xml",
-            "oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
-        )
+    ResourcesPatcher.transform(initial, "*", "*")(propertySet)
 
-        // - allow "item" and "choices" because we use this for itemsets
-        // - allow "type" because it's used for the FB list of types
-        val AllowedDuplicateNames = Set("item", "choices", "type")
+    assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
+  }
 
-        for (url ← urls) {
+  @Test def testResourcesConsistency(): Unit = {
 
-            val doc =
-                useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
-                    TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
-                }
+    import org.orbeon.scaxon.XML._
 
-            // Baseline is "en"
-            val englishResource = doc / * / "resource" filter hasLang("en") head
+    def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == "en"
 
-            // Recursively compare element presence and order. All other nodes, including text and attribute nodes, are
-            // ignored.
-            def compareElements(left: NodeInfo, right: NodeInfo, lang: String): Boolean = (left, right) match {
-                case (left: DocumentInfo, right: DocumentInfo) ⇒
-                    compareElements(left.rootElement, right.rootElement, lang)
-                case (left: NodeInfo, right: NodeInfo) if isElement(left) ⇒
+    val urls = Seq(
+      "oxf:/apps/fr/i18n/resources.xml",
+      "oxf:/forms/orbeon/builder/form/resources.xml",
+      "oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+    )
 
-                    def commonMessageSuffix = s" (url=$url and lang=$lang)"
+    // - allow "item" and "choices" because we use this for itemsets
+    // - allow "type" because it's used for the FB list of types
+    val AllowedDuplicateNames = Set("item", "choices", "type")
 
-                    assert(left.name === right.name, s"different names$commonMessageSuffix")
+    for (url ← urls) {
 
-                    // Ignore children of "div" because it can contain XHTML which is different per language
-                    left.name == right.name && (left.name == "div" || {
-                        val leftChildren  = left  / *
-                        val rightChildren = right / *
-
-                        val duplicates = findDuplicates(leftChildren map (_.name)) filterNot AllowedDuplicateNames
-
-                        assert(
-                            duplicates.isEmpty,
-                            s"duplicate names under `${left.name}`: ${duplicates mkString ", "}$commonMessageSuffix"
-                        )
-
-                        def elemNames(elems: Seq[NodeInfo]) =
-                            elems map (_.name) mkString ("[", ", ", "]")
-
-                        def errorSuffix =
-                            s"$commonMessageSuffix (left=${elemNames(leftChildren)}, right=${elemNames(rightChildren)}"
-
-                        assert(leftChildren.size === rightChildren.size, s"different sizes$errorSuffix")
-
-                        leftChildren.size == rightChildren.size && {
-                            (leftChildren zip rightChildren) forall {
-                                case (l, r) ⇒ compareElements(l, r, lang)
-                            }
-                        }
-                    })
-                case _ ⇒
-                    // Ignore all other nodes
-                    true
-            }
-
-            for {
-                resource ← doc / * / "resource" filterNot hasLang("en")
-                lang     = resource attValue "*:lang"
-            } locally {
-                assert(compareElements(englishResource, resource, lang))
-            }
+      val doc =
+        useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+          TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
         }
+
+      // Baseline is "en"
+      val englishResource = doc / * / "resource" filter hasLang("en") head
+
+      // Recursively compare element presence and order. All other nodes, including text and attribute nodes, are
+      // ignored.
+      def compareElements(left: NodeInfo, right: NodeInfo, lang: String): Boolean = (left, right) match {
+        case (left: DocumentInfo, right: DocumentInfo) ⇒
+          compareElements(left.rootElement, right.rootElement, lang)
+        case (left: NodeInfo, right: NodeInfo) if isElement(left) ⇒
+
+          def commonMessageSuffix = s" (url=$url and lang=$lang)"
+
+          assert(left.name === right.name, s"different names$commonMessageSuffix")
+
+          // Ignore children of "div" because it can contain XHTML which is different per language
+          left.name == right.name && (left.name == "div" || {
+            val leftChildren  = left  / *
+            val rightChildren = right / *
+
+            val duplicates = findDuplicates(leftChildren map (_.name)) filterNot AllowedDuplicateNames
+
+            assert(
+              duplicates.isEmpty,
+              s"duplicate names under `${left.name}`: ${duplicates mkString ", "}$commonMessageSuffix"
+            )
+
+            def elemNames(elems: Seq[NodeInfo]) =
+              elems map (_.name) mkString ("[", ", ", "]")
+
+            def errorSuffix =
+              s"$commonMessageSuffix (left=${elemNames(leftChildren)}, right=${elemNames(rightChildren)}"
+
+            assert(leftChildren.size === rightChildren.size, s"different sizes$errorSuffix")
+
+            leftChildren.size == rightChildren.size && {
+              (leftChildren zip rightChildren) forall {
+                case (l, r) ⇒ compareElements(l, r, lang)
+              }
+            }
+          })
+        case _ ⇒
+          // Ignore all other nodes
+          true
+      }
+
+      for {
+        resource ← doc / * / "resource" filterNot hasLang("en")
+        lang     = resource attValue "*:lang"
+      } locally {
+        assert(compareElements(englishResource, resource, lang))
+      }
     }
+  }
 }

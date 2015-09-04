@@ -19,81 +19,81 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait BasicControls extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
-    import Builder._
+  import Builder._
 
-    @Test def addGridsSectionsControls(): Unit = {
+  @Test def addGridsSectionsControls(): Unit = {
 
-        def clickOnToolboxControlButtons(from: Int, to: Int) =
-            executeScript(
-                "ORBEON.jQuery('.fb-tool > .fb-add-control > button').slice(arguments[0], arguments[1] + 1).click();",
-                new java.lang.Integer(from),
-                new java.lang.Integer(to)
-            )
+    def clickOnToolboxControlButtons(from: Int, to: Int) =
+      executeScript(
+        "ORBEON.jQuery('.fb-tool > .fb-add-control > button').slice(arguments[0], arguments[1] + 1).click();",
+        new java.lang.Integer(from),
+        new java.lang.Integer(to)
+      )
 
-        def clickOnToolboxButtonsAndCheck(from: Int, to: Int) =
-            for {
-                _ ← clickOnToolboxControlButtons(from, to)
-                - ← assert(countCurrentGridRows == (to + 1))
-            }()
+    def clickOnToolboxButtonsAndCheck(from: Int, to: Int) =
+      for {
+        _ ← clickOnToolboxControlButtons(from, to)
+        - ← assert(countCurrentGridRows == (to + 1))
+      }()
 
-        // Insert controls step by step as inserting all of them at once can take more than the allowed timeout
-        def clickOnAllToolboxButtonsAndCheck(step: Int) = (
-            0 until ControlsCount
-            sliding (step, step)
-            map     (r ⇒ r.head → r.last)
-            foreach (clickOnToolboxButtonsAndCheck _).tupled
-        )
+    // Insert controls step by step as inserting all of them at once can take more than the allowed timeout
+    def clickOnAllToolboxButtonsAndCheck(step: Int) = (
+      0 until ControlsCount
+      sliding (step, step)
+      map     (r ⇒ r.head → r.last)
+      foreach (clickOnToolboxButtonsAndCheck _).tupled
+    )
 
-        def setAndCheckNameOfControlInCell(from: Int, to: Int, controlName: String) =
-            for {
-                _ ← moveOverCellInCurrentGrid(from, to)
-                _ ← openControlSettings()
-                _ ← ControlSettings.setControlName(controlName)
-                _ ← ControlSettings.applySettings()
-                _ ← moveOverCellInCurrentGrid(from, to)
-                _ ← openControlSettings()
-                _ ← assert(controlName == ControlSettings.getControlName)
-                _ ← ControlSettings.cancelSettings()
-            }()
+    def setAndCheckNameOfControlInCell(from: Int, to: Int, controlName: String) =
+      for {
+        _ ← moveOverCellInCurrentGrid(from, to)
+        _ ← openControlSettings()
+        _ ← ControlSettings.setControlName(controlName)
+        _ ← ControlSettings.applySettings()
+        _ ← moveOverCellInCurrentGrid(from, to)
+        _ ← openControlSettings()
+        _ ← assert(controlName == ControlSettings.getControlName)
+        _ ← ControlSettings.cancelSettings()
+      }()
 
-        onNewForm {
-            for {
-                - ← assert(countSections == 1) // the form has an initial section
-                - ← assert(countGrids == 1)    // the form has an initial grid
-                _ ← assert(countAllToolboxControlButtons == ControlsCount)
+    onNewForm {
+      for {
+        - ← assert(countSections == 1) // the form has an initial section
+        - ← assert(countGrids == 1)    // the form has an initial grid
+        _ ← assert(countAllToolboxControlButtons == ControlsCount)
 
-                _ ← insertNewGrid()
-                - ← assert(countGrids == 2)
-                _ ← clickOnAllToolboxButtonsAndCheck(5)
+        _ ← insertNewGrid()
+        - ← assert(countGrids == 2)
+        _ ← clickOnAllToolboxButtonsAndCheck(5)
 
-                _ ← setAndCheckNameOfControlInCell(1, 1, "my-input")
+        _ ← setAndCheckNameOfControlInCell(1, 1, "my-input")
 
-                _ ← insertNewRepeatedGrid()
-                - ← assert(countRepeatedGrids == 1)
-                - ← assert(countGrids == 3)
-                _ ← clickOnAllToolboxButtonsAndCheck(5)
+        _ ← insertNewRepeatedGrid()
+        - ← assert(countRepeatedGrids == 1)
+        - ← assert(countGrids == 3)
+        _ ← clickOnAllToolboxButtonsAndCheck(5)
 
-                _ ← setAndCheckNameOfControlInCell(1 + 2 * 1, 1 + 1, "my-input-in-repeated-grid") // adjust row/col in repeated grid
+        _ ← setAndCheckNameOfControlInCell(1 + 2 * 1, 1 + 1, "my-input-in-repeated-grid") // adjust row/col in repeated grid
 
-                _ ← insertNewSection()
-                - ← assert(countSections == 2)
-            }()
-        }
+        _ ← insertNewSection()
+        - ← assert(countSections == 2)
+      }()
     }
+  }
 
-    @Test def moveSections(): Unit = {
+  @Test def moveSections(): Unit = {
 
-        onNewForm {
-            for {
-                - ← assert(countSections == 1) // the form has an initial section
-                - ← assert(countGrids == 1)    // the form has an initial grid
+    onNewForm {
+      for {
+        - ← assert(countSections == 1) // the form has an initial section
+        - ← assert(countGrids == 1)    // the form has an initial grid
 
-                _ ← insertNewSection()
-                - ← assert(countSections == 2)
+        _ ← insertNewSection()
+        - ← assert(countSections == 2)
 
-                _ ← insertNewSection()
-                - ← assert(countSections == 2)
-            }()
-        }
+        _ ← insertNewSection()
+        - ← assert(countSections == 2)
+      }()
     }
+  }
 }

@@ -37,203 +37,203 @@ import collection.mutable
  * ContentHandler able to serialize text or binary documents to an output stream.
  */
 class BinaryTextXMLReceiver(
-    output                    : Either[Response, OutputStream], // one of those is required
-    closeStream               : Boolean,                        // whether to close the stream upon endDocument()
-    forceContentType          : Boolean,
-    requestedContentType      : Option[String],
-    ignoreDocumentContentType : Boolean,
-    forceEncoding             : Boolean,
-    requestedEncoding         : Option[String],
-    ignoreDocumentEncoding    : Boolean
+  output                    : Either[Response, OutputStream], // one of those is required
+  closeStream               : Boolean,                        // whether to close the stream upon endDocument()
+  forceContentType          : Boolean,
+  requestedContentType      : Option[String],
+  ignoreDocumentContentType : Boolean,
+  forceEncoding             : Boolean,
+  requestedEncoding         : Option[String],
+  ignoreDocumentEncoding    : Boolean
 ) extends XMLReceiverAdapter {
 
-    require(! forceContentType || isNotBlank(requestedContentType.get))
-    require(! forceEncoding    || isNotBlank(requestedEncoding.get))
+  require(! forceContentType || isNotBlank(requestedContentType.get))
+  require(! forceEncoding    || isNotBlank(requestedEncoding.get))
 
-    val response     = output.left.toOption
-    val outputStream = response map (_.getOutputStream) getOrElse output.right.get
+  val response     = output.left.toOption
+  val outputStream = response map (_.getOutputStream) getOrElse output.right.get
 
-    private val prefixMappings = new mutable.HashMap[String, String]
+  private val prefixMappings = new mutable.HashMap[String, String]
 
-    private var elementLevel: Int = 0
-    private var writer: Writer = null
-    private var outputReceiver: XMLReceiver = null
+  private var elementLevel: Int = 0
+  private var writer: Writer = null
+  private var outputReceiver: XMLReceiver = null
 
-    // For Java callers
-    def this(
-        response                  : ExternalContext.Response,
-        outputStream              : OutputStream,
-        closeStream               : Boolean,
-        forceContentType          : Boolean,
-        requestedContentType      : String,
-        ignoreDocumentContentType : Boolean,
-        forceEncoding             : Boolean,
-        requestedEncoding         : String,
-        ignoreDocumentEncoding    : Boolean
-    ) =
-        this(
-            if (response ne null) Left(response) else Right(outputStream),
-            closeStream,
-            forceContentType,
-            nonEmptyOrNone(requestedContentType),
-            ignoreDocumentContentType,
-            forceEncoding,
-            nonEmptyOrNone(requestedEncoding),
-            ignoreDocumentEncoding
-        )
+  // For Java callers
+  def this(
+    response                  : ExternalContext.Response,
+    outputStream              : OutputStream,
+    closeStream               : Boolean,
+    forceContentType          : Boolean,
+    requestedContentType      : String,
+    ignoreDocumentContentType : Boolean,
+    forceEncoding             : Boolean,
+    requestedEncoding         : String,
+    ignoreDocumentEncoding    : Boolean
+  ) =
+    this(
+      if (response ne null) Left(response) else Right(outputStream),
+      closeStream,
+      forceContentType,
+      nonEmptyOrNone(requestedContentType),
+      ignoreDocumentContentType,
+      forceEncoding,
+      nonEmptyOrNone(requestedEncoding),
+      ignoreDocumentEncoding
+    )
 
-    // Simple constructor to write to a stream and close it
-    def this(outputStream: OutputStream) =
-        this(Right(outputStream), true, false, None, false, false, None, false)
+  // Simple constructor to write to a stream and close it
+  def this(outputStream: OutputStream) =
+    this(Right(outputStream), true, false, None, false, false, None, false)
 
-    // Record definitions only before root element arrives
-    override def startPrefixMapping(prefix: String, uri: String): Unit =
-        if (elementLevel == 0)
-            prefixMappings.put(prefix, uri)
+  // Record definitions only before root element arrives
+  override def startPrefixMapping(prefix: String, uri: String): Unit =
+    if (elementLevel == 0)
+      prefixMappings.put(prefix, uri)
 
-    override def startElement(namespaceURI: String, localName: String, qName: String, attributes: Attributes): Unit = {
-        elementLevel += 1
+  override def startElement(namespaceURI: String, localName: String, qName: String, attributes: Attributes): Unit = {
+    elementLevel += 1
 
-        if (elementLevel == 1) {
-            // This is the root element
+    if (elementLevel == 1) {
+      // This is the root element
 
-            // Get xsi:type attribute and determine whether the input is binary or text
+      // Get xsi:type attribute and determine whether the input is binary or text
 
-            val xsiType = Option(attributes.getValue(XSI_TYPE_QNAME.getNamespaceURI, XSI_TYPE_QNAME.getName)) getOrElse
-                (throw new OXFException("Root element must contain an xsi:type attribute"))
+      val xsiType = Option(attributes.getValue(XSI_TYPE_QNAME.getNamespaceURI, XSI_TYPE_QNAME.getName)) getOrElse
+        (throw new OXFException("Root element must contain an xsi:type attribute"))
 
-            val (typePrefix, typeLocalName) = XML.parseQName(xsiType)
+      val (typePrefix, typeLocalName) = XML.parseQName(xsiType)
 
-            val typeNamespaceURI =
-                prefixMappings.getOrElse(typePrefix, throw new OXFException(s"Undeclared prefix in xsi:type: $typePrefix"))
+      val typeNamespaceURI =
+        prefixMappings.getOrElse(typePrefix, throw new OXFException(s"Undeclared prefix in xsi:type: $typePrefix"))
 
-            val isBinaryInput = QName.get(typeLocalName, Namespace.get(typePrefix, typeNamespaceURI)) match {
-                case XS_BASE64BINARY_QNAME ⇒ true
-                case XS_STRING_QNAME ⇒ false
-                case _ ⇒ throw new OXFException("Type xs:string or xs:base64Binary must be specified")
-            }
+      val isBinaryInput = QName.get(typeLocalName, Namespace.get(typePrefix, typeNamespaceURI)) match {
+        case XS_BASE64BINARY_QNAME ⇒ true
+        case XS_STRING_QNAME ⇒ false
+        case _ ⇒ throw new OXFException("Type xs:string or xs:base64Binary must be specified")
+      }
 
-            // Set last-modified, Content-Disposition and status code when available
-            response foreach { response ⇒
+      // Set last-modified, Content-Disposition and status code when available
+      response foreach { response ⇒
 
-                // This will override caching settings which may have taken place before
-                nonEmptyOrNone(attributes.getValue(Headers.LastModifiedLower)) foreach
-                    (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
+        // This will override caching settings which may have taken place before
+        nonEmptyOrNone(attributes.getValue(Headers.LastModifiedLower)) foreach
+          (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
 
-                nonEmptyOrNone(attributes.getValue("filename")) foreach
-                    (fileName ⇒ response.setHeader("Content-Disposition", "attachment; filename=" + fileName))
+        nonEmptyOrNone(attributes.getValue("filename")) foreach
+          (fileName ⇒ response.setHeader("Content-Disposition", "attachment; filename=" + fileName))
 
-                nonEmptyOrNone(attributes.getValue("status-code")) foreach
-                    (statusCode ⇒ response.setStatus(statusCode.toInt))
-            }
+        nonEmptyOrNone(attributes.getValue("status-code")) foreach
+          (statusCode ⇒ response.setStatus(statusCode.toInt))
+      }
 
-            // Set ContentHandler and headers depending on input type
-            val contentTypeAttribute = Option(attributes.getValue(Headers.ContentTypeLower))
-            if (isBinaryInput) {
-                response foreach { response ⇒
-                    // Get content-type and encoding
+      // Set ContentHandler and headers depending on input type
+      val contentTypeAttribute = Option(attributes.getValue(Headers.ContentTypeLower))
+      if (isBinaryInput) {
+        response foreach { response ⇒
+          // Get content-type and encoding
 
-                    if (! forceContentType          &&
-                        ! ignoreDocumentContentType &&
-                        ! forceEncoding             &&
-                        ! ignoreDocumentEncoding    &&
-                        contentTypeAttribute.isDefined) {
-                        // Simple case where we just forward what's coming in
-                        response.setContentType(contentTypeAttribute.get)
-                    } else {
-                        // Otherwise try some funky logic based on the configuration
-                        val contentType = getContentType(contentTypeAttribute, DefaultBinaryContentType)
-                        val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
+          if (! forceContentType          &&
+            ! ignoreDocumentContentType &&
+            ! forceEncoding             &&
+            ! ignoreDocumentEncoding    &&
+            contentTypeAttribute.isDefined) {
+            // Simple case where we just forward what's coming in
+            response.setContentType(contentTypeAttribute.get)
+          } else {
+            // Otherwise try some funky logic based on the configuration
+            val contentType = getContentType(contentTypeAttribute, DefaultBinaryContentType)
+            val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
 
-                        // Output encoding only for text content types, defaulting to utf-8
-                        // NOTE: The "binary" mode doesn't mean the content is binary, it could be text as well. So we
-                        // output a charset when possible.
-                        if (XMLUtils.isTextOrJSONContentType(contentType))
-                            response.setContentType(contentType + "; charset=" + encoding)
-                        else
-                            response.setContentType(contentType)
-                    }
-                }
-                outputReceiver = new Base64XMLReceiver(outputStream)
-            } else {
-                // Get content-type and encoding
-                val contentType = getContentType(contentTypeAttribute, DefaultTextContentType)
-                val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
-
-                // Always set the content type with a charset attribute, defaulting to utf-8
-                response foreach (_.setContentType(contentType + "; charset=" + encoding))
-
-                writer = new OutputStreamWriter(outputStream, encoding)
-                outputReceiver = new TextXMLReceiver(writer)
-            }
+            // Output encoding only for text content types, defaulting to utf-8
+            // NOTE: The "binary" mode doesn't mean the content is binary, it could be text as well. So we
+            // output a charset when possible.
+            if (XMLUtils.isTextOrJSONContentType(contentType))
+              response.setContentType(contentType + "; charset=" + encoding)
+            else
+              response.setContentType(contentType)
+          }
         }
+        outputReceiver = new Base64XMLReceiver(outputStream)
+      } else {
+        // Get content-type and encoding
+        val contentType = getContentType(contentTypeAttribute, DefaultTextContentType)
+        val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
+
+        // Always set the content type with a charset attribute, defaulting to utf-8
+        response foreach (_.setContentType(contentType + "; charset=" + encoding))
+
+        writer = new OutputStreamWriter(outputStream, encoding)
+        outputReceiver = new TextXMLReceiver(writer)
+      }
     }
+  }
 
-    override def endElement(namespaceURI: String, localName: String, qName: String): Unit =
-        elementLevel -= 1
+  override def endElement(namespaceURI: String, localName: String, qName: String): Unit =
+    elementLevel -= 1
 
-    override def characters(ch: Array[Char], start: Int, length: Int): Unit =
-        outputReceiver.characters(ch, start, length)
+  override def characters(ch: Array[Char], start: Int, length: Int): Unit =
+    outputReceiver.characters(ch, start, length)
 
-    override def endDocument(): Unit = {
+  override def endDocument(): Unit = {
+    if (writer ne null)
+      writer.flush()
+    outputStream.flush()
+    if (closeStream)
+      outputStream.close()
+  }
+
+  override def processingInstruction(target: String, data: String): Unit =
+    parseSerializerPI(target, data) match {
+      case Some(("status-code", Some(code))) ⇒
+        response foreach (_.setStatus(code.toInt))
+      case Some(("flush", _)) ⇒
         if (writer ne null)
-            writer.flush()
+          writer.flush()
+
         outputStream.flush()
-        if (closeStream)
-            outputStream.close()
+      case _ ⇒
+        super.processingInstruction(target, data)
     }
 
-    override def processingInstruction(target: String, data: String): Unit =
-        parseSerializerPI(target, data) match {
-            case Some(("status-code", Some(code))) ⇒
-                response foreach (_.setStatus(code.toInt))
-            case Some(("flush", _)) ⇒
-                if (writer ne null)
-                    writer.flush()
+  // Content type determination algorithm
+  private def getContentType(contentTypeAttribute: Option[String], defaultContentType: String) =
+    if (forceContentType)
+      requestedContentType.get
+    else if (ignoreDocumentContentType)
+      requestedContentType getOrElse defaultContentType
+    else
+      contentTypeAttribute map getContentTypeMediaType getOrElse defaultContentType
 
-                outputStream.flush()
-            case _ ⇒
-                super.processingInstruction(target, data)
-        }
-
-    // Content type determination algorithm
-    private def getContentType(contentTypeAttribute: Option[String], defaultContentType: String) =
-        if (forceContentType)
-            requestedContentType.get
-        else if (ignoreDocumentContentType)
-            requestedContentType getOrElse defaultContentType
-        else
-            contentTypeAttribute map getContentTypeMediaType getOrElse defaultContentType
-
-    // Encoding determination algorithm
-    private def getEncoding(contentTypeAttribute: Option[String], defaultEncoding: String) =
-        if (forceEncoding)
-            requestedEncoding.get
-        else if (ignoreDocumentEncoding)
-            requestedEncoding getOrElse defaultEncoding
-        else
-            contentTypeAttribute flatMap (c ⇒ Option(getContentTypeCharset(c))) getOrElse defaultEncoding
+  // Encoding determination algorithm
+  private def getEncoding(contentTypeAttribute: Option[String], defaultEncoding: String) =
+    if (forceEncoding)
+      requestedEncoding.get
+    else if (ignoreDocumentEncoding)
+      requestedEncoding getOrElse defaultEncoding
+    else
+      contentTypeAttribute flatMap (c ⇒ Option(getContentTypeCharset(c))) getOrElse defaultEncoding
 }
 
 object BinaryTextXMLReceiver {
 
-    val DefaultBinaryContentType = "application/octet-stream"
-    val DefaultTextContentType   = "text/plain"
+  val DefaultBinaryContentType = "application/octet-stream"
+  val DefaultTextContentType   = "text/plain"
 
-    val PITargets = Set("orbeon-serializer", "oxf-serializer")
+  val PITargets = Set("orbeon-serializer", "oxf-serializer")
 
-    private val StatusCodeRE = """status-code="([^"]*)"""".r
+  private val StatusCodeRE = """status-code="([^"]*)"""".r
 
-    def parseSerializerPI(target: String, data: String): Option[(String, Option[String])] = {
-        if (PITargets(target)) {
-            Option(data) collect {
-                case StatusCodeRE(code) ⇒ "status-code" → Some(code)
-                case "flush"            ⇒ "flush" → None
-            }
-        } else
-            None
-    }
+  def parseSerializerPI(target: String, data: String): Option[(String, Option[String])] = {
+    if (PITargets(target)) {
+      Option(data) collect {
+        case StatusCodeRE(code) ⇒ "status-code" → Some(code)
+        case "flush"            ⇒ "flush" → None
+      }
+    } else
+      None
+  }
 
-    def isSerializerPI(target: String, data: String) =
-        parseSerializerPI(target, data).isDefined
+  def isSerializerPI(target: String, data: String) =
+    parseSerializerPI(target, data).isDefined
 }

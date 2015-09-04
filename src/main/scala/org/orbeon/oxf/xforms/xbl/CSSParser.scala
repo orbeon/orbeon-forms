@@ -19,60 +19,60 @@ import org.apache.commons.lang3.StringUtils
 // TODO: handle [att], [att=val], [att~=val], [att|=val]
 object CSSParser {
 
-    // Convert a CSS selector to XPath
-    def toXPath(cssSelector: String): String = {
-        val sb = new StringBuilder
-        val selectors = StringUtils.split(cssSelector, ',')
+  // Convert a CSS selector to XPath
+  def toXPath(cssSelector: String): String = {
+    val sb = new StringBuilder
+    val selectors = StringUtils.split(cssSelector, ',')
 
-        var firstSelector = true
-        for (selector ← selectors) {
-            if (! firstSelector)
-                sb append '|'
+    var firstSelector = true
+    for (selector ← selectors) {
+      if (! firstSelector)
+        sb append '|'
 
-            val pathsElements = StringUtils.split(selector.trim, ' ')
-            var firstElement = true
-            var wasChildAxis = false
-            for (pathElement ← pathsElements) {
+      val pathsElements = StringUtils.split(selector.trim, ' ')
+      var firstElement = true
+      var wasChildAxis = false
+      for (pathElement ← pathsElements) {
 
-                def appendPathElement() = {
-                    if (Set(":root", "*:root")(pathElement))
-                        sb append "."
-                    else
-                        sb append pathElement.replace('|', ':').trim
-                    false
-                }
-
-                wasChildAxis =
-                    if (firstElement) {
-                        // First path element
-                        if (Set(":root", "*:root")(pathElement)) {
-                            appendPathElement()
-                        } else if (pathElement == ">") {
-                            sb append "./"
-                            true
-                        } else {
-                            sb append "descendant-or-self::"
-                            appendPathElement()
-                        }
-                    } else {
-                        // Subsequent path element
-                        if (pathElement == ">") {
-                            sb append '/'
-                            true
-                        } else if (! wasChildAxis) {
-                            sb append "//"
-                            appendPathElement()
-                        } else {
-                            appendPathElement()
-                        }
-                    }
-
-                firstElement = false
-            }
-
-            firstSelector = false
+        def appendPathElement() = {
+          if (Set(":root", "*:root")(pathElement))
+            sb append "."
+          else
+            sb append pathElement.replace('|', ':').trim
+          false
         }
 
-        sb.toString
+        wasChildAxis =
+          if (firstElement) {
+            // First path element
+            if (Set(":root", "*:root")(pathElement)) {
+              appendPathElement()
+            } else if (pathElement == ">") {
+              sb append "./"
+              true
+            } else {
+              sb append "descendant-or-self::"
+              appendPathElement()
+            }
+          } else {
+            // Subsequent path element
+            if (pathElement == ">") {
+              sb append '/'
+              true
+            } else if (! wasChildAxis) {
+              sb append "//"
+              appendPathElement()
+            } else {
+              appendPathElement()
+            }
+          }
+
+        firstElement = false
+      }
+
+      firstSelector = false
     }
+
+    sb.toString
+  }
 }

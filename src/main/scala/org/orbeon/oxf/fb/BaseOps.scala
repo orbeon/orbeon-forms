@@ -26,122 +26,122 @@ import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 trait BaseOps extends Logging {
 
-    implicit def logger = containingDocument.getIndentedLogger("form-builder")
+  implicit def logger = containingDocument.getIndentedLogger("form-builder")
 
-    // Minimal version of IE supported
-    val MinimalIEVersion = 11
+  // Minimal version of IE supported
+  val MinimalIEVersion = 11
 
-    // Id of the xxf:dynamic control holding the edited form
-    val DynamicControlId = "fb"
+  // Id of the xxf:dynamic control holding the edited form
+  val DynamicControlId = "fb"
 
-    // Find the form document being edited
-    def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
+  // Find the form document being edited
+  def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
 
-    // All xbl:binding elements available
-    def componentBindings =
-        asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
+  // All xbl:binding elements available
+  def componentBindings =
+    asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-    // All xbl:binding elements available for section templates
-    def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
-        componentBindings filter (_.attClasses("fr-section-component"))
+  // All xbl:binding elements available for section templates
+  def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
+    componentBindings filter (_.attClasses("fr-section-component"))
 
-    // Find the binding's first URI qualified name
-    // For now takes the first CSS rule and assume the form foo|bar.
-    def bindingFirstURIQualifiedName(binding: NodeInfo) = {
-        val firstElementCSSName = (binding /@ "element" stringValue) split "," head
-        val elementQName        = firstElementCSSName.replace('|', ':')
+  // Find the binding's first URI qualified name
+  // For now takes the first CSS rule and assume the form foo|bar.
+  def bindingFirstURIQualifiedName(binding: NodeInfo) = {
+    val firstElementCSSName = (binding /@ "element" stringValue) split "," head
+    val elementQName        = firstElementCSSName.replace('|', ':')
 
-        binding.resolveURIQualifiedName(elementQName)
+    binding.resolveURIQualifiedName(elementQName)
+  }
+
+  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]) = {
+
+    val bindingsForSectionTemplates =
+      availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
+
+    bindingsForSectionTemplates map { binding ⇒
+      bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
+    } toMap
+  }
+
+  // Return fb-form-instance
+  def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get
+
+  // Find the top-level form model of the form being edited
+  def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
+
+  def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
+
+  def templateRoot(inDoc: NodeInfo, repeatName: String) =
+    inlineInstanceRootElement(inDoc, templateId(repeatName))
+
+  // Find the next available id for a given token
+  def nextId(inDoc: NodeInfo, token: String) =
+    nextIds(inDoc, token, 1).head
+
+  // Find a series of next available ids for a given token
+  // Return ids of the form "foo-123-foo", where "foo" is the token
+  def nextIds(inDoc: NodeInfo, token: String, count: Int) = {
+
+    val prefix = token + "-"
+    val suffix = "-" + token
+
+    def findAllIds = {
+      val root = inDoc.getDocumentRoot
+
+      // Use id index when possible, otherwise use plain XPath
+      val fbInstance = fbFormInstance
+
+      def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
+      def elementIdsFromXPath = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix)) iterator
+
+      def canUseIndex = fbInstance.documentInfo == root
+
+      val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
+      val instanceIds = formInstanceRoot(root) \\ * map (_.localname + suffix)
+
+      elementIds ++ instanceIds
     }
 
-    def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]) = {
+    val allIds = collection.mutable.Set() ++ findAllIds
+    var guess = allIds.size + 1
 
-        val bindingsForSectionTemplates =
-            availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
+    def nextId = {
+      def buildId(i: Int) = prefix + i + suffix
 
-        bindingsForSectionTemplates map { binding ⇒
-            bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
-        } toMap
+      while (allIds(buildId(guess)))
+        guess += 1
+
+      val result = buildId(guess)
+      allIds += result
+      result
     }
 
-    // Return fb-form-instance
-    def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get
+    for (_ ← 1 to count)
+      yield nextId
+  }
 
-    // Find the top-level form model of the form being edited
-    def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
+  def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
-    def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
+  // Whether the browser is supported
+  // Concretely, we only return false if the browser is an "old" version of IE
+  def isBrowserSupported = {
+    val request = NetUtils.getExternalContext.getRequest
+    ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
+  }
 
-    def templateRoot(inDoc: NodeInfo, repeatName: String) =
-        inlineInstanceRootElement(inDoc, templateId(repeatName))
+  def debugDumpDocumentForGrids(message: String, inDoc: NodeInfo) =
+    if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
+      debugDumpDocument(message, inDoc)
 
-    // Find the next available id for a given token
-    def nextId(inDoc: NodeInfo, token: String) =
-        nextIds(inDoc, token, 1).head
+  def debugDumpDocument(message: String, inDoc: NodeInfo) =
+    debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
 
-    // Find a series of next available ids for a given token
-    // Return ids of the form "foo-123-foo", where "foo" is the token
-    def nextIds(inDoc: NodeInfo, token: String, count: Int) = {
+  def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
+    val name            = origin.head.localname
+    val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
+    val elementsBefore  = into child * filter (e ⇒ namesUntil(e.localname))
 
-        val prefix = token + "-"
-        val suffix = "-" + token
-
-        def findAllIds = {
-            val root = inDoc.getDocumentRoot
-
-            // Use id index when possible, otherwise use plain XPath
-            val fbInstance = fbFormInstance
-
-            def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
-            def elementIdsFromXPath = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix)) iterator
-
-            def canUseIndex = fbInstance.documentInfo == root
-
-            val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-            val instanceIds = formInstanceRoot(root) \\ * map (_.localname + suffix)
-
-            elementIds ++ instanceIds
-        }
-
-        val allIds = collection.mutable.Set() ++ findAllIds
-        var guess = allIds.size + 1
-
-        def nextId = {
-            def buildId(i: Int) = prefix + i + suffix
-
-            while (allIds(buildId(guess)))
-                guess += 1
-
-            val result = buildId(guess)
-            allIds += result
-            result
-        }
-
-        for (_ ← 1 to count)
-            yield nextId
-    }
-
-    def makeInstanceExpression(name: String) = "instance('" + name + "')"
-
-    // Whether the browser is supported
-    // Concretely, we only return false if the browser is an "old" version of IE
-    def isBrowserSupported = {
-        val request = NetUtils.getExternalContext.getRequest
-        ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
-    }
-
-    def debugDumpDocumentForGrids(message: String, inDoc: NodeInfo) =
-        if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
-            debugDumpDocument(message, inDoc)
-
-    def debugDumpDocument(message: String, inDoc: NodeInfo) =
-        debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
-
-    def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
-        val name            = origin.head.localname
-        val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
-        val elementsBefore  = into child * filter (e ⇒ namesUntil(e.localname))
-
-        insert(into = into, after = elementsBefore, origin = origin)
-    }
+    insert(into = into, after = elementsBefore, origin = origin)
+  }
 }

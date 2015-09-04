@@ -20,12 +20,12 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xforms.xbl.Scope
 
 class ContainerControl(
-    staticStateContext : StaticStateContext,
-    element            : Element,
-    parent             : Option[ElementAnalysis],
-    preceding          : Option[ElementAnalysis],
-    scope              : Scope
+  staticStateContext : StaticStateContext,
+  element            : Element,
+  parent             : Option[ElementAnalysis],
+  preceding          : Option[ElementAnalysis],
+  scope              : Scope
 ) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with ViewTrait {
-    // For <xf:group xxf:element="xh:div">. Can be null.
-    val elementQName = Dom4jUtils.extractAttributeValueQName(element, XFormsConstants.XXFORMS_ELEMENT_QNAME)
+  // For <xf:group xxf:element="xh:div">. Can be null.
+  val elementQName = Dom4jUtils.extractAttributeValueQName(element, XFormsConstants.XXFORMS_ELEMENT_QNAME)
 }

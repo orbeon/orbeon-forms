@@ -24,54 +24,54 @@ import scala.util.control.NonFatal
 
 object DataModel {
 
-    private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
-        { case bind if exists(bind \@ "name") ⇒ bind }
+  private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
+    { case bind if exists(bind \@ "name") ⇒ bind }
 
-    private def childrenBindsWithNames(bind: NodeInfo) =
-        bind \ (XF → "bind") collect bindWithName
+  private def childrenBindsWithNames(bind: NodeInfo) =
+    bind \ (XF → "bind") collect bindWithName
 
-    private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any): Unit = {
-        def update(bind: NodeInfo): Unit = {
-            childrenBindsWithNames(bind) foreach { child ⇒
-                op(child)
-                update(child)
-            }
-        }
-
-        findTopLevelBind(inDoc) foreach update
+  private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any): Unit = {
+    def update(bind: NodeInfo): Unit = {
+      childrenBindsWithNames(bind) foreach { child ⇒
+        op(child)
+        update(child)
+      }
     }
 
-    // Update binds for automatic mode
-    def updateBindsForAutomatic(inDoc: NodeInfo) =
-        foreachBindWithName(inDoc) { child ⇒
-            delete(child \@ "nodeset")
-            ensureAttribute(child, "ref", child attValue "name")
-        }
+    findTopLevelBind(inDoc) foreach update
+  }
 
-    // Leave public for unit tests
-    def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
-
-        def evaluateBoundItem(namespaces: NamespaceMapping) =
-            Option(evalOne(control.bindingContext.contextItem, expr, namespaces, null, containingDocument.getRequestStats.addXPathStat))
-
-        try {
-            control.bind flatMap
-                (bind ⇒ evaluateBoundItem(bind.staticBind.namespaceMapping)) exists
-                    (XFormsControl.isAllowedBoundItem(control, _))
-        } catch {
-            case NonFatal(_) ⇒ false
-        }
+  // Update binds for automatic mode
+  def updateBindsForAutomatic(inDoc: NodeInfo) =
+    foreachBindWithName(inDoc) { child ⇒
+      delete(child \@ "nodeset")
+      ensureAttribute(child, "ref", child attValue "name")
     }
 
-    // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
-    def isAllowedBoundItem(controlName: String, itemOption: Option[Item]) = {
-        for {
-            item    ← itemOption
-            control ← findStaticControlByName(controlName)
-            if control.isInstanceOf[SingleNodeTrait]
-            singleNodeTrait = control.asInstanceOf[SingleNodeTrait]
-        } yield
-            singleNodeTrait.isAllowedBoundItem(item)
-    } getOrElse
-        false
+  // Leave public for unit tests
+  def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
+
+    def evaluateBoundItem(namespaces: NamespaceMapping) =
+      Option(evalOne(control.bindingContext.contextItem, expr, namespaces, null, containingDocument.getRequestStats.addXPathStat))
+
+    try {
+      control.bind flatMap
+        (bind ⇒ evaluateBoundItem(bind.staticBind.namespaceMapping)) exists
+          (XFormsControl.isAllowedBoundItem(control, _))
+    } catch {
+      case NonFatal(_) ⇒ false
+    }
+  }
+
+  // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
+  def isAllowedBoundItem(controlName: String, itemOption: Option[Item]) = {
+    for {
+      item    ← itemOption
+      control ← findStaticControlByName(controlName)
+      if control.isInstanceOf[SingleNodeTrait]
+      singleNodeTrait = control.asInstanceOf[SingleNodeTrait]
+    } yield
+      singleNodeTrait.isAllowedBoundItem(item)
+  } getOrElse
+    false
 }

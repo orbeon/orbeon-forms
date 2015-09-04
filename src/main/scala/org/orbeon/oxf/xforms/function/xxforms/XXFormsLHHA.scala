@@ -20,19 +20,19 @@ import org.orbeon.saxon.value.StringValue
 
 class XXFormsLHHA extends XFormsFunction with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext) = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        def evaluateControlItem(f: XFormsControl ⇒ String) =
-            relevantControl(0) map (control ⇒ StringValue.makeStringValue(f(control))) orNull
+    def evaluateControlItem(f: XFormsControl ⇒ String) =
+      relevantControl(0) map (control ⇒ StringValue.makeStringValue(f(control))) orNull
 
-        evaluateControlItem(operation match {
-            case 0 ⇒ _.getLabel
-            case 1 ⇒ _.getHelp
-            case 2 ⇒ _.getHint
-            case 3 ⇒ _.getAlert
-            case _ ⇒ throw new UnsupportedOperationException
-        })
-    }
+    evaluateControlItem(operation match {
+      case 0 ⇒ _.getLabel
+      case 1 ⇒ _.getHelp
+      case 2 ⇒ _.getHint
+      case 3 ⇒ _.getAlert
+      case _ ⇒ throw new UnsupportedOperationException
+    })
+  }
 }

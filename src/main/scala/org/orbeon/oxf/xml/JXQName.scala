@@ -17,12 +17,12 @@ import javax.xml.namespace.{QName ⇒ JQName}
 
 // Helpers for javax.xml.namespace.QName
 object JXQName {
-    def apply(local: String)              = new JQName(local)
-    def apply(uri: String, local: String) = new JQName(uri, local)
-    def apply(uriLocal: (String, String)) = new JQName(uriLocal._1, uriLocal._2)
-    
-    def unapply(c: javax.xml.namespace.QName) = Some(c.getNamespaceURI, c.getLocalPart)
+  def apply(local: String)              = new JQName(local)
+  def apply(uri: String, local: String) = new JQName(uri, local)
+  def apply(uriLocal: (String, String)) = new JQName(uriLocal._1, uriLocal._2)
+  
+  def unapply(c: javax.xml.namespace.QName) = Some(c.getNamespaceURI, c.getLocalPart)
 
-    implicit def tupleToJQName(tuple: (String, String)) = JXQName(tuple._1, tuple._2)
-    implicit def stringToJQname(s: String) = JXQName(s)
+  implicit def tupleToJQName(tuple: (String, String)) = JXQName(tuple._1, tuple._2)
+  implicit def stringToJQname(s: String) = JXQName(s)
 }

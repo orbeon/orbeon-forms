@@ -21,22 +21,22 @@ import org.orbeon.oxf.util.Base64
 
 // XML template with its serialization
 case class AnnotatedTemplate(saxStore: SAXStore) {
-    private lazy val asByteArray = toByteArray(saxStore)
-    // Used to serialized into dynamic state
-    def asByteSeq = asByteArray.toSeq // this produces a WrappedArray and must not copy
-    // Used to serialize into static state document
-    def asBase64 = Base64.encode(asByteArray, false)
+  private lazy val asByteArray = toByteArray(saxStore)
+  // Used to serialized into dynamic state
+  def asByteSeq = asByteArray.toSeq // this produces a WrappedArray and must not copy
+  // Used to serialize into static state document
+  def asBase64 = Base64.encode(asByteArray, false)
 }
 
 object AnnotatedTemplate {
 
-    def applyJava(saxStore: SAXStore) = AnnotatedTemplate(saxStore)
-    
-    // Restore based on bytes
-    def apply(bytes: Seq[Byte]): AnnotatedTemplate =
-        AnnotatedTemplate(fromByteSeq[SAXStore](bytes))
+  def applyJava(saxStore: SAXStore) = AnnotatedTemplate(saxStore)
+  
+  // Restore based on bytes
+  def apply(bytes: Seq[Byte]): AnnotatedTemplate =
+    AnnotatedTemplate(fromByteSeq[SAXStore](bytes))
 
-    // Restore based on a Base64-encoded string
-    def apply(base64: String): AnnotatedTemplate =
-        AnnotatedTemplate(fromByteArray[SAXStore](Base64.decode(base64)))
+  // Restore based on a Base64-encoded string
+  def apply(base64: String): AnnotatedTemplate =
+    AnnotatedTemplate(fromByteArray[SAXStore](Base64.decode(base64)))
 }

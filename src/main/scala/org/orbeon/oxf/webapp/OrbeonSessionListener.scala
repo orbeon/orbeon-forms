@@ -29,65 +29,65 @@ class OrbeonSessionListenerDelegate extends OrbeonSessionListener
  */
 class OrbeonSessionListener extends HttpSessionListener {
 
-    private val InitProcessorPrefix     = "oxf.session-created-processor."
-    private val InitInputPrefix         = "oxf.session-created-processor.input."
-    private val DestroyProcessorPrefix  = "oxf.session-destroyed-processor."
-    private val DestroyInputPrefix      = "oxf.session-destroyed-processor.input."
+  private val InitProcessorPrefix     = "oxf.session-created-processor."
+  private val InitInputPrefix         = "oxf.session-created-processor.input."
+  private val DestroyProcessorPrefix  = "oxf.session-destroyed-processor."
+  private val DestroyInputPrefix      = "oxf.session-destroyed-processor.input."
 
-    private implicit val logger = ProcessorService.Logger
+  private implicit val logger = ProcessorService.Logger
 
-    def logPrefix = "Session listener"
-    def initParameters = Map()
+  def logPrefix = "Session listener"
+  def initParameters = Map()
 
-    def sessionCreated(event: HttpSessionEvent): Unit =
-        withRootException("session creation", new ServletException(_)) {
+  def sessionCreated(event: HttpSessionEvent): Unit =
+    withRootException("session creation", new ServletException(_)) {
 
-            val httpSession = event.getSession
+      val httpSession = event.getSession
 
-            // Immediately store SessionListeners into the session to avoid concurrency issues which can occur if we
-            // do this lazily in ServletExternalContext.addListener().
-            httpSession.setAttribute(SessionListeners.SessionListenersKey, new SessionListeners)
+      // Immediately store SessionListeners into the session to avoid concurrency issues which can occur if we
+      // do this lazily in ServletExternalContext.addListener().
+      httpSession.setAttribute(SessionListeners.SessionListenersKey, new SessionListeners)
 
-            runWithServletContext(
-                servletContext         = httpSession.getServletContext,
-                session                = Some(httpSession),
-                logMessagePrefix       = logPrefix,
-                message                = "Session created.",
-                uriNamePropertyPrefix  = InitProcessorPrefix,
-                processorInputProperty = InitInputPrefix
-            )
+      runWithServletContext(
+        servletContext         = httpSession.getServletContext,
+        session                = Some(httpSession),
+        logMessagePrefix       = logPrefix,
+        message                = "Session created.",
+        uriNamePropertyPrefix  = InitProcessorPrefix,
+        processorInputProperty = InitInputPrefix
+      )
+    }
+
+  def sessionDestroyed(event: HttpSessionEvent): Unit =
+    withRootException("session destruction", new ServletException(_)) {
+      val httpSession = event.getSession
+      if (httpSession ne null) {
+
+        runWithServletContext(
+          servletContext         = httpSession.getServletContext,
+          session                = Some(httpSession),
+          logMessagePrefix       = logPrefix,
+          message                = "Session destroyed.",
+          uriNamePropertyPrefix  = DestroyProcessorPrefix,
+          processorInputProperty = DestroyInputPrefix
+        )
+
+        // Run listeners after the processor because processor might add new listeners
+        val listeners =
+          httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
+
+        for {
+          listeners ← Option(listeners).iterator
+          listener  ← listeners.iterateRemoveAndClose()
+        } locally {
+          try {
+            listener.sessionDestroyed()
+          } catch {
+            case NonFatal(t) ⇒
+              // Catch so we can continue running the remaining listeners
+              logger.error("Throwable caught when calling listener", t)
+          }
         }
-
-    def sessionDestroyed(event: HttpSessionEvent): Unit =
-        withRootException("session destruction", new ServletException(_)) {
-            val httpSession = event.getSession
-            if (httpSession ne null) {
-
-                runWithServletContext(
-                    servletContext         = httpSession.getServletContext,
-                    session                = Some(httpSession),
-                    logMessagePrefix       = logPrefix,
-                    message                = "Session destroyed.",
-                    uriNamePropertyPrefix  = DestroyProcessorPrefix,
-                    processorInputProperty = DestroyInputPrefix
-                )
-
-                // Run listeners after the processor because processor might add new listeners
-                val listeners =
-                    httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
-
-                for {
-                    listeners ← Option(listeners).iterator
-                    listener  ← listeners.iterateRemoveAndClose()
-                } locally {
-                    try {
-                        listener.sessionDestroyed()
-                    } catch {
-                        case NonFatal(t) ⇒
-                            // Catch so we can continue running the remaining listeners
-                            logger.error("Throwable caught when calling listener", t)
-                    }
-                }
-            }
-        }
+      }
+    }
 }

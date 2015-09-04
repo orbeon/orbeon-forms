@@ -14,38 +14,38 @@ package org.orbeon.oxf.util
  */
 class DynamicVariable[T](initial: ⇒ Option[T] = None, isInheritable: Boolean = true) {
 
-    protected val threadLocal =
-        if (isInheritable)
-            new InheritableThreadLocal[Option[T]] {
-                override def initialValue = initial
-            }
-        else
-            new ThreadLocal[Option[T]] {
-                override def initialValue = initial
-            }
+  protected val threadLocal =
+    if (isInheritable)
+      new InheritableThreadLocal[Option[T]] {
+        override def initialValue = initial
+      }
+    else
+      new ThreadLocal[Option[T]] {
+        override def initialValue = initial
+      }
 
-    def value = threadLocal.get match {
-        case some @ Some(value) ⇒ some
-        case None ⇒
-            threadLocal.remove() // because get above creates the ThreadLocal if missing
-            None
-    }
+  def value = threadLocal.get match {
+    case some @ Some(value) ⇒ some
+    case None ⇒
+      threadLocal.remove() // because get above creates the ThreadLocal if missing
+      None
+  }
 
-    def value_=(value: T) = threadLocal set Some(value)
+  def value_=(value: T) = threadLocal set Some(value)
 
-    def withValue[S](value: T)(thunk: ⇒ S): S = {
+  def withValue[S](value: T)(thunk: ⇒ S): S = {
 
-        val oldValue = threadLocal.get
-        threadLocal set Some(value)
+    val oldValue = threadLocal.get
+    threadLocal set Some(value)
 
-        try
-            thunk
-        finally
-            oldValue match {
-                case some @ Some(_) ⇒ threadLocal set some
-                case None ⇒ threadLocal.remove()
-            }
-    }
+    try
+      thunk
+    finally
+      oldValue match {
+        case some @ Some(_) ⇒ threadLocal set some
+        case None ⇒ threadLocal.remove()
+      }
+  }
 
-    override def toString: String = "DynamicVariable(" + value + ")"
+  override def toString: String = "DynamicVariable(" + value + ")"
 }

@@ -25,137 +25,137 @@ import org.orbeon.scaxon.XML
 
 object Transform {
 
-    // Create a transformation pipeline configuration for processing XBL templates
-    def createTransformConfig(transformQName: QName, transform: Element, lastModified: Long) = {
-        // Create reusable pipeline config
-        val pipelineConfig = {
-            val pipeline = XML.elemToDom4j(
-                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+  // Create a transformation pipeline configuration for processing XBL templates
+  def createTransformConfig(transformQName: QName, transform: Element, lastModified: Long) = {
+    // Create reusable pipeline config
+    val pipelineConfig = {
+      val pipeline = XML.elemToDom4j(
+        <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+              xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-                    <p:param type="input" name="transform"/>
-                    <p:param type="input" name="data"/>
-                    <p:param type="output" name="data"/>
+          <p:param type="input" name="transform"/>
+          <p:param type="input" name="data"/>
+          <p:param type="output" name="data"/>
 
-                    <p:processor name={transformQName.getQualifiedName}><!-- namespace for QName might not be in scope! -->
-                        <p:input name="config" href="#transform"/>
-                        <p:input name="data" href="#data"/>
-                        <p:output name="data" ref="data"/>
-                    </p:processor>
+          <p:processor name={transformQName.getQualifiedName}><!-- namespace for QName might not be in scope! -->
+            <p:input name="config" href="#transform"/>
+            <p:input name="data" href="#data"/>
+            <p:output name="data" ref="data"/>
+          </p:processor>
 
-                </p:config>)
+        </p:config>)
 
-            val ast = PipelineReader.readPipeline(pipeline, lastModified)
-            PipelineProcessor.createConfigFromAST(ast)
-        }
-
-        // Create transform input separately to help with namespaces (easier with a separate document)
-        // NOTE: We don't create and connect the pipeline here because we don't yet have the data input. Ideally we
-        // should have something similar to what the pipeline processor does, with the ability to dynamically connect
-        // pipeline inputs and inputs while still allowing caching of the pipeline itself.
-        val domGenerator = PipelineUtils.createDOMGenerator(
-            Dom4jUtils.createDocumentCopyParentNamespaces(transform),
-            "xbl-transform-config",
-            lastModified,
-            Dom4jUtils.makeSystemId(transform)
-        )
-
-        (pipelineConfig, domGenerator)
+      val ast = PipelineReader.readPipeline(pipeline, lastModified)
+      PipelineProcessor.createConfigFromAST(ast)
     }
 
-    // Run a transformation created above on a bound element
-    def transformBoundElement(pipelineConfig: PipelineConfig, domGeneratorConfig: DOMGenerator, boundElement: Element) = {
-        val pipeline = new PipelineProcessor(pipelineConfig)
-        PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
+    // Create transform input separately to help with namespaces (easier with a separate document)
+    // NOTE: We don't create and connect the pipeline here because we don't yet have the data input. Ideally we
+    // should have something similar to what the pipeline processor does, with the ability to dynamically connect
+    // pipeline inputs and inputs while still allowing caching of the pipeline itself.
+    val domGenerator = PipelineUtils.createDOMGenerator(
+      Dom4jUtils.createDocumentCopyParentNamespaces(transform),
+      "xbl-transform-config",
+      lastModified,
+      Dom4jUtils.makeSystemId(transform)
+    )
 
-        // Connect the bound element to the processor data input
-        val domGeneratorData = PipelineUtils.createDOMGenerator(
-            Dom4jUtils.createDocumentCopyParentNamespaces(boundElement),
-            "xbl-transform-data",
-            DOMGenerator.ZeroValidity,
-            Dom4jUtils.makeSystemId(boundElement)
-        )
-        PipelineUtils.connect(domGeneratorData, "data", pipeline, "data")
+    (pipelineConfig, domGenerator)
+  }
 
-        // Connect a DOM serializer to the processor data output
-        val domSerializerData = new DOMSerializer
-        PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
+  // Run a transformation created above on a bound element
+  def transformBoundElement(pipelineConfig: PipelineConfig, domGeneratorConfig: DOMGenerator, boundElement: Element) = {
+    val pipeline = new PipelineProcessor(pipelineConfig)
+    PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
 
-        // Run the transformation
-        withPipelineContext { newPipelineContext ⇒
-            pipeline.reset(newPipelineContext)
-            domSerializerData.runGetDocument(newPipelineContext)
-        }
+    // Connect the bound element to the processor data input
+    val domGeneratorData = PipelineUtils.createDOMGenerator(
+      Dom4jUtils.createDocumentCopyParentNamespaces(boundElement),
+      "xbl-transform-data",
+      DOMGenerator.ZeroValidity,
+      Dom4jUtils.makeSystemId(boundElement)
+    )
+    PipelineUtils.connect(domGeneratorData, "data", pipeline, "data")
+
+    // Connect a DOM serializer to the processor data output
+    val domSerializerData = new DOMSerializer
+    PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
+
+    // Run the transformation
+    withPipelineContext { newPipelineContext ⇒
+      pipeline.reset(newPipelineContext)
+      domSerializerData.runGetDocument(newPipelineContext)
+    }
+  }
+
+  // Create an XSLT pipeline to transform XBL source
+  private def createXSLTPipeline(path: String, transform: Document, lastModified: Long) = {
+    // Create pipeline config
+    val pipelineConfig = {
+      val pipeline = XML.elemToDom4j(
+        <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+              xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+          <p:param type="input" name="transform"/>
+          <p:param type="output" name="data"/>
+
+          <p:processor name="oxf:unsafe-xslt">
+            <p:input name="config" href="#transform"/>
+            <p:input name="data"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
+            <p:output name="data" ref="data"/>
+          </p:processor>
+
+        </p:config>)
+
+      val ast = PipelineReader.readPipeline(pipeline, lastModified)
+      PipelineProcessor.createConfigFromAST(ast)
     }
 
-    // Create an XSLT pipeline to transform XBL source
-    private def createXSLTPipeline(path: String, transform: Document, lastModified: Long) = {
-        // Create pipeline config
-        val pipelineConfig = {
-            val pipeline = XML.elemToDom4j(
-                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    // Create transform generator
+    val domGeneratorConfig = PipelineUtils.createDOMGenerator(
+      transform,
+      "xbl-transform-config",
+      lastModified,
+      path
+    )
 
-                    <p:param type="input" name="transform"/>
-                    <p:param type="output" name="data"/>
+    // Create pipeline and connect transform input
+    val pipeline = new PipelineProcessor(pipelineConfig)
+    PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
 
-                    <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="config" href="#transform"/>
-                        <p:input name="data"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
-                        <p:output name="data" ref="data"/>
-                    </p:processor>
+    // Connect a DOM serializer to the processor data output
+    val domSerializerData = new DOMSerializer
+    PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
 
-                </p:config>)
+    (pipeline, domSerializerData)
+  }
 
-            val ast = PipelineReader.readPipeline(pipeline, lastModified)
-            PipelineProcessor.createConfigFromAST(ast)
-        }
+  // Transform an XBL document using XSLT
+  private def transformXBLDocument(path: String, transform: Document, lastModified: Long) = {
 
-        // Create transform generator
-        val domGeneratorConfig = PipelineUtils.createDOMGenerator(
-            transform,
-            "xbl-transform-config",
-            lastModified,
-            path
-        )
+    val (pipeline, domSerializerData) = createXSLTPipeline(path, transform, lastModified)
 
-        // Create pipeline and connect transform input
-        val pipeline = new PipelineProcessor(pipelineConfig)
-        PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
+    // Run the transformation
+    withPipelineContext { newPipelineContext ⇒
+      pipeline.reset(newPipelineContext)
+      domSerializerData.runGetDocument(newPipelineContext)
+    }
+  }
 
-        // Connect a DOM serializer to the processor data output
-        val domSerializerData = new DOMSerializer
-        PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
-
-        (pipeline, domSerializerData)
+  // Transform an XBL document using XSLT if it is an XSLT document
+  def transformXBLDocumentIfNeeded(path: String, sourceXBL: Document, lastModified: Long) = {
+    // Support /xsl:* or /*[@xsl:version = '2.0']
+    val isXSLT = {
+      val rootElement = sourceXBL.getRootElement
+      rootElement.getNamespaceURI == XMLConstants.XSLT_NAMESPACE_URI || rootElement.attributeValue(XMLConstants.XSLT_VERSION_QNAME) == "2.0"
     }
 
-    // Transform an XBL document using XSLT
-    private def transformXBLDocument(path: String, transform: Document, lastModified: Long) = {
-
-        val (pipeline, domSerializerData) = createXSLTPipeline(path, transform, lastModified)
-
-        // Run the transformation
-        withPipelineContext { newPipelineContext ⇒
-            pipeline.reset(newPipelineContext)
-            domSerializerData.runGetDocument(newPipelineContext)
-        }
-    }
-
-    // Transform an XBL document using XSLT if it is an XSLT document
-    def transformXBLDocumentIfNeeded(path: String, sourceXBL: Document, lastModified: Long) = {
-        // Support /xsl:* or /*[@xsl:version = '2.0']
-        val isXSLT = {
-            val rootElement = sourceXBL.getRootElement
-            rootElement.getNamespaceURI == XMLConstants.XSLT_NAMESPACE_URI || rootElement.attributeValue(XMLConstants.XSLT_VERSION_QNAME) == "2.0"
-        }
-
-        if (isXSLT) {
-            // Consider the XBL document to be an XSLT transformation and run it
-            // NOTE: We don't handle XSLT last modified dependencies at all at this time. Could we?
-            transformXBLDocument(path, sourceXBL, lastModified)
-        } else
-            // Return unmodified XBL document
-            sourceXBL
-    }
+    if (isXSLT) {
+      // Consider the XBL document to be an XSLT transformation and run it
+      // NOTE: We don't handle XSLT last modified dependencies at all at this time. Could we?
+      transformXBLDocument(path, sourceXBL, lastModified)
+    } else
+      // Return unmodified XBL document
+      sourceXBL
+  }
 }

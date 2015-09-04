@@ -22,64 +22,64 @@ import org.orbeon.saxon.value.{ObjectValue, BooleanValue}
 import scala.util.control.Breaks._
 
 class XXFormsForall extends XFormsFunction with ExistentialFunction  {
-    def defaultValue = true
-    def returnNonDefaultValue(b: Boolean) = ! b
+  def defaultValue = true
+  def returnNonDefaultValue(b: Boolean) = ! b
 }
 
 class XXFormsExists extends XFormsFunction with ExistentialFunction  {
-    def defaultValue = false
-    def returnNonDefaultValue(b: Boolean) = b
+  def defaultValue = false
+  def returnNonDefaultValue(b: Boolean) = b
 }
 
 trait ExistentialFunction extends XFormsFunction with FunctionSupport {
 
-    def defaultValue: Boolean
-    def returnNonDefaultValue(b: Boolean): Boolean
+  def defaultValue: Boolean
+  def returnNonDefaultValue(b: Boolean): Boolean
 
-    override def evaluateItem(context: XPathContext): BooleanValue = {
+  override def evaluateItem(context: XPathContext): BooleanValue = {
 
-        def throwDynamicError() = {
-            val err = new XPathException("Second argument to xxf:forall must be an expression prepared using saxon:expression", this)
-            err.setXPathContext(context)
-            err.setErrorCode(SaxonErrorCode.SXXF0001)
-            throw err
-        }
-
-        val items = arguments(0).iterate(context)
-        val pexpr  =
-            Option(arguments(1).evaluateItem(context)) collect
-            { case o: ObjectValue        ⇒ o.getObject  } collect
-            { case e: PreparedExpression ⇒ e } getOrElse
-            { throwDynamicError() }
-
-        val c = context.newCleanContext
-        c.setOriginatingConstructType(Location.SAXON_HIGHER_ORDER_EXTENSION_FUNCTION)
-        c.setCurrentIterator(items)
-        c.openStackFrame(pexpr.stackFrameMap)
-
-        for (i ← 2 to arguments.length - 1) {
-            val slot = pexpr.variables(i - 2).getLocalSlotNumber
-            c.setLocalVariable(slot, ExpressionTool.eagerEvaluate(arguments(i), c))
-        }
-
-        breakable {
-            while (true) {
-                val next = items.next()
-                if (next eq null)
-                    break()
-
-                pexpr.expression.evaluateItem(c) match {
-                    case b: BooleanValue ⇒
-                        if (returnNonDefaultValue(b.getBooleanValue))
-                            return ! defaultValue
-                    case _ ⇒
-                        val e = new XPathException("expression in xxf:forall() must return numeric values")
-                        e.setXPathContext(context)
-                        throw e
-                }
-            }
-        }
-
-        defaultValue
+    def throwDynamicError() = {
+      val err = new XPathException("Second argument to xxf:forall must be an expression prepared using saxon:expression", this)
+      err.setXPathContext(context)
+      err.setErrorCode(SaxonErrorCode.SXXF0001)
+      throw err
     }
+
+    val items = arguments(0).iterate(context)
+    val pexpr  =
+      Option(arguments(1).evaluateItem(context)) collect
+      { case o: ObjectValue        ⇒ o.getObject  } collect
+      { case e: PreparedExpression ⇒ e } getOrElse
+      { throwDynamicError() }
+
+    val c = context.newCleanContext
+    c.setOriginatingConstructType(Location.SAXON_HIGHER_ORDER_EXTENSION_FUNCTION)
+    c.setCurrentIterator(items)
+    c.openStackFrame(pexpr.stackFrameMap)
+
+    for (i ← 2 to arguments.length - 1) {
+      val slot = pexpr.variables(i - 2).getLocalSlotNumber
+      c.setLocalVariable(slot, ExpressionTool.eagerEvaluate(arguments(i), c))
+    }
+
+    breakable {
+      while (true) {
+        val next = items.next()
+        if (next eq null)
+          break()
+
+        pexpr.expression.evaluateItem(c) match {
+          case b: BooleanValue ⇒
+            if (returnNonDefaultValue(b.getBooleanValue))
+              return ! defaultValue
+          case _ ⇒
+            val e = new XPathException("expression in xxf:forall() must return numeric values")
+            e.setXPathContext(context)
+            throw e
+        }
+      }
+    }
+
+    defaultValue
+  }
 }

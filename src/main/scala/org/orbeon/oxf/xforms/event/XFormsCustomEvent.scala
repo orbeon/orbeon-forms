@@ -19,8 +19,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
  * Custom event.
  */
 class XFormsCustomEvent(eventName: String, target: XFormsEventTarget, properties: PropertyGetter, bubbles: Boolean, cancelable: Boolean)
-        extends XFormsEvent(eventName, target, properties, bubbles, cancelable) {
+    extends XFormsEvent(eventName, target, properties, bubbles, cancelable) {
 
-    // Don't warn for unsupported attributes on custom events
-    override def warnIfMissingProperty = false
+  // Don't warn for unsupported attributes on custom events
+  override def warnIfMissingProperty = false
 }

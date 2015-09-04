@@ -20,15 +20,15 @@ import org.orbeon.saxon.om.EmptyIterator
 
 class XXFormsGetVariable extends XFormsFunction with FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext) = {
+  override def iterate(xpathContext: XPathContext) = {
 
-        val containingDocument = getContainingDocument(xpathContext)
-        val modelEffectiveId   = stringArgument(0)(xpathContext)
-        val variableName       = stringArgument(1)(xpathContext)
+    val containingDocument = getContainingDocument(xpathContext)
+    val modelEffectiveId   = stringArgument(0)(xpathContext)
+    val variableName       = stringArgument(1)(xpathContext)
 
-        containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
-            case model: XFormsModel ⇒ model.getVariable(variableName)
-            case _ ⇒ EmptyIterator.getInstance
-        }
+    containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
+      case model: XFormsModel ⇒ model.getVariable(variableName)
+      case _ ⇒ EmptyIterator.getInstance
     }
+  }
 }

@@ -21,20 +21,20 @@ import org.orbeon.oxf.xml.{DigestContentHandler, XMLReceiver}
 // This processor provides digest-based caching based on any content
 class DigestedProcessor(content: XMLReceiver ⇒ Unit) extends ProcessorImpl {
 
-    override def createOutput(name: String) =
-        new DigestTransformerOutputImpl(DigestedProcessor.this, name) {
+  override def createOutput(name: String) =
+    new DigestTransformerOutputImpl(DigestedProcessor.this, name) {
 
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) = content(xmlReceiver)
+      def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) = content(xmlReceiver)
 
-            def fillOutState(pipelineContext: PipelineContext, digestState: DigestState) = true
+      def fillOutState(pipelineContext: PipelineContext, digestState: DigestState) = true
 
-            def computeDigest(pipelineContext: PipelineContext, digestState: DigestState) = {
-                val digester = new DigestContentHandler
-                content(digester)
-                digester.getResult
-            }
-        }
+      def computeDigest(pipelineContext: PipelineContext, digestState: DigestState) = {
+        val digester = new DigestContentHandler
+        content(digester)
+        digester.getResult
+      }
+    }
 
-    override def reset(context: PipelineContext): Unit =
-        setState(context, new DigestState)
+  override def reset(context: PipelineContext): Unit =
+    setState(context, new DigestState)
 }

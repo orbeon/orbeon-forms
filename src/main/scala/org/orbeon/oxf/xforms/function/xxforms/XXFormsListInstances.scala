@@ -22,14 +22,14 @@ import scala.collection.JavaConverters._
 
 class XXFormsListInstances extends XFormsFunction with FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext): SequenceIterator =
-        resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {
-            case model: XFormsModel ⇒
-                for {
-                    instance    ← model.getInstances.asScala
-                    effectiveId = instance.getEffectiveId
-                    absoluteId  = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
-                } yield
-                    absoluteId
-        }
+  override def iterate(xpathContext: XPathContext): SequenceIterator =
+    resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {
+      case model: XFormsModel ⇒
+        for {
+          instance    ← model.getInstances.asScala
+          effectiveId = instance.getEffectiveId
+          absoluteId  = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
+        } yield
+          absoluteId
+    }
 }

@@ -18,70 +18,70 @@ import org.orbeon.saxon.value.{Whitespace ⇒ SWhitespace}
 
 
 class CharacterAccumulator {
-    
-    private var appendCount = 0
-    private val acc = new java.lang.StringBuilder
+  
+  private var appendCount = 0
+  private val acc = new java.lang.StringBuilder
 
-    // Stats
-    private var _savedCharacters = 0
-    def savedBytes = _savedCharacters * 2
-    
-    private var _multipleAppends = 0
-    def multipleAppends = _multipleAppends
-    
-    def append(policy: Policy, ch: Array[Char], start: Int, length: Int): Unit =
-        if (length > 0) {
-            acc.append(ch, start, length)
-            appendCount += 1
-        }
+  // Stats
+  private var _savedCharacters = 0
+  def savedBytes = _savedCharacters * 2
+  
+  private var _multipleAppends = 0
+  def multipleAppends = _multipleAppends
+  
+  def append(policy: Policy, ch: Array[Char], start: Int, length: Int): Unit =
+    if (length > 0) {
+      acc.append(ch, start, length)
+      appendCount += 1
+    }
 
-    def collapseAndReset(policy: Policy): String = {
+  def collapseAndReset(policy: Policy): String = {
 
-        val originalLength = acc.length
-        val resultCS =
-            policy match {
-                case Preserve  ⇒ acc
-                case Normalize ⇒ SWhitespace.collapseWhitespace(acc)
-                case Collapse  ⇒ collapseWhitespaceNoTrim(acc)
+    val originalLength = acc.length
+    val resultCS =
+      policy match {
+        case Preserve  ⇒ acc
+        case Normalize ⇒ SWhitespace.collapseWhitespace(acc)
+        case Collapse  ⇒ collapseWhitespaceNoTrim(acc)
+      }
+
+    _savedCharacters += originalLength - resultCS.length
+    _multipleAppends += 0 max appendCount - 1
+
+    val result = if (resultCS.length > 0) resultCS.toString else ""
+    reset()
+    result
+  }
+
+  // Collapse whitespace but don't remove leading/trailing space if any. This is more conservative.
+  // Inspired by Saxon collapseWhitespace
+  private def collapseWhitespaceNoTrim(cs: CharSequence): CharSequence = {
+    val length = cs.length
+    if (length == 0 || ! SWhitespace.containsWhitespace(cs))
+      cs
+    else {
+      val sb = new java.lang.StringBuilder(length)
+      var inWhitespace = false
+      var i = 0
+      while (i < length) {
+        cs.charAt(i) match {
+          case c @ ('\n' | '\r' | '\t' | ' ') ⇒
+            if (! inWhitespace) {
+              sb.append(' ')
+              inWhitespace = true
             }
-
-        _savedCharacters += originalLength - resultCS.length
-        _multipleAppends += 0 max appendCount - 1
-
-        val result = if (resultCS.length > 0) resultCS.toString else ""
-        reset()
-        result
-    }
-
-    // Collapse whitespace but don't remove leading/trailing space if any. This is more conservative.
-    // Inspired by Saxon collapseWhitespace
-    private def collapseWhitespaceNoTrim(cs: CharSequence): CharSequence = {
-        val length = cs.length
-        if (length == 0 || ! SWhitespace.containsWhitespace(cs))
-            cs
-        else {
-            val sb = new java.lang.StringBuilder(length)
-            var inWhitespace = false
-            var i = 0
-            while (i < length) {
-                cs.charAt(i) match {
-                    case c @ ('\n' | '\r' | '\t' | ' ') ⇒
-                        if (! inWhitespace) {
-                            sb.append(' ')
-                            inWhitespace = true
-                        }
-                    case c ⇒
-                        sb.append(c)
-                        inWhitespace = false
-                }
-                i += 1
-            }
-            sb
+          case c ⇒
+            sb.append(c)
+            inWhitespace = false
         }
+        i += 1
+      }
+      sb
     }
-    
-    private def reset(): Unit = {
-        appendCount = 0
-        acc.setLength(0)
-    }
+  }
+  
+  private def reset(): Unit = {
+    appendCount = 0
+    acc.setLength(0)
+  }
 }

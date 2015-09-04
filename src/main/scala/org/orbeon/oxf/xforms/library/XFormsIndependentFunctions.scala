@@ -23,25 +23,25 @@ import org.orbeon.oxf.xforms.function.{Random, Hmac, Digest}
  */
 trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
 
-    // Define in early definition of subclass
-    val XFormsIndependentFunctionsNS: Seq[String]
+  // Define in early definition of subclass
+  val XFormsIndependentFunctionsNS: Seq[String]
 
-    Namespace(XFormsIndependentFunctionsNS) {
-        Fun("digest", classOf[Digest], op = 0, min = 2, STRING, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+  Namespace(XFormsIndependentFunctionsNS) {
+    Fun("digest", classOf[Digest], op = 0, min = 2, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("hmac", classOf[Hmac], op = 0, min = 3, STRING, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("hmac", classOf[Hmac], op = 0, min = 3, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("random", classOf[Random], op = 0, min = 0, NUMERIC, EXACTLY_ONE,
-            Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
-        )
-    }
+    Fun("random", classOf[Random], op = 0, min = 0, NUMERIC, EXACTLY_ONE,
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
+    )
+  }
 }

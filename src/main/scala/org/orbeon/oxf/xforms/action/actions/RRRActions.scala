@@ -21,29 +21,29 @@ import org.orbeon.oxf.xforms.event.events.{XFormsRevalidateEvent, XFormsRecalcul
 import org.dom4j.QName
 
 trait RRRFunctions {
-    def setFlag(model: XFormsModel, applyDefaults: Boolean)
-    def createEvent(model: XFormsModel, applyDefaults: Boolean): XFormsEvent
+  def setFlag(model: XFormsModel, applyDefaults: Boolean)
+  def createEvent(model: XFormsModel, applyDefaults: Boolean): XFormsEvent
 }
 
 trait XFormsRebuildFunctions extends RRRFunctions {
-    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.deferredActionContext.rebuild = true
-    def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRebuildEvent(model)
+  def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.deferredActionContext.rebuild = true
+  def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRebuildEvent(model)
 }
 
 trait XFormsRecalculateFunctions extends RRRFunctions {
-    def setFlag(model: XFormsModel, applyDefaults: Boolean) = {
-        model.deferredActionContext.recalculateRevalidate = true
-        if (applyDefaults)
-            model.getBinds.resetFirstCalculate()
-    }
-    def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRecalculateEvent(model, applyDefaults)
+  def setFlag(model: XFormsModel, applyDefaults: Boolean) = {
+    model.deferredActionContext.recalculateRevalidate = true
+    if (applyDefaults)
+      model.getBinds.resetFirstCalculate()
+  }
+  def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRecalculateEvent(model, applyDefaults)
 }
 
 trait XFormsRevalidateFunctions extends RRRFunctions {
-    // With recalculate and revalidate unified, make revalidate no longer eager by not setting the flag anymore
-    // See https://github.com/orbeon/orbeon-forms/issues/1650
-    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = ()
-    def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRevalidateEvent(model)
+  // With recalculate and revalidate unified, make revalidate no longer eager by not setting the flag anymore
+  // See https://github.com/orbeon/orbeon-forms/issues/1650
+  def setFlag(model: XFormsModel, applyDefaults: Boolean)     = ()
+  def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRevalidateEvent(model)
 }
 
 // Concrete action classes
@@ -54,44 +54,44 @@ class XFormsRevalidateAction  extends RRRAction with XFormsRevalidateFunctions
 // Common functionality
 trait RRRAction extends XFormsAction with RRRFunctions {
 
-    override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext): Unit = {
 
-        val interpreter = context.interpreter
-        val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
+    val interpreter = context.interpreter
+    val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
 
-        def resolve(qName: QName) =
-            (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
+    def resolve(qName: QName) =
+      (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
 
-        val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
-        val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
+    val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
+    val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 
-        RRRAction.execute(this, model, deferred, applyDefaults)
-    }
+    RRRAction.execute(this, model, deferred, applyDefaults)
+  }
 }
 
 object RRRAction{
 
-    private def execute(functions: RRRFunctions, model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
-        // Set the flag in any case
-        functions.setFlag(model, applyDefaults)
+  private def execute(functions: RRRFunctions, model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
+    // Set the flag in any case
+    functions.setFlag(model, applyDefaults)
 
-        // Perform the action immediately if needed
-        // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the
-        // purpose of these events is anyway.
-        if (! deferred)
-            Dispatch.dispatchEvent(functions.createEvent(model, applyDefaults))
-    }
+    // Perform the action immediately if needed
+    // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the
+    // purpose of these events is anyway.
+    if (! deferred)
+      Dispatch.dispatchEvent(functions.createEvent(model, applyDefaults))
+  }
 
-    private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
-    private object ConcreteRecalculateFunctions extends XFormsRecalculateFunctions
-    private object ConcreteRevalidateFunctions  extends XFormsRevalidateFunctions
+  private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
+  private object ConcreteRecalculateFunctions extends XFormsRecalculateFunctions
+  private object ConcreteRevalidateFunctions  extends XFormsRevalidateFunctions
 
-    def rebuild(model: XFormsModel, deferred: Boolean = false) =
-        execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)
+  def rebuild(model: XFormsModel, deferred: Boolean = false) =
+    execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)
 
-    def revalidate(model: XFormsModel, deferred: Boolean = false) =
-        execute(ConcreteRevalidateFunctions, model, deferred, applyDefaults = false)
+  def revalidate(model: XFormsModel, deferred: Boolean = false) =
+    execute(ConcreteRevalidateFunctions, model, deferred, applyDefaults = false)
 
-    def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false) =
-        execute(ConcreteRecalculateFunctions, model, deferred, applyDefaults)
+  def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false) =
+    execute(ConcreteRecalculateFunctions, model, deferred, applyDefaults)
 }

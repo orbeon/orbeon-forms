@@ -19,10 +19,10 @@ import org.orbeon.saxon.expr.XPathContext
 
 class XXFormsValue extends FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) =
-        relevantControl(0)(xpathContext) collect {
-            case control: XFormsValueControl ⇒ control.getValue
-        }
+  override def evaluateItem(xpathContext: XPathContext) =
+    relevantControl(0)(xpathContext) collect {
+      case control: XFormsValueControl ⇒ control.getValue
+    }
 
-    // TODO: PathMap
+  // TODO: PathMap
 }

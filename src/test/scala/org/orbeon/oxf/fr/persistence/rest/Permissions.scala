@@ -17,26 +17,26 @@ import scala.xml.Elem
 
 private object Permissions {
 
-    type Permissions = Option[Seq[Permission]]
+  type Permissions = Option[Seq[Permission]]
 
-    sealed trait PermissionFor
-    case object Anyone            extends PermissionFor
-    case object Owner             extends PermissionFor
-    case object Group             extends PermissionFor
-    case class Role(role: String) extends PermissionFor
-    case class Permission(permissionFor: PermissionFor, operations: Set[String])
+  sealed trait PermissionFor
+  case object Anyone            extends PermissionFor
+  case object Owner             extends PermissionFor
+  case object Group             extends PermissionFor
+  case class Role(role: String) extends PermissionFor
+  case class Permission(permissionFor: PermissionFor, operations: Set[String])
 
-    def serialize(permissions: Permissions): Option[Elem] =
-        permissions map ( ps ⇒
-            <permissions>{ ps map ( p ⇒
-                <permission operations={p.operations.mkString(" ")}>{
-                    p.permissionFor match {
-                        case Anyone  ⇒ ""
-                        case Owner   ⇒ <owner/>
-                        case Group   ⇒ <group-member/>
-                        case Role(r) ⇒ <user-role any-of={r}/>
-                    }
-                }</permission>
-            )}</permissions>
-        )
+  def serialize(permissions: Permissions): Option[Elem] =
+    permissions map ( ps ⇒
+      <permissions>{ ps map ( p ⇒
+        <permission operations={p.operations.mkString(" ")}>{
+          p.permissionFor match {
+            case Anyone  ⇒ ""
+            case Owner   ⇒ <owner/>
+            case Group   ⇒ <group-member/>
+            case Role(r) ⇒ <user-role any-of={r}/>
+          }
+        }</permission>
+      )}</permissions>
+    )
 }

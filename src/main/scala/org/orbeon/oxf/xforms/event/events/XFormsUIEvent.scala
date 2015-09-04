@@ -21,58 +21,58 @@ import XFormsEvent._
  * Base class for UI events, that is events only dispatched to controls.
  */
 abstract class XFormsUIEvent(
-        eventName: String,
-        val targetControl: XFormsControl,
-        properties: PropertyGetter,
-        bubbles: Boolean,
-        cancelable: Boolean)
-    extends XFormsEvent(
-        eventName,
-        targetControl,
-        properties,
-        bubbles,
-        cancelable) {
+    eventName: String,
+    val targetControl: XFormsControl,
+    properties: PropertyGetter,
+    bubbles: Boolean,
+    cancelable: Boolean)
+  extends XFormsEvent(
+    eventName,
+    targetControl,
+    properties,
+    bubbles,
+    cancelable) {
 
-    def this(eventName: String, target: XFormsControl, properties: PropertyGetter) =
-        this(eventName, target, properties, bubbles = true, cancelable = false)
+  def this(eventName: String, target: XFormsControl, properties: PropertyGetter) =
+    this(eventName, target, properties, bubbles = true, cancelable = false)
 
-    require(targetControl ne null)
+  require(targetControl ne null)
 
-    override def lazyProperties = getters(this, XFormsUIEvent.Getters)
-    override def newPropertyName(name: String) = XFormsUIEvent.Deprecated.get(name) orElse super.newPropertyName(name)
+  override def lazyProperties = getters(this, XFormsUIEvent.Getters)
+  override def newPropertyName(name: String) = XFormsUIEvent.Deprecated.get(name) orElse super.newPropertyName(name)
 }
 
 private object XFormsUIEvent {
-    
-    val Deprecated = Map(
-        "target-ref" → "xxf:binding",
-        "alert"      → "xxf:alert",
-        "label"      → "xxf:label",
-        "hint"       → "xxf:hint",
-        "help"       → "xxf:help"
-    )
-    
-    val Getters = Map[String, XFormsUIEvent ⇒ Option[Any]](
-        "target-ref"                    → binding,
-        xxformsName("binding")          → binding,
-        xxformsName("control-position") → controlPosition,
-        "label"                         → label,
-        xxformsName("label")            → label,
-        "help"                          → help,
-        xxformsName("help")             → help,
-        "hint"                          → hint,
-        xxformsName("hint")             → hint,
-        "alert"                         → alert,
-        xxformsName("alert")            → alert
-    )
+  
+  val Deprecated = Map(
+    "target-ref" → "xxf:binding",
+    "alert"      → "xxf:alert",
+    "label"      → "xxf:label",
+    "hint"       → "xxf:hint",
+    "help"       → "xxf:help"
+  )
+  
+  val Getters = Map[String, XFormsUIEvent ⇒ Option[Any]](
+    "target-ref"                    → binding,
+    xxformsName("binding")          → binding,
+    xxformsName("control-position") → controlPosition,
+    "label"                         → label,
+    xxformsName("label")            → label,
+    "help"                          → help,
+    xxformsName("help")             → help,
+    "hint"                          → hint,
+    xxformsName("hint")             → hint,
+    "alert"                         → alert,
+    xxformsName("alert")            → alert
+  )
 
-    def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)
+  def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)
 
-    def controlPosition(e: XFormsUIEvent) =
-        e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
+  def controlPosition(e: XFormsUIEvent) =
+    e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
 
-    def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel)
-    def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp)
-    def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint)
-    def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert)
+  def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel)
+  def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp)
+  def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint)
+  def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert)
 }

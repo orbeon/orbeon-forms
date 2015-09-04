@@ -27,39 +27,39 @@ import scala.collection.immutable.TreeMap
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
-    @Test def amendServletRequest() {
+  @Test def amendServletRequest() {
 
-        // Initial headers
-        val initialHeaders = Map(
-            "p1" → Seq("v1a", "v1b"),
-            // NOTE: Just use these header names because that's what's configured in the properties for the Liferay test
-            "Orbeon-Liferay-User-Email".toLowerCase → Seq("test@orbeon.com"),
-            "Orbeon-Liferay-User-Roles".toLowerCase → Seq("manager,employee")
-        )
+    // Initial headers
+    val initialHeaders = Map(
+      "p1" → Seq("v1a", "v1b"),
+      // NOTE: Just use these header names because that's what's configured in the properties for the Liferay test
+      "Orbeon-Liferay-User-Email".toLowerCase → Seq("test@orbeon.com"),
+      "Orbeon-Liferay-User-Roles".toLowerCase → Seq("manager,employee")
+    )
 
-        // Request with initial headers
-        val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
-            override def getHeader(name: String) = initialHeaders.get(name) map (_.head) orNull
-            override def getHeaders(name: String) =
-                asJavaEnumeration(initialHeaders.get(name) map (_.iterator) getOrElse Iterator.empty)
-            override def getHeaderNames= initialHeaders.keysIterator
-        }
-
-        val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest)
-
-        // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
-        val expectedHeaders = initialHeaders ++ Map(
-            OrbeonUsernameHeaderName → Seq("test@orbeon.com"),
-            OrbeonRolesHeaderName    → Seq("manager", "employee")
-        )
-
-        // NOTE: Use asInstanceOf because servlet API doesn't have generics
-        val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[JEnumeration[String]] map
-            (n ⇒ n → amendedRequest.getHeaders(n).asInstanceOf[JEnumeration[String]].toList) toMap
-
-        // Compare using TreeMap to get a reliable order
-        def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map
-
-        assert(toTreeMap(expectedHeaders) === toTreeMap(actualHeaders))
+    // Request with initial headers
+    val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+      override def getHeader(name: String) = initialHeaders.get(name) map (_.head) orNull
+      override def getHeaders(name: String) =
+        asJavaEnumeration(initialHeaders.get(name) map (_.iterator) getOrElse Iterator.empty)
+      override def getHeaderNames= initialHeaders.keysIterator
     }
+
+    val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest)
+
+    // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
+    val expectedHeaders = initialHeaders ++ Map(
+      OrbeonUsernameHeaderName → Seq("test@orbeon.com"),
+      OrbeonRolesHeaderName    → Seq("manager", "employee")
+    )
+
+    // NOTE: Use asInstanceOf because servlet API doesn't have generics
+    val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[JEnumeration[String]] map
+      (n ⇒ n → amendedRequest.getHeaders(n).asInstanceOf[JEnumeration[String]].toList) toMap
+
+    // Compare using TreeMap to get a reliable order
+    def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map
+
+    assert(toTreeMap(expectedHeaders) === toTreeMap(actualHeaders))
+  }
 }

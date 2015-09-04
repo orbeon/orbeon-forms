@@ -23,16 +23,16 @@ import collection.JavaConverters._
 import org.orbeon.saxon.om.NodeInfo
 
 class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XFORMS_DELETE, target, properties, bubbles = true, cancelable = false)
-    with InstanceEvent {
+  extends XFormsEvent(XFORMS_DELETE, target, properties, bubbles = true, cancelable = false)
+  with InstanceEvent {
 
-    def this(target: XFormsEventTarget, deleteInfos: JList[DeleteInfo], deleteIndex: Int) = {
-        this(target, Map("deleted-nodes" → Option(deleteInfos.asScala map (_.nodeInfo)), "delete-location" → Option(deleteIndex)))
-        _deleteInfosOpt = Option(deleteInfos.asScala)
-    }
+  def this(target: XFormsEventTarget, deleteInfos: JList[DeleteInfo], deleteIndex: Int) = {
+    this(target, Map("deleted-nodes" → Option(deleteInfos.asScala map (_.nodeInfo)), "delete-location" → Option(deleteIndex)))
+    _deleteInfosOpt = Option(deleteInfos.asScala)
+  }
 
-    private var _deleteInfosOpt: Option[Seq[DeleteInfo]] = None
-    def deleteInfos = _deleteInfosOpt.get
+  private var _deleteInfosOpt: Option[Seq[DeleteInfo]] = None
+  def deleteInfos = _deleteInfosOpt.get
 
-    def deletedNodes = property[Seq[NodeInfo]]("deleted-nodes").get
+  def deletedNodes = property[Seq[NodeInfo]]("deleted-nodes").get
 }

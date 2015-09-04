@@ -27,23 +27,23 @@ import org.orbeon.saxon.om.VirtualNode
  * xxf:extract-document() takes an element as parameter and extracts a document.
  */
 class XXFormsExtractDocument extends XFormsFunction {
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        def effectiveBooleanValue(e: Expression) = ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
+    def effectiveBooleanValue(e: Expression) = ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
 
-        val item                  = argument(0).evaluateItem(xpathContext)
-        val excludeResultPrefixes = argument.lift(1) map (_.evaluateAsString(xpathContext).toString)
-        val readonly              = argument.lift(2) exists effectiveBooleanValue
+    val item                  = argument(0).evaluateItem(xpathContext)
+    val excludeResultPrefixes = argument.lift(1) map (_.evaluateAsString(xpathContext).toString)
+    val readonly              = argument.lift(2) exists effectiveBooleanValue
 
-        val rootElement =
-            item match {
-                case virtualNode: VirtualNode ⇒
-                    virtualNode.getUnderlyingNode.asInstanceOf[Element]
-                case nodeInfo: NodeInfo ⇒
-                    TransformerUtils.tinyTreeToDom4j(nodeInfo).getRootElement
-                case _ ⇒ return null
-            }
+    val rootElement =
+      item match {
+        case virtualNode: VirtualNode ⇒
+          virtualNode.getUnderlyingNode.asInstanceOf[Element]
+        case nodeInfo: NodeInfo ⇒
+          TransformerUtils.tinyTreeToDom4j(nodeInfo).getRootElement
+        case _ ⇒ return null
+      }
 
-        Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false, removeInstanceData = true)
-    }
+    Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false, removeInstanceData = true)
+  }
 }

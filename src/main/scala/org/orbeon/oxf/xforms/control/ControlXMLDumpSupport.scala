@@ -22,39 +22,39 @@ import org.orbeon.saxon.om.{NodeInfo, Item}
 
 trait ControlXMLDumpSupport extends DebugXML{
 
-    self: XFormsControl ⇒
+  self: XFormsControl ⇒
 
-    def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
+  def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
 
-        def itemToString(i: Item) = i match {
-            case atomic: AtomicValue ⇒ atomic.getStringValue
-            case node: NodeInfo ⇒ node.getDisplayName
-            case _ ⇒ throw new IllegalStateException
-        }
-
-        helper.startElement(localName, Array(
-            "id", getId,
-            "effectiveId", effectiveId,
-            "isRelevant", isRelevant.toString,
-            "wasRelevant", wasRelevant.toString,
-            "binding-names", bindingContext.nodeset.asScala map itemToString mkString ("(", ", ", ")"),
-            "binding-position", bindingContext.position.toString,
-            "scope", scope.scopeId
-        ))
-        childrenActions foreach (_.toXML(helper, List.empty)(()))
-        content
-        helper.endElement()
+    def itemToString(i: Item) = i match {
+      case atomic: AtomicValue ⇒ atomic.getStringValue
+      case node: NodeInfo ⇒ node.getDisplayName
+      case _ ⇒ throw new IllegalStateException
     }
 
-    def toXML(helper: XMLReceiverHelper): Unit = {
-        helper.startDocument()
-        toXML(helper, List.empty)(())
-        helper.endDocument()
-    }
+    helper.startElement(localName, Array(
+      "id", getId,
+      "effectiveId", effectiveId,
+      "isRelevant", isRelevant.toString,
+      "wasRelevant", wasRelevant.toString,
+      "binding-names", bindingContext.nodeset.asScala map itemToString mkString ("(", ", ", ")"),
+      "binding-position", bindingContext.position.toString,
+      "scope", scope.scopeId
+    ))
+    childrenActions foreach (_.toXML(helper, List.empty)(()))
+    content
+    helper.endElement()
+  }
 
-    def toXMLString =
-        Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this))
+  def toXML(helper: XMLReceiverHelper): Unit = {
+    helper.startDocument()
+    toXML(helper, List.empty)(())
+    helper.endDocument()
+  }
 
-    def dumpXML(): Unit =
-        println(toXMLString)
+  def toXMLString =
+    Dom4jUtils.domToPrettyString(Dom4jUtils.createDocument(this))
+
+  def dumpXML(): Unit =
+    println(toXMLString)
 }

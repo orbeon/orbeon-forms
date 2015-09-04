@@ -20,28 +20,28 @@ import org.orbeon.oxf.common.Version
 
 
 class CRUD
-        extends ProcessorImpl
-        with RequestResponse
-        with Common
-        with Read
-        with CreateUpdateDelete {
+    extends ProcessorImpl
+    with RequestResponse
+    with Common
+    with Read
+    with CreateUpdateDelete {
 
-    override def start(pipelineContext: PipelineContext): Unit =
-        try {
-            val req = request
+  override def start(pipelineContext: PipelineContext): Unit =
+    try {
+      val req = request
 
 //            val PEProviders = Seq("oracle", "db2", "sqlserver")
 //            if (PEProviders.contains(req.provider))
 //                Version.instance.requirePEFeature("Enterprise relational database")
 
-            httpRequest.getMethod match {
-                case "GET"    ⇒ get(req)
-                case "PUT"    ⇒ change(req, delete = false)
-                case "DELETE" ⇒ change(req, delete = true)
-                case _        ⇒ httpResponse.setStatus(405)
-            }
-        } catch {
-            case e: HttpStatusCodeException ⇒
-                httpResponse.setStatus(e.code)
-        }
+      httpRequest.getMethod match {
+        case "GET"    ⇒ get(req)
+        case "PUT"    ⇒ change(req, delete = false)
+        case "DELETE" ⇒ change(req, delete = true)
+        case _        ⇒ httpResponse.setStatus(405)
+      }
+    } catch {
+      case e: HttpStatusCodeException ⇒
+        httpResponse.setStatus(e.code)
+    }
 }

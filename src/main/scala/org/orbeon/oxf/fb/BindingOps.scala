@@ -24,209 +24,209 @@ import org.orbeon.scaxon.XML._
 
 trait BindingOps {
 
-    def possibleAppearancesByControlNameAsXML(
-        inDoc             : NodeInfo,
-        controlName       : String,
-        isInitialLoad     : Boolean,
-        builtinDatatype   : String,
-        desiredAppearance : String    // relevant only if isInitialLoad == false
-    ): Array[NodeInfo] = {
+  def possibleAppearancesByControlNameAsXML(
+    inDoc             : NodeInfo,
+    controlName       : String,
+    isInitialLoad     : Boolean,
+    builtinDatatype   : String,
+    desiredAppearance : String    // relevant only if isInitialLoad == false
+  ): Array[NodeInfo] = {
 
-        val bindings    = FormBuilder.componentBindings
-        val descriptors = getAllRelevantDescriptors(bindings)
-        val lang        = FormBuilder.currentLang
+    val bindings    = FormBuilder.componentBindings
+    val descriptors = getAllRelevantDescriptors(bindings)
+    val lang        = FormBuilder.currentLang
 
+    for {
+      controlElem                  ← findControlByName(inDoc, controlName).to[Array]
+      originalDatatype             = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
+      (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
+          elemName    = controlElem.uriQualifiedName,
+          datatype    = originalDatatype,
+          appearances = controlElem attTokens APPEARANCE_QNAME,
+          descriptors = descriptors
+        )
+      newDatatype                  = Model.qNameForBuiltinTypeName(builtinDatatype, required = false)
+      appearanceElem               ← possibleAppearancesWithLabelAsXML(
+          elemName                = virtualName,
+          builtinType             = newDatatype,
+          // Upon initial load, we want to select as current the original appearance. Later, we want to try
+          // to keep the current appearance. For example, if dropdown has type `string`, and we change the
+          // type to `date`, we don't want the appearance to reset, so we use the passed `desiredAppearance`.
+          // If the appearance doesn't match, then no appearance is marked as current. The UI will pick the
+          // first appearance listed as current.
+          appearancesForSelection = if (isInitialLoad) appearanceOpt.to[Set] else Set(desiredAppearance),
+          lang                    = lang,
+          bindings                = bindings
+        )
+    } yield
+      appearanceElem
+  }
+
+  private def possibleAppearancesWithLabelAsXML(
+    elemName                : QName,
+    builtinType             : QName,
+    appearancesForSelection : Set[String],
+    lang                    : String,
+    bindings                : Seq[NodeInfo]
+  ): Array[NodeInfo] = {
+
+    def appearanceMatches(appearanceOpt: Option[String]) = appearanceOpt match {
+      case Some(appearance) ⇒ appearancesForSelection contains appearance
+      case None             ⇒ appearancesForSelection.isEmpty
+    }
+
+    val appearancesXML =
+      for {
+        (valueOpt, label, icon) ← possibleAppearancesWithLabel(
+            elemName,
+            builtinType,
+            lang,
+            bindings
+          )
+      } yield
+        <appearance current={appearanceMatches(valueOpt).toString}>
+          <label>{label}</label>
+          <value>{valueOpt.getOrElse("")}</value>
+          <icon>{icon}</icon>
+        </appearance>
+
+    appearancesXML map elemToNodeInfo toArray
+  }
+
+  // Find the possible appearances and descriptions for the given control with the given datatype. Only return
+  // appearances which have metadata.
+  //
+  // - `None` represents no appearance (default appearance)
+  // - `Some(appearance)` represents a specific appearance
+  def possibleAppearancesWithLabel(
+    elemName : QName,
+    datatype : QName,
+    lang     : String,
+    bindings : Seq[NodeInfo]
+  ): Seq[(Option[String], String, String)] = {
+
+    def metadataOpt(bindingOpt: Option[NodeInfo]) =
+      bindingOpt.to[List] flatMap bindingMetadata headOption
+
+    possibleAppearancesWithBindings(elemName, datatype, bindings) map {
+      case (appearanceOpt, bindingOpt, _) ⇒
+        (appearanceOpt, metadataOpt(bindingOpt))
+    } collect {
+      case (appearanceOpt, Some(metadata)) ⇒
+
+        def findMetadata(elems: Seq[NodeInfo]) = {
+
+          def fromLang  = elems find (_.attValue("lang") == lang)
+          def fromFirst = elems.headOption
+
+          fromLang orElse fromFirst map (_.stringValue) flatMap nonEmptyOrNone
+        }
+
+        val displayNames = metadata / "*:display-name"
+        val icons        = metadata / "*:icon" / "*:small-icon"
+
+        val displayNameOpt = findMetadata(displayNames)
+        val icon           = findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png"
+
+        (appearanceOpt, displayNameOpt, icon)
+    } collect {
+      case (appearanceOpt, Some(displayName), icon) ⇒
+        (appearanceOpt, displayName, icon)
+    }
+  }
+
+  private def bindingMetadata(binding: NodeInfo) =
+    binding / "*:metadata"
+
+  // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
+  def findViewTemplate(binding: NodeInfo): Option[NodeInfo] = {
+    val metadata = bindingMetadata(binding)
+    (((metadata / "*:template") ++ (metadata / "*:templates" / "*:view")) / *).headOption
+  }
+
+  // In other words we leave Type and Required and custom MIPs as they are
+  // This must match what is done in annotate.xpl
+  private val BindTemplateAttributesToNamespace =
+    Set(Model.Relevant, Model.Readonly, Model.Constraint, Model.Calculate, Model.Default) map (_.aName)
+
+  // From an <xbl:binding>, return all bind attributes
+  // They are obtained from the legacy datatype element or from templates/bind.
+  def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
+
+    val metadata            = bindingMetadata(binding)
+    val datatypeMetadataOpt = metadata / "*:datatype" headOption
+    val bindMetadataOpt     = metadata / "*:templates" / "*:bind" headOption
+
+    val allAttributes = {
+
+      val typeFromDatatype =
+        for (elem ← datatypeMetadataOpt.to[List])
+        yield
+          (elem, QName.get("type"), elem.stringValue)
+
+      val bindAttributes = {
         for {
-            controlElem                  ← findControlByName(inDoc, controlName).to[Array]
-            originalDatatype             = FormBuilder.DatatypeValidation.fromForm(inDoc, controlName).datatypeQName
-            (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
-                    elemName    = controlElem.uriQualifiedName,
-                    datatype    = originalDatatype,
-                    appearances = controlElem attTokens APPEARANCE_QNAME,
-                    descriptors = descriptors
-                )
-            newDatatype                  = Model.qNameForBuiltinTypeName(builtinDatatype, required = false)
-            appearanceElem               ← possibleAppearancesWithLabelAsXML(
-                    elemName                = virtualName,
-                    builtinType             = newDatatype,
-                    // Upon initial load, we want to select as current the original appearance. Later, we want to try
-                    // to keep the current appearance. For example, if dropdown has type `string`, and we change the
-                    // type to `date`, we don't want the appearance to reset, so we use the passed `desiredAppearance`.
-                    // If the appearance doesn't match, then no appearance is marked as current. The UI will pick the
-                    // first appearance listed as current.
-                    appearancesForSelection = if (isInitialLoad) appearanceOpt.to[Set] else Set(desiredAppearance),
-                    lang                    = lang,
-                    bindings                = bindings
-                )
+          elem ← bindMetadataOpt.to[List]
+          att  ← elem /@ @*
         } yield
-            appearanceElem
+          (elem, QName.get(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)
+      }
+
+      typeFromDatatype ::: bindAttributes
     }
 
-    private def possibleAppearancesWithLabelAsXML(
-        elemName                : QName,
-        builtinType             : QName,
-        appearancesForSelection : Set[String],
-        lang                    : String,
-        bindings                : Seq[NodeInfo]
-    ): Array[NodeInfo] = {
-
-        def appearanceMatches(appearanceOpt: Option[String]) = appearanceOpt match {
-            case Some(appearance) ⇒ appearancesForSelection contains appearance
-            case None             ⇒ appearancesForSelection.isEmpty
-        }
-
-        val appearancesXML =
-            for {
-                (valueOpt, label, icon) ← possibleAppearancesWithLabel(
-                        elemName,
-                        builtinType,
-                        lang,
-                        bindings
-                    )
-            } yield
-                <appearance current={appearanceMatches(valueOpt).toString}>
-                    <label>{label}</label>
-                    <value>{valueOpt.getOrElse("")}</value>
-                    <icon>{icon}</icon>
-                </appearance>
-
-        appearancesXML map elemToNodeInfo toArray
+    allAttributes collect {
+      case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
+        // Some attributes must be prefixed before being inserted into the edited form
+        QName.get(qname.getName, "fb", FormBuilder.FB) → value
+      case (elem, qname, value) if !(qname.getName == "type" && elem.resolveQName(value).getName == "string") ⇒
+        // Exclude `type="*:string"`
+        qname → value
+    } map {
+      case (qname, value) ⇒
+        attributeInfo(qname, value)
     }
+  }
 
-    // Find the possible appearances and descriptions for the given control with the given datatype. Only return
-    // appearances which have metadata.
-    //
-    // - `None` represents no appearance (default appearance)
-    // - `Some(appearance)` represents a specific appearance
-    def possibleAppearancesWithLabel(
-        elemName : QName,
-        datatype : QName,
-        lang     : String,
-        bindings : Seq[NodeInfo]
-    ): Seq[(Option[String], String, String)] = {
+  // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
+  def bindingForControlElementOrEmpty(controlElement: NodeInfo) =
+    bindingForControlElement(controlElement, FormBuilder.componentBindings).orNull
 
-        def metadataOpt(bindingOpt: Option[NodeInfo]) =
-            bindingOpt.to[List] flatMap bindingMetadata headOption
+  // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
+  def bindingForControlElement(controlElem: NodeInfo, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
 
-        possibleAppearancesWithBindings(elemName, datatype, bindings) map {
-            case (appearanceOpt, bindingOpt, _) ⇒
-                (appearanceOpt, metadataOpt(bindingOpt))
-        } collect {
-            case (appearanceOpt, Some(metadata)) ⇒
+    val elemName    = controlElem.uriQualifiedName
+    val appearances = controlElem attTokens APPEARANCE_QNAME
+    val descriptors = getAllRelevantDescriptors(bindings)
 
-                def findMetadata(elems: Seq[NodeInfo]) = {
+    for {
+      descriptor      ← findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+      binding         ← descriptor.binding
+    } yield
+      binding
+  }
 
-                    def fromLang  = elems find (_.attValue("lang") == lang)
-                    def fromFirst = elems.headOption
+  // Finds if a control uses a particular type of editor (say "static-itemset")
+  def controlElementHasEditor(controlElem: NodeInfo, editor: String, bindings: Seq[NodeInfo]): Boolean = {
 
-                    fromLang orElse fromFirst map (_.stringValue) flatMap nonEmptyOrNone
-                }
+    val editorAttributeValueOpt =
+      for {
+        binding         ← bindingForControlElement(controlElem, bindings)
+        editorAttribute ← (bindingMetadata(binding) / "*:editors" /@ editor).headOption
+      } yield
+        editorAttribute.stringValue
 
-                val displayNames = metadata / "*:display-name"
-                val icons        = metadata / "*:icon" / "*:small-icon"
+    editorAttributeValueOpt contains "true"
+  }
 
-                val displayNameOpt = findMetadata(displayNames)
-                val icon           = findMetadata(icons) getOrElse "/apps/fr/style/images/silk/plugin.png"
+  // Create a new data holder given the new control name, using the instance template if found
+  def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
 
-                (appearanceOpt, displayNameOpt, icon)
-        } collect {
-            case (appearanceOpt, Some(displayName), icon) ⇒
-                (appearanceOpt, displayName, icon)
-        }
-    }
+    val instanceTemplate = bindingMetadata(binding) / "*:templates" / "*:instance"
 
-    private def bindingMetadata(binding: NodeInfo) =
-        binding / "*:metadata"
-
-    // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
-    def findViewTemplate(binding: NodeInfo): Option[NodeInfo] = {
-        val metadata = bindingMetadata(binding)
-        (((metadata / "*:template") ++ (metadata / "*:templates" / "*:view")) / *).headOption
-    }
-
-    // In other words we leave Type and Required and custom MIPs as they are
-    // This must match what is done in annotate.xpl
-    private val BindTemplateAttributesToNamespace =
-        Set(Model.Relevant, Model.Readonly, Model.Constraint, Model.Calculate, Model.Default) map (_.aName)
-
-    // From an <xbl:binding>, return all bind attributes
-    // They are obtained from the legacy datatype element or from templates/bind.
-    def findBindAttributesTemplate(binding: NodeInfo): Seq[NodeInfo] = {
-
-        val metadata            = bindingMetadata(binding)
-        val datatypeMetadataOpt = metadata / "*:datatype" headOption
-        val bindMetadataOpt     = metadata / "*:templates" / "*:bind" headOption
-
-        val allAttributes = {
-
-            val typeFromDatatype =
-                for (elem ← datatypeMetadataOpt.to[List])
-                yield
-                    (elem, QName.get("type"), elem.stringValue)
-
-            val bindAttributes = {
-                for {
-                    elem ← bindMetadataOpt.to[List]
-                    att  ← elem /@ @*
-                } yield
-                    (elem, QName.get(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)
-            }
-
-            typeFromDatatype ::: bindAttributes
-        }
-
-        allAttributes collect {
-            case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
-                // Some attributes must be prefixed before being inserted into the edited form
-                QName.get(qname.getName, "fb", FormBuilder.FB) → value
-            case (elem, qname, value) if !(qname.getName == "type" && elem.resolveQName(value).getName == "string") ⇒
-                // Exclude `type="*:string"`
-                qname → value
-        } map {
-            case (qname, value) ⇒
-                attributeInfo(qname, value)
-        }
-    }
-
-    // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-    def bindingForControlElementOrEmpty(controlElement: NodeInfo) =
-        bindingForControlElement(controlElement, FormBuilder.componentBindings).orNull
-
-    // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-    def bindingForControlElement(controlElem: NodeInfo, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
-
-        val elemName    = controlElem.uriQualifiedName
-        val appearances = controlElem attTokens APPEARANCE_QNAME
-        val descriptors = getAllRelevantDescriptors(bindings)
-
-        for {
-            descriptor      ← findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
-            binding         ← descriptor.binding
-        } yield
-            binding
-    }
-
-    // Finds if a control uses a particular type of editor (say "static-itemset")
-    def controlElementHasEditor(controlElem: NodeInfo, editor: String, bindings: Seq[NodeInfo]): Boolean = {
-
-        val editorAttributeValueOpt =
-            for {
-                binding         ← bindingForControlElement(controlElem, bindings)
-                editorAttribute ← (bindingMetadata(binding) / "*:editors" /@ editor).headOption
-            } yield
-                editorAttribute.stringValue
-
-        editorAttributeValueOpt contains "true"
-    }
-
-    // Create a new data holder given the new control name, using the instance template if found
-    def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
-
-        val instanceTemplate = bindingMetadata(binding) / "*:templates" / "*:instance"
-
-        if (instanceTemplate.nonEmpty)
-            elementInfo(controlName, (instanceTemplate.head /@ @*) ++ (instanceTemplate / *))
-        else
-            elementInfo(controlName)
-    }
+    if (instanceTemplate.nonEmpty)
+      elementInfo(controlName, (instanceTemplate.head /@ @*) ++ (instanceTemplate / *))
+    else
+      elementInfo(controlName)
+  }
 }

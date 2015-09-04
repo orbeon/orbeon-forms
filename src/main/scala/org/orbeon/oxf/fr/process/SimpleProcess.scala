@@ -35,92 +35,92 @@ import scala.util.Try
 //
 object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFormsActions with Logging {
 
-    implicit val logger = containingDocument.getIndentedLogger("process")
+  implicit val logger = containingDocument.getIndentedLogger("process")
 
-    override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
+  override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
 
-    def currentXFormsDocumentId = XFormsAPI.containingDocument.getUUID
+  def currentXFormsDocumentId = XFormsAPI.containingDocument.getUUID
 
-    // All XPath runs in the context of the main form instance's root element
-    def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
-    def xpathFunctionLibrary = XFormsFunctionLibrary
-    def xpathFunctionContext = XPath.functionContext.orNull
+  // All XPath runs in the context of the main form instance's root element
+  def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
+  def xpathFunctionLibrary = XFormsFunctionLibrary
+  def xpathFunctionContext = XPath.functionContext.orNull
 
-    // NOTE: Clear the PDF/TIFF URL *before* the process, because if we clear it after, it will be already cleared
-    // during the second pass of a two-pass submission.
-    override def beforeProcess() = Try {
-        List("pdf", "tiff") foreach { mode ⇒
+  // NOTE: Clear the PDF/TIFF URL *before* the process, because if we clear it after, it will be already cleared
+  // during the second pass of a two-pass submission.
+  override def beforeProcess() = Try {
+    List("pdf", "tiff") foreach { mode ⇒
 
-            // Remove resource and temporary file if any
-            pdfOrTiffPathOpt(mode) foreach { path ⇒
-                XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
-            }
+      // Remove resource and temporary file if any
+      pdfOrTiffPathOpt(mode) foreach { path ⇒
+        XFormsResourceServer.tryToRemoveDynamicResource(path, removeFile = true)
+      }
 
-            // Clear stored path
-            setvalue(pdfTiffPathInstanceRootElementOpt(mode).to[List], "")
+      // Clear stored path
+      setvalue(pdfTiffPathInstanceRootElementOpt(mode).to[List], "")
+    }
+  }
+
+  override def processError(t: Throwable) =
+    tryErrorMessage(Map(Some("resource") → "process-error"))
+
+  def writeSuspendedProcess(process: String) =
+    setvalue(topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement, process)
+
+  def readSuspendedProcess =
+    topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
+
+  // Search first in properties, then try legacy workflow-send
+  // The scope is interpreted as a property prefix.
+  def findProcessByName(scope: String, name: String) = {
+    implicit val formRunnerParams = FormRunnerParams()
+    formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
+  }
+
+  // Legacy: build "workflow-send" process based on properties
+  private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
+
+    def booleanPropertySet(name: String) = booleanFormRunnerProperty(name)
+    def stringPropertySet (name: String) = formRunnerProperty(name) flatMap nonEmptyOrNone isDefined
+
+    buttonName match {
+      case "workflow-send" ⇒
+        val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send.email")
+        val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send.success.uri")
+        val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send.error.uri")
+
+        val buffer = ListBuffer[String]()
+
+        buffer += "require-uploads"
+        buffer += ThenCombinator.name
+        buffer += "require-valid"
+        buffer += ThenCombinator.name
+        buffer += "save"
+        buffer += ThenCombinator.name
+        buffer += """success-message("save-success")"""
+
+        if (isLegacySendEmail) {
+          buffer += ThenCombinator.name
+          buffer += "email"
         }
-    }
 
-    override def processError(t: Throwable) =
-        tryErrorMessage(Map(Some("resource") → "process-error"))
+        // TODO: Pass `content = "pdf-url"` if isLegacyCreatePDF. Requires better parsing of process arguments.
+        //def isLegacyCreatePDF = isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
 
-    def writeSuspendedProcess(process: String) =
-        setvalue(topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement, process)
-
-    def readSuspendedProcess =
-        topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
-
-    // Search first in properties, then try legacy workflow-send
-    // The scope is interpreted as a property prefix.
-    def findProcessByName(scope: String, name: String) = {
-        implicit val formRunnerParams = FormRunnerParams()
-        formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
-    }
-
-    // Legacy: build "workflow-send" process based on properties
-    private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
-
-        def booleanPropertySet(name: String) = booleanFormRunnerProperty(name)
-        def stringPropertySet (name: String) = formRunnerProperty(name) flatMap nonEmptyOrNone isDefined
-
-        buttonName match {
-            case "workflow-send" ⇒
-                val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send.email")
-                val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send.success.uri")
-                val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send.error.uri")
-
-                val buffer = ListBuffer[String]()
-
-                buffer += "require-uploads"
-                buffer += ThenCombinator.name
-                buffer += "require-valid"
-                buffer += ThenCombinator.name
-                buffer += "save"
-                buffer += ThenCombinator.name
-                buffer += """success-message("save-success")"""
-
-                if (isLegacySendEmail) {
-                    buffer += ThenCombinator.name
-                    buffer += "email"
-                }
-
-                // TODO: Pass `content = "pdf-url"` if isLegacyCreatePDF. Requires better parsing of process arguments.
-                //def isLegacyCreatePDF = isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
-
-                // Workaround is to change config from oxf.fr.detail.send.pdf = true to oxf.fr.detail.send.success.content = "pdf-url"
-                if (isLegacyNavigateSuccess) {
-                    buffer += ThenCombinator.name
-                    buffer += """send("oxf.fr.detail.send.success")"""
-                }
-
-                if (isLegacyNavigateError) {
-                    buffer += RecoverCombinator.name
-                    buffer += """send("oxf.fr.detail.send.error")"""
-                }
-
-                Some(buffer mkString " ")
-            case _ ⇒
-                None
+        // Workaround is to change config from oxf.fr.detail.send.pdf = true to oxf.fr.detail.send.success.content = "pdf-url"
+        if (isLegacyNavigateSuccess) {
+          buffer += ThenCombinator.name
+          buffer += """send("oxf.fr.detail.send.success")"""
         }
+
+        if (isLegacyNavigateError) {
+          buffer += RecoverCombinator.name
+          buffer += """send("oxf.fr.detail.send.error")"""
+        }
+
+        Some(buffer mkString " ")
+      case _ ⇒
+        None
     }
+  }
 }

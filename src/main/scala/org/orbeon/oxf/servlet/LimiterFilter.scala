@@ -39,86 +39,86 @@ import scala.util.matching.Regex
 // - x1.25
 class LimiterFilter extends Filter {
 
-    import LimiterFilter.Logger._
+  import LimiterFilter.Logger._
 
-    private case class FilterSettings(semaphore: Semaphore, include: Regex, exclude: Regex)
+  private case class FilterSettings(semaphore: Semaphore, include: Regex, exclude: Regex)
 
-    private var settingsOpt: Option[FilterSettings] = None
+  private var settingsOpt: Option[FilterSettings] = None
 
-    override def init(config: FilterConfig) = {
+  override def init(config: FilterConfig) = {
 
-        val limit = desiredParallelism(config.getInitParameter)
+    val limit = desiredParallelism(config.getInitParameter)
 
-        info("initializing")
+    info("initializing")
 
-        val settings =
-            FilterSettings(
-                new Semaphore(limit, true),
-                (nonEmptyOrNone(config.getInitParameter("include")) getOrElse "$.").r,
-                (nonEmptyOrNone(config.getInitParameter("exclude")) getOrElse "$.").r
-            )
+    val settings =
+      FilterSettings(
+        new Semaphore(limit, true),
+        (nonEmptyOrNone(config.getInitParameter("include")) getOrElse "$.").r,
+        (nonEmptyOrNone(config.getInitParameter("exclude")) getOrElse "$.").r
+      )
 
-        info(s"configuring: $settings")
+    info(s"configuring: $settings")
 
-        settingsOpt = Some(settings)
+    settingsOpt = Some(settings)
+  }
+
+  override def destroy() = {
+    info(s"destroying")
+    settingsOpt = None
+  }
+
+  override def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
+    settingsOpt foreach { case FilterSettings(semaphore, include, exclude) ⇒
+
+      val httpReq = MinimalRequest(req.asInstanceOf[HttpServletRequest])
+
+      httpReq.getRequestPath match {
+        case path if include.pattern.matcher(path).matches && ! exclude.pattern.matcher(path).matches ⇒
+          LifecycleLogger.withEvent(httpReq, "limiter", "filter", Nil) {
+            val timestamp = System.currentTimeMillis
+            semaphore.acquire()
+            try {
+              // Log request details again in case wait takes a while
+              val logParams = LifecycleLogger.basicRequestDetails(httpReq) ::: List("wait" → LifecycleLogger.formatDelay(timestamp))
+              LifecycleLogger.withEvent(httpReq, "limiter", "chain", logParams) {
+                chain.doFilter(req, res)
+              }
+            } finally
+              semaphore.release()
+          }
+        case path ⇒
+          LifecycleLogger.withEvent(httpReq, "limiter", "nofilter", Nil) {
+            chain.doFilter(req, res)
+          }
+      }
     }
 
-    override def destroy() = {
-        info(s"destroying")
-        settingsOpt = None
-    }
+  // Inspired from Scala code so under Scala license http://www.scala-lang.org/license.html
+  // https://github.com/scala/scala/blob/2.11.x/src/library/scala/concurrent/impl/ExecutionContextImpl.scala
+  private def desiredParallelism(param: String ⇒ String) = {
 
-    override def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
-        settingsOpt foreach { case FilterSettings(semaphore, include, exclude) ⇒
+    def stringParamWithDefault(name: String, default: String) =
+      nonEmptyOrNone(param(name)) getOrElse default
 
-            val httpReq = MinimalRequest(req.asInstanceOf[HttpServletRequest])
+    def getInt(name: String, default: String) =
+      stringParamWithDefault(name, default) match {
+        case s if s.charAt(0) == 'x' ⇒ (Runtime.getRuntime.availableProcessors * s.substring(1).toDouble).ceil.toInt
+        case other                   ⇒ other.toInt
+      }
 
-            httpReq.getRequestPath match {
-                case path if include.pattern.matcher(path).matches && ! exclude.pattern.matcher(path).matches ⇒
-                    LifecycleLogger.withEvent(httpReq, "limiter", "filter", Nil) {
-                        val timestamp = System.currentTimeMillis
-                        semaphore.acquire()
-                        try {
-                            // Log request details again in case wait takes a while
-                            val logParams = LifecycleLogger.basicRequestDetails(httpReq) ::: List("wait" → LifecycleLogger.formatDelay(timestamp))
-                            LifecycleLogger.withEvent(httpReq, "limiter", "chain", logParams) {
-                                chain.doFilter(req, res)
-                            }
-                        } finally
-                            semaphore.release()
-                    }
-                case path ⇒
-                    LifecycleLogger.withEvent(httpReq, "limiter", "nofilter", Nil) {
-                        chain.doFilter(req, res)
-                    }
-            }
-        }
+    def range(floor: Int, desired: Int, ceiling: Int) =
+      scala.math.min(scala.math.max(floor, desired), ceiling)
 
-    // Inspired from Scala code so under Scala license http://www.scala-lang.org/license.html
-    // https://github.com/scala/scala/blob/2.11.x/src/library/scala/concurrent/impl/ExecutionContextImpl.scala
-    private def desiredParallelism(param: String ⇒ String) = {
-
-        def stringParamWithDefault(name: String, default: String) =
-            nonEmptyOrNone(param(name)) getOrElse default
-
-        def getInt(name: String, default: String) =
-            stringParamWithDefault(name, default) match {
-                case s if s.charAt(0) == 'x' ⇒ (Runtime.getRuntime.availableProcessors * s.substring(1).toDouble).ceil.toInt
-                case other                   ⇒ other.toInt
-            }
-
-        def range(floor: Int, desired: Int, ceiling: Int) =
-            scala.math.min(scala.math.max(floor, desired), ceiling)
-
-        range(
-            getInt("min-threads", "1"),
-            getInt("num-threads", "x1"),
-            getInt("max-threads", "x1")
-        )
-    }
+    range(
+      getInt("min-threads", "1"),
+      getInt("num-threads", "x1"),
+      getInt("max-threads", "x1")
+    )
+  }
 }
 
 private object LimiterFilter {
-    val LoggerName = "org.orbeon.filter.limiter"
-    val Logger     = LoggerFactory.getLogger(LoggerName)
+  val LoggerName = "org.orbeon.filter.limiter"
+  val Logger     = LoggerFactory.getLogger(LoggerName)
 }

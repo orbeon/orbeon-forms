@@ -19,33 +19,33 @@ import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsContainerControl, XF
 
 class XXFormsSetvisitedAction extends XFormsAction {
 
-    override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext): Unit = {
 
-        // "This XForms Action begins by invoking the deferred update behavior."
-        synchronizeAndRefreshIfNeeded(context)
+    // "This XForms Action begins by invoking the deferred update behavior."
+    synchronizeAndRefreshIfNeeded(context)
 
-        // Parameters
-        val visited = resolveBooleanAVT("visited", default = true)(context)
-        val recurse = resolveBooleanAVT("recurse", default = false)(context)
+    // Parameters
+    val visited = resolveBooleanAVT("visited", default = true)(context)
+    val recurse = resolveBooleanAVT("recurse", default = false)(context)
 
-        // Resolve and update control
-        resolveControl("control")(context) foreach (applyToVisitable(_, _.visited = visited, recurse))
+    // Resolve and update control
+    resolveControl("control")(context) foreach (applyToVisitable(_, _.visited = visited, recurse))
 
-        //resolveControl("control")(context).iterator flatMap (ControlsIterator(_, includeSelf = true)) foreach (_.visited = visited)
-    }
+    //resolveControl("control")(context).iterator flatMap (ControlsIterator(_, includeSelf = true)) foreach (_.visited = visited)
+  }
 
-    private def applyToVisitable(control: XFormsControl, visit: VisitableTrait ⇒ Any, recurse: Boolean): Unit =
-        if (control.isRelevant && ! control.isStaticReadonly)
-            control match {
-                case containerControl: XFormsContainerControl ⇒
-                    visit(containerControl)
+  private def applyToVisitable(control: XFormsControl, visit: VisitableTrait ⇒ Any, recurse: Boolean): Unit =
+    if (control.isRelevant && ! control.isStaticReadonly)
+      control match {
+        case containerControl: XFormsContainerControl ⇒
+          visit(containerControl)
 
-                    if (recurse)
-                        for (control ← containerControl.children)
-                            applyToVisitable(control, visit, recurse)
+          if (recurse)
+            for (control ← containerControl.children)
+              applyToVisitable(control, visit, recurse)
 
-                case control: VisitableTrait ⇒
-                    visit(control)
-                case _ ⇒
-            }
+        case control: VisitableTrait ⇒
+          visit(control)
+        case _ ⇒
+      }
 }

@@ -22,33 +22,33 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
  */
 abstract class XPathAnalysis extends DebugXML  {
 
-    val xpathString: String
-    val figuredOutDependencies: Boolean
+  val xpathString: String
+  val figuredOutDependencies: Boolean
 
-    val valueDependentPaths: MapSet[String, String]
-    val returnablePaths: MapSet[String, String]
+  val valueDependentPaths: MapSet[String, String]
+  val returnablePaths: MapSet[String, String]
 
-    val dependentModels: collection.Set[String]
-    val dependentInstances: collection.Set[String]
+  val dependentModels: collection.Set[String]
+  val dependentInstances: collection.Set[String]
 
-    def returnableInstances = returnablePaths.keys
+  def returnableInstances = returnablePaths.keys
 
-    // For all those, return true if any path matches
-    // NOTE: For now just check exact paths. Later must be smarter?
+  // For all those, return true if any path matches
+  // NOTE: For now just check exact paths. Later must be smarter?
 
-    def intersectsBinding(touchedPaths:  MapSet[String, String]) = valueDependentPaths intersects touchedPaths
-    def intersectsModels (touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains)
-    def intersectsValue  (touchedPaths:  MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
+  def intersectsBinding(touchedPaths:  MapSet[String, String]) = valueDependentPaths intersects touchedPaths
+  def intersectsModels (touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains)
+  def intersectsValue  (touchedPaths:  MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
 
-    // Combine this analysis with another one and return a new analysis
-    def combine(other: XPathAnalysis): XPathAnalysis
+  // Combine this analysis with another one and return a new analysis
+  def combine(other: XPathAnalysis): XPathAnalysis
 
-    // Convert this analysis into the same analysis, where values have become dependencies
-    def makeValuesDependencies: XPathAnalysis
+  // Convert this analysis into the same analysis, where values have become dependencies
+  def makeValuesDependencies: XPathAnalysis
 
-    def toXML(helper: XMLReceiverHelper)
+  def toXML(helper: XMLReceiverHelper)
 
-    def freeTransientState() = ()
+  def freeTransientState() = ()
 }
 
 /**
@@ -58,37 +58,37 @@ case class InstancePath(instancePrefixedId: String, path: String)
 
 object XPathAnalysis {
 
-    // Constant analysis, positive or negative
-    abstract class ConstantXPathAnalysis(val xpathString: String, val figuredOutDependencies: Boolean) extends XPathAnalysis {
+  // Constant analysis, positive or negative
+  abstract class ConstantXPathAnalysis(val xpathString: String, val figuredOutDependencies: Boolean) extends XPathAnalysis {
 
-        require(xpathString ne null)
+    require(xpathString ne null)
 
-        val dependentInstances = Set.empty[String]
-        val dependentModels = Set.empty[String]
-        val returnablePaths = MapSet.empty[String, String]
-        val valueDependentPaths = MapSet.empty[String, String]
+    val dependentInstances = Set.empty[String]
+    val dependentModels = Set.empty[String]
+    val returnablePaths = MapSet.empty[String, String]
+    val valueDependentPaths = MapSet.empty[String, String]
 
-        def makeValuesDependencies = this
+    def makeValuesDependencies = this
 
-        def toXML(helper: XMLReceiverHelper) =
-            helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
-    }
+    def toXML(helper: XMLReceiverHelper) =
+      helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
+  }
 
-    // Some kind of combination that makes sense (might not exactly match the combined PathMap)
-    def combineXPathStrings(s1: String, s2: String) = "(" + s1 + ") | (" + s2 + ")"
+  // Some kind of combination that makes sense (might not exactly match the combined PathMap)
+  def combineXPathStrings(s1: String, s2: String) = "(" + s1 + ") | (" + s2 + ")"
 }
 
 object NegativeAnalysis {
-    def apply(xpathString: String): XPathAnalysis = new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
-        override def combine(other: XPathAnalysis) = NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
-    }
+  def apply(xpathString: String): XPathAnalysis = new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
+    override def combine(other: XPathAnalysis) = NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
+  }
 }
 
 object StringAnalysis {
 
-    private val ConstantAnalysis = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
-        override def combine(other: XPathAnalysis) = other
-    }
+  private val ConstantAnalysis = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
+    override def combine(other: XPathAnalysis) = other
+  }
 
-    def apply(): XPathAnalysis = ConstantAnalysis
+  def apply(): XPathAnalysis = ConstantAnalysis
 }

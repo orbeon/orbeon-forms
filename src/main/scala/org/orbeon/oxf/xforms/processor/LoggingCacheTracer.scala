@@ -18,15 +18,15 @@ import org.orbeon.oxf.util.IndentedLogger
 
 class LoggingCacheTracer(logger: IndentedLogger) extends CacheTracer {
 
-    def digestAndTemplateStatus(digestIfFound: Option[String]) =
-        digestIfFound match {
-            case Some(digest) ⇒ logger.logDebug("", "template and static state digest obtained from cache", "digest", digest)
-            case None         ⇒ logger.logDebug("", "template and static state digest not obtained from cache.")
-        }
+  def digestAndTemplateStatus(digestIfFound: Option[String]) =
+    digestIfFound match {
+      case Some(digest) ⇒ logger.logDebug("", "template and static state digest obtained from cache", "digest", digest)
+      case None         ⇒ logger.logDebug("", "template and static state digest not obtained from cache.")
+    }
 
-    def staticStateStatus(found: Boolean, digest: String) =
-        if (found)
-            logger.logDebug("", "found up-to-date static state by digest in cache", "digest", digest)
-        else
-            logger.logDebug("", "did not find static state by digest in cache", "digest", digest)
+  def staticStateStatus(found: Boolean, digest: String) =
+    if (found)
+      logger.logDebug("", "found up-to-date static state by digest in cache", "digest", digest)
+    else
+      logger.logDebug("", "did not find static state by digest in cache", "digest", digest)
 }

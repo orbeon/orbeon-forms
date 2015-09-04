@@ -21,32 +21,32 @@ import org.orbeon.oxf.fr.FormRunnerAuth
 import scala.collection.JavaConversions._
 
 class FormRunnerAuthFilter extends Filter {
-    
-    def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) =
-        chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+  
+  def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) =
+    chain.doFilter(FormRunnerAuthFilter.amendRequest(req.asInstanceOf[HttpServletRequest]), res)
 
-    def init(filterConfig: FilterConfig) = ()
-    def destroy() = ()
+  def init(filterConfig: FilterConfig) = ()
+  def destroy() = ()
 }
 
 object FormRunnerAuthFilter {
 
-    import java.util.{Enumeration ⇒ JEnumeration}
+  import java.util.{Enumeration ⇒ JEnumeration}
 
-    def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
+  def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
-        def getHeader(name: String) = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
-            case Array() ⇒ None
-            case array   ⇒ Some(array)
-        }
-
-        val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
-
-        trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-            val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
-            val headersToPrepend = authHeaders
-        }
-
-        new BaseServletRequestWrapper(servletRequest) with CustomHeaders
+    def getHeader(name: String) = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
+      case Array() ⇒ None
+      case array   ⇒ Some(array)
     }
+
+    val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(servletRequest, getHeader).toMap
+
+    trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
+      val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
+      val headersToPrepend = authHeaders
+    }
+
+    new BaseServletRequestWrapper(servletRequest) with CustomHeaders
+  }
 }

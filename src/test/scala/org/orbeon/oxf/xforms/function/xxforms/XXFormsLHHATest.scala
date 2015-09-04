@@ -20,50 +20,50 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def lhhaFunctions() {
+  @Test def lhhaFunctions() {
 
-        this setupDocument
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-                 xmlns:xf="http://www.w3.org/2002/xforms"
-                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                 xmlns:ev="http://www.w3.org/2001/xml-events">
-                <xh:head>
-                    <xf:model>
-                        <xf:instance>
-                            <value label="My label" help="My help" hint="My hint" alert="My alert"/>
-                        </xf:instance>
+    this setupDocument
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:ev="http://www.w3.org/2001/xml-events">
+        <xh:head>
+          <xf:model>
+            <xf:instance>
+              <value label="My label" help="My help" hint="My hint" alert="My alert"/>
+            </xf:instance>
 
-                        <xf:bind ref="instance()" constraint="false()"/>
+            <xf:bind ref="instance()" constraint="false()"/>
 
-                        <xf:instance id="results">
-                            <results label="" help="" hint="" alert=""/>
-                        </xf:instance>
+            <xf:instance id="results">
+              <results label="" help="" hint="" alert=""/>
+            </xf:instance>
 
-                        <xf:action ev:event="xforms-ready" context="instance('results')">
-                            <xf:setvalue ref="@label" value="xxf:label('my-input')"/>
-                            <xf:setvalue ref="@help" value="xxf:help('my-input')"/>
-                            <xf:setvalue ref="@hint" value="xxf:hint('my-input')"/>
-                            <xf:setvalue ref="@alert" value="xxf:alert('my-input')"/>
-                        </xf:action>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:input id="my-input" ref=".">
-                        <xf:label ref="@label"/>
-                        <xf:help ref="@help"/>
-                        <xf:hint ref="@hint"/>
-                        <xf:alert ref="@alert"/>
-                    </xf:input>
+            <xf:action ev:event="xforms-ready" context="instance('results')">
+              <xf:setvalue ref="@label" value="xxf:label('my-input')"/>
+              <xf:setvalue ref="@help" value="xxf:help('my-input')"/>
+              <xf:setvalue ref="@hint" value="xxf:hint('my-input')"/>
+              <xf:setvalue ref="@alert" value="xxf:alert('my-input')"/>
+            </xf:action>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <xf:input id="my-input" ref=".">
+            <xf:label ref="@label"/>
+            <xf:help ref="@help"/>
+            <xf:hint ref="@hint"/>
+            <xf:alert ref="@alert"/>
+          </xf:input>
 
-                    <xf:output id="label" ref="instance('results')/@label"/>
-                    <xf:output id="help" ref="instance('results')/@help"/>
-                    <xf:output id="hint" ref="instance('results')/@hint"/>
-                    <xf:output id="alert" ref="instance('results')/@alert"/>
-                </xh:body>
-            </xh:html>
+          <xf:output id="label" ref="instance('results')/@label"/>
+          <xf:output id="help" ref="instance('results')/@help"/>
+          <xf:output id="hint" ref="instance('results')/@hint"/>
+          <xf:output id="alert" ref="instance('results')/@alert"/>
+        </xh:body>
+      </xh:html>
 
-        // NOTE: Make the control invalid so that the alert message is not empty
-        for (lhha ← Seq("label", "help", "hint", "alert"))
-            assert(getValueControl(lhha).getValue === "My " + lhha)
-    }
+    // NOTE: Make the control invalid so that the alert message is not empty
+    for (lhha ← Seq("label", "help", "hint", "alert"))
+      assert(getValueControl(lhha).getValue === "My " + lhha)
+  }
 }

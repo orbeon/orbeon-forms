@@ -22,39 +22,39 @@ import org.orbeon.oxf.util.ScalaUtils._
  */
 object CoffeeScriptCompiler {
 
-    // Lazy so that if the compiler is never used it is never loaded
-    private lazy val compilerScope = {
-        val loader = getClass.getClassLoader
-        useAndClose(loader.getResourceAsStream("org/orbeon/oxf/xforms/script/coffee-script.js")) { inputStream ⇒
-            useAndClose(new InputStreamReader(inputStream, "utf-8")) { reader ⇒
-                val cx = Context.enter()
-                try {
-                    // "A scope is a set of JavaScript object" http://goo.gl/H8g5f
-                    // "initStandardObjects is an expensive method to call and it allocates a fair amount of memory"
-                    val topLevelScope = cx.initStandardObjects()
-
-                    cx.setOptimizationLevel(-1) // see e.g. http://goo.gl/QCxgT
-                    cx.evaluateReader(topLevelScope, reader, "coffee-script.js", 1, null)
-
-                    topLevelScope
-                } finally {
-                    Context.exit()
-                }
-            }
-        }
-    }
-
-    def compile(scriptSource: String, filename: String, line: Int) = synchronized {
-        // For now play it safe: only one concurrent compilation for this object
+  // Lazy so that if the compiler is never used it is never loaded
+  private lazy val compilerScope = {
+    val loader = getClass.getClassLoader
+    useAndClose(loader.getResourceAsStream("org/orbeon/oxf/xforms/script/coffee-script.js")) { inputStream ⇒
+      useAndClose(new InputStreamReader(inputStream, "utf-8")) { reader ⇒
         val cx = Context.enter()
         try {
-            val newScope = cx.newObject(compilerScope)
-            newScope.setParentScope(compilerScope)
-            newScope.put("scriptSource", newScope, scriptSource)
+          // "A scope is a set of JavaScript object" http://goo.gl/H8g5f
+          // "initStandardObjects is an expensive method to call and it allocates a fair amount of memory"
+          val topLevelScope = cx.initStandardObjects()
 
-            cx.evaluateString(newScope, "CoffeeScript.compile(scriptSource, {})", filename, line, null).asInstanceOf[String]
+          cx.setOptimizationLevel(-1) // see e.g. http://goo.gl/QCxgT
+          cx.evaluateReader(topLevelScope, reader, "coffee-script.js", 1, null)
+
+          topLevelScope
         } finally {
-            Context.exit()
+          Context.exit()
         }
+      }
     }
+  }
+
+  def compile(scriptSource: String, filename: String, line: Int) = synchronized {
+    // For now play it safe: only one concurrent compilation for this object
+    val cx = Context.enter()
+    try {
+      val newScope = cx.newObject(compilerScope)
+      newScope.setParentScope(compilerScope)
+      newScope.put("scriptSource", newScope, scriptSource)
+
+      cx.evaluateString(newScope, "CoffeeScript.compile(scriptSource, {})", filename, line, null).asInstanceOf[String]
+    } finally {
+      Context.exit()
+    }
+  }
 }

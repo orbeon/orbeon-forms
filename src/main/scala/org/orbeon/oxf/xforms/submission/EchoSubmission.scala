@@ -24,63 +24,63 @@ import org.orbeon.oxf.xml.XMLUtils
  */
 class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(submission) {
 
-    def getType = "echo"
+  def getType = "echo"
 
-    // Match for replace="instance|none|all" and the submission resource starts with "test:" or "echo:"
-    def isMatch(
-        p : XFormsModelSubmission#SubmissionParameters,
-        p2: XFormsModelSubmission#SecondPassParameters,
-        sp: XFormsModelSubmission#SerializationParameters
-    ) =
-        (p.isReplaceInstance || p.isReplaceNone || p.isReplaceAll) &&
-            (p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:"))
+  // Match for replace="instance|none|all" and the submission resource starts with "test:" or "echo:"
+  def isMatch(
+    p : XFormsModelSubmission#SubmissionParameters,
+    p2: XFormsModelSubmission#SecondPassParameters,
+    sp: XFormsModelSubmission#SerializationParameters
+  ) =
+    (p.isReplaceInstance || p.isReplaceNone || p.isReplaceAll) &&
+      (p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:"))
 
-    def connect(
-        p : XFormsModelSubmission#SubmissionParameters,
-        p2: XFormsModelSubmission#SecondPassParameters,
-        sp: XFormsModelSubmission#SerializationParameters
-    ) = {
+  def connect(
+    p : XFormsModelSubmission#SubmissionParameters,
+    p2: XFormsModelSubmission#SecondPassParameters,
+    sp: XFormsModelSubmission#SerializationParameters
+  ) = {
 
-        if (sp.messageBody == null) {
-            // Not sure when this can happen, but it can't be good
-            throw new XFormsSubmissionException(submission, "Action 'test:': no message body.", "processing submission response")
-        }  else {
-            // Log message body for debugging purposes
-            val indentedLogger = getDetailsLogger(p, p2)
-            if (indentedLogger.isDebugEnabled && BaseSubmission.isLogBody)
-                Connection.logRequestBody(sp.actualRequestMediatype, sp.messageBody)(indentedLogger)
-        }
-
-        val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll)
-
-        val headers = Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
-            scheme            = "http",
-            httpMethodUpper   = p.actualHttpMethod,
-            hasCredentials    = p2.credentials != null,
-            mediatype         = sp.actualRequestMediatype,
-            encodingForSOAP   = p2.encoding,
-            customHeaders     = customHeaderNameValues,
-            headersToForward  = Connection.headersToForwardFromProperty)(
-            logger            = getDetailsLogger(p, p2)
-        )
-
-        // Do as if we are receiving a regular XML response
-        val connectionResult = ConnectionResult(
-            url                 = p2.actionOrResource,
-            statusCode          = 200,
-            headers             = headers,
-            content             = StreamedContent(
-                inputStream     = new ByteArrayInputStream(sp.messageBody),
-                contentType     = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
-                contentLength   = Some(sp.messageBody.length),
-                title           = None
-            )
-        )
-        val replacer = submission.getReplacer(connectionResult, p.asInstanceOf[submission.SubmissionParameters])
-
-        // Deserialize here so it can run in parallel
-        replacer.deserialize(connectionResult, p, p2)
-
-        new SubmissionResult(submission.getEffectiveId, replacer, connectionResult)
+    if (sp.messageBody == null) {
+      // Not sure when this can happen, but it can't be good
+      throw new XFormsSubmissionException(submission, "Action 'test:': no message body.", "processing submission response")
+    }  else {
+      // Log message body for debugging purposes
+      val indentedLogger = getDetailsLogger(p, p2)
+      if (indentedLogger.isDebugEnabled && BaseSubmission.isLogBody)
+        Connection.logRequestBody(sp.actualRequestMediatype, sp.messageBody)(indentedLogger)
     }
+
+    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll)
+
+    val headers = Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+      scheme            = "http",
+      httpMethodUpper   = p.actualHttpMethod,
+      hasCredentials    = p2.credentials != null,
+      mediatype         = sp.actualRequestMediatype,
+      encodingForSOAP   = p2.encoding,
+      customHeaders     = customHeaderNameValues,
+      headersToForward  = Connection.headersToForwardFromProperty)(
+      logger            = getDetailsLogger(p, p2)
+    )
+
+    // Do as if we are receiving a regular XML response
+    val connectionResult = ConnectionResult(
+      url                 = p2.actionOrResource,
+      statusCode          = 200,
+      headers             = headers,
+      content             = StreamedContent(
+        inputStream     = new ByteArrayInputStream(sp.messageBody),
+        contentType     = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
+        contentLength   = Some(sp.messageBody.length),
+        title           = None
+      )
+    )
+    val replacer = submission.getReplacer(connectionResult, p.asInstanceOf[submission.SubmissionParameters])
+
+    // Deserialize here so it can run in parallel
+    replacer.deserialize(connectionResult, p, p2)
+
+    new SubmissionResult(submission.getEffectiveId, replacer, connectionResult)
+  }
 }

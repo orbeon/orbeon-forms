@@ -27,149 +27,149 @@ import scala.collection.JavaConverters._
 
 trait FormRunnerPermissions {
 
-    /**
-     * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
-     * the operations attribute.
-     */
-    private def permissionOperations(permissionElement: NodeInfo): Seq[String] =
-        permissionElement attTokens "operations" toList
+  /**
+   * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
+   * the operations attribute.
+   */
+  private def permissionOperations(permissionElement: NodeInfo): Seq[String] =
+    permissionElement attTokens "operations" toList
 
-    /**
-     * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
-     * just based on the user's roles. Users might be able to perform additional operations on specific data, which
-     * can be tested with allAuthorizedOperations().
-     * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
-     */
-    //@XPathFunction
-    def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
-        if (permissionsElement eq null)
-            Seq("*")                                                         // No permissions defined for this form, authorize any operation
-        else
-            (permissionsElement \ "permission")
-                    .filter(p ⇒
-                    (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
-                    (p \ * forall (_.localname == "user-role")))             // … or with only `user-role` constraints
-                    .filter(p ⇒
-                    p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
-                        ScalaUtils.split((r \@ "any-of").stringValue)        // Constraint is satisfied if user has at least one of the roles
-                        .map(_.replace("%20", " "))                          // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
-                            .intersect(orbeonRoles.toSeq).nonEmpty))
-                .flatMap(permissionOperations)                               // For the permissions that passed, return the list operations
-                .distinct                                                    // Remove duplicate operations
+  /**
+   * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
+   * just based on the user's roles. Users might be able to perform additional operations on specific data, which
+   * can be tested with allAuthorizedOperations().
+   * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
+   */
+  //@XPathFunction
+  def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
+    if (permissionsElement eq null)
+      Seq("*")                                                         // No permissions defined for this form, authorize any operation
+    else
+      (permissionsElement \ "permission")
+          .filter(p ⇒
+          (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
+          (p \ * forall (_.localname == "user-role")))             // … or with only `user-role` constraints
+          .filter(p ⇒
+          p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
+            ScalaUtils.split((r \@ "any-of").stringValue)        // Constraint is satisfied if user has at least one of the roles
+            .map(_.replace("%20", " "))                          // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
+              .intersect(orbeonRoles.toSeq).nonEmpty))
+        .flatMap(permissionOperations)                               // For the permissions that passed, return the list operations
+        .distinct                                                    // Remove duplicate operations
+  }
+
+  //@XPathFunction
+  def xpathAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
+    def toOption(s: String) = if (s == null || s == "") None else Some(s)
+    allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname))
+  }
+
+  def allAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: Option[String], dataGroupname: Option[String]): Seq[String] = {
+
+    // For both username and groupname, we don't want nulls, or if specified empty string
+    assert(dataUsername  != null)
+    assert(dataGroupname != null)
+    assert(dataUsername .map(_ != "").getOrElse(true))
+    assert(dataGroupname.map(_ != "").getOrElse(true))
+
+    def operations(headerWithUsernameOrGroupname: String, maybeDataUsernameOrGroupname: Option[String], condition: String): Seq[String] = {
+      val request = NetUtils.getExternalContext.getRequest
+      val maybeCurrentUsernameOrGroupname = request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).toSeq.flatten.headOption
+      (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
+        case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
+          if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
+            val allPermissions = permissionsElement \ "permission"
+            val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
+            permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
+        case _ ⇒ Nil
+      }
     }
 
-    //@XPathFunction
-    def xpathAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
-        def toOption(s: String) = if (s == null || s == "") None else Some(s)
-        allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname))
+    val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
+    rolesOperations match {
+      case Seq("*") ⇒ Seq("*")
+      case _ ⇒
+        val ownerOperations       = operations(OrbeonUsernameHeaderName, dataUsername,  "owner")
+        val groupMemberOperations = operations(OrbeonGroupHeaderName   , dataGroupname, "group-member")
+        (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
+  }
 
-    def allAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: Option[String], dataGroupname: Option[String]): Seq[String] = {
+  /**
+   * This is an "optimistic" version of allAuthorizedOperations, asking what operation you can do on data assuming
+   * you are the owner and a group member. It is used in the Form Runner home page to determine if it is even
+   * worth linking to the summary page for a given form.
+   */
+  //@XPathFunction
+  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
+    val headers  = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
+    val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption
+    val group    = headers.get(OrbeonGroupHeaderName   ).toSeq.flatten.headOption
 
-        // For both username and groupname, we don't want nulls, or if specified empty string
-        assert(dataUsername  != null)
-        assert(dataGroupname != null)
-        assert(dataUsername .map(_ != "").getOrElse(true))
-        assert(dataGroupname.map(_ != "").getOrElse(true))
+    allAuthorizedOperations(permissionsElement, username, group)
+  }
 
-        def operations(headerWithUsernameOrGroupname: String, maybeDataUsernameOrGroupname: Option[String], condition: String): Seq[String] = {
-            val request = NetUtils.getExternalContext.getRequest
-            val maybeCurrentUsernameOrGroupname = request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).toSeq.flatten.headOption
-            (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
-                case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
-                    if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
-                        val allPermissions = permissionsElement \ "permission"
-                        val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
-                        permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
-                case _ ⇒ Nil
-            }
+  /** Given a list of forms metadata:
+   *  - determines the operations the current user can perform,
+   *  - annotates the `<form>` with an `operations="…"` attribute,
+   *  - filters out forms the current user can perform no operation on.
+   */
+  def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo]): List[NodeInfo] = {
+
+    // We only need one wrapper; create it when we encounter the first <form>
+    var wrapperOpt: Option[DocumentWrapper] = None
+
+    val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.fbRoles, orbeonRoles)
+
+    formsEls.flatMap { formEl ⇒
+
+      val wrapper = wrapperOpt.getOrElse(
+        // Create wrapper we don't have one already
+        new DocumentWrapper(Dom4jUtils.createDocument, null, formEl.getConfiguration)
+        // Save wrapper for following iterations
+        |!> (w ⇒ wrapperOpt = Some(w))
+      )
+
+      val appName  = formEl.elemValue("application-name")
+      val formName = formEl.elemValue("form-name")
+      val isAdmin  = {
+        def canAccessEverything = fbPermissions.isDefinedAt("*")
+        def canAccessAppForm = {
+          val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
+          formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)
         }
+        canAccessEverything || canAccessAppForm
+      }
 
-        val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
-        rolesOperations match {
-            case Seq("*") ⇒ Seq("*")
-            case _ ⇒
-                val ownerOperations       = operations(OrbeonUsernameHeaderName, dataUsername,  "owner")
-                val groupMemberOperations = operations(OrbeonGroupHeaderName   , dataGroupname, "group-member")
-                (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
-        }
+      // For each form, compute the operations the user can potentially perform
+      val operations = {
+        val adminOperation = isAdmin.list("admin")
+        val permissionsElement = formEl.child("permissions").headOption.orNull
+        val otherOperations = allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
+        adminOperation ++ otherOperations
+      }
+
+      // Is this form metadata returned by the API?
+      val keepForm = isAdmin ||                             // Admins can see everything, otherwise:
+        ! (   formName == "library"                       // Filter libraries
+           || operations.isEmpty                          // Filter forms on which user can't possibly do anything
+           || formEl.elemValue("available") == "false")   // Filter forms marked as not available
+
+      // If kept, rewrite <form> to add operations="…" attribute
+      keepForm list {
+        val newFormEl = wrapper.wrap(element("form"))
+        val operationsAttr = attributeInfo("operations", operations mkString " ")
+        val newFormContent = operationsAttr +: formEl.child(*)
+        insert(into = Seq(newFormEl), origin = newFormContent)
+        newFormEl
+      }
     }
+  }
 
-    /**
-     * This is an "optimistic" version of allAuthorizedOperations, asking what operation you can do on data assuming
-     * you are the owner and a group member. It is used in the Form Runner home page to determine if it is even
-     * worth linking to the summary page for a given form.
-     */
-    //@XPathFunction
-    def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
-        val headers  = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
-        val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption
-        val group    = headers.get(OrbeonGroupHeaderName   ).toSeq.flatten.headOption
+  def orbeonRoles: Set[String] =
+    NetUtils.getExternalContext.getRequest.getUserRoles.to[Set]
 
-        allAuthorizedOperations(permissionsElement, username, group)
-    }
-
-    /** Given a list of forms metadata:
-     *  - determines the operations the current user can perform,
-     *  - annotates the `<form>` with an `operations="…"` attribute,
-     *  - filters out forms the current user can perform no operation on.
-     */
-    def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo]): List[NodeInfo] = {
-
-        // We only need one wrapper; create it when we encounter the first <form>
-        var wrapperOpt: Option[DocumentWrapper] = None
-
-        val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.fbRoles, orbeonRoles)
-
-        formsEls.flatMap { formEl ⇒
-
-            val wrapper = wrapperOpt.getOrElse(
-                // Create wrapper we don't have one already
-                new DocumentWrapper(Dom4jUtils.createDocument, null, formEl.getConfiguration)
-                // Save wrapper for following iterations
-                |!> (w ⇒ wrapperOpt = Some(w))
-            )
-
-            val appName  = formEl.elemValue("application-name")
-            val formName = formEl.elemValue("form-name")
-            val isAdmin  = {
-                def canAccessEverything = fbPermissions.isDefinedAt("*")
-                def canAccessAppForm = {
-                    val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
-                    formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)
-                }
-                canAccessEverything || canAccessAppForm
-            }
-
-            // For each form, compute the operations the user can potentially perform
-            val operations = {
-                val adminOperation = isAdmin.list("admin")
-                val permissionsElement = formEl.child("permissions").headOption.orNull
-                val otherOperations = allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
-                adminOperation ++ otherOperations
-            }
-
-            // Is this form metadata returned by the API?
-            val keepForm = isAdmin ||                             // Admins can see everything, otherwise:
-                ! (   formName == "library"                       // Filter libraries
-                   || operations.isEmpty                          // Filter forms on which user can't possibly do anything
-                   || formEl.elemValue("available") == "false")   // Filter forms marked as not available
-
-            // If kept, rewrite <form> to add operations="…" attribute
-            keepForm list {
-                val newFormEl = wrapper.wrap(element("form"))
-                val operationsAttr = attributeInfo("operations", operations mkString " ")
-                val newFormContent = operationsAttr +: formEl.child(*)
-                insert(into = Seq(newFormEl), origin = newFormContent)
-                newFormEl
-            }
-        }
-    }
-
-    def orbeonRoles: Set[String] =
-        NetUtils.getExternalContext.getRequest.getUserRoles.to[Set]
-
-    //@XPathFunction
-    def orbeonRolesSequence: SequenceIterator =
-        orbeonRoles.iterator map stringToStringValue
+  //@XPathFunction
+  def orbeonRolesSequence: SequenceIterator =
+    orbeonRoles.iterator map stringToStringValue
 }

@@ -22,30 +22,30 @@ import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest
 
 class LiveResultFormatter extends JUnitResultFormatter {
 
-    private var out = System.out
+  private var out = System.out
 
-    def addError(test: Test, error: Throwable): Unit = {
-        logResult(test, "FAIL")
-        error.printStackTrace(out) // TODO: use orbeon-errorified API/jar
-    }
+  def addError(test: Test, error: Throwable): Unit = {
+    logResult(test, "FAIL")
+    error.printStackTrace(out) // TODO: use orbeon-errorified API/jar
+  }
 
-    def addFailure(test: Test, failure: AssertionFailedError): Unit = {
-        addError(test, failure)
-    }
+  def addFailure(test: Test, failure: AssertionFailedError): Unit = {
+    addError(test, failure)
+  }
 
-    def endTest(test: Test): Unit = {
-        logResult(test, "PASS")
-    }
+  def endTest(test: Test): Unit = {
+    logResult(test, "PASS")
+  }
 
-    def startTest(test: Test) = ()
-    def endTestSuite(testSuite: JUnitTest) = ()
-    def setOutput(out: OutputStream): Unit = this.out = new PrintStream(out)
-    def setSystemError(text: String) = ()
-    def setSystemOutput(text: String) = ()
-    def startTestSuite(testSuite: JUnitTest) = ()
+  def startTest(test: Test) = ()
+  def endTestSuite(testSuite: JUnitTest) = ()
+  def setOutput(out: OutputStream): Unit = this.out = new PrintStream(out)
+  def setSystemError(text: String) = ()
+  def setSystemOutput(text: String) = ()
+  def startTestSuite(testSuite: JUnitTest) = ()
 
-    private def logResult(test: Test, result: String): Unit = {
-        out.println("[" + result + "] " + test)
-        out.flush()
-    }
+  private def logResult(test: Test, result: String): Unit = {
+    out.println("[" + result + "] " + test)
+    out.flush()
+  }
 }

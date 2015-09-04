@@ -20,14 +20,14 @@ import org.orbeon.oxf.webapp.WebAppContext
 // This context uses the original WebAppContext and session
 class LocalExternalContext(val webAppContext: WebAppContext, request: Request, response: Response) extends ExternalContext {
 
-    def getWebAppContext = webAppContext
-    def getSession(create: Boolean) = request.getSession(create)
+  def getWebAppContext = webAppContext
+  def getSession(create: Boolean) = request.getSession(create)
 
-    val getRequest  = request
-    val getResponse = response
+  val getRequest  = request
+  val getResponse = response
 
-    def getStartLoggerString = getRequest.getRequestPath + " - Received request"
-    def getEndLoggerString   = getRequest.getRequestPath
+  def getStartLoggerString = getRequest.getRequestPath + " - Received request"
+  def getEndLoggerString   = getRequest.getRequestPath
 
-    def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException
+  def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException
 }

@@ -20,28 +20,28 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class StringReplacerTest extends AssertionsForJUnit {
 
-    implicit def logger = ResourceManagerTestBase.newIndentedLogger
+  implicit def logger = ResourceManagerTestBase.newIndentedLogger
 
-    @Test def simpleReplacements(): Unit = {
+  @Test def simpleReplacements(): Unit = {
 
-        val TestString = "abcdabcd"
+    val TestString = "abcdabcd"
 
-        // Valid replacements
-        assert("AbCdAbCd"             === StringReplacer("""{ "a": "A", "c": "C" }""")     (logger)(TestString))
-        assert("BcdBcd"               === StringReplacer("""{ "a": "aaa", "aaab": "B" }""")(logger)(TestString))
-        assert("dcbadcba"             === StringReplacer("""{ "abcd": "dcba" }""")         (logger)(TestString))
-        assert("""between "quotes"""" === StringReplacer("""{ "'": "\"" }""")              (logger)("between 'quotes'"))
+    // Valid replacements
+    assert("AbCdAbCd"             === StringReplacer("""{ "a": "A", "c": "C" }""")     (logger)(TestString))
+    assert("BcdBcd"               === StringReplacer("""{ "a": "aaa", "aaab": "B" }""")(logger)(TestString))
+    assert("dcbadcba"             === StringReplacer("""{ "abcd": "dcba" }""")         (logger)(TestString))
+    assert("""between "quotes"""" === StringReplacer("""{ "'": "\"" }""")              (logger)("between 'quotes'"))
 
-        // Empty map
-        assert(TestString === StringReplacer("""{}""")(logger)(TestString))
+    // Empty map
+    assert(TestString === StringReplacer("""{}""")(logger)(TestString))
 
-        // Not a map
-        assert(TestString === StringReplacer("""[]""")(logger)(TestString))
+    // Not a map
+    assert(TestString === StringReplacer("""[]""")(logger)(TestString))
 
-        // Map not to a string
-        assert(TestString === StringReplacer("""{ "a": 1 }""")(logger)(TestString))
+    // Map not to a string
+    assert(TestString === StringReplacer("""{ "a": 1 }""")(logger)(TestString))
 
-        // Invalid JSON
-        assert(TestString === StringReplacer("""{ 'a': 'A' }""")(logger)(TestString))
-    }
+    // Invalid JSON
+    assert(TestString === StringReplacer("""{ 'a': 'A' }""")(logger)(TestString))
+  }
 }

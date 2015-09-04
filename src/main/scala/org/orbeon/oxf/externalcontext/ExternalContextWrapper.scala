@@ -17,14 +17,14 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 
 class ExternalContextWrapper(val externalContext: ExternalContext) extends ExternalContext {
 
-    def getWebAppContext = externalContext.getWebAppContext
-    def getSession(create: Boolean): ExternalContext.Session = externalContext.getSession(create)
+  def getWebAppContext = externalContext.getWebAppContext
+  def getSession(create: Boolean): ExternalContext.Session = externalContext.getSession(create)
 
-    def getRequest: ExternalContext.Request = externalContext.getRequest
-    def getResponse: ExternalContext.Response = externalContext.getResponse
+  def getRequest: ExternalContext.Request = externalContext.getRequest
+  def getResponse: ExternalContext.Response = externalContext.getResponse
 
-    def getStartLoggerString = externalContext.getStartLoggerString
-    def getEndLoggerString = externalContext.getEndLoggerString
+  def getStartLoggerString = externalContext.getStartLoggerString
+  def getEndLoggerString = externalContext.getEndLoggerString
 
-    def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = externalContext.getRequestDispatcher(path, isContextRelative)
+  def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = externalContext.getRequestDispatcher(path, isContextRelative)
 }

@@ -23,43 +23,43 @@ import java.io._
 import scala.util.control.NonFatal
 
 class CoffeeScriptTask extends MatchingTask {
-    
-    @BeanProperty var fromDir: File = _
-    @BeanProperty var toDir: File = _
+  
+  @BeanProperty var fromDir: File = _
+  @BeanProperty var toDir: File = _
 
-    override def execute(): Unit = {
+  override def execute(): Unit = {
 
-        Seq(fromDir, toDir) find (!_.isDirectory) foreach (s ⇒ throw new BuildException(s + " is not a valid directory"))
+    Seq(fromDir, toDir) find (!_.isDirectory) foreach (s ⇒ throw new BuildException(s + " is not a valid directory"))
 
-        try {
-            for (fileName ← getDirectoryScanner(fromDir).getIncludedFiles) {
+    try {
+      for (fileName ← getDirectoryScanner(fromDir).getIncludedFiles) {
 
-                val iFile = new File(fromDir.getAbsolutePath, fileName)
-                val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init :+ "js" mkString ".")
+        val iFile = new File(fromDir.getAbsolutePath, fileName)
+        val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init :+ "js" mkString ".")
 
-                if (oFile.lastModified < iFile.lastModified) {
+        if (oFile.lastModified < iFile.lastModified) {
 
-                    // Read CoffeeScript as a string; CoffeeScript is always UTF-8
-                    val coffeeReader = new InputStreamReader(new FileInputStream(iFile), Charset.forName("UTF-8"))
-                    val coffeeString = NetUtils.readStreamAsString(coffeeReader)
+          // Read CoffeeScript as a string; CoffeeScript is always UTF-8
+          val coffeeReader = new InputStreamReader(new FileInputStream(iFile), Charset.forName("UTF-8"))
+          val coffeeString = NetUtils.readStreamAsString(coffeeReader)
 
-                    // Compile
-                    log("Compiling " + fileName)
-                    val jsString = CoffeeScriptCompiler.compile(coffeeString, fileName, 0)
+          // Compile
+          log("Compiling " + fileName)
+          val jsString = CoffeeScriptCompiler.compile(coffeeString, fileName, 0)
 
-                    // Write result
-                    oFile.getParentFile.mkdirs()
-                    try {
-                        copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
-                    } catch {
-                        case NonFatal(t) ⇒
-                            runQuietly(oFile.delete()) // remove output file if something happened while producing the file
-                            throw t
-                    }
-                }
-            }
-        } catch {
-            case NonFatal(t) ⇒ throw new BuildException(t)
+          // Write result
+          oFile.getParentFile.mkdirs()
+          try {
+            copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
+          } catch {
+            case NonFatal(t) ⇒
+              runQuietly(oFile.delete()) // remove output file if something happened while producing the file
+              throw t
+          }
         }
+      }
+    } catch {
+      case NonFatal(t) ⇒ throw new BuildException(t)
     }
+  }
 }

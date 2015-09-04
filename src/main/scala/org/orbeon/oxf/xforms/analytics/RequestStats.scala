@@ -19,83 +19,83 @@ import org.orbeon.oxf.xforms.XFormsProperties
 // Gather request statistics
 // For now, only support XPath statistics
 trait RequestStats {
-    def afterInitialResponse()
-    def afterUpdateResponse()
-    def addXPathStat(expr: String, time: Long)
-    def withXPath[T](expr: ⇒ String)(body: ⇒ T): T
+  def afterInitialResponse()
+  def afterUpdateResponse()
+  def addXPathStat(expr: String, time: Long)
+  def withXPath[T](expr: ⇒ String)(body: ⇒ T): T
 
-    // For Java callers
-    def getReporter: (String, Long) ⇒ Unit = addXPathStat
+  // For Java callers
+  def getReporter: (String, Long) ⇒ Unit = addXPathStat
 }
 
 class RequestStatsImpl extends RequestStats {
 
-    private class XPathStats(val expr: String) {
-        private var _count = 0
-        private var _totalTime = 0L
+  private class XPathStats(val expr: String) {
+    private var _count = 0
+    private var _totalTime = 0L
 
-        def addStat(time: Long) = {
-            _count += 1
-            _totalTime += time
-        }
-
-        def count = _count
-        def totalTime = _totalTime
-        def meanTime = _totalTime / _count
-
-        override def toString =
-            "expr: " + expr + ", count: " + count + ", total time: " + totalTime+ ", mean time: " + meanTime
+    def addStat(time: Long) = {
+      _count += 1
+      _totalTime += time
     }
 
-    private val xpathStats = mutable.Map[String, XPathStats]()
+    def count = _count
+    def totalTime = _totalTime
+    def meanTime = _totalTime / _count
 
-    def addXPathStat(expr: String, time: Long) =
-        xpathStats.getOrElseUpdate(expr, new XPathStats(expr)).addStat(time)
+    override def toString =
+      "expr: " + expr + ", count: " + count + ", total time: " + totalTime+ ", mean time: " + meanTime
+  }
 
-    private def topXPath(n: Int, f: XPathStats ⇒ Long) =
-        xpathStats.values.toSeq sortBy f takeRight n reverse
+  private val xpathStats = mutable.Map[String, XPathStats]()
 
-    private def distinctXPath = xpathStats.size
+  def addXPathStat(expr: String, time: Long) =
+    xpathStats.getOrElseUpdate(expr, new XPathStats(expr)).addStat(time)
 
-    def afterInitialResponse(): Unit =
-        afterUpdateResponse()
+  private def topXPath(n: Int, f: XPathStats ⇒ Long) =
+    xpathStats.values.toSeq sortBy f takeRight n reverse
 
-    def afterUpdateResponse(): Unit = {
-        println("afterResponse:")
-        println(" distinct XPath: " + distinctXPath)
-        println(" total time in XPath: " + (xpathStats.values map (_.totalTime) sum))
-        println(" top XPath by mean time: ")
-        for ((topXPath, i) ← topXPath(10, _.meanTime).zipWithIndex)
-            println("  " + (i + 1) + ": " + topXPath.toString)
-        println(" top XPath by total time: ")
-        for ((topXPath, i) ← topXPath(10, _.totalTime).zipWithIndex)
-            println("  " + (i + 1) + ": " + topXPath.toString)
-    }
+  private def distinctXPath = xpathStats.size
 
-    def withXPath[T](expr: ⇒ String)(body: ⇒ T): T = {
-        val startTime = System.nanoTime
+  def afterInitialResponse(): Unit =
+    afterUpdateResponse()
 
-        val result = body
+  def afterUpdateResponse(): Unit = {
+    println("afterResponse:")
+    println(" distinct XPath: " + distinctXPath)
+    println(" total time in XPath: " + (xpathStats.values map (_.totalTime) sum))
+    println(" top XPath by mean time: ")
+    for ((topXPath, i) ← topXPath(10, _.meanTime).zipWithIndex)
+      println("  " + (i + 1) + ": " + topXPath.toString)
+    println(" top XPath by total time: ")
+    for ((topXPath, i) ← topXPath(10, _.totalTime).zipWithIndex)
+      println("  " + (i + 1) + ": " + topXPath.toString)
+  }
 
-        val totalTimeMicroSeconds = (System.nanoTime - startTime) / 1000 // never smaller on OS X
-        if (totalTimeMicroSeconds > 0)
-            addXPathStat(expr, totalTimeMicroSeconds)
+  def withXPath[T](expr: ⇒ String)(body: ⇒ T): T = {
+    val startTime = System.nanoTime
 
-        result
-    }
+    val result = body
+
+    val totalTimeMicroSeconds = (System.nanoTime - startTime) / 1000 // never smaller on OS X
+    if (totalTimeMicroSeconds > 0)
+      addXPathStat(expr, totalTimeMicroSeconds)
+
+    result
+  }
 }
 
 object NOPRequestStats extends RequestStats {
-    def afterInitialResponse() = ()
-    def afterUpdateResponse() = ()
-    def addXPathStat(expr: String, time: Long) = ()
-    def withXPath[T](expr: ⇒ String)(body: ⇒ T) = body
+  def afterInitialResponse() = ()
+  def afterUpdateResponse() = ()
+  def addXPathStat(expr: String, time: Long) = ()
+  def withXPath[T](expr: ⇒ String)(body: ⇒ T) = body
 }
 
 object RequestStatsImpl {
-    def apply(): RequestStats =
-        if (XFormsProperties.isRequestStats)
-            new RequestStatsImpl()
-        else
-            NOPRequestStats
+  def apply(): RequestStats =
+    if (XFormsProperties.isRequestStats)
+      new RequestStatsImpl()
+    else
+      NOPRequestStats
 }

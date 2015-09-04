@@ -29,32 +29,32 @@ import org.orbeon.saxon.om.Item
  * 10.1.10 The send Element
  */
 class XFormsSendAction extends XFormsAction {
-    override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
+  override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
 
-        // Find submission object
-        val submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME)
-        if (submissionId == null)
-            throw new OXFException("Missing mandatory submission attribute on xf:send element.")
+    // Find submission object
+    val submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME)
+    if (submissionId == null)
+      throw new OXFException("Missing mandatory submission attribute on xf:send element.")
 
-        // Resolve AVT
-        val resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, submissionId)
+    // Resolve AVT
+    val resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, submissionId)
 
-        if (resolvedSubmissionStaticId eq null)
-            return
+    if (resolvedSubmissionStaticId eq null)
+      return
 
-        // Find actual target
-        val submission = actionInterpreter.resolveObject(actionElement, resolvedSubmissionStaticId)
+    // Find actual target
+    val submission = actionInterpreter.resolveObject(actionElement, resolvedSubmissionStaticId)
 
-        if (submission.isInstanceOf[XFormsModelSubmission]) {
-            // Dispatch event to submission object
-            val newEvent = new XFormsSubmitEvent(submission.asInstanceOf[XFormsEventTarget], XFormsAction.eventProperties(actionInterpreter, actionElement))
-            Dispatch.dispatchEvent(newEvent)
-        } else {
-            // "If there is a null search result for the target object and the source object is an XForms action such as
-            // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-            val indentedLogger = actionInterpreter.indentedLogger
-            if (indentedLogger.isDebugEnabled)
-                indentedLogger.logDebug("xf:send", "submission does not refer to an existing xf:submission element, ignoring action", "submission id", submissionId)
-        }
+    if (submission.isInstanceOf[XFormsModelSubmission]) {
+      // Dispatch event to submission object
+      val newEvent = new XFormsSubmitEvent(submission.asInstanceOf[XFormsEventTarget], XFormsAction.eventProperties(actionInterpreter, actionElement))
+      Dispatch.dispatchEvent(newEvent)
+    } else {
+      // "If there is a null search result for the target object and the source object is an XForms action such as
+      // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+      val indentedLogger = actionInterpreter.indentedLogger
+      if (indentedLogger.isDebugEnabled)
+        indentedLogger.logDebug("xf:send", "submission does not refer to an existing xf:submission element, ignoring action", "submission id", submissionId)
     }
+  }
 }

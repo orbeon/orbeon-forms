@@ -19,8 +19,8 @@ import org.orbeon.oxf.xforms.XFormsConstants.FOR_QNAME
 
 trait ChildrenLHHAItemsetsAndActionsTrait extends ChildrenBuilderTrait {
 
-    // For leaf controls, keep nested LHHA and actions
-    override def findRelevantChildrenElements =
-        findAllChildrenElements collect
-            { case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || SelectionControlUtil.isTopLevelItemsetElement(e) || XFormsActions.isAction(e.getQName) ⇒ (e, s) }
+  // For leaf controls, keep nested LHHA and actions
+  override def findRelevantChildrenElements =
+    findAllChildrenElements collect
+      { case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || SelectionControlUtil.isTopLevelItemsetElement(e) || XFormsActions.isAction(e.getQName) ⇒ (e, s) }
 }

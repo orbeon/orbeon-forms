@@ -16,23 +16,23 @@ package org.orbeon.oxf.common
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 class ValidationException(val message: String, val throwable: Throwable, locationData: LocationData)
-        extends OXFException((Option(locationData) map (_.toString + ": ") getOrElse "") + message, throwable) {
+    extends OXFException((Option(locationData) map (_.toString + ": ") getOrElse "") + message, throwable) {
 
-    private var _allLocationData = Option(locationData).toList
+  private var _allLocationData = Option(locationData).toList
 
-    def this(message: String, locationData: LocationData) =
-        this(message, null, locationData)
+  def this(message: String, locationData: LocationData) =
+    this(message, null, locationData)
 
-    def this(throwable: Throwable, locationData: LocationData) =
-        this(throwable.getMessage, throwable, locationData)
+  def this(throwable: Throwable, locationData: LocationData) =
+    this(throwable.getMessage, throwable, locationData)
 
-    def addLocationData(locationData: LocationData) =
-        _allLocationData ::= locationData ensuring (_ ne null)
+  def addLocationData(locationData: LocationData) =
+    _allLocationData ::= locationData ensuring (_ ne null)
 
-    def allLocationData   = _allLocationData
-    def firstLocationData = _allLocationData.headOption.orNull
+  def allLocationData   = _allLocationData
+  def firstLocationData = _allLocationData.headOption.orNull
 
-    // Q: Shouldn't getMessage return a string containing all the messages in locationDataList?
-    // Q: Then, in IndentedLogger, we could skip showing the message and the throwable.getMessage(). The latter would suffice.
-    override def getMessage = super.getMessage
+  // Q: Shouldn't getMessage return a string containing all the messages in locationDataList?
+  // Q: Then, in IndentedLogger, we could skip showing the message and the throwable.getMessage(). The latter would suffice.
+  override def getMessage = super.getMessage
 }

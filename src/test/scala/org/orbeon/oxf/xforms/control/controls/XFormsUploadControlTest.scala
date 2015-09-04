@@ -21,37 +21,37 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.PathOps
 
 class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsForJUnit with PathOps {
-    @Test def hmac(): Unit = {
+  @Test def hmac(): Unit = {
 
-        val parameters = List(
-            "file:/foo/tmp1.tmp",
-            "bar & baz.png",
-            "image/png",
-            "1234"
-        )
+    val parameters = List(
+      "file:/foo/tmp1.tmp",
+      "bar & baz.png",
+      "image/png",
+      "1234"
+    )
 
-        def hmacFromList(p: List[String]) =
-            hmacURL(p(0), Some(p(1)), Some(p(2)), Some(p(3)))
-        
-        val signed = hmacFromList(parameters)
+    def hmacFromList(p: List[String]) =
+      hmacURL(p(0), Some(p(1)), Some(p(2)), Some(p(3)))
+    
+    val signed = hmacFromList(parameters)
 
-        // Basic asserts
-        assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234&mac=49acb231d3cf572cfce67f09a31d6669a3d0257f" === signed)
-        assert(Some("49acb231d3cf572cfce67f09a31d6669a3d0257f") === getMAC(signed))
-        assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234" === removeMAC(signed))
+    // Basic asserts
+    assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234&mac=49acb231d3cf572cfce67f09a31d6669a3d0257f" === signed)
+    assert(Some("49acb231d3cf572cfce67f09a31d6669a3d0257f") === getMAC(signed))
+    assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234" === removeMAC(signed))
 
-        assert(true === verifyMAC(signed))
+    assert(true === verifyMAC(signed))
 
-        val names = List("filename", "mediatype", "size")
+    val names = List("filename", "mediatype", "size")
 
-        // Check parameter values
-        for ((name, expected) ← names zip parameters.tail)
-            assert(Some(expected) === getFirstQueryParameter(signed, name))
+    // Check parameter values
+    for ((name, expected) ← names zip parameters.tail)
+      assert(Some(expected) === getFirstQueryParameter(signed, name))
 
-        // Modify each parameter in turn and make sure the MAC is different
-        for (pos ← 0 to parameters.size - 1) {
-            val newParameters = parameters.updated(pos, parameters(pos) + 'x')
-            assert(getMAC(signed) != getMAC(hmacFromList(newParameters)))
-        }
+    // Modify each parameter in turn and make sure the MAC is different
+    for (pos ← 0 to parameters.size - 1) {
+      val newParameters = parameters.updated(pos, parameters(pos) + 'x')
+      assert(getMAC(signed) != getMAC(hmacFromList(newParameters)))
     }
+  }
 }

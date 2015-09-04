@@ -23,12 +23,12 @@ import org.orbeon.oxf.xforms.model.DataModel
  */
 trait ValueTrait extends SimpleElementAnalysis with SingleNodeTrait {
 
-    override protected def computeValueAnalysis: Option[XPathAnalysis] = {
-        val subExpression = if (value.isDefined) "string((" + value.get + ")[1])" else "string(.)"
-        Some(analyzeXPath(getChildrenContext, subExpression))
-    }
+  override protected def computeValueAnalysis: Option[XPathAnalysis] = {
+    val subExpression = if (value.isDefined) "string((" + value.get + ")[1])" else "string(.)"
+    Some(analyzeXPath(getChildrenContext, subExpression))
+  }
 
-    override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
+  override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
 
-    // TODO: Move value handling from ElementAnalysis to here? Need base trait to handle value controls, variables, and LHHA.
+  // TODO: Move value handling from ElementAnalysis to here? Need base trait to handle value controls, variables, and LHHA.
 }

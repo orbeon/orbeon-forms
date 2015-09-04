@@ -19,8 +19,8 @@ import org.xml.sax.SAXException
  * Callback interface for visiting itemsets.
  */
 trait ItemsetListener[T] {
-    @throws(classOf[SAXException]) def startLevel(o: T, item: Item)
-    @throws(classOf[SAXException]) def endLevel(o: T)
-    @throws(classOf[SAXException]) def startItem(o: T, item: Item, first: Boolean)
-    @throws(classOf[SAXException]) def endItem(o: T, item: Item)
+  @throws(classOf[SAXException]) def startLevel(o: T, item: Item)
+  @throws(classOf[SAXException]) def endLevel(o: T)
+  @throws(classOf[SAXException]) def startItem(o: T, item: Item, first: Boolean)
+  @throws(classOf[SAXException]) def endItem(o: T, item: Item)
 }

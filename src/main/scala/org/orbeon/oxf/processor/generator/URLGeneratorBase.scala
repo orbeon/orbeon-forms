@@ -23,28 +23,28 @@ import scala.collection.JavaConverters._
 
 object URLGeneratorBase {
 
-    def extractHeaders(configElement: Element): Map[String, Array[String]] = {
+  def extractHeaders(configElement: Element): Map[String, Array[String]] = {
 
-        val headerPairs =
-            for {
-                headerElem  ← configElement.selectNodes("/config/header").asInstanceOf[ju.List[Element]].asScala
-                headerName  = headerElem.element("name").getStringValue
-                valueElem   ← headerElem.elements("value").asInstanceOf[ju.List[Element]].asScala
-                headerValue = valueElem.getStringValue
-            } yield
-                headerName → headerValue
+    val headerPairs =
+      for {
+        headerElem  ← configElement.selectNodes("/config/header").asInstanceOf[ju.List[Element]].asScala
+        headerName  = headerElem.element("name").getStringValue
+        valueElem   ← headerElem.elements("value").asInstanceOf[ju.List[Element]].asScala
+        headerValue = valueElem.getStringValue
+      } yield
+        headerName → headerValue
 
-        ScalaUtils.combineValues[String, String, Array](headerPairs).toMap
-    }
+    ScalaUtils.combineValues[String, String, Array](headerPairs).toMap
+  }
 
-    def setIfModifiedIfNeeded(
-        headersOrNull      : Map[String, Array[String]],
-        lastModifiedOrNull : jl.Long
-    ): ju.Map[String, Array[String]] = {
+  def setIfModifiedIfNeeded(
+    headersOrNull      : Map[String, Array[String]],
+    lastModifiedOrNull : jl.Long
+  ): ju.Map[String, Array[String]] = {
 
-        val headersOrEmpty  = Option(headersOrNull) getOrElse Map.empty[String, Array[String]]
-        val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to[List]
+    val headersOrEmpty  = Option(headersOrNull) getOrElse Map.empty[String, Array[String]]
+    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to[List]
 
-        headersOrEmpty ++ newHeaderAsList
-    }.asJava
+    headersOrEmpty ++ newHeaderAsList
+  }.asJava
 }

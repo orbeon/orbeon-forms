@@ -15,6 +15,6 @@ package org.orbeon.oxf.common
 
 // Orbeon Forms runtime exception
 class OXFException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
-    def this(message: String)  = this(message, null)
-    def this(cause: Throwable) = this(cause.toString, cause) // this is what Throwable does
+  def this(message: String)  = this(message, null)
+  def this(cause: Throwable) = this(cause.toString, cause) // this is what Throwable does
 }

@@ -23,31 +23,31 @@ import org.dom4j.Document
 
 class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 
-    @Test def extractMetadata(): Unit = {
+  @Test def extractMetadata(): Unit = {
 
-        val is = ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/fb/form-with-metadata.xhtml")
+    val is = ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/fb/form-with-metadata.xhtml")
 
-        val (_, metadataOpt) = RequestReader.dataAndMetadataAsString(is, metadata = true)
+    val (_, metadataOpt) = RequestReader.dataAndMetadataAsString(is, metadata = true)
 
-        val expected: Document =
-            <metadata>
-                <application-name>acme</application-name>
-                <form-name>order</form-name>
-                <title xml:lang="en">ACME Order Form</title>
-                <description xml:lang="en">This is a form to order new stuff from ACME, Inc.</description>
-                <title xml:lang="fr">Formulaire de commande ACME</title>
-                <description xml:lang="fr">Ceci est un formulaire de commande pour ACME, Inc.</description>
-                <permissions>
-                    <permission operations="read update delete">
-                        <group-member/>
-                    </permission>
-                    <permission operations="read update delete">
-                        <owner/>
-                    </permission>
-                    <permission operations="create"/>
-                </permissions>
-            </metadata>
+    val expected: Document =
+      <metadata>
+        <application-name>acme</application-name>
+        <form-name>order</form-name>
+        <title xml:lang="en">ACME Order Form</title>
+        <description xml:lang="en">This is a form to order new stuff from ACME, Inc.</description>
+        <title xml:lang="fr">Formulaire de commande ACME</title>
+        <description xml:lang="fr">Ceci est un formulaire de commande pour ACME, Inc.</description>
+        <permissions>
+          <permission operations="read update delete">
+            <group-member/>
+          </permission>
+          <permission operations="read update delete">
+            <owner/>
+          </permission>
+          <permission operations="create"/>
+        </permissions>
+      </metadata>
 
-        assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map Dom4jUtils.readDom4j get)
-    }
+    assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map Dom4jUtils.readDom4j get)
+  }
 }

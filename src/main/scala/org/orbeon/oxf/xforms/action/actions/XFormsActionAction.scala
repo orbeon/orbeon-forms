@@ -24,43 +24,43 @@ import org.orbeon.oxf.xforms.analysis._
  */
 class XFormsActionAction extends XFormsAction {
 
-    override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext): Unit = {
 
-        val actionInterpreter = actionContext.interpreter
-        val actionElement = actionContext.element
+    val actionInterpreter = actionContext.interpreter
+    val actionElement = actionContext.element
 
-        val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
-        if (mediatype eq null) {
-            // Standard XForms action
-            val contextStack = actionInterpreter.actionXPathContext
-            val partAnalysis = contextStack.container.getPartAnalysis
+    val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
+    if (mediatype eq null) {
+      // Standard XForms action
+      val contextStack = actionInterpreter.actionXPathContext
+      val partAnalysis = contextStack.container.getPartAnalysis
 
-            // Iterate over child actions
-            var variablesCount = 0
-            for (childActionElement ← Dom4jUtils.elements(actionElement).asScala) {
+      // Iterate over child actions
+      var variablesCount = 0
+      for (childActionElement ← Dom4jUtils.elements(actionElement).asScala) {
 
-                val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
+        val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
 
-                Option(partAnalysis.getControlAnalysis(childPrefixedId)) match {
-                    case Some(variable: VariableAnalysisTrait) ⇒
-                        // Scope variable
-                        contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
-                        variablesCount += 1
-                    case Some(action) ⇒
-                        // Run child action
-                        // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
-                        actionInterpreter.runAction(action)
-                    case None ⇒
-                        throw new IllegalStateException
-                }
-            }
-
-            // Unscope all variables
-            for (_ ← 1 to variablesCount)
-                contextStack.popBinding()
-        } else {
-            // Delegate to xxf:script
-            XFormsActions.getScriptAction.execute(actionContext)
+        Option(partAnalysis.getControlAnalysis(childPrefixedId)) match {
+          case Some(variable: VariableAnalysisTrait) ⇒
+            // Scope variable
+            contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
+            variablesCount += 1
+          case Some(action) ⇒
+            // Run child action
+            // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
+            actionInterpreter.runAction(action)
+          case None ⇒
+            throw new IllegalStateException
         }
+      }
+
+      // Unscope all variables
+      for (_ ← 1 to variablesCount)
+        contextStack.popBinding()
+    } else {
+      // Delegate to xxf:script
+      XFormsActions.getScriptAction.execute(actionContext)
     }
+  }
 }

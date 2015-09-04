@@ -24,24 +24,24 @@ import org.orbeon.saxon.om.SequenceIterator
  */
 class EXFormsSort extends XXFormsSort {
 
-    override def iterate(xpathContext: XPathContext): SequenceIterator = {
-        val sequenceToSortExpression = argument(0)
-        val selectExpression         = argument(1)
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+    val sequenceToSortExpression = argument(0)
+    val selectExpression         = argument(1)
 
-        val (sortKeyContext, sortKeyExpression) = {
-            val pooledExpression = prepareExpression(xpathContext, selectExpression, isAVT = false)
+    val (sortKeyContext, sortKeyExpression) = {
+      val pooledExpression = prepareExpression(xpathContext, selectExpression, isAVT = false)
 
-            val (dynamicContext, xpathContextMajor) = pooledExpression.newDynamicAndMajorContexts
-            pooledExpression.prepareDynamicContext(xpathContextMajor)
-            (dynamicContext.getXPathContextObject, pooledExpression.internalExpression)
-        }
-        sort(xpathContext, sortKeyContext, sequenceToSortExpression, sortKeyExpression)
+      val (dynamicContext, xpathContextMajor) = pooledExpression.newDynamicAndMajorContexts
+      pooledExpression.prepareDynamicContext(xpathContextMajor)
+      (dynamicContext.getXPathContextObject, pooledExpression.internalExpression)
     }
+    sort(xpathContext, sortKeyContext, sequenceToSortExpression, sortKeyExpression)
+  }
 
-    // Needed by prepareExpression()
-    override def checkArguments(visitor: ExpressionVisitor): Unit =
-        copyStaticContextIfNeeded(visitor)
+  // Needed by prepareExpression()
+  override def checkArguments(visitor: ExpressionVisitor): Unit =
+    copyStaticContextIfNeeded(visitor)
 
-    override def getIntrinsicDependencies =
-        StaticProperty.DEPENDS_ON_CONTEXT_ITEM
+  override def getIntrinsicDependencies =
+    StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 }

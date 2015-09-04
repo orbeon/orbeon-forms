@@ -33,136 +33,136 @@ import scala.util.control.NonFatal
 // Helper trait for xforms-submit-done/xforms-submit-error
 trait SubmitResponseEvent extends XFormsEvent {
 
-    def connectionResult: Option[ConnectionResult]
-    final def headers = connectionResult map (_.headers)
+  def connectionResult: Option[ConnectionResult]
+  final def headers = connectionResult map (_.headers)
 
-    override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
-    override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
-    override def newPropertyName(name: String) = SubmitResponseEvent.Deprecated.get(name) orElse super.newPropertyName(name)
+  override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+  override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
+  override def newPropertyName(name: String) = SubmitResponseEvent.Deprecated.get(name) orElse super.newPropertyName(name)
 }
 
 private object SubmitResponseEvent {
 
-    import org.orbeon.oxf.util.XPathCache._
-    import org.orbeon.oxf.xml.NamespaceMapping.EMPTY_MAPPING
+  import org.orbeon.oxf.util.XPathCache._
+  import org.orbeon.oxf.xml.NamespaceMapping.EMPTY_MAPPING
 
-    // "Zero or more elements, each one representing a content header in the error response received by a
-    // failed submission. The returned node-set is empty if the failed submission did not receive an error
-    // response or if there were no headers. Each element has a local name of header with no namespace URI and
-    // two child elements, name and value, whose string contents are the name and value of the header,
-    // respectively."
-    def headersDocument(headersOpt: Option[Iterable[(String, immutable.Seq[String])]]): Option[DocumentInfo] =
-        headersOpt filter (_.nonEmpty) map { headers ⇒
-            val sb = new StringBuilder
-            sb.append("<headers>")
-            for ((name, values) ← headers) {
-                sb.append("<header><name>")
-                sb.append(XMLUtils.escapeXMLMinimal(name))
-                sb.append("</name>")
-                for (value ← values) {
-                    sb.append("<value>")
-                    sb.append(XMLUtils.escapeXMLMinimal(value))
-                    sb.append("</value>")
-                }
-                sb.append("</header>")
-            }
-            sb.append("</headers>")
-            TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
+  // "Zero or more elements, each one representing a content header in the error response received by a
+  // failed submission. The returned node-set is empty if the failed submission did not receive an error
+  // response or if there were no headers. Each element has a local name of header with no namespace URI and
+  // two child elements, name and value, whose string contents are the name and value of the header,
+  // respectively."
+  def headersDocument(headersOpt: Option[Iterable[(String, immutable.Seq[String])]]): Option[DocumentInfo] =
+    headersOpt filter (_.nonEmpty) map { headers ⇒
+      val sb = new StringBuilder
+      sb.append("<headers>")
+      for ((name, values) ← headers) {
+        sb.append("<header><name>")
+        sb.append(XMLUtils.escapeXMLMinimal(name))
+        sb.append("</name>")
+        for (value ← values) {
+          sb.append("<value>")
+          sb.append(XMLUtils.escapeXMLMinimal(value))
+          sb.append("</value>")
+        }
+        sb.append("</header>")
+      }
+      sb.append("</headers>")
+      TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
+    }
+
+  def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = headersDocument(e.headers) map { document: Item ⇒
+    evaluateKeepItems(
+      Seq(document).asJava,
+      1,
+      "/headers/header",
+      EMPTY_MAPPING,
+      null, null, null, null,
+      e.locationData,
+      e.containingDocument.getRequestStats.addXPathStat).asScala
+  }
+
+  def body(e: SubmitResponseEvent): Option[AnyRef] = {
+    implicit val logger = e.indentedLogger
+    e.connectionResult flatMap tryToReadBody map {
+      case Left(string)    ⇒ string
+      case Right(document) ⇒ document
+    }
+  }
+
+  def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
+    // Log response details if not done already
+    cxr.logResponseDetailsOnce(Level.ERROR)
+
+    if (cxr.hasContent) {
+
+      // XForms 1.1:
+      //
+      // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
+      // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
+      // the error response specifies a text media type (starting with text/), then the response body is returned
+      // as a string. Otherwise, an empty string is returned."
+      //
+      // We go a bit further, trying to read independently from the returned mediatype.
+
+      def warn[T](message: String): PartialFunction[Throwable, Option[T]] = {
+        case NonFatal(t) ⇒
+          logger.logWarning("xforms-submit-error", message, t)
+          None
+      }
+
+      // Read the whole stream to a temp URI so we can read it more than once if needed
+      val tempURIOpt =
+        try useAndClose(cxr.content.inputStream) { is ⇒
+          Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
+        } catch
+          warn("error while reading response body.")
+
+      tempURIOpt flatMap { tempURI ⇒
+
+        // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
+        // Should modify readTinyTree() and readDom4j()
+        def tryXML: Try[String Either DocumentInfo] =
+          Try {
+            Right(
+              useAndClose(URLFactory.createURL(tempURI).openStream()) { is ⇒
+                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
+              }
+            )
+          }
+
+        def tryText: Try[String Either DocumentInfo]  =
+          Try {
+            Left(ConnectionResult.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
+          }
+
+        def asString(value: String Either DocumentInfo) = value match {
+          case Left(text) ⇒ text
+          case Right(xml) ⇒ TransformerUtils.tinyTreeToString(xml)
         }
 
-    def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = headersDocument(e.headers) map { document: Item ⇒
-        evaluateKeepItems(
-            Seq(document).asJava,
-            1,
-            "/headers/header",
-            EMPTY_MAPPING,
-            null, null, null, null,
-            e.locationData,
-            e.containingDocument.getRequestStats.addXPathStat).asScala
-    }
+        val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption
 
-    def body(e: SubmitResponseEvent): Option[AnyRef] = {
-        implicit val logger = e.indentedLogger
-        e.connectionResult flatMap tryToReadBody map {
-            case Left(string)    ⇒ string
-            case Right(document) ⇒ document
-        }
-    }
+        if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
+          result map asString foreach { value ⇒
+            logger.logError("xforms-submit-error", "setting body document", "body", s"\n$value")
+          }
 
-    def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
-        // Log response details if not done already
-        cxr.logResponseDetailsOnce(Level.ERROR)
+        result
+      }
+    } else
+      None
+  }
 
-        if (cxr.hasContent) {
+  val Deprecated = Map(
+    "body" → "response-body"
+  )
 
-            // XForms 1.1:
-            //
-            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
-            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
-            // the error response specifies a text media type (starting with text/), then the response body is returned
-            // as a string. Otherwise, an empty string is returned."
-            //
-            // We go a bit further, trying to read independently from the returned mediatype.
-
-            def warn[T](message: String): PartialFunction[Throwable, Option[T]] = {
-                case NonFatal(t) ⇒
-                    logger.logWarning("xforms-submit-error", message, t)
-                    None
-            }
-
-            // Read the whole stream to a temp URI so we can read it more than once if needed
-            val tempURIOpt =
-                try useAndClose(cxr.content.inputStream) { is ⇒
-                    Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
-                } catch
-                    warn("error while reading response body.")
-
-            tempURIOpt flatMap { tempURI ⇒
-
-                // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
-                // Should modify readTinyTree() and readDom4j()
-                def tryXML: Try[String Either DocumentInfo] =
-                    Try {
-                        Right(
-                            useAndClose(URLFactory.createURL(tempURI).openStream()) { is ⇒
-                                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
-                            }
-                        )
-                    }
-
-                def tryText: Try[String Either DocumentInfo]  =
-                    Try {
-                        Left(ConnectionResult.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
-                    }
-
-                def asString(value: String Either DocumentInfo) = value match {
-                    case Left(text) ⇒ text
-                    case Right(xml) ⇒ TransformerUtils.tinyTreeToString(xml)
-                }
-
-                val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption
-
-                if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
-                    result map asString foreach { value ⇒
-                        logger.logError("xforms-submit-error", "setting body document", "body", s"\n$value")
-                    }
-
-                result
-            }
-        } else
-            None
-    }
-
-    val Deprecated = Map(
-        "body" → "response-body"
-    )
-
-    val Getters = Map[String, SubmitResponseEvent ⇒ Option[Any]] (
-        "response-headers"       → headerElements,
-        "response-reason-phrase" → (e ⇒ throw new ValidationException("Property Not implemented yet: " + "response-reason-phrase", e.locationData)),
-        "response-body"          → body,
-        "body"                   → body,
-        "resource-uri"           → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.url))),
-        "response-status-code"   → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.statusCode) filter (_ > 0)))
-    )
+  val Getters = Map[String, SubmitResponseEvent ⇒ Option[Any]] (
+    "response-headers"       → headerElements,
+    "response-reason-phrase" → (e ⇒ throw new ValidationException("Property Not implemented yet: " + "response-reason-phrase", e.locationData)),
+    "response-body"          → body,
+    "body"                   → body,
+    "resource-uri"           → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.url))),
+    "response-status-code"   → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.statusCode) filter (_ > 0)))
+  )
 }

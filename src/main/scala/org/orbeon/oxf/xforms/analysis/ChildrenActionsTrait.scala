@@ -17,8 +17,8 @@ import org.orbeon.oxf.xforms.action.XFormsActions
 
 trait ChildrenActionsTrait extends ChildrenBuilderTrait {
 
-    // Keep nested actions only
-    override def findRelevantChildrenElements =
-        findAllChildrenElements collect
-            { case (e, s) if XFormsActions.isAction(e.getQName) ⇒ (e, s) }
+  // Keep nested actions only
+  override def findRelevantChildrenElements =
+    findAllChildrenElements collect
+      { case (e, s) if XFormsActions.isAction(e.getQName) ⇒ (e, s) }
 }

@@ -22,40 +22,40 @@ import org.dom4j.QName
 // Trait for all elements that have an appearance
 trait AppearanceTrait extends SimpleElementAnalysis {
 
-    import AppearanceTrait._
+  import AppearanceTrait._
 
-    val appearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
-    val mediatype   = Option(element.attributeValue(MEDIATYPE_QNAME))
-    
-    def encodeAndAppendAppearances(sb: jl.StringBuilder) =
-        appearances foreach (encodeAndAppendAppearance(sb, localName, _))
+  val appearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+  val mediatype   = Option(element.attributeValue(MEDIATYPE_QNAME))
+  
+  def encodeAndAppendAppearances(sb: jl.StringBuilder) =
+    appearances foreach (encodeAndAppendAppearance(sb, localName, _))
 }
 
 object AppearanceTrait {
-    // The client expects long prefixes
-    private val StandardPrefixes = Map(XXFORMS_NAMESPACE_URI → "xxforms", XFORMS_NAMESPACE_URI → "xforms")
+  // The client expects long prefixes
+  private val StandardPrefixes = Map(XXFORMS_NAMESPACE_URI → "xxforms", XFORMS_NAMESPACE_URI → "xforms")
 
-    def encodeAndAppendAppearance(sb: jl.StringBuilder, lhha: String, appearance: QName): Unit = {
-        if (sb.length > 0)
-            sb.append(' ')
-        sb.append("xforms-")
-        sb.append(lhha)
-        sb.append("-appearance-")
-        encodeAppearanceValue(sb, appearance)
-    }
+  def encodeAndAppendAppearance(sb: jl.StringBuilder, lhha: String, appearance: QName): Unit = {
+    if (sb.length > 0)
+      sb.append(' ')
+    sb.append("xforms-")
+    sb.append(lhha)
+    sb.append("-appearance-")
+    encodeAppearanceValue(sb, appearance)
+  }
 
-    def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName) = {
-        // Names in a namespace may get a prefix
-        val uri = appearance.getNamespaceURI
-        if (uri.nonEmpty) {
-            // Try standard prefixes or else use the QName prefix
-            val prefix = AppearanceTrait.StandardPrefixes.getOrElse(uri, appearance.getNamespacePrefix)
-            if (prefix.nonEmpty) {
-                sb.append(prefix)
-                sb.append("-")
-            }
-        }
-        sb.append(appearance.getName)
-        sb
+  def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName) = {
+    // Names in a namespace may get a prefix
+    val uri = appearance.getNamespaceURI
+    if (uri.nonEmpty) {
+      // Try standard prefixes or else use the QName prefix
+      val prefix = AppearanceTrait.StandardPrefixes.getOrElse(uri, appearance.getNamespacePrefix)
+      if (prefix.nonEmpty) {
+        sb.append(prefix)
+        sb.append("-")
+      }
     }
+    sb.append(appearance.getName)
+    sb
+  }
 }

@@ -22,54 +22,54 @@ import scala.collection.mutable
 // placed in a Set. Ids which are not automatically generated are also added to a Set.
 class IdGenerator(var _nextSequenceNumber: Int = 1) {
 
-    import IdGenerator._
+  import IdGenerator._
 
-    private val _bits   = mutable.BitSet()
-    private val _others = mutable.Set[String]()
+  private val _bits   = mutable.BitSet()
+  private val _others = mutable.Set[String]()
 
-    def nextSequenceNumber = _nextSequenceNumber
+  def nextSequenceNumber = _nextSequenceNumber
 
-    def ids = (_bits.iterator map (i ⇒ AutomaticIdPrefix + (i + 1).toString)) ++ _others.iterator
+  def ids = (_bits.iterator map (i ⇒ AutomaticIdPrefix + (i + 1).toString)) ++ _others.iterator
 
-    def contains(id: String): Boolean =  id match {
-        case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
-            _bits contains (digits.toInt - 1)
-        case _ ⇒
-            _others contains id
-    }
-    
-    def add(id: String): Unit = id match {
-        case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
-            _bits += digits.toInt - 1
-        case _ ⇒
-            _others += id
-    }
-    
-    // Skip existing ids to handle these cases:
-    //
-    // - user uses attribute of the form xf-*
-    // - XBL copies id attributes from bound element, so within template the id may be of the form xf-*
-    def nextId(): String = {
+  def contains(id: String): Boolean =  id match {
+    case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
+      _bits contains (digits.toInt - 1)
+    case _ ⇒
+      _others contains id
+  }
+  
+  def add(id: String): Unit = id match {
+    case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
+      _bits += digits.toInt - 1
+    case _ ⇒
+      _others += id
+  }
+  
+  // Skip existing ids to handle these cases:
+  //
+  // - user uses attribute of the form xf-*
+  // - XBL copies id attributes from bound element, so within template the id may be of the form xf-*
+  def nextId(): String = {
 
-        def containsAutomaticId(id: Int): Boolean =
-            if (id <= MaxBits)
-                _bits(id - 1)
-            else
-                _others.contains(AutomaticIdPrefix + id)
+    def containsAutomaticId(id: Int): Boolean =
+      if (id <= MaxBits)
+        _bits(id - 1)
+      else
+        _others.contains(AutomaticIdPrefix + id)
 
-        while (containsAutomaticId(_nextSequenceNumber))
-            _nextSequenceNumber += 1
+    while (containsAutomaticId(_nextSequenceNumber))
+      _nextSequenceNumber += 1
 
-        val result = AutomaticIdPrefix + _nextSequenceNumber
-        _nextSequenceNumber += 1
-        result
-    }
+    val result = AutomaticIdPrefix + _nextSequenceNumber
+    _nextSequenceNumber += 1
+    result
+  }
 }
 
 private object IdGenerator {
-    val MaxBytes = 1024         // 1024 means up to xf-8096
-    val MaxBits  = MaxBytes * 8
+  val MaxBytes = 1024         // 1024 means up to xf-8096
+  val MaxBits  = MaxBytes * 8
 
-    val AutomaticIdPrefix = "xf-"
-    val AutomaticIdFormat = "xf-(\\d+)".r
+  val AutomaticIdPrefix = "xf-"
+  val AutomaticIdFormat = "xf-(\\d+)".r
 }

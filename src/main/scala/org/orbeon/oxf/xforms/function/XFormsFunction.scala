@@ -41,243 +41,243 @@ import scala.collection.{mutable ⇒ m}
  */
 abstract class XFormsFunction extends SystemFunction {
 
-    import XFormsFunction._
+  import XFormsFunction._
 
-    // Public accessor for Scala traits
-    def arguments: Seq[Expression] = argument
-    def functionOperation: Int = operation
+  // Public accessor for Scala traits
+  def arguments: Seq[Expression] = argument
+  def functionOperation: Int = operation
 
-    /**
-     * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-     * (because the value of the expression depends on the runtime context)
-     *
-     * NOTE: A few functions would benefit from not having this, but it is always safe.
-     */
-    override def preEvaluate(visitor: ExpressionVisitor) = this
+  /**
+   * preEvaluate: this method suppresses compile-time evaluation by doing nothing
+   * (because the value of the expression depends on the runtime context)
+   *
+   * NOTE: A few functions would benefit from not having this, but it is always safe.
+   */
+  override def preEvaluate(visitor: ExpressionVisitor) = this
 
-    def bindingContext = context.bindingContext
+  def bindingContext = context.bindingContext
 
-    def getSourceEffectiveId =
-        context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
+  def getSourceEffectiveId =
+    context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
-    def elementAnalysisForSource = {
-        val prefixedId = XFormsUtils.getPrefixedId(getSourceEffectiveId)
-        context.container.partAnalysis.getControlAnalysisOption(prefixedId)
+  def elementAnalysisForSource = {
+    val prefixedId = XFormsUtils.getPrefixedId(getSourceEffectiveId)
+    context.container.partAnalysis.getControlAnalysisOption(prefixedId)
+  }
+
+  def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext) = {
+    val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
+    context.container.partAnalysis.getControlAnalysisOption(prefixedId)
+  }
+
+  def sourceScope(implicit xpathContext: XPathContext) =
+    context.container.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
+
+  def getContainingDocument(implicit xpathContext: XPathContext) =
+    Option(context) map (_.container.getContainingDocument) orNull
+
+  def setProperty(name: String, value: Any) =
+    context.setProperty(name, value)
+
+  protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
+
+    val evaluatedExpression =
+      qNameExpression.evaluateItem(xpathContext)
+
+    evaluatedExpression match {
+      case qName: QNameValue ⇒
+        // Directly got a QName so there is no need for namespace resolution
+        qNameFromQNameValue(qName)
+      case atomic: AtomicValue ⇒
+        // Must resolve prefix if present
+        qNameFromStringValue(atomic.getStringValue, bindingContext)
+      case other ⇒
+        throw new OXFException(s"Cannot create QName from non-atomic item of class '${other.getClass.getName}'")
+    }
+  }
+
+  // The following is inspired by saxon:evaluate()
+  protected def prepareExpression(initialXPathContext: XPathContext, parameterExpression: Expression, isAVT: Boolean): PooledXPathExpression = {
+
+    // Evaluate parameter into an XPath string
+    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
+
+    // Copy static context information
+    val staticContext = this.staticContext.copy
+    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
+
+    // Propagate in-scope variable definitions since they are not copied automatically
+    val inScopeVariables = bindingContext.getInScopeVariables
+    val variableDeclarations =
+      for {
+        (name, _) ← inScopeVariables.asScala.toList
+        variable = staticContext.declareVariable("", name)
+      } yield
+        name → variable
+
+    // Create expression
+    val pooledXPathExpression =
+      XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations)
+
+    // Set context items and position for use at runtime
+    pooledXPathExpression.setContextItem(initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
+
+    // Set variables for use at runtime
+    pooledXPathExpression.setVariables(inScopeVariables)
+
+    pooledXPathExpression
+  }
+
+  // See comments in Saxon Evaluate.java
+  private var staticContext: IndependentContext = null
+
+  // The following copies all the StaticContext information into a new StaticContext
+  def copyStaticContextIfNeeded(visitor: ExpressionVisitor): Unit = {
+    // See same method in Saxon Evaluate.java
+    if (staticContext eq null) { // only do this once
+      val env = visitor.getStaticContext
+      super.checkArguments(visitor)
+
+      val namespaceResolver = env.getNamespaceResolver
+
+      staticContext = new IndependentContext(env.getConfiguration)
+
+      staticContext.setBaseURI(env.getBaseURI)
+      staticContext.setImportedSchemaNamespaces(env.getImportedSchemaNamespaces)
+      staticContext.setDefaultFunctionNamespace(env.getDefaultFunctionNamespace)
+      staticContext.setDefaultElementNamespace(env.getDefaultElementNamespace)
+      staticContext.setFunctionLibrary(env.getFunctionLibrary)
+
+      for {
+        prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
+        if prefix.nonEmpty
+        uri = namespaceResolver.getURIForPrefix(prefix, true)
+      } locally {
+        staticContext.declareNamespace(prefix, uri)
+      }
+    }
+  }
+
+  // By default, all XForms function invalidate the map. Subclasses can override this behavior. This ensures that
+  // we do not, by default, produce invalid maps.
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+    pathMap.setInvalidated(true)
+    null
+  }
+
+  // Default implementation which adds child expressions (here function arguments) to the pathmap
+  protected def addSubExpressionsToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet  = {
+
+    val attachmentPoint = pathMapAttachmentPoint(pathMap, pathMapNodeSet)
+
+    val result = new PathMapNodeSet
+    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child ⇒
+      result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
     }
 
-    def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext) = {
-        val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
-        context.container.partAnalysis.getControlAnalysisOption(prefixedId)
+    val th = getExecutable.getConfiguration.getTypeHierarchy
+    if (getItemType(th).isInstanceOf[AtomicType])
+      null
+    else
+      result
+  }
+
+  protected def pathMapAttachmentPoint(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet  =
+    if ((getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0) {
+      Option(pathMapNodeSet) getOrElse {
+        val cie = new ContextItemExpression
+        cie.setContainer(getContainer)
+        new PathMapNodeSet(pathMap.makeNewRoot(cie))
+      }
+    } else {
+      null
     }
-
-    def sourceScope(implicit xpathContext: XPathContext) =
-        context.container.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
-
-    def getContainingDocument(implicit xpathContext: XPathContext) =
-        Option(context) map (_.container.getContainingDocument) orNull
-
-    def setProperty(name: String, value: Any) =
-        context.setProperty(name, value)
-
-    protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
-
-        val evaluatedExpression =
-            qNameExpression.evaluateItem(xpathContext)
-
-        evaluatedExpression match {
-            case qName: QNameValue ⇒
-                // Directly got a QName so there is no need for namespace resolution
-                qNameFromQNameValue(qName)
-            case atomic: AtomicValue ⇒
-                // Must resolve prefix if present
-                qNameFromStringValue(atomic.getStringValue, bindingContext)
-            case other ⇒
-                throw new OXFException(s"Cannot create QName from non-atomic item of class '${other.getClass.getName}'")
-        }
-    }
-
-    // The following is inspired by saxon:evaluate()
-    protected def prepareExpression(initialXPathContext: XPathContext, parameterExpression: Expression, isAVT: Boolean): PooledXPathExpression = {
-
-        // Evaluate parameter into an XPath string
-        val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
-
-        // Copy static context information
-        val staticContext = this.staticContext.copy
-        staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
-
-        // Propagate in-scope variable definitions since they are not copied automatically
-        val inScopeVariables = bindingContext.getInScopeVariables
-        val variableDeclarations =
-            for {
-                (name, _) ← inScopeVariables.asScala.toList
-                variable = staticContext.declareVariable("", name)
-            } yield
-                name → variable
-
-        // Create expression
-        val pooledXPathExpression =
-            XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations)
-
-        // Set context items and position for use at runtime
-        pooledXPathExpression.setContextItem(initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
-
-        // Set variables for use at runtime
-        pooledXPathExpression.setVariables(inScopeVariables)
-
-        pooledXPathExpression
-    }
-
-    // See comments in Saxon Evaluate.java
-    private var staticContext: IndependentContext = null
-
-    // The following copies all the StaticContext information into a new StaticContext
-    def copyStaticContextIfNeeded(visitor: ExpressionVisitor): Unit = {
-        // See same method in Saxon Evaluate.java
-        if (staticContext eq null) { // only do this once
-            val env = visitor.getStaticContext
-            super.checkArguments(visitor)
-
-            val namespaceResolver = env.getNamespaceResolver
-
-            staticContext = new IndependentContext(env.getConfiguration)
-
-            staticContext.setBaseURI(env.getBaseURI)
-            staticContext.setImportedSchemaNamespaces(env.getImportedSchemaNamespaces)
-            staticContext.setDefaultFunctionNamespace(env.getDefaultFunctionNamespace)
-            staticContext.setDefaultElementNamespace(env.getDefaultElementNamespace)
-            staticContext.setFunctionLibrary(env.getFunctionLibrary)
-
-            for {
-                prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
-                if prefix.nonEmpty
-                uri = namespaceResolver.getURIForPrefix(prefix, true)
-            } locally {
-                staticContext.declareNamespace(prefix, uri)
-            }
-        }
-    }
-
-    // By default, all XForms function invalidate the map. Subclasses can override this behavior. This ensures that
-    // we do not, by default, produce invalid maps.
-    override def addToPathMap(
-        pathMap        : PathMap,
-        pathMapNodeSet : PathMapNodeSet
-    ): PathMapNodeSet = {
-        pathMap.setInvalidated(true)
-        null
-    }
-
-    // Default implementation which adds child expressions (here function arguments) to the pathmap
-    protected def addSubExpressionsToPathMap(
-        pathMap        : PathMap,
-        pathMapNodeSet : PathMapNodeSet
-    ): PathMapNodeSet  = {
-
-        val attachmentPoint = pathMapAttachmentPoint(pathMap, pathMapNodeSet)
-
-        val result = new PathMapNodeSet
-        iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child ⇒
-            result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
-        }
-
-        val th = getExecutable.getConfiguration.getTypeHierarchy
-        if (getItemType(th).isInstanceOf[AtomicType])
-            null
-        else
-            result
-    }
-
-    protected def pathMapAttachmentPoint(
-        pathMap        : PathMap,
-        pathMapNodeSet : PathMapNodeSet
-    ): PathMapNodeSet  =
-        if ((getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0) {
-            Option(pathMapNodeSet) getOrElse {
-                val cie = new ContextItemExpression
-                cie.setContainer(getContainer)
-                new PathMapNodeSet(pathMap.makeNewRoot(cie))
-            }
-        } else {
-            null
-        }
 }
 
 object XFormsFunction {
 
-    case class Context(
-        container         : XBLContainer,
-        bindingContext    : BindingContext,
-        sourceEffectiveId : String,
-        model             : XFormsModel,
-        data              : Any
-    ) extends XPath.FunctionContext {
+  case class Context(
+    container         : XBLContainer,
+    bindingContext    : BindingContext,
+    sourceEffectiveId : String,
+    model             : XFormsModel,
+    data              : Any
+  ) extends XPath.FunctionContext {
 
-        def containingDocument = container.containingDocument
+    def containingDocument = container.containingDocument
 
-        private var _properties: Option[m.Map[String, Any]] = None
-        def properties = _properties
+    private var _properties: Option[m.Map[String, Any]] = None
+    def properties = _properties
 
-        def setProperty(name: String, value: Any) = {
-            if (_properties.isEmpty)
-                _properties = Some(m.Map.empty[String, Any])
-            _properties foreach (_ += name → value)
-        }
+    def setProperty(name: String, value: Any) = {
+      if (_properties.isEmpty)
+        _properties = Some(m.Map.empty[String, Any])
+      _properties foreach (_ += name → value)
+    }
+  }
+
+  def sourceElementAnalysis(pathMap: PathMap) =
+    pathMap.getPathMapContext match {
+      case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
+      case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
     }
 
-    def sourceElementAnalysis(pathMap: PathMap) =
-        pathMap.getPathMapContext match {
-            case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
-            case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+  def context =
+    XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
+
+  // This ADT or something like it should be defined somewhere else
+  sealed trait QNameType
+  case   class UnprefixedName(local: String) extends QNameType
+  case   class PrefixedName(prefix: String, local: String) extends QNameType
+
+  def parseQName(lexicalQName: String): QNameType =
+    XML.parseQName(lexicalQName) match {
+      case ("", local)     ⇒ UnprefixedName(local)
+      case (prefix, local) ⇒ PrefixedName(prefix, local)
+    }
+
+  def qNameFromQNameValue(value: QNameValue): Dom4jQName =
+    parseQName(value.getStringValue) match {
+      case PrefixedName(prefix, local) ⇒ new Dom4jQName(local, new Namespace(prefix, value.getNamespaceURI))
+      case UnprefixedName(local)       ⇒ new Dom4jQName(local)
+    }
+
+  def qNameFromStringValue(value: String, bindingContext: BindingContext): Dom4jQName =
+    parseQName(value) match {
+      case PrefixedName(prefix, local) ⇒
+
+        def prefixNotInScope() =
+          throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
+
+        val namespaceMapping = context.data match {
+          case Some(bindNode: BindNode) ⇒
+            // Function was called from a bind
+            bindNode.parentBind.staticBind.namespaceMapping
+          case _ if bindingContext.controlElement ne null ⇒
+            // Function was called from a control
+            // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
+            context.container.getNamespaceMappings(bindingContext.controlElement)
+          case _ ⇒
+            // Unclear which cases reach here!
+            // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
+            prefixNotInScope()
         }
 
-    def context =
-        XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
+        val qNameURI = namespaceMapping.mapping.get(prefix)
+        if (qNameURI eq null)
+          prefixNotInScope()
 
-    // This ADT or something like it should be defined somewhere else
-    sealed trait QNameType
-    case   class UnprefixedName(local: String) extends QNameType
-    case   class PrefixedName(prefix: String, local: String) extends QNameType
-
-    def parseQName(lexicalQName: String): QNameType =
-        XML.parseQName(lexicalQName) match {
-            case ("", local)     ⇒ UnprefixedName(local)
-            case (prefix, local) ⇒ PrefixedName(prefix, local)
-        }
-
-    def qNameFromQNameValue(value: QNameValue): Dom4jQName =
-        parseQName(value.getStringValue) match {
-            case PrefixedName(prefix, local) ⇒ new Dom4jQName(local, new Namespace(prefix, value.getNamespaceURI))
-            case UnprefixedName(local)       ⇒ new Dom4jQName(local)
-        }
-
-    def qNameFromStringValue(value: String, bindingContext: BindingContext): Dom4jQName =
-        parseQName(value) match {
-            case PrefixedName(prefix, local) ⇒
-
-                def prefixNotInScope() =
-                    throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
-
-                val namespaceMapping = context.data match {
-                    case Some(bindNode: BindNode) ⇒
-                        // Function was called from a bind
-                        bindNode.parentBind.staticBind.namespaceMapping
-                    case _ if bindingContext.controlElement ne null ⇒
-                        // Function was called from a control
-                        // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
-                        context.container.getNamespaceMappings(bindingContext.controlElement)
-                    case _ ⇒
-                        // Unclear which cases reach here!
-                        // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
-                        prefixNotInScope()
-                }
-
-                val qNameURI = namespaceMapping.mapping.get(prefix)
-                if (qNameURI eq null)
-                    prefixNotInScope()
-
-                new Dom4jQName(local, new Namespace(prefix, qNameURI))
-            case UnprefixedName(local) ⇒
-                new Dom4jQName(local)
-        }
+        new Dom4jQName(local, new Namespace(prefix, qNameURI))
+      case UnprefixedName(local) ⇒
+        new Dom4jQName(local)
+    }
 }

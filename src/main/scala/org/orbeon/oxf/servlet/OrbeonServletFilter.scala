@@ -27,37 +27,37 @@ class OrbeonServletFilterDelegate extends OrbeonServletFilter
 
 class OrbeonServletFilter extends Filter with ServletPortlet {
 
-    private implicit val logger = ProcessorService.Logger
+  private implicit val logger = ProcessorService.Logger
 
-    def logPrefix = "Servlet filter"
+  def logPrefix = "Servlet filter"
 
-    // Immutable map of servlet parameters
-    private var _initParameters: Map[String, String] = _
-    def initParameters = _initParameters
+  // Immutable map of servlet parameters
+  private var _initParameters: Map[String, String] = _
+  def initParameters = _initParameters
 
-    // Filter init
-    def init(config: FilterConfig): Unit =
-        withRootException("initialization", new ServletException(_)) {
+  // Filter init
+  def init(config: FilterConfig): Unit =
+    withRootException("initialization", new ServletException(_)) {
 
-            _initParameters =
-                config.getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
-                    (n ⇒ n → config.getInitParameter(n)) toMap
+      _initParameters =
+        config.getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
+          (n ⇒ n → config.getInitParameter(n)) toMap
 
-            init(WebAppContext(config.getServletContext), None)
-        }
+      init(WebAppContext(config.getServletContext), None)
+    }
 
-    // Filter destroy
-    def destroy(): Unit =
-        withRootException("destruction", new ServletException(_)) {
-            destroy(None)
-        }
+  // Filter destroy
+  def destroy(): Unit =
+    withRootException("destruction", new ServletException(_)) {
+      destroy(None)
+    }
 
-    // Filter request
-    def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain): Unit =
-        withRootException("request", new ServletException(_)) {
-            val pipelineContext = new PipelineContext
-            pipelineContext.setAttribute(ServletFilterGenerator.FILTER_CHAIN, chain)
-            val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse])
-            processorService.service(pipelineContext, externalContext)
-        }
+  // Filter request
+  def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain): Unit =
+    withRootException("request", new ServletException(_)) {
+      val pipelineContext = new PipelineContext
+      pipelineContext.setAttribute(ServletFilterGenerator.FILTER_CHAIN, chain)
+      val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse])
+      processorService.service(pipelineContext, externalContext)
+    }
 }

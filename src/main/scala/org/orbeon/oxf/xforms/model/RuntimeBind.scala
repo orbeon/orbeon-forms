@@ -22,104 +22,104 @@ import scala.collection.{mutable ⇒ m}
 
 class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parentIteration: BindIteration, isSingleNodeContext: Boolean) extends XFormsObject {
 
-    def containingDocument = model.containingDocument
-    def getEffectiveId     = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, staticId)
-    def staticId           = staticBind.staticId
+  def containingDocument = model.containingDocument
+  def getEffectiveId     = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, staticId)
+  def staticId           = staticBind.staticId
 
-    val (items, bindNodes) = {
-        val contextStack = model.getContextStack
-        contextStack.pushBinding(staticBind.element, model.getEffectiveId, model.getResolutionScope)
+  val (items, bindNodes) = {
+    val contextStack = model.getContextStack
+    contextStack.pushBinding(staticBind.element, model.getEffectiveId, model.getResolutionScope)
 
-        // NOTE: This should probably go into XFormsContextStack
-        val bindingContext = contextStack.getCurrentBindingContext
+    // NOTE: This should probably go into XFormsContextStack
+    val bindingContext = contextStack.getCurrentBindingContext
 
-        // @ref can be missing and defaults to the context item
-        val items = bindingContext.childContext ensuring (_ ne null)
+    // @ref can be missing and defaults to the context item
+    val items = bindingContext.childContext ensuring (_ ne null)
 
-        val binds = model.getBinds
+    val binds = model.getBinds
 
-        // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
-        // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind
-        // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
-        // the Single Node Binding or Node Set Binding"
-        if (isSingleNodeContext)
-            binds.singleNodeContextBinds += staticBind.staticId → this
+    // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
+    // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind
+    // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
+    // the Single Node Binding or Node Set Binding"
+    if (isSingleNodeContext)
+      binds.singleNodeContextBinds += staticBind.staticId → this
 
-        val itemsAsScala = items.asScala
-        val itemsSize    = itemsAsScala.size
+    val itemsAsScala = items.asScala
+    val itemsSize    = itemsAsScala.size
 
-        val bindNodes: Seq[BindNode] =
-            if (itemsAsScala.nonEmpty) {
-                // Only then does it make sense to create BindNodes
-                val childrenStaticBinds = staticBind.children
-                if (childrenStaticBinds.nonEmpty) {
-                    // There are children binds (and maybe MIPs)
-                    val result = new m.ArrayBuffer[BindNode](itemsSize)
-                    
-                    val childrenBindsHaveSingleNodeContext = isSingleNodeContext && itemsSize == 1
+    val bindNodes: Seq[BindNode] =
+      if (itemsAsScala.nonEmpty) {
+        // Only then does it make sense to create BindNodes
+        val childrenStaticBinds = staticBind.children
+        if (childrenStaticBinds.nonEmpty) {
+          // There are children binds (and maybe MIPs)
+          val result = new m.ArrayBuffer[BindNode](itemsSize)
+          
+          val childrenBindsHaveSingleNodeContext = isSingleNodeContext && itemsSize == 1
 
-                    // Iterate over nodeset and produce child iterations
-                    var currentPosition = 1
-                    for (item ← itemsAsScala) {
-                        contextStack.pushIteration(currentPosition)
+          // Iterate over nodeset and produce child iterations
+          var currentPosition = 1
+          for (item ← itemsAsScala) {
+            contextStack.pushIteration(currentPosition)
 
-                        // Create iteration and remember it
-                        val currentBindIteration =
-                            new BindIteration(
-                                this,
-                                currentPosition,
-                                item,
-                                childrenBindsHaveSingleNodeContext,
-                                childrenStaticBinds
-                            )
+            // Create iteration and remember it
+            val currentBindIteration =
+              new BindIteration(
+                this,
+                currentPosition,
+                item,
+                childrenBindsHaveSingleNodeContext,
+                childrenStaticBinds
+              )
 
-                        result += currentBindIteration
+            result += currentBindIteration
 
-                        // Create mapping context item → iteration
-                        // NOTE: There might already be a mapping.
-                        // NOTE: Indexing nodes is probably not efficient with Dom4j, as nodes don't implement hashCode!
-                        if (! childrenBindsHaveSingleNodeContext) {
-                            val existingIterations = binds.iterationsForContextItem.getOrElseUpdate(item, Nil)
-                            binds.iterationsForContextItem += item → (currentBindIteration :: existingIterations)
-                        }
-
-                        contextStack.popBinding
-                        currentPosition += 1
-                    }
-                    result
-                } else if (staticBind.hasMIPs) {
-                    // No children binds, but we have MIPs, so create holders too
-                    val result = new m.ArrayBuffer[BindNode](itemsSize)
-                    var currentPosition = 1
-                    for (item ← itemsAsScala) {
-                        result += new BindNode(this, currentPosition, item)
-                        currentPosition += 1
-                    }
-                    result
-                } else
-                    Nil
-            } else
-                Nil
-
-        contextStack.popBinding
-
-        (items, bindNodes)
-    }
-
-    def applyBinds(bindRunner: BindRunner): Unit =
-        if (bindNodes.nonEmpty)
-            for (bindNode ← bindNodes) {
-                // Handle current node
-                bindRunner.applyBind(bindNode)
-
-                // Handle children binds if any
-                bindNode match {
-                    case iteration: BindIteration ⇒ iteration.applyBinds(bindRunner)
-                    case _ ⇒
-                }
+            // Create mapping context item → iteration
+            // NOTE: There might already be a mapping.
+            // NOTE: Indexing nodes is probably not efficient with Dom4j, as nodes don't implement hashCode!
+            if (! childrenBindsHaveSingleNodeContext) {
+              val existingIterations = binds.iterationsForContextItem.getOrElseUpdate(item, Nil)
+              binds.iterationsForContextItem += item → (currentBindIteration :: existingIterations)
             }
 
-    // The RuntimeBind might not have BindNodes, so create one when needed
-    def getOrCreateBindNode(position: Int) =
-        bindNodes.lift(position - 1) getOrElse new BindNode(this, position, items.get(position - 1))
+            contextStack.popBinding
+            currentPosition += 1
+          }
+          result
+        } else if (staticBind.hasMIPs) {
+          // No children binds, but we have MIPs, so create holders too
+          val result = new m.ArrayBuffer[BindNode](itemsSize)
+          var currentPosition = 1
+          for (item ← itemsAsScala) {
+            result += new BindNode(this, currentPosition, item)
+            currentPosition += 1
+          }
+          result
+        } else
+          Nil
+      } else
+        Nil
+
+    contextStack.popBinding
+
+    (items, bindNodes)
+  }
+
+  def applyBinds(bindRunner: BindRunner): Unit =
+    if (bindNodes.nonEmpty)
+      for (bindNode ← bindNodes) {
+        // Handle current node
+        bindRunner.applyBind(bindNode)
+
+        // Handle children binds if any
+        bindNode match {
+          case iteration: BindIteration ⇒ iteration.applyBinds(bindRunner)
+          case _ ⇒
+        }
+      }
+
+  // The RuntimeBind might not have BindNodes, so create one when needed
+  def getOrCreateBindNode(position: Int) =
+    bindNodes.lift(position - 1) getOrElse new BindNode(this, position, items.get(position - 1))
 }

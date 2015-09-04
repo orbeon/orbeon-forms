@@ -22,11 +22,11 @@ import org.orbeon.saxon.value.StringValue
  * case($switch-id as xs:string) as xs:string? function.
  */
 class XFormsCase extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-        for {
-            control      ← relevantControl(0)(xpathContext)
-            switch       ← collectByErasedType[XFormsSwitchControl](control)
-            selectedCase ← switch.selectedCase
-        } yield
-            selectedCase.getId
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    for {
+      control      ← relevantControl(0)(xpathContext)
+      switch       ← collectByErasedType[XFormsSwitchControl](control)
+      selectedCase ← switch.selectedCase
+    } yield
+      selectedCase.getId
 }

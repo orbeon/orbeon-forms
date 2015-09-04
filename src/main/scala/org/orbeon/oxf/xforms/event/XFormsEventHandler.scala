@@ -19,8 +19,8 @@ import org.orbeon.oxf.xforms.BindingContext
 // Runtime event handler
 trait XFormsEventHandler {
 
-    def getEffectiveId: String
+  def getEffectiveId: String
 
-    def container: XBLContainer
-    def bindingContext: BindingContext
+  def container: XBLContainer
+  def bindingContext: BindingContext
 }

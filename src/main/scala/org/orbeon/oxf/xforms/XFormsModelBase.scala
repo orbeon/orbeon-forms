@@ -31,225 +31,225 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: String, val staticModel: Model)
-    extends Logging
-    with ListenersTrait {
+  extends Logging
+  with ListenersTrait {
 
-    val containingDocument = container.getContainingDocument
-    implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
+  val containingDocument = container.getContainingDocument
+  implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
 
-    val deferredActionContext = new DeferredActionContext(container)
+  val deferredActionContext = new DeferredActionContext(container)
 
-    // TEMP: implemented in Java subclass until we move everything to Scala
-    def resetAndEvaluateVariables(): Unit
-    def getBinds: XFormsModelBinds
-    def getInstances: ju.List[XFormsInstance]
-    def mustBindValidate: Boolean
+  // TEMP: implemented in Java subclass until we move everything to Scala
+  def resetAndEvaluateVariables(): Unit
+  def getBinds: XFormsModelBinds
+  def getInstances: ju.List[XFormsInstance]
+  def mustBindValidate: Boolean
 
-    private lazy val _schemaValidator =
-        new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
+  private lazy val _schemaValidator =
+    new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
 
-    def schemaValidator = _schemaValidator
-    def hasSchema = _schemaValidator.hasSchema
+  def schemaValidator = _schemaValidator
+  def hasSchema = _schemaValidator.hasSchema
 
-    def getSchemaURIs: Array[String] =
-        if (hasSchema)
-            _schemaValidator.getSchemaURIs
-        else
-            null
+  def getSchemaURIs: Array[String] =
+    if (hasSchema)
+      _schemaValidator.getSchemaURIs
+    else
+      null
 
-    def doRebuild(): Unit = {
-        if (deferredActionContext.rebuild) {
-            try {
-                resetAndEvaluateVariables()
-                if (hasInstancesAndBinds) {
-                    // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
-                    getBinds.rebuild()
+  def doRebuild(): Unit = {
+    if (deferredActionContext.rebuild) {
+      try {
+        resetAndEvaluateVariables()
+        if (hasInstancesAndBinds) {
+          // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
+          getBinds.rebuild()
 
-                    // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-                    // TODO: Handle XPathDependencies
-                    container.requireRefresh()
-                }
-            } finally
-                deferredActionContext.rebuild = false
+          // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+          // TODO: Handle XPathDependencies
+          container.requireRefresh()
         }
-        containingDocument.getXPathDependencies.rebuildDone(staticModel)
+      } finally
+        deferredActionContext.rebuild = false
+    }
+    containingDocument.getXPathDependencies.rebuildDone(staticModel)
+  }
+
+  // Recalculate and revalidate are a combined operation
+  // See https://github.com/orbeon/orbeon-forms/issues/1650
+  def doRecalculateRevalidate(applyDefaults: Boolean): Unit = {
+
+    val instances = getInstances.asScala
+
+    // Do the work if needed
+    // TODO: Ensure that there are no side effects via event dispatch.
+    def recalculateRevalidate: Option[collection.Set[String]] =
+      if (deferredActionContext.recalculateRevalidate) {
+        try {
+          doRecalculate(applyDefaults)
+          containingDocument.getXPathDependencies.recalculateDone(staticModel)
+
+          // Validate only if needed, including checking the flags, because if validation state is clean, validation
+          // being idempotent, revalidating is not needed.
+          val mustRevalidate = instances.nonEmpty && (mustBindValidate || hasSchema)
+
+          if (mustRevalidate) {
+            val invalidInstances = doRevalidate()
+            containingDocument.getXPathDependencies.revalidateDone(staticModel)
+
+            Some(invalidInstances)
+          } else
+            None
+        } finally
+          deferredActionContext.recalculateRevalidate = false
+      } else
+        None
+
+    // Gather events to dispatch, at most one per instance, and only if validity has changed
+    // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
+    // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
+    // algorithm below.
+    def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): Seq[XFormsEvent] = {
+
+      val changedInstances =
+        for {
+          instance           ← instances
+          previouslyValid    = instance.valid
+          currentlyValid     = ! invalidInstancesIds(instance.getEffectiveId)
+          if previouslyValid != currentlyValid
+        } yield
+          instance
+
+      // Update instance validity
+      for (instance ← changedInstances)
+        instance.valid = ! instance.valid
+
+      // Create events
+      for (instance ← changedInstances)
+      yield
+        if (instance.valid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
     }
 
-    // Recalculate and revalidate are a combined operation
-    // See https://github.com/orbeon/orbeon-forms/issues/1650
-    def doRecalculateRevalidate(applyDefaults: Boolean): Unit = {
+    val validationEvents =
+      recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
 
-        val instances = getInstances.asScala
+    // Dispatch all events
+    for (event ← validationEvents)
+      Dispatch.dispatchEvent(event)
+  }
 
-        // Do the work if needed
-        // TODO: Ensure that there are no side effects via event dispatch.
-        def recalculateRevalidate: Option[collection.Set[String]] =
-            if (deferredActionContext.recalculateRevalidate) {
-                try {
-                    doRecalculate(applyDefaults)
-                    containingDocument.getXPathDependencies.recalculateDone(staticModel)
+  private def doRecalculate(applyDefaults: Boolean): Unit =
+    withDebug("performing recalculate", List("model" → effectiveId)) {
 
-                    // Validate only if needed, including checking the flags, because if validation state is clean, validation
-                    // being idempotent, revalidating is not needed.
-                    val mustRevalidate = instances.nonEmpty && (mustBindValidate || hasSchema)
+      val hasVariables = staticModel.variablesSeq.nonEmpty
 
-                    if (mustRevalidate) {
-                        val invalidInstances = doRevalidate()
-                        containingDocument.getXPathDependencies.revalidateDone(staticModel)
+      // Re-evaluate top-level variables if needed
+      if (hasInstancesAndBinds || hasVariables)
+        resetAndEvaluateVariables()
 
-                        Some(invalidInstances)
-                    } else
-                        None
-                } finally
-                    deferredActionContext.recalculateRevalidate = false
-            } else
-                None
-
-        // Gather events to dispatch, at most one per instance, and only if validity has changed
-        // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
-        // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
-        // algorithm below.
-        def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): Seq[XFormsEvent] = {
-
-            val changedInstances =
-                for {
-                    instance           ← instances
-                    previouslyValid    = instance.valid
-                    currentlyValid     = ! invalidInstancesIds(instance.getEffectiveId)
-                    if previouslyValid != currentlyValid
-                } yield
-                    instance
-
-            // Update instance validity
-            for (instance ← changedInstances)
-                instance.valid = ! instance.valid
-
-            // Create events
-            for (instance ← changedInstances)
-            yield
-                if (instance.valid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
-        }
-
-        val validationEvents =
-            recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
-
-        // Dispatch all events
-        for (event ← validationEvents)
-            Dispatch.dispatchEvent(event)
+      // Apply calculate binds
+      if (hasInstancesAndBinds)
+        getBinds.applyCalculateBinds(applyDefaults)
     }
 
-    private def doRecalculate(applyDefaults: Boolean): Unit =
-        withDebug("performing recalculate", List("model" → effectiveId)) {
+  private def doRevalidate(): collection.Set[String] =
+    withDebug("performing revalidate", List("model" → effectiveId)) {
 
-            val hasVariables = staticModel.variablesSeq.nonEmpty
+      val instances = getInstances.asScala
+      val invalidInstancesIds = mutable.LinkedHashSet[String]()
 
-            // Re-evaluate top-level variables if needed
-            if (hasInstancesAndBinds || hasVariables)
-                resetAndEvaluateVariables()
+      // Clear schema validation state
+      // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
+      for {
+        instance ← instances
+        instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
+        if instanceMightBeSchemaValidated
+      } locally {
+        DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
+      }
 
-            // Apply calculate binds
-            if (hasInstancesAndBinds)
-                getBinds.applyCalculateBinds(applyDefaults)
+      // Validate using schemas if needed
+      if (hasSchema)
+        for {
+          instance ← instances
+          if instance.isSchemaValidation                   // we don't support validating read-only instances
+          if ! _schemaValidator.validateInstance(instance) // apply schema
+        } locally {
+          // Remember that instance is invalid
+          invalidInstancesIds += instance.getEffectiveId
         }
 
-    private def doRevalidate(): collection.Set[String] =
-        withDebug("performing revalidate", List("model" → effectiveId)) {
+      // Validate using binds if needed
+      if (mustBindValidate)
+        getBinds.applyValidationBinds(invalidInstancesIds.asJava)
 
-            val instances = getInstances.asScala
-            val invalidInstancesIds = mutable.LinkedHashSet[String]()
+      invalidInstancesIds
+    }
 
-            // Clear schema validation state
-            // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
-            for {
-                instance ← instances
-                instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
-                if instanceMightBeSchemaValidated
-            } locally {
-                DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
-            }
+  private def hasInstancesAndBinds: Boolean =
+    ! getInstances.isEmpty && (getBinds ne null)
 
-            // Validate using schemas if needed
-            if (hasSchema)
-                for {
-                    instance ← instances
-                    if instance.isSchemaValidation                   // we don't support validating read-only instances
-                    if ! _schemaValidator.validateInstance(instance) // apply schema
-                } locally {
-                    // Remember that instance is invalid
-                    invalidInstancesIds += instance.getEffectiveId
-                }
+  def needRebuildRecalculateRevalidate =
+    deferredActionContext.rebuild || deferredActionContext.recalculateRevalidate
 
-            // Validate using binds if needed
-            if (mustBindValidate)
-                getBinds.applyValidationBinds(invalidInstancesIds.asJava)
+  // This is called in response to dispatching xforms-refresh to this model, whether using the xf:refresh
+  // action or by dispatching the event by hand.
 
-            invalidInstancesIds
-        }
+  // NOTE: If the refresh flag is not set, we do not call synchronizeAndRefresh() because that would only have the
+  // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
+  // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
+  // FIXME: See https://github.com/orbeon/orbeon-forms/issues/1650
+  protected def doRefresh(): Unit =
+    if (containingDocument.getControls.isRequireRefresh)
+      container.synchronizeAndRefresh()
 
-    private def hasInstancesAndBinds: Boolean =
-        ! getInstances.isEmpty && (getBinds ne null)
+  def getDefaultEvaluationContext: BindingContext
 
-    def needRebuildRecalculateRevalidate =
-        deferredActionContext.rebuild || deferredActionContext.recalculateRevalidate
-
-    // This is called in response to dispatching xforms-refresh to this model, whether using the xf:refresh
-    // action or by dispatching the event by hand.
-
-    // NOTE: If the refresh flag is not set, we do not call synchronizeAndRefresh() because that would only have the
-    // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
-    // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
-    // FIXME: See https://github.com/orbeon/orbeon-forms/issues/1650
-    protected def doRefresh(): Unit =
-        if (containingDocument.getControls.isRequireRefresh)
-            container.synchronizeAndRefresh()
-
-    def getDefaultEvaluationContext: BindingContext
-
-    val variableResolver =
-        (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
-            staticModel.bindsByName.get(variableQName.getLocalName) match {
-                case Some(targetStaticBind) ⇒
-                    // Variable value is a bind nodeset to resolve
-                    BindVariableResolver.resolveClosestBind(
-                        modelBinds          = getBinds,
-                        contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
-                        targetStaticBind    = targetStaticBind
-                    ) getOrElse
-                        (throw new IllegalStateException)
-                case None ⇒
-                    // Try top-level model variables
-                    val modelVariables = getDefaultEvaluationContext.getInScopeVariables
-                    // NOTE: With XPath analysis on, variable scope has been checked statically
-                    Option(modelVariables.get(variableQName.getLocalName)) getOrElse
-                        (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
-            }
+  val variableResolver =
+    (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
+      staticModel.bindsByName.get(variableQName.getLocalName) match {
+        case Some(targetStaticBind) ⇒
+          // Variable value is a bind nodeset to resolve
+          BindVariableResolver.resolveClosestBind(
+            modelBinds          = getBinds,
+            contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
+            targetStaticBind    = targetStaticBind
+          ) getOrElse
+            (throw new IllegalStateException)
+        case None ⇒
+          // Try top-level model variables
+          val modelVariables = getDefaultEvaluationContext.getInScopeVariables
+          // NOTE: With XPath analysis on, variable scope has been checked statically
+          Option(modelVariables.get(variableQName.getLocalName)) getOrElse
+            (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
+      }
 }
 
 class DeferredActionContext(container: XBLContainer) {
 
-    var rebuild = false
-    var recalculateRevalidate = false
+  var rebuild = false
+  var recalculateRevalidate = false
 
-    def markRebuild()               = rebuild = true
-    def markRecalculateRevalidate() = recalculateRevalidate = true
+  def markRebuild()               = rebuild = true
+  def markRecalculateRevalidate() = recalculateRevalidate = true
 
-    def markStructuralChange(): Unit = {
-        // "XForms Actions that change the tree structure of instance data result in setting all four deferred update
-        // flags to true for the model over which they operate"
+  def markStructuralChange(): Unit = {
+    // "XForms Actions that change the tree structure of instance data result in setting all four deferred update
+    // flags to true for the model over which they operate"
 
-        rebuild = true
-        recalculateRevalidate = true
-        container.requireRefresh()
-    }
+    rebuild = true
+    recalculateRevalidate = true
+    container.requireRefresh()
+  }
 
-    def markValueChange(isCalculate: Boolean): Unit = {
-        // "XForms Actions that change only the value of an instance node results in setting the flags for
-        // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
+  def markValueChange(isCalculate: Boolean): Unit = {
+    // "XForms Actions that change only the value of an instance node results in setting the flags for
+    // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
 
-        // Only set recalculate when we are not currently performing a recalculate (avoid infinite loop)
-        if (! isCalculate)
-            recalculateRevalidate = true
+    // Only set recalculate when we are not currently performing a recalculate (avoid infinite loop)
+    if (! isCalculate)
+      recalculateRevalidate = true
 
-        container.requireRefresh()
-    }
+    container.requireRefresh()
+  }
 }

@@ -17,16 +17,16 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import collection.JavaConverters._
 
 object ExternalContextOps {
-    implicit class RequestOps(request: Request) {
+  implicit class RequestOps(request: Request) {
 
-        // NOTE: Ideally would return immutable.Map
-        def parameters: collection.Map[String, Array[AnyRef]] =
-            request.getParameterMap.asScala
+    // NOTE: Ideally would return immutable.Map
+    def parameters: collection.Map[String, Array[AnyRef]] =
+      request.getParameterMap.asScala
 
-        def getFirstParamAsString(name: String) =
-            Option(request.getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
+    def getFirstParamAsString(name: String) =
+      Option(request.getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
 
-        def getFirstHeader(name: String) =
-            Option(request.getHeaderValuesMap.get(name)) flatMap (_.lift(0))
-    }
+    def getFirstHeader(name: String) =
+      Option(request.getHeaderValuesMap.get(name)) flatMap (_.lift(0))
+  }
 }

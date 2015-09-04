@@ -20,26 +20,26 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 // This filter checks that the caller provides the appropriate request token. If not, it sends a 403 back.
 class TokenSecurityFilter extends Filter {
 
-    private var servletContext: ServletContext = _
+  private var servletContext: ServletContext = _
 
-    def init(config: FilterConfig) = servletContext = config.getServletContext
-    def destroy() = servletContext = null
+  def init(config: FilterConfig) = servletContext = config.getServletContext
+  def destroy() = servletContext = null
 
-    def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
-        val httpReq = req.asInstanceOf[HttpServletRequest]
+  def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
+    val httpReq = req.asInstanceOf[HttpServletRequest]
 
-        def authorized =
-            Authorizer.authorizedWithToken(
-                k ⇒ Option(httpReq.getHeader(k)) map (v ⇒ Array(v)),
-                k ⇒ Option(servletContext.getAttribute(k)))
+    def authorized =
+      Authorizer.authorizedWithToken(
+        k ⇒ Option(httpReq.getHeader(k)) map (v ⇒ Array(v)),
+        k ⇒ Option(servletContext.getAttribute(k)))
 
-        if (authorized) {
-            // Go along
-            chain.doFilter(req, res)
-        } else {
-            // Tell the client access is forbidden
-            val httpRes = res.asInstanceOf[HttpServletResponse]
-            httpRes.setStatus(403)
-        }
+    if (authorized) {
+      // Go along
+      chain.doFilter(req, res)
+    } else {
+      // Tell the client access is forbidden
+      val httpRes = res.asInstanceOf[HttpServletResponse]
+      httpRes.setStatus(403)
     }
+  }
 }

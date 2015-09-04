@@ -19,12 +19,12 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class XXFormsDndEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_DND, target, properties, bubbles = false, cancelable = false) {
+  extends XFormsEvent(XXFORMS_DND, target, properties, bubbles = false, cancelable = false) {
 
-    def getDndStart = property[String]("dnd-start").get
-    def getDndEnd   = property[String]("dnd-end").get
+  def getDndStart = property[String]("dnd-start").get
+  def getDndEnd   = property[String]("dnd-end").get
 }
 
 object XXFormsDndEvent {
-    val StandardProperties = Map(XXFORMS_DND → Seq("dnd-start", "dnd-end"))
+  val StandardProperties = Map(XXFORMS_DND → Seq("dnd-start", "dnd-end"))
 }

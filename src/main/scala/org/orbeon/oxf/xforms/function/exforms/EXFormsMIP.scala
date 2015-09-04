@@ -22,23 +22,23 @@ import org.orbeon.saxon.value.BooleanValue
 
 // Base class for eXForms MIP functions.
 class EXFormsMIP extends XXFormsMIPFunction {
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        // "If the argument is omitted, it defaults to a node-set with the context node as its only member."
-        val itemOption = argument.lift(0) map (_.iterate(xpathContext).next()) orElse Option(xpathContext.getContextItem)
+    // "If the argument is omitted, it defaults to a node-set with the context node as its only member."
+    val itemOption = argument.lift(0) map (_.iterate(xpathContext).next()) orElse Option(xpathContext.getContextItem)
 
-        def getOrDefault(item: Item, getFromNode: NodeInfo ⇒ Boolean, default: Boolean) = item match {
-            case nodeInfo: NodeInfo ⇒ getFromNode(nodeInfo)
-            case _ ⇒ default
-        }
-
-        def get(item: Item) = operation match {
-            case 0 ⇒ getOrDefault(item, InstanceData.getInheritedRelevant, default = true)
-            case 1 ⇒ getOrDefault(item, InstanceData.getInheritedReadonly, default = true)
-            case 2 ⇒ getOrDefault(item, InstanceData.getRequired,          default = false)
-        }
-
-        // "If the node-set is empty then the function returns false."
-        itemOption map (item ⇒ BooleanValue.get(get(item))) getOrElse BooleanValue.FALSE
+    def getOrDefault(item: Item, getFromNode: NodeInfo ⇒ Boolean, default: Boolean) = item match {
+      case nodeInfo: NodeInfo ⇒ getFromNode(nodeInfo)
+      case _ ⇒ default
     }
+
+    def get(item: Item) = operation match {
+      case 0 ⇒ getOrDefault(item, InstanceData.getInheritedRelevant, default = true)
+      case 1 ⇒ getOrDefault(item, InstanceData.getInheritedReadonly, default = true)
+      case 2 ⇒ getOrDefault(item, InstanceData.getRequired,          default = false)
+    }
+
+    // "If the node-set is empty then the function returns false."
+    itemOption map (item ⇒ BooleanValue.get(get(item))) getOrElse BooleanValue.FALSE
+  }
 }

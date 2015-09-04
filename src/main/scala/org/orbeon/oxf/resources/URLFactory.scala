@@ -28,25 +28,25 @@ import org.orbeon.oxf.util.NetUtils.{getProtocol, removeQueryString}
  */
 object URLFactory {
 
-    def createURL(spec: String): URL =
-        createURL(null.asInstanceOf[URL], spec)
+  def createURL(spec: String): URL =
+    createURL(null.asInstanceOf[URL], spec)
 
-    def createURL(context: String, spec: String): URL =
-        createURL(nonEmptyOrNone(context) map createURL orNull, spec)
+  def createURL(context: String, spec: String): URL =
+    createURL(nonEmptyOrNone(context) map createURL orNull, spec)
 
-    def createURL(context: URL, spec: String): URL = protocol(context, spec) match {
-        case "http" | "https"       ⇒ new URL(context, spec, HTTP)
-        case OXFHandler.PROTOCOL    ⇒ new URL(context, removeQueryString(spec), OXF)
-        case SystemHandler.PROTOCOL ⇒ new URL(context, removeQueryString(spec), System)
-        case "data"                 ⇒ new URL(context, removeQueryString(spec), DataHandler)
-        case "file"                 ⇒ new URL(context, removeQueryString(spec))
-        case _                      ⇒ new URL(context, spec)
-    }
+  def createURL(context: URL, spec: String): URL = protocol(context, spec) match {
+    case "http" | "https"       ⇒ new URL(context, spec, HTTP)
+    case OXFHandler.PROTOCOL    ⇒ new URL(context, removeQueryString(spec), OXF)
+    case SystemHandler.PROTOCOL ⇒ new URL(context, removeQueryString(spec), System)
+    case "data"                 ⇒ new URL(context, removeQueryString(spec), DataHandler)
+    case "file"                 ⇒ new URL(context, removeQueryString(spec))
+    case _                      ⇒ new URL(context, spec)
+  }
 
-    private def protocol(context: URL, spec: String) =
-        Option(getProtocol(spec)) orElse (Option(context) map (_.getProtocol)) getOrElse (throw new IllegalArgumentException)
+  private def protocol(context: URL, spec: String) =
+    Option(getProtocol(spec)) orElse (Option(context) map (_.getProtocol)) getOrElse (throw new IllegalArgumentException)
 
-    private val OXF    = new OXFHandler
-    private val HTTP   = new HTTPHandler
-    private val System = new SystemHandler
+  private val OXF    = new OXFHandler
+  private val HTTP   = new HTTPHandler
+  private val System = new SystemHandler
 }

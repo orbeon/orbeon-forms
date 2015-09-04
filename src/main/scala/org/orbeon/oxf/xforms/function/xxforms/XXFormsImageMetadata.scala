@@ -25,25 +25,25 @@ import ImageMetadata._
 
 class XXFormsImageMetadata extends XFormsFunction with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        def argumentAsString =
-            nonEmptyOrNone(itemsArgumentOpt(0).get.next().getStringValue)
+    def argumentAsString =
+      nonEmptyOrNone(itemsArgumentOpt(0).get.next().getStringValue)
 
-        def createStream(content: String) =
-            if (NetUtils.urlHasProtocol(content))
-                URLFactory.createURL(content).openStream()
-            else
-                new ByteArrayInputStream(Base64.decodeBase64(content))
+    def createStream(content: String) =
+      if (NetUtils.urlHasProtocol(content))
+        URLFactory.createURL(content).openStream()
+      else
+        new ByteArrayInputStream(Base64.decodeBase64(content))
 
-        def findMetadata(is: InputStream) =
-            stringArgument(1) match {
-                case "mediatype" ⇒ findImageMediatype(is) map stringToStringValue
-                case name        ⇒ findKnownMetadata(is, name)
-            }
+    def findMetadata(is: InputStream) =
+      stringArgument(1) match {
+        case "mediatype" ⇒ findImageMediatype(is) map stringToStringValue
+        case name        ⇒ findKnownMetadata(is, name)
+      }
 
-        argumentAsString map createStream flatMap findMetadata orNull
-    }
+    argumentAsString map createStream flatMap findMetadata orNull
+  }
 }

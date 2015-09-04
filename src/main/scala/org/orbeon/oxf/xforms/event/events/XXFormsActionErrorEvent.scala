@@ -21,28 +21,28 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import XFormsEvent._
 
 class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XFormsEvents.XXFORMS_ACTION_ERROR, target, properties, bubbles = true, cancelable = false) {
+  extends XFormsEvent(XFormsEvents.XXFORMS_ACTION_ERROR, target, properties, bubbles = true, cancelable = false) {
 
-    def this(target: XFormsEventTarget, throwable: Throwable) = {
-        this(target, EmptyGetter)
-        throwableOpt = Option(throwable)
-    }
+  def this(target: XFormsEventTarget, throwable: Throwable) = {
+    this(target, EmptyGetter)
+    throwableOpt = Option(throwable)
+  }
 
-    private var throwableOpt: Option[Throwable] = None
-    def throwable = throwableOpt.orNull
-    private lazy val rootLocationOpt = throwableOpt flatMap getRootLocationData
+  private var throwableOpt: Option[Throwable] = None
+  def throwable = throwableOpt.orNull
+  private lazy val rootLocationOpt = throwableOpt flatMap getRootLocationData
 
-    override def lazyProperties = getters(this, XXFormsActionErrorEvent.Getters)
+  override def lazyProperties = getters(this, XXFormsActionErrorEvent.Getters)
 }
 
 private object XXFormsActionErrorEvent {
 
-    val Getters = Map[String, XXFormsActionErrorEvent ⇒ Option[Any]](
-        "element"   → (e ⇒ e.rootLocationOpt collect { case x: ExtendedLocationData if x.elementString.isDefined ⇒ x.elementString.get }),
-        "system-id" → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getSystemID))),
-        "line"      → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getLine))),
-        "column"    → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getCol))),
-        "message"   → (e ⇒ e.throwableOpt map Exceptions.getRootThrowable flatMap (t ⇒ Option(t.getMessage))),
-        "throwable" → (e ⇒ e.throwableOpt map OrbeonFormatter.format)
-    )
+  val Getters = Map[String, XXFormsActionErrorEvent ⇒ Option[Any]](
+    "element"   → (e ⇒ e.rootLocationOpt collect { case x: ExtendedLocationData if x.elementString.isDefined ⇒ x.elementString.get }),
+    "system-id" → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getSystemID))),
+    "line"      → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getLine))),
+    "column"    → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getCol))),
+    "message"   → (e ⇒ e.throwableOpt map Exceptions.getRootThrowable flatMap (t ⇒ Option(t.getMessage))),
+    "throwable" → (e ⇒ e.throwableOpt map OrbeonFormatter.format)
+  )
 }

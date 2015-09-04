@@ -21,99 +21,99 @@ import org.orbeon.scaxon.XML._
 
 object MigrationOps {
 
-    private def findAllGridRepeats(doc: DocumentInfo) =
-        findFRBodyElement(doc) descendant * filter IsGrid filter isRepeat
+  private def findAllGridRepeats(doc: DocumentInfo) =
+    findFRBodyElement(doc) descendant * filter IsGrid filter isRepeat
 
-    private def findLegacyGridRepeats(doc: DocumentInfo) =
-        findAllGridRepeats(doc) filter isLegacyRepeat
+  private def findLegacyGridRepeats(doc: DocumentInfo) =
+    findAllGridRepeats(doc) filter isLegacyRepeat
 
-    // Used for migrating the form definition's legacy grid repeats
-    // The rest of the implementation is in annotate.xpl.
-    //@XPathFunction
-    def findLegacyGridBindsAndTemplates(outerDocument: DocumentInfo): Seq[NodeInfo] = {
+  // Used for migrating the form definition's legacy grid repeats
+  // The rest of the implementation is in annotate.xpl.
+  //@XPathFunction
+  def findLegacyGridBindsAndTemplates(outerDocument: DocumentInfo): Seq[NodeInfo] = {
 
-        val legacyGrids = findLegacyGridRepeats(outerDocument)
-        val names       = legacyGrids map getControlName
+    val legacyGrids = findLegacyGridRepeats(outerDocument)
+    val names       = legacyGrids map getControlName
 
-        val binds       = names flatMap (findBindByName      (outerDocument, _))
-        val templates   = names flatMap (findTemplateInstance(outerDocument, _))
+    val binds       = names flatMap (findBindByName      (outerDocument, _))
+    val templates   = names flatMap (findTemplateInstance(outerDocument, _))
 
-        binds ++ templates
+    binds ++ templates
+  }
+
+  // Return a sequence of simple paths pointing to nodes to move into nested iterations
+  //
+  // Assumptions:
+  //
+  // - grids are not nested (they are not meant to be)
+  // - section templates are not nested (they could be in the future)
+  // - repeated grids can have repeat="true|content"
+  //
+  // For an example of JSON, see MigrationTest.
+  //
+  //@XPathFunction
+  def buildGridMigrationMap(
+    outerDocument        : DocumentInfo,
+    availableXBLBindings : Option[DocumentInfo],
+    legacyGridsOnly      : Boolean
+  ): String = {
+
+    def findGrids(doc: DocumentInfo) =
+      if (legacyGridsOnly) findLegacyGridRepeats(doc) else findAllGridRepeats(doc)
+
+    // Process section templates only if bindings are provided
+    val (sectionsWithTemplates, xblBindingsByURIQualifiedName) = availableXBLBindings match {
+      case Some(bindingsDocument) ⇒
+        (
+          findSectionsWithTemplates(findFRBodyElement(outerDocument)),
+          FormBuilder.sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
+        )
+      case None ⇒
+        (
+          Nil,
+          Map.empty[(String, String), DocumentInfo]
+        )
     }
 
-    // Return a sequence of simple paths pointing to nodes to move into nested iterations
-    //
-    // Assumptions:
-    //
-    // - grids are not nested (they are not meant to be)
-    // - section templates are not nested (they could be in the future)
-    // - repeated grids can have repeat="true|content"
-    //
-    // For an example of JSON, see MigrationTest.
-    //
-    //@XPathFunction
-    def buildGridMigrationMap(
-        outerDocument        : DocumentInfo,
-        availableXBLBindings : Option[DocumentInfo],
-        legacyGridsOnly      : Boolean
-    ): String = {
-
-        def findGrids(doc: DocumentInfo) =
-            if (legacyGridsOnly) findLegacyGridRepeats(doc) else findAllGridRepeats(doc)
-
-        // Process section templates only if bindings are provided
-        val (sectionsWithTemplates, xblBindingsByURIQualifiedName) = availableXBLBindings match {
-            case Some(bindingsDocument) ⇒
-                (
-                    findSectionsWithTemplates(findFRBodyElement(outerDocument)),
-                    FormBuilder.sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
-                )
-            case None ⇒
-                (
-                    Nil,
-                    Map.empty[(String, String), DocumentInfo]
-                )
-        }
-
-        def gridRepeatIterationName(grid: NodeInfo): String = {
-            val controlName = getControlName(grid)
-            if (isLegacyRepeat(grid))
-                defaultIterationName(controlName)
-            else
-                findRepeatIterationName(grid, controlName).get
-        }
-
-        def pathsForBinding(doc: DocumentInfo): Seq[(String, String)] = {
-
-            val names =
-                findGrids(doc) map
-                (grid ⇒ (getControlName(grid), gridRepeatIterationName(grid)))
-
-            for {
-                (gridName, iterationName) ← names
-                (_, path)                 ← findBindAndPathStatically(doc, gridName)
-            } yield
-                (path, iterationName)
-        }
-
-        def pathsForSectionTemplate(section: NodeInfo): Seq[(String, String)] = {
-
-            val sectionName    = getControlNameOpt(section).get                // section must have a name
-            val xblBindingName = sectionTemplateBindingName(section).get       // section must have a binding
-            val xblBinding     = xblBindingsByURIQualifiedName(xblBindingName) // binding must be available
-
-            // NOTE: Don't use findDataHolders. We don't want current holders, as there might be none if there is are
-            // currently no iterations around a section template, for example. We must find this statically.
-            val (_, holderPath) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
-
-            pathsForBinding(xblBinding.root) map {
-                case (path, iterationName) ⇒ (holderPath + '/' + path, iterationName)
-            }
-        }
-
-        pathsForBinding(outerDocument) ++ (sectionsWithTemplates flatMap pathsForSectionTemplate) match {
-            case Nil        ⇒ ""
-            case migrations ⇒ DataMigration.encodeMigrationsToJSON(migrations)
-        }
+    def gridRepeatIterationName(grid: NodeInfo): String = {
+      val controlName = getControlName(grid)
+      if (isLegacyRepeat(grid))
+        defaultIterationName(controlName)
+      else
+        findRepeatIterationName(grid, controlName).get
     }
+
+    def pathsForBinding(doc: DocumentInfo): Seq[(String, String)] = {
+
+      val names =
+        findGrids(doc) map
+        (grid ⇒ (getControlName(grid), gridRepeatIterationName(grid)))
+
+      for {
+        (gridName, iterationName) ← names
+        (_, path)                 ← findBindAndPathStatically(doc, gridName)
+      } yield
+        (path, iterationName)
+    }
+
+    def pathsForSectionTemplate(section: NodeInfo): Seq[(String, String)] = {
+
+      val sectionName    = getControlNameOpt(section).get                // section must have a name
+      val xblBindingName = sectionTemplateBindingName(section).get       // section must have a binding
+      val xblBinding     = xblBindingsByURIQualifiedName(xblBindingName) // binding must be available
+
+      // NOTE: Don't use findDataHolders. We don't want current holders, as there might be none if there is are
+      // currently no iterations around a section template, for example. We must find this statically.
+      val (_, holderPath) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
+
+      pathsForBinding(xblBinding.root) map {
+        case (path, iterationName) ⇒ (holderPath + '/' + path, iterationName)
+      }
+    }
+
+    pathsForBinding(outerDocument) ++ (sectionsWithTemplates flatMap pathsForSectionTemplate) match {
+      case Nil        ⇒ ""
+      case migrations ⇒ DataMigration.encodeMigrationsToJSON(migrations)
+    }
+  }
 }

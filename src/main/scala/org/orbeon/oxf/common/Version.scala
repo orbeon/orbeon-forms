@@ -24,63 +24,63 @@ import org.orbeon.oxf.util.ScalaUtils._
 // NOTE: This could be a trait, but this causes difficulties to XPath callers to reach `object Version` functions.
 abstract class Version {
 
-    import Version._
+  import Version._
 
-    def requirePEFeature(featureName: String)
-    def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean
-    def createUIDependencies(containingDocument: XFormsContainingDocument): XPathDependencies
+  def requirePEFeature(featureName: String)
+  def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean
+  def createUIDependencies(containingDocument: XFormsContainingDocument): XPathDependencies
 
-    override def toString = VersionString
+  override def toString = VersionString
 }
 
 object Version {
 
-    private val PossibleEditions = Set("CE", "PE")
+  private val PossibleEditions = Set("CE", "PE")
 
-    val VersionNumber = "@RELEASE@"
-    val Edition       = Option("@EDITION@") filter PossibleEditions getOrElse "CE"
-    val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
+  val VersionNumber = "4.10.0.pre.201509042127"
+  val Edition       = Option("PE") filter PossibleEditions getOrElse "CE"
+  val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 
-    def versionStringIfAllowed =
-        Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
+  def versionStringIfAllowed =
+    Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
 
-    // For XPath callers
-    def versionStringIfAllowedOrEmpty =
-        versionStringIfAllowed.orNull
+  // For XPath callers
+  def versionStringIfAllowedOrEmpty =
+    versionStringIfAllowed.orNull
 
-    // For backward compatibility
-    def getVersionString =
-        versionStringIfAllowedOrEmpty
+  // For backward compatibility
+  def getVersionString =
+    versionStringIfAllowedOrEmpty
 
-    val logger = LoggerFactory.createLogger(classOf[Version])
+  val logger = LoggerFactory.createLogger(classOf[Version])
 
-    // Create a Version instance using reflection
-    lazy val instance: Version = {
+  // Create a Version instance using reflection
+  lazy val instance: Version = {
 
-        val versionClassName = "org.orbeon.oxf.common." + Edition + "Version"
+    val versionClassName = "org.orbeon.oxf.common." + Edition + "Version"
 
-        def logContextClassLoaderIssue[T](message: String): PartialFunction[Throwable, Option[T]] = {
-            case NonFatal(t) ⇒
-                logger.info(message, t)
-                None
-        }
-
-        def contextClassLoaderOpt =
-            try Option(Thread.currentThread.getContextClassLoader)
-            catch logContextClassLoaderIssue("Failed to obtain context ClassLoader")
-
-        def fromContextClassLoaderOpt =
-            contextClassLoaderOpt flatMap { classLoader ⇒
-                try Some(classLoader.loadClass(versionClassName).asInstanceOf[Class[Version]])
-                catch logContextClassLoaderIssue("Failed to load Version from context ClassLoader")
-            }
-
-        def fromName =
-            Class.forName(versionClassName).asInstanceOf[Class[Version]]
-
-        fromContextClassLoaderOpt getOrElse fromName newInstance
+    def logContextClassLoaderIssue[T](message: String): PartialFunction[Throwable, Option[T]] = {
+      case NonFatal(t) ⇒
+        logger.info(message, t)
+        None
     }
 
-    //@XPathFunction
-    def isPE = Edition == "PE"
+    def contextClassLoaderOpt =
+      try Option(Thread.currentThread.getContextClassLoader)
+      catch logContextClassLoaderIssue("Failed to obtain context ClassLoader")
+
+    def fromContextClassLoaderOpt =
+      contextClassLoaderOpt flatMap { classLoader ⇒
+        try Some(classLoader.loadClass(versionClassName).asInstanceOf[Class[Version]])
+        catch logContextClassLoaderIssue("Failed to load Version from context ClassLoader")
+      }
+
+    def fromName =
+      Class.forName(versionClassName).asInstanceOf[Class[Version]]
+
+    fromContextClassLoaderOpt getOrElse fromName newInstance
+  }
+
+  //@XPathFunction
+  def isPE = Edition == "PE"
 }

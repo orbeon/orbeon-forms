@@ -24,125 +24,125 @@ import scala.collection.mutable
 
 trait PartXBLAnalysis extends TransientState {
 
-    self: PartAnalysisImpl ⇒
+  self: PartAnalysisImpl ⇒
 
-    val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
+  val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
 
-    private[PartXBLAnalysis] val scopesById              = mutable.HashMap[String, Scope]()
-    private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = mutable.HashMap[String, Scope]()
+  private[PartXBLAnalysis] val scopesById              = mutable.HashMap[String, Scope]()
+  private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = mutable.HashMap[String, Scope]()
 
-    protected def initializeScopes(): Unit = {
-        // Add existing ids to scope map
-        val prefix = startScope.fullPrefix
-        metadata.idGenerator.add("#document") // top-level is not added to the id generator until now
-        for {
-            staticId   ← metadata.idGenerator.ids
-            prefixedId = prefix + staticId
-        } locally {
-            mapScopeIds(staticId, prefixedId, startScope, ignoreIfPresent = false)
+  protected def initializeScopes(): Unit = {
+    // Add existing ids to scope map
+    val prefix = startScope.fullPrefix
+    metadata.idGenerator.add("#document") // top-level is not added to the id generator until now
+    for {
+      staticId   ← metadata.idGenerator.ids
+      prefixedId = prefix + staticId
+    } locally {
+      mapScopeIds(staticId, prefixedId, startScope, ignoreIfPresent = false)
+    }
+
+    registerScope(startScope)
+  }
+  
+  def dumpScopes(): Unit = {
+    println("scopes:")
+    println(
+      prefixedIdToXBLScopeMap.to[List].map{
+        case (id, scope) ⇒ s"$id → ${scope.scopeId}"
+      }.sorted.mkString("\n")
+    )
+  }
+
+  def newScope(parent: Scope, scopeId: String) =
+    registerScope(new Scope(parent, scopeId))
+
+  private def registerScope(scope: Scope) = {
+    assert(! scopesById.contains(scope.scopeId))
+
+    scopesById += scope.scopeId → scope
+    scope
+  }
+
+  def deregisterScope(scope: Scope) =
+    scopesById -= scope.scopeId
+
+  def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit =
+    if (prefixedIdToXBLScopeMap.contains(prefixedId)) {
+      if (! ignoreIfPresent)
+        throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
+    } else {
+      scope += staticId → prefixedId
+      prefixedIdToXBLScopeMap += prefixedId → scope
+    }
+
+  // Deindex the given control's XBL-related information
+  def unmapScopeIds(control: ElementAnalysis): Unit = {
+    control match {
+      case component: ComponentControl ⇒
+        xblBindings.removeBinding(component.prefixedId)
+        deregisterScope(component.binding.innerScope)
+      case attribute: AttributeControl ⇒
+        control.scope -= attribute.forStaticId
+        prefixedIdToXBLScopeMap -= attribute.forPrefixedId
+      case bind: StaticBind ⇒
+        bind.iterateNestedIds foreach { mipId ⇒
+          control.scope -= mipId
+          prefixedIdToXBLScopeMap -= XFormsUtils.getRelatedEffectiveId(control.prefixedId, mipId)
         }
-
-        registerScope(startScope)
+      case _ ⇒
     }
-    
-    def dumpScopes(): Unit = {
-        println("scopes:")
-        println(
-            prefixedIdToXBLScopeMap.to[List].map{
-                case (id, scope) ⇒ s"$id → ${scope.scopeId}"
-            }.sorted.mkString("\n")
-        )
+    control.scope -= control.staticId
+    prefixedIdToXBLScopeMap -= control.prefixedId
+  }
+
+  def containingScope(prefixedId: String) = {
+    val prefix = XFormsUtils.getEffectiveIdPrefix(prefixedId)
+
+    val scopeId = if (prefix.length == 0) "" else prefix.init
+    scopesById.get(scopeId).orNull
+  }
+
+  def scopeForPrefixedId(prefixedId: String) =
+    prefixedIdToXBLScopeMap.get(prefixedId).orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
+
+  def getBinding(prefixedId: String) =
+    xblBindings.getBinding(prefixedId)
+
+  def allBindingsMaybeDuplicates =
+    metadata.allBindingsMaybeDuplicates
+
+  // Search scope in ancestor or self parts
+  def searchResolutionScopeByPrefixedId(prefixedId: String) =
+    ancestorOrSelfIterator map (_.scopeForPrefixedId(prefixedId)) find (_ ne null) get
+
+  def getGlobals = xblBindings.allGlobals
+
+  // For the given bound node prefixed id, remove the current shadow tree and create a new one
+  // NOTE: Can be used only in a sub-part, as this mutates the tree
+  def updateShadowTree(prefixedId: String, element: Element) = {
+    assert(! isTopLevel)
+    getControlAnalysis(prefixedId) match {
+      case existingComponent: ComponentControl ⇒
+
+        // Remove the component's binding, including all controls
+        existingComponent.removeBinding()
+
+        // Create new ConcreteBinding
+        existingComponent.setBinding(element)
+
+        // Rebuild subtree
+        analyzeSubtree(existingComponent)
+
+        existingComponent
+
+      case _ ⇒
+        throw new IllegalArgumentException
     }
+  }
 
-    def newScope(parent: Scope, scopeId: String) =
-        registerScope(new Scope(parent, scopeId))
-
-    private def registerScope(scope: Scope) = {
-        assert(! scopesById.contains(scope.scopeId))
-
-        scopesById += scope.scopeId → scope
-        scope
-    }
-
-    def deregisterScope(scope: Scope) =
-        scopesById -= scope.scopeId
-
-    def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit =
-        if (prefixedIdToXBLScopeMap.contains(prefixedId)) {
-            if (! ignoreIfPresent)
-                throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
-        } else {
-            scope += staticId → prefixedId
-            prefixedIdToXBLScopeMap += prefixedId → scope
-        }
-
-    // Deindex the given control's XBL-related information
-    def unmapScopeIds(control: ElementAnalysis): Unit = {
-        control match {
-            case component: ComponentControl ⇒
-                xblBindings.removeBinding(component.prefixedId)
-                deregisterScope(component.binding.innerScope)
-            case attribute: AttributeControl ⇒
-                control.scope -= attribute.forStaticId
-                prefixedIdToXBLScopeMap -= attribute.forPrefixedId
-            case bind: StaticBind ⇒
-                bind.iterateNestedIds foreach { mipId ⇒
-                    control.scope -= mipId
-                    prefixedIdToXBLScopeMap -= XFormsUtils.getRelatedEffectiveId(control.prefixedId, mipId)
-                }
-            case _ ⇒
-        }
-        control.scope -= control.staticId
-        prefixedIdToXBLScopeMap -= control.prefixedId
-    }
-
-    def containingScope(prefixedId: String) = {
-        val prefix = XFormsUtils.getEffectiveIdPrefix(prefixedId)
-
-        val scopeId = if (prefix.length == 0) "" else prefix.init
-        scopesById.get(scopeId).orNull
-    }
-
-    def scopeForPrefixedId(prefixedId: String) =
-        prefixedIdToXBLScopeMap.get(prefixedId).orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
-
-    def getBinding(prefixedId: String) =
-        xblBindings.getBinding(prefixedId)
-
-    def allBindingsMaybeDuplicates =
-        metadata.allBindingsMaybeDuplicates
-
-    // Search scope in ancestor or self parts
-    def searchResolutionScopeByPrefixedId(prefixedId: String) =
-        ancestorOrSelfIterator map (_.scopeForPrefixedId(prefixedId)) find (_ ne null) get
-
-    def getGlobals = xblBindings.allGlobals
-
-    // For the given bound node prefixed id, remove the current shadow tree and create a new one
-    // NOTE: Can be used only in a sub-part, as this mutates the tree
-    def updateShadowTree(prefixedId: String, element: Element) = {
-        assert(! isTopLevel)
-        getControlAnalysis(prefixedId) match {
-            case existingComponent: ComponentControl ⇒
-
-                // Remove the component's binding, including all controls
-                existingComponent.removeBinding()
-
-                // Create new ConcreteBinding
-                existingComponent.setBinding(element)
-
-                // Rebuild subtree
-                analyzeSubtree(existingComponent)
-
-                existingComponent
-
-            case _ ⇒
-                throw new IllegalArgumentException
-        }
-    }
-
-    override def freeTransientState() = {
-        super.freeTransientState()
-        xblBindings.freeTransientState()
-    }
+  override def freeTransientState() = {
+    super.freeTransientState()
+    xblBindings.freeTransientState()
+  }
 }

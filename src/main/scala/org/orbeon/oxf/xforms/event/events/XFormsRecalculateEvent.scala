@@ -19,12 +19,12 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 class XFormsRecalculateEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsEvent(XFORMS_RECALCULATE, target, properties, bubbles = true, cancelable = true) {
+    extends XFormsEvent(XFORMS_RECALCULATE, target, properties, bubbles = true, cancelable = true) {
 
-    def this(target: XFormsEventTarget, applyDefaults: Boolean) =
-        this(target, Map("apply-defaults" → Option(applyDefaults)))
+  def this(target: XFormsEventTarget, applyDefaults: Boolean) =
+    this(target, Map("apply-defaults" → Option(applyDefaults)))
 
-    def this(target: XFormsEventTarget) = this(target, Map("apply-defaults" → Some(false)))
+  def this(target: XFormsEventTarget) = this(target, Map("apply-defaults" → Some(false)))
 
-    def applyDefaults = property[Boolean]("apply-defaults") getOrElse false
+  def applyDefaults = property[Boolean]("apply-defaults") getOrElse false
 }

@@ -18,27 +18,27 @@ import org.orbeon.oxf.xforms.XFormsStaticState
 
 object XFormsStaticStateCache {
 
-    trait CacheTracer {
-        def digestAndTemplateStatus(digestIfFound: Option[String])
-        def staticStateStatus(found: Boolean, digest: String)
-    }
+  trait CacheTracer {
+    def digestAndTemplateStatus(digestIfFound: Option[String])
+    def staticStateStatus(found: Boolean, digest: String)
+  }
 
-    def storeDocument(staticState: XFormsStaticState): Unit =
-        cache.add(createCacheKey(staticState.digest), ConstantValidity, staticState)
+  def storeDocument(staticState: XFormsStaticState): Unit =
+    cache.add(createCacheKey(staticState.digest), ConstantValidity, staticState)
 
-    def getDocumentJava(digest: String) =
-        findDocument(digest).orNull
+  def getDocumentJava(digest: String) =
+    findDocument(digest).orNull
 
-    def findDocument(digest: String) =
-        Option(cache.findValid(createCacheKey(digest), ConstantValidity).asInstanceOf[XFormsStaticState])
+  def findDocument(digest: String) =
+    Option(cache.findValid(createCacheKey(digest), ConstantValidity).asInstanceOf[XFormsStaticState])
 
-    private def createCacheKey(digest: String) =
-        new InternalCacheKey(ContainingDocumentKeyType, digest ensuring (_ ne null))
+  private def createCacheKey(digest: String) =
+    new InternalCacheKey(ContainingDocumentKeyType, digest ensuring (_ ne null))
 
-    private val XFormsDocumentCache = "xforms.cache.static-state"
-    private val XFormsDocumentCacheDefaultSize = 50
-    private val ConstantValidity = 0L
-    private val ContainingDocumentKeyType = XFormsDocumentCache
+  private val XFormsDocumentCache = "xforms.cache.static-state"
+  private val XFormsDocumentCacheDefaultSize = 50
+  private val ConstantValidity = 0L
+  private val ContainingDocumentKeyType = XFormsDocumentCache
 
-    private val cache = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
+  private val cache = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
 }

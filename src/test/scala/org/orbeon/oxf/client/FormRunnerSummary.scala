@@ -18,13 +18,13 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait FormRunnerSummary extends AssertionsForJUnit with FormRunnerOps {
 
-    @Test def navigateSummary(): Unit = {
-        Summary.navigate("orbeon", "bookshelf")
+  @Test def navigateSummary(): Unit = {
+    Summary.navigate("orbeon", "bookshelf")
 
-        assert("1 to 10 of 12" === Summary.paging)
-        Summary.nextPage()
-        assert("11 to 12 of 12" === Summary.paging)
-        Summary.firstPage()
-        assert("1 to 10 of 12" === Summary.paging)
-    }
+    assert("1 to 10 of 12" === Summary.paging)
+    Summary.nextPage()
+    assert("11 to 12 of 12" === Summary.paging)
+    Summary.firstPage()
+    assert("1 to 10 of 12" === Summary.paging)
+  }
 }

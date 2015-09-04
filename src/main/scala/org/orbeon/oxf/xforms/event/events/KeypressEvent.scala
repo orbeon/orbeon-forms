@@ -20,40 +20,40 @@ import org.apache.commons.lang3.StringUtils._
 import XFormsEvent._
 
 class KeypressEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(KEYPRESS, target, KeypressEvent.filter(properties), bubbles = true, cancelable = false) {
+  extends XFormsEvent(KEYPRESS, target, KeypressEvent.filter(properties), bubbles = true, cancelable = false) {
 
-    // NOTE: Not sure if should be cancelable, this seems to indicate that "special keys" should not
-    // be cancelable: http://www.quirksmode.org/dom/events/keys.html
-    // NOTE: For now, not an XFormsUIEvent because can also be targeted at XFormsContainingDocument
+  // NOTE: Not sure if should be cancelable, this seems to indicate that "special keys" should not
+  // be cancelable: http://www.quirksmode.org/dom/events/keys.html
+  // NOTE: For now, not an XFormsUIEvent because can also be targeted at XFormsContainingDocument
 
-    import KeypressEvent._
+  import KeypressEvent._
 
-    override def matches(handler: EventHandler): Boolean = {
-        val handlerKeyModifiers = handler.getKeyModifiers
-        val handlerKeyText = handler.getKeyText
+  override def matches(handler: EventHandler): Boolean = {
+    val handlerKeyModifiers = handler.getKeyModifiers
+    val handlerKeyText = handler.getKeyText
 
-        // NOTE: We check on an exact match for modifiers, should be smarter
-        (handlerKeyModifiers == null || keyModifiers == handlerKeyModifiers) && (handlerKeyText == null || keyText == handlerKeyText)
-    }
+    // NOTE: We check on an exact match for modifiers, should be smarter
+    (handlerKeyModifiers == null || keyModifiers == handlerKeyModifiers) && (handlerKeyText == null || keyText == handlerKeyText)
+  }
 
-    def keyModifiers = property[String](ModifiersProperty).orNull
-    def keyText      = property[String](TextProperty).orNull
+  def keyModifiers = property[String](ModifiersProperty).orNull
+  def keyText      = property[String](TextProperty).orNull
 }
 
 object KeypressEvent {
 
-    // Filter incoming properties
-    private def filter(properties: PropertyGetter) = new PropertyGetter {
-        def isDefinedAt(name: String) = properties.isDefinedAt(name)
-        def apply(name: String) = name match {
-            case ModifiersProperty ⇒ properties(name) collect { case value: String if isNotBlank(value) ⇒ value.trim }
-            case TextProperty      ⇒ properties(name) collect { case value: String if isNotEmpty(value) ⇒ value } // allow for e.g. " "
-            case _                 ⇒ properties(name)
-        }
+  // Filter incoming properties
+  private def filter(properties: PropertyGetter) = new PropertyGetter {
+    def isDefinedAt(name: String) = properties.isDefinedAt(name)
+    def apply(name: String) = name match {
+      case ModifiersProperty ⇒ properties(name) collect { case value: String if isNotBlank(value) ⇒ value.trim }
+      case TextProperty      ⇒ properties(name) collect { case value: String if isNotEmpty(value) ⇒ value } // allow for e.g. " "
+      case _                 ⇒ properties(name)
     }
+  }
 
-    val ModifiersProperty = XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName
-    val TextProperty      = XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName
+  val ModifiersProperty = XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName
+  val TextProperty      = XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName
 
-    val StandardProperties = Map(KEYPRESS → Seq(ModifiersProperty, TextProperty))
+  val StandardProperties = Map(KEYPRESS → Seq(ModifiersProperty, TextProperty))
 }

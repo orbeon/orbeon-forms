@@ -19,14 +19,14 @@ import org.orbeon.oxf.fr.FormRunnerContainerOps
  * Form Builder functions.
  */
 object FormBuilder
-    extends FormRunnerContainerOps // temporary, remove once no longer needed (check XForms/XSLT clients)
-    with BaseOps
-    with ContainerOps
-    with ControlOps
-    with GridOps
-    with SectionOps
-    with AlertsAndConstraintsOps
-    with SchemaOps
-    with PermissionsOps
-    with PublishOps
-    with BindingOps
+  extends FormRunnerContainerOps // temporary, remove once no longer needed (check XForms/XSLT clients)
+  with BaseOps
+  with ContainerOps
+  with ControlOps
+  with GridOps
+  with SectionOps
+  with AlertsAndConstraintsOps
+  with SchemaOps
+  with PermissionsOps
+  with PublishOps
+  with BindingOps

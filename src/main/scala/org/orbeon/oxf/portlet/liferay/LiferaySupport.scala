@@ -21,28 +21,28 @@ import org.orbeon.oxf.util.ScalaUtils._
 
 object LiferaySupport {
 
-    private val HeaderNamesGetters = List[(String, User ⇒ List[String])](
-        "Orbeon-Liferay-User-Id"          → (u ⇒ Option(u.getUserId) map (_.toString) toList),
-        "Orbeon-Liferay-User-Screen-Name" → (u ⇒ Option(u.getScreenName).toList),
-        "Orbeon-Liferay-User-Full-Name"   → (u ⇒ Option(u.getFullName).toList),
-        "Orbeon-Liferay-User-Email"       → (u ⇒ Option(u.getEmailAddress).toList),
-        "Orbeon-Liferay-User-Group-Id"    → (u ⇒ Option(u.getGroup) map (_.getGroupId.toString) toList),
-        "Orbeon-Liferay-User-Group-Name"  → (u ⇒ Option(u.getGroup) map (_.getName) toList),
-        "Orbeon-Liferay-User-Roles"       → (u ⇒ u.getRoles.asScala map (_.getName) toList)
-    )
+  private val HeaderNamesGetters = List[(String, User ⇒ List[String])](
+    "Orbeon-Liferay-User-Id"          → (u ⇒ Option(u.getUserId) map (_.toString) toList),
+    "Orbeon-Liferay-User-Screen-Name" → (u ⇒ Option(u.getScreenName).toList),
+    "Orbeon-Liferay-User-Full-Name"   → (u ⇒ Option(u.getFullName).toList),
+    "Orbeon-Liferay-User-Email"       → (u ⇒ Option(u.getEmailAddress).toList),
+    "Orbeon-Liferay-User-Group-Id"    → (u ⇒ Option(u.getGroup) map (_.getGroupId.toString) toList),
+    "Orbeon-Liferay-User-Group-Name"  → (u ⇒ Option(u.getGroup) map (_.getName) toList),
+    "Orbeon-Liferay-User-Roles"       → (u ⇒ u.getRoles.asScala map (_.getName) toList)
+  )
 
-    val AllHeaderNames                   = HeaderNamesGetters map (_._1) toSet
-    val AllHeaderNamesLower              = AllHeaderNames map (_.toLowerCase)
-    val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLower zip AllHeaderNames toMap
+  val AllHeaderNames                   = HeaderNamesGetters map (_._1) toSet
+  val AllHeaderNamesLower              = AllHeaderNames map (_.toLowerCase)
+  val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLower zip AllHeaderNames toMap
 
-    // Return Liferay user, group and role information as headers. There can be multiple role headers.
-    def userHeaders(user: User): List[(String, String)] =
-        for {
-            (name, getter) ← HeaderNamesGetters
-            value          ← getter(user)
-        } yield
-            name → value
+  // Return Liferay user, group and role information as headers. There can be multiple role headers.
+  def userHeaders(user: User): List[(String, String)] =
+    for {
+      (name, getter) ← HeaderNamesGetters
+      value          ← getter(user)
+    } yield
+      name → value
 
-    def languageHeader(request: PortletRequest) =
-        nonEmptyOrNone(LanguageUtil.getLanguageId(request)) map ("Orbeon-Liferay-Language" →)
+  def languageHeader(request: PortletRequest) =
+    nonEmptyOrNone(LanguageUtil.getLanguageId(request)) map ("Orbeon-Liferay-Language" →)
 }

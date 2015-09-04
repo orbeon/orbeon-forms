@@ -23,117 +23,117 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
-    val WarningsInfosTemplate = "oxf:/org/orbeon/oxf/fr/form-with-alert-levels.xhtml"
+  val WarningsInfosTemplate = "oxf:/org/orbeon/oxf/fr/form-with-alert-levels.xhtml"
 
-    val NumberControlId     = "number-control"
-    val TextControlId       = "text-control"
-    val DefaultAlertMessage = "Missing or incorrect value"
+  val NumberControlId     = "number-control"
+  val TextControlId       = "text-control"
+  val DefaultAlertMessage = "Missing or incorrect value"
 
-    def numberControl = getSingleNodeControl(NumberControlId)
-    def textControl   = getSingleNodeControl(TextControlId)
+  def numberControl = getSingleNodeControl(NumberControlId)
+  def textControl   = getSingleNodeControl(TextControlId)
 
-    @Test def alertLevels(): Unit =
-        withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
+  @Test def alertLevels(): Unit =
+    withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
 
-            // number-control
-            assert(Some(ErrorLevel) === numberControl.alertLevel)
-            assert(DefaultAlertMessage === numberControl.getAlert)
+      // number-control
+      assert(Some(ErrorLevel) === numberControl.alertLevel)
+      assert(DefaultAlertMessage === numberControl.getAlert)
 
-            setControlValue(NumberControlId, "a")
-            assert(Some(ErrorLevel) === numberControl.alertLevel)
-            assert(DefaultAlertMessage === numberControl.getAlert)
+      setControlValue(NumberControlId, "a")
+      assert(Some(ErrorLevel) === numberControl.alertLevel)
+      assert(DefaultAlertMessage === numberControl.getAlert)
 
-            setControlValue(NumberControlId, "10")
-            assert(Some(ErrorLevel) === numberControl.alertLevel)
-            assert("Must be 50 or more" === numberControl.getAlert)
+      setControlValue(NumberControlId, "10")
+      assert(Some(ErrorLevel) === numberControl.alertLevel)
+      assert("Must be 50 or more" === numberControl.getAlert)
 
-            setControlValue(NumberControlId, "50")
-            assert(Some(WarningLevel) === numberControl.alertLevel)
-            assert("Should be 100 or more" === numberControl.getAlert)
+      setControlValue(NumberControlId, "50")
+      assert(Some(WarningLevel) === numberControl.alertLevel)
+      assert("Should be 100 or more" === numberControl.getAlert)
 
-            setControlValue(NumberControlId, "1000")
-            assert(None === numberControl.alertLevel)
-            assert(null eq numberControl.getAlert)
+      setControlValue(NumberControlId, "1000")
+      assert(None === numberControl.alertLevel)
+      assert(null eq numberControl.getAlert)
 
-            setControlValue(NumberControlId, "1001")
-            assert(Some(InfoLevel) === numberControl.alertLevel)
-            assert("Nice, greater than 1000!" == numberControl.getAlert)
+      setControlValue(NumberControlId, "1001")
+      assert(Some(InfoLevel) === numberControl.alertLevel)
+      assert("Nice, greater than 1000!" == numberControl.getAlert)
 
-            // text-control
-            assert(None === textControl.alertLevel)
-            assert(null eq textControl.getAlert)
+      // text-control
+      assert(None === textControl.alertLevel)
+      assert(null eq textControl.getAlert)
 
-            setControlValue(TextControlId, "This is…")
-            assert(None === textControl.alertLevel)
-            assert(null eq textControl.getAlert)
+      setControlValue(TextControlId, "This is…")
+      assert(None === textControl.alertLevel)
+      assert(null eq textControl.getAlert)
 
-            setControlValue(TextControlId, "This is a little bit too long!")
-            assert(Some(WarningLevel) === textControl.alertLevel)
-            assert("Should be shorter than 10 characters" === textControl.getAlert)
+      setControlValue(TextControlId, "This is a little bit too long!")
+      assert(Some(WarningLevel) === textControl.alertLevel)
+      assert("Should be shorter than 10 characters" === textControl.getAlert)
 
-            setControlValue(TextControlId, "this!")
-            assert(Some(WarningLevel) === textControl.alertLevel)
-            assert("Should not start with a lowercase letter" === textControl.getAlert)
+      setControlValue(TextControlId, "this!")
+      assert(Some(WarningLevel) === textControl.alertLevel)
+      assert("Should not start with a lowercase letter" === textControl.getAlert)
 
-            setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
-            assert(Some(WarningLevel) === textControl.alertLevel)
-            assert("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>" === textControl.getAlert)
-        }
+      setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
+      assert(Some(WarningLevel) === textControl.alertLevel)
+      assert("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>" === textControl.getAlert)
+    }
 
-    @Test def annotate(): Unit =
-        withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
+  @Test def annotate(): Unit =
+    withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
 
-            def copyFormInstance = {
-                val formInstance = instance("fr-form-instance").get.underlyingDocumentOrNull
-                Dom4jUtils.createDocumentCopyElement(formInstance.getRootElement)
-            }
+      def copyFormInstance = {
+        val formInstance = instance("fr-form-instance").get.underlyingDocumentOrNull
+        Dom4jUtils.createDocumentCopyElement(formInstance.getRootElement)
+      }
 
-            def copyAndAnnotate(tokens: String) =
-                XFormsModelSubmissionBase.prepareXML(document, instance("fr-form-instance").get.root, prune = false, tokens)
+      def copyAndAnnotate(tokens: String) =
+        XFormsModelSubmissionBase.prepareXML(document, instance("fr-form-instance").get.root, prune = false, tokens)
 
-            // Cause warnings and info
-            setControlValue(NumberControlId, "1001")
-            setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
+      // Cause warnings and info
+      setControlValue(NumberControlId, "1001")
+      setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
 
-            // No annotation
-            assertXMLDocumentsIgnoreNamespacesInScope(copyFormInstance, copyAndAnnotate(""))
+      // No annotation
+      assertXMLDocumentsIgnoreNamespacesInScope(copyFormInstance, copyAndAnnotate(""))
 
-            locally {
-                val expected: JDocument =
-                    <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                        <my-section>
-                            <number>1001</number>
-                            <text xxf:warning="&lt;ul&gt;&lt;li&gt;Should be shorter than 10 characters&lt;/li&gt;&lt;li&gt;Should not start with a lowercase letter&lt;/li&gt;&lt;/ul&gt;">this is a little bit too long and starts with a lowercase letter!</text>
-                        </my-section>
-                    </form>
+      locally {
+        val expected: JDocument =
+          <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <my-section>
+              <number>1001</number>
+              <text xxf:warning="&lt;ul&gt;&lt;li&gt;Should be shorter than 10 characters&lt;/li&gt;&lt;li&gt;Should not start with a lowercase letter&lt;/li&gt;&lt;/ul&gt;">this is a little bit too long and starts with a lowercase letter!</text>
+            </my-section>
+          </form>
 
-                assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning"))
-            }
+        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning"))
+      }
 
-            locally {
-                val expected: JDocument =
-                    <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                        <my-section>
-                            <number xxf:info="Nice, greater than 1000!">1001</number>
-                            <text>this is a little bit too long and starts with a lowercase letter!</text>
-                        </my-section>
-                    </form>
+      locally {
+        val expected: JDocument =
+          <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <my-section>
+              <number xxf:info="Nice, greater than 1000!">1001</number>
+              <text>this is a little bit too long and starts with a lowercase letter!</text>
+            </my-section>
+          </form>
 
-                assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("info"))
-            }
+        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("info"))
+      }
 
-            locally {
-                setControlValue(TextControlId, "This is a little bit too long!")
+      locally {
+        setControlValue(TextControlId, "This is a little bit too long!")
 
-                val expected: JDocument =
-                    <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                        <my-section>
-                            <number xxf:info="Nice, greater than 1000!">1001</number>
-                            <text xxf:warning="Should be shorter than 10 characters">This is a little bit too long!</text>
-                        </my-section>
-                    </form>
+        val expected: JDocument =
+          <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <my-section>
+              <number xxf:info="Nice, greater than 1000!">1001</number>
+              <text xxf:warning="Should be shorter than 10 characters">This is a little bit too long!</text>
+            </my-section>
+          </form>
 
-                assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning info"))
-            }
-        }
+        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning info"))
+      }
+    }
 }

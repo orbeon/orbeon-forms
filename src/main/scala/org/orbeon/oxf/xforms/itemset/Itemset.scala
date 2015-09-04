@@ -34,165 +34,165 @@ import org.xml.sax.SAXException
  */
 class Itemset(multiple: Boolean) extends ItemContainer {
 
-    import Itemset._
+  import Itemset._
 
-    // All of this itemset's selected items based on the given instance value
-    def jSelectedItems(value: String): JIterable[Item] =
-        (allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList) asJava
+  // All of this itemset's selected items based on the given instance value
+  def jSelectedItems(value: String): JIterable[Item] =
+    (allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList) asJava
 
-    // Return the list of items as a JSON tree
-    def getJSONTreeInfo(controlValue: String, encode: Boolean, locationData: LocationData): String = {
-        // Produce a JSON fragment with hierarchical information
+  // Return the list of items as a JSON tree
+  def getJSONTreeInfo(controlValue: String, encode: Boolean, locationData: LocationData): String = {
+    // Produce a JSON fragment with hierarchical information
 
-        val sb = new StringBuilder
-        // Array of top-level items
-        sb.append("[")
-        try {
-            visit(null, new ItemsetListener[AnyRef] {
+    val sb = new StringBuilder
+    // Array of top-level items
+    sb.append("[")
+    try {
+      visit(null, new ItemsetListener[AnyRef] {
 
-                def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
-                    if (! first)
-                        sb.append(',')
+        def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
+          if (! first)
+            sb.append(',')
 
-                    // Start object
-                    sb.append("{")
+          // Start object
+          sb.append("{")
 
-                    // Item LHH and value
-                    sb.append(""""label":"""")
-                    sb.append(item.javaScriptLabel(locationData))
-                    item.javaScriptHelp(locationData) foreach { h ⇒
-                        sb.append("""","help":"""")
-                        sb.append(h)
-                    }
-                    item.javaScriptHint(locationData) foreach { h ⇒
-                        sb.append("""","hint":"""")
-                        sb.append(h)
-                    }
-                    sb.append("""","value":"""")
-                    sb.append(item.javaScriptValue(encode))
-                    sb.append('"')
+          // Item LHH and value
+          sb.append(""""label":"""")
+          sb.append(item.javaScriptLabel(locationData))
+          item.javaScriptHelp(locationData) foreach { h ⇒
+            sb.append("""","help":"""")
+            sb.append(h)
+          }
+          item.javaScriptHint(locationData) foreach { h ⇒
+            sb.append("""","hint":"""")
+            sb.append(h)
+          }
+          sb.append("""","value":"""")
+          sb.append(item.javaScriptValue(encode))
+          sb.append('"')
 
-                    // Item attributes if any
-                    val attributes = item.attributes
-                    if (attributes.nonEmpty) {
-                        sb.append(""","attributes":{""")
+          // Item attributes if any
+          val attributes = item.attributes
+          if (attributes.nonEmpty) {
+            sb.append(""","attributes":{""")
 
-                        val nameValues =
-                            for {
-                                (name, value) ← attributes
-                                escapedName   = XFormsUtils.escapeJavaScript(getAttributeName(name))
-                                escapedValue  = XFormsUtils.escapeJavaScript(value)
-                            } yield
-                                s""""$escapedName":"$escapedValue""""
+            val nameValues =
+              for {
+                (name, value) ← attributes
+                escapedName   = XFormsUtils.escapeJavaScript(getAttributeName(name))
+                escapedValue  = XFormsUtils.escapeJavaScript(value)
+              } yield
+                s""""$escapedName":"$escapedValue""""
 
-                        sb.append(nameValues mkString ",")
+            sb.append(nameValues mkString ",")
 
-                        sb.append('}')
-                    }
+            sb.append('}')
+          }
 
-                    // Handle selection
-                    val itemValue = Option(item.value) getOrElse ""
-                    val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
+          // Handle selection
+          val itemValue = Option(item.value) getOrElse ""
+          val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
 
-                    if (itemSelected) {
-                        sb.append(""","selected":""")
-                        sb.append(itemSelected.toString)
-                    }
+          if (itemSelected) {
+            sb.append(""","selected":""")
+            sb.append(itemSelected.toString)
+          }
 
-                    // Start array of children items
-                    if (item.hasChildren)
-                        sb.append(""","children":[""")
-                }
-
-                def endItem(o: AnyRef, item: Item): Unit = {
-                    // End array of children items
-                    if (item.hasChildren)
-                        sb.append(']')
-
-                    // End object
-                    sb.append("}")
-                }
-
-                def startLevel(o: AnyRef, item: Item) = ()
-                def endLevel(o: AnyRef) = ()
-            })
-        } catch {
-            case e: SAXException ⇒ throw new ValidationException("Error while creating itemset tree", e, locationData)
+          // Start array of children items
+          if (item.hasChildren)
+            sb.append(""","children":[""")
         }
-        sb.append("]")
 
-        sb.toString
-    }
+        def endItem(o: AnyRef, item: Item): Unit = {
+          // End array of children items
+          if (item.hasChildren)
+            sb.append(']')
 
-    // Return the list of items as an XML tree
-    def getXMLTreeInfo(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
-        val treeBuilder = new TinyBuilder
-        val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
-        identity.setResult(treeBuilder)
-        val ch = new XMLReceiverHelper(identity)
-
-        ch.startDocument()
-        ch.startElement("itemset")
-        if (hasChildren) {
-            visit(null, new ItemsetListener[AnyRef] {
-                def startLevel(o: AnyRef, item: Item): Unit =
-                    ch.startElement("choices")
-
-                def endLevel(o: AnyRef): Unit =
-                    ch.endElement()
-
-                def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
-                    val itemValue = Option(item.value) getOrElse ""
-                    val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
-
-                    val itemAttributes =
-                        if (itemSelected)
-                            Array("selected", "true")
-                        else
-                            Array[String]()
-
-                    // TODO: Item attributes if any
-
-                    ch.startElement("item", itemAttributes)
-
-                    ch.startElement("label")
-                    item.label.streamAsHTML(ch, locationData)
-                    ch.endElement()
-
-                    item.help foreach { h ⇒
-                        ch.startElement("help")
-                        h.streamAsHTML(ch, locationData)
-                        ch.endElement()
-                    }
-
-                    item.hint foreach { h ⇒
-                        ch.startElement("hint")
-                        h.streamAsHTML(ch, locationData)
-                        ch.endElement()
-                    }
-
-                    ch.startElement("value")
-                    ch.text(itemValue)
-                    ch.endElement()
-                }
-
-                def endItem(o: AnyRef, item: Item): Unit =
-                    ch.endElement()
-            })
+          // End object
+          sb.append("}")
         }
-        ch.endElement()
-        ch.endDocument()
 
-        treeBuilder.getCurrentRoot.asInstanceOf[DocumentInfo]
+        def startLevel(o: AnyRef, item: Item) = ()
+        def endLevel(o: AnyRef) = ()
+      })
+    } catch {
+      case e: SAXException ⇒ throw new ValidationException("Error while creating itemset tree", e, locationData)
     }
+    sb.append("]")
+
+    sb.toString
+  }
+
+  // Return the list of items as an XML tree
+  def getXMLTreeInfo(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
+    val treeBuilder = new TinyBuilder
+    val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
+    identity.setResult(treeBuilder)
+    val ch = new XMLReceiverHelper(identity)
+
+    ch.startDocument()
+    ch.startElement("itemset")
+    if (hasChildren) {
+      visit(null, new ItemsetListener[AnyRef] {
+        def startLevel(o: AnyRef, item: Item): Unit =
+          ch.startElement("choices")
+
+        def endLevel(o: AnyRef): Unit =
+          ch.endElement()
+
+        def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
+          val itemValue = Option(item.value) getOrElse ""
+          val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
+
+          val itemAttributes =
+            if (itemSelected)
+              Array("selected", "true")
+            else
+              Array[String]()
+
+          // TODO: Item attributes if any
+
+          ch.startElement("item", itemAttributes)
+
+          ch.startElement("label")
+          item.label.streamAsHTML(ch, locationData)
+          ch.endElement()
+
+          item.help foreach { h ⇒
+            ch.startElement("help")
+            h.streamAsHTML(ch, locationData)
+            ch.endElement()
+          }
+
+          item.hint foreach { h ⇒
+            ch.startElement("hint")
+            h.streamAsHTML(ch, locationData)
+            ch.endElement()
+          }
+
+          ch.startElement("value")
+          ch.text(itemValue)
+          ch.endElement()
+        }
+
+        def endItem(o: AnyRef, item: Item): Unit =
+          ch.endElement()
+      })
+    }
+    ch.endElement()
+    ch.endDocument()
+
+    treeBuilder.getCurrentRoot.asInstanceOf[DocumentInfo]
+  }
 }
 
 object Itemset {
-    def getAttributeName(name: QName): String =
-        if (name.getNamespace == Namespace.NO_NAMESPACE)
-            name.getName
-        else if (name.getNamespace == XFormsConstants.XXFORMS_NAMESPACE)
-            "xxforms-" + name.getName
-        else
-            throw new IllegalStateException("Invalid attribute on item: " + name.getName)
+  def getAttributeName(name: QName): String =
+    if (name.getNamespace == Namespace.NO_NAMESPACE)
+      name.getName
+    else if (name.getNamespace == XFormsConstants.XXFORMS_NAMESPACE)
+      "xxforms-" + name.getName
+    else
+      throw new IllegalStateException("Invalid attribute on item: " + name.getName)
 }

@@ -50,106 +50,106 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet
  */
 class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPortlet {
 
-    private implicit val logger = ProcessorService.Logger
+  private implicit val logger = ProcessorService.Logger
 
-    // For BufferedPortlet
-    def title(request: RenderRequest) = getTitle(request)
-    def portletContext = getPortletContext
+  // For BufferedPortlet
+  def title(request: RenderRequest) = getTitle(request)
+  def portletContext = getPortletContext
 
-    // For ServletPortlet
-    def logPrefix = "Portlet"
+  // For ServletPortlet
+  def logPrefix = "Portlet"
 
-    // Immutable map of portlet parameters
-    lazy val initParameters =
-        getInitParameterNames.asScala map
-            (n ⇒ n → getInitParameter(n)) toMap
+  // Immutable map of portlet parameters
+  lazy val initParameters =
+    getInitParameterNames.asScala map
+      (n ⇒ n → getInitParameter(n)) toMap
 
-    case class AsyncContext(externalContext: ExternalContext, pipelineContext: Option[PipelineContext])
+  case class AsyncContext(externalContext: ExternalContext, pipelineContext: Option[PipelineContext])
 
-    // Portlet init
-    override def init(): Unit =
-        withRootException("initialization", new PortletException(_)) {
-            // Obtain WebAppContext as that will initialize the resource manager if needed, which is required by
-            // Version
-            val webAppContext = WebAppContext(getPortletContext)
-            Version.instance.requirePEFeature("Orbeon Forms portlet") // this is a PE feature
-            init(webAppContext, Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
-        }
-
-    // Portlet destroy
-    override def destroy(): Unit =
-        withRootException("destruction", new PortletException(_)) {
-            destroy(Some("oxf.portlet-destroyed-processor." → "oxf.portlet-destroyed-processor.input."))
-        }
-
-    // Portlet render
-    override def render(request: RenderRequest, response: RenderResponse): Unit =
-        currentPortlet.withValue(this) {
-            withRootException("render", new PortletException(_)) {
-                implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
-                bufferedRender(request, response, callService(directContext(request)))
-            }
-        }
-
-    // Portlet action
-    override def processAction(request: ActionRequest, response: ActionResponse): Unit =
-        currentPortlet.withValue(this) {
-            withRootException("action", new PortletException(_)) {
-                implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null)
-                bufferedProcessAction(request, response, callService(directContext(request)))
-            }
-        }
-
-    // Portlet resource
-    override def serveResource(request: ResourceRequest, response: ResourceResponse) =
-        currentPortlet.withValue(this) {
-            withRootException("resource", new PortletException(_)) {
-                implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
-                directServeResource(request, response)
-            }
-        }
-
-    private def directContext(request: PortletRequest): AsyncContext = {
-        val pipelineContext = new PipelineContext
-        val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
-
-        AsyncContext(externalContext, Some(pipelineContext))
+  // Portlet init
+  override def init(): Unit =
+    withRootException("initialization", new PortletException(_)) {
+      // Obtain WebAppContext as that will initialize the resource manager if needed, which is required by
+      // Version
+      val webAppContext = WebAppContext(getPortletContext)
+      Version.instance.requirePEFeature("Orbeon Forms portlet") // this is a PE feature
+      init(webAppContext, Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
     }
 
-    // Call the Orbeon Forms pipeline processor service
-    private def callService(context: AsyncContext): StreamedContentOrRedirect = {
-        processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
-        bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponse])
+  // Portlet destroy
+  override def destroy(): Unit =
+    withRootException("destruction", new PortletException(_)) {
+      destroy(Some("oxf.portlet-destroyed-processor." → "oxf.portlet-destroyed-processor.input."))
     }
 
-    private def directServeResource(request: ResourceRequest, response: ResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
-        // Process request
-        val pipelineContext = new PipelineContext
-        val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
-        processorService.service(pipelineContext, externalContext)
-
-        // Write out the response
-        val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]
-        Option(directResponse.getContentType) foreach response.setContentType
-        APISupport.writeResponseBody(
-            BufferedContent(
-                directResponse.getBytes,
-                Option(directResponse.getContentType),
-                None
-            )
-        )
+  // Portlet render
+  override def render(request: RenderRequest, response: RenderResponse): Unit =
+    currentPortlet.withValue(this) {
+      withRootException("render", new PortletException(_)) {
+        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
+        bufferedRender(request, response, callService(directContext(request)))
+      }
     }
 
-    private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): StreamedContentOrRedirect =
-        if (bufferedResponse.isRedirect)
-            Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
-        else {
-            val bytes = bufferedResponse.getBytes
-            StreamedContent.fromBytes(bytes, Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
-        }
+  // Portlet action
+  override def processAction(request: ActionRequest, response: ActionResponse): Unit =
+    currentPortlet.withValue(this) {
+      withRootException("action", new PortletException(_)) {
+        implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null)
+        bufferedProcessAction(request, response, callService(directContext(request)))
+      }
+    }
+
+  // Portlet resource
+  override def serveResource(request: ResourceRequest, response: ResourceResponse) =
+    currentPortlet.withValue(this) {
+      withRootException("resource", new PortletException(_)) {
+        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
+        directServeResource(request, response)
+      }
+    }
+
+  private def directContext(request: PortletRequest): AsyncContext = {
+    val pipelineContext = new PipelineContext
+    val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
+
+    AsyncContext(externalContext, Some(pipelineContext))
+  }
+
+  // Call the Orbeon Forms pipeline processor service
+  private def callService(context: AsyncContext): StreamedContentOrRedirect = {
+    processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
+    bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponse])
+  }
+
+  private def directServeResource(request: ResourceRequest, response: ResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
+    // Process request
+    val pipelineContext = new PipelineContext
+    val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
+    processorService.service(pipelineContext, externalContext)
+
+    // Write out the response
+    val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]
+    Option(directResponse.getContentType) foreach response.setContentType
+    APISupport.writeResponseBody(
+      BufferedContent(
+        directResponse.getBytes,
+        Option(directResponse.getContentType),
+        None
+      )
+    )
+  }
+
+  private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): StreamedContentOrRedirect =
+    if (bufferedResponse.isRedirect)
+      Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
+    else {
+      val bytes = bufferedResponse.getBytes
+      StreamedContent.fromBytes(bytes, Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
+    }
 }
 
 object OrbeonPortlet {
-    // As of 2012-05-08, used only by LocalPortletSubmission to get access to ProcessorService
-    val currentPortlet = new DynamicVariable[OrbeonPortlet]
+  // As of 2012-05-08, used only by LocalPortletSubmission to get access to ProcessorService
+  val currentPortlet = new DynamicVariable[OrbeonPortlet]
 }

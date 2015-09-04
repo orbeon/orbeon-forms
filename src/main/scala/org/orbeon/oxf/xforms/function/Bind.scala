@@ -19,16 +19,16 @@ import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
 class Bind extends XFormsFunction with FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext): SequenceIterator = {
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        val bindId = stringArgument(0)
+    val bindId = stringArgument(0)
 
-        XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, Option(bindingContext.getSingleItem)) match {
-            case Some(bind: RuntimeBind) ⇒ new ListIterator(bind.items)
-            case _                       ⇒ EmptyIterator.getInstance
-        }
+    XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, Option(bindingContext.getSingleItem)) match {
+      case Some(bind: RuntimeBind) ⇒ new ListIterator(bind.items)
+      case _                       ⇒ EmptyIterator.getInstance
     }
+  }
 }
 

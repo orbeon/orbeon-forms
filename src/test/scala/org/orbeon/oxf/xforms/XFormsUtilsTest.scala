@@ -19,25 +19,25 @@ import XFormsUtils._
 import org.orbeon.oxf.test.DocumentTestBase
 
 class XFormsUtilsTest extends DocumentTestBase with AssertionsForJUnit {
-    @Test def effectiveAndAbsolute(): Unit = {
-        val pairs = Map(
-            "foo"             → "|foo|",
-            "foo≡bar"         → "|foo≡bar|",
-            "foo≡bar≡baz⊙1-2" → "|foo≡bar≡baz⊙1-2|"
-        )
+  @Test def effectiveAndAbsolute(): Unit = {
+    val pairs = Map(
+      "foo"             → "|foo|",
+      "foo≡bar"         → "|foo≡bar|",
+      "foo≡bar≡baz⊙1-2" → "|foo≡bar≡baz⊙1-2|"
+    )
 
-        for ((effective, absolute) ← pairs) {
-            assert(isAbsoluteId(absolute))
-            assert(effective === absoluteIdToEffectiveId(absolute))
-            assert(absolute  === effectiveIdToAbsoluteId(effective))
-        }
+    for ((effective, absolute) ← pairs) {
+      assert(isAbsoluteId(absolute))
+      assert(effective === absoluteIdToEffectiveId(absolute))
+      assert(absolute  === effectiveIdToAbsoluteId(effective))
     }
+  }
 
-    @Test def absolute(): Unit = {
-        assert(isAbsoluteId("|foo|"))
-        assert(! isAbsoluteId("||"))
-        assert(! isAbsoluteId("|"))
-        assert(! isAbsoluteId(""))
-        assert(! isAbsoluteId("≡≡"))
-    }
+  @Test def absolute(): Unit = {
+    assert(isAbsoluteId("|foo|"))
+    assert(! isAbsoluteId("||"))
+    assert(! isAbsoluteId("|"))
+    assert(! isAbsoluteId(""))
+    assert(! isAbsoluteId("≡≡"))
+  }
 }

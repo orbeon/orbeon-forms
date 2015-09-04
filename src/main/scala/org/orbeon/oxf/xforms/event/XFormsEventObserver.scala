@@ -20,7 +20,7 @@ import Dispatch.EventListener
  * Represents an event observer. Implemented by controls, xf:model, xf:instance, xf:submission.
  */
 trait XFormsEventObserver extends XFormsEventTarget {
-    def addListener(eventName: String, listener: EventListener)
-    def removeListener(eventName: String, listener: EventListener)
-    def getListeners(eventName: String): immutable.Seq[EventListener]
+  def addListener(eventName: String, listener: EventListener)
+  def removeListener(eventName: String, listener: EventListener)
+  def getListeners(eventName: String): immutable.Seq[EventListener]
 }

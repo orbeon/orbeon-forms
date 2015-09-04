@@ -24,21 +24,21 @@ import org.orbeon.oxf.xforms.analysis.model.Model
  */
 class XXFormsCustomMIP extends XXFormsMIPFunction {
 
-    override def evaluateItem(xpathContext: XPathContext) =
-        argument(0).iterate(xpathContext).next() match {
-            case nodeInfo: NodeInfo ⇒
-                // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
-                // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
-                // the one used on the binds.
-                val qName = getQNameFromExpression(xpathContext, argument(1))
-                val name  = Model.buildCustomMIPName(qName.getQualifiedName)
+  override def evaluateItem(xpathContext: XPathContext) =
+    argument(0).iterate(xpathContext).next() match {
+      case nodeInfo: NodeInfo ⇒
+        // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
+        // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
+        // the one used on the binds.
+        val qName = getQNameFromExpression(xpathContext, argument(1))
+        val name  = Model.buildCustomMIPName(qName.getQualifiedName)
 
-                // Return the value or null
-                Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap
-                    (m ⇒ m get name) map
-                    StringValue.makeStringValue orNull
-            case _ ⇒
-                // $item is empty or its first item is not a node
-                null
-        }
+        // Return the value or null
+        Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap
+          (m ⇒ m get name) map
+          StringValue.makeStringValue orNull
+      case _ ⇒
+        // $item is empty or its first item is not a node
+        null
+    }
 }

@@ -25,29 +25,29 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
 class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
+  extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    // If we are really at the root, register to ControlTree. This so that the tree is made available during
-    // construction to XPath functions like index() or case()
-    override def addChild(control: XFormsControl ): Unit = {
-        super.addChild(control)
+  // If we are really at the root, register to ControlTree. This so that the tree is made available during
+  // construction to XPath functions like index() or case()
+  override def addChild(control: XFormsControl ): Unit = {
+    super.addChild(control)
 
-        if (parent eq null) // ne null when child of xxf:dynamic
-            containingDocument.getControls.getCurrentControlTree.setRoot(this)
-    }
+    if (parent eq null) // ne null when child of xxf:dynamic
+      containingDocument.getControls.getCurrentControlTree.setRoot(this)
+  }
 
-    override def performDefaultAction(event: XFormsEvent): Unit = event match {
-        case load: XXFormsLoadEvent ⇒
-            // Internal load event
-            try
-                NetUtils.getExternalContext.getResponse.sendRedirect(load.resource, false, false)
-            catch {
-                case e: IOException ⇒ throw new ValidationException(e, getLocationData)
-            }
-        case _ ⇒
-            super.performDefaultAction(event)
-    }
+  override def performDefaultAction(event: XFormsEvent): Unit = event match {
+    case load: XXFormsLoadEvent ⇒
+      // Internal load event
+      try
+        NetUtils.getExternalContext.getResponse.sendRedirect(load.resource, false, false)
+      catch {
+        case e: IOException ⇒ throw new ValidationException(e, getLocationData)
+      }
+    case _ ⇒
+      super.performDefaultAction(event)
+  }
 
-    // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
-    //override def supportsRefreshEvents = true
+  // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
+  //override def supportsRefreshEvents = true
 }

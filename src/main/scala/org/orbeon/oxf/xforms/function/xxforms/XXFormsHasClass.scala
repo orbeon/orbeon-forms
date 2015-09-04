@@ -17,10 +17,10 @@ import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 
 class XXFormsHasClass extends XFormsFunction with FunctionSupport with ClassSupport {
-    override def evaluateItem(xpathContext: XPathContext) =
-        classes(1)(xpathContext)(stringArgument(0)(xpathContext))
+  override def evaluateItem(xpathContext: XPathContext) =
+    classes(1)(xpathContext)(stringArgument(0)(xpathContext))
 
-    // Needed otherwise xpathContext.getContextItem doesn't return the correct value
-    override def getIntrinsicDependencies =
-        if (argument.size == 1) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
+  // Needed otherwise xpathContext.getContextItem doesn't return the correct value
+  override def getIntrinsicDependencies =
+    if (argument.size == 1) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }

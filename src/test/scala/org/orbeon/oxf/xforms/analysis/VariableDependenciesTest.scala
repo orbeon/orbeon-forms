@@ -21,41 +21,41 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def variableWithIntermediateControl() {
-        Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+  @Test def variableWithIntermediateControl() {
+    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
-        this setupDocument
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-                     xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:ev="http://www.w3.org/2001/xml-events"
-                     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xh:head>
-                    <xf:model id="model" xxf:encrypt-item-values="false" xxf:xpath-analysis="true">
-                        <xf:instance id="instance">
-                            <form>
-                                <lang>en</lang>
-                                <label lang="en">Name</label>
-                                <label lang="fr">Nom</label>
-                            </form>
-                        </xf:instance>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:var id="my-var" name="lang" value="label[@lang = ../lang]"/>
+    this setupDocument
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+           xmlns:xf="http://www.w3.org/2002/xforms"
+           xmlns:ev="http://www.w3.org/2001/xml-events"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+        <xh:head>
+          <xf:model id="model" xxf:encrypt-item-values="false" xxf:xpath-analysis="true">
+            <xf:instance id="instance">
+              <form>
+                <lang>en</lang>
+                <label lang="en">Name</label>
+                <label lang="fr">Nom</label>
+              </form>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <xf:var id="my-var" name="lang" value="label[@lang = ../lang]"/>
 
-                    <xf:input id="my-input" ref="lang"/>
+          <xf:input id="my-input" ref="lang"/>
 
-                    <xf:output id="my-output" value="''">
-                        <xf:label ref="$lang"/>
-                    </xf:output>
-                </xh:body>
-            </xh:html>
+          <xf:output id="my-output" value="''">
+            <xf:label ref="$lang"/>
+          </xf:output>
+        </xh:body>
+      </xh:html>
 
-        assert(getControl("my-output").getLabel === "Name")
+    assert(getControl("my-output").getLabel === "Name")
 
-        setControlValue("my-input", "fr")
+    setControlValue("my-input", "fr")
 
-        assert(getControl("my-output").getLabel === "Nom")
-    }
+    assert(getControl("my-output").getLabel === "Nom")
+  }
 }

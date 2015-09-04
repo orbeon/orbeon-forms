@@ -32,75 +32,75 @@ import org.orbeon.scaxon.XML
  * property('xxf:noscript')
  */
 private object Property {
-    val Version                  = StringValue.makeStringValue("1.1")
-    val ConformanceLevel         = StringValue.makeStringValue("full")
-    val VersionProperty          = "version"
-    val ConformanceLevelProperty = "conformance-level"
+  val Version                  = StringValue.makeStringValue("1.1")
+  val ConformanceLevel         = StringValue.makeStringValue("full")
+  val VersionProperty          = "version"
+  val ConformanceLevelProperty = "conformance-level"
 }
 
 class Property extends XFormsFunction with FunctionSupport {
 
-    import Property._
+  import Property._
 
-    private var arg: Either[(String, String), Map[String, String]] = null
+  private var arg: Either[(String, String), Map[String, String]] = null
 
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        val uriLocal =
-            arg match {
-                case Left(uriLocal)    ⇒ uriLocal
-                case Right(namespaces) ⇒
-                    val propertyNameString = stringArgument(0)
-                    val qName = Dom4jUtils.extractTextValueQName(namespaces.asJava, propertyNameString, false)
-                    (qName.getNamespaceURI, qName.getName)
-            }
+    val uriLocal =
+      arg match {
+        case Left(uriLocal)    ⇒ uriLocal
+        case Right(namespaces) ⇒
+          val propertyNameString = stringArgument(0)
+          val qName = Dom4jUtils.extractTextValueQName(namespaces.asJava, propertyNameString, false)
+          (qName.getNamespaceURI, qName.getName)
+      }
 
-        uriLocal match {
-            case (_, local) if local.toLowerCase.contains("password") ⇒
-                // Never return any property containing the string "password" as a first line of defense
-                null
-            case ("", VersionProperty) ⇒
-                Version
-            case ("", ConformanceLevelProperty) ⇒
-                ConformanceLevel
-            case (XXFORMS_NAMESPACE_URI, local) ⇒
-                // Property in the xxforms namespace: return our properties
-                Option(getContainingDocument(xpathContext).getProperty(local)) map
-                    (v ⇒ XFormsUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
-            case (uri, local) ⇒
-                throw new XPathException(s"Unknown property: property('${stringArgument(0)}')")
-        }
+    uriLocal match {
+      case (_, local) if local.toLowerCase.contains("password") ⇒
+        // Never return any property containing the string "password" as a first line of defense
+        null
+      case ("", VersionProperty) ⇒
+        Version
+      case ("", ConformanceLevelProperty) ⇒
+        ConformanceLevel
+      case (XXFORMS_NAMESPACE_URI, local) ⇒
+        // Property in the xxforms namespace: return our properties
+        Option(getContainingDocument(xpathContext).getProperty(local)) map
+          (v ⇒ XFormsUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
+      case (uri, local) ⇒
+        throw new XPathException(s"Unknown property: property('${stringArgument(0)}')")
     }
+  }
 
-    // See also Saxon Evaluate.java
-    override def checkArguments(visitor: ExpressionVisitor): Unit = {
-        super.checkArguments(visitor)
-        if (arg eq null) {
-            val namespaceResolver = visitor.getStaticContext.getNamespaceResolver
-            arg = arguments(0) match {
-                case sl: StringLiteral ⇒
-                    // This is the most common case where the parameter value is known at expression compilation time
-                    val (prefix, local) = XML.parseQName(sl.getStringValue)
-                    Left(namespaceResolver.getURIForPrefix(prefix, false) → local)
-                case _ ⇒
-                    // NOTE: Event.java has the exact same code in Java
-                    val pairs =
-                        for {
-                            prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[ju.Iterator[String]].asScala
-                            if prefix != ""
-                            uri = namespaceResolver.getURIForPrefix(prefix, false)
-                        } yield
-                            prefix → uri
+  // See also Saxon Evaluate.java
+  override def checkArguments(visitor: ExpressionVisitor): Unit = {
+    super.checkArguments(visitor)
+    if (arg eq null) {
+      val namespaceResolver = visitor.getStaticContext.getNamespaceResolver
+      arg = arguments(0) match {
+        case sl: StringLiteral ⇒
+          // This is the most common case where the parameter value is known at expression compilation time
+          val (prefix, local) = XML.parseQName(sl.getStringValue)
+          Left(namespaceResolver.getURIForPrefix(prefix, false) → local)
+        case _ ⇒
+          // NOTE: Event.java has the exact same code in Java
+          val pairs =
+            for {
+              prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[ju.Iterator[String]].asScala
+              if prefix != ""
+              uri = namespaceResolver.getURIForPrefix(prefix, false)
+            } yield
+              prefix → uri
 
-                    Right(pairs.toMap)
-            }
-        }
+          Right(pairs.toMap)
+      }
     }
+  }
 
-    // Default behavior: depend on arguments
-    // We don't consider that a change to the properties should cause a reevaluation
-    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
-        addSubExpressionsToPathMap(pathMap, pathMapNodeSet)
+  // Default behavior: depend on arguments
+  // We don't consider that a change to the properties should cause a reevaluation
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
+    addSubExpressionsToPathMap(pathMap, pathMapNodeSet)
 }

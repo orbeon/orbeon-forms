@@ -28,28 +28,28 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  * xf:submit control.
  */
 class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsTriggerControl(container, parent, element, id) {
+    extends XFormsTriggerControl(container, parent, element, id) {
 
-    override def performDefaultAction(event: XFormsEvent): Unit = {
-        // Do the default stuff upon receiving a DOMActivate event
-        if (event.name == DOM_ACTIVATE) {
+  override def performDefaultAction(event: XFormsEvent): Unit = {
+    // Do the default stuff upon receiving a DOMActivate event
+    if (event.name == DOM_ACTIVATE) {
 
-            // Find submission id
-            val submissionId =
-                Option(element.attributeValue(SUBMISSION_QNAME)) getOrElse
-                (throw new ValidationException("xf:submit requires a submission attribute.", getLocationData))
+      // Find submission id
+      val submissionId =
+        Option(element.attributeValue(SUBMISSION_QNAME)) getOrElse
+        (throw new ValidationException("xf:submit requires a submission attribute.", getLocationData))
 
-            resolve(submissionId) match {
-                case Some(submission: XFormsModelSubmission) ⇒
-                    // Submission found, dispatch xforms-submit event to it
-                    Dispatch.dispatchEvent(new XFormsSubmitEvent(submission))
-                case _ ⇒
-                    // "If there is a null search result for the target object and the source object is an XForms action such as
-                    // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-                    debug("submission does not refer to an existing xf:submission element, ignoring action",
-                        Seq("submission id" → submissionId))
-            }
-        }
-        super.performDefaultAction(event)
+      resolve(submissionId) match {
+        case Some(submission: XFormsModelSubmission) ⇒
+          // Submission found, dispatch xforms-submit event to it
+          Dispatch.dispatchEvent(new XFormsSubmitEvent(submission))
+        case _ ⇒
+          // "If there is a null search result for the target object and the source object is an XForms action such as
+          // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+          debug("submission does not refer to an existing xf:submission element, ignoring action",
+            Seq("submission id" → submissionId))
+      }
     }
+    super.performDefaultAction(event)
+  }
 }

@@ -29,97 +29,97 @@ import scala.annotation.tailrec
 // - internal requests are made to the Orbeon servlet
 object InternalHttpClient extends HttpClient {
 
-    def connect(
-        url         : String,
-        credentials : Option[Credentials], // ignored
-        cookieStore : CookieStore,         // ignored
-        method      : String,
-        headers     : Map[String, List[String]],
-        content     : Option[StreamedContent]
-    ): HttpResponse = {
+  def connect(
+    url         : String,
+    credentials : Option[Credentials], // ignored
+    cookieStore : CookieStore,         // ignored
+    method      : String,
+    headers     : Map[String, List[String]],
+    content     : Option[StreamedContent]
+  ): HttpResponse = {
 
-        require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
+    require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
 
-        val currentServletPortlet =
-            OrbeonServlet.currentServlet.value orElse
-            OrbeonPortlet.currentPortlet.value getOrElse
-            (throw new OXFException(s"InternalHttpClient: missing current servlet or portlet connecting to $url."))
+    val currentServletPortlet =
+      OrbeonServlet.currentServlet.value orElse
+      OrbeonPortlet.currentPortlet.value getOrElse
+      (throw new OXFException(s"InternalHttpClient: missing current servlet or portlet connecting to $url."))
 
-        val incomingExternalContext = NetUtils.getExternalContext
-        val incomingRequest         = incomingExternalContext.getRequest
+    val incomingExternalContext = NetUtils.getExternalContext
+    val incomingRequest         = incomingExternalContext.getRequest
 
-        // NOTE: Only `oxf:redirect` calls `Response.sendRedirect` with `isServerSide = true`. In turn, `oxf:redirect`
-        // is only called from the PFC with action results, and only passes `isServerSide = true` if
-        // `instance-passing = "forward"`, which is not the default. Form Runner doesn't make use of this. Even in that
-        // case data is passed as a URL parameter called `$instance` instead of using a request body. However, one user
-        // has reported needing this to work as of 2015-05.
-        @tailrec
-        def processRedirects(
-            pathQuery : String,
-            method    : String,
-            headers   : Map[String, List[String]],
-            content   : Option[StreamedContent]
-        ): LocalResponse = {
+    // NOTE: Only `oxf:redirect` calls `Response.sendRedirect` with `isServerSide = true`. In turn, `oxf:redirect`
+    // is only called from the PFC with action results, and only passes `isServerSide = true` if
+    // `instance-passing = "forward"`, which is not the default. Form Runner doesn't make use of this. Even in that
+    // case data is passed as a URL parameter called `$instance` instead of using a request body. However, one user
+    // has reported needing this to work as of 2015-05.
+    @tailrec
+    def processRedirects(
+      pathQuery : String,
+      method    : String,
+      headers   : Map[String, List[String]],
+      content   : Option[StreamedContent]
+    ): LocalResponse = {
 
-            val request =
-                new LocalRequest(
-                    incomingRequest         = incomingRequest,
-                    contextPath             = incomingRequest.getContextPath,
-                    pathQuery               = pathQuery,
-                    methodUpper             = method,
-                    headersMaybeCapitalized = headers,
-                    content                 = content
-                )
+      val request =
+        new LocalRequest(
+          incomingRequest         = incomingRequest,
+          contextPath             = incomingRequest.getContextPath,
+          pathQuery               = pathQuery,
+          methodUpper             = method,
+          headersMaybeCapitalized = headers,
+          content                 = content
+        )
 
-            // Honor Orbeon-Client header (see also ServletExternalContext)
-            val urlRewriter =
-                Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
-                    case Some(client) if EmbeddedClientValues(client) ⇒
-                        new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
-                    case Some(client) ⇒
-                        new ServletURLRewriter(request)
-                    case None ⇒
-                        incomingExternalContext.getResponse: URLRewriter
-                }
-
-            val response = new LocalResponse(urlRewriter)
-
-            currentServletPortlet.processorService.service(
-                new PipelineContext,
-                new LocalExternalContext(
-                    incomingExternalContext.getWebAppContext,
-                    request,
-                    response
-                )
-            )
-
-            // NOTE: It is unclear which headers should be passed upon redirect. For example, if we have a User-Agent
-            // header coming from the browser, it should be kept. But headers associated with content, such as
-            // Content-Type and Content-Length, must not be provided upon redirect. Possibly, only headers  coming from
-            // the incoming request should be passed, minus content headers.
-            response.serverSideRedirect match {
-                case Some(location) ⇒ processRedirects(location, "GET", Map.empty, None)
-                case None           ⇒ response
-            }
+      // Honor Orbeon-Client header (see also ServletExternalContext)
+      val urlRewriter =
+        Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
+          case Some(client) if EmbeddedClientValues(client) ⇒
+            new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
+          case Some(client) ⇒
+            new ServletURLRewriter(request)
+          case None ⇒
+            incomingExternalContext.getResponse: URLRewriter
         }
 
-        val response = processRedirects(url, method, headers, content)
+      val response = new LocalResponse(urlRewriter)
 
-        new HttpResponse {
-            lazy val statusCode   = response.statusCode
-            lazy val headers      = response.capitalizedHeaders
-            lazy val lastModified = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
-            lazy val content      = StreamedContent(
-                inputStream       = response.getInputStream,
-                contentType       = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
-                contentLength     = Headers.firstLongHeaderIgnoreCase(headers, Headers.ContentLength),
-                title             = None
-            )
-            def disconnect()      = content.close()
-        }
+      currentServletPortlet.processorService.service(
+        new PipelineContext,
+        new LocalExternalContext(
+          incomingExternalContext.getWebAppContext,
+          request,
+          response
+        )
+      )
+
+      // NOTE: It is unclear which headers should be passed upon redirect. For example, if we have a User-Agent
+      // header coming from the browser, it should be kept. But headers associated with content, such as
+      // Content-Type and Content-Length, must not be provided upon redirect. Possibly, only headers  coming from
+      // the incoming request should be passed, minus content headers.
+      response.serverSideRedirect match {
+        case Some(location) ⇒ processRedirects(location, "GET", Map.empty, None)
+        case None           ⇒ response
+      }
     }
 
-    override def shutdown() = ()
+    val response = processRedirects(url, method, headers, content)
 
-    private val EmbeddedClientValues = Set("embedded", "portlet")
+    new HttpResponse {
+      lazy val statusCode   = response.statusCode
+      lazy val headers      = response.capitalizedHeaders
+      lazy val lastModified = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+      lazy val content      = StreamedContent(
+        inputStream       = response.getInputStream,
+        contentType       = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
+        contentLength     = Headers.firstLongHeaderIgnoreCase(headers, Headers.ContentLength),
+        title             = None
+      )
+      def disconnect()      = content.close()
+    }
+  }
+
+  override def shutdown() = ()
+
+  private val EmbeddedClientValues = Set("embedded", "portlet")
 }

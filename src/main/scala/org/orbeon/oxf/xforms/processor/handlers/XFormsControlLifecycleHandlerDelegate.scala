@@ -18,15 +18,15 @@ import org.xml.sax.Attributes
 
 class XFormsControlLifecycleHandlerDelegate(handlerContext: HandlerContext, containingDocument: XFormsContainingDocument, attributes: Attributes) {
 
-    val isTemplate  = handlerContext.isTemplate
-    val prefixedId  = handlerContext.getPrefixedId(attributes)
-    val effectiveId = handlerContext.getEffectiveId(attributes)
+  val isTemplate  = handlerContext.isTemplate
+  val prefixedId  = handlerContext.getPrefixedId(attributes)
+  val effectiveId = handlerContext.getEffectiveId(attributes)
 
-    val currentControlOpt =
-        if (handlerContext.isTemplate)
-            None
-        else
-            Option(containingDocument.getControlByEffectiveId(effectiveId))
+  val currentControlOpt =
+    if (handlerContext.isTemplate)
+      None
+    else
+      Option(containingDocument.getControlByEffectiveId(effectiveId))
 
-    val currentControlOrNull = currentControlOpt.orNull
+  val currentControlOrNull = currentControlOpt.orNull
 }

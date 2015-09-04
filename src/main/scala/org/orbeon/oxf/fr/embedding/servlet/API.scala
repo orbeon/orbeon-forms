@@ -25,83 +25,83 @@ import scala.collection.immutable.Seq
 
 object API {
 
-    // Embed an Orbeon Forms page by path
-    def embedPageJava(
-        req        : HttpServletRequest,
-        writer     : Writer,
-        path       : String,
-        headers    : ju.Map[String, String]
-     ): Unit =
-        withSettings(req, writer) { settings ⇒
+  // Embed an Orbeon Forms page by path
+  def embedPageJava(
+    req        : HttpServletRequest,
+    writer     : Writer,
+    path       : String,
+    headers    : ju.Map[String, String]
+   ): Unit =
+    withSettings(req, writer) { settings ⇒
 
-            implicit val ctx = new ServletEmbeddingContextWithResponse(
-                req,
-                Left(writer),
-                nextNamespace(req),
-                settings.orbeonPrefix,
-                settings.httpClient
-            )
+      implicit val ctx = new ServletEmbeddingContextWithResponse(
+        req,
+        Left(writer),
+        nextNamespace(req),
+        settings.orbeonPrefix,
+        settings.httpClient
+      )
 
-            proxyPage(
-                settings.formRunnerURL,
-                path,
-                Option(headers) map (_.asScala.to[List]) getOrElse Nil
-            )
-        }
+      proxyPage(
+        settings.formRunnerURL,
+        path,
+        Option(headers) map (_.asScala.to[List]) getOrElse Nil
+      )
+    }
 
-    // Embed a Form Runner form
-    def embedFormJava(
-        req        : HttpServletRequest,
-        writer     : Writer,
-        app        : String,
-        form       : String,
-        mode       : String,
-        documentId : String,
-        query      : String,
-        headers    : ju.Map[String, String]
-     ): Unit =
-        embedPageJava(
-            req,
-            writer,
-            formRunnerPath(app, form, mode, Option(documentId), Option(query)),
-            headers
-        )
+  // Embed a Form Runner form
+  def embedFormJava(
+    req        : HttpServletRequest,
+    writer     : Writer,
+    app        : String,
+    form       : String,
+    mode       : String,
+    documentId : String,
+    query      : String,
+    headers    : ju.Map[String, String]
+   ): Unit =
+    embedPageJava(
+      req,
+      writer,
+      formRunnerPath(app, form, mode, Option(documentId), Option(query)),
+      headers
+    )
 
-    // Embed an Orbeon Forms page by path
-    def embedPage(
-        req        : HttpServletRequest,
-        out        : Writer Either HttpServletResponse,
-        path       : String,
-        headers    : Seq[(String, String)] = Nil
-     ): Unit =
-        withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
+  // Embed an Orbeon Forms page by path
+  def embedPage(
+    req        : HttpServletRequest,
+    out        : Writer Either HttpServletResponse,
+    path       : String,
+    headers    : Seq[(String, String)] = Nil
+   ): Unit =
+    withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
 
-            implicit val ctx = new ServletEmbeddingContextWithResponse(
-                req,
-                out,
-                nextNamespace(req),
-                settings.orbeonPrefix,
-                settings.httpClient
-            )
+      implicit val ctx = new ServletEmbeddingContextWithResponse(
+        req,
+        out,
+        nextNamespace(req),
+        settings.orbeonPrefix,
+        settings.httpClient
+      )
 
-            proxyPage(settings.formRunnerURL, path, headers)
-        }
+      proxyPage(settings.formRunnerURL, path, headers)
+    }
 
-    // Embed a Form Runner form
-    def embedForm(
-        req        : HttpServletRequest,
-        out        : Writer Either HttpServletResponse,
-        app        : String,
-        form       : String,
-        mode       : Mode,
-        documentId : Option[String] = None,
-        query      : Option[String] = None,
-        headers    : Seq[(String, String)] = Nil
-    ): Unit =
-        embedPage(
-            req,
-            out,
-            formRunnerPath(app, form, mode.name, documentId, query),
-            headers
-        )
+  // Embed a Form Runner form
+  def embedForm(
+    req        : HttpServletRequest,
+    out        : Writer Either HttpServletResponse,
+    app        : String,
+    form       : String,
+    mode       : Mode,
+    documentId : Option[String] = None,
+    query      : Option[String] = None,
+    headers    : Seq[(String, String)] = Nil
+  ): Unit =
+    embedPage(
+      req,
+      out,
+      formRunnerPath(app, form, mode.name, documentId, query),
+      headers
+    )
 }

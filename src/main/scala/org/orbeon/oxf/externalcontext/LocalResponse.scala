@@ -24,111 +24,111 @@ import scala.collection.mutable
 
 class LocalResponse(rewriter: URLRewriter) extends Response {
 
-    private var _statusCode                         = 200
-    private var _serverSideRedirect: Option[String] = None
-    private var _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
+  private var _statusCode                         = 200
+  private var _serverSideRedirect: Option[String] = None
+  private var _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
 
-    private var _stringWriter: StringBuilderWriter        = null
-    private var _printWriter : PrintWriter                = null
-    private var _byteStream  : LocalByteArrayOutputStream = null
-    private var _inputStream : InputStream                = null
+  private var _stringWriter: StringBuilderWriter        = null
+  private var _printWriter : PrintWriter                = null
+  private var _byteStream  : LocalByteArrayOutputStream = null
+  private var _inputStream : InputStream                = null
 
-    def statusCode = _statusCode
-    def serverSideRedirect = _serverSideRedirect
+  def statusCode = _statusCode
+  def serverSideRedirect = _serverSideRedirect
 
-    def capitalizedHeaders =
-        _lowerCaseHeaders.toList map
-        { case (k, v) ⇒ Headers.capitalizeCommonOrSplitHeader(k) → v } toMap
+  def capitalizedHeaders =
+    _lowerCaseHeaders.toList map
+    { case (k, v) ⇒ Headers.capitalizeCommonOrSplitHeader(k) → v } toMap
 
-    def getInputStream: InputStream = {
-        if (_inputStream eq null) {
-            _inputStream =
-                if (_stringWriter ne null) {
-                    val bytes = _stringWriter.getBuilder.toString.getBytes("UTF-8")
-                    new ByteArrayInputStream(bytes, 0, bytes.length)
-                } else if (_byteStream ne null) {
-                    new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)
-                }  else {
-                    EmptyInputStream
-                }
+  def getInputStream: InputStream = {
+    if (_inputStream eq null) {
+      _inputStream =
+        if (_stringWriter ne null) {
+          val bytes = _stringWriter.getBuilder.toString.getBytes("UTF-8")
+          new ByteArrayInputStream(bytes, 0, bytes.length)
+        } else if (_byteStream ne null) {
+          new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)
+        }  else {
+          EmptyInputStream
         }
-        _inputStream
+    }
+    _inputStream
+  }
+
+  def setHeader(name: String, value: String): Unit =
+    _lowerCaseHeaders += name.toLowerCase → List(value)
+
+  def addHeader(name: String, value: String): Unit =
+    _lowerCaseHeaders += name.toLowerCase  → (_lowerCaseHeaders.getOrElse(name.toLowerCase , Nil) :+ value)
+
+  def checkIfModifiedSince(lastModified: Long) = true
+
+  def getCharacterEncoding = null
+
+  def getNamespacePrefix = ""
+
+  def getOutputStream: OutputStream = {
+    if (_byteStream eq null)
+      _byteStream = new LocalByteArrayOutputStream
+    _byteStream
+  }
+
+  def getWriter: PrintWriter = {
+    if (_stringWriter eq null) {
+      _stringWriter = new StringBuilderWriter
+      _printWriter = new PrintWriter(_stringWriter)
+    }
+    _printWriter
+  }
+
+  def isCommitted = false
+
+  def reset() = ()
+
+  def rewriteActionURL(urlString: String) =
+    rewriter.rewriteActionURL(urlString)
+
+  def rewriteRenderURL(urlString: String) =
+    rewriter.rewriteRenderURL(urlString)
+
+  def rewriteActionURL(urlString: String, portletMode: String, windowState: String) =
+    rewriter.rewriteActionURL(urlString, portletMode, windowState)
+
+  def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =
+    rewriter.rewriteRenderURL(urlString, portletMode, windowState)
+
+  def rewriteResourceURL(urlString: String, rewriteMode: Int) =
+    rewriter.rewriteResourceURL(urlString, rewriteMode)
+
+  def sendError(sc: Int): Unit =
+    this._statusCode = sc
+
+  def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) =
+    if (isServerSide) {
+      this._serverSideRedirect = Some(location)
+    } else {
+      this._statusCode = 302
+      setHeader(Headers.LocationLower, location)
     }
 
-    def setHeader(name: String, value: String): Unit =
-        _lowerCaseHeaders += name.toLowerCase → List(value)
+  def setPageCaching(lastModified: Long) = () // Q: Should set headers?
+  def setResourceCaching(lastModified: Long, expires: Long) = () // Q: Should set headers?
 
-    def addHeader(name: String, value: String): Unit =
-        _lowerCaseHeaders += name.toLowerCase  → (_lowerCaseHeaders.getOrElse(name.toLowerCase , Nil) :+ value)
+  def setStatus(status: Int): Unit =
+    this._statusCode = status
 
-    def checkIfModifiedSince(lastModified: Long) = true
+  def setContentLength(len: Int): Unit =
+    setHeader(Headers.ContentLength, len.toString)
 
-    def getCharacterEncoding = null
+  def setContentType(contentType: String): Unit =
+    setHeader(Headers.ContentType, contentType)
 
-    def getNamespacePrefix = ""
+  def setTitle(title: String) = ()
 
-    def getOutputStream: OutputStream = {
-        if (_byteStream eq null)
-            _byteStream = new LocalByteArrayOutputStream
-        _byteStream
-    }
-
-    def getWriter: PrintWriter = {
-        if (_stringWriter eq null) {
-            _stringWriter = new StringBuilderWriter
-            _printWriter = new PrintWriter(_stringWriter)
-        }
-        _printWriter
-    }
-
-    def isCommitted = false
-
-    def reset() = ()
-
-    def rewriteActionURL(urlString: String) =
-        rewriter.rewriteActionURL(urlString)
-
-    def rewriteRenderURL(urlString: String) =
-        rewriter.rewriteRenderURL(urlString)
-
-    def rewriteActionURL(urlString: String, portletMode: String, windowState: String) =
-        rewriter.rewriteActionURL(urlString, portletMode, windowState)
-
-    def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =
-        rewriter.rewriteRenderURL(urlString, portletMode, windowState)
-
-    def rewriteResourceURL(urlString: String, rewriteMode: Int) =
-        rewriter.rewriteResourceURL(urlString, rewriteMode)
-
-    def sendError(sc: Int): Unit =
-        this._statusCode = sc
-
-    def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean) =
-        if (isServerSide) {
-            this._serverSideRedirect = Some(location)
-        } else {
-            this._statusCode = 302
-            setHeader(Headers.LocationLower, location)
-        }
-
-    def setPageCaching(lastModified: Long) = () // Q: Should set headers?
-    def setResourceCaching(lastModified: Long, expires: Long) = () // Q: Should set headers?
-
-    def setStatus(status: Int): Unit =
-        this._statusCode = status
-
-    def setContentLength(len: Int): Unit =
-        setHeader(Headers.ContentLength, len.toString)
-
-    def setContentType(contentType: String): Unit =
-        setHeader(Headers.ContentType, contentType)
-
-    def setTitle(title: String) = ()
-
-    def getNativeResponse: AnyRef =
-        throw new UnsupportedOperationException
+  def getNativeResponse: AnyRef =
+    throw new UnsupportedOperationException
 }
 
 private class LocalByteArrayOutputStream extends ByteArrayOutputStream {
-    def getByteArray = buf
+  def getByteArray = buf
 }

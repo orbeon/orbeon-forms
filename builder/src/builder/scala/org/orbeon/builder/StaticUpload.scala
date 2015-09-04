@@ -15,20 +15,20 @@ package org.orbeon.builder
 
 object StaticUpload {
 
-    private val SpacerImagePath = "/ops/images/xforms/spacer.gif"
-    private val PhotoImagePath  = "/apps/fr/style/images/silk/photo.png"
+  private val SpacerImagePath = "/ops/images/xforms/spacer.gif"
+  private val PhotoImagePath  = "/apps/fr/style/images/silk/photo.png"
 
-    private def findAndReplaceAllSpacersWithImages() =
-        $(s"#fr-form-group .fb-upload img.xforms-output-output[src $$= '$SpacerImagePath']").toArray foreach { image ⇒
-            $(image).attr("src") foreach { src ⇒
-                val prefix = src.substring(0, src.indexOf(SpacerImagePath))
-                $(image).attr("src", prefix + PhotoImagePath)
-            }
-        }
+  private def findAndReplaceAllSpacersWithImages() =
+    $(s"#fr-form-group .fb-upload img.xforms-output-output[src $$= '$SpacerImagePath']").toArray foreach { image ⇒
+      $(image).attr("src") foreach { src ⇒
+        val prefix = src.substring(0, src.indexOf(SpacerImagePath))
+        $(image).attr("src", prefix + PhotoImagePath)
+      }
+    }
 
-    // Initial run when the form is first loaded
-    findAndReplaceAllSpacersWithImages()
+  // Initial run when the form is first loaded
+  findAndReplaceAllSpacersWithImages()
 
-    // Run again after every Ajax request
-    Events.ajaxResponseProcessedEvent.subscribe(findAndReplaceAllSpacersWithImages _)
+  // Run again after every Ajax request
+  Events.ajaxResponseProcessedEvent.subscribe(findAndReplaceAllSpacersWithImages _)
 }

@@ -21,76 +21,76 @@ import collection.JavaConverters._
 
 trait ControlLocalSupport {
 
-    self: XFormsControl ⇒
+  self: XFormsControl ⇒
 
-    // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
-    private[control] var initialLocal: XFormsControlLocal = null
-    private[control] var currentLocal: XFormsControlLocal = null
+  // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
+  private[control] var initialLocal: XFormsControlLocal = null
+  private[control] var currentLocal: XFormsControlLocal = null
 
-    /**
-     * Serialize this control's information which cannot be reconstructed from instances. The result is empty if no
-     * serialization is needed, or a map of name/value pairs otherwise.
-     */
-    def serializeLocal = JCollections.emptyMap[String, String]
+  /**
+   * Serialize this control's information which cannot be reconstructed from instances. The result is empty if no
+   * serialization is needed, or a map of name/value pairs otherwise.
+   */
+  def serializeLocal = JCollections.emptyMap[String, String]
 
-    final def controlState = {
-        val keyValues = serializeLocal
-        val isVisited = visited
+  final def controlState = {
+    val keyValues = serializeLocal
+    val isVisited = visited
 
-        if (keyValues.isEmpty && ! isVisited)
-            None
-        else if (keyValues.isEmpty && isVisited)
-            Some(ControlState(effectiveId, isVisited, Map.empty))
-        else
-            Some(ControlState(effectiveId, isVisited, keyValues.asScala.toMap))
+    if (keyValues.isEmpty && ! isVisited)
+      None
+    else if (keyValues.isEmpty && isVisited)
+      Some(ControlState(effectiveId, isVisited, Map.empty))
+    else
+      Some(ControlState(effectiveId, isVisited, keyValues.asScala.toMap))
+  }
+
+  final def updateLocalCopy(copy: XFormsControl): Unit = {
+    if (this.currentLocal != null) {
+      // There is some local data
+      if (this.currentLocal ne this.initialLocal) {
+        // The trees don't keep wasteful references
+        copy.currentLocal = copy.initialLocal
+        this.initialLocal = this.currentLocal
+      } else {
+        // The new tree must have its own copy
+        // NOTE: We could implement a copy-on-write flag here
+        copy.initialLocal = this.currentLocal.clone.asInstanceOf[XFormsControlLocal]
+        copy.currentLocal = copy.initialLocal
+      }
+    }
+  }
+
+  final def setLocal(local: XFormsControlLocal): Unit = {
+    this.initialLocal = local
+    this.currentLocal = local
+  }
+
+  final def getLocalForUpdate = {
+    if (containingDocument.isHandleDifferences) {
+      // Happening during a client request where we need to handle diffs
+      val controls = containingDocument.getControls
+      if (controls.getInitialControlTree ne controls.getCurrentControlTree) {
+        if (currentLocal ne initialLocal)
+          throw new OXFException("currentLocal != initialLocal")
+      } else if (initialLocal eq currentLocal)
+        currentLocal = initialLocal.clone.asInstanceOf[XFormsControlLocal]
+    } else {
+      // Happening during initialization
+      // NOP: Don't modify currentLocal
     }
 
-    final def updateLocalCopy(copy: XFormsControl): Unit = {
-        if (this.currentLocal != null) {
-            // There is some local data
-            if (this.currentLocal ne this.initialLocal) {
-                // The trees don't keep wasteful references
-                copy.currentLocal = copy.initialLocal
-                this.initialLocal = this.currentLocal
-            } else {
-                // The new tree must have its own copy
-                // NOTE: We could implement a copy-on-write flag here
-                copy.initialLocal = this.currentLocal.clone.asInstanceOf[XFormsControlLocal]
-                copy.currentLocal = copy.initialLocal
-            }
-        }
-    }
+    currentLocal
+  }
 
-    final def setLocal(local: XFormsControlLocal): Unit = {
-        this.initialLocal = local
-        this.currentLocal = local
-    }
+  final def getInitialLocal = initialLocal
+  final def getCurrentLocal = currentLocal
 
-    final def getLocalForUpdate = {
-        if (containingDocument.isHandleDifferences) {
-            // Happening during a client request where we need to handle diffs
-            val controls = containingDocument.getControls
-            if (controls.getInitialControlTree ne controls.getCurrentControlTree) {
-                if (currentLocal ne initialLocal)
-                    throw new OXFException("currentLocal != initialLocal")
-            } else if (initialLocal eq currentLocal)
-                currentLocal = initialLocal.clone.asInstanceOf[XFormsControlLocal]
-        } else {
-            // Happening during initialization
-            // NOP: Don't modify currentLocal
-        }
-
-        currentLocal
-    }
-
-    final def getInitialLocal = initialLocal
-    final def getCurrentLocal = currentLocal
-
-    final def resetLocal() = initialLocal = currentLocal
+  final def resetLocal() = initialLocal = currentLocal
 }
 
 object ControlLocalSupport {
-    class XFormsControlLocal extends Cloneable {
-        override def clone: AnyRef = super.clone
-    }
+  class XFormsControlLocal extends Cloneable {
+    override def clone: AnyRef = super.clone
+  }
 }

@@ -25,25 +25,25 @@ class OrbeonServletContextListenerDelegate extends OrbeonServletContextListener
  */
 class OrbeonServletContextListener extends ServletContextListener {
 
-    private val InitProcessorPrefix     = "oxf.context-initialized-processor."
-    private val InitInputPrefix         = "oxf.context-initialized-processor.input."
-    private val DestroyProcessorPrefix  = "oxf.context-destroyed-processor."
-    private val DestroyInputPrefix      = "oxf.context-destroyed-processor.input."
+  private val InitProcessorPrefix     = "oxf.context-initialized-processor."
+  private val InitInputPrefix         = "oxf.context-initialized-processor.input."
+  private val DestroyProcessorPrefix  = "oxf.context-destroyed-processor."
+  private val DestroyInputPrefix      = "oxf.context-destroyed-processor.input."
 
-    private implicit val logger = ProcessorService.Logger
+  private implicit val logger = ProcessorService.Logger
 
-    def logPrefix = "Context listener"
-    def initParameters = Map()
+  def logPrefix = "Context listener"
+  def initParameters = Map()
 
-    def contextInitialized(event: ServletContextEvent): Unit =
-        withRootException("context creation", new ServletException(_)) {
-            runWithServletContext(event.getServletContext, None, logPrefix, "Context initialized.", InitProcessorPrefix, InitInputPrefix)
-        }
+  def contextInitialized(event: ServletContextEvent): Unit =
+    withRootException("context creation", new ServletException(_)) {
+      runWithServletContext(event.getServletContext, None, logPrefix, "Context initialized.", InitProcessorPrefix, InitInputPrefix)
+    }
 
-    def contextDestroyed(event: ServletContextEvent): Unit =
-        withRootException("context destruction", new ServletException(_)) {
-            runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
-            // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
-            WebAppContext(event.getServletContext).webAppDestroyed()
-        }
+  def contextDestroyed(event: ServletContextEvent): Unit =
+    withRootException("context destruction", new ServletException(_)) {
+      runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
+      // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
+      WebAppContext(event.getServletContext).webAppDestroyed()
+    }
 }

@@ -19,53 +19,53 @@ import javax.xml.transform.stream.StreamResult
 import org.xml.sax.Attributes
 
 object HTMLFragmentSerializer {
+  
+  def create(writer: Writer, skipRootElement: Boolean) = {
     
-    def create(writer: Writer, skipRootElement: Boolean) = {
-        
-        val identity = TransformerUtils.getIdentityTransformerHandler
-        
-        TransformerUtils.applyOutputProperties(
-            identity.getTransformer,
-            "html",
-            null,
-            null,
-            null,
-            "utf-8",
-            true,
-            null,
-            false,
-            0
-        )
+    val identity = TransformerUtils.getIdentityTransformerHandler
+    
+    TransformerUtils.applyOutputProperties(
+      identity.getTransformer,
+      "html",
+      null,
+      null,
+      null,
+      "utf-8",
+      true,
+      null,
+      false,
+      0
+    )
 
-        identity.setResult(new StreamResult(writer))
-        
-        val htmlReceiver = new PlainHTMLOrXHTMLReceiver("", identity)
-        
-        if (skipRootElement)
-            new SkipRootElement(htmlReceiver)
-        else
-            htmlReceiver
-            
+    identity.setResult(new StreamResult(writer))
+    
+    val htmlReceiver = new PlainHTMLOrXHTMLReceiver("", identity)
+    
+    if (skipRootElement)
+      new SkipRootElement(htmlReceiver)
+    else
+      htmlReceiver
+      
+  }
+  
+  class SkipRootElement(receiver: XMLReceiver) extends ForwardingXMLReceiver(receiver) {
+  
+    var level = 0
+  
+    override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+      
+      if (level > 0)
+        super.startElement(uri, localname, qName, attributes)
+      
+      level += 1
     }
-    
-    class SkipRootElement(receiver: XMLReceiver) extends ForwardingXMLReceiver(receiver) {
-    
-        var level = 0
-    
-        override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-            
-            if (level > 0)
-                super.startElement(uri, localname, qName, attributes)
-            
-            level += 1
-        }
-    
-        override def endElement(uri: String, localname: String, qName: String): Unit = {
-            
-            level -= 1
-            
-            if (level > 0)
-                super.endElement(uri, localname, qName)
-        }
+  
+    override def endElement(uri: String, localname: String, qName: String): Unit = {
+      
+      level -= 1
+      
+      if (level > 0)
+        super.endElement(uri, localname, qName)
     }
+  }
 }

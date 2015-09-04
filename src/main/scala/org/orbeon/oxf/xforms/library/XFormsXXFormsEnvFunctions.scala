@@ -24,23 +24,23 @@ import org.orbeon.oxf.xforms.function._
  */
 trait XFormsXXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
-    // Define in early definition of subclass
-    val XFormsXXFormsEnvFunctionsNS: Seq[String]
+  // Define in early definition of subclass
+  val XFormsXXFormsEnvFunctionsNS: Seq[String]
 
-    Namespace(XFormsXXFormsEnvFunctionsNS) {
+  Namespace(XFormsXXFormsEnvFunctionsNS) {
 
-        Fun("element", classOf[XFormsElement], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
-            Arg(ANY_ATOMIC, EXACTLY_ONE),
-            Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
+    Fun("element", classOf[XFormsElement], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
+      Arg(ANY_ATOMIC, EXACTLY_ONE),
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
-        Fun("attribute", classOf[XFormsAttribute], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
-            Arg(ANY_ATOMIC, EXACTLY_ONE),
-            Arg(ANY_ATOMIC, EXACTLY_ONE)
-        )
+    Fun("attribute", classOf[XFormsAttribute], op = 0, min = 1, Type.NODE_TYPE, EXACTLY_ONE,
+      Arg(ANY_ATOMIC, EXACTLY_ONE),
+      Arg(ANY_ATOMIC, EXACTLY_ONE)
+    )
 
-        Fun("case", classOf[XFormsCase], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
-    }
+    Fun("case", classOf[XFormsCase], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+  }
 }

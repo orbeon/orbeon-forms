@@ -17,5 +17,5 @@ import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 abstract class XFormsSingleNodeContainerControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsSingleNodeControl(container, parent, element, effectiveId)
-    with XFormsContainerControl
+  extends XFormsSingleNodeControl(container, parent, element, effectiveId)
+  with XFormsContainerControl

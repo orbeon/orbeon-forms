@@ -17,70 +17,70 @@ import collection.JavaConverters._
 
 trait ItemContainer {
 
-    var level: Int = 0
-    def isTopLevel = level == 0
+  var level: Int = 0
+  def isTopLevel = level == 0
 
-    var parent: ItemContainer = null
+  var parent: ItemContainer = null
 
-    private var _children: List[Item] = Nil
+  private var _children: List[Item] = Nil
 
-    def addChildItem(childItem: Item): Unit = {
-        childItem.level = level
-        childItem.parent = this
+  def addChildItem(childItem: Item): Unit = {
+    childItem.level = level
+    childItem.parent = this
 
-        _children ::= childItem
+    _children ::= childItem
+  }
+
+  def hasChildren = _children.nonEmpty
+  def children = _children.reverse
+  def lastChild = _children.head
+
+  def pruneNonRelevantChildren(): Unit = {
+    // Prune children first
+    _children foreach (_.pruneNonRelevantChildren())
+    // Keep only children which have children or which have a value
+    _children = _children filter (child ⇒ child.hasChildren || (child.value ne null))
+  }
+
+  // Visit the entire itemset
+  def visit[T](o: T, listener: ItemsetListener[T]): Unit = {
+    if (hasChildren) {
+      listener.startLevel(o, selfItem) // Item is used only by menu, not ideal!
+      var first = true
+      for (item ← children) {
+        listener.startItem(o, item, first)
+        item.visit(o, listener)
+        listener.endItem(o, item)
+        first = false
+      }
+      listener.endLevel(o)
+    }
+  }
+
+  // Depth-first Iterator over all the items of this and children
+  def allItemsIterator: Iterator[Item] = {
+    def selfIterator = new Iterator[Item] {
+      var current = selfItem
+      def hasNext = current ne null
+      def next() = {
+        val result = current
+        current = null
+        result
+      }
     }
 
-    def hasChildren = _children.nonEmpty
-    def children = _children.reverse
-    def lastChild = _children.head
+    def childrenIterator = children.iterator flatMap (_.allItemsIterator)
 
-    def pruneNonRelevantChildren(): Unit = {
-        // Prune children first
-        _children foreach (_.pruneNonRelevantChildren())
-        // Keep only children which have children or which have a value
-        _children = _children filter (child ⇒ child.hasChildren || (child.value ne null))
-    }
+    selfIterator ++ childrenIterator
+  }
 
-    // Visit the entire itemset
-    def visit[T](o: T, listener: ItemsetListener[T]): Unit = {
-        if (hasChildren) {
-            listener.startLevel(o, selfItem) // Item is used only by menu, not ideal!
-            var first = true
-            for (item ← children) {
-                listener.startItem(o, item, first)
-                item.visit(o, listener)
-                listener.endItem(o, item)
-                first = false
-            }
-            listener.endLevel(o)
-        }
-    }
+  def jAllItemsIterator = allItemsIterator.asJava
 
-    // Depth-first Iterator over all the items of this and children
-    def allItemsIterator: Iterator[Item] = {
-        def selfIterator = new Iterator[Item] {
-            var current = selfItem
-            def hasNext = current ne null
-            def next() = {
-                val result = current
-                current = null
-                result
-            }
-        }
+  // Implement deep equals
+  override def equals(other: Any) = other match {
+    case other: ItemContainer ⇒ _children == other._children
+    case _ ⇒ false
+  }
 
-        def childrenIterator = children.iterator flatMap (_.allItemsIterator)
-
-        selfIterator ++ childrenIterator
-    }
-
-    def jAllItemsIterator = allItemsIterator.asJava
-
-    // Implement deep equals
-    override def equals(other: Any) = other match {
-        case other: ItemContainer ⇒ _children == other._children
-        case _ ⇒ false
-    }
-
-    private def selfItem = if (this.isInstanceOf[Item]) this.asInstanceOf[Item] else null
+  private def selfItem = if (this.isInstanceOf[Item]) this.asInstanceOf[Item] else null
 }

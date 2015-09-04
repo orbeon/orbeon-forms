@@ -30,182 +30,182 @@ import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.xml.sax.helpers.AttributesImpl
 
 private case class XXFormsDialogControlLocal(
-    var visible             : Boolean,
-    var constrainToViewport : Boolean,
-    var neighborControlId   : Option[String]
+  var visible             : Boolean,
+  var constrainToViewport : Boolean,
+  var neighborControlId   : Option[String]
 ) extends XFormsControlLocal
 
 // Represents an extension xxf:dialog control
 class XXFormsDialogControl(
-    container   : XBLContainer, 
-    parent      : XFormsControl, 
-    element     : Element, 
-    effectiveId : String
+  container   : XBLContainer, 
+  parent      : XFormsControl, 
+  element     : Element, 
+  effectiveId : String
 ) extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    // NOTE: Attributes logic duplicated in XXFormsDialogHandler.
-    // TODO: Should be in the static state.
+  // NOTE: Attributes logic duplicated in XXFormsDialogHandler.
+  // TODO: Should be in the static state.
 
-    // Commented out as those are not used currently.
-    // private var level = Option(element.attributeValue("level")) getOrElse {
-    //     // Default is "modeless" for "minimal" appearance, "modal" otherwise
-    //     if (appearances(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)) "modeless" else "modal"
-    // }
-    //
-    // private val close                    = ! ("false" == element.attributeValue("close"))
-    // private val draggable                = ! ("false" == element.attributeValue("draggable"))
+  // Commented out as those are not used currently.
+  // private var level = Option(element.attributeValue("level")) getOrElse {
+  //     // Default is "modeless" for "minimal" appearance, "modal" otherwise
+  //     if (appearances(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)) "modeless" else "modal"
+  // }
+  //
+  // private val close                    = ! ("false" == element.attributeValue("close"))
+  // private val draggable                = ! ("false" == element.attributeValue("draggable"))
 
-    private val defaultNeighborControlId = Option(element.attributeValue("neighbor"))
-    private val initiallyVisible         = element.attributeValue("visible") == "true"
+  private val defaultNeighborControlId = Option(element.attributeValue("neighbor"))
+  private val initiallyVisible         = element.attributeValue("visible") == "true"
 
-    // Initial local state
-    setLocal(XXFormsDialogControlLocal(initiallyVisible, constrainToViewport = false, None))
+  // Initial local state
+  setLocal(XXFormsDialogControlLocal(initiallyVisible, constrainToViewport = false, None))
 
-    override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
+  override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
 
-        super.onCreate(restoreState, state)
-        
-        state match {
-            case Some(ControlState(_, _, keyValues)) ⇒
-                setLocal(XXFormsDialogControlLocal(
-                    visible             = keyValues("visible") == "true",
-                    constrainToViewport = keyValues.get("constrain") contains "true",
-                    neighborControlId   = keyValues.get("neighbor")
-                ))
-            case None if restoreState ⇒
-                // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
-                // a particular control might not be found.
-                setLocal(XXFormsDialogControlLocal(
-                    visible             = initiallyVisible,
-                    constrainToViewport = false,
-                    neighborControlId   = None
-                ))
-            case _ ⇒
-        }
+    super.onCreate(restoreState, state)
+    
+    state match {
+      case Some(ControlState(_, _, keyValues)) ⇒
+        setLocal(XXFormsDialogControlLocal(
+          visible             = keyValues("visible") == "true",
+          constrainToViewport = keyValues.get("constrain") contains "true",
+          neighborControlId   = keyValues.get("neighbor")
+        ))
+      case None if restoreState ⇒
+        // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
+        // a particular control might not be found.
+        setLocal(XXFormsDialogControlLocal(
+          visible             = initiallyVisible,
+          constrainToViewport = false,
+          neighborControlId   = None
+        ))
+      case _ ⇒
+    }
+  }
+
+  override def getJavaScriptInitialization = getCommonJavaScriptInitialization
+
+  private def dialogCurrentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
+
+  def isVisible             = dialogCurrentLocal.visible
+  def wasVisible            = getInitialLocal.asInstanceOf[XXFormsDialogControlLocal].visible
+  def neighborControlId     = dialogCurrentLocal.neighborControlId orElse defaultNeighborControlId
+  def isConstrainToViewport = dialogCurrentLocal.constrainToViewport
+
+  override def performTargetAction(event: XFormsEvent): Unit = {
+    super.performTargetAction(event)
+    event.name match {
+      case XXFORMS_DIALOG_OPEN ⇒
+        val dialogOpenEvent = event.asInstanceOf[XXFormsDialogOpenEvent]
+
+        val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
+        localForUpdate.visible             = true
+        localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
+        localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
+
+        containingDocument.getControls.markDirtySinceLastRequest(true)
+        containingDocument.getControls.doPartialRefresh(this)
+      case XXFORMS_DIALOG_CLOSE ⇒
+        val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
+        localForUpdate.visible             = false
+        localForUpdate.neighborControlId   = None
+        localForUpdate.constrainToViewport = false
+
+        containingDocument.getControls.markDirtySinceLastRequest(false)
+        containingDocument.getControls.doPartialRefresh(this)
+      case _ ⇒
+    }
+  }
+
+  override def performDefaultAction(event: XFormsEvent): Unit = {
+    event.name match {
+      case XXFORMS_DIALOG_OPEN ⇒
+        // If dialog is closed and the focus is within the dialog, remove the focus
+        // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
+        if (isVisible && ! Focus.isFocusWithinContainer(this))
+          Dispatch.dispatchEvent(new XFormsFocusEvent(this, false))
+      case XXFORMS_DIALOG_CLOSE ⇒
+        // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
+        if (! isVisible && Focus.isFocusWithinContainer(this))
+          Focus.removeFocus(containingDocument)
+      case _ ⇒
+    }
+    super.performDefaultAction(event)
+  }
+
+  override def serializeLocal = {
+
+    val local = dialogCurrentLocal
+    val result = new ju.HashMap[String, String](3)
+
+    result.put("visible", local.visible.toString)
+    if (local.visible) {
+      result.put("constrain", local.constrainToViewport.toString)
+      local.neighborControlId foreach (result.put("neighbor", _))
+    }
+    result
+  }
+
+  override def equalsExternal(other: XFormsControl): Boolean = {
+    if (other == null)
+      return false
+    
+    // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
+    // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
+    
+    val otherDialog = other.asInstanceOf[XXFormsDialogControl]
+    if (otherDialog.wasVisible != isVisible)
+      return false
+    
+    super.equalsExternal(other)
+  }
+
+  override def outputAjaxDiff(
+    ch                    : XMLReceiverHelper,
+    other                 : XFormsControl,
+    attributesImpl        : AttributesImpl,
+    isNewlyVisibleSubtree : Boolean
+  ): Unit = {
+
+    locally {
+      val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+      if (doOutputElement)
+        ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
     }
 
-    override def getJavaScriptInitialization = getCommonJavaScriptInitialization
-
-    private def dialogCurrentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
-
-    def isVisible             = dialogCurrentLocal.visible
-    def wasVisible            = getInitialLocal.asInstanceOf[XXFormsDialogControlLocal].visible
-    def neighborControlId     = dialogCurrentLocal.neighborControlId orElse defaultNeighborControlId
-    def isConstrainToViewport = dialogCurrentLocal.constrainToViewport
-
-    override def performTargetAction(event: XFormsEvent): Unit = {
-        super.performTargetAction(event)
-        event.name match {
-            case XXFORMS_DIALOG_OPEN ⇒
-                val dialogOpenEvent = event.asInstanceOf[XXFormsDialogOpenEvent]
-
-                val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
-                localForUpdate.visible             = true
-                localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
-                localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
-
-                containingDocument.getControls.markDirtySinceLastRequest(true)
-                containingDocument.getControls.doPartialRefresh(this)
-            case XXFORMS_DIALOG_CLOSE ⇒
-                val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
-                localForUpdate.visible             = false
-                localForUpdate.neighborControlId   = None
-                localForUpdate.constrainToViewport = false
-
-                containingDocument.getControls.markDirtySinceLastRequest(false)
-                containingDocument.getControls.doPartialRefresh(this)
-            case _ ⇒
+    locally {
+      // NOTE: This uses visible/hidden. But we could also handle this with relevant="true|false".
+      // 2015-04-01: Unsure if note above still makes sense.
+      val otherDialog = other.asInstanceOf[XXFormsDialogControl]
+      var doOutputElement = false
+      
+      val atts = new AttributesImpl
+      atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
+      
+      val visible = isVisible
+      if (isNewlyVisibleSubtree || visible != otherDialog.wasVisible) {
+        atts.addAttribute("", "visibility", "visibility", CDATA, if (visible) "visible" else "hidden")
+        doOutputElement = true
+      }
+      if (visible) {
+        val neighborOpt = neighborControlId
+        if (isNewlyVisibleSubtree || neighborOpt != otherDialog.neighborControlId) {
+          neighborOpt foreach { neighbor ⇒
+            atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
+            doOutputElement = true
+          }
         }
-    }
-
-    override def performDefaultAction(event: XFormsEvent): Unit = {
-        event.name match {
-            case XXFORMS_DIALOG_OPEN ⇒
-                // If dialog is closed and the focus is within the dialog, remove the focus
-                // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
-                if (isVisible && ! Focus.isFocusWithinContainer(this))
-                    Dispatch.dispatchEvent(new XFormsFocusEvent(this, false))
-            case XXFORMS_DIALOG_CLOSE ⇒
-                // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
-                if (! isVisible && Focus.isFocusWithinContainer(this))
-                    Focus.removeFocus(containingDocument)
-            case _ ⇒
+        val constrain = isConstrainToViewport
+        if (isNewlyVisibleSubtree || constrain != otherDialog.isConstrainToViewport) {
+          atts.addAttribute("", "constrain", "constrain", CDATA, constrain.toString)
+          doOutputElement = true
         }
-        super.performDefaultAction(event)
+      }
+      if (doOutputElement)
+        ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", atts)
     }
+  }
 
-    override def serializeLocal = {
-
-        val local = dialogCurrentLocal
-        val result = new ju.HashMap[String, String](3)
-
-        result.put("visible", local.visible.toString)
-        if (local.visible) {
-            result.put("constrain", local.constrainToViewport.toString)
-            local.neighborControlId foreach (result.put("neighbor", _))
-        }
-        result
-    }
-
-    override def equalsExternal(other: XFormsControl): Boolean = {
-        if (other == null)
-            return false
-        
-        // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
-        // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
-        
-        val otherDialog = other.asInstanceOf[XXFormsDialogControl]
-        if (otherDialog.wasVisible != isVisible)
-            return false
-        
-        super.equalsExternal(other)
-    }
-
-    override def outputAjaxDiff(
-        ch                    : XMLReceiverHelper,
-        other                 : XFormsControl,
-        attributesImpl        : AttributesImpl,
-        isNewlyVisibleSubtree : Boolean
-    ): Unit = {
-
-        locally {
-            val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
-            if (doOutputElement)
-                ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
-        }
-
-        locally {
-            // NOTE: This uses visible/hidden. But we could also handle this with relevant="true|false".
-            // 2015-04-01: Unsure if note above still makes sense.
-            val otherDialog = other.asInstanceOf[XXFormsDialogControl]
-            var doOutputElement = false
-            
-            val atts = new AttributesImpl
-            atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
-            
-            val visible = isVisible
-            if (isNewlyVisibleSubtree || visible != otherDialog.wasVisible) {
-                atts.addAttribute("", "visibility", "visibility", CDATA, if (visible) "visible" else "hidden")
-                doOutputElement = true
-            }
-            if (visible) {
-                val neighborOpt = neighborControlId
-                if (isNewlyVisibleSubtree || neighborOpt != otherDialog.neighborControlId) {
-                    neighborOpt foreach { neighbor ⇒
-                        atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
-                        doOutputElement = true
-                    }
-                }
-                val constrain = isConstrainToViewport
-                if (isNewlyVisibleSubtree || constrain != otherDialog.isConstrainToViewport) {
-                    atts.addAttribute("", "constrain", "constrain", CDATA, constrain.toString)
-                    doOutputElement = true
-                }
-            }
-            if (doOutputElement)
-                ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", atts)
-        }
-    }
-
-    override def contentVisible = isVisible
+  override def contentVisible = isVisible
 }

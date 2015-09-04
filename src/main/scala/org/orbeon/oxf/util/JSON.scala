@@ -15,26 +15,26 @@ package org.orbeon.oxf.util
 
 
 object JSON {
-    // This function from lift-json
-    // Copyright 2009-2010 WorldWide Conferencing, LLC
-    // "Licensed under the Apache License, Version 2.0 (the "License")"
-    // https://github.com/lift/lift/blob/master/framework/lift-base/lift-json/src/main/scala/net/liftweb/json/JsonAST.scala
-    def quoteValue(s: String): String = {
-        val buf = new StringBuilder
-        for (i ← 0 until s.length) {
-            val c = s.charAt(i)
-            buf.append(c match {
-                case '"' ⇒ "\\\""
-                case '\\' ⇒ "\\\\"
-                case '\b' ⇒ "\\b"
-                case '\f' ⇒ "\\f"
-                case '\n' ⇒ "\\n"
-                case '\r' ⇒ "\\r"
-                case '\t' ⇒ "\\t"
-                case c if ((c >= '\u0000' && c < '\u001f') || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100')) ⇒ "\\u%04x".format(c: Int)
-                case c ⇒ c
-            })
-        }
-        buf.toString
+  // This function from lift-json
+  // Copyright 2009-2010 WorldWide Conferencing, LLC
+  // "Licensed under the Apache License, Version 2.0 (the "License")"
+  // https://github.com/lift/lift/blob/master/framework/lift-base/lift-json/src/main/scala/net/liftweb/json/JsonAST.scala
+  def quoteValue(s: String): String = {
+    val buf = new StringBuilder
+    for (i ← 0 until s.length) {
+      val c = s.charAt(i)
+      buf.append(c match {
+        case '"' ⇒ "\\\""
+        case '\\' ⇒ "\\\\"
+        case '\b' ⇒ "\\b"
+        case '\f' ⇒ "\\f"
+        case '\n' ⇒ "\\n"
+        case '\r' ⇒ "\\r"
+        case '\t' ⇒ "\\t"
+        case c if ((c >= '\u0000' && c < '\u001f') || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100')) ⇒ "\\u%04x".format(c: Int)
+        case c ⇒ c
+      })
     }
+    buf.toString
+  }
 }

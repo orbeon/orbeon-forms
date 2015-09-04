@@ -23,33 +23,33 @@ import script.ServerScript
  */
 class XXFormsScriptAction extends XFormsAction {
 
-    override def execute(actionContext: DynamicActionContext): Unit = {
+  override def execute(actionContext: DynamicActionContext): Unit = {
 
-        val actionInterpreter = actionContext.interpreter
-        val actionElement = actionContext.element
+    val actionInterpreter = actionContext.interpreter
+    val actionElement = actionContext.element
 
-        val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
-        mediatype match {
-            case "javascript" | "text/javascript" | "application/javascript" | null ⇒
-                // Get script based on id
-                val script = {
-                    val partAnalysis = actionInterpreter.actionXPathContext.container.getPartAnalysis
-                    partAnalysis.scripts(actionInterpreter.getActionPrefixedId(actionElement))
-                }
-
-                // Run Script on server or client
-                script match {
-                    case serverScript: ServerScript ⇒
-                        actionInterpreter.containingDocument.getScriptInterpreter.runScript(serverScript)
-                    case clientScript ⇒
-                        actionInterpreter.containingDocument.addScriptToRun(clientScript, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
-                }
-            case "xpath" | "text/xpath" | "application/xpath" ⇒ // "unofficial" type
-                // Evaluate XPath expression for its side effects only
-                val bindingContext = actionInterpreter.actionXPathContext.getCurrentBindingContext
-                actionInterpreter.evaluateKeepItems(actionElement, bindingContext.nodeset, bindingContext.position, actionElement.getText)
-            case other ⇒
-                throw new OXFException("Unsupported script type: " + other)
+    val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
+    mediatype match {
+      case "javascript" | "text/javascript" | "application/javascript" | null ⇒
+        // Get script based on id
+        val script = {
+          val partAnalysis = actionInterpreter.actionXPathContext.container.getPartAnalysis
+          partAnalysis.scripts(actionInterpreter.getActionPrefixedId(actionElement))
         }
+
+        // Run Script on server or client
+        script match {
+          case serverScript: ServerScript ⇒
+            actionInterpreter.containingDocument.getScriptInterpreter.runScript(serverScript)
+          case clientScript ⇒
+            actionInterpreter.containingDocument.addScriptToRun(clientScript, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
+        }
+      case "xpath" | "text/xpath" | "application/xpath" ⇒ // "unofficial" type
+        // Evaluate XPath expression for its side effects only
+        val bindingContext = actionInterpreter.actionXPathContext.getCurrentBindingContext
+        actionInterpreter.evaluateKeepItems(actionElement, bindingContext.nodeset, bindingContext.position, actionElement.getText)
+      case other ⇒
+        throw new OXFException("Unsupported script type: " + other)
     }
+  }
 }

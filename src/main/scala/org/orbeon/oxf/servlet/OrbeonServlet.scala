@@ -36,51 +36,51 @@ class OrbeonServletDelegate extends OrbeonServlet
  */
 class OrbeonServlet extends HttpServlet with ServletPortlet {
 
-    import OrbeonServlet._
+  import OrbeonServlet._
 
-    private implicit val logger = ProcessorService.Logger
+  private implicit val logger = ProcessorService.Logger
 
-    val HttpAcceptMethodsParam = "oxf.http.accept-methods"
-    val DefaultMethods = "get post head"
+  val HttpAcceptMethodsParam = "oxf.http.accept-methods"
+  val DefaultMethods = "get post head"
 
-    // Accepted methods for this servlet
-    private lazy val acceptedMethods =
-        initParameters.getOrElse(HttpAcceptMethodsParam, DefaultMethods) split """[\s,]+""" filter (_.nonEmpty) toSet
+  // Accepted methods for this servlet
+  private lazy val acceptedMethods =
+    initParameters.getOrElse(HttpAcceptMethodsParam, DefaultMethods) split """[\s,]+""" filter (_.nonEmpty) toSet
 
-    def logPrefix = "Servlet"
+  def logPrefix = "Servlet"
 
-    // Immutable map of servlet parameters
-    lazy val initParameters =
-        getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
-            (n ⇒ n → getInitParameter(n)) toMap
+  // Immutable map of servlet parameters
+  lazy val initParameters =
+    getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
+      (n ⇒ n → getInitParameter(n)) toMap
 
-    // Servlet init
-    override def init(): Unit =
-        withRootException("initialization", new ServletException(_)) {
-            init(WebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." → "oxf.servlet-initialized-processor.input."))
-        }
+  // Servlet init
+  override def init(): Unit =
+    withRootException("initialization", new ServletException(_)) {
+      init(WebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." → "oxf.servlet-initialized-processor.input."))
+    }
 
-    // Servlet destroy
-    override def destroy(): Unit =
-        withRootException("destruction", new ServletException(_)) {
-            destroy(Some("oxf.servlet-destroyed-processor." → "oxf.servlet-destroyed-processor.input."))
-        }
+  // Servlet destroy
+  override def destroy(): Unit =
+    withRootException("destruction", new ServletException(_)) {
+      destroy(Some("oxf.servlet-destroyed-processor." → "oxf.servlet-destroyed-processor.input."))
+    }
 
-    // Servlet request
-    override def service(request: HttpServletRequest, response: HttpServletResponse): Unit =
-        currentServlet.withValue(this) {
-            withRootException("request", new ServletException(_)) {
-                val httpMethod = request.getMethod
-                if (! acceptedMethods(httpMethod.toLowerCase))
-                    throw new OXFException("HTTP method not accepted: " + httpMethod + ". You can configure methods in your web.xml using the parameter: " + HttpAcceptMethodsParam)
+  // Servlet request
+  override def service(request: HttpServletRequest, response: HttpServletResponse): Unit =
+    currentServlet.withValue(this) {
+      withRootException("request", new ServletException(_)) {
+        val httpMethod = request.getMethod
+        if (! acceptedMethods(httpMethod.toLowerCase))
+          throw new OXFException("HTTP method not accepted: " + httpMethod + ". You can configure methods in your web.xml using the parameter: " + HttpAcceptMethodsParam)
 
-                val pipelineContext = new PipelineContext
-                val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
-                processorService.service(pipelineContext, externalContext)
-            }
-        }
+        val pipelineContext = new PipelineContext
+        val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
+        processorService.service(pipelineContext, externalContext)
+      }
+    }
 }
 
 object OrbeonServlet {
-    val currentServlet = new DynamicVariable[OrbeonServlet]
+  val currentServlet = new DynamicVariable[OrbeonServlet]
 }

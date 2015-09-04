@@ -18,75 +18,75 @@ import org.junit.Test
 
 class URLFinderTest extends AssertionsForJUnit {
 
-    import URLFinder._
+  import URLFinder._
 
-    @Test def testFindURLs(): Unit = {
+  @Test def testFindURLs(): Unit = {
 
-        val expected = List(
-            """www.google.com"""                                           → List("""www.google.com"""),
-            """http://www.google.com"""                                    → List("""http://www.google.com"""),
-            """https://www.google.com"""                                   → List("""https://www.google.com"""),
-            """http://www.google.com,"""                                   → List("""http://www.google.com"""),
-            """http://www.google.com."""                                   → List("""http://www.google.com"""),
-            """http://www.google.com:"""                                   → List("""http://www.google.com"""),
-            """this (http://www.google.com) works"""                       → List("""http://www.google.com"""),
-            """this http://userid:password@example.com:8080/, works"""     → List("""http://userid:password@example.com:8080/"""),
-            """this http://223.255.255.254, works"""                       → List("""http://223.255.255.254"""),
-            """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" → List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),
-            """naked google.com URL and another (http://twitter.com/)"""   → List("""google.com""", """http://twitter.com/"""),
-            """trailing / works too for google.com/."""                    → List("""google.com/"""),
-            """this info@orbeon.com works"""                               → List("""info@orbeon.com"""),
-            """this info@orbeon.com@ works"""                              → Nil,
-            """this (info@orbeon.com) works"""                             → List("""info@orbeon.com"""),
-            """this (info@orbeon.com, ada.lovelace@london.uk) works"""     → List("""info@orbeon.com""", """ada.lovelace@london.uk"""),
-            """this (INFO@ORBEON.COM) works"""                             → List("""INFO@ORBEON.COM"""),
-            """this info@orbeon.com/ works"""                              → List("""info@orbeon.com"""),
-            """this mailto:info@orbeon.com works"""                        → List("""info@orbeon.com""")
-        )
+    val expected = List(
+      """www.google.com"""                                           → List("""www.google.com"""),
+      """http://www.google.com"""                                    → List("""http://www.google.com"""),
+      """https://www.google.com"""                                   → List("""https://www.google.com"""),
+      """http://www.google.com,"""                                   → List("""http://www.google.com"""),
+      """http://www.google.com."""                                   → List("""http://www.google.com"""),
+      """http://www.google.com:"""                                   → List("""http://www.google.com"""),
+      """this (http://www.google.com) works"""                       → List("""http://www.google.com"""),
+      """this http://userid:password@example.com:8080/, works"""     → List("""http://userid:password@example.com:8080/"""),
+      """this http://223.255.255.254, works"""                       → List("""http://223.255.255.254"""),
+      """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" → List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),
+      """naked google.com URL and another (http://twitter.com/)"""   → List("""google.com""", """http://twitter.com/"""),
+      """trailing / works too for google.com/."""                    → List("""google.com/"""),
+      """this info@orbeon.com works"""                               → List("""info@orbeon.com"""),
+      """this info@orbeon.com@ works"""                              → Nil,
+      """this (info@orbeon.com) works"""                             → List("""info@orbeon.com"""),
+      """this (info@orbeon.com, ada.lovelace@london.uk) works"""     → List("""info@orbeon.com""", """ada.lovelace@london.uk"""),
+      """this (INFO@ORBEON.COM) works"""                             → List("""INFO@ORBEON.COM"""),
+      """this info@orbeon.com/ works"""                              → List("""info@orbeon.com"""),
+      """this mailto:info@orbeon.com works"""                        → List("""info@orbeon.com""")
+    )
 
-        for ((in, out) ← expected)
-            assert(out === findURLs(in).to[List])
-    }
+    for ((in, out) ← expected)
+      assert(out === findURLs(in).to[List])
+  }
 
-    @Test def testReplaceURLs(): Unit = {
+  @Test def testReplaceURLs(): Unit = {
 
-        val input =
-            """- Music is an art (https://en.wikipedia.org/wiki/Art).
-              |- URL with parameters: http://example.org/a=1&b=2.
-              |- Dungeons & Dragons
-              |- Email info@orbeon.com
-              |- if (a < b) 42 else 0
-              |- From Wikipedia (https://en.wikipedia.org/wiki/Music).
-              |- Some naked domain is www.orbeon.com
-              |- if (a < b) 42 else 0""".stripMargin
+    val input =
+      """- Music is an art (https://en.wikipedia.org/wiki/Art).
+        |- URL with parameters: http://example.org/a=1&b=2.
+        |- Dungeons & Dragons
+        |- Email info@orbeon.com
+        |- if (a < b) 42 else 0
+        |- From Wikipedia (https://en.wikipedia.org/wiki/Music).
+        |- Some naked domain is www.orbeon.com
+        |- if (a < b) 42 else 0""".stripMargin
 
-        val expected =
-            """<span>- Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
-              |- URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
-              |- Dungeons &amp; Dragons
-              |- Email <a href="mailto:info@orbeon.com">info@orbeon.com</a>
-              |- if (a &lt; b) 42 else 0
-              |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).
-              |- Some naked domain is <a href="http://www.orbeon.com">www.orbeon.com</a>
-              |- if (a &lt; b) 42 else 0</span>""".stripMargin
+    val expected =
+      """<span>- Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
+        |- URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
+        |- Dungeons &amp; Dragons
+        |- Email <a href="mailto:info@orbeon.com">info@orbeon.com</a>
+        |- if (a &lt; b) 42 else 0
+        |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).
+        |- Some naked domain is <a href="http://www.orbeon.com">www.orbeon.com</a>
+        |- if (a &lt; b) 42 else 0</span>""".stripMargin
 
-        assert(expected === replaceURLs(input, replaceWithHyperlink))
-    }
+    assert(expected === replaceURLs(input, replaceWithHyperlink))
+  }
+  
+  @Test def testEmail(): Unit = {
     
-    @Test def testEmail(): Unit = {
-        
-        val expected = List(
-            """www.google.com"""         → false,
-            """info@orbeon.com"""        → true,
-            """info@orbeon.com@"""       → false,
-            """(info@orbeon.com)"""      → false,
-            """ada.lovelace@london.uk""" → true,
-            """INFO@ORBEON.COM"""        → true,
-            """info@orbeon.com/"""       → false,
-            """mailto:info@orbeon.com""" → false
-        )
+    val expected = List(
+      """www.google.com"""         → false,
+      """info@orbeon.com"""        → true,
+      """info@orbeon.com@"""       → false,
+      """(info@orbeon.com)"""      → false,
+      """ada.lovelace@london.uk""" → true,
+      """INFO@ORBEON.COM"""        → true,
+      """info@orbeon.com/"""       → false,
+      """mailto:info@orbeon.com""" → false
+    )
 
-        for ((in, out) ← expected)
-            assert(out === isEmail(in))
-    }
+    for ((in, out) ← expected)
+      assert(out === isEmail(in))
+  }
 }

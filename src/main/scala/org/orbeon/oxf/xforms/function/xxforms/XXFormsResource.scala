@@ -26,89 +26,89 @@ import org.apache.commons.lang3.StringUtils
 
 class XXFormsResource extends XFormsFunction with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext): StringValue = {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        def findInstance = stringArgumentOpt(1) match {
-            case Some(instanceName) ⇒ resolveOrFindByStaticOrAbsoluteId(instanceName)
-            case None               ⇒ resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
-        }
-
-        def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }
-
-        def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String) = {
-            val availableLangs = resourcesElement \ "resource" \@ "lang"
-            availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
-        }
-
-        val resultOpt =
-            for {
-                elementAnalysis ← elementAnalysisForSource
-                resources       ← findResourcesElement
-                requestedLang   ← XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis)
-                resourceRoot    ← findResourceElementForLang(resources, requestedLang)
-                leaf            ← path(resourceRoot, StringUtils.replace(stringArgument(0), ".", "/"))
-            } yield
-                stringToStringValue(leaf.stringValue)
-
-        resultOpt.orNull
+    def findInstance = stringArgumentOpt(1) match {
+      case Some(instanceName) ⇒ resolveOrFindByStaticOrAbsoluteId(instanceName)
+      case None               ⇒ resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
     }
 
-    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
+    def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }
 
-        // Only support dependencies if we can figure out the resource path statically
-        // In theory, we could also support the case where we don't know the path, and assume that any change to the
-        // resources would cause a miss. But I don't think we have a way to express this right now. Note that the case
-        // where a single resource changes is rare as we tend to use a readonly instance for resources anyway. But the
-        // function must work in either case, readonly and readwrite.
-        val resourcePath = arguments(0) match {
-            case s: StringLiteral ⇒
-                split[List](s.getStringValue, "/.")
-            case _ ⇒
-                pathMap.setInvalidated(true)
-                return null
-        }
-
-        // Dependency on language
-        XXFormsLang.addXMLLangDependency(pathMap)
-        if (pathMap.isInvalidated)
-            return null
-
-        // Dependency on all arguments
-        arguments foreach (_.addToPathMap(pathMap, pathMapNodeSet))
-
-        val namePool = getExecutable.getConfiguration.getNamePool
-
-        // Add dependency as if on instance('my-instance-name')
-        def addInstanceDependency(name: String) = {
-
-            def newInstanceExpression = {
-                val instanceExpression = new Instance
-
-                instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
-                instanceExpression.setArguments(Array(new StringLiteral(name)))
-
-                instanceExpression
-            }
-
-            // Start with new instance() root
-            var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
-
-            // Add path elements to pathmap
-            "resource" :: resourcePath foreach { name ⇒
-                val test = new NameTest(Type.ELEMENT, "", name, namePool)
-                target = new AxisExpression(Axis.CHILD, test).addToPathMap(pathMap, target)
-            }
-
-            // The result is used as an atomic value
-            target.setAtomized()
-        }
-
-        addInstanceDependency("orbeon-resources")
-        addInstanceDependency("fr-form-resources")
-
-        // We return an atomic value
-        null
+    def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String) = {
+      val availableLangs = resourcesElement \ "resource" \@ "lang"
+      availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
     }
+
+    val resultOpt =
+      for {
+        elementAnalysis ← elementAnalysisForSource
+        resources       ← findResourcesElement
+        requestedLang   ← XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis)
+        resourceRoot    ← findResourceElementForLang(resources, requestedLang)
+        leaf            ← path(resourceRoot, StringUtils.replace(stringArgument(0), ".", "/"))
+      } yield
+        stringToStringValue(leaf.stringValue)
+
+    resultOpt.orNull
+  }
+
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
+
+    // Only support dependencies if we can figure out the resource path statically
+    // In theory, we could also support the case where we don't know the path, and assume that any change to the
+    // resources would cause a miss. But I don't think we have a way to express this right now. Note that the case
+    // where a single resource changes is rare as we tend to use a readonly instance for resources anyway. But the
+    // function must work in either case, readonly and readwrite.
+    val resourcePath = arguments(0) match {
+      case s: StringLiteral ⇒
+        split[List](s.getStringValue, "/.")
+      case _ ⇒
+        pathMap.setInvalidated(true)
+        return null
+    }
+
+    // Dependency on language
+    XXFormsLang.addXMLLangDependency(pathMap)
+    if (pathMap.isInvalidated)
+      return null
+
+    // Dependency on all arguments
+    arguments foreach (_.addToPathMap(pathMap, pathMapNodeSet))
+
+    val namePool = getExecutable.getConfiguration.getNamePool
+
+    // Add dependency as if on instance('my-instance-name')
+    def addInstanceDependency(name: String) = {
+
+      def newInstanceExpression = {
+        val instanceExpression = new Instance
+
+        instanceExpression.setFunctionName(new StructuredQName("", NamespaceConstant.FN, "instance"))
+        instanceExpression.setArguments(Array(new StringLiteral(name)))
+
+        instanceExpression
+      }
+
+      // Start with new instance() root
+      var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
+
+      // Add path elements to pathmap
+      "resource" :: resourcePath foreach { name ⇒
+        val test = new NameTest(Type.ELEMENT, "", name, namePool)
+        target = new AxisExpression(Axis.CHILD, test).addToPathMap(pathMap, target)
+      }
+
+      // The result is used as an atomic value
+      target.setAtomized()
+    }
+
+    addInstanceDependency("orbeon-resources")
+    addInstanceDependency("fr-form-resources")
+
+    // We return an atomic value
+    null
+  }
 }

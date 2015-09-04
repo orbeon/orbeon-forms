@@ -31,86 +31,86 @@ import org.mockito.invocation.InvocationOnMock
 
 trait XFormsSupport extends MockitoSugar {
 
-    self: DocumentTestBase ⇒
+  self: DocumentTestBase ⇒
 
-    def withActionAndDoc[T](url: String)(body: ⇒ T): T =
-        withActionAndDoc(setupDocument(url))(body)
+  def withActionAndDoc[T](url: String)(body: ⇒ T): T =
+    withActionAndDoc(setupDocument(url))(body)
 
-    def withActionAndDoc[T](doc: XFormsContainingDocument)(body: ⇒ T): T =
-        withScalaAction(mockActionInterpreter(doc)) {
-            withContainingDocument(doc) {
-                body
-            }
-        }
-
-    private def mockActionInterpreter(doc: XFormsContainingDocument) = {
-        val actionInterpreter = mock[XFormsActionInterpreter]
-        Mockito when actionInterpreter.containingDocument thenReturn doc
-        Mockito when actionInterpreter.container thenReturn doc
-        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger)
-
-        // Resolve assuming target relative to the document
-        Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString()) thenAnswer new Answer[XFormsObject] {
-            def answer(invocation: InvocationOnMock) = {
-                val targetStaticOrAbsoluteId = invocation.getArguments()(1).asInstanceOf[String]
-                doc.resolveObjectById("#document", targetStaticOrAbsoluteId, null)
-            }
-        }
-
-        actionInterpreter
+  def withActionAndDoc[T](doc: XFormsContainingDocument)(body: ⇒ T): T =
+    withScalaAction(mockActionInterpreter(doc)) {
+      withContainingDocument(doc) {
+        body
+      }
     }
 
-    // Dispatch a custom event to the object with the given prefixed id
-    def dispatch(name: String, prefixedId: String) =
-        Dispatch.dispatchEvent(
-            new XFormsCustomEvent(
-                name,
-                document.getObjectByEffectiveId(prefixedId).asInstanceOf[XFormsEventTarget],
-                Map(),
-                bubbles = true,
-                cancelable = true)
-        )
+  private def mockActionInterpreter(doc: XFormsContainingDocument) = {
+    val actionInterpreter = mock[XFormsActionInterpreter]
+    Mockito when actionInterpreter.containingDocument thenReturn doc
+    Mockito when actionInterpreter.container thenReturn doc
+    Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger)
 
-    // Get a top-level instance
-    def instance(instanceStaticId: String) =
-        document.findInstance(instanceStaticId)
-
-    // Convert an instance to a string
-    def instanceToString(instance: XFormsInstance) =
-        TransformerUtils.tinyTreeToString(instance.documentInfo)
-
-    def getControlValue(controlId: String) = getValueControl(controlId).getValue
-    def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue
-
-    def setControlValue(controlId: String, value: String): Unit = {
-        // This stores the value without testing for readonly
-        document.startOutermostActionHandler()
-        getValueControl(controlId).storeExternalValue(value)
-        document.endOutermostActionHandler()
+    // Resolve assuming target relative to the document
+    Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString()) thenAnswer new Answer[XFormsObject] {
+      def answer(invocation: InvocationOnMock) = {
+        val targetStaticOrAbsoluteId = invocation.getArguments()(1).asInstanceOf[String]
+        doc.resolveObjectById("#document", targetStaticOrAbsoluteId, null)
+      }
     }
 
-    def setControlValueWithEvent(controlId: String, value: String): Unit =
-        ClientEvents.processEvent(document, new XXFormsValueEvent(getObject(controlId).asInstanceOf[XFormsEventTarget], value))
+    actionInterpreter
+  }
 
-    def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
-    def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
-    def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
-    def isValid(controlId: String)    = getSingleNodeControl(controlId).isValid
-    def getType(controlId: String)    = getSingleNodeControl(controlId).valueType
+  // Dispatch a custom event to the object with the given prefixed id
+  def dispatch(name: String, prefixedId: String) =
+    Dispatch.dispatchEvent(
+      new XFormsCustomEvent(
+        name,
+        document.getObjectByEffectiveId(prefixedId).asInstanceOf[XFormsEventTarget],
+        Map(),
+        bubbles = true,
+        cancelable = true)
+    )
 
-    def getItemset(controlId: String) = {
-        val select1 = getObject(controlId).asInstanceOf[XFormsSelect1Control]
-        select1.getItemset.getJSONTreeInfo(null, select1.mustEncodeValues, null)
-    }
+  // Get a top-level instance
+  def instance(instanceStaticId: String) =
+    document.findInstance(instanceStaticId)
 
-    def resolveControl(staticOrAbsoluteId: String)       = resolveObject(staticOrAbsoluteId) collect { case c: XFormsControl ⇒ c }
-    def resolveComponent(staticOrAbsoluteId: String)     = resolveObject(staticOrAbsoluteId) collect { case c: XFormsComponentControl ⇒ c }
-    def resolveValueControl(staticOrAbsoluteId: String)  = resolveObject(staticOrAbsoluteId) collect { case c: XFormsValueControl ⇒ c }
-    def resolveModel(staticOrAbsoluteId: String)         = resolveObject(staticOrAbsoluteId) collect { case m: XFormsModel   ⇒ m }
-    def resolveObject(staticOrAbsoluteId: String)        = document.resolveObjectByIdInScope("#document", staticOrAbsoluteId)
+  // Convert an instance to a string
+  def instanceToString(instance: XFormsInstance) =
+    TransformerUtils.tinyTreeToString(instance.documentInfo)
 
-    def getControl(controlEffectiveId: String)           = getObject(controlEffectiveId).asInstanceOf[XFormsControl]
-    def getSingleNodeControl(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsSingleNodeControl]
-    def getValueControl(controlEffectiveId: String)      = getObject(controlEffectiveId).asInstanceOf[XFormsValueControl]
-    def getObject(effectiveId: String)                   = document.getObjectByEffectiveId(effectiveId)
+  def getControlValue(controlId: String) = getValueControl(controlId).getValue
+  def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue
+
+  def setControlValue(controlId: String, value: String): Unit = {
+    // This stores the value without testing for readonly
+    document.startOutermostActionHandler()
+    getValueControl(controlId).storeExternalValue(value)
+    document.endOutermostActionHandler()
+  }
+
+  def setControlValueWithEvent(controlId: String, value: String): Unit =
+    ClientEvents.processEvent(document, new XXFormsValueEvent(getObject(controlId).asInstanceOf[XFormsEventTarget], value))
+
+  def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
+  def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
+  def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
+  def isValid(controlId: String)    = getSingleNodeControl(controlId).isValid
+  def getType(controlId: String)    = getSingleNodeControl(controlId).valueType
+
+  def getItemset(controlId: String) = {
+    val select1 = getObject(controlId).asInstanceOf[XFormsSelect1Control]
+    select1.getItemset.getJSONTreeInfo(null, select1.mustEncodeValues, null)
+  }
+
+  def resolveControl(staticOrAbsoluteId: String)       = resolveObject(staticOrAbsoluteId) collect { case c: XFormsControl ⇒ c }
+  def resolveComponent(staticOrAbsoluteId: String)     = resolveObject(staticOrAbsoluteId) collect { case c: XFormsComponentControl ⇒ c }
+  def resolveValueControl(staticOrAbsoluteId: String)  = resolveObject(staticOrAbsoluteId) collect { case c: XFormsValueControl ⇒ c }
+  def resolveModel(staticOrAbsoluteId: String)         = resolveObject(staticOrAbsoluteId) collect { case m: XFormsModel   ⇒ m }
+  def resolveObject(staticOrAbsoluteId: String)        = document.resolveObjectByIdInScope("#document", staticOrAbsoluteId)
+
+  def getControl(controlEffectiveId: String)           = getObject(controlEffectiveId).asInstanceOf[XFormsControl]
+  def getSingleNodeControl(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsSingleNodeControl]
+  def getValueControl(controlEffectiveId: String)      = getObject(controlEffectiveId).asInstanceOf[XFormsValueControl]
+  def getObject(effectiveId: String)                   = document.getObjectByEffectiveId(effectiveId)
 }

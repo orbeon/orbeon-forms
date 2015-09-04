@@ -19,50 +19,50 @@ import Dispatch.EventListener
 // Support for adding/removing/getting event listeners.
 trait ListenersTrait {
 
-    // Not sure Vector is a good fit for small collections. Might use List and reverse upon getListeners.
-    // Use var/null instead of lazy val so that getListeners() won't cause creation of the map
-    private var listeners: mutable.Map[String, Vector[EventListener]] = _
+  // Not sure Vector is a good fit for small collections. Might use List and reverse upon getListeners.
+  // Use var/null instead of lazy val so that getListeners() won't cause creation of the map
+  private var listeners: mutable.Map[String, Vector[EventListener]] = _
 
-    // Add a listener for the given event name
-    def addListener(eventName: String, listener: EventListener): Unit = {
-        require(eventName ne null)
-        require(listener ne null)
+  // Add a listener for the given event name
+  def addListener(eventName: String, listener: EventListener): Unit = {
+    require(eventName ne null)
+    require(listener ne null)
 
-        if (listeners eq null)
-            listeners = new mutable.HashMap[String, Vector[EventListener]]
+    if (listeners eq null)
+      listeners = new mutable.HashMap[String, Vector[EventListener]]
 
-        val currentListeners = listeners.getOrElseUpdate(eventName, Vector.empty)
-        listeners += eventName → (currentListeners :+ listener)
-    }
+    val currentListeners = listeners.getOrElseUpdate(eventName, Vector.empty)
+    listeners += eventName → (currentListeners :+ listener)
+  }
 
-    // API for Java callers
-    def removeListener(eventName: String, listener: EventListener): Unit =
-        removeListener(eventName, Option(listener))
+  // API for Java callers
+  def removeListener(eventName: String, listener: EventListener): Unit =
+    removeListener(eventName, Option(listener))
 
-    // Add a given listener (if provided) or all listeners for the given event name
-    def removeListener(eventName: String, listener: Option[EventListener]): Unit = {
+  // Add a given listener (if provided) or all listeners for the given event name
+  def removeListener(eventName: String, listener: Option[EventListener]): Unit = {
 
-        require(eventName ne null)
-        require(listener ne null)
+    require(eventName ne null)
+    require(listener ne null)
 
-        if (listeners ne null)
-            listeners.get(eventName) foreach {
-                currentListeners ⇒
-                    listener match {
-                        case Some(listener) ⇒
-                            // Remove given listener only
-                            val newListeners = currentListeners filterNot (_ eq listener)
-                            if (newListeners.nonEmpty)
-                                listeners += eventName → newListeners
-                            else
-                                listeners -= eventName
-                        case None ⇒
-                            // Remove all listeners
-                            listeners -= eventName
-                    }
-            }
-    }
+    if (listeners ne null)
+      listeners.get(eventName) foreach {
+        currentListeners ⇒
+          listener match {
+            case Some(listener) ⇒
+              // Remove given listener only
+              val newListeners = currentListeners filterNot (_ eq listener)
+              if (newListeners.nonEmpty)
+                listeners += eventName → newListeners
+              else
+                listeners -= eventName
+            case None ⇒
+              // Remove all listeners
+              listeners -= eventName
+          }
+      }
+  }
 
-    def getListeners(eventName: String): immutable.Seq[EventListener] =
-        if (listeners ne null) listeners.getOrElse(eventName, Nil) else Nil
+  def getListeners(eventName: String): immutable.Seq[EventListener] =
+    if (listeners ne null) listeners.getOrElse(eventName, Nil) else Nil
 }

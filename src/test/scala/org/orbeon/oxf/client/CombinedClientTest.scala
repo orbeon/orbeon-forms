@@ -21,15 +21,15 @@ import org.orbeon.oxf.client.fr.{Grid, Currency}
 // List all client tests which we want to run with a single run of the driver
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class CombinedClientTest
-    extends OrbeonClientBase
-    with RepeatSettings
-    with XForms
-    with FormRunnerSummary
-    with OrbeonFormsDemoPath
-    with ControlResourcesEditor
-    with Permissions
-    with Services
-    with Currency
-    with Grid
-    with BasicControls
-    with NewFormParams
+  extends OrbeonClientBase
+  with RepeatSettings
+  with XForms
+  with FormRunnerSummary
+  with OrbeonFormsDemoPath
+  with ControlResourcesEditor
+  with Permissions
+  with Services
+  with Currency
+  with Grid
+  with BasicControls
+  with NewFormParams

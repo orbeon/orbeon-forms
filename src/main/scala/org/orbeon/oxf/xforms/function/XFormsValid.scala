@@ -28,15 +28,15 @@ import org.orbeon.scaxon.XML.{asScalaIterator, isElementOrAttribute}
  */
 class XFormsValid extends XXFormsMIPFunction with ValidSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext) = {
 
-        implicit val xpc = xpathContext
+    implicit val xpc = xpathContext
 
-        val pruneNonRelevant = booleanArgument(1, default = true)
-        val recurse          = booleanArgument(2, default = true)
+    val pruneNonRelevant = booleanArgument(1, default = true)
+    val recurse          = booleanArgument(2, default = true)
 
-        isValid(pruneNonRelevant, recurse)
-    }
+    isValid(pruneNonRelevant, recurse)
+  }
 }
 
 /**
@@ -47,42 +47,42 @@ class XFormsValid extends XXFormsMIPFunction with ValidSupport {
  */
 class XXFormsValid extends XXFormsMIPFunction with ValidSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext) = {
 
-        implicit val xpc = xpathContext
+    implicit val xpc = xpathContext
 
-        val recurse          = booleanArgument(1, default = false)
-        val pruneNonRelevant = booleanArgument(2, default = false)
+    val recurse          = booleanArgument(1, default = false)
+    val pruneNonRelevant = booleanArgument(2, default = false)
 
-        isValid(pruneNonRelevant, recurse)
-    }
+    isValid(pruneNonRelevant, recurse)
+  }
 }
 
 trait ValidSupport extends FunctionSupport {
 
-    def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext) = {
+  def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext) = {
 
-        val items = itemsArgumentOrContextOpt(0)
+    val items = itemsArgumentOrContextOpt(0)
 
-        if (recurse)
-            ! (asScalaIterator(items) exists (i ⇒ ! isTreeValid(i, pruneNonRelevant)))
-        else
-            ! (asScalaIterator(items) exists (i ⇒ ! isItemValid(i, pruneNonRelevant)))
-    }
+    if (recurse)
+      ! (asScalaIterator(items) exists (i ⇒ ! isTreeValid(i, pruneNonRelevant)))
+    else
+      ! (asScalaIterator(items) exists (i ⇒ ! isItemValid(i, pruneNonRelevant)))
+  }
 
-    // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
-    def isItemValid(item: Item, pruneNonRelevant: Boolean) = item match {
-        case nodeInfo: NodeInfo if isElementOrAttribute(nodeInfo) ⇒
-            pruneNonRelevant && ! InstanceData.getInheritedRelevant(nodeInfo) || InstanceData.getValid(nodeInfo)
-        case _ ⇒
-            true
-    }
+  // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
+  def isItemValid(item: Item, pruneNonRelevant: Boolean) = item match {
+    case nodeInfo: NodeInfo if isElementOrAttribute(nodeInfo) ⇒
+      pruneNonRelevant && ! InstanceData.getInheritedRelevant(nodeInfo) || InstanceData.getValid(nodeInfo)
+    case _ ⇒
+      true
+  }
 
-    // Tree is valid unless one of its descendant-or-self nodes is invalid
-    def isTreeValid(item: Item, pruneNonRelevant: Boolean) = item match {
-        case nodeInfo: NodeInfo if isElementOrAttribute(nodeInfo) ⇒
-            ! (AttributesAndElementsIterator(nodeInfo) exists (! isItemValid(_, pruneNonRelevant)))
-        case _ ⇒
-            true
-    }
+  // Tree is valid unless one of its descendant-or-self nodes is invalid
+  def isTreeValid(item: Item, pruneNonRelevant: Boolean) = item match {
+    case nodeInfo: NodeInfo if isElementOrAttribute(nodeInfo) ⇒
+      ! (AttributesAndElementsIterator(nodeInfo) exists (! isItemValid(_, pruneNonRelevant)))
+    case _ ⇒
+      true
+  }
 }

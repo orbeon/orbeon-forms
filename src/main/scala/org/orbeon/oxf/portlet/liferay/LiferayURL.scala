@@ -23,54 +23,54 @@ import org.orbeon.oxf.util.NetUtils
 // Liferay-specific portlet support
 object LiferayURL {
 
-    // Liferay resource id parameter
-    private val ResourceIdParameter = "p_p_resource_id"
+  // Liferay resource id parameter
+  private val ResourceIdParameter = "p_p_resource_id"
 
-    // Magic number to indicate we want to process the resource URL below
-    private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
+  // Magic number to indicate we want to process the resource URL below
+  private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
 
-    // Liferay-specific code: attempt to move p_p_resource_id with magic number to the end so that client can attempt to
-    // find a base URL. This is specifically written to handle https://github.com/orbeon/orbeon-forms/issues/258
-    def moveMagicResourceId(encodedURL: String): String =
-        if (encodedURL.contains(URLBaseMagic) && encodedURL.contains(ResourceIdParameter)) {
-            splitQuery(encodedURL) match {
-                case (path, Some(query)) ⇒
-                    val parameters = decodeSimpleQuery(query)
-                    parameters collect { case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) ⇒ resourceId } headOption match {
-                        case Some(resourceId) ⇒
-                            val updated = (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)
-                            NetUtils.appendQueryString(path, encodeSimpleQuery(updated))
-                        case None ⇒
-                            encodedURL
-                    }
-                case _ ⇒ encodedURL
-            }
-        } else
-            encodedURL
+  // Liferay-specific code: attempt to move p_p_resource_id with magic number to the end so that client can attempt to
+  // find a base URL. This is specifically written to handle https://github.com/orbeon/orbeon-forms/issues/258
+  def moveMagicResourceId(encodedURL: String): String =
+    if (encodedURL.contains(URLBaseMagic) && encodedURL.contains(ResourceIdParameter)) {
+      splitQuery(encodedURL) match {
+        case (path, Some(query)) ⇒
+          val parameters = decodeSimpleQuery(query)
+          parameters collect { case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) ⇒ resourceId } headOption match {
+            case Some(resourceId) ⇒
+              val updated = (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)
+              NetUtils.appendQueryString(path, encodeSimpleQuery(updated))
+            case None ⇒
+              encodedURL
+          }
+        case _ ⇒ encodedURL
+      }
+    } else
+      encodedURL
 
 
-    // Rewrite a WSRP-encoded URL to a portlet URL
-    def wsrpToPortletURL(encodedURL: String, response: MimeResponse): String = {
+  // Rewrite a WSRP-encoded URL to a portlet URL
+  def wsrpToPortletURL(encodedURL: String, response: MimeResponse): String = {
 
-        def createResourceURL(resourceId: String) = {
-            val url = response.createResourceURL
-            url.setResourceID(resourceId)
-            url.setCacheability(ResourceURL.PAGE)
-            moveMagicResourceId(url.toString)
-        }
-
-        def createPortletURL(url: PortletURL, portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) = {
-            portletMode foreach (v ⇒ url.setPortletMode(new PortletMode(v)))
-            windowState foreach (v ⇒ url.setWindowState(new WindowState(v)))
-            url.setParameters(navigationParameters)
-            url.toString
-        }
-
-        WSRPURLRewriter.decodeURL(
-            encodedURL,
-            createResourceURL,
-            createPortletURL(response.createActionURL, _, _, _),
-            createPortletURL(response.createRenderURL, _, _, _)
-        )
+    def createResourceURL(resourceId: String) = {
+      val url = response.createResourceURL
+      url.setResourceID(resourceId)
+      url.setCacheability(ResourceURL.PAGE)
+      moveMagicResourceId(url.toString)
     }
+
+    def createPortletURL(url: PortletURL, portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) = {
+      portletMode foreach (v ⇒ url.setPortletMode(new PortletMode(v)))
+      windowState foreach (v ⇒ url.setWindowState(new WindowState(v)))
+      url.setParameters(navigationParameters)
+      url.toString
+    }
+
+    WSRPURLRewriter.decodeURL(
+      encodedURL,
+      createResourceURL,
+      createPortletURL(response.createActionURL, _, _, _),
+      createPortletURL(response.createRenderURL, _, _, _)
+    )
+  }
 }

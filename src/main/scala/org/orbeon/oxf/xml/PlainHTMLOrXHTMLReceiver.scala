@@ -18,80 +18,80 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 class PlainHTMLOrXHTMLReceiver(targetURI: String, xmlReceiver: XMLReceiver)
-        extends ForwardingXMLReceiver(xmlReceiver) {
+    extends ForwardingXMLReceiver(xmlReceiver) {
 
-    var level = 0
-    var inXHTMLNamespace = false
+  var level = 0
+  var inXHTMLNamespace = false
 
-    // Consider elements in no namespace to be HTML, see #1981
-    def isHTMLElement(uri: String) = uri == HtmlURI || uri == ""
+  // Consider elements in no namespace to be HTML, see #1981
+  def isHTMLElement(uri: String) = uri == HtmlURI || uri == ""
 
-    override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
+  override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
 
-        // http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer SHOULD output
-        // namespace declarations in a way that is consistent with the requirements of the XHTML DTD if
-        // this is possible". We tried to output the document in the XHTML namespace only if the root
-        // element is "{http://www.w3.org/1999/xhtml}html", however the issue then is that in the case
-        // of a fragment, the resulting document is not in the XHTML namespace and the XHTML serializer
-        // is unable to output elements such as <br />. So we have reverted this change and when the
-        // HTML namespace is specified we now always output the document in the XHTML namespace.
-        if (level == 0 && targetURI == HtmlURI) {
-            inXHTMLNamespace = true
-            super.startPrefixMapping("", HtmlURI)
-        }
-
-        if (isHTMLElement(uri))
-            super.startElement(if (inXHTMLNamespace) targetURI else "", localname, localname, filterAttributes(attributes))
-
-        level += 1
+    // http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer SHOULD output
+    // namespace declarations in a way that is consistent with the requirements of the XHTML DTD if
+    // this is possible". We tried to output the document in the XHTML namespace only if the root
+    // element is "{http://www.w3.org/1999/xhtml}html", however the issue then is that in the case
+    // of a fragment, the resulting document is not in the XHTML namespace and the XHTML serializer
+    // is unable to output elements such as <br />. So we have reverted this change and when the
+    // HTML namespace is specified we now always output the document in the XHTML namespace.
+    if (level == 0 && targetURI == HtmlURI) {
+      inXHTMLNamespace = true
+      super.startPrefixMapping("", HtmlURI)
     }
 
-    override def endElement(uri: String, localname: String, qName: String) = {
+    if (isHTMLElement(uri))
+      super.startElement(if (inXHTMLNamespace) targetURI else "", localname, localname, filterAttributes(attributes))
 
-        level -= 1
+    level += 1
+  }
 
-        if (isHTMLElement(uri))
-            super.endElement(if (inXHTMLNamespace) targetURI else "", localname, localname)
+  override def endElement(uri: String, localname: String, qName: String) = {
 
-        if (level == 0 && inXHTMLNamespace)
-            super.endPrefixMapping("")
+    level -= 1
+
+    if (isHTMLElement(uri))
+      super.endElement(if (inXHTMLNamespace) targetURI else "", localname, localname)
+
+    if (level == 0 && inXHTMLNamespace)
+      super.endPrefixMapping("")
+  }
+
+  // Swallow all namespace mappings
+  override def startPrefixMapping(prefix: String, uri: String) = ()
+  override def endPrefixMapping(prefix: String) = ()
+
+  // Only keep attributes in no namespace
+  def filterAttributes(attributes: Attributes) = {
+    
+    val length = attributes.getLength
+
+    // Whether there is at least one attribute in a namespace
+    def hasNamespace: Boolean = {
+      var i = 0
+      while (i < length) {
+        if (attributes.getURI(i) != "")
+          return true
+
+        i += 1
+      }
+      false
     }
 
-    // Swallow all namespace mappings
-    override def startPrefixMapping(prefix: String, uri: String) = ()
-    override def endPrefixMapping(prefix: String) = ()
+    if (hasNamespace) {
+      val newAttributes = new AttributesImpl
 
-    // Only keep attributes in no namespace
-    def filterAttributes(attributes: Attributes) = {
-        
-        val length = attributes.getLength
+      var i = 0
+      while (i < length) {
+        if (attributes.getURI(i) == "")
+          newAttributes.addAttribute(attributes.getURI(i), attributes.getLocalName(i),
+            attributes.getQName(i), attributes.getType(i), attributes.getValue(i))
 
-        // Whether there is at least one attribute in a namespace
-        def hasNamespace: Boolean = {
-            var i = 0
-            while (i < length) {
-                if (attributes.getURI(i) != "")
-                    return true
+        i += 1
+      }
 
-                i += 1
-            }
-            false
-        }
-
-        if (hasNamespace) {
-            val newAttributes = new AttributesImpl
-
-            var i = 0
-            while (i < length) {
-                if (attributes.getURI(i) == "")
-                    newAttributes.addAttribute(attributes.getURI(i), attributes.getLocalName(i),
-                        attributes.getQName(i), attributes.getType(i), attributes.getValue(i))
-
-                i += 1
-            }
-
-            newAttributes
-        } else
-            attributes
-    }
+      newAttributes
+    } else
+      attributes
+  }
 }

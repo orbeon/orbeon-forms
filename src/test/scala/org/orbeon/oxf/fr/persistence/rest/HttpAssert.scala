@@ -21,67 +21,67 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 private object HttpAssert extends XMLSupport {
 
-    sealed trait Expected
-    case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
-    case   class ExpectedCode(code: Int) extends Expected
+  sealed trait Expected
+  case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
+  case   class ExpectedCode(code: Int) extends Expected
 
-    def get(
-        url         : String,
-        version     : Version,
-        expected    : Expected,
-        credentials : Option[HttpRequest.Credentials] = None)(implicit
-        logger      : IndentedLogger
-    ): Unit = {
+  def get(
+    url         : String,
+    version     : Version,
+    expected    : Expected,
+    credentials : Option[HttpRequest.Credentials] = None)(implicit
+    logger      : IndentedLogger
+  ): Unit = {
 
-        val (resultCode, headers, resultBody) = {
-            val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
-            val lowerCaseHeaders = headers.map{case (header, value) ⇒ header.toLowerCase → value}
-            (resultCode, lowerCaseHeaders, resultBody)
+    val (resultCode, headers, resultBody) = {
+      val (resultCode, headers, resultBody) = HttpRequest.get(url, version, credentials)
+      val lowerCaseHeaders = headers.map{case (header, value) ⇒ header.toLowerCase → value}
+      (resultCode, lowerCaseHeaders, resultBody)
+    }
+
+    expected match {
+      case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
+        assert(resultCode === 200)
+        // Check body
+        body match {
+          case HttpRequest.XML(expectedDoc) ⇒
+            val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
+            assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
+          case HttpRequest.Binary(expectedFile) ⇒
+            assert(resultBody.get === expectedFile)
         }
-
-        expected match {
-            case ExpectedBody(body, expectedOperations, expectedFormVersion) ⇒
-                assert(resultCode === 200)
-                // Check body
-                body match {
-                    case HttpRequest.XML(expectedDoc) ⇒
-                        val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
-                        assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
-                    case HttpRequest.Binary(expectedFile) ⇒
-                        assert(resultBody.get === expectedFile)
-                }
-                // Check operations
-                val resultOperationsString = headers.get("orbeon-operations").map(_.head)
-                val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
-                assert(expectedOperations === resultOperationsSet)
-                // Check form version
-                val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
-                assert(expectedFormVersion === resultFormVersion)
-            case ExpectedCode(expectedCode) ⇒
-                assert(resultCode === expectedCode)
-        }
+        // Check operations
+        val resultOperationsString = headers.get("orbeon-operations").map(_.head)
+        val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
+        assert(expectedOperations === resultOperationsSet)
+        // Check form version
+        val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
+        assert(expectedFormVersion === resultFormVersion)
+      case ExpectedCode(expectedCode) ⇒
+        assert(resultCode === expectedCode)
     }
+  }
 
-    def put(
-        url          : String,
-        version      : Version,
-        body         : HttpRequest.Body,
-        expectedCode : Int,
-        credentials  : Option[HttpRequest.Credentials] = None)(implicit
-        logger       : IndentedLogger
-    ): Unit = {
-        val actualCode = HttpRequest.put(url, version, body, credentials)
-        assert(actualCode === expectedCode)
-    }
+  def put(
+    url          : String,
+    version      : Version,
+    body         : HttpRequest.Body,
+    expectedCode : Int,
+    credentials  : Option[HttpRequest.Credentials] = None)(implicit
+    logger       : IndentedLogger
+  ): Unit = {
+    val actualCode = HttpRequest.put(url, version, body, credentials)
+    assert(actualCode === expectedCode)
+  }
 
-    def del(
-        url          : String,
-        version      : Version,
-        expectedCode : Int,
-        credentials  : Option[HttpRequest.Credentials] = None)(implicit
-        logger       : IndentedLogger
-    ): Unit = {
-        val actualCode = HttpRequest.del(url, version, credentials)
-        assert(actualCode === expectedCode)
-    }
+  def del(
+    url          : String,
+    version      : Version,
+    expectedCode : Int,
+    credentials  : Option[HttpRequest.Credentials] = None)(implicit
+    logger       : IndentedLogger
+  ): Unit = {
+    val actualCode = HttpRequest.del(url, version, credentials)
+    assert(actualCode === expectedCode)
+  }
 }

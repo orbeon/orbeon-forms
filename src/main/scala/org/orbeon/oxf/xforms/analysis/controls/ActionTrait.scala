@@ -20,25 +20,25 @@ import org.dom4j.{Namespace, QName}
 
 trait ActionTrait extends SimpleElementAnalysis {
 
-    import ActionTrait._
+  import ActionTrait._
 
-    private def find(qNames: Seq[QName]) = qNames.iterator map element.attributeValue find (_ ne null)
+  private def find(qNames: Seq[QName]) = qNames.iterator map element.attributeValue find (_ ne null)
 
-    val ifCondition     = find(IfQNames)
-    val whileCondition  = find(WhileQNames)
-    val iterate         = find(IterateQNames)
+  val ifCondition     = find(IfQNames)
+  val whileCondition  = find(WhileQNames)
+  val iterate         = find(IterateQNames)
 
-    def ifConditionJava    = ifCondition.orNull
-    def whileConditionJava = whileCondition.orNull
-    def iterateJava        = iterate.orNull
+  def ifConditionJava    = ifCondition.orNull
+  def whileConditionJava = whileCondition.orNull
+  def iterateJava        = iterate.orNull
 }
 
 private object ActionTrait {
 
-    val Namespaces    = Seq(Namespace.NO_NAMESPACE, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
-    def makeQName(s: String) = new QName(s, _: Namespace)
+  val Namespaces    = Seq(Namespace.NO_NAMESPACE, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
+  def makeQName(s: String) = new QName(s, _: Namespace)
 
-    val IfQNames      = Namespaces map makeQName("if")
-    val WhileQNames   = Namespaces map makeQName("while")
-    val IterateQNames = Namespaces map makeQName("iterate")
+  val IfQNames      = Namespaces map makeQName("if")
+  val WhileQNames   = Namespaces map makeQName("while")
+  val IterateQNames = Namespaces map makeQName("iterate")
 }

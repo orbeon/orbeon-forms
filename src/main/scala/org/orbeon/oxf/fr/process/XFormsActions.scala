@@ -22,66 +22,66 @@ import scala.util.Try
 
 trait XFormsActions {
 
-    self: ProcessInterpreter ⇒
+  self: ProcessInterpreter ⇒
 
-    def AllowedXFormsActions = Map[String, Action](
-        "xf:send"     → tryXFormsSend,
-        "xf:dispatch" → tryXFormsDispatch,
-        "xf:show"     → tryShowDialog,
-        "xf:hide"     → tryHideDialog,
-        "xf:setvalue" → trySetvalue
-    )
+  def AllowedXFormsActions = Map[String, Action](
+    "xf:send"     → tryXFormsSend,
+    "xf:dispatch" → tryXFormsDispatch,
+    "xf:show"     → tryShowDialog,
+    "xf:hide"     → tryHideDialog,
+    "xf:setvalue" → trySetvalue
+  )
 
-    def tryXFormsSend(params: ActionParams): Try[Any] =
-        Try {
-            val submission = paramByNameOrDefault(params, "submission")
-            submission foreach (sendThrowOnError(_))
-        }
-
-    private val StandardDispatchParams = Set("name", "targetid")
-    private val StandardDialogParams   = Set("dialog")
-
-    private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]) = params.collect {
-        case (Some(name), value) if ! standardParamNames(name) ⇒ name → Option(evaluateValueTemplate(value))
+  def tryXFormsSend(params: ActionParams): Try[Any] =
+    Try {
+      val submission = paramByNameOrDefault(params, "submission")
+      submission foreach (sendThrowOnError(_))
     }
 
-    def tryXFormsDispatch(params: ActionParams): Try[Any] =
-        Try {
-            val eventName     = paramByNameOrDefault(params, "name")
-            val eventTargetId = paramByName(params, "targetid") getOrElse FormModel
+  private val StandardDispatchParams = Set("name", "targetid")
+  private val StandardDialogParams   = Set("dialog")
 
-            eventName foreach (dispatch(_, eventTargetId, properties = collectCustomProperties(params, StandardDispatchParams)))
-        }
+  private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]) = params.collect {
+    case (Some(name), value) if ! standardParamNames(name) ⇒ name → Option(evaluateValueTemplate(value))
+  }
 
-    def tryShowDialog(params: ActionParams): Try[Any] =
-        Try {
-            val dialogName = paramByNameOrDefault(params, "dialog")
+  def tryXFormsDispatch(params: ActionParams): Try[Any] =
+    Try {
+      val eventName     = paramByNameOrDefault(params, "name")
+      val eventTargetId = paramByName(params, "targetid") getOrElse FormModel
 
-            dialogName foreach (show(_, properties = collectCustomProperties(params, StandardDialogParams)))
-        }
+      eventName foreach (dispatch(_, eventTargetId, properties = collectCustomProperties(params, StandardDispatchParams)))
+    }
 
-    def tryHideDialog(params: ActionParams): Try[Any] =
-        Try {
-            val dialogName = paramByNameOrDefault(params, "dialog")
+  def tryShowDialog(params: ActionParams): Try[Any] =
+    Try {
+      val dialogName = paramByNameOrDefault(params, "dialog")
 
-            dialogName foreach (hide(_, properties = collectCustomProperties(params, StandardDialogParams)))
-        }
+      dialogName foreach (show(_, properties = collectCustomProperties(params, StandardDialogParams)))
+    }
 
-    def trySetvalue(params: ActionParams): Try[Any] =
-        Try {
-            evaluateOne(requiredParamByName(params, "setvalue", "ref")) match {
-                case nodeInfo: NodeInfo ⇒
-                    val valueToSet = params.get(Some("value")) match {
-                        case Some(valueExpr) ⇒
-                            evaluateString(
-                                item = nodeInfo,
-                                expr = valueExpr
-                            )
-                        case None            ⇒ ""
-                    }
-                    setvalue(nodeInfo, valueToSet)
-                case _ ⇒
-                    debug("setvalue: `ref` parameter did not return a node, ignoring")
-            }
-        }
+  def tryHideDialog(params: ActionParams): Try[Any] =
+    Try {
+      val dialogName = paramByNameOrDefault(params, "dialog")
+
+      dialogName foreach (hide(_, properties = collectCustomProperties(params, StandardDialogParams)))
+    }
+
+  def trySetvalue(params: ActionParams): Try[Any] =
+    Try {
+      evaluateOne(requiredParamByName(params, "setvalue", "ref")) match {
+        case nodeInfo: NodeInfo ⇒
+          val valueToSet = params.get(Some("value")) match {
+            case Some(valueExpr) ⇒
+              evaluateString(
+                item = nodeInfo,
+                expr = valueExpr
+              )
+            case None            ⇒ ""
+          }
+          setvalue(nodeInfo, valueToSet)
+        case _ ⇒
+          debug("setvalue: `ref` parameter did not return a node, ignoring")
+      }
+    }
 }

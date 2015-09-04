@@ -23,27 +23,27 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
  * This implementation of dependencies simply says that everything must be updated all the time.
  */
 class DumbXPathDependencies extends XPathDependencies {
-    def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) = ()
-    def markStructuralChange(model: XFormsModel, instance: XFormsInstance) = ()
-    def rebuildDone(model: Model) = ()
-    def recalculateDone(model: Model) = ()
-    def revalidateDone(model: Model) = ()
-    def refreshStart() = ()
-    def refreshDone() = ()
-    def bindingUpdateStart() = ()
-    def bindingUpdateDone() = ()
-    def afterInitialResponse() = ()
-    def beforeUpdateResponse() = ()
-    def afterUpdateResponse() = ()
-    def notifyComputeLHHA() = ()
-    def notifyOptimizeLHHA() = ()
-    def notifyComputeItemset() = ()
-    def notifyOptimizeItemset() = ()
-    def requireBindingUpdate(controlPrefixedId: String) = true
-    def requireValueUpdate(controlPrefixedId: String) = true
-    def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String) = true
-    def requireItemsetUpdate(controlPrefixedId: String) = true
-    def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
-    def hasAnyValidationBind(model: Model, instancePrefixedId: String) = true
-    def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel) = true
+  def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) = ()
+  def markStructuralChange(model: XFormsModel, instance: XFormsInstance) = ()
+  def rebuildDone(model: Model) = ()
+  def recalculateDone(model: Model) = ()
+  def revalidateDone(model: Model) = ()
+  def refreshStart() = ()
+  def refreshDone() = ()
+  def bindingUpdateStart() = ()
+  def bindingUpdateDone() = ()
+  def afterInitialResponse() = ()
+  def beforeUpdateResponse() = ()
+  def afterUpdateResponse() = ()
+  def notifyComputeLHHA() = ()
+  def notifyOptimizeLHHA() = ()
+  def notifyComputeItemset() = ()
+  def notifyOptimizeItemset() = ()
+  def requireBindingUpdate(controlPrefixedId: String) = true
+  def requireValueUpdate(controlPrefixedId: String) = true
+  def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String) = true
+  def requireItemsetUpdate(controlPrefixedId: String) = true
+  def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
+  def hasAnyValidationBind(model: Model, instancePrefixedId: String) = true
+  def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel) = true
 }

@@ -18,64 +18,64 @@ import org.orbeon.scaxon.SAXEvents._
 
 // Receiver which produces a subtree rooted at the first element matching the predicate provided.
 class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] ⇒ Boolean)
-        extends ForwardingXMLReceiver(receiver) {
+    extends ForwardingXMLReceiver(receiver) {
 
-    super.setForward(false)
+  super.setForward(false)
 
-    private val namespaceContext = new NamespaceContext
-    private var stack: List[StartElement] = Nil
-    private var level = 0
-    private var matchLevel = -1
-    private var done = false
+  private val namespaceContext = new NamespaceContext
+  private var stack: List[StartElement] = Nil
+  private var level = 0
+  private var matchLevel = -1
+  private var done = false
 
-    override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-        if (! done) {
+  override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+    if (! done) {
 
-            level += 1
-            stack ::= StartElement(uri, localname, qName, attributes)
+      level += 1
+      stack ::= StartElement(uri, localname, qName, attributes)
 
-            namespaceContext.startElement()
+      namespaceContext.startElement()
 
-            if (matchLevel < 0 && matches(stack)) {
-                matchLevel = level
-                super.setForward(true)
-                super.startDocument()
-                for ((prefix, uri) ← namespaceContext.current.mappings)
-                    super.startPrefixMapping(prefix, uri)
-            }
-        }
-
-        super.startElement(uri, localname, qName, attributes)
+      if (matchLevel < 0 && matches(stack)) {
+        matchLevel = level
+        super.setForward(true)
+        super.startDocument()
+        for ((prefix, uri) ← namespaceContext.current.mappings)
+          super.startPrefixMapping(prefix, uri)
+      }
     }
 
-    override def endElement(uri: String, localname: String, qName: String): Unit = {
+    super.startElement(uri, localname, qName, attributes)
+  }
 
-        super.endElement(uri, localname, qName)
+  override def endElement(uri: String, localname: String, qName: String): Unit = {
 
-        if (! done) {
+    super.endElement(uri, localname, qName)
 
-            if (matchLevel == level) {
-                matchLevel = -1
+    if (! done) {
 
-                for ((prefix, _) ← namespaceContext.current.mappings)
-                    super.endPrefixMapping(prefix)
+      if (matchLevel == level) {
+        matchLevel = -1
 
-                super.endDocument()
-                super.setForward(false)
-                done = true
-            }
+        for ((prefix, _) ← namespaceContext.current.mappings)
+          super.endPrefixMapping(prefix)
 
-            namespaceContext.endElement()
-            stack = stack.tail
-            level -= 1
-        }
+        super.endDocument()
+        super.setForward(false)
+        done = true
+      }
+
+      namespaceContext.endElement()
+      stack = stack.tail
+      level -= 1
     }
+  }
 
-    override def startPrefixMapping(prefix: String, uri: String): Unit = {
-        super.startPrefixMapping(prefix, uri)
+  override def startPrefixMapping(prefix: String, uri: String): Unit = {
+    super.startPrefixMapping(prefix, uri)
 
-        if (! done)
-            namespaceContext.startPrefixMapping(prefix, uri)
-    }
+    if (! done)
+      namespaceContext.startPrefixMapping(prefix, uri)
+  }
 }
 

@@ -11,71 +11,71 @@ import org.orbeon.saxon.om.{EmptyIterator, Axis, AxisIterator, NodeInfo}
  */
 class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true) extends Iterator[NodeInfo] {
 
-    private var current = findNext()
+  private var current = findNext()
 
-    def next() = {
-        val result = current
-        current = findNext()
-        result
+  def next() = {
+    val result = current
+    current = findNext()
+    result
+  }
+
+  def hasNext = current ne null
+
+  private var attributes: AxisIterator = _
+  private var descendants: Iterator[NodeInfo] = _
+  private var children: AxisIterator = _
+
+  private def findNext(): NodeInfo = {
+
+    // Exhaust attributes if any
+    if (attributes ne null) {
+      val next = attributes.next().asInstanceOf[NodeInfo]
+      if (next ne null)
+        return next
+      else
+        attributes = null
     }
 
-    def hasNext = current ne null
-
-    private var attributes: AxisIterator = _
-    private var descendants: Iterator[NodeInfo] = _
-    private var children: AxisIterator = _
-
-    private def findNext(): NodeInfo = {
-
-        // Exhaust attributes if any
-        if (attributes ne null) {
-            val next = attributes.next().asInstanceOf[NodeInfo]
-            if (next ne null)
-                return next
-            else
-                attributes = null
-        }
-
-        // Exhaust descendants if any
-        if (descendants ne null) {
-            if (descendants.hasNext)
-                return descendants.next()
-            else
-                descendants = null
-        }
-
-        // We have exhausted attributes and descendants
-        if (children ne null) {
-            // Move to next child
-            val next = children.next().asInstanceOf[NodeInfo]
-            if (next ne null) {
-                attributes = next.iterateAxis(Axis.ATTRIBUTE)
-                if (next.hasChildNodes)
-                    descendants = new AttributesAndElementsIterator(next, false)
-                next
-            } else
-                null
-        } else {
-            // This is the start
-            attributes = start.iterateAxis(Axis.ATTRIBUTE)
-
-            children =
-                if (start.hasChildNodes)
-                    start.iterateAxis(Axis.CHILD, NodeKindTest.makeNodeKindTest(Type.ELEMENT))
-                else
-                    EmptyIterator.getInstance
-
-            if (includeSelf)
-                start
-            else
-                findNext()
-        }
+    // Exhaust descendants if any
+    if (descendants ne null) {
+      if (descendants.hasNext)
+        return descendants.next()
+      else
+        descendants = null
     }
+
+    // We have exhausted attributes and descendants
+    if (children ne null) {
+      // Move to next child
+      val next = children.next().asInstanceOf[NodeInfo]
+      if (next ne null) {
+        attributes = next.iterateAxis(Axis.ATTRIBUTE)
+        if (next.hasChildNodes)
+          descendants = new AttributesAndElementsIterator(next, false)
+        next
+      } else
+        null
+    } else {
+      // This is the start
+      attributes = start.iterateAxis(Axis.ATTRIBUTE)
+
+      children =
+        if (start.hasChildNodes)
+          start.iterateAxis(Axis.CHILD, NodeKindTest.makeNodeKindTest(Type.ELEMENT))
+        else
+          EmptyIterator.getInstance
+
+      if (includeSelf)
+        start
+      else
+        findNext()
+    }
+  }
 }
 
 object AttributesAndElementsIterator {
-    def apply(start: NodeInfo, includeSelf: Boolean = true)
-        = new AttributesAndElementsIterator(start, includeSelf)
+  def apply(start: NodeInfo, includeSelf: Boolean = true)
+    = new AttributesAndElementsIterator(start, includeSelf)
 }
 
 //

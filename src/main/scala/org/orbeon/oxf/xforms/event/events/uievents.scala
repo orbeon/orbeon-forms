@@ -21,132 +21,132 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(DOM_ACTIVATE, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(DOM_ACTIVATE, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsHelpEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_HELP, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_HELP, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsHintEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_HINT, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_HINT, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsFocusEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_FOCUS, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
-    def this(target: XFormsEventTarget, inputOnly: Boolean = false) = this(target, Map("input-only" → Some(inputOnly)))
+  extends XFormsUIEvent(XFORMS_FOCUS, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
+  def this(target: XFormsEventTarget, inputOnly: Boolean = false) = this(target, Map("input-only" → Some(inputOnly)))
 
-    def inputOnly = propertyOrDefault[Boolean]("input-only", default = false)
+  def inputOnly = propertyOrDefault[Boolean]("input-only", default = false)
 }
 
 class XXFormsBlurEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XXFORMS_BLUR, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
+  extends XFormsUIEvent(XXFORMS_BLUR, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
 }
 
 class DOMFocusInEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(DOM_FOCUS_IN, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(DOM_FOCUS_IN, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class DOMFocusOutEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(DOM_FOCUS_OUT, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(DOM_FOCUS_OUT, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsEnabledEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_ENABLED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_ENABLED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsDisabledEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_DISABLED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_DISABLED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsReadonlyEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_READONLY, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_READONLY, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsReadwriteEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_READWRITE, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_READWRITE, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsValidEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_VALID, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_VALID, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsInvalidEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_INVALID, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_INVALID, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsRequiredEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_REQUIRED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_REQUIRED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsOptionalEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_OPTIONAL, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XFORMS_OPTIONAL, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XXFormsVisitedEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XXFORMS_VISITED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XXFORMS_VISITED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XXFormsUnvisitedEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XXFORMS_UNVISITED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+  extends XFormsUIEvent(XXFORMS_UNVISITED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
 class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_VALUE_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, XFormsValueChangeEvent.properties(target))
+  extends XFormsUIEvent(XFORMS_VALUE_CHANGED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget) = this(target, XFormsValueChangeEvent.properties(target))
 }
 
 private object XFormsValueChangeEvent {
 
-    val XXFValue = xxformsName("value")
+  val XXFValue = xxformsName("value")
 
-    def properties(target: XFormsEventTarget): PropertyGetter = {
-        case XXFValue ⇒ Option(target) collect { case v: XFormsValueControl ⇒ v.getValue }
-    }
+  def properties(target: XFormsEventTarget): PropertyGetter = {
+    case XXFValue ⇒ Option(target) collect { case v: XFormsValueControl ⇒ v.getValue }
+  }
 }
 
 class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]) =
-        this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
+  extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
+  def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]) =
+    this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
 }
 
 private object XXFormsConstraintsChangedEvent {
 
-    def validationsForLevel(current: List[StaticBind#MIP], level: ValidationLevel) =
-        current filter (_.level == level) map (_.id)
+  def validationsForLevel(current: List[StaticBind#MIP], level: ValidationLevel) =
+    current filter (_.level == level) map (_.id)
 
-    def diffValidations(previous: List[StaticBind#MIP], current: List[StaticBind#MIP], level: ValidationLevel) = {
-        val previousIds = previous.map(_.id).toSet
-        validationsForLevel(current, level) filterNot previousIds
-    }
+  def diffValidations(previous: List[StaticBind#MIP], current: List[StaticBind#MIP], level: ValidationLevel) = {
+    val previousIds = previous.map(_.id).toSet
+    validationsForLevel(current, level) filterNot previousIds
+  }
 
-    def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
-        case "level"            ⇒ level map (_.name)
-        case "constraints"      ⇒ Option(current map (_.id))
-        case "errors"           ⇒ Some(validationsForLevel(current, ErrorLevel))
-        case "warnings"         ⇒ Some(validationsForLevel(current, WarningLevel))
-        case "infos"            ⇒ Some(validationsForLevel(current, InfoLevel))
-        case "added-errors"     ⇒ Some(diffValidations(previous, current, ErrorLevel))
-        case "removed-errors"   ⇒ Some(diffValidations(current, previous, ErrorLevel))
-        case "added-warnings"   ⇒ Some(diffValidations(previous, current, WarningLevel))
-        case "removed-warnings" ⇒ Some(diffValidations(current, previous, WarningLevel))
-        case "added-infos"      ⇒ Some(diffValidations(previous, current, InfoLevel))
-        case "removed-infos"    ⇒ Some(diffValidations(current, previous, InfoLevel))
-    }
+  def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
+    case "level"            ⇒ level map (_.name)
+    case "constraints"      ⇒ Option(current map (_.id))
+    case "errors"           ⇒ Some(validationsForLevel(current, ErrorLevel))
+    case "warnings"         ⇒ Some(validationsForLevel(current, WarningLevel))
+    case "infos"            ⇒ Some(validationsForLevel(current, InfoLevel))
+    case "added-errors"     ⇒ Some(diffValidations(previous, current, ErrorLevel))
+    case "removed-errors"   ⇒ Some(diffValidations(current, previous, ErrorLevel))
+    case "added-warnings"   ⇒ Some(diffValidations(previous, current, WarningLevel))
+    case "removed-warnings" ⇒ Some(diffValidations(current, previous, WarningLevel))
+    case "added-infos"      ⇒ Some(diffValidations(previous, current, InfoLevel))
+    case "removed-infos"    ⇒ Some(diffValidations(current, previous, InfoLevel))
+  }
 }

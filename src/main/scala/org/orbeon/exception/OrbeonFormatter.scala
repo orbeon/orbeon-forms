@@ -22,34 +22,34 @@ import org.orbeon.oxf.util.ScalaUtils._
 // Orbeon-specific exception formatter
 object OrbeonFormatter extends Formatter {
 
-    val Width = 120
-    val MaxStackLength = 80
+  val Width = 120
+  val MaxStackLength = 80
 
-    override def getThrowableMessage(throwable: Throwable): Option[String] =
-        throwable match {
-            case ve: ValidationException ⇒ Option(ve.message)
-            case t ⇒ Option(t.getMessage)
+  override def getThrowableMessage(throwable: Throwable): Option[String] =
+    throwable match {
+      case ve: ValidationException ⇒ Option(ve.message)
+      case t ⇒ Option(t.getMessage)
+    }
+
+  override def getAllLocationData(t: Throwable): List[SourceLocation] =
+    OrbeonLocationException.getAllLocationData(t) flatMap sourceLocation
+
+  // Create SourceLocation from LocationData
+  private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
+    isNotBlank(locationData.getSystemID) option {
+
+      val (description, params) =
+        locationData match {
+          case extended: ExtendedLocationData ⇒ (extended.description, extended.params)
+          case _                              ⇒ (None, Nil)
         }
 
-    override def getAllLocationData(t: Throwable): List[SourceLocation] =
-        OrbeonLocationException.getAllLocationData(t) flatMap sourceLocation
-
-    // Create SourceLocation from LocationData
-    private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
-        isNotBlank(locationData.getSystemID) option {
-
-            val (description, params) =
-                locationData match {
-                    case extended: ExtendedLocationData ⇒ (extended.description, extended.params)
-                    case _                              ⇒ (None, Nil)
-                }
-
-            SourceLocation(
-                locationData.getSystemID,
-                filterLineCol(locationData.getLine),
-                filterLineCol(locationData.getCol),
-                description,
-                params.to[List]
-            )
-        }
+      SourceLocation(
+        locationData.getSystemID,
+        filterLineCol(locationData.getLine),
+        filterLineCol(locationData.getCol),
+        description,
+        params.to[List]
+      )
+    }
 }

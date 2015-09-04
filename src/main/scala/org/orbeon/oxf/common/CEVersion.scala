@@ -21,25 +21,25 @@ import java.{util ⇒ ju}
 
 class CEVersion extends Version {
 
-    import CEVersion._
-    import Version._
+  import CEVersion._
+  import Version._
 
-    // Feature is disallowed
-    def requirePEFeature(featureName: String): Unit =
-        throw new OXFException("Feature is not enabled in this version of the product: " + featureName)
+  // Feature is disallowed
+  def requirePEFeature(featureName: String): Unit =
+    throw new OXFException("Feature is not enabled in this version of the product: " + featureName)
 
-    def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = {
-        // Just warn the first time
-        if (featureRequested && ! WarnedFeatures.containsKey(featureName)) {
-            logger.warn("Feature is not enabled in this version of the product: " + featureName)
-            WarnedFeatures.put(featureName, ())
-        }
-        false
+  def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = {
+    // Just warn the first time
+    if (featureRequested && ! WarnedFeatures.containsKey(featureName)) {
+      logger.warn("Feature is not enabled in this version of the product: " + featureName)
+      WarnedFeatures.put(featureName, ())
     }
+    false
+  }
 
-    def createUIDependencies(containingDocument: XFormsContainingDocument) = new DumbXPathDependencies
+  def createUIDependencies(containingDocument: XFormsContainingDocument) = new DumbXPathDependencies
 }
 
 private object CEVersion {
-    val WarnedFeatures: ju.Map[String, Unit] = new ConcurrentHashMap[String, Unit]
+  val WarnedFeatures: ju.Map[String, Unit] = new ConcurrentHashMap[String, Unit]
 }

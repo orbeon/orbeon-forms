@@ -23,33 +23,33 @@ import org.orbeon.saxon.om._
  * xxf:invalid-binds()
  */
 class XXFormsInvalidBinds extends XFormsFunction with FunctionSupport {// don't extend XFormsMIPFunction as addToPathMap returns something different
+  
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
     
-    override def iterate(xpathContext: XPathContext): SequenceIterator = {
-        
-        // First item or context node if any
-        val item = argument.lift(0) map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
-        
-        item match {
-            case Some(nodeInfo: NodeInfo) ⇒
-                Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
-                    case Some(invalidBindIdsString) ⇒
-                        asIterator(ScalaUtils.split[Array](invalidBindIdsString))
-                    case None ⇒
-                        // No invalid bind ids
-                        EmptyIterator.getInstance
-                }
-
-            case _ ⇒
-                // Return () if we can't access the node
-                EmptyIterator.getInstance
+    // First item or context node if any
+    val item = argument.lift(0) map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
+    
+    item match {
+      case Some(nodeInfo: NodeInfo) ⇒
+        Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
+          case Some(invalidBindIdsString) ⇒
+            asIterator(ScalaUtils.split[Array](invalidBindIdsString))
+          case None ⇒
+            // No invalid bind ids
+            EmptyIterator.getInstance
         }
+
+      case _ ⇒
+        // Return () if we can't access the node
+        EmptyIterator.getInstance
     }
+  }
 
-    // TODO: something smart
-    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
-        super.addToPathMap(pathMap, pathMapNodeSet)
+  // TODO: something smart
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
+    super.addToPathMap(pathMap, pathMapNodeSet)
 
-    // Needed otherwise xpathContext.getContextItem doesn't return the correct value
-    override def getIntrinsicDependencies =
-        if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
+  // Needed otherwise xpathContext.getContextItem doesn't return the correct value
+  override def getIntrinsicDependencies =
+    if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }

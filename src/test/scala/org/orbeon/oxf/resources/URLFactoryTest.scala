@@ -20,19 +20,19 @@ import org.junit.Test
 
 class URLFactoryTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    @Test def basic(): Unit = {
+  @Test def basic(): Unit = {
 
-        val expected = Seq(
-            ("oxf",    null,          "/foo/bar.txt", null)   → "oxf:/foo/bar.txt?a=42",
-            ("system", null,          "out",          null)   → "system:out?a=42",
-            ("http",   "example.org", "/foo/bar.txt", "a=42") → "http://example.org/foo/bar.txt?a=42",
-            ("https",  "example.org", "/foo/bar.txt", "a=42") → "https://example.org/foo/bar.txt?a=42",
-            ("file",   "",            "/foo/bar.txt", null)   → "file:/foo/bar.txt?a=42"
-        )
+    val expected = Seq(
+      ("oxf",    null,          "/foo/bar.txt", null)   → "oxf:/foo/bar.txt?a=42",
+      ("system", null,          "out",          null)   → "system:out?a=42",
+      ("http",   "example.org", "/foo/bar.txt", "a=42") → "http://example.org/foo/bar.txt?a=42",
+      ("https",  "example.org", "/foo/bar.txt", "a=42") → "https://example.org/foo/bar.txt?a=42",
+      ("file",   "",            "/foo/bar.txt", null)   → "file:/foo/bar.txt?a=42"
+    )
 
-        for ((parts, urlString) ← expected) {
-            val url = URLFactory.createURL(urlString)
-            assert(parts === (url.getProtocol, url.getHost, url.getPath, url.getQuery))
-        }
+    for ((parts, urlString) ← expected) {
+      val url = URLFactory.createURL(urlString)
+      assert(parts === (url.getProtocol, url.getHost, url.getPath, url.getQuery))
     }
+  }
 }

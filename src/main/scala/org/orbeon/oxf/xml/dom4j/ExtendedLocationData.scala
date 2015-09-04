@@ -20,76 +20,76 @@ import collection.{breakOut, immutable}
  * LocationData information with additional information.
  */
 class ExtendedLocationData private (
-        val systemID: String,
-        val line: Int,
-        val col: Int,
-        val description: Option[String],
-        paramsAllowNullValues: immutable.Seq[(String, String)])
-    extends LocationData(systemID, line, col) {
+    val systemID: String,
+    val line: Int,
+    val col: Int,
+    val description: Option[String],
+    paramsAllowNullValues: immutable.Seq[(String, String)])
+  extends LocationData(systemID, line, col) {
 
-    val params = paramsAllowNullValues filter (_._2 ne null)
+  val params = paramsAllowNullValues filter (_._2 ne null)
 
-    // With description
-    def this(systemID: String, line: Int, col: Int, description: String) =
-        this(systemID, line, col, Option(description), Nil)
+  // With description
+  def this(systemID: String, line: Int, col: Int, description: String) =
+    this(systemID, line, col, Option(description), Nil)
 
-    // With LocationData, description, params and element
-    def this(locationData: LocationData, description: Option[String] = None, params: immutable.Seq[(String, String)] = Nil, element: Option[Element] = None) =
-        this(
-            Option(locationData) map (_.getSystemID) orNull,
-            Option(locationData) map (_.getLine) getOrElse -1,
-            Option(locationData) map (_.getCol) getOrElse -1,
-            description,
-            (if (element.isDefined) List("element" → (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
-        )
+  // With LocationData, description, params and element
+  def this(locationData: LocationData, description: Option[String] = None, params: immutable.Seq[(String, String)] = Nil, element: Option[Element] = None) =
+    this(
+      Option(locationData) map (_.getSystemID) orNull,
+      Option(locationData) map (_.getLine) getOrElse -1,
+      Option(locationData) map (_.getCol) getOrElse -1,
+      description,
+      (if (element.isDefined) List("element" → (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
+    )
 
-    // For Java callers: with LocationData, description, element and parameters
-    def this(locationData: LocationData, description: String, element: Element, params: Array[String]) =
-        this(
-            locationData,
-            Option(description),
-            ExtendedLocationData.arrayToPairs(params),
-            Option(element)
-        )
+  // For Java callers: with LocationData, description, element and parameters
+  def this(locationData: LocationData, description: String, element: Element, params: Array[String]) =
+    this(
+      locationData,
+      Option(description),
+      ExtendedLocationData.arrayToPairs(params),
+      Option(element)
+    )
 
-    // For Java callers: with LocationData and description
-    def this(locationData: LocationData, description: String) =
-        this(locationData, Some(description))
+  // For Java callers: with LocationData and description
+  def this(locationData: LocationData, description: String) =
+    this(locationData, Some(description))
 
-    // For Java callers: with LocationData, description and element
-    def this(locationData: LocationData, description: String, element: Element) =
-        this(locationData, Option(description), element = Option(element))
+  // For Java callers: with LocationData, description and element
+  def this(locationData: LocationData, description: String, element: Element) =
+    this(locationData, Option(description), element = Option(element))
 
-    // For Java callers: with LocationData, description and parameters
-    def this(locationData: LocationData, description: String, params: Array[String]) =
-        this(locationData, description, null: Element, params)
+  // For Java callers: with LocationData, description and parameters
+  def this(locationData: LocationData, description: String, params: Array[String]) =
+    this(locationData, description, null: Element, params)
 
-    // The element, if any, represented as a String
-    def elementString = params.toMap.get("element")
+  // The element, if any, represented as a String
+  def elementString = params.toMap.get("element")
 
-    // For Java callers
-    def getDescription               = description.orNull
-    def getElementString             = getElementDebugString
-    def getElementDebugString        = elementString.orNull
-    def getParameters: Array[String] = params.flatMap(p ⇒ Array(p._1, p._2))(breakOut)
+  // For Java callers
+  def getDescription               = description.orNull
+  def getElementString             = getElementDebugString
+  def getElementDebugString        = elementString.orNull
+  def getParameters: Array[String] = params.flatMap(p ⇒ Array(p._1, p._2))(breakOut)
 
-    override def toString = {
+  override def toString = {
 
-        def parametersString =
-            params collect { case (k, v) if v ne null ⇒ s"$k='$v'" } mkString ", "
+    def parametersString =
+      params collect { case (k, v) if v ne null ⇒ s"$k='$v'" } mkString ", "
 
-        super.toString + (
-            if (description.isDefined || params.nonEmpty)
-                " (" + (description getOrElse "") + (if (params.nonEmpty) (": " + parametersString) else "") + ")"
-            else
-                ""
-        )
-    }
+    super.toString + (
+      if (description.isDefined || params.nonEmpty)
+        " (" + (description getOrElse "") + (if (params.nonEmpty) (": " + parametersString) else "") + ")"
+      else
+        ""
+    )
+  }
 }
 
 object ExtendedLocationData {
-    def arrayToPairs(a: Seq[String]) = Option(a ensuring (_.size % 2 == 0)) match {
-        case Some(a) ⇒ a.grouped(2).toList collect { case Seq(k, v) ⇒ k → v }
-        case None    ⇒ Nil
-    }
+  def arrayToPairs(a: Seq[String]) = Option(a ensuring (_.size % 2 == 0)) match {
+    case Some(a) ⇒ a.grouped(2).toList collect { case Seq(k, v) ⇒ k → v }
+    case None    ⇒ Nil
+  }
 }

@@ -21,167 +21,167 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
-    val Doc = "oxf:/org/orbeon/oxf/fb/template-for-repeated-sections.xhtml"
+  val Doc = "oxf:/org/orbeon/oxf/fb/template-for-repeated-sections.xhtml"
 
-    @Test def modelInstanceBodyElements(): Unit =
-        withActionAndFBDoc(Doc) { doc ⇒
+  @Test def modelInstanceBodyElements(): Unit =
+    withActionAndFBDoc(Doc) { doc ⇒
 
-            // Enable repeat
-            locally {
-                setRepeatProperties(doc, "my-section", repeat = true, "", "", "")
-    
-                val expected =
-                    elemToDom4j(
-                        <form>
-                            <my-section>
-                                <my-section-iteration>
-                                    <my-input/>
-                                    <my-grid>
-                                        <my-grid-iteration>
-                                            <my-textarea/>
-                                        </my-grid-iteration>
-                                    </my-grid>
-                                </my-section-iteration>
-                            </my-section>
-                            <other-section>
-                                <other-input/>
-                            </other-section>
-                        </form>
-                    )
-    
-                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
-            }
+      // Enable repeat
+      locally {
+        setRepeatProperties(doc, "my-section", repeat = true, "", "", "")
+  
+        val expected =
+          elemToDom4j(
+            <form>
+              <my-section>
+                <my-section-iteration>
+                  <my-input/>
+                  <my-grid>
+                    <my-grid-iteration>
+                      <my-textarea/>
+                    </my-grid-iteration>
+                  </my-grid>
+                </my-section-iteration>
+              </my-section>
+              <other-section>
+                <other-input/>
+              </other-section>
+            </form>
+          )
+  
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+      }
 
-            // Rename section
-            locally {
-                renameControlIterationIfNeeded(doc, "my-section", "foo", "", "")
-                renameControlIfNeeded(doc, "my-section", "foo")
+      // Rename section
+      locally {
+        renameControlIterationIfNeeded(doc, "my-section", "foo", "", "")
+        renameControlIfNeeded(doc, "my-section", "foo")
 
-                val expected =
-                    elemToDom4j(
-                        <form>
-                            <foo>
-                                <foo-iteration>
-                                    <my-input/>
-                                    <my-grid>
-                                        <my-grid-iteration>
-                                            <my-textarea/>
-                                        </my-grid-iteration>
-                                    </my-grid>
-                                </foo-iteration>
-                            </foo>
-                            <other-section>
-                                <other-input/>
-                            </other-section>
-                        </form>
-                    )
+        val expected =
+          elemToDom4j(
+            <form>
+              <foo>
+                <foo-iteration>
+                  <my-input/>
+                  <my-grid>
+                    <my-grid-iteration>
+                      <my-textarea/>
+                    </my-grid-iteration>
+                  </my-grid>
+                </foo-iteration>
+              </foo>
+              <other-section>
+                <other-input/>
+              </other-section>
+            </form>
+          )
 
-                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
-            }
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+      }
 
-            // Custom iteration element name
-            locally {
-                renameControlIterationIfNeeded(doc, "foo", "", "", "bar")
-                
-                val expected =
-                    elemToDom4j(
-                        <form>
-                            <foo>
-                                <bar>
-                                    <my-input/>
-                                    <my-grid>
-                                        <my-grid-iteration>
-                                            <my-textarea/>
-                                        </my-grid-iteration>
-                                    </my-grid>
-                                </bar>
-                            </foo>
-                            <other-section>
-                                <other-input/>
-                            </other-section>
-                        </form>
-                    )
-                
-                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
-            }
+      // Custom iteration element name
+      locally {
+        renameControlIterationIfNeeded(doc, "foo", "", "", "bar")
+        
+        val expected =
+          elemToDom4j(
+            <form>
+              <foo>
+                <bar>
+                  <my-input/>
+                  <my-grid>
+                    <my-grid-iteration>
+                      <my-textarea/>
+                    </my-grid-iteration>
+                  </my-grid>
+                </bar>
+              </foo>
+              <other-section>
+                <other-input/>
+              </other-section>
+            </form>
+          )
+        
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+      }
 
-            // Change min/max
-            locally {
-                setRepeatProperties(doc, "foo", repeat = true, "1", "2", "")
+      // Change min/max
+      locally {
+        setRepeatProperties(doc, "foo", repeat = true, "1", "2", "")
 
-                val section = findControlByName(doc, "foo").get
+        val section = findControlByName(doc, "foo").get
 
-                assert("1" === section.attValue("min"))
-                assert("2" === section.attValue("max"))
+        assert("1" === section.attValue("min"))
+        assert("2" === section.attValue("max"))
 
-                assert("1" === getNormalizedMin(doc, "foo"))
-                assert(Some("2") === getNormalizedMax(doc, "foo"))
-            }
+        assert("1" === getNormalizedMin(doc, "foo"))
+        assert(Some("2") === getNormalizedMax(doc, "foo"))
+      }
 
-            // Change min/max
-            locally {
-                setRepeatProperties(doc, "foo", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "")
+      // Change min/max
+      locally {
+        setRepeatProperties(doc, "foo", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "")
 
-                val section = findControlByName(doc, "foo").get
+        val section = findControlByName(doc, "foo").get
 
-                assert("{1 + 1}" === section.attValue("min"))
-                assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
+        assert("{1 + 1}" === section.attValue("min"))
+        assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
 
-                assert("1 + 1" === getNormalizedMin(doc, "foo"))
-                assert(Some("count(//*[contains(@foo, '{')])") === getNormalizedMax(doc, "foo"))
-            }
+        assert("1 + 1" === getNormalizedMin(doc, "foo"))
+        assert(Some("count(//*[contains(@foo, '{')])") === getNormalizedMax(doc, "foo"))
+      }
 
-            // Move section into it
-            locally {
-                moveSectionRight(findControlByName(doc, "other-section").get)
+      // Move section into it
+      locally {
+        moveSectionRight(findControlByName(doc, "other-section").get)
 
-                val expected =
-                    elemToDom4j(
-                        <form>
-                            <foo>
-                                <bar>
-                                    <my-input/>
-                                    <my-grid>
-                                        <my-grid-iteration>
-                                            <my-textarea/>
-                                        </my-grid-iteration>
-                                    </my-grid>
-                                    <other-section>
-                                        <other-input/>
-                                    </other-section>
-                                </bar>
-                            </foo>
-                        </form>
-                    )
+        val expected =
+          elemToDom4j(
+            <form>
+              <foo>
+                <bar>
+                  <my-input/>
+                  <my-grid>
+                    <my-grid-iteration>
+                      <my-textarea/>
+                    </my-grid-iteration>
+                  </my-grid>
+                  <other-section>
+                    <other-input/>
+                  </other-section>
+                </bar>
+              </foo>
+            </form>
+          )
 
-                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
-            }
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+      }
 
-            // Disable repeat
-            locally {
-                setRepeatProperties(doc, "foo", repeat = false, "", "", "")
+      // Disable repeat
+      locally {
+        setRepeatProperties(doc, "foo", repeat = false, "", "", "")
 
-                val expected =
-                    elemToDom4j(
-                        <form>
-                            <foo>
-                                <my-input/>
-                                <my-grid>
-                                    <my-grid-iteration>
-                                        <my-textarea/>
-                                    </my-grid-iteration>
-                                </my-grid>
-                                <other-section>
-                                    <other-input/>
-                                </other-section>
-                            </foo>
-                        </form>
-                    )
-    
-                assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+        val expected =
+          elemToDom4j(
+            <form>
+              <foo>
+                <my-input/>
+                <my-grid>
+                  <my-grid-iteration>
+                    <my-textarea/>
+                  </my-grid-iteration>
+                </my-grid>
+                <other-section>
+                  <other-input/>
+                </other-section>
+              </foo>
+            </form>
+          )
+  
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
 
-                assert("0" === getNormalizedMin(doc, "foo"))
-                assert(None === getNormalizedMax(doc, "foo"))
-            }
-        }
+        assert("0" === getNormalizedMin(doc, "foo"))
+        assert(None === getNormalizedMax(doc, "foo"))
+      }
+    }
 }

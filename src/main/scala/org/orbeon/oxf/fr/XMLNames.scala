@@ -18,20 +18,20 @@ import org.orbeon.scaxon.XML.Test
 
 object XMLNames {
 
-    val XBLXBLTest            : Test = XBL → "xbl"
-    val XBLBindingTest        : Test = XBL → "binding"
-    val XBLTemplateTest       : Test = XBL → "template"
-    val XBLImplementationTest : Test = XBL → "implementation"
+  val XBLXBLTest            : Test = XBL → "xbl"
+  val XBLBindingTest        : Test = XBL → "binding"
+  val XBLTemplateTest       : Test = XBL → "template"
+  val XBLImplementationTest : Test = XBL → "implementation"
 
-    val FRBodyTest            : Test = FR → "body"
+  val FRBodyTest            : Test = FR → "body"
 
-    val FRGridTest            : Test = FR → "grid"
-    val FRSectionTest         : Test = FR → "section"
+  val FRGridTest            : Test = FR → "grid"
+  val FRSectionTest         : Test = FR → "section"
 
-    val XFModelTest           : Test = XF → "model"
-    val XFInstanceTest        : Test = XF → "instance"
-    val XFBindTest            : Test = XF → "bind"
-    val XFGroupTest           : Test = XF → "group"
+  val XFModelTest           : Test = XF → "model"
+  val XFInstanceTest        : Test = XF → "instance"
+  val XFBindTest            : Test = XF → "bind"
+  val XFGroupTest           : Test = XF → "group"
 
-    val FRContainerTest = FRSectionTest || FRGridTest
+  val FRContainerTest = FRSectionTest || FRGridTest
 }

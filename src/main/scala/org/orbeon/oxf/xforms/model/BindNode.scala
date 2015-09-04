@@ -33,221 +33,221 @@ import scala.collection.mutable
 // The constructor automatically adds the BindNode to the instance data node if any.
 class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
-    import BindNode._
+  import BindNode._
 
-    require(parentBind ne null)
+  require(parentBind ne null)
 
-    val (node, hasChildrenElements) =
-        item match {
-            case node: NodeInfo ⇒
-                val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && XML.hasChildElement(node)
-                InstanceData.addBindNode(node, this)
-                // The last type wins
-                staticBind.dataType foreach (InstanceData.setBindType(node, _))
-                (node, hasChildrenElements)
-            case _ ⇒
-                (null, false)
-        }
-
-    // Current MIP state
-    private var _relevant = Model.DEFAULT_RELEVANT // move to public var once all callers are Scala
-    private var _readonly = Model.DEFAULT_READONLY // move to public var once all callers are Scala
-    private var _required = Model.DEFAULT_REQUIRED // move to public var once all callers are Scala
-
-    private var _invalidTypeValidation: StaticBind#MIP = null
-    private var _requiredValidation: StaticBind#MIP    = null
-
-    private var _customMips = Map.empty[String, String]
-
-    // Since there are only 3 levels we should always get an optimized immutable Map
-    // For a given level, an empty List is not allowed.
-    var failedConstraints = EmptyValidations
-
-    // Failed validations for the given level, including type/required
-    def failedValidations(level: ValidationLevel) = level match {
-        case level @ ErrorLevel if ! typeValid || ! requiredValid ⇒
-            // Add type/required if needed
-            (! typeValid     list invalidTypeValidation)     :::
-            (! requiredValid list invalidRequiredValidation) :::
-            failedConstraints.getOrElse(level, Nil)
-        case level ⇒
-            // Cannot be type/required as those only have ErrorLevel
-            failedConstraints(level)
+  val (node, hasChildrenElements) =
+    item match {
+      case node: NodeInfo ⇒
+        val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && XML.hasChildElement(node)
+        InstanceData.addBindNode(node, this)
+        // The last type wins
+        staticBind.dataType foreach (InstanceData.setBindType(node, _))
+        (node, hasChildrenElements)
+      case _ ⇒
+        (null, false)
     }
 
-    // Highest failed validation level, including type/required
-    def highestValidationLevel = {
-        def typeOrRequiredLevel = (! typeValid || ! requiredValid) option ErrorLevel
-        def constraintLevel     = LevelsByPriority find failedConstraints.contains
+  // Current MIP state
+  private var _relevant = Model.DEFAULT_RELEVANT // move to public var once all callers are Scala
+  private var _readonly = Model.DEFAULT_READONLY // move to public var once all callers are Scala
+  private var _required = Model.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
-        typeOrRequiredLevel orElse constraintLevel
-    }
+  private var _invalidTypeValidation: StaticBind#MIP = null
+  private var _requiredValidation: StaticBind#MIP    = null
 
-    // All failed validations, including type/required
-    def failedValidationsForAllLevels: Validations =
-        if (typeValid && requiredValid)
-            failedConstraints
-        else
-            failedConstraints + (ErrorLevel → failedValidations(ErrorLevel))
+  private var _customMips = Map.empty[String, String]
 
-    def staticBind = parentBind.staticBind
-    def locationData = staticBind.locationData
+  // Since there are only 3 levels we should always get an optimized immutable Map
+  // For a given level, an empty List is not allowed.
+  var failedConstraints = EmptyValidations
 
-    def setRelevant(value: Boolean) = this._relevant = value
-    def setReadonly(value: Boolean) = this._readonly = value
-    def setRequired(value: Boolean) = this._required = value
+  // Failed validations for the given level, including type/required
+  def failedValidations(level: ValidationLevel) = level match {
+    case level @ ErrorLevel if ! typeValid || ! requiredValid ⇒
+      // Add type/required if needed
+      (! typeValid     list invalidTypeValidation)     :::
+      (! requiredValid list invalidRequiredValidation) :::
+      failedConstraints.getOrElse(level, Nil)
+    case level ⇒
+      // Cannot be type/required as those only have ErrorLevel
+      failedConstraints(level)
+  }
 
-    def setTypeValid(value: Boolean, mip: StaticBind#MIP)     = this._invalidTypeValidation = if (! value) mip else null
-    def setRequiredValid(value: Boolean, mip: StaticBind#MIP) = this._requiredValidation    = if (! value) mip else null
+  // Highest failed validation level, including type/required
+  def highestValidationLevel = {
+    def typeOrRequiredLevel = (! typeValid || ! requiredValid) option ErrorLevel
+    def constraintLevel     = LevelsByPriority find failedConstraints.contains
 
-    def setCustom(name: String, value: String) = _customMips += name → value
-    def clearCustom(name: String)             = _customMips -= name
+    typeOrRequiredLevel orElse constraintLevel
+  }
 
-    def relevant        = _relevant
-    def readonly        = _readonly
-    def required        = _required
+  // All failed validations, including type/required
+  def failedValidationsForAllLevels: Validations =
+    if (typeValid && requiredValid)
+      failedConstraints
+    else
+      failedConstraints + (ErrorLevel → failedValidations(ErrorLevel))
 
-    def invalidTypeValidation     = _invalidTypeValidation
-    def typeValid                 = _invalidTypeValidation eq null
-    def invalidRequiredValidation = _requiredValidation
-    def requiredValid             = _requiredValidation eq null
+  def staticBind = parentBind.staticBind
+  def locationData = staticBind.locationData
 
-    def constraintsSatisfiedForLevel(level: ValidationLevel) = ! failedConstraints.contains(level)
-    def valid = typeValid && requiredValid && constraintsSatisfiedForLevel(ErrorLevel)
+  def setRelevant(value: Boolean) = this._relevant = value
+  def setReadonly(value: Boolean) = this._readonly = value
+  def setRequired(value: Boolean) = this._required = value
 
-    def ancestorOrSelfBindNodes =
-        Iterator.iterate(this)(_.parentBind.parentIteration) takeWhile (_ ne null)
+  def setTypeValid(value: Boolean, mip: StaticBind#MIP)     = this._invalidTypeValidation = if (! value) mip else null
+  def setRequiredValid(value: Boolean, mip: StaticBind#MIP) = this._requiredValidation    = if (! value) mip else null
+
+  def setCustom(name: String, value: String) = _customMips += name → value
+  def clearCustom(name: String)             = _customMips -= name
+
+  def relevant        = _relevant
+  def readonly        = _readonly
+  def required        = _required
+
+  def invalidTypeValidation     = _invalidTypeValidation
+  def typeValid                 = _invalidTypeValidation eq null
+  def invalidRequiredValidation = _requiredValidation
+  def requiredValid             = _requiredValidation eq null
+
+  def constraintsSatisfiedForLevel(level: ValidationLevel) = ! failedConstraints.contains(level)
+  def valid = typeValid && requiredValid && constraintsSatisfiedForLevel(ErrorLevel)
+
+  def ancestorOrSelfBindNodes =
+    Iterator.iterate(this)(_.parentBind.parentIteration) takeWhile (_ ne null)
 }
 
 object BindNode {
 
-    type Validations = Map[ValidationLevel, List[StaticBind#MIP]]
+  type Validations = Map[ValidationLevel, List[StaticBind#MIP]]
 
-    val EmptyValidations: Validations = Map()
+  val EmptyValidations: Validations = Map()
 
-    // NOTE: This takes the first custom MIP of a given name associated with the bind. We do store multiple
-    // ones statically, but don't have yet a solution to combine them. Should we string-join them? See also
-    // XFormsModelBindsBase.evaluateCustomMIP.
-    def collectAllCustomMIPs(bindNodes: JList[BindNode]) =
-        if (bindNodes eq null)
-            Map.empty[String, String]
-        else if (bindNodes.size == 1)
-            bindNodes.get(0)._customMips
-        else
-            bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips)
+  // NOTE: This takes the first custom MIP of a given name associated with the bind. We do store multiple
+  // ones statically, but don't have yet a solution to combine them. Should we string-join them? See also
+  // XFormsModelBindsBase.evaluateCustomMIP.
+  def collectAllCustomMIPs(bindNodes: JList[BindNode]) =
+    if (bindNodes eq null)
+      Map.empty[String, String]
+    else if (bindNodes.size == 1)
+      bindNodes.get(0)._customMips
+    else
+      bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips)
 
-    // - prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830. It
-    //   might be better to use another validation level, for example Missing, to handle this. But supporting this
-    //   would have more impact (Form Builder, Form Runner error summary) so we would need to investigate more. For
-    //   now, we consider that, for a control, required error validations take precedence over other validations.
-    // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
-    private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
-        mipsForLevel match {
-            case (ErrorLevel, mips) if mips exists (_.name == Required.name) ⇒
-                ErrorLevel → (mips filter (_.name == Required.name))
-            case (ErrorLevel, mips) if mips exists (_.name == Type.name) ⇒
-                ErrorLevel → (mips filter (_.name == Type.name))
-            case validations ⇒
-                validations
-        }
+  // - prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830. It
+  //   might be better to use another validation level, for example Missing, to handle this. But supporting this
+  //   would have more impact (Form Builder, Form Runner error summary) so we would need to investigate more. For
+  //   now, we consider that, for a control, required error validations take precedence over other validations.
+  // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
+  private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
+    mipsForLevel match {
+      case (ErrorLevel, mips) if mips exists (_.name == Required.name) ⇒
+        ErrorLevel → (mips filter (_.name == Required.name))
+      case (ErrorLevel, mips) if mips exists (_.name == Type.name) ⇒
+        ErrorLevel → (mips filter (_.name == Type.name))
+      case validations ⇒
+        validations
+    }
 
-    // Get all failed constraints for all levels, combining BindNodes if needed.
-    // 2014-07-18: Used by XFormsModelSubmissionBase.annotateWithAlerts only.
-    def failedValidationsForAllLevelsPrioritizeRequired(node: Node) =
-        failedValidationsForAllLevels(node) map prioritizeValidations
+  // Get all failed constraints for all levels, combining BindNodes if needed.
+  // 2014-07-18: Used by XFormsModelSubmissionBase.annotateWithAlerts only.
+  def failedValidationsForAllLevelsPrioritizeRequired(node: Node) =
+    failedValidationsForAllLevels(node) map prioritizeValidations
 
-    def failedValidationsForAllLevels(node: Node): Validations =
-        collectFailedValidationsForAllLevels(
-            Option(InstanceData.getLocalInstanceData(node))
-            map (_.getBindNodes.asScala)
-            getOrElse Nil
-        )
+  def failedValidationsForAllLevels(node: Node): Validations =
+    collectFailedValidationsForAllLevels(
+      Option(InstanceData.getLocalInstanceData(node))
+      map (_.getBindNodes.asScala)
+      getOrElse Nil
+    )
 
-    private def collectFailedValidationsForAllLevels(bindNodes: Seq[BindNode]): Validations =
-        if (bindNodes.isEmpty)
-            EmptyValidations
-        else if (bindNodes.size == 1)
-            bindNodes.head.failedValidationsForAllLevels
-        else {
-            // This is rather inefficient but hopefully rare
-            val buildersByLevel =
-                mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
+  private def collectFailedValidationsForAllLevels(bindNodes: Seq[BindNode]): Validations =
+    if (bindNodes.isEmpty)
+      EmptyValidations
+    else if (bindNodes.size == 1)
+      bindNodes.head.failedValidationsForAllLevels
+    else {
+      // This is rather inefficient but hopefully rare
+      val buildersByLevel =
+        mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
 
-            for {
-                level       ← LevelsByPriority
-                bindNode    ← bindNodes
-                failed      = bindNode.failedValidationsForAllLevels.getOrElse(level, Nil)
-                if failed.nonEmpty
-            } locally {
-                val builder = buildersByLevel.getOrElseUpdate(level, List.newBuilder[StaticBind#MIP])
-                builder ++= failed
-            }
+      for {
+        level       ← LevelsByPriority
+        bindNode    ← bindNodes
+        failed      = bindNode.failedValidationsForAllLevels.getOrElse(level, Nil)
+        if failed.nonEmpty
+      } locally {
+        val builder = buildersByLevel.getOrElseUpdate(level, List.newBuilder[StaticBind#MIP])
+        builder ++= failed
+      }
 
-            buildersByLevel.map { case (k, v) ⇒ k → v.result()} (breakOut)
-        }
+      buildersByLevel.map { case (k, v) ⇒ k → v.result()} (breakOut)
+    }
 
-    // Get all failed constraints for the highest level only, combining BindNodes if needed.
-    // 2014-07-18: Used by XFormsSingleNodeControl only.
-    def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: NodeInfo) =
-        failedValidationsForHighestLevel(nodeInfo) map prioritizeValidations
+  // Get all failed constraints for the highest level only, combining BindNodes if needed.
+  // 2014-07-18: Used by XFormsSingleNodeControl only.
+  def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: NodeInfo) =
+    failedValidationsForHighestLevel(nodeInfo) map prioritizeValidations
 
-    def failedValidationsForHighestLevel(nodeInfo: NodeInfo) =
-        collectFailedValidationsForHighestLevel(
-            Option(InstanceData.getLocalInstanceData(nodeInfo, false))
-            map (_.getBindNodes.asScala)
-            getOrElse Nil
-        )
+  def failedValidationsForHighestLevel(nodeInfo: NodeInfo) =
+    collectFailedValidationsForHighestLevel(
+      Option(InstanceData.getLocalInstanceData(nodeInfo, false))
+      map (_.getBindNodes.asScala)
+      getOrElse Nil
+    )
 
-    private def collectFailedValidationsForHighestLevel(
-        bindNodes : Seq[BindNode]
-    ): Option[(ValidationLevel, List[StaticBind#MIP])] =
-        collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
+  private def collectFailedValidationsForHighestLevel(
+    bindNodes : Seq[BindNode]
+  ): Option[(ValidationLevel, List[StaticBind#MIP])] =
+    collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
 
-    private def collectFailedValidationsForLevel(
-        bindNodes : Seq[BindNode],
-        findLevel : BindNode ⇒ Option[ValidationLevel]
-    ): Option[(ValidationLevel, List[StaticBind#MIP])] =
-        if (bindNodes.isEmpty)
-            None
-        else {
-            val consideredLevels = bindNodes flatMap (node ⇒ findLevel(node) map (level ⇒ (level, node)))
-            val highestLevelOpt  = consideredLevels.nonEmpty option (consideredLevels map (_._1) max)
+  private def collectFailedValidationsForLevel(
+    bindNodes : Seq[BindNode],
+    findLevel : BindNode ⇒ Option[ValidationLevel]
+  ): Option[(ValidationLevel, List[StaticBind#MIP])] =
+    if (bindNodes.isEmpty)
+      None
+    else {
+      val consideredLevels = bindNodes flatMap (node ⇒ findLevel(node) map (level ⇒ (level, node)))
+      val highestLevelOpt  = consideredLevels.nonEmpty option (consideredLevels map (_._1) max)
 
-            highestLevelOpt map {
-                highestLevel ⇒
+      highestLevelOpt map {
+        highestLevel ⇒
 
-                    val failedForHighest =
-                        consideredLevels.toList collect {
-                            case (`highestLevel`, node) ⇒ node.failedValidations(highestLevel)
-                        } flatten
+          val failedForHighest =
+            consideredLevels.toList collect {
+              case (`highestLevel`, node) ⇒ node.failedValidations(highestLevel)
+            } flatten
 
-                    (highestLevel, failedForHighest)
-            }
-        }
+          (highestLevel, failedForHighest)
+      }
+    }
 }
 
 // Bind node that also contains nested binds
 class BindIteration(
-    parentBind                         : RuntimeBind,
-    position                           : Int,
-    item                               : Item,
-    childrenBindsHaveSingleNodeContext : Boolean,
-    childrenStaticBinds                : Seq[StaticBind]
+  parentBind                         : RuntimeBind,
+  position                           : Int,
+  item                               : Item,
+  childrenBindsHaveSingleNodeContext : Boolean,
+  childrenStaticBinds                : Seq[StaticBind]
 ) extends BindNode(parentBind, position, item) {
 
-    require(childrenStaticBinds.nonEmpty)
+  require(childrenStaticBinds.nonEmpty)
 
-    def forStaticId = parentBind.staticId
+  def forStaticId = parentBind.staticId
 
-    // Iterate over children and create children binds
-    val childrenBinds =
-        for (staticBind ← childrenStaticBinds)
-            yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
+  // Iterate over children and create children binds
+  val childrenBinds =
+    for (staticBind ← childrenStaticBinds)
+      yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
 
-    def applyBinds(bindRunner: XFormsModelBinds.BindRunner): Unit =
-        for (currentBind ← childrenBinds)
-            currentBind.applyBinds(bindRunner)
+  def applyBinds(bindRunner: XFormsModelBinds.BindRunner): Unit =
+    for (currentBind ← childrenBinds)
+      currentBind.applyBinds(bindRunner)
 
-    def findChildBindByStaticId(bindId: String) =
-        childrenBinds find (_.staticBind.staticId == bindId)
+  def findChildBindByStaticId(bindId: String) =
+    childrenBinds find (_.staticBind.staticId == bindId)
 }

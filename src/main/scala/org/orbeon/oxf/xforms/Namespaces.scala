@@ -17,9 +17,9 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.XFormsConstants._
 
 trait Namespaces {
-    val XH  = XHTML_NAMESPACE_URI
-    val XF  = XFORMS_NAMESPACE_URI
-    val XXF = XXFORMS_NAMESPACE_URI
-    val XS  = XSD_URI
-    val XBL = XBL_NAMESPACE_URI
+  val XH  = XHTML_NAMESPACE_URI
+  val XF  = XFORMS_NAMESPACE_URI
+  val XXF = XXFORMS_NAMESPACE_URI
+  val XS  = XSD_URI
+  val XBL = XBL_NAMESPACE_URI
 }

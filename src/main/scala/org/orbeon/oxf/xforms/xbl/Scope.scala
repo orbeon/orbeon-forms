@@ -26,40 +26,40 @@ import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
  */
 class Scope(val parent: Scope, val scopeId: String) {
 
-    assert((parent ne null) || scopeId == "")
+  assert((parent ne null) || scopeId == "")
 
-    private val idMap = mutable.HashMap[String, String]()
-    val fullPrefix = if (isTopLevelScope) "" else scopeId + COMPONENT_SEPARATOR
-    
-    def isTopLevelScope = scopeId.length == 0
+  private val idMap = mutable.HashMap[String, String]()
+  val fullPrefix = if (isTopLevelScope) "" else scopeId + COMPONENT_SEPARATOR
+  
+  def isTopLevelScope = scopeId.length == 0
 
-    // Return the prefixed id of the given control static id within this scope, null if not found
-    def prefixedIdForStaticId(staticId: String) =
-        idMap.get(staticId).orNull
+  // Return the prefixed id of the given control static id within this scope, null if not found
+  def prefixedIdForStaticId(staticId: String) =
+    idMap.get(staticId).orNull
 
-    def prefixedIdForStaticIdOpt(staticId: String) =
-        idMap.get(staticId)
+  def prefixedIdForStaticIdOpt(staticId: String) =
+    idMap.get(staticId)
 
-    def contains(staticId: String) = idMap.contains(staticId)
+  def contains(staticId: String) = idMap.contains(staticId)
 
-    // Add a static id → prefixed id mapping
-    def += (kv: (String, String)) = kv match {
-        case (staticId, prefixedId) ⇒
-            // Index static id ⇒ prefixed id by scope
-            idMap += staticId → prefixedId
-    }
+  // Add a static id → prefixed id mapping
+  def += (kv: (String, String)) = kv match {
+    case (staticId, prefixedId) ⇒
+      // Index static id ⇒ prefixed id by scope
+      idMap += staticId → prefixedId
+  }
 
-    // Remove a mapping by static id
-    def -= (staticId: String): Unit =
-        idMap -= staticId
+  // Remove a mapping by static id
+  def -= (staticId: String): Unit =
+    idMap -= staticId
 
-    // Equality is defined purely based on the scope id
-    override def hashCode = scopeId.hashCode
+  // Equality is defined purely based on the scope id
+  override def hashCode = scopeId.hashCode
 
-    override def equals(that: Any) = that match {
-        case thatScope: Scope ⇒ scopeId == thatScope.scopeId
-        case _ ⇒ false
-    }
+  override def equals(that: Any) = that match {
+    case thatScope: Scope ⇒ scopeId == thatScope.scopeId
+    case _ ⇒ false
+  }
 
-    override def toString = "Scope(" + scopeId + ")"
+  override def toString = "Scope(" + scopeId + ")"
 }

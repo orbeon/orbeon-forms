@@ -19,28 +19,28 @@ import scala.collection.JavaConverters._
 
 trait RequestPrependHeaders extends PortletRequestWrapper {
 
-    def headersToPrepend: Map[String, Array[String]]
+  def headersToPrepend: Map[String, Array[String]]
 
-    override def getPropertyNames =
-        (headersToPrepend.keysIterator ++ (super.getPropertyNames.asScala filterNot headersToPrepend.keySet))
-            .asJavaEnumeration
+  override def getPropertyNames =
+    (headersToPrepend.keysIterator ++ (super.getPropertyNames.asScala filterNot headersToPrepend.keySet))
+      .asJavaEnumeration
 
-    override def getProperty(name: String) =
-        addedHeaderOption(name) getOrElse super.getProperty(name)
+  override def getProperty(name: String) =
+    addedHeaderOption(name) getOrElse super.getProperty(name)
 
-    override def getProperties(name: String) =
-        headersToPrepend.get(name) map (_.iterator.asJavaEnumeration) getOrElse super.getProperties(name)
+  override def getProperties(name: String) =
+    headersToPrepend.get(name) map (_.iterator.asJavaEnumeration) getOrElse super.getProperties(name)
 
-    private def addedHeaderOption(name: String) =
-        headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
+  private def addedHeaderOption(name: String) =
+    headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
 }
 
 trait RequestRemoveHeaders extends PortletRequestWrapper {
 
-    def headersToRemove: String ⇒ Boolean
+  def headersToRemove: String ⇒ Boolean
 
-    override def getPropertyNames = (super.getPropertyNames.asScala filterNot headersToRemove).asJavaEnumeration
+  override def getPropertyNames = (super.getPropertyNames.asScala filterNot headersToRemove).asJavaEnumeration
 
-    override def getProperty(name: String)   = if (headersToRemove(name)) null else super.getProperty(name)
-    override def getProperties(name: String) = if (headersToRemove(name)) null else super.getProperties(name)
+  override def getProperty(name: String)   = if (headersToRemove(name)) null else super.getProperty(name)
+  override def getProperties(name: String) = if (headersToRemove(name)) null else super.getProperties(name)
 }

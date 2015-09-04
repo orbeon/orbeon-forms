@@ -26,53 +26,53 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 // the input parameters.
 class BinaryTextXMLReceiverTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def noContentType(): Unit = {
+  @Test def noContentType(): Unit = {
 
-        val (response, receiver) = responseWithReceiver
+    val (response, receiver) = responseWithReceiver
 
-        val document: Document =
-            <document
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xsi:type="xs:base64Binary"/>
+    val document: Document =
+      <document
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xsi:type="xs:base64Binary"/>
 
-        TransformerUtils.writeDom4j(document, receiver)
+    TransformerUtils.writeDom4j(document, receiver)
 
-        assert("application/octet-stream" === response.contentType)
+    assert("application/octet-stream" === response.contentType)
+  }
+
+  @Test def forwardAsIs(): Unit =
+    for (contentType ← Seq("text/html; charset=utf-16", "text/html", "image/png")) {
+      val (response, receiver) = responseWithReceiver
+
+      val document: Document =
+        <document
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xsi:type="xs:base64Binary"
+          content-type={contentType}/>
+
+      TransformerUtils.writeDom4j(document, receiver)
+
+      assert(contentType === response.contentType)
     }
 
-    @Test def forwardAsIs(): Unit =
-        for (contentType ← Seq("text/html; charset=utf-16", "text/html", "image/png")) {
-            val (response, receiver) = responseWithReceiver
+  def responseWithReceiver = {
+    val response = new TestResponse
+    (response, new BinaryTextXMLReceiver(Left(response), true, false, None, false, false, None, false))
+  }
 
-            val document: Document =
-                <document
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                    xsi:type="xs:base64Binary"
-                    content-type={contentType}/>
+  class TestResponse extends ResponseAdapter {
 
-            TransformerUtils.writeDom4j(document, receiver)
+    var contentType: String = _
+    var status: Int = -1
 
-            assert(contentType === response.contentType)
-        }
+    override def setContentType(contentType: String): Unit = this.contentType = contentType
+    override def setStatus(status: Int): Unit = this.status = status
 
-    def responseWithReceiver = {
-        val response = new TestResponse
-        (response, new BinaryTextXMLReceiver(Left(response), true, false, None, false, false, None, false))
-    }
+    override def setPageCaching(lastModified: Long): Unit = super.setPageCaching(lastModified)
+    override def setHeader(name: String, value: String): Unit = super.setHeader(name, value)
 
-    class TestResponse extends ResponseAdapter {
-
-        var contentType: String = _
-        var status: Int = -1
-
-        override def setContentType(contentType: String): Unit = this.contentType = contentType
-        override def setStatus(status: Int): Unit = this.status = status
-
-        override def setPageCaching(lastModified: Long): Unit = super.setPageCaching(lastModified)
-        override def setHeader(name: String, value: String): Unit = super.setHeader(name, value)
-
-        override val getOutputStream = new ByteArrayOutputStream
-    }
+    override val getOutputStream = new ByteArrayOutputStream
+  }
 }

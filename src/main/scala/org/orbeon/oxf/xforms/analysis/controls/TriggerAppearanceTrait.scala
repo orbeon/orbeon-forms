@@ -18,30 +18,30 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 
 trait TriggerAppearanceTrait extends AppearanceTrait {
 
-    // Normalize appearances
-    override val appearances = {
-        // val initialAppearances = super.appearances
-        val initialAppearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+  // Normalize appearances
+  override val appearances = {
+    // val initialAppearances = super.appearances
+    val initialAppearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
 
-        val isMinimal = initialAppearances(XFORMS_MINIMAL_APPEARANCE_QNAME)
-        val isCompact = initialAppearances(XFORMS_COMPACT_APPEARANCE_QNAME)
+    val isMinimal = initialAppearances(XFORMS_MINIMAL_APPEARANCE_QNAME)
+    val isCompact = initialAppearances(XFORMS_COMPACT_APPEARANCE_QNAME)
 
-        val isModal = element.attributeValue(XXFORMS_MODAL_QNAME) == "true"
+    val isModal = element.attributeValue(XXFORMS_MODAL_QNAME) == "true"
 
-        // - When the appearance is not minimal, put a class for the full appearance, so we can style the full trigger
-        //   properly without banging our head on walls due to poor CSS support in IE.
-        // - Don't add xforms-trigger-appearance-full to all controls as it is usually not needed and would add more
-        //   markup.
-        val updated =
-            if (! isMinimal && ! isCompact)
-                initialAppearances + XFORMS_FULL_APPEARANCE_QNAME
-            else
-                initialAppearances
+    // - When the appearance is not minimal, put a class for the full appearance, so we can style the full trigger
+    //   properly without banging our head on walls due to poor CSS support in IE.
+    // - Don't add xforms-trigger-appearance-full to all controls as it is usually not needed and would add more
+    //   markup.
+    val updated =
+      if (! isMinimal && ! isCompact)
+        initialAppearances + XFORMS_FULL_APPEARANCE_QNAME
+      else
+        initialAppearances
 
-        // Add "modal" pseudo-appearance if needed
-        if (isModal)
-            updated + XFORMS_MODAL_APPEARANCE_QNAME
-        else
-            updated
-    }
+    // Add "modal" pseudo-appearance if needed
+    if (isModal)
+      updated + XFORMS_MODAL_APPEARANCE_QNAME
+    else
+      updated
+  }
 }

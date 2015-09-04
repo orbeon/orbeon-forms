@@ -21,76 +21,76 @@ import scala.collection.{breakOut, mutable}
 
 object XBLResources {
 
-    sealed trait HeadElement
-    case   class ReferenceElement(src: String) extends HeadElement
-    case   class InlineElement(text: String)   extends HeadElement
+  sealed trait HeadElement
+  case   class ReferenceElement(src: String) extends HeadElement
+  case   class InlineElement(text: String)   extends HeadElement
 
-    val EmptyHeadElementSeq = Seq[HeadElement]()
+  val EmptyHeadElementSeq = Seq[HeadElement]()
 
-    object HeadElement {
-        def apply(e: Element): HeadElement = {
+  object HeadElement {
+    def apply(e: Element): HeadElement = {
 
-            val href = e.attributeValue("href")
-            val src = e.attributeValue("src")
-            val resType = e.attributeValue("type")
-            val rel = Option(e.attributeValue("rel")) getOrElse "" toLowerCase
+      val href = e.attributeValue("href")
+      val src = e.attributeValue("src")
+      val resType = e.attributeValue("type")
+      val rel = Option(e.attributeValue("rel")) getOrElse "" toLowerCase
 
-            e.getName match {
-                case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒
-                    ReferenceElement(href)
-                case "style" if (src ne null) && ((resType eq null) || resType == "text/css") ⇒
-                    ReferenceElement(src)
-                case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") ⇒
-                    ReferenceElement(src)
-                case "style" if src eq null  ⇒
-                    InlineElement(e.getStringValue)
-                case "script" if src eq null ⇒
-                    InlineElement(e.getStringValue)
-                case _ ⇒
-                    throw new IllegalArgumentException(
-                        s"Invalid element passed to HeadElement(): ${Dom4jUtils.elementToDebugString(e)}"
-                    )
-            }
-        }
+      e.getName match {
+        case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒
+          ReferenceElement(href)
+        case "style" if (src ne null) && ((resType eq null) || resType == "text/css") ⇒
+          ReferenceElement(src)
+        case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") ⇒
+          ReferenceElement(src)
+        case "style" if src eq null  ⇒
+          InlineElement(e.getStringValue)
+        case "script" if src eq null ⇒
+          InlineElement(e.getStringValue)
+        case _ ⇒
+          throw new IllegalArgumentException(
+            s"Invalid element passed to HeadElement(): ${Dom4jUtils.elementToDebugString(e)}"
+          )
+      }
     }
+  }
 
-    // All elements ordered in a consistent way: first by CSS name, then in the order in which they appear for that
-    // given CSS name, removing duplicates
-    //
-    // NOTE: We used to attempt to sort by binding QName, when all bindings were direct. The code was actually incorrect
-    // and "sorted" by <xbl:binding> instead (so no sorting). Now we wort by CSS name instead.
-    def orderedHeadElements(
-        bindings        : Iterable[AbstractBinding],
-        getHeadElements : AbstractBinding ⇒ Seq[HeadElement]
-    ): List[HeadElement] =
-        ((bindings.to[List] sortBy (_.cssName)).flatMap(getHeadElements)(breakOut): mutable.LinkedHashSet[HeadElement]).to[List]
+  // All elements ordered in a consistent way: first by CSS name, then in the order in which they appear for that
+  // given CSS name, removing duplicates
+  //
+  // NOTE: We used to attempt to sort by binding QName, when all bindings were direct. The code was actually incorrect
+  // and "sorted" by <xbl:binding> instead (so no sorting). Now we wort by CSS name instead.
+  def orderedHeadElements(
+    bindings        : Iterable[AbstractBinding],
+    getHeadElements : AbstractBinding ⇒ Seq[HeadElement]
+  ): List[HeadElement] =
+    ((bindings.to[List] sortBy (_.cssName)).flatMap(getHeadElements)(breakOut): mutable.LinkedHashSet[HeadElement]).to[List]
 
-    // Output baseline, remaining, and inline resources
-    def outputResources(
-        outputElement : (Option[String], Option[String], Option[String]) ⇒ Unit,
-        getBuiltin    : Boolean ⇒ Seq[ResourceConfig],
-        headElements  : Iterable[HeadElement],
-        xblBaseline   : Iterable[String],
-        minimal       : Boolean
-    ): Unit = {
+  // Output baseline, remaining, and inline resources
+  def outputResources(
+    outputElement : (Option[String], Option[String], Option[String]) ⇒ Unit,
+    getBuiltin    : Boolean ⇒ Seq[ResourceConfig],
+    headElements  : Iterable[HeadElement],
+    xblBaseline   : Iterable[String],
+    minimal       : Boolean
+  ): Unit = {
 
-        // For now, actual builtin resources always include the baseline builtin resources
-        val builtinBaseline: mutable.LinkedHashSet[String] = getBuiltin(false).map(_.getResourcePath(minimal))(breakOut)
-        val allBaseline = builtinBaseline ++ xblBaseline
+    // For now, actual builtin resources always include the baseline builtin resources
+    val builtinBaseline: mutable.LinkedHashSet[String] = getBuiltin(false).map(_.getResourcePath(minimal))(breakOut)
+    val allBaseline = builtinBaseline ++ xblBaseline
 
-        // Output baseline resources with a CSS class
-        allBaseline foreach (s ⇒ outputElement(Some(s), Some("xforms-baseline"), None))
+    // Output baseline resources with a CSS class
+    allBaseline foreach (s ⇒ outputElement(Some(s), Some("xforms-baseline"), None))
 
-        // This is in the order defined by XBLBindings.orderedHeadElements
-        val xbl = headElements
+    // This is in the order defined by XBLBindings.orderedHeadElements
+    val xbl = headElements
 
-        val builtinUsed: mutable.LinkedHashSet[String] = getBuiltin(true).map(_.getResourcePath(minimal))(breakOut)
-        val xblUsed: List[String] = xbl.collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
+    val builtinUsed: mutable.LinkedHashSet[String] = getBuiltin(true).map(_.getResourcePath(minimal))(breakOut)
+    val xblUsed: List[String] = xbl.collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
 
-        // Output remaining resources if any, with no CSS class
-        builtinUsed ++ xblUsed -- allBaseline foreach (s ⇒ outputElement(Some(s), None, None))
+    // Output remaining resources if any, with no CSS class
+    builtinUsed ++ xblUsed -- allBaseline foreach (s ⇒ outputElement(Some(s), None, None))
 
-        // Output inline XBL resources
-        xbl collect { case e: InlineElement ⇒ outputElement(None, None, Option(e.text)) }
-    }
+    // Output inline XBL resources
+    xbl collect { case e: InlineElement ⇒ outputElement(None, None, Option(e.text)) }
+  }
 }

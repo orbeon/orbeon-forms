@@ -26,36 +26,36 @@ import org.orbeon.scaxon.XML._
 
 class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
 
-    // Test for issue #1689, where errors were not if the error summary was placed before what it was observing
-    @Test def onTop(): Unit = {
-        val doc = this setupDocument
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-                  xmlns:xf="http://www.w3.org/2002/xforms"
-                  xmlns:ev="http://www.w3.org/2001/xml-events"
-                  xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                <xh:head>
-                    <xf:model>
-                        <xf:instance>
-                            <invalid/>
-                        </xf:instance>
-                        <xf:bind ref="." constraint="false()"/>
-                        <xf:dispatch ev:event="xforms-ready" name="fr-visit-all" targetid="error-summary"/>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <fr:error-summary id="error-summary" observer="output"/>
-                    <xf:input ref="." id="output">
-                        <xf:alert>alert</xf:alert>
-                    </xf:input>
-                </xh:body>
-            </xh:html>
+  // Test for issue #1689, where errors were not if the error summary was placed before what it was observing
+  @Test def onTop(): Unit = {
+    val doc = this setupDocument
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:ev="http://www.w3.org/2001/xml-events"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <xh:head>
+          <xf:model>
+            <xf:instance>
+              <invalid/>
+            </xf:instance>
+            <xf:bind ref="." constraint="false()"/>
+            <xf:dispatch ev:event="xforms-ready" name="fr-visit-all" targetid="error-summary"/>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <fr:error-summary id="error-summary" observer="output"/>
+          <xf:input ref="." id="output">
+            <xf:alert>alert</xf:alert>
+          </xf:input>
+        </xh:body>
+      </xh:html>
 
-        withContainingDocument(doc) {
-            val errorSummary = resolveComponent("error-summary").get
-            val stateInstance = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
-            val visibleAlertCountAttr = stateInstance / "state" / "visible-counts" /@ "alert"
-            val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
-            assert(visibleAlertCountValue === "1")
-        }
+    withContainingDocument(doc) {
+      val errorSummary = resolveComponent("error-summary").get
+      val stateInstance = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
+      val visibleAlertCountAttr = stateInstance / "state" / "visible-counts" /@ "alert"
+      val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
+      assert(visibleAlertCountValue === "1")
     }
+  }
 }

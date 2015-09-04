@@ -17,14 +17,14 @@ import org.apache.commons.lang3.StringUtils
 
 object RunMode {
 
-    val RunModeProperty = "oxf.run-mode"
+  val RunModeProperty = "oxf.run-mode"
 
-    val ProdRunMode = "prod"
-    val DevRunMode = "dev"
+  val ProdRunMode = "prod"
+  val DevRunMode = "dev"
 
-    val DefaultRunMode = ProdRunMode
+  val DefaultRunMode = ProdRunMode
 
-    // Return the web app's run mode
-    def getRunMode(contextParams: Map[String, String]) =
-        Option(StringUtils.trimToNull(contextParams.get(RunModeProperty).orNull)) getOrElse DefaultRunMode
+  // Return the web app's run mode
+  def getRunMode(contextParams: Map[String, String]) =
+    Option(StringUtils.trimToNull(contextParams.get(RunModeProperty).orNull)) getOrElse DefaultRunMode
 }

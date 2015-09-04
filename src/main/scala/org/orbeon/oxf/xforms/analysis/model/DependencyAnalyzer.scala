@@ -27,121 +27,121 @@ import scala.annotation.tailrec
 // See also: https://github.com/orbeon/orbeon-forms/issues/2186
 object DependencyAnalyzer {
 
-    val LoggerName = "org.orbeon.xforms.analysis.calculate"
-    val Logger     = LoggerFactory.getLogger(LoggerName)
+  val LoggerName = "org.orbeon.xforms.analysis.calculate"
+  val Logger     = LoggerFactory.getLogger(LoggerName)
 
-    private case class BindDetails(staticBind: StaticBind, name: Option[String], refs: Set[String])
+  private case class BindDetails(staticBind: StaticBind, name: Option[String], refs: Set[String])
 
-    private object BindDetails {
+  private object BindDetails {
 
-        def fromStaticBindMIP(
-            validBindNames : scala.collection.Set[String],
-            staticBind     : StaticBind,
-            mipOpt         : Option[StaticBind#XPathMIP]
-        ): Option[BindDetails] =
-            mipOpt map { mip ⇒
+    def fromStaticBindMIP(
+      validBindNames : scala.collection.Set[String],
+      staticBind     : StaticBind,
+      mipOpt         : Option[StaticBind#XPathMIP]
+    ): Option[BindDetails] =
+      mipOpt map { mip ⇒
 
-                val compiledExpr = mip.compiledExpression
-                val expr         = compiledExpr.expression.getInternalExpression
+        val compiledExpr = mip.compiledExpression
+        val expr         = compiledExpr.expression.getInternalExpression
 
-                val externalVariableReferenceIt = SaxonUtils.iterateExpressionTree(expr) collect {
-                    case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] ⇒ vr
-                }
+        val externalVariableReferenceIt = SaxonUtils.iterateExpressionTree(expr) collect {
+          case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] ⇒ vr
+        }
 
-                val referencedVariableNames = (
-                    externalVariableReferenceIt
-                    map    (_.getBinding.getVariableQName.getLocalName)
-                    filter validBindNames
-                )
+        val referencedVariableNames = (
+          externalVariableReferenceIt
+          map    (_.getBinding.getVariableQName.getLocalName)
+          filter validBindNames
+        )
 
-                BindDetails(staticBind, staticBind.nameOpt, referencedVariableNames.to[Set])
-            }
+        BindDetails(staticBind, staticBind.nameOpt, referencedVariableNames.to[Set])
+      }
+  }
+
+  def determineEvaluationOrder(tree: BindTree, mip: Model.StringMIP): List[StaticBind] = {
+
+    if (Logger.isDebugEnabled)
+      Logger.debug(s"analyzing ${mip.name} dependencies for model ${tree.model.staticId}")
+
+    val allBindsByName = tree.bindsByName
+
+    val bindsWithMIPDetails = {
+
+      def iterateBinds(binds: Seq[StaticBind]): Iterator[StaticBind] =
+        binds.iterator flatMap (b ⇒ Iterator(b) ++ iterateBinds(b.children))
+
+      val validBindNames = allBindsByName.keySet
+
+      val bindsIt   = iterateBinds(tree.topLevelBinds)
+      val detailsIt = bindsIt flatMap (b ⇒ BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
+
+      detailsIt.to[List]
     }
 
-    def determineEvaluationOrder(tree: BindTree, mip: Model.StringMIP): List[StaticBind] = {
+    // The algorithm requires all vertices so create all the ones which are referenced by name by expressions, but
+    // are not present in bindsWithMIPDetails.
+    val otherBindDetailsIt = {
 
-        if (Logger.isDebugEnabled)
-            Logger.debug(s"analyzing ${mip.name} dependencies for model ${tree.model.staticId}")
+      val existingBindNames = bindsWithMIPDetails flatMap (_.name) toSet
+      val referredBindNames = bindsWithMIPDetails flatMap (_.refs) toSet
+      val namesToAdd        = referredBindNames -- existingBindNames
 
-        val allBindsByName = tree.bindsByName
-
-        val bindsWithMIPDetails = {
-
-            def iterateBinds(binds: Seq[StaticBind]): Iterator[StaticBind] =
-                binds.iterator flatMap (b ⇒ Iterator(b) ++ iterateBinds(b.children))
-
-            val validBindNames = allBindsByName.keySet
-
-            val bindsIt   = iterateBinds(tree.topLevelBinds)
-            val detailsIt = bindsIt flatMap (b ⇒ BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
-
-            detailsIt.to[List]
-        }
-
-        // The algorithm requires all vertices so create all the ones which are referenced by name by expressions, but
-        // are not present in bindsWithMIPDetails.
-        val otherBindDetailsIt = {
-
-            val existingBindNames = bindsWithMIPDetails flatMap (_.name) toSet
-            val referredBindNames = bindsWithMIPDetails flatMap (_.refs) toSet
-            val namesToAdd        = referredBindNames -- existingBindNames
-
-            for {
-                name       ← namesToAdd
-                staticBind ← allBindsByName.get(name)
-            } yield
-                BindDetails.apply(staticBind, staticBind.nameOpt, Set.empty)
-        }
-
-        // NOTE: We would like to follow the original bind order as closely as possible, but currently we don't: the
-        // order consists of nodes without references first, followed by the order or nodes with one reference, etc.
-        // We might need to do a different algorithm to preserve the order.
-        def sortTopologically(bindsForSort: List[BindDetails]) = {
-            @tailrec
-            def visit(bindDetails: List[BindDetails], done: List[StaticBind]): List[StaticBind] =
-                bindDetails partition (_.refs.isEmpty) match {
-                    case (Nil, Nil) ⇒
-                        done
-                    case (Nil, head :: _) ⇒
-                        throw new ValidationException(
-                            s"MIP dependency cycle found for bind id `${head.staticBind.staticId}`",
-                            head.staticBind.locationData
-                        )
-                    case (noRefs, withRefs) ⇒
-                        visit(
-                            bindDetails = withRefs map (b ⇒ b.copy(refs = b.refs -- (noRefs flatMap (_.name)))),
-                            done        = noRefs.map(_.staticBind).reverse ::: done
-                        )
-                }
-
-            visit(bindsForSort, Nil).reverse
-        }
-
-        def logResult(result: List[StaticBind]) =
-            if (result.nonEmpty && Logger.isDebugEnabled) {
-
-                val idsToRefs = bindsWithMIPDetails map (b ⇒ b.staticBind.staticId → b.refs) toMap
-
-                val maxStaticId = result map (_.staticId.size) max
-
-                def explanation(staticBind: StaticBind) = {
-
-                    val staticId = staticBind.staticId
-                    val refs     = idsToRefs(staticId)
-
-                    val dependsOnMsg = if (refs.isEmpty) "" else refs mkString (" (references: ", ", ", ")")
-
-                    s"  ${staticId.padTo(maxStaticId, ' ')}$dependsOnMsg"
-                }
-
-                val allExplanations = result map explanation mkString "\n"
-
-                Logger.debug(s"topological sort (${result.size}} nodes):\n$allExplanations")
-            }
-
-        // We are only interested in the binds containing the MIP
-        val idsToKeep = bindsWithMIPDetails map (_.staticBind.staticId) toSet
-
-        (sortTopologically(bindsWithMIPDetails ++ otherBindDetailsIt) filter (b ⇒ idsToKeep(b.staticId))) |!> logResult
+      for {
+        name       ← namesToAdd
+        staticBind ← allBindsByName.get(name)
+      } yield
+        BindDetails.apply(staticBind, staticBind.nameOpt, Set.empty)
     }
+
+    // NOTE: We would like to follow the original bind order as closely as possible, but currently we don't: the
+    // order consists of nodes without references first, followed by the order or nodes with one reference, etc.
+    // We might need to do a different algorithm to preserve the order.
+    def sortTopologically(bindsForSort: List[BindDetails]) = {
+      @tailrec
+      def visit(bindDetails: List[BindDetails], done: List[StaticBind]): List[StaticBind] =
+        bindDetails partition (_.refs.isEmpty) match {
+          case (Nil, Nil) ⇒
+            done
+          case (Nil, head :: _) ⇒
+            throw new ValidationException(
+              s"MIP dependency cycle found for bind id `${head.staticBind.staticId}`",
+              head.staticBind.locationData
+            )
+          case (noRefs, withRefs) ⇒
+            visit(
+              bindDetails = withRefs map (b ⇒ b.copy(refs = b.refs -- (noRefs flatMap (_.name)))),
+              done        = noRefs.map(_.staticBind).reverse ::: done
+            )
+        }
+
+      visit(bindsForSort, Nil).reverse
+    }
+
+    def logResult(result: List[StaticBind]) =
+      if (result.nonEmpty && Logger.isDebugEnabled) {
+
+        val idsToRefs = bindsWithMIPDetails map (b ⇒ b.staticBind.staticId → b.refs) toMap
+
+        val maxStaticId = result map (_.staticId.size) max
+
+        def explanation(staticBind: StaticBind) = {
+
+          val staticId = staticBind.staticId
+          val refs     = idsToRefs(staticId)
+
+          val dependsOnMsg = if (refs.isEmpty) "" else refs mkString (" (references: ", ", ", ")")
+
+          s"  ${staticId.padTo(maxStaticId, ' ')}$dependsOnMsg"
+        }
+
+        val allExplanations = result map explanation mkString "\n"
+
+        Logger.debug(s"topological sort (${result.size}} nodes):\n$allExplanations")
+      }
+
+    // We are only interested in the binds containing the MIP
+    val idsToKeep = bindsWithMIPDetails map (_.staticBind.staticId) toSet
+
+    (sortTopologically(bindsWithMIPDetails ++ otherBindDetailsIt) filter (b ⇒ idsToKeep(b.staticId))) |!> logResult
+  }
 }

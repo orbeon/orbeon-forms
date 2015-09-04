@@ -20,21 +20,21 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.xbl.Scope
 
 class AttributeControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends CoreControl(staticStateContext, element, parent, preceding, scope)
-        with ValueTrait
-        with OptionalSingleNode {
+    extends CoreControl(staticStateContext, element, parent, preceding, scope)
+    with ValueTrait
+    with OptionalSingleNode {
 
-    // Attribute control uses an AVT
-    override def computeValueAnalysis = Some(analyzeXPath(getChildrenContext, attributeValue, avt = true))
+  // Attribute control uses an AVT
+  override def computeValueAnalysis = Some(analyzeXPath(getChildrenContext, attributeValue, avt = true))
 
-    val forStaticId = element.attributeValue(FOR_QNAME)
-    val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, forStaticId)
+  val forStaticId = element.attributeValue(FOR_QNAME)
+  val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, forStaticId)
 
-    val attributeName = element.attributeValue(NAME_QNAME)
-    val attributeValue = element.attributeValue(VALUE_QNAME)
+  val attributeName = element.attributeValue(NAME_QNAME)
+  val attributeValue = element.attributeValue(VALUE_QNAME)
 
-    val forName = element.attributeValue("for-name")
-    val urlType = element.attributeValue("url-type")
-    val portletMode = element.attributeValue("portlet-mode")
-    val windowState = element.attributeValue("window-state")
+  val forName = element.attributeValue("for-name")
+  val urlType = element.attributeValue("url-type")
+  val portletMode = element.attributeValue("portlet-mode")
+  val windowState = element.attributeValue("window-state")
 }

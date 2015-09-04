@@ -19,6 +19,6 @@ import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
  * Function library to use from XSLT and XPL.
  */
 object FunctionLibrary extends PipelineFunctionLibrary {
-    // For Java callers
-    def instance = this
+  // For Java callers
+  def instance = this
 }

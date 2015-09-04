@@ -19,14 +19,14 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 class XFormsSubmitDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsEvent(XFORMS_SUBMIT_DONE, target, properties, bubbles = true, cancelable = false)
-        with SubmitResponseEvent {
+    extends XFormsEvent(XFORMS_SUBMIT_DONE, target, properties, bubbles = true, cancelable = false)
+    with SubmitResponseEvent {
 
-    def this(target: XFormsEventTarget, connectionResult: ConnectionResult) = {
-        this(target, EmptyGetter)
-        _connectionResult = Option(connectionResult)
-    }
+  def this(target: XFormsEventTarget, connectionResult: ConnectionResult) = {
+    this(target, EmptyGetter)
+    _connectionResult = Option(connectionResult)
+  }
 
-    private[this] var _connectionResult: Option[ConnectionResult] = None
-    def connectionResult = _connectionResult
+  private[this] var _connectionResult: Option[ConnectionResult] = None
+  def connectionResult = _connectionResult
 }

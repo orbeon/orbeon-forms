@@ -24,13 +24,13 @@ import org.orbeon.oxf.xml.XMLReceiver
  * This rewriter always rewrites using ServletURLRewriter.
  */
 class XHTMLServletRewrite extends XHTMLRewrite {
-    override def createOutput(name: String) =
-        addOutput(name, new CacheableTransformerOutputImpl(this, name) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
-                val externalContext = NetUtils.getExternalContext
-                val rewriter = getRewriteXMLReceiver(new ServletURLRewriter(externalContext.getRequest), xmlReceiver, false)
+  override def createOutput(name: String) =
+    addOutput(name, new CacheableTransformerOutputImpl(this, name) {
+      def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
+        val externalContext = NetUtils.getExternalContext
+        val rewriter = getRewriteXMLReceiver(new ServletURLRewriter(externalContext.getRequest), xmlReceiver, false)
 
-                readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, rewriter)
-            }
-        })
+        readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, rewriter)
+      }
+    })
 }

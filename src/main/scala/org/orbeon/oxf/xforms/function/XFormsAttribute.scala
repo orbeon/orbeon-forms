@@ -21,13 +21,13 @@ import org.orbeon.scaxon.XML
  * xxf:attribute()
  */
 class XFormsAttribute extends XFormsFunction {
-    override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-        // Attribute QName and value
-        val qName = argument.lift(0) map (getQNameFromExpression(xpathContext, _)) get
-        val value = argument.lift(1) flatMap (e ⇒ Option(e.evaluateItem(xpathContext))) map (_.getStringValue) getOrElse ""
+    // Attribute QName and value
+    val qName = argument.lift(0) map (getQNameFromExpression(xpathContext, _)) get
+    val value = argument.lift(1) flatMap (e ⇒ Option(e.evaluateItem(xpathContext))) map (_.getStringValue) getOrElse ""
 
-        // Create and wrap the attribute
-        XML.attributeInfo(qName, value)
-    }
+    // Create and wrap the attribute
+    XML.attributeInfo(qName, value)
+  }
 }

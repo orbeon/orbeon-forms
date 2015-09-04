@@ -18,14 +18,14 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 
 // Dynamic context used when running actions
 case class DynamicActionContext(
-      interpreter: XFormsActionInterpreter,
-      analysis: ElementAnalysis,
-      overriddenContext: Option[Item]) {
+    interpreter: XFormsActionInterpreter,
+    analysis: ElementAnalysis,
+    overriddenContext: Option[Item]) {
 
-    def actionName = analysis.localName
-    def element = analysis.element
-    def scope = analysis.scope
-    def containingDocument = interpreter.containingDocument
+  def actionName = analysis.localName
+  def element = analysis.element
+  def scope = analysis.scope
+  def containingDocument = interpreter.containingDocument
 
-    def logger = interpreter.indentedLogger
+  def logger = interpreter.indentedLogger
 }

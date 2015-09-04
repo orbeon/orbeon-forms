@@ -18,13 +18,13 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 
 trait XFormsStateStore {
 
-    def storeDocumentState(containingDocument: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean)
-    def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState
+  def storeDocumentState(containingDocument: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean)
+  def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState
 
-    def getMaxSize: Long
-    def getCurrentSize: Long
+  def getMaxSize: Long
+  def getCurrentSize: Long
 
-    // For unit tests
-    def addStateCombined(staticStateUUID: String, dynamicStateUUID: String, xformsState: XFormsState, sessionId: String)
-    def findStateCombined(staticStateUUID: String, dynamicStateUUID: String): XFormsState
+  // For unit tests
+  def addStateCombined(staticStateUUID: String, dynamicStateUUID: String, xformsState: XFormsState, sessionId: String)
+  def findStateCombined(staticStateUUID: String, dynamicStateUUID: String): XFormsState
 }

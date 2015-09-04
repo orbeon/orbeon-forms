@@ -20,27 +20,27 @@ import org.orbeon.oxf.fr.FormRunner._
 
 trait FormRunnerSummary {
 
-    // Get a field's label in HTML for the Summary page
-    //@XPathFunction
-    def htmlFieldLabel(name: String, htmlLabel: Boolean, resources: NodeInfo): String = {
-        def resourceLabelOpt = (resources \ name \ "label" map (v ⇒ if (htmlLabel) v.stringValue else XMLUtils.escapeXMLMinimal(v.stringValue))).headOption
-        resourceLabelOpt getOrElse '[' + name + ']'
-    }
+  // Get a field's label in HTML for the Summary page
+  //@XPathFunction
+  def htmlFieldLabel(name: String, htmlLabel: Boolean, resources: NodeInfo): String = {
+    def resourceLabelOpt = (resources \ name \ "label" map (v ⇒ if (htmlLabel) v.stringValue else XMLUtils.escapeXMLMinimal(v.stringValue))).headOption
+    resourceLabelOpt getOrElse '[' + name + ']'
+  }
 
-    //@XPathFunction
-    def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {
+  //@XPathFunction
+  def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {
 
-        val someFormVersion = Some(formVersion) // use the same form version as the data to clone
+    val someFormVersion = Some(formVersion) // use the same form version as the data to clone
 
-        putWithAttachments(
-            data               = data.root,
-            toBaseURI          = "", // local save
-            fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
-            toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
-            filename           = "data.xml",
-            commonQueryString  = "",
-            forceAttachments   = true,
-            formVersion        = someFormVersion
-        )
-    }
+    putWithAttachments(
+      data               = data.root,
+      toBaseURI          = "", // local save
+      fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
+      toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
+      filename           = "data.xml",
+      commonQueryString  = "",
+      forceAttachments   = true,
+      formVersion        = someFormVersion
+    )
+  }
 }

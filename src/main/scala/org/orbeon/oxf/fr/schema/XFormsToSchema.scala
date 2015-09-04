@@ -40,25 +40,25 @@ import org.orbeon.scaxon.XML.{Attribute ⇒ _, Text ⇒ _, _}
  */
 class XFormsToSchema extends XFormsToSomething {
 
-    private val SchemaPath  = """/fr/service/?([^/^.]+)/([^/^.]+)/[^/^.]+""".r
+  private val SchemaPath  = """/fr/service/?([^/^.]+)/([^/^.]+)/[^/^.]+""".r
 
-    case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
+  case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
 
-    protected def produceOutput(pipelineContext: PipelineContext,
-                                outputName: String,
-                                externalContext: ExternalContext,
-                                indentedLogger: IndentedLogger,
-                                stage2CacheableState: Stage2CacheableState,
-                                containingDocument: XFormsContainingDocument,
-                                xmlReceiver: XMLReceiver): Unit = {
-        // This is a PE feature
-        Version.instance.requirePEFeature("XForms schema generator service")
+  protected def produceOutput(pipelineContext: PipelineContext,
+                outputName: String,
+                externalContext: ExternalContext,
+                indentedLogger: IndentedLogger,
+                stage2CacheableState: Stage2CacheableState,
+                containingDocument: XFormsContainingDocument,
+                xmlReceiver: XMLReceiver): Unit = {
+    // This is a PE feature
+    Version.instance.requirePEFeature("XForms schema generator service")
 
-        val SchemaPath(appName, _) = NetUtils.getExternalContext.getRequest.getRequestPath
-        val formSource = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA), XPath.GlobalConfiguration)
+    val SchemaPath(appName, _) = NetUtils.getExternalContext.getRequest.getRequestPath
+    val formSource = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA), XPath.GlobalConfiguration)
 
-        // Send result to output
-        val schema = SchemaGenerator.createSchema(appName, formSource, containingDocument)
-        elemToSAX(schema, xmlReceiver)
-    }
+    // Send result to output
+    val schema = SchemaGenerator.createSchema(appName, formSource, containingDocument)
+    elemToSAX(schema, xmlReceiver)
+  }
 }

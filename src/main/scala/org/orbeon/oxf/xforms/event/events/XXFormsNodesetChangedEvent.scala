@@ -20,29 +20,29 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_NODESET_CHANGED
 import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 
 class XXFormsNodesetChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XXFORMS_NODESET_CHANGED, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = false) {
+  extends XFormsUIEvent(XXFORMS_NODESET_CHANGED, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = false) {
 
-    def this(target: XFormsControl, newIterations: Seq[XFormsRepeatIterationControl], oldIterationPositions: Seq[Int], newIterationPositions: Seq[Int]) = {
-        this(target, EmptyGetter)
-        this.newIterationsOpt = Option(newIterations map (_.iterationIndex))
-        this.oldIterationPositionsOpt = Option(oldIterationPositions)
-        this.newIterationPositionsOpt = Option(newIterationPositions)
-    }
+  def this(target: XFormsControl, newIterations: Seq[XFormsRepeatIterationControl], oldIterationPositions: Seq[Int], newIterationPositions: Seq[Int]) = {
+    this(target, EmptyGetter)
+    this.newIterationsOpt = Option(newIterations map (_.iterationIndex))
+    this.oldIterationPositionsOpt = Option(oldIterationPositions)
+    this.newIterationPositionsOpt = Option(newIterationPositions)
+  }
 
-    private var newIterationsOpt: Option[Seq[Int]] = None
-    private var oldIterationPositionsOpt: Option[Seq[Int]] = None
-    private var newIterationPositionsOpt: Option[Seq[Int]] = None
+  private var newIterationsOpt: Option[Seq[Int]] = None
+  private var oldIterationPositionsOpt: Option[Seq[Int]] = None
+  private var newIterationPositionsOpt: Option[Seq[Int]] = None
 
-    override def lazyProperties = super.lazyProperties orElse getters(this, XXFormsNodesetChangedEvent.Getters)
+  override def lazyProperties = super.lazyProperties orElse getters(this, XXFormsNodesetChangedEvent.Getters)
 }
 
 private object XXFormsNodesetChangedEvent {
 
-    import XFormsEvent._
+  import XFormsEvent._
 
-    val Getters = Map[String, XXFormsNodesetChangedEvent ⇒ Option[Any]](
-        xxformsName("new-positions")    → (_.newIterationsOpt),
-        xxformsName("from-positions")   → (_.oldIterationPositionsOpt),
-        xxformsName("to-positions")     → (_.newIterationPositionsOpt)
-    )
+  val Getters = Map[String, XXFormsNodesetChangedEvent ⇒ Option[Any]](
+    xxformsName("new-positions")    → (_.newIterationsOpt),
+    xxformsName("from-positions")   → (_.oldIterationPositionsOpt),
+    xxformsName("to-positions")     → (_.newIterationPositionsOpt)
+  )
 }

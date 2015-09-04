@@ -21,31 +21,31 @@ import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
 
-    private var _document: XFormsContainingDocument = _
-    def document = _document
+  private var _document: XFormsContainingDocument = _
+  def document = _document
 
-    def setupDocument(documentURL: String): XFormsContainingDocument =
-        setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
+  def setupDocument(documentURL: String): XFormsContainingDocument =
+    setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-    def setupDocument(xhtml: JDocument): XFormsContainingDocument = {
-        ResourceManagerTestBase.staticSetup()
+  def setupDocument(xhtml: JDocument): XFormsContainingDocument = {
+    ResourceManagerTestBase.staticSetup()
 
-        val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
-        _document = new XFormsContainingDocument(staticState, null, null, true)
+    val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
+    _document = new XFormsContainingDocument(staticState, null, null, true)
 
-        _document.setTemplateIfNeeded(AnnotatedTemplate(template))
-        _document.afterInitialResponse()
-        _document.beforeExternalEvents(null)
+    _document.setTemplateIfNeeded(AnnotatedTemplate(template))
+    _document.afterInitialResponse()
+    _document.beforeExternalEvents(null)
 
-        _document
+    _document
+  }
+
+  @After def disposeDocument(): Unit = {
+    if (_document ne null) {
+      _document.afterExternalEvents()
+      _document.afterUpdateResponse()
+
+      _document = null
     }
-
-    @After def disposeDocument(): Unit = {
-        if (_document ne null) {
-            _document.afterExternalEvents()
-            _document.afterUpdateResponse()
-
-            _document = null
-        }
-    }
+  }
 }

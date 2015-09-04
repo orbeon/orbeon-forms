@@ -18,43 +18,43 @@ import org.junit.Test
 
 
 class DateUtilsTest extends AssertionsForJUnit {
-    @Test def parse(): Unit = {
+  @Test def parse(): Unit = {
 
-        val utcTimezones = Seq("+00:00", "-00:00", "Z")
-        def appendUTCTimezones(value: (String, Long)) = utcTimezones map (suffix ⇒ (value._1 + suffix, value._2))
+    val utcTimezones = Seq("+00:00", "-00:00", "Z")
+    def appendUTCTimezones(value: (String, Long)) = utcTimezones map (suffix ⇒ (value._1 + suffix, value._2))
 
-        val valuesNoExplicitTz = Seq(
-            "1970-01-01T00:00:00.000" → 0L,
-            "1970-01-01T00:00:00"     → 0L,
-            "1970-01-01"              → 0L,
-            "2012-05-29T19:35:04.123" → 1338320104123L,
-            "2012-05-29T19:35:04"     → 1338320104000L,
-            "2012-05-29"              → 1338249600000L
-        )
+    val valuesNoExplicitTz = Seq(
+      "1970-01-01T00:00:00.000" → 0L,
+      "1970-01-01T00:00:00"     → 0L,
+      "1970-01-01"              → 0L,
+      "2012-05-29T19:35:04.123" → 1338320104123L,
+      "2012-05-29T19:35:04"     → 1338320104000L,
+      "2012-05-29"              → 1338249600000L
+    )
 
-        // Values with an explicit timezone
-        val valuesWithExplicitTz = valuesNoExplicitTz flatMap appendUTCTimezones
+    // Values with an explicit timezone
+    val valuesWithExplicitTz = valuesNoExplicitTz flatMap appendUTCTimezones
 
-        // How many minutes to add to UTC time to get the local time
-        val defaultTzOffsetMs = DateUtils.DefaultOffsetMinutes * 60 * 1000
+    // How many minutes to add to UTC time to get the local time
+    val defaultTzOffsetMs = DateUtils.DefaultOffsetMinutes * 60 * 1000
 
-        for ((value, expected) ← valuesNoExplicitTz)
-            assert(expected - defaultTzOffsetMs === DateUtils.parseISODateOrDateTime(value))
+    for ((value, expected) ← valuesNoExplicitTz)
+      assert(expected - defaultTzOffsetMs === DateUtils.parseISODateOrDateTime(value))
 
-        for ((value, expected) ← valuesWithExplicitTz)
-            assert(expected === DateUtils.parseISODateOrDateTime(value))
+    for ((value, expected) ← valuesWithExplicitTz)
+      assert(expected === DateUtils.parseISODateOrDateTime(value))
 
-        // Test all 3 HTTP date formats
-        for (value ← Seq("Tue, 29 May 2012 19:35:04 GMT", "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"))
-            assert(1338320104000L === DateUtils.parseRFC1123(value))
+    // Test all 3 HTTP date formats
+    for (value ← Seq("Tue, 29 May 2012 19:35:04 GMT", "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"))
+      assert(1338320104000L === DateUtils.parseRFC1123(value))
 
-    }
+  }
 
-    @Test def format(): Unit = {
-        assert("1970-01-01T00:00:00.000Z"       === DateUtils.DateTime.print(0L))
-        assert("Thu, 01 Jan 1970 00:00:00 GMT"  === DateUtils.RFC1123Date.print(0L))
+  @Test def format(): Unit = {
+    assert("1970-01-01T00:00:00.000Z"       === DateUtils.DateTime.print(0L))
+    assert("Thu, 01 Jan 1970 00:00:00 GMT"  === DateUtils.RFC1123Date.print(0L))
 
-        assert("2012-05-29T19:35:04.123Z"       === DateUtils.DateTime.print(1338320104123L))
-        assert("Tue, 29 May 2012 19:35:04 GMT"  === DateUtils.RFC1123Date.print(1338320104123L))
-    }
+    assert("2012-05-29T19:35:04.123Z"       === DateUtils.DateTime.print(1338320104123L))
+    assert("Tue, 29 May 2012 19:35:04 GMT"  === DateUtils.RFC1123Date.print(1338320104123L))
+  }
 }

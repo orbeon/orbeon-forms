@@ -18,6 +18,6 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
 
 class XXFormsVisited extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-        relevantControl(0)(xpathContext) map (_.visited)
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+    relevantControl(0)(xpathContext) map (_.visited)
 }

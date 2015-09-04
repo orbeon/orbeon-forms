@@ -23,20 +23,20 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 */
 class XFormsSetfocusAction extends XFormsAction {
 
-    override def execute(context: DynamicActionContext): Unit = {
+  override def execute(context: DynamicActionContext): Unit = {
 
-        // "This XForms Action begins by invoking the deferred update behavior."
-        synchronizeAndRefreshIfNeeded(context)
+    // "This XForms Action begins by invoking the deferred update behavior."
+    synchronizeAndRefreshIfNeeded(context)
 
-        // Extension: whether to focus on input controls only
-        val inputOnly = resolveBooleanAVT("input-only", default = false)(context)
+    // Extension: whether to focus on input controls only
+    val inputOnly = resolveBooleanAVT("input-only", default = false)(context)
 
-        // Resolve and update control
-        resolveControl("control")(context) foreach
-            (XFormsSetfocusAction.setfocus(_, inputOnly))
-    }
+    // Resolve and update control
+    resolveControl("control")(context) foreach
+      (XFormsSetfocusAction.setfocus(_, inputOnly))
+  }
 }
 object XFormsSetfocusAction {
-    def setfocus(control: XFormsControl, inputOnly: Boolean = false): Unit =
-        Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly))
+  def setfocus(control: XFormsControl, inputOnly: Boolean = false): Unit =
+    Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly))
 }

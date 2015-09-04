@@ -30,138 +30,138 @@ class SimpleElementAnalysis(
    preceding              : Option[ElementAnalysis],
    val scope              : Scope
 ) extends ElementAnalysis(
-    staticStateContext.partAnalysis, 
-    element, 
-    parent, 
-    preceding
+  staticStateContext.partAnalysis, 
+  element, 
+  parent, 
+  preceding
 ) {
-    
-    self ⇒
+  
+  self ⇒
 
-    require(scope ne null)
+  require(scope ne null)
 
-    // Index of the element in the view
-    def index = staticStateContext.index
+  // Index of the element in the view
+  def index = staticStateContext.index
 
-    // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
-    // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
-    lazy val model = findContainingModel
+  // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
+  // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
+  lazy val model = findContainingModel
 
-    val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
+  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
 
-    lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
+  lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 
-    protected def getRootVariables: Map[String, VariableTrait] = Map.empty
+  protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
-    def containerScope = part.containingScope(prefixedId)
+  def containerScope = part.containingScope(prefixedId)
 
-    /**
-     * Find the model associated with the given element, whether explicitly set with @model, or inherited.
-     */
-    private def findContainingModel =
-        // Check for local @model attribute
-        element.attributeValue(XFormsConstants.MODEL_QNAME) match {
-            case localModelStaticId: String ⇒
-                // Get model prefixed id and verify it belongs to this scope
-                val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
-                val localModel = part.getModel(localModelPrefixedId)
-                if (localModel eq null)
-                    throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
+  /**
+   * Find the model associated with the given element, whether explicitly set with @model, or inherited.
+   */
+  private def findContainingModel =
+    // Check for local @model attribute
+    element.attributeValue(XFormsConstants.MODEL_QNAME) match {
+      case localModelStaticId: String ⇒
+        // Get model prefixed id and verify it belongs to this scope
+        val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
+        val localModel = part.getModel(localModelPrefixedId)
+        if (localModel eq null)
+          throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
 
-                Some(localModel)
-            case _ ⇒
-                // Use inherited model
-                closestAncestorInScope match {
-                    case Some(ancestor) ⇒ ancestor.model // there is an ancestor control in the same scope, use its model id
-                    case None           ⇒ part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
-                }
-        }
-
-    protected def computeContextAnalysis = {
-        context match {
-            case Some(context) ⇒
-                // @context attribute, use the overridden in-scope context
-                Some(analyzeXPath(getInScopeContext, context))
-            case None ⇒
-                // No @context attribute, use the original in-scope context
-                getInScopeContext
+        Some(localModel)
+      case _ ⇒
+        // Use inherited model
+        closestAncestorInScope match {
+          case Some(ancestor) ⇒ ancestor.model // there is an ancestor control in the same scope, use its model id
+          case None           ⇒ part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
         }
     }
 
-    protected def computeBindingAnalysis = {
-        bind match {
-            case Some(bindStaticId) ⇒
-                // Use @bind analysis directly from model
-                val model = part.getModelByScopeAndBind(scope, bindStaticId)
-                if (model eq null)
-                    throw new ValidationException("Reference to non-existing bind id: " + bindStaticId, ElementAnalysis.createLocationData(element))
-                model.bindsById.get(bindStaticId) map (_.getBindingAnalysis) orNull
-            case None ⇒
-                // No @bind
-                ref match {
-                    case Some(ref) ⇒
-                        // New binding expression
-                        Some(analyzeXPath(getContextAnalysis, ref))
-                    case None ⇒
-                        // TODO: TEMP: Control does not have a binding. But return one anyway so that controls w/o their own binding also get updated.
-                        getContextAnalysis
-                }
+  protected def computeContextAnalysis = {
+    context match {
+      case Some(context) ⇒
+        // @context attribute, use the overridden in-scope context
+        Some(analyzeXPath(getInScopeContext, context))
+      case None ⇒
+        // No @context attribute, use the original in-scope context
+        getInScopeContext
+    }
+  }
+
+  protected def computeBindingAnalysis = {
+    bind match {
+      case Some(bindStaticId) ⇒
+        // Use @bind analysis directly from model
+        val model = part.getModelByScopeAndBind(scope, bindStaticId)
+        if (model eq null)
+          throw new ValidationException("Reference to non-existing bind id: " + bindStaticId, ElementAnalysis.createLocationData(element))
+        model.bindsById.get(bindStaticId) map (_.getBindingAnalysis) orNull
+      case None ⇒
+        // No @bind
+        ref match {
+          case Some(ref) ⇒
+            // New binding expression
+            Some(analyzeXPath(getContextAnalysis, ref))
+          case None ⇒
+            // TODO: TEMP: Control does not have a binding. But return one anyway so that controls w/o their own binding also get updated.
+            getContextAnalysis
         }
     }
+  }
 
-    // No value defined, leave this to subclasses
-    protected def computeValueAnalysis: Option[XPathAnalysis] = None
+  // No value defined, leave this to subclasses
+  protected def computeValueAnalysis: Option[XPathAnalysis] = None
 
-    private def getInScopeContext: Option[XPathAnalysis] = {
-        ElementAnalysis.getClosestAncestorInScopeModel(self, ScopeModel(scope, model)) match {
-            case Some(ancestor: ElementAnalysis) ⇒
-                // There is an ancestor in the same scope with same model, use its analysis as base
-                ancestor.getChildrenContext
-            case None ⇒
-                // We are top-level in a scope/model combination
-                model match {
-                    case Some(containingModel) ⇒ containingModel.getChildrenContext // ask model
-                    case None ⇒ None // no model
-                }
+  private def getInScopeContext: Option[XPathAnalysis] = {
+    ElementAnalysis.getClosestAncestorInScopeModel(self, ScopeModel(scope, model)) match {
+      case Some(ancestor: ElementAnalysis) ⇒
+        // There is an ancestor in the same scope with same model, use its analysis as base
+        ancestor.getChildrenContext
+      case None ⇒
+        // We are top-level in a scope/model combination
+        model match {
+          case Some(containingModel) ⇒ containingModel.getChildrenContext // ask model
+          case None ⇒ None // no model
         }
     }
+  }
 
-    def getChildElementScope(childElement: Element) = {
-        val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
-        part.scopeForPrefixedId(childPrefixedId)
-    }
+  def getChildElementScope(childElement: Element) = {
+    val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
+    part.scopeForPrefixedId(childPrefixedId)
+  }
 
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String, avt: Boolean = false): XPathAnalysis =
-        analyzeXPath(contextAnalysis, inScopeVariables, xpathString, avt)
+  protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String, avt: Boolean = false): XPathAnalysis =
+    analyzeXPath(contextAnalysis, inScopeVariables, xpathString, avt)
 
-    // For callers without a CompiledExpression
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String, avt: Boolean): XPathAnalysis = {
+  // For callers without a CompiledExpression
+  protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String, avt: Boolean): XPathAnalysis = {
 
-        val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
+    val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
 
-        PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId),
-            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element, avt)
-    }
+    PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId),
+      contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element, avt)
+  }
 
-    // For callers with a CompiledExpression
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], expression: CompiledExpression): XPathAnalysis = {
-        val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
-        PathMapXPathAnalysis(part, expression, contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, element)
-    }
+  // For callers with a CompiledExpression
+  protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], expression: CompiledExpression): XPathAnalysis = {
+    val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
+    PathMapXPathAnalysis(part, expression, contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, element)
+  }
 
-    class SimplePathMapContext {
+  class SimplePathMapContext {
 
-        // Current element
-        def element = self
+    // Current element
+    def element = self
 
-        // Return the analysis for the context in scope
-        def context = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
+    // Return the analysis for the context in scope
+    def context = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
 
-        // Return a map of static id ⇒ analysis for all the ancestor-or-self in scope.
-        def getInScopeContexts: collection.Map[String, ElementAnalysis] =
-            LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis ⇒ elementAnalysis.staticId → elementAnalysis): _*)
+    // Return a map of static id ⇒ analysis for all the ancestor-or-self in scope.
+    def getInScopeContexts: collection.Map[String, ElementAnalysis] =
+      LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis ⇒ elementAnalysis.staticId → elementAnalysis): _*)
 
-        // Return analysis for closest ancestor repeat in scope.
-        def getInScopeRepeat = self.ancestorRepeatInScope
-    }
+    // Return analysis for closest ancestor repeat in scope.
+    def getInScopeRepeat = self.ancestorRepeatInScope
+  }
 }

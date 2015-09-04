@@ -22,55 +22,55 @@ import org.orbeon.oxf.util.ScalaUtils._
 case class DataPart(isDraft: Boolean, documentId: String)
 
 case class Request(
-    provider : String,
-    app      : String,
-    form     : String,
-    filename : Option[String],
-    version  : Version,
-    dataPart : Option[DataPart]
+  provider : String,
+  app      : String,
+  form     : String,
+  filename : Option[String],
+  version  : Version,
+  dataPart : Option[DataPart]
 ) {
-    def forForm       = dataPart.isEmpty
-    def forData       = dataPart.isDefined
-    def forAttachment = filename.isDefined
+  def forForm       = dataPart.isEmpty
+  def forData       = dataPart.isDefined
+  def forAttachment = filename.isDefined
 }
 
 trait RequestResponse {
 
-    def tableName(request: Request): String =
-        Seq(
-            Some("orbeon_form"),
-            request.forForm       option "_definition",
-            request.forData       option "_data",
-            request.forAttachment option "_attach"
-        ).flatten.mkString
+  def tableName(request: Request): String =
+    Seq(
+      Some("orbeon_form"),
+      request.forForm       option "_definition",
+      request.forData       option "_data",
+      request.forAttachment option "_attach"
+    ).flatten.mkString
 
-    def httpRequest = NetUtils.getExternalContext.getRequest
-    def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
+  def httpRequest = NetUtils.getExternalContext.getRequest
+  def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
 
-    def requestUsername : Option[String] = headerValue(OrbeonUsernameHeaderName)
-    def requestGroup: Option[String]     = headerValue(OrbeonGroupHeaderName)
-    def requestFlatView                  = headerValue("orbeon-create-flat-view").contains("true")
+  def requestUsername : Option[String] = headerValue(OrbeonUsernameHeaderName)
+  def requestGroup: Option[String]     = headerValue(OrbeonGroupHeaderName)
+  def requestFlatView                  = headerValue("orbeon-create-flat-view").contains("true")
 
-    val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
-    val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
+  val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
+  val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
 
-    def request: Request = {
+  def request: Request = {
 
-        import Version._
+    import Version._
 
-        val version =
-            Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
+    val version =
+      Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
 
-        httpRequest.getRequestPath match {
-            case CrudFormPath(provider, app, form, filename) ⇒
-                val file = if (filename == "form.xhtml") None else Some(filename)
-                Request(provider, app, form, file, version, None)
-            case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
-                val file = if (filename == "data.xml") None else Some(filename)
-                val dataPart = DataPart(dataOrDraft == "draft", documentId)
-                Request(provider, app, form, file, version, Some(dataPart))
-        }
+    httpRequest.getRequestPath match {
+      case CrudFormPath(provider, app, form, filename) ⇒
+        val file = if (filename == "form.xhtml") None else Some(filename)
+        Request(provider, app, form, file, version, None)
+      case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
+        val file = if (filename == "data.xml") None else Some(filename)
+        val dataPart = DataPart(dataOrDraft == "draft", documentId)
+        Request(provider, app, form, file, version, Some(dataPart))
     }
+  }
 
-    def httpResponse = NetUtils.getExternalContext.getResponse
+  def httpResponse = NetUtils.getExternalContext.getResponse
 }

@@ -27,46 +27,46 @@ import org.orbeon.saxon.om.NamespaceConstant
  * Function library for XPath expressions in XForms.
  */
 object XFormsFunctionLibrary extends {
-    // Namespace the functions. We wish we had trait parameters, see:
-    // http://docs.scala-lang.org/sips/pending/trait-parameters.html
-    val XFormsIndependentFunctionsNS  = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
-    val XFormsEnvFunctionsNS          = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
-    val XFormsXXFormsEnvFunctionsNS   = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
-    val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
-    val XXFormsIndependentFunctionsNS = Seq(XXFORMS_NAMESPACE_URI)
-    val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
-    val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
-    val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
-    val tryXFormsDocument             = true
+  // Namespace the functions. We wish we had trait parameters, see:
+  // http://docs.scala-lang.org/sips/pending/trait-parameters.html
+  val XFormsIndependentFunctionsNS  = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+  val XFormsEnvFunctionsNS          = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+  val XFormsXXFormsEnvFunctionsNS   = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
+  val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+  val XXFormsIndependentFunctionsNS = Seq(XXFORMS_NAMESPACE_URI)
+  val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
+  val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
+  val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
+  val tryXFormsDocument             = true
 }
-    with OrbeonFunctionLibrary
-    with XFormsIndependentFunctions
-    with XFormsEnvFunctions
-    with XFormsXXFormsEnvFunctions
-    with XFormsFunnyFunctions
-    with XFormsDeprecatedFunctions
-    with XXFormsIndependentFunctions
-    with XXFormsEnvFunctions
-    with EXFormsFunctions
-    with XSLTFunctions {
+  with OrbeonFunctionLibrary
+  with XFormsIndependentFunctions
+  with XFormsEnvFunctions
+  with XFormsXXFormsEnvFunctions
+  with XFormsFunnyFunctions
+  with XFormsDeprecatedFunctions
+  with XXFormsIndependentFunctions
+  with XXFormsEnvFunctions
+  with EXFormsFunctions
+  with XSLTFunctions {
 
-    // For Java callers
-    def instance = this
+  // For Java callers
+  def instance = this
 
-    // Saxon's last() function doesn't do what we need
-    Fun("last", classOf[Last], op = 0, min = 0, INTEGER, EXACTLY_ONE)
+  // Saxon's last() function doesn't do what we need
+  Fun("last", classOf[Last], op = 0, min = 0, INTEGER, EXACTLY_ONE)
 
-    // Forward these to our own implementation so we can handle PathMap
-    Fun("count", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.COUNT, min = 1, INTEGER, EXACTLY_ONE,
-        Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE, IntegerValue.ZERO)
-    )
+  // Forward these to our own implementation so we can handle PathMap
+  Fun("count", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.COUNT, min = 1, INTEGER, EXACTLY_ONE,
+    Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE, IntegerValue.ZERO)
+  )
 
-    Fun("avg", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.AVG, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-        Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE, EmptySequence.getInstance())
-    )
+  Fun("avg", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.AVG, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+    Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE, EmptySequence.getInstance())
+  )
 
-    Fun("sum", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.SUM, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-        Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE),
-        Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE)
-    )
+  Fun("sum", classOf[org.orbeon.oxf.xforms.function.Aggregate], op = Aggregate.SUM, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+    Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE),
+    Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE)
+  )
 }

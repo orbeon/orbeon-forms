@@ -22,75 +22,75 @@ import scala.collection.mutable
 
 trait XFormsContainerControl extends VisitableTrait {
 
-    private var _children: mutable.Buffer[XFormsControl] = _ // allow null internally
-    private def hasChildren = (_children ne null) && _children.nonEmpty
+  private var _children: mutable.Buffer[XFormsControl] = _ // allow null internally
+  private def hasChildren = (_children ne null) && _children.nonEmpty
 
-    // Get all the direct children controls (never null)
-    def children: Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
-    def childrenJava: JList[XFormsControl] = children.asJava
+  // Get all the direct children controls (never null)
+  def children: Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
+  def childrenJava: JList[XFormsControl] = children.asJava
 
-    // Add a child control
-    def addChild(control: XFormsControl): Unit = {
-        if (_children eq null)
-            _children = mutable.Buffer[XFormsControl]()
-        _children += control
+  // Add a child control
+  def addChild(control: XFormsControl): Unit = {
+    if (_children eq null)
+      _children = mutable.Buffer[XFormsControl]()
+    _children += control
+  }
+
+  // Number of direct children control
+  def getSize = children.size
+
+  // Set all the direct children at once
+  protected def setChildren(children: mutable.Buffer[XFormsControl]) = {
+    require(children ne null)
+    this._children = children
+  }
+
+  // Remove all children at once
+  def clearChildren() =
+    this._children = null
+
+  // Update this control's effective id and its descendants based on the parent's effective id
+  override def updateEffectiveId(): Unit = {
+    super.updateEffectiveId()
+
+    if (hasChildren)
+      for (currentControl ← _children)
+        currentControl.updateEffectiveId()
+  }
+
+  override def getBackCopy: AnyRef = {
+    // Clone this
+    val cloned = super.getBackCopy.asInstanceOf[XFormsContainerControl]
+
+    // Clone children if any
+    if (hasChildren) {
+      cloned._children = new mutable.ArrayBuffer[XFormsControl](_children.size)
+      for (currentChildControl ← _children) {
+        val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
+        currentChildClone.parent = null // cloned control doesn't need a parent
+        cloned._children += currentChildClone
+      }
     }
 
-    // Number of direct children control
-    def getSize = children.size
+    cloned
+  }
 
-    // Set all the direct children at once
-    protected def setChildren(children: mutable.Buffer[XFormsControl]) = {
-        require(children ne null)
-        this._children = children
+  override def iterationRemoved(): Unit = {
+    if (hasChildren)
+      for (currentControl ← _children)
+        currentControl.iterationRemoved()
+  }
+
+  // focus to the first form control in the container that is able to accept focus"
+  override def focusableControls =
+    if (isRelevant && hasChildren)
+      _children.iterator flatMap (_.focusableControls)
+    else
+      Iterator.empty
+
+  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
+    super.toXML(helper, attributes) {
+      children foreach (_.toXML(helper, List.empty)(()))
     }
-
-    // Remove all children at once
-    def clearChildren() =
-        this._children = null
-
-    // Update this control's effective id and its descendants based on the parent's effective id
-    override def updateEffectiveId(): Unit = {
-        super.updateEffectiveId()
-
-        if (hasChildren)
-            for (currentControl ← _children)
-                currentControl.updateEffectiveId()
-    }
-
-    override def getBackCopy: AnyRef = {
-        // Clone this
-        val cloned = super.getBackCopy.asInstanceOf[XFormsContainerControl]
-
-        // Clone children if any
-        if (hasChildren) {
-            cloned._children = new mutable.ArrayBuffer[XFormsControl](_children.size)
-            for (currentChildControl ← _children) {
-                val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
-                currentChildClone.parent = null // cloned control doesn't need a parent
-                cloned._children += currentChildClone
-            }
-        }
-
-        cloned
-    }
-
-    override def iterationRemoved(): Unit = {
-        if (hasChildren)
-            for (currentControl ← _children)
-                currentControl.iterationRemoved()
-    }
-
-    // focus to the first form control in the container that is able to accept focus"
-    override def focusableControls =
-        if (isRelevant && hasChildren)
-            _children.iterator flatMap (_.focusableControls)
-        else
-            Iterator.empty
-
-    override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
-        super.toXML(helper, attributes) {
-            children foreach (_.toXML(helper, List.empty)(()))
-        }
-    }
+  }
 }

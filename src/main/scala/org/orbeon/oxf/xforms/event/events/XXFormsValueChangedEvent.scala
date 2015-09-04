@@ -19,33 +19,33 @@ import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 import org.orbeon.saxon.om._
 
 class XXFormsValueChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_VALUE_CHANGED, target, properties, bubbles = true, cancelable = true)
-    with InstanceEvent {
+  extends XFormsEvent(XXFORMS_VALUE_CHANGED, target, properties, bubbles = true, cancelable = true)
+  with InstanceEvent {
 
-    def this(target: XFormsEventTarget, node: NodeInfo, oldValue: String, newValue: String) = {
-        this(target, EmptyGetter)
-        nodeOpt = Option(node)
-        oldValueOpt = Option(oldValue)
-        newValueOpt = Option(newValue)
-    }
+  def this(target: XFormsEventTarget, node: NodeInfo, oldValue: String, newValue: String) = {
+    this(target, EmptyGetter)
+    nodeOpt = Option(node)
+    oldValueOpt = Option(oldValue)
+    newValueOpt = Option(newValue)
+  }
 
-    private var nodeOpt: Option[NodeInfo] = None
-    def node = nodeOpt.orNull
+  private var nodeOpt: Option[NodeInfo] = None
+  def node = nodeOpt.orNull
 
-    private var oldValueOpt: Option[String] = None
-    private var newValueOpt: Option[String] = None
+  private var oldValueOpt: Option[String] = None
+  private var newValueOpt: Option[String] = None
 
-    def oldValue = oldValueOpt.get
-    def newValue = newValueOpt.get
+  def oldValue = oldValueOpt.get
+  def newValue = newValueOpt.get
 
-    override def lazyProperties = getters(this, XXFormsValueChangedEvent.Getters)
+  override def lazyProperties = getters(this, XXFormsValueChangedEvent.Getters)
 }
 
 private object XXFormsValueChangedEvent {
 
-    val Getters = Map[String, XXFormsValueChangedEvent ⇒ Option[Any]](
-        "node"      → (_.nodeOpt),
-        "old-value" → (_.oldValueOpt),
-        "new-value" → (_.newValueOpt)
-    )
+  val Getters = Map[String, XXFormsValueChangedEvent ⇒ Option[Any]](
+    "node"      → (_.nodeOpt),
+    "old-value" → (_.oldValueOpt),
+    "new-value" → (_.newValueOpt)
+  )
 }

@@ -18,19 +18,19 @@ import org.junit.Test
 
 class SaxonUtilsTest extends AssertionsForJUnit {
 
-    @Test def makeNCName(): Unit = {
+  @Test def makeNCName(): Unit = {
 
-        intercept[IllegalArgumentException] {
-            SaxonUtils.makeNCName("")
-        }
-
-        intercept[IllegalArgumentException] {
-            SaxonUtils.makeNCName("  ")
-        }
-
-        assert("foo"      === SaxonUtils.makeNCName("foo"))
-        assert("_foo_"    === SaxonUtils.makeNCName(" foo "))
-        assert("_2foos"   === SaxonUtils.makeNCName("42foos"))
-        assert("foo_bar_" === SaxonUtils.makeNCName("foo(bar)"))
+    intercept[IllegalArgumentException] {
+      SaxonUtils.makeNCName("")
     }
+
+    intercept[IllegalArgumentException] {
+      SaxonUtils.makeNCName("  ")
+    }
+
+    assert("foo"      === SaxonUtils.makeNCName("foo"))
+    assert("_foo_"    === SaxonUtils.makeNCName(" foo "))
+    assert("_2foos"   === SaxonUtils.makeNCName("42foos"))
+    assert("foo_bar_" === SaxonUtils.makeNCName("foo(bar)"))
+  }
 }

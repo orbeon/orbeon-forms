@@ -18,5 +18,5 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.Scope
 
 class CoreControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-        with ViewTrait with StaticLHHASupport
+    extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+    with ViewTrait with StaticLHHASupport

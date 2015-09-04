@@ -24,37 +24,37 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.dom4j.DocumentWrapper
 
 class XFormsSubmitSerializeEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsEvent(XFORMS_SUBMIT_SERIALIZE, target, properties, bubbles = true, cancelable = false) {
+    extends XFormsEvent(XFORMS_SUBMIT_SERIALIZE, target, properties, bubbles = true, cancelable = false) {
 
-    def this(target: XFormsEventTarget, binding: NodeInfo, requestedSerialization: String) = {
-        this(target, EmptyGetter)
-        bindingOpt = Option(binding)
-        requestedSerializationOpt = Option(requestedSerialization)
-    }
+  def this(target: XFormsEventTarget, binding: NodeInfo, requestedSerialization: String) = {
+    this(target, EmptyGetter)
+    bindingOpt = Option(binding)
+    requestedSerializationOpt = Option(requestedSerialization)
+  }
 
-    private var bindingOpt: Option[NodeInfo] = None
-    private var requestedSerializationOpt: Option[String] = None
+  private var bindingOpt: Option[NodeInfo] = None
+  private var requestedSerializationOpt: Option[String] = None
 
-    def submissionBodyAsString = property[NodeInfo]("submission-body") map (_.getStringValue) get
+  def submissionBodyAsString = property[NodeInfo]("submission-body") map (_.getStringValue) get
 
-    override def lazyProperties = getters(this, XFormsSubmitSerializeEvent.Getters)
+  override def lazyProperties = getters(this, XFormsSubmitSerializeEvent.Getters)
 }
 
 private object XFormsSubmitSerializeEvent {
 
-    import XFormsEvent._
+  import XFormsEvent._
 
-    def createSubmissionBodyElement(containingDocument: XFormsContainingDocument) = {
-        val document = Dom4jUtils.createDocument
-        val docWrapper = new DocumentWrapper(document, null, XPath.GlobalConfiguration)
-        val submissionBodyElement = Dom4jUtils.createElement("submission-body")
-        document.setRootElement(submissionBodyElement)
-        docWrapper.wrap(submissionBodyElement)
-    }
+  def createSubmissionBodyElement(containingDocument: XFormsContainingDocument) = {
+    val document = Dom4jUtils.createDocument
+    val docWrapper = new DocumentWrapper(document, null, XPath.GlobalConfiguration)
+    val submissionBodyElement = Dom4jUtils.createElement("submission-body")
+    document.setRootElement(submissionBodyElement)
+    docWrapper.wrap(submissionBodyElement)
+  }
 
-    val Getters = Map[String, XFormsSubmitSerializeEvent ⇒ Option[Any]] (
-        xxformsName("binding")       → (_.bindingOpt),
-        xxformsName("serialization") → (_.requestedSerializationOpt),
-        "submission-body"            → (e ⇒ Option(createSubmissionBodyElement(e.containingDocument)))
-    )
+  val Getters = Map[String, XFormsSubmitSerializeEvent ⇒ Option[Any]] (
+    xxformsName("binding")       → (_.bindingOpt),
+    xxformsName("serialization") → (_.requestedSerializationOpt),
+    "submission-body"            → (e ⇒ Option(createSubmissionBodyElement(e.containingDocument)))
+  )
 }

@@ -19,25 +19,25 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait Currency extends AssertionsForJUnit with FormRunnerOps {
 
-    // https://github.com/orbeon/orbeon-forms/issues/1026
-    @Test def displayUpdateWhenNoXFormsUpdate(): Unit = {
+  // https://github.com/orbeon/orbeon-forms/issues/1026
+  @Test def displayUpdateWhenNoXFormsUpdate(): Unit = {
 
-        val currencyInput = cssSelector(".xbl-fr-currency .xbl-fr-number-visible-input")
-        val emailInput = cssSelector(".xforms-type-email input")
+    val currencyInput = cssSelector(".xbl-fr-currency .xbl-fr-number-visible-input")
+    val emailInput = cssSelector(".xforms-type-email input")
 
-        for {
-            _ ← loadOrbeonPage("/fr/orbeon/controls/new")
-            _ ← clickOn(LinkTextQuery("Typed Controls"))
-        }()
+    for {
+      _ ← loadOrbeonPage("/fr/orbeon/controls/new")
+      _ ← clickOn(LinkTextQuery("Typed Controls"))
+    }()
 
-        def enterCheck(input: String, result: String) = for {
-            _ ← clickOn(currencyInput)
-            _ ← textField(currencyInput).value = input
-            _ ← clickOn(emailInput)
-            _ ← assert(textField(currencyInput).value === result)
-        }()
+    def enterCheck(input: String, result: String) = for {
+      _ ← clickOn(currencyInput)
+      _ ← textField(currencyInput).value = input
+      _ ← clickOn(emailInput)
+      _ ← assert(textField(currencyInput).value === result)
+    }()
 
-        enterCheck(".9", "0.90")
-        enterCheck(".9998", ".9998")
-    }
+    enterCheck(".9", "0.90")
+    enterCheck(".9998", ".9998")
+  }
 }

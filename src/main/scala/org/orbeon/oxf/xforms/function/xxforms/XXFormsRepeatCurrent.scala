@@ -26,35 +26,35 @@ import org.orbeon.saxon.expr._
  */
 class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis with FunctionSupport {
 
-    override def evaluateItem(xpathContext: XPathContext) = {
-        implicit val ctx = xpathContext
-        bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).getSingleItem
-    }
+  override def evaluateItem(xpathContext: XPathContext) = {
+    implicit val ctx = xpathContext
+    bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).getSingleItem
+  }
 
-    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
+  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
 
-        // Match on context expression
-        argument.headOption match {
-            case Some(repeatIdExpression: StringLiteral) ⇒
-                // Argument is literal and we have a context to ask
-                pathMap.getPathMapContext match {
-                    case context: SimpleElementAnalysis#SimplePathMapContext ⇒
-                        // Get PathMap for context id
-                        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
-                    case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-                }
-            case None ⇒
-                // Argument is not specified, ask PathMap for the result
-                pathMap.getPathMapContext match {
-                    case context: SimpleElementAnalysis#SimplePathMapContext ⇒
-                        // Get PathMap for context id
-                        matchSimpleAnalysis(pathMap, context.getInScopeRepeat)
-                    case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-                }
-            case _ ⇒
-                // Argument is not literal so we can't figure it out
-                pathMap.setInvalidated(true)
-                null
+    // Match on context expression
+    argument.headOption match {
+      case Some(repeatIdExpression: StringLiteral) ⇒
+        // Argument is literal and we have a context to ask
+        pathMap.getPathMapContext match {
+          case context: SimpleElementAnalysis#SimplePathMapContext ⇒
+            // Get PathMap for context id
+            matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
+          case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
         }
+      case None ⇒
+        // Argument is not specified, ask PathMap for the result
+        pathMap.getPathMapContext match {
+          case context: SimpleElementAnalysis#SimplePathMapContext ⇒
+            // Get PathMap for context id
+            matchSimpleAnalysis(pathMap, context.getInScopeRepeat)
+          case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+        }
+      case _ ⇒
+        // Argument is not literal so we can't figure it out
+        pathMap.setInvalidated(true)
+        null
     }
+  }
 }

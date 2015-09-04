@@ -26,65 +26,65 @@ import org.orbeon.saxon.om.NamespaceConstant
  */
 trait XFormsDeprecatedFunctions extends OrbeonFunctionLibrary {
 
-    Namespace(Seq(NamespaceConstant.FN, XFormsConstants.XFORMS_NAMESPACE_URI)) {
+  Namespace(Seq(NamespaceConstant.FN, XFormsConstants.XFORMS_NAMESPACE_URI)) {
 
-        Fun("local-date", classOf[LocalDate], op = 0, min = 0, STRING, EXACTLY_ONE,
-            Arg(STRING, ALLOWS_ZERO_OR_ONE)
-        )
+    Fun("local-date", classOf[LocalDate], op = 0, min = 0, STRING, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
 
-        Fun("local-dateTime", classOf[LocalDateTime], op = 0, min = 0, STRING, EXACTLY_ONE,
-            Arg(STRING, ALLOWS_ZERO_OR_ONE)
-        )
+    Fun("local-dateTime", classOf[LocalDateTime], op = 0, min = 0, STRING, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
 
-        Fun("now", classOf[Now], op = 0, min = 0, STRING, EXACTLY_ONE,
-            Arg(STRING, ALLOWS_ZERO_OR_ONE)
-        )
+    Fun("now", classOf[Now], op = 0, min = 0, STRING, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
 
-        Fun("days-from-date", classOf[DaysFromDate], op = 0, min = 1, INTEGER, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("days-from-date", classOf[DaysFromDate], op = 0, min = 1, INTEGER, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("days-to-date", classOf[DaysToDate], op = 0, min = 1, STRING, EXACTLY_ONE,
-            Arg(INTEGER, EXACTLY_ONE)
-        )
+    Fun("days-to-date", classOf[DaysToDate], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(INTEGER, EXACTLY_ONE)
+    )
 
-        Fun("seconds-to-dateTime", classOf[SecondsToDateTime], op = 0, min = 1, DATE_TIME, ALLOWS_ZERO_OR_ONE,
-            Arg(NUMERIC, EXACTLY_ONE)
-        )
+    Fun("seconds-to-dateTime", classOf[SecondsToDateTime], op = 0, min = 1, DATE_TIME, ALLOWS_ZERO_OR_ONE,
+      Arg(NUMERIC, EXACTLY_ONE)
+    )
 
-        Fun("seconds", classOf[Seconds], op = 0, min = 1, DOUBLE, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("seconds", classOf[Seconds], op = 0, min = 1, DOUBLE, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("months", classOf[Months], op = 0, min = 1, INTEGER, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("months", classOf[Months], op = 0, min = 1, INTEGER, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        // NOTE: Deprecated under this name. Use xxf:if() instead
-        Fun("xfif", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
-            Arg(BOOLEAN, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+    // NOTE: Deprecated under this name. Use xxf:if() instead
+    Fun("xfif", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
+      Arg(BOOLEAN, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        Fun("choose", classOf[Choose], op = 0, min = 3, Type.ITEM_TYPE, EXACTLY_ONE,
-            Arg(BOOLEAN, EXACTLY_ONE),
-            Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        )
-    }
+    Fun("choose", classOf[Choose], op = 0, min = 3, Type.ITEM_TYPE, EXACTLY_ONE,
+      Arg(BOOLEAN, EXACTLY_ONE),
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
+  }
 
-    Namespace(XFormsConstants.XFORMS_NAMESPACE_URI) {
+  Namespace(XFormsConstants.XFORMS_NAMESPACE_URI) {
 
-        Fun("if", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
-            Arg(BOOLEAN, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE),
-            Arg(STRING, EXACTLY_ONE)
-        )
+    Fun("if", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
+      Arg(BOOLEAN, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
 
-        // NOTE: incompatible with the XPath 2.0 version
-        Fun("seconds-from-dateTime", classOf[SecondsFromDateTime], op = 0, min = 1, DECIMAL, EXACTLY_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
-    }
+    // NOTE: incompatible with the XPath 2.0 version
+    Fun("seconds-from-dateTime", classOf[SecondsFromDateTime], op = 0, min = 1, DECIMAL, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+  }
 }

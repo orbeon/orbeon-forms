@@ -37,18 +37,18 @@ class PlainXHTMLConverter extends Converter(HtmlURI)
 
 abstract class Converter(targetURI: String) extends ProcessorImpl {
 
-    self ⇒
+  self ⇒
 
-    addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
-    addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
+  addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
+  addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
-    override def createOutput(outputName: String) =
-        addOutput(outputName, new CacheableTransformerOutputImpl(self, outputName) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
-                readInputAsSAX(
-                    pipelineContext, 
-                    ProcessorImpl.INPUT_DATA, 
-                    new PlainHTMLOrXHTMLReceiver(targetURI, xmlReceiver)
-                )
-        })
+  override def createOutput(outputName: String) =
+    addOutput(outputName, new CacheableTransformerOutputImpl(self, outputName) {
+      def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
+        readInputAsSAX(
+          pipelineContext, 
+          ProcessorImpl.INPUT_DATA, 
+          new PlainHTMLOrXHTMLReceiver(targetURI, xmlReceiver)
+        )
+    })
 }

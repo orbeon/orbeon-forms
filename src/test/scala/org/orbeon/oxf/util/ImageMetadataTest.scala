@@ -22,31 +22,31 @@ import org.orbeon.saxon.value.Int64Value
 
 class ImageMetadataTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    @Test def readMetadata(): Unit = {
+  @Test def readMetadata(): Unit = {
 
-        val URLPrefix = "oxf:/org/orbeon/oxf/util/hs-2010-13-a-web"
+    val URLPrefix = "oxf:/org/orbeon/oxf/util/hs-2010-13-a-web"
 
-        val ExtensionsToMediatypes = Map(
-            "jpg" → "image/jpeg",
-            "png" → "image/png",
-            "gif" → "image/gif",
-            "bmp" → "image/bmp")
+    val ExtensionsToMediatypes = Map(
+      "jpg" → "image/jpeg",
+      "png" → "image/png",
+      "gif" → "image/gif",
+      "bmp" → "image/bmp")
 
-        for (extension ← ExtensionsToMediatypes.keys) {
-            def openStream = URLFactory.createURL(URLPrefix + "." + extension).openStream()
+    for (extension ← ExtensionsToMediatypes.keys) {
+      def openStream = URLFactory.createURL(URLPrefix + "." + extension).openStream()
 
-            val mediatype = findImageMediatype(openStream).get
+      val mediatype = findImageMediatype(openStream).get
 
-            assert(ExtensionsToMediatypes(extension) === mediatype)
+      assert(ExtensionsToMediatypes(extension) === mediatype)
 
-            if (extension != "bmp") { // some .bmp don't have the width/height metadata
+      if (extension != "bmp") { // some .bmp don't have the width/height metadata
 
-                val width  = findKnownMetadata(openStream, "width").get.asInstanceOf[Int64Value].longValue
-                val height = findKnownMetadata(openStream, "height").get.asInstanceOf[Int64Value].longValue
+        val width  = findKnownMetadata(openStream, "width").get.asInstanceOf[Int64Value].longValue
+        val height = findKnownMetadata(openStream, "height").get.asInstanceOf[Int64Value].longValue
 
-                assert(400L === width)
-                assert(368L === height)
-            }
-        }
+        assert(400L === width)
+        assert(368L === height)
+      }
     }
+  }
 }

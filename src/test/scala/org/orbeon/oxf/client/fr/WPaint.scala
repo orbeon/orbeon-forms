@@ -19,21 +19,21 @@ import org.scalatest.junit.AssertionsForJUnit
 
 trait WPaint extends AssertionsForJUnit with FormRunnerOps {
 
-    @Test def loadEditSaveWorkflow(): Unit = {
+  @Test def loadEditSaveWorkflow(): Unit = {
 
-        for {
-            _ ← loadOrbeonPage("/fr/orbeon/controls/new")
-            // switch to attachments tab
-            // select image
-            // ⇒ image is shown (annotation == image)
-            // draw on image
-            // ⇒ annotation shows (annotation changes, save it)
-            // save form
-            // ⇒ check URL is now edit/id
-            // reload page
-            // ⇒ check the annotation is the same as before
-            // clear
-            // check the annotation is the same as the original image
-        }()
-    }
+    for {
+      _ ← loadOrbeonPage("/fr/orbeon/controls/new")
+      // switch to attachments tab
+      // select image
+      // ⇒ image is shown (annotation == image)
+      // draw on image
+      // ⇒ annotation shows (annotation changes, save it)
+      // save form
+      // ⇒ check URL is now edit/id
+      // reload page
+      // ⇒ check the annotation is the same as before
+      // clear
+      // check the annotation is the same as the original image
+    }()
+  }
 }

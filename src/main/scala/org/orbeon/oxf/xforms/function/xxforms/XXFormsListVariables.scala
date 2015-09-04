@@ -22,22 +22,22 @@ import org.orbeon.saxon.value.StringValue
 
 class XXFormsListVariables extends XFormsFunction with FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext) = {
+  override def iterate(xpathContext: XPathContext) = {
 
-        implicit val ctx = xpathContext
+    implicit val ctx = xpathContext
 
-        val modelEffectiveId = stringArgument(0)(xpathContext)
+    val modelEffectiveId = stringArgument(0)(xpathContext)
 
-        XFormsFunction.context.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
-            case model: XFormsModel ⇒
-                val variables = model.getTopLevelVariables
+    XFormsFunction.context.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
+      case model: XFormsModel ⇒
+        val variables = model.getTopLevelVariables
 
-                if (variables.size() > 0)
-                    new ListIterator(variables.asScala.map { case (name, _) ⇒ StringValue.makeStringValue(name) }.toList.asJava)
-                else
-                    EmptyIterator.getInstance
+        if (variables.size() > 0)
+          new ListIterator(variables.asScala.map { case (name, _) ⇒ StringValue.makeStringValue(name) }.toList.asJava)
+        else
+          EmptyIterator.getInstance
 
-            case _ ⇒ EmptyIterator.getInstance
-        }
+      case _ ⇒ EmptyIterator.getInstance
     }
+  }
 }

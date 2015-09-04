@@ -24,30 +24,30 @@ import org.w3c.dom.{Document ⇒ W3CDocument }
  */
 class DOMSerializer extends ProcessorImpl {
 
-    import ProcessorImpl._
+  import ProcessorImpl._
 
-    addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
+  addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
 
-    /**
-     * Find the last modified timestamp of the dependencies of this processor.
-     *
-     * @param pipelineContext       pipeline context
-     * @return                      timestamp, <= 0 if unknown
-     */
-    def findInputLastModified(pipelineContext: PipelineContext): Long =
-        findInputLastModified(pipelineContext, getInputByName(INPUT_DATA), false)
+  /**
+   * Find the last modified timestamp of the dependencies of this processor.
+   *
+   * @param pipelineContext       pipeline context
+   * @return                      timestamp, <= 0 if unknown
+   */
+  def findInputLastModified(pipelineContext: PipelineContext): Long =
+    findInputLastModified(pipelineContext, getInputByName(INPUT_DATA), false)
 
-    override def start(pipelineContext: PipelineContext): Unit = {
-        // Q: should use Context instead?
-        pipelineContext.setAttribute(this, readCacheInputAsDOM4J(pipelineContext, INPUT_DATA))
-    }
+  override def start(pipelineContext: PipelineContext): Unit = {
+    // Q: should use Context instead?
+    pipelineContext.setAttribute(this, readCacheInputAsDOM4J(pipelineContext, INPUT_DATA))
+  }
 
-    def runGetW3CDocument(pipelineContext: PipelineContext): W3CDocument =
-        readCacheInputAsDOM(pipelineContext, INPUT_DATA)
+  def runGetW3CDocument(pipelineContext: PipelineContext): W3CDocument =
+    readCacheInputAsDOM(pipelineContext, INPUT_DATA)
 
-    def runGetDocument(pipelineContext: PipelineContext): Document =
-        readCacheInputAsDOM4J(pipelineContext, INPUT_DATA)
+  def runGetDocument(pipelineContext: PipelineContext): Document =
+    readCacheInputAsDOM4J(pipelineContext, INPUT_DATA)
 
-    def runGetTinyTree(pipelineContext: PipelineContext): DocumentInfo =
-        readCacheInputAsTinyTree(pipelineContext, XPath.GlobalConfiguration, INPUT_DATA)
+  def runGetTinyTree(pipelineContext: PipelineContext): DocumentInfo =
+    readCacheInputAsTinyTree(pipelineContext, XPath.GlobalConfiguration, INPUT_DATA)
 }

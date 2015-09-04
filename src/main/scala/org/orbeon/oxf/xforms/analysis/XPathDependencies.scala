@@ -23,36 +23,36 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
  * Interface to dependencies implementation.
  */
 trait XPathDependencies {
-    def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo)
-    def markStructuralChange(model: XFormsModel, instance: XFormsInstance)
+  def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo)
+  def markStructuralChange(model: XFormsModel, instance: XFormsInstance)
 
-    def rebuildDone(model: Model)
-    def recalculateDone(model: Model)
-    def revalidateDone(model: Model)
+  def rebuildDone(model: Model)
+  def recalculateDone(model: Model)
+  def revalidateDone(model: Model)
 
-    def refreshStart()
-    def refreshDone()
+  def refreshStart()
+  def refreshDone()
 
-    def bindingUpdateStart()
-    def bindingUpdateDone()
+  def bindingUpdateStart()
+  def bindingUpdateDone()
 
-    def afterInitialResponse()
-    def beforeUpdateResponse()
-    def afterUpdateResponse()
+  def afterInitialResponse()
+  def beforeUpdateResponse()
+  def afterUpdateResponse()
 
-    def notifyComputeLHHA()
-    def notifyOptimizeLHHA()
+  def notifyComputeLHHA()
+  def notifyOptimizeLHHA()
 
-    def notifyComputeItemset()
-    def notifyOptimizeItemset()
+  def notifyComputeItemset()
+  def notifyOptimizeItemset()
 
-    def requireBindingUpdate(controlPrefixedId: String): Boolean
-    def requireValueUpdate(controlPrefixedId: String): Boolean
-    def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String): Boolean
-    def requireItemsetUpdate(controlPrefixedId: String): Boolean
+  def requireBindingUpdate(controlPrefixedId: String): Boolean
+  def requireValueUpdate(controlPrefixedId: String): Boolean
+  def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String): Boolean
+  def requireItemsetUpdate(controlPrefixedId: String): Boolean
 
-    def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
-    def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean
+  def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
+  def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean
 
-    def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel): Boolean
+  def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel): Boolean
 }

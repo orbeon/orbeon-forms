@@ -25,18 +25,18 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
 
 class OutputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends ValueControl(staticStateContext, element, parent, preceding, scope)
-        with ValueTrait
-        with OptionalSingleNode
-        with ChildrenBuilderTrait
-        with ChildrenLHHAAndActionsTrait
-        with FormatTrait {
+    extends ValueControl(staticStateContext, element, parent, preceding, scope)
+    with ValueTrait
+    with OptionalSingleNode
+    with ChildrenBuilderTrait
+    with ChildrenLHHAAndActionsTrait
+    with FormatTrait {
 
-    // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
-    override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
+  // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
+  override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
 
-    override protected val allowedExtensionAttributes = appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) set XXFORMS_TARGET_QNAME
+  override protected val allowedExtensionAttributes = appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) set XXFORMS_TARGET_QNAME
 
-    override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
-    override val externalEvents              = externalEventsDef
+  override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
+  override val externalEvents              = externalEventsDef
 }

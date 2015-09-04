@@ -30,108 +30,108 @@ import collection.{Set ⇒ CSet}
  * xf:select represents items as a list of space-separated tokens.
  */
 class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsSelect1Control(container, parent, element, id) {
+    extends XFormsSelect1Control(container, parent, element, id) {
 
-    import XFormsSelectControl._
+  import XFormsSelectControl._
 
-    /**
-     * Set an external value. This consists of a list of space-separated tokens.
-     *
-     * - Itemset values which are in the list of tokens are merged with the bound control's value.
-     * - Itemset values which are not in the list of tokens are removed from the bound control's value.
-     */
-    override def translateExternalValue(externalValue: String) = {
+  /**
+   * Set an external value. This consists of a list of space-separated tokens.
+   *
+   * - Itemset values which are in the list of tokens are merged with the bound control's value.
+   * - Itemset values which are not in the list of tokens are removed from the bound control's value.
+   */
+  override def translateExternalValue(externalValue: String) = {
 
-        val existingValues = valueAsLinkedSet(getValue)
-        val itemsetValues  = mutable.LinkedHashSet(getItemset.allItemsIterator map (_.value) toList: _*)
+    val existingValues = valueAsLinkedSet(getValue)
+    val itemsetValues  = mutable.LinkedHashSet(getItemset.allItemsIterator map (_.value) toList: _*)
 
-        val incomingValuesFiltered = {
-            val newUIValues = valueAsSet(externalValue)
+    val incomingValuesFiltered = {
+      val newUIValues = valueAsSet(externalValue)
 
-            val matches: Item ⇒ Boolean =
-                if (mustEncodeValues)
-                    item ⇒ newUIValues(item.position.toString)
-                else
-                    item ⇒ newUIValues(item.value)
+      val matches: Item ⇒ Boolean =
+        if (mustEncodeValues)
+          item ⇒ newUIValues(item.position.toString)
+        else
+          item ⇒ newUIValues(item.value)
 
-            mutable.LinkedHashSet(getItemset.allItemsIterator filter matches map (_.value) toList: _*)
-        }
-
-        val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
-            updateSelection(existingValues, itemsetValues, incomingValuesFiltered)
-
-        // Dispatch xforms-deselect events
-        for (value ← newlySelectedValues)
-            Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
-
-        // Select events must be sent after all xforms-deselect events
-        for (value ← newlyDeselectedValues)
-            Dispatch.dispatchEvent(new XFormsDeselectEvent(this, value))
-
-        newInstanceValue mkString " "
+      mutable.LinkedHashSet(getItemset.allItemsIterator filter matches map (_.value) toList: _*)
     }
 
-    override def markDirtyImpl(): Unit = {
+    val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
+      updateSelection(existingValues, itemsetValues, incomingValuesFiltered)
 
-        // Default implementation
-        super.markDirtyImpl()
-        if (! isExternalValueDirty && containingDocument.getXPathDependencies.requireItemsetUpdate(getPrefixedId)) {
-            // If the itemset has changed but the value has not changed, the external value might still need to be
-            // re-evaluated.
-            markExternalValueDirty()
-        }
+    // Dispatch xforms-deselect events
+    for (value ← newlySelectedValues)
+      Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
+
+    // Select events must be sent after all xforms-deselect events
+    for (value ← newlyDeselectedValues)
+      Dispatch.dispatchEvent(new XFormsDeselectEvent(this, value))
+
+    newInstanceValue mkString " "
+  }
+
+  override def markDirtyImpl(): Unit = {
+
+    // Default implementation
+    super.markDirtyImpl()
+    if (! isExternalValueDirty && containingDocument.getXPathDependencies.requireItemsetUpdate(getPrefixedId)) {
+      // If the itemset has changed but the value has not changed, the external value might still need to be
+      // re-evaluated.
+      markExternalValueDirty()
     }
+  }
 
-    override def evaluateExternalValue(): Unit = {
+  override def evaluateExternalValue(): Unit = {
 
-        // If the control is relevant, its internal value and itemset must be defined
-        val internalValue = getValue   ensuring (_ ne null)
-        val itemset       = getItemset ensuring (_ ne null)
+    // If the control is relevant, its internal value and itemset must be defined
+    val internalValue = getValue   ensuring (_ ne null)
+    val itemset       = getItemset ensuring (_ ne null)
 
-        val updatedValue =
-            if (internalValue == "") {
-                // This means that nothing is selected
-                internalValue
-            } else {
-                // Values in the itemset
-                val instanceValues = valueAsSet(internalValue)
+    val updatedValue =
+      if (internalValue == "") {
+        // This means that nothing is selected
+        internalValue
+      } else {
+        // Values in the itemset
+        val instanceValues = valueAsSet(internalValue)
 
-                // All itemset external values for which the value exists in the instance
-                val intersection =
-                    for {
-                        item ← itemset.allItemsIterator
-                        if instanceValues(item.value)
-                    } yield
-                        item.externalValue(mustEncodeValues)
+        // All itemset external values for which the value exists in the instance
+        val intersection =
+          for {
+            item ← itemset.allItemsIterator
+            if instanceValues(item.value)
+          } yield
+            item.externalValue(mustEncodeValues)
 
-                // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
-                // there might be duplicates.
-                intersection mkString " "
-            }
+        // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
+        // there might be duplicates.
+        intersection mkString " "
+      }
 
-        setExternalValue(updatedValue)
-    }
+    setExternalValue(updatedValue)
+  }
 }
 
 object XFormsSelectControl {
-    // Compute a new item selection
-    def updateSelection(existingValues: CSet[String], itemsetValues: CSet[String], incomingValuesFiltered: CSet[String]) = {
+  // Compute a new item selection
+  def updateSelection(existingValues: CSet[String], itemsetValues: CSet[String], incomingValuesFiltered: CSet[String]) = {
 
-        val newlySelectedValues   = incomingValuesFiltered -- existingValues
-        val newlyDeselectedValues = itemsetValues -- incomingValuesFiltered intersect existingValues
+    val newlySelectedValues   = incomingValuesFiltered -- existingValues
+    val newlyDeselectedValues = itemsetValues -- incomingValuesFiltered intersect existingValues
 
-        val newInstanceValue = existingValues ++ newlySelectedValues -- newlyDeselectedValues
+    val newInstanceValue = existingValues ++ newlySelectedValues -- newlyDeselectedValues
 
-        (newlySelectedValues, newlyDeselectedValues, newInstanceValue)
-    }
+    (newlySelectedValues, newlyDeselectedValues, newInstanceValue)
+  }
 
-    private def valueAsLinkedSet(s: String) = nonEmptyOrNone(s) match {
-        case Some(list) ⇒ mutable.LinkedHashSet(list split """\s+""": _*)
-        case None ⇒ Set[String]()
-    }
+  private def valueAsLinkedSet(s: String) = nonEmptyOrNone(s) match {
+    case Some(list) ⇒ mutable.LinkedHashSet(list split """\s+""": _*)
+    case None ⇒ Set[String]()
+  }
 
-    private def valueAsSet(s: String) = nonEmptyOrNone(s) match {
-        case Some(list) ⇒ list split """\s+""" toSet
-        case None ⇒ Set[String]()
-    }
+  private def valueAsSet(s: String) = nonEmptyOrNone(s) match {
+    case Some(list) ⇒ list split """\s+""" toSet
+    case None ⇒ Set[String]()
+  }
 }

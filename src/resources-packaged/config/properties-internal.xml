@@ -107,7 +107,7 @@
     <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                           value="false"/>
 
     <!-- Whitespace handling for XForms documents -->
-    <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                   value="normalize"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                   value="collapse"/>
     <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize">
         xf|model,
         xbl|xbl
@@ -124,7 +124,12 @@
         xxf|sequence,
         xxf|script,
         xf|action[type=xpath],
-        xs|schema
+        xs|schema,
+        xh|pre,
+        xh|textarea,
+        xh|script,
+        xh|style,
+        xh|template
     </property>
     <property as="xs:string"  name="oxf.xforms.whitespace.base.collapse">
         xf|label,
@@ -136,16 +141,6 @@
         xxbl|global
     </property>
     <property as="xs:string"  name="oxf.xforms.whitespace.html.default"                   value="normalize"/>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.normalize">
-        xh|html
-    </property>
-    <property as="xs:string"  name="oxf.xforms.whitespace.html.preserve">
-        xh|pre,
-        xh|textarea,
-        xh|script,
-        xh|style,
-        xh|template
-    </property>
     <property as="xs:string"  name="oxf.xforms.whitespace.html.collapse">
         xh|title,
         xh|body

@@ -3765,9 +3765,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             YAHOO.util.Dom.addClass(document.body, "yui-skin-sam");
 
             // Add the xforms-ios and/or xforms-mobile classes on the body
+            // For detecting mobile, see http://stackoverflow.com/a/3540295/5295
             if (YAHOO.env.ua.webkit && YAHOO.env.ua.mobile)
                 $(document.body).addClass('xforms-ios');
-            if ($.browser.mobile)
+            if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()))
                 $(document.body).addClass('xforms-mobile');
 
             // Initialize attributes on form

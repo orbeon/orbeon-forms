@@ -202,15 +202,6 @@
         background-repeat: no-repeat;
     }
 
-    // Reset to default platform styling for dates on iOS
-    .xforms-ios .xforms-input input.xforms-type-date {
-        width: initial;
-        padding-right: initial;
-        background-image: initial;
-        background-position: initial;
-        background-repeat: initial;
-    }
-
     .xforms-type-date img { vertical-align: middle; padding-left: .2em; }
     .xforms-readonly img.xforms-type-date { display: none; }
 
@@ -220,16 +211,17 @@
         background-image: url(../../ops/images/xforms/clock.png);
         background-position: right center;
         background-repeat: no-repeat;
+
     }
 
-    // Reset to default platform styling for dates on iOS
-    .xforms-ios .xforms-input input.xforms-type-time {
-        width: initial;
-        padding-right: initial;
-        background-image: initial;
-        background-position: initial;
-        background-repeat: initial;
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator,
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="time"]::-webkit-inner-spin-button {
+        display: none;
+        -webkit-appearance: none;
     }
+
     .xforms-type-dateTime input.xforms-type-date { margin-right: 1em }
 
 

@@ -146,13 +146,6 @@
   background-position: right center;
   background-repeat: no-repeat;
 }
-.orbeon .xforms-ios .xforms-input input.xforms-type-date {
-  width: initial;
-  padding-right: initial;
-  background-image: initial;
-  background-position: initial;
-  background-repeat: initial;
-}
 .orbeon .xforms-type-date img {
   vertical-align: middle;
   padding-left: .2em;
@@ -167,12 +160,12 @@
   background-position: right center;
   background-repeat: no-repeat;
 }
-.orbeon .xforms-ios .xforms-input input.xforms-type-time {
-  width: initial;
-  padding-right: initial;
-  background-image: initial;
-  background-position: initial;
-  background-repeat: initial;
+.orbeon input[type="date"]::-webkit-calendar-picker-indicator,
+.orbeon input[type="time"]::-webkit-calendar-picker-indicator,
+.orbeon input[type="date"]::-webkit-inner-spin-button,
+.orbeon input[type="time"]::-webkit-inner-spin-button {
+  display: none;
+  -webkit-appearance: none;
 }
 .orbeon .xforms-type-dateTime input.xforms-type-date {
   margin-right: 1em;

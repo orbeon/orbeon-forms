@@ -36,20 +36,6 @@
         serverValueOutputId: null,
         tinymceInitialized: false,
 
-        // We have 2 distinct scenarios:
-        //
-        //     a. If the focus is triggered by the server (e.g. button doing a xf:setfocus)
-        //         1. Before setting the focus on the control we set the mask.
-        //         2. If we get the focus event because set the focus, we don't send the focus to the server.
-        //         3. Then we can safely reset the mask.
-        //
-        //     b. If the focus is triggered the user (e.g. tabbing through fields)
-        //         1. We get a focus event, set the mask, send the event to the server
-        //         2. When server tells us to set the focus, we don't (as the focus could have changed),
-        //            and reset the mask
-
-        maskFocus: false,
-
         init: function() {
             this.serverValueOutputId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-server-value', null, this.container)[0].id;
 
@@ -66,7 +52,7 @@
                 var iframe = $(this.container).find('iframe');
                 // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
                 iframe.contents().on('click', _.bind(function() { this.container.click(); }, this));
-                $(iframe[0].contentWindow).on('focus', _.bind(this.focus, this));
+                $(iframe[0].contentWindow).on('focus', _.bind(this.onFocus, this));
                 // Copy the tabindex on the iframe
                 if (!_.isUndefined(tabindex)) iframe.attr('tabindex', tabindex);
                 this.tinymceInitialized = true;
@@ -100,23 +86,14 @@
         },
 
         // TinyMCE got the focus
-        focus: function(event) {
-            if (! this.maskFocus) {
-                this.maskFocus = true;
-                event.target = this.container;                          // From the perspective of the XForms engine, the focus is on the XBL component
-                Events.focus(event);                                    // Forward to the "XForms engine"
-            }
+        onFocus: function(event) {
+            event.target = this.container;                          // From the perspective of the XForms engine, the focus is on the XBL component
+            Events.focus(event);                                    // Forward to the "XForms engine"
         },
 
         // The server tells us to set the focus on the TinyMCE
-        serverSetFocus: function() {
-            if (! this.maskFocus) {
-                this.maskFocus = true;
-                this.myEditor.focus();
-                this.maskFocus = false;
-            } else {
-                this.maskFocus = false;
-            }
+        setFocus: function() {
+            this.myEditor.focus();
         },
 
         hasFocus: function() {

@@ -36,8 +36,7 @@
 
         // Set on focus, reset on blur, used to know if we should format the value when we received a new value from the server
         hasFocus: false,
-        maskFocus: false,
-
+ 
         init: function() {
             // Get information from the DOM
 
@@ -66,38 +65,28 @@
             this.groupingSeparator = Document.getValue(this.groupingSeparatorElement.id);
 
             // Register listener
-            YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.focus, this, true);
-            YAHOO.util.Event.addBlurListener(this.visibleInputElement, this.blur, this, true);
+            YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.onFocus, this, true);
+            YAHOO.util.Event.addBlurListener(this.visibleInputElement, this.onBlur, this, true);
             $(this.visibleInputElement).on('keypress', _.bind(function(e) {
                 if (e.which == 13) this.sendValueToServer();
             }, this));
         },
 
-        focus: function() {
-            if (! this.maskFocus) {
-                this.hasFocus = true;
-                this.maskFocus = true;
-                this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
-                ORBEON.xforms.Globals.currentFocusControlId = this.container.id;
-            }
+        onFocus: function() {
+            this.hasFocus = true;
+            this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
         },
 
-        serverSetFocus: function() {
-            if (! this.maskFocus) {
-                this.maskFocus = true;
-                this.visibleInputElement.focus();
-                this.maskFocus = false;
-            } else {
-                this.maskFocus = false;
-            }
-        },
+        setFocus: function() {
+            this.visibleInputElement.focus();
+         },
 
         sendValueToServer: function() {
             var newValue = this.visibleInputElement.value;
             Document.setValue(this.xformsInputElement.id, newValue);
         },
 
-        blur: function() {
+        onBlur: function() {
             this.hasFocus = false;
             this.sendValueToServer();
             var formId = $(this.container).parents('form').attr('id');

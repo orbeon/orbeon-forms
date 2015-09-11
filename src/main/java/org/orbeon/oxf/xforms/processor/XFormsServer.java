@@ -718,15 +718,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else if (afterFocusEffectiveId != null && ! afterFocusEffectiveId.equals(beforeFocusEffectiveId)) {
 
                         // There is a focused control and it is different from the focus as known by the client
-
-                        final boolean isComponentWithFocus =
-                            afterFocusedControl.staticControl() instanceof ComponentControl &&
-                                ((ComponentControl) afterFocusedControl.staticControl()).binding().abstractBinding().modeFocus();
-
-                        // Don't tell the client if we are a component which handles focus on its own
-                        // See https://github.com/orbeon/orbeon-forms/issues/1864
-                        if (! isComponentWithFocus)
-                            outputFocusInfo(ch, containingDocument, true, afterFocusEffectiveId);
+                        outputFocusInfo(ch, containingDocument, true, afterFocusEffectiveId);
                     }
                 }
 

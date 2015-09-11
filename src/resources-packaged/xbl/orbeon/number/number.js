@@ -34,7 +34,9 @@
         groupingSeparatorElement: null,
         groupingSeparator: null,
 
+        // Set on focus, reset on blur, used to know if we should format the value when we received a new value from the server
         hasFocus: false,
+        maskFocus: false,
 
         init: function() {
             // Get information from the DOM
@@ -42,6 +44,7 @@
             this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-xforms-input", null, this.container)[0];
             this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, this.container)[0];
             this.hasFocus = false;
+            this.maskFocus = false;
 
             // Properties
             // Find prefix based on class/control name, as this JS can be used with fr:number and fr:currency and properties use the control name
@@ -71,10 +74,22 @@
         },
 
         focus: function() {
-            this.hasFocus = true;
-            this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
-            ORBEON.xforms.Globals.currentFocusControlId = this.container.id;
-            Document.dispatchEvent(this.xformsInputElement.id, 'xforms-focus');
+            if (! this.maskFocus) {
+                this.hasFocus = true;
+                this.maskFocus = true;
+                this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
+                ORBEON.xforms.Globals.currentFocusControlId = this.container.id;
+            }
+        },
+
+        serverSetFocus: function() {
+            if (! this.maskFocus) {
+                this.maskFocus = true;
+                this.visibleInputElement.focus();
+                this.maskFocus = false;
+            } else {
+                this.maskFocus = false;
+            }
         },
 
         sendValueToServer: function() {

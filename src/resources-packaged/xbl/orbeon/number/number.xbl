@@ -68,7 +68,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-focus">
-                <xxf:script id="xf-fo">ORBEON.jQuery(this).find('.xbl-fr-number-visible-input').focus();</xxf:script>
+                <xxf:script id="xf-fo">YAHOO.xbl.fr.Number.instance(this).serverSetFocus();</xxf:script>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

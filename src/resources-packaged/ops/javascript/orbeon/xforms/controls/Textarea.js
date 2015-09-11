@@ -18,7 +18,6 @@
 
     Events.ajaxResponseProcessedEvent.subscribe(function() {
         _.each($(AutosizeSelector).toArray(), function(ta) {
-            console.log(ta);
             // Initialize potentially new textareas added to the page
             autosize(ta);
             // Update size of textareas, whose content or style might have changed

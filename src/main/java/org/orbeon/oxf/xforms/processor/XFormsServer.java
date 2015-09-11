@@ -718,6 +718,7 @@ public class XFormsServer extends ProcessorImpl {
 
                         // There is a focused control and it is different from the focus as known by the client
                         outputFocusInfo(ch, containingDocument, true, afterFocusEffectiveId);
+
                     }
                 }
 

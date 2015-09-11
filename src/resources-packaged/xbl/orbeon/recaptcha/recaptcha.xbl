@@ -36,9 +36,6 @@
             <xbl:handler event="fr-reload" phase="target">
                 <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxf:script>
             </xbl:handler>
-            <xbl:handler event="xforms-focus" phase="target">
-                <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).focus();</xxf:script>
-            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->

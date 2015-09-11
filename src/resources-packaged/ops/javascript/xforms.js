@@ -2242,11 +2242,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Special case for RTE
                 ORBEON.xforms.Page.getControl(control).setFocus();
             } else if ($(control).is('.xbl-component.xbl-focusable')) {
-                // NOP:
-                // Right now the server tells us when a focusable XBL control gets the focus, but we wouldn't want it
-                // to, as the generic code below is likely to do something wrong for XBL controls (e.g. set the
-                // focus on the "B" icon of a TinyMCE), and instead we prefer to let XBL controls handle the focus
-                // themselves, rather than force a generic algorithm on them.
+                var instance = $(control).data('xforms-xbl-object');
+                if (_.isObject(instance) && _.isFunction(instance.setFocus))
+                    instance.setFocus();
             } else {
                 // Generic code to find focusable descendant-or-self HTML element and focus on it
                 var htmlControl = $(control).find('input:visible, textarea:visible, select:visible, button:visible, a:visible');
@@ -3610,7 +3608,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     this.prototype.destroy = function () {
                         if (!_.isUndefined(originalDestroy))
                             originalDestroy.call(this);
-                        xblClass._instances[this.container.id] = null;
+                        $(this.container).data('xforms-xbl-object', null);
                     }
                 }
 
@@ -3625,12 +3623,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                     return doNothingSingleton;
                 } else {
-                    // Create object holding instances
-                    if (_.isUndefined(this._instances))
-                        this._instances = {};
                     // Get or create instance
-                    var instance = this._instances[container.id];
-                    if (_.isUndefined(instance) || YAHOO.lang.isNull(instance) || instance.container != container) {
+                    var instance = $(container).data('xforms-xbl-object');
+                    if (! _.isObject(instance) || instance.container != container) {
                         instance = new xblClass(container);
                         instance.xblClass = xblClass;
                         instance.container = container;
@@ -3638,7 +3633,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             instance.initialized = false;
                             instance.init();
                         }
-                        this._instances[container.id] = instance;
+                        $(container).data('xforms-xbl-object', instance);
                     }
                     return instance;
                 }

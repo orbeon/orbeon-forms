@@ -34,16 +34,11 @@
         groupingSeparatorElement: null,
         groupingSeparator: null,
 
-        // Set on focus, reset on blur, used to know if we should format the value when we received a new value from the server
-        hasFocus: false,
- 
         init: function() {
             // Get information from the DOM
 
             this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-xforms-input", null, this.container)[0];
             this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, this.container)[0];
-            this.hasFocus = false;
-            this.maskFocus = false;
 
             // Properties
             // Find prefix based on class/control name, as this JS can be used with fr:number and fr:currency and properties use the control name
@@ -73,7 +68,6 @@
         },
 
         onFocus: function() {
-            this.hasFocus = true;
             this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
         },
 
@@ -87,7 +81,6 @@
         },
 
         onBlur: function() {
-            this.hasFocus = false;
             this.sendValueToServer();
             var formId = $(this.container).parents('form').attr('id');
 
@@ -115,11 +108,16 @@
         },
 
         updateWithServerValue: function() {
-            // Get value as formatted by server
+
             var numberFormattedValue = Document.getValue(this.xformsInputElement.id);
-            // If there is an update in the value, and the field already has the focus, just populate with the
-            // XForms value without number formatting
-            this.visibleInputElement.value = this.hasFocus ? this.numberToEditString(numberFormattedValue) : numberFormattedValue;
+            var numberEditValue      = this.numberToEditString(numberFormattedValue);
+            var hasFocus             = this.visibleInputElement == document.activeElement;
+
+            this.visibleInputElement.value =
+                hasFocus ?
+                numberEditValue :
+                numberFormattedValue;
+
             // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
             this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
         },

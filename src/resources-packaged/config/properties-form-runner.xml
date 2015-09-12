@@ -185,6 +185,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"              value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                             value="fr-number"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                           value="fr-number"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"                   value="select-label"/>
 
     <!-- PDF fonts -->
     <!-- Optional PDF font embedding. Specifying a family name is optional.

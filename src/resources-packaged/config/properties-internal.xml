@@ -220,6 +220,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"        value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="fr-number"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="fr-number"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"             value="select-label"/>
 
      <!-- Internal processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value='save'/>

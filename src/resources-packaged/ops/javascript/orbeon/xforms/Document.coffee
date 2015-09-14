@@ -29,7 +29,7 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
             args = newArgs
 
         # Use first XForms form, if none is specified
-        args.form = _.head f$.filter '.xforms-form', $ document.forms unless args.form?
+        args.form = _.head($(document.forms).filter('.xforms-form')) unless args.form?
         event = new AjaxServer.Event args
         AjaxServer.fireEvents [event], incremental? and incremental
 

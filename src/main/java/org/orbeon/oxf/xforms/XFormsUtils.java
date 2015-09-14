@@ -790,10 +790,7 @@ public class XFormsUtils {
                     ! defaultHTML && LHHAAnalysis.isHTML(element) || defaultHTML && ! LHHAAnalysis.isPlainText(element);
 
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
-                {
-                    outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, false, scala.Option.<ControlState>apply(null));
-                    outputControl.evaluate();
-                }
+                outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, false, scala.Option.<ControlState>apply(null));
                 contextStack.popBinding();
 
                 if (outputControl.isRelevant()) {
@@ -843,15 +840,12 @@ public class XFormsUtils {
                                     = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue, element.getName());
 
                             contextStack.pushBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element));
-                            {
-                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, false, scala.Option.<ControlState >apply(null));
-                                attributeControl.evaluate();
-                            }
+                            attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false, false, scala.Option.<ControlState >apply(null));
                             contextStack.popBinding();
 
                             resolvedValue = attributeControl.getExternalValue();
                         } else if (currentAttributeName.equals("id")) {
-                            // This is an id, prefix if needed  
+                            // This is an id, prefix if needed
                             resolvedValue = prefix + currentAttributeValue;
                         } else {
                             // Simply use control value

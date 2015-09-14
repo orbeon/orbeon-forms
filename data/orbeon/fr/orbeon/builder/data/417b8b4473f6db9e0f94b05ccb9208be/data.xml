@@ -883,7 +883,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <fr:grid columns="2">
                         <xh:tr>
                             <xh:td>
-                                <fr:image bind="static-image-bind" id="static-image-control">d
+                                <fr:image bind="static-image-bind" id="static-image-control">
                                     <xf:label ref="$form-resources/static-image/label"/>
                                 </fr:image>
                             </xh:td>

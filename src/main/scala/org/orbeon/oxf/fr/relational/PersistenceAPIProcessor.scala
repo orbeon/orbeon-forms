@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.fr.relational
 
-import org.orbeon.oxf.pipeline.api.{PipelineContext}
-import org.orbeon.oxf.processor.{ProcessorOutput, ProcessorImpl}
-import org.orbeon.oxf.util.{XPath, NetUtils}
-import org.orbeon.oxf.util.DateUtils.DateTime
-import org.orbeon.oxf.fr.relational.RelationalUtils._
-import org.orbeon.scaxon.XML._
 import java.sql.Timestamp
-import org.orbeon.scaxon.XML
-import scala.collection.mutable.ListBuffer
+
+import org.orbeon.oxf.fr.relational.RelationalUtils._
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
+import org.orbeon.oxf.util.DateUtils.DateTime
+import org.orbeon.oxf.util.{NetUtils, XPath}
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.XML._
+
+import scala.collection.mutable.ListBuffer
 
 /**
  * Implementation of the persistence API for relational databases.
@@ -166,5 +168,4 @@ class PersistenceAPIProcessor extends ProcessorImpl {
       }
     })
   }
-
 }

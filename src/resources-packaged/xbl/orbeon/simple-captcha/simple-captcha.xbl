@@ -26,16 +26,13 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
 
-    <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha" xxbl:mode="focus binding lhha">
+    <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha" xxbl:mode="binding lhha">
         <xbl:resources>
              <xbl:style src="/xbl/orbeon/simple-captcha/simple-captcha.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
-            </xbl:handler>
-            <xbl:handler event="xforms-focus">
-                <xxf:script id="xf-fo">ORBEON.jQuery(this).find('input').focus();</xxf:script>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>

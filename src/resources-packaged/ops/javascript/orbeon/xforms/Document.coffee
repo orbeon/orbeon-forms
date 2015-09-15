@@ -62,19 +62,19 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
     # Returns the value of an XForms control.
     # @param {String | HTMLElement} control
     # @param {HTMLElement} form
-    getValue: (control, form) ->
-        Controls.getCurrentValue(Document._findControl(control, form))
+    getValue: (controlIdOrElement, form) ->
+        Controls.getCurrentValue(Document._findControl(controlIdOrElem, form))
 
     # Set the value of an XForms control.
     # @param {String | HTMLElement} control
     # @param {String} newValue
     # @param {HTMLElement} form
-    setValue: (control, newValue, form) ->
+    setValue: (controlIdOrElement, newValue, form) ->
 
-        # Cast to String if caller passes a non-string value "by mistake"
+        # Cast to String if caller passes a non-string value "by mistake" (or not, like a Number)
         newValue = newValue.toString()
 
-        control = Document._findControl(control, form)
+        control = Document._findControl(controlIdOrElem, form)
 
         if $(control).is('.xforms-output, .xforms-upload')
             throw 'Cannot set the value of an output or upload control'

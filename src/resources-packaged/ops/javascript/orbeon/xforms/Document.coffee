@@ -33,25 +33,58 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
         event = new AjaxServer.Event args
         AjaxServer.fireEvents [event], incremental? and incremental
 
+    _findControl: (controlIdOrElem, formElem) ->
+
+        [controlId, resolvedControl] =
+            if _.isString(controlIdOrElem)
+                controlId = controlIdOrElem
+
+                formId =
+                    if _.isElement(formElem)
+                        formElem.id
+                    else
+                        $(document.forms).filter('.xforms-form')[0].id
+
+                ns = ORBEON.xforms.Globals.ns[formId]
+
+                [controlId, document.getElementById(ns + controlId)]
+            else
+                [controlIdOrElem.id, controlIdOrElem]
+
+        if not resolvedControl?
+            throw "Cannot find control id #{controlId}"
+
+        if Controls.isInRepeatTemplate(resolvedControl)
+            throw 'Cannot set the value of a repeat template'
+
+        resolvedControl
+
     # Returns the value of an XForms control.
     # @param {String | HTMLElement} control
-    getValue: (control) ->
-        control = document.getElementById control if _.isString control
-        Controls.getCurrentValue control
+    # @param {HTMLElement} form
+    getValue: (control, form) ->
+        Controls.getCurrentValue(Document._findControl(control, form))
 
     # Set the value of an XForms control.
     # @param {String | HTMLElement} control
     # @param {String} newValue
-    setValue: (control, newValue) ->
-        newValue = newValue.toString()                                                                                  # Cast to String if caller passes a non-string value "by mistake"
-        if _.isString control
-            control = document.getElementById control
-            throw 'Cannot find control id ' + control if not control? or Controls.isInRepeatTemplate control
-        throw 'Cannot set the value of a repeat template' if Controls.isInRepeatTemplate control
-        throw 'Cannot set the value of an output or upload control' if f$.is '.xforms-output, .xforms-upload', $ control
-        Controls.setCurrentValue control, newValue                                                                      # Directly change the value in the UI without waiting for an Ajax response
-        event = new AjaxServer.Event null, control.id, newValue, "xxforms-value"                                        # And also fire server event
-        AjaxServer.fireEvents [event], false
+    # @param {HTMLElement} form
+    setValue: (control, newValue, form) ->
+
+        # Cast to String if caller passes a non-string value "by mistake"
+        newValue = newValue.toString()
+
+        control = Document._findControl(control, form)
+
+        if $(control).is('.xforms-output, .xforms-upload')
+            throw 'Cannot set the value of an output or upload control'
+
+        # Directly change the value in the UI without waiting for an Ajax response
+        Controls.setCurrentValue(control, newValue)
+
+        # And also fire server event
+        event = new AjaxServer.Event null, control.id, newValue, "xxforms-value"
+        AjaxServer.fireEvents([event], false)
 
     # Returns whether the document is being reloaded.
     isReloading: -> ORBEON.xforms.Globals.isReloading

@@ -70,10 +70,18 @@
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <!-- Either a number or currency -->
-                    <xsl:variable name="is-currency" as="xs:boolean" select="exists(/fr:currency)"/>
+
+                    <!-- Either number or currency -->
+                    <xsl:variable
+                        name="is-currency"
+                        as="xs:boolean"
+                        select="exists(/fr:currency)"/>
+
                     <!-- JavaScript code obtaining the JavaScript companion object -->
-                    <xsl:variable name="js-object" as="xs:string" select="concat('YAHOO.xbl.fr.', if ($is-currency) then 'Currency' else 'Number', '.instance(this)')"/>
+                    <xsl:variable
+                        name="js-object"
+                        as="xs:string"
+                        select="concat('YAHOO.xbl.fr.', if ($is-currency) then 'Currency' else 'Number', '.instance(this)')"/>
 
                     <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
                     <xf:group>
@@ -89,15 +97,18 @@
                         <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
                         <!--<xsl:copy-of select="xxbl:parameter(., 'picture')"/>-->
 
-                        <xf:var name="picture-string"
-                                value="concat(
-                                           '#,##0',
-                                           if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
-                                           string-join(for $i in 1 to xs:integer($digits-after-decimal) return '0', '')
-                                       )"/>
+                        <xf:var
+                            name="picture-string"
+                            value="
+                                concat(
+                                    '#,##0',
+                                    if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
+                                    string-join(for $i in 1 to xs:integer($digits-after-decimal) return '0', '')
+                                )"/>
 
                         <!-- Access to XForms value and change event -->
-                        <!-- TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
+                        <!-- TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this
+                             leads to a bug when the prefix changes and the amount stays the same -->
                         <!--
                             format:
                                 if the value is a decimal: prefix and space (if any prefix), then formatted decimal with grouping and decimal separator
@@ -117,15 +128,36 @@
                             If the value has more significant digits after the decimal point than allowed, don't format
                             the value: https://github.com/orbeon/orbeon-forms/issues/599
                         -->
-                        <xf:var name="formatted" id="formatted-value"
+                        <xf:var
+                            name="formatted"
+                            id="formatted-value"
                             value="
-                                if (string($binding) castable as xs:decimal)
-                                then
-                                    if (string-length(substring-after(string(xs:decimal($binding)), '.')) gt xs:integer($digits-after-decimal))
-                                    then
-                                        translate(string($binding), '.', $decimal-separator)
+                                if (string($binding) castable as xs:decimal) then
+                                    if (
+                                        string-length(
+                                            substring-after(
+                                                string(xs:decimal($binding)),
+                                                '.'
+                                            )
+                                        ) gt xs:integer($digits-after-decimal)
+                                    ) then
+                                        translate(
+                                            string($binding),
+                                            '.',
+                                            $decimal-separator
+                                        )
                                     else
-                                        translate(format-number(xs:decimal($binding), $picture-string), '.,', concat($decimal-separator, $grouping-separator))
+                                        translate(
+                                            format-number(
+                                                xs:decimal($binding),
+                                                $picture-string
+                                            ),
+                                            '.,',
+                                            concat(
+                                                $decimal-separator,
+                                                $grouping-separator
+                                            )
+                                        )
                                 else
                                      string($binding)">
                             <!-- Rewrite event as xxforms-iteration-moved doesn't bubble -->
@@ -143,6 +175,7 @@
 
                         <!-- Readwrite mode -->
                         <xf:group ref="$binding[not($view)]">
+                            <!--  Hidden XForms input -->
                             <xf:input
                                     ref="."
                                     class="xbl-fr-number-xforms-input xforms-hidden"
@@ -152,7 +185,7 @@
                                 <xxf:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxf:script>
                             </xf:input>
 
-                            <!-- The visible HTML input -->
+                            <!-- Visible HTML input -->
                             <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid.xforms-visited -->
                             <xh:span class="fr-width-10em {{(if ($prefix) then 'input-prepend' else (), if ($suffix) then 'input-append' else ())}}">
                                 <xf:group class="add-on" ref=".[$prefix]"><xf:output value="$prefix"/></xf:group>

@@ -311,23 +311,39 @@ body {
     #fb-service-dialog {
         width: 550px;
         max-width: none;
+
+        .fb-service-dialog-error, .fb-service-dialog-success {
+            border: 2px solid;
+            padding: 2px;
+        }
+
         .fb-service-dialog-error {
-            border: 2px solid red; padding: .25em;
-            select {
-                border: none;
-            }
+            border-color: red;
         }
+
         .fb-service-dialog-success {
-            border: 2px solid green;
-            padding: .25em;
+            border-color: green;
         }
-        .fb-submission-response {
-            display: block;
-            height: 200px;
-            overflow-y: auto;
+
+        .fb-submission-response-body {
             textarea {
-                height: 10em;
+                height: 200px;
             }
+        }
+
+        .fb-submission-response-headers {
+            display: block;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .fb-submission-response-noheaders {
+            font-style: italic;
+            padding: 4px;
+        }
+
+        .fb-service-request-body textarea {
+            height: @baseLineHeight * 8 + 8px;
         }
     }
 

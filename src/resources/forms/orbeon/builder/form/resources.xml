@@ -623,6 +623,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP Service Editor</label>
+            <tab-definition><label>Definition</label></tab-definition>
+            <tab-advanced><label>Advanced</label></tab-advanced>
+            <tab-test><label>Test Results</label></tab-test>
+            <url-parameters><label>URL Parameters</label></url-parameters>
+            <parameter-name><label>Name</label></parameter-name>
+            <parameter-default-value><label>Default Value</label></parameter-default-value>
+            <no-headers>No headers received.</no-headers>
             <service-name>
                 <label>Service Name</label>
                 <hint>Choose a unique name for this service</hint>
@@ -699,10 +706,10 @@
                 <label>Headers</label>
             </headers>
             <header-name>
-                <label>Name</label>
+                <label>Header Name</label>
             </header-name>
             <header-value>
-                <label>Value(s)</label>
+                <label>Header Value(s)</label>
             </header-value>
             <response-body>
                 <label>Response Body</label>
@@ -1518,6 +1525,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editeur de services HTTP</label>
+            <tab-definition><label>Définition</label></tab-definition>
+            <tab-advanced><label>Fonctions avancées</label></tab-advanced>
+            <tab-test><label>Résultat du test</label></tab-test>
+            <url-parameters><label>Paramètres d'URL</label></url-parameters>
+            <parameter-name><label>Nom</label></parameter-name>
+            <parameter-default-value><label>Valeur par défaut</label></parameter-default-value>
+            <no-headers>Pas d'en-têtes reçus.</no-headers>
             <service-name>
                 <label>Nom du service</label>
                 <hint>Choisisez un nom de service unique</hint>
@@ -2414,6 +2428,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjenesteredigering</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Tjenestenavn</label>
                 <hint>Velg et entydig navn for denne tjenesten</hint>
@@ -3309,6 +3330,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>Редактор HTTP-сервисов</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Название сервиса</label>
                 <hint>Выберите уникальное название для этого сервиса</hint>
@@ -4197,6 +4225,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editore servizi HTTP</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Nome del servizio</label>
                 <hint>Scegli un nome univoco per questo servizio</hint>
@@ -5086,6 +5121,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-Dienst Editor</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Name des Dienstes</label>
                 <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
@@ -5977,6 +6019,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-palvelineditori</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Palvelun nimi</label>
                 <hint>Valitse nimi tälle palvelulle</hint>
@@ -6873,6 +6922,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor de Servicios HTTP</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Nombre del Servicio</label>
                 <hint>Ingrese un nombre único para este Servicio</hint>
@@ -7768,6 +7824,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor do serviço HTTP</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Nome do Serviço</label>
                 <hint>Escolha um nome único para este serviço</hint>
@@ -8664,6 +8727,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjänster</label>
+            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
+            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
+            <tab-test todo="true"><label>[Test Results]</label></tab-test>
+            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
+            <parameter-name todo="true"><label>[Name]</label></parameter-name>
+            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
+            <no-headers todo="true">[No headers received].</no-headers>
             <service-name>
                 <label>Namn</label>
                 <hint>Definiera ett unikt namn för denna HTTP-tjänst</hint>

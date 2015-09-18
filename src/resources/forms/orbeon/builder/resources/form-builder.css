@@ -308,24 +308,31 @@ body {
   width: 550px;
   max-width: none;
 }
-.orbeon #fb-service-dialog .fb-service-dialog-error {
-  border: 2px solid red;
-  padding: .25em;
+.orbeon #fb-service-dialog .fb-service-dialog-error,
+.orbeon #fb-service-dialog .fb-service-dialog-success {
+  border: 2px solid;
+  padding: 2px;
 }
-.orbeon #fb-service-dialog .fb-service-dialog-error select {
-  border: none;
+.orbeon #fb-service-dialog .fb-service-dialog-error {
+  border-color: red;
 }
 .orbeon #fb-service-dialog .fb-service-dialog-success {
-  border: 2px solid green;
-  padding: .25em;
+  border-color: green;
 }
-.orbeon #fb-service-dialog .fb-submission-response {
-  display: block;
+.orbeon #fb-service-dialog .fb-submission-response-body textarea {
   height: 200px;
+}
+.orbeon #fb-service-dialog .fb-submission-response-headers {
+  display: block;
+  max-height: 200px;
   overflow-y: auto;
 }
-.orbeon #fb-service-dialog .fb-submission-response textarea {
-  height: 10em;
+.orbeon #fb-service-dialog .fb-submission-response-noheaders {
+  font-style: italic;
+  padding: 4px;
+}
+.orbeon #fb-service-dialog .fb-service-request-body textarea {
+  height: 168px;
 }
 .orbeon #fb-action-dialog {
   width: 800px;

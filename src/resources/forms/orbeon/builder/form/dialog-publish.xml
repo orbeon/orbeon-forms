@@ -84,15 +84,15 @@
                     <xf:group ref=".[$versioning-supported and $existing-version gt 0]">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 appearance="full" ref="instance()/version">
+                                <xf:select1 ref="instance()/version">
                                     <xf:item>
                                         <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, $existing-version + 1)"/>
                                         <xf:value>next</xf:value>
                                     </xf:item>
-                                    <xf:item>
-                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, $existing-version)"/>
-                                        <xf:value value="$existing-version"/>
-                                    </xf:item>
+                                    <xf:itemset ref="reverse(1 to $existing-version)">
+                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, .)"/>
+                                        <xf:value value="."/>
+                                    </xf:itemset>
                                 </xf:select1>
                             </xh:td>
                         </xh:tr>

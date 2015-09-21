@@ -35,7 +35,7 @@
         <setvalue ref="/*/form" matcher-group="4"/>
     </service>
 
-    <!-- ==== Built-in Oracle, MySQL, PostgreSQL, and DB2 persistence services =========================================================== -->
+    <!-- ==== Built-in relational persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"

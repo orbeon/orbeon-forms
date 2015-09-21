@@ -145,7 +145,8 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         mediatype         = actualRequestMediatype,
         encodingForSOAP   = encoding,
         customHeaders     = customHeaderNameValues,
-        headersToForward  = Connection.headersToForwardFromProperty)(
+        headersToForward  = Connection.headersToForwardFromProperty,
+        getHeader         = containingDocument.headersGetter)(
         logger            = indentedLogger
       )
 

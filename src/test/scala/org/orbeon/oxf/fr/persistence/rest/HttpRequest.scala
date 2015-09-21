@@ -69,7 +69,8 @@ private object HttpRequest {
         hasCredentials   = false,
         customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
         headersToForward = Connection.headersToForwardFromProperty,
-        cookiesToForward = Connection.cookiesToForwardFromProperty
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = _ ⇒ None
       )
     }
 

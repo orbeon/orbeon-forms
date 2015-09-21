@@ -292,6 +292,8 @@ trait ContainingDocumentRequest {
   def getContainerNamespace    = _containerNamespace // always "" for servlets.
   def getVersionedPathMatchers = _versionedPathMatchers
 
+  def headersGetter: String ⇒ Option[List[String]] = getRequestHeaders.get
+
   protected def initializeRequestInformation(): Unit =
     Option(NetUtils.getExternalContext.getRequest) match {
       case Some(request) ⇒

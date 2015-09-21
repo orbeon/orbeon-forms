@@ -225,7 +225,8 @@ object XFormsResourceServer {
     contentType      : Option[String],
     lastModified     : Long,
     customHeaders    : Map[String, List[String]],
-    headersToForward : Set[String])(implicit
+    headersToForward : Set[String],
+    getHeader        : String ⇒ Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String = {
 
@@ -251,7 +252,8 @@ object XFormsResourceServer {
         hasCredentials   = false,
         customHeaders    = customHeaders,
         headersToForward = headersToForward,
-        cookiesToForward = Connection.cookiesToForwardFromProperty)(
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = getHeader)(
         logger           = logger
       )
 
@@ -281,8 +283,9 @@ object XFormsResourceServer {
   }
 
   // For Java callers
+  // 2015-09-21: Only used by FileSerializer.
   def jProxyURI(uri: String, contentType: String) =
-    proxyURI(uri, None, Option(contentType), -1, Map(), Set())(null)
+    proxyURI(uri, None, Option(contentType), -1, Map(), Set(), _ ⇒ None)(null)
 
   // Try to remove a dynamic resource
   //

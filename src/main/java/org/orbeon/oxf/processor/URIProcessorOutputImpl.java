@@ -389,6 +389,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                         credentials != null,
                         null,
                         Connection.jHeadersToForward(),
+                        Connection.getHeaderFromRequest(externalContext.getRequest()),
                         indentedLogger
                     );
 

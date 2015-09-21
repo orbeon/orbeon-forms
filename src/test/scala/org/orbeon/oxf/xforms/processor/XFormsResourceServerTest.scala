@@ -24,9 +24,9 @@ class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsFo
     implicit val indentedLogger = ResourceManagerTestBase.newIndentedLogger
 
     assert("/xforms-server/dynamic/d696cd8de9f92d36e3f34151ca9eba1807b19e01" ===
-      XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set()))
+      XFormsResourceServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
 
     assert("/xforms-server/dynamic/563ec01cad20b038a8109ba984daac278a350f72" ===
-      XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set()))
+      XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
   }
 }

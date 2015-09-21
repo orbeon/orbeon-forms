@@ -141,6 +141,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                             false,
                             explicitHeaders,
                             Connection.jHeadersToForward(),
+                            Connection.getHeaderFromRequest(externalContext.getRequest()),
                             indentedLogger
                         );
 

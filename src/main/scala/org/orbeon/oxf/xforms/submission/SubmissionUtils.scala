@@ -64,7 +64,8 @@ object SubmissionUtils {
         hasCredentials   = false,
         customHeaders    = Map(),
         headersToForward = Connection.headersToForwardFromProperty,
-        cookiesToForward = Connection.cookiesToForwardFromProperty
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = model.containingDocument.headersGetter
       ) mapValues (_.toList),
       loadState       = true,
       logBody         = BaseSubmission.isLogBody

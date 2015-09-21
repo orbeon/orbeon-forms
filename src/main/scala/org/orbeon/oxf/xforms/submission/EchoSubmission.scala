@@ -60,7 +60,8 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       mediatype         = sp.actualRequestMediatype,
       encodingForSOAP   = p2.encoding,
       customHeaders     = customHeaderNameValues,
-      headersToForward  = Connection.headersToForwardFromProperty)(
+      headersToForward  = Connection.headersToForwardFromProperty,
+      getHeader         = containingDocument.headersGetter)(
       logger            = getDetailsLogger(p, p2)
     )
 

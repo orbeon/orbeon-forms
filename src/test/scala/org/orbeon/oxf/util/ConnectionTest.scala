@@ -30,15 +30,15 @@ import org.scalatest.mock.MockitoSugar
 import collection.mutable
 
 class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
-  
+
   @Test def forwardHeaders(): Unit = {
-    
+
     // Custom headers
     val customHeaderValuesMap = Map(
       "my-stuff"   → List("my-value"),
       "your-stuff" → List("your-value-1", "your-value-2")
     )
-    
+
     // Create request and wrapper
     val incomingRequest = new RequestAdapter {
       override val getHeaderValuesMap = mutable.LinkedHashMap(
@@ -55,7 +55,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     val externalContext = Mockito.mock(classOf[ExternalContext])
     Mockito when externalContext.getRequest thenReturn incomingRequest
     Mockito when externalContext.getWebAppContext thenReturn webAppContext
-    
+
     // NOTE: Should instead use withExternalContext()
     PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
     val headers =
@@ -66,7 +66,8 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         mediatype         = null,
         encodingForSOAP   = "UTF-8",
         customHeaders     = customHeaderValuesMap,
-        headersToForward  = Set("cookie", "authorization", "user-agent"))(
+        headersToForward  = Set("cookie", "authorization", "user-agent"),
+        getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
         logger            = ResourceManagerTestBase.newIndentedLogger
       )
 
@@ -113,7 +114,8 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         mediatype         = bodyMediaType,
         encodingForSOAP   = "UTF-8",
         customHeaders     = explicitHeaders,
-        headersToForward  = Set())(
+        headersToForward  = Set(),
+        getHeader         = _ ⇒ None)(
         logger            = ResourceManagerTestBase.newIndentedLogger
       )
 

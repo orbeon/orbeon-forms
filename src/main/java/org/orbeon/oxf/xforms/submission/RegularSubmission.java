@@ -59,6 +59,7 @@ public class RegularSubmission extends BaseSubmission {
                 p2.encoding,
                 customHeaderNameValues,
                 Connection.headersToForwardFromProperty(),
+                containingDocument().headersGetter(),
                 detailsLogger
             );
 
@@ -100,7 +101,7 @@ public class RegularSubmission extends BaseSubmission {
 
                     // Update status
                     status[0] = true;
-                    
+
                     // Obtain replacer
                     // TODO: This refers to Submission.
                     final Replacer replacer = submission().getReplacer(connectionResult, p);
@@ -125,7 +126,7 @@ public class RegularSubmission extends BaseSubmission {
         };
 
         // Submit the callable
-        // This returns null if the execution is deferred 
+        // This returns null if the execution is deferred
         return submitCallable(p, p2, callable);
     }
 }

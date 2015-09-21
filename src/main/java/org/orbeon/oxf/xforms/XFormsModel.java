@@ -639,6 +639,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                     instance.credentialsOrNull() != null,
                     null,
                     Connection.jHeadersToForward(),
+                    containingDocument().headersGetter(),
                     indentedLogger()
                 );
 

@@ -134,7 +134,15 @@ class XFormsOutputControl(
           value
 
       def doProxyURI(uri: String, lastModified: Long) =
-        proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Connection.headersToForwardFromProperty)
+        proxyURI(
+          uri              = uri,
+          filename         = filename,
+          contentType      = mediatype,
+          lastModified     = lastModified,
+          customHeaders    = evaluatedHeaders,
+          headersToForward = Connection.headersToForwardFromProperty,
+          getHeader        = containingDocument.headersGetter
+      )
 
       if (StringUtils.isNotBlank(internalValue)) {
         getBuiltinTypeName match {

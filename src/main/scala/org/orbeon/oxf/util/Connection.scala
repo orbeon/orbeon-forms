@@ -377,11 +377,12 @@ object Connection extends Logging {
     hasCredentials   : Boolean,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
-    cookiesToForward : List[String])(implicit
+    cookiesToForward : List[String],
+    getHeader        : String ⇒ Option[List[String]])(implicit
     logger           : IndentedLogger
   ): Map[String, List[String]] =
     if (schemeRequiresHeaders(scheme))
-      buildConnectionHeadersLower(hasCredentials, customHeaders, headersToForward, cookiesToForward)
+      buildConnectionHeadersLower(hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
     else
       EmptyHeaders
 
@@ -391,6 +392,7 @@ object Connection extends Logging {
     hasCredentials      : Boolean,
     customHeadersOrNull : JMap[String, Array[String]],
     headersToForward    : String,
+    getHeader        : String ⇒ Option[List[String]],
     logger              : IndentedLogger
   ): Map[String, List[String]] =
     buildConnectionHeadersLowerIfNeeded(
@@ -398,7 +400,8 @@ object Connection extends Logging {
       hasCredentials,
       Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
       valueAs[Set](headersToForward),
-      cookiesToForwardFromProperty)(
+      cookiesToForwardFromProperty,
+      getHeader)(
       logger
     )
 
@@ -409,7 +412,8 @@ object Connection extends Logging {
     mediatype         : String,
     encodingForSOAP   : String,
     customHeaders     : Map[String, List[String]],
-    headersToForward  : Set[String])(implicit
+    headersToForward  : Set[String],
+    getHeader         : String ⇒ Option[List[String]])(implicit
     logger            : IndentedLogger
   ): Map[String, List[String]] =
     if (schemeRequiresHeaders(scheme)) {
@@ -437,7 +441,8 @@ object Connection extends Logging {
           hasCredentials,
           headersWithContentTypeIfNeeded,
           headersToForward,
-          cookiesToForwardFromProperty
+          cookiesToForwardFromProperty,
+          getHeader
         )
 
       val soapHeadersLower =
@@ -473,6 +478,43 @@ object Connection extends Logging {
   def cookiesToForwardFromProperty: List[String] =
     valueAs[List](getPropertyHandleCustom(HttpForwardCookiesProperty)).distinct
 
+  // From header names and a getter for header values, find the list of headers to forward
+  def getHeadersToForward(
+    hasCredentials : Boolean, // exclude `Authorization` header when true
+    headerNames    : Set[String],
+    getHeader      : String ⇒ Option[List[String]])(implicit
+    logger         : IndentedLogger
+  ): List[(String, List[String])] = {
+
+    // NOTE: Forwarding the `Cookie` header may yield unpredictable results.
+    val forwardHeaderNamesLower = headerNames map (_.toLowerCase)
+
+    def canForwardHeader(nameLower: String) = {
+      // Only forward Authorization header if there is no credentials provided
+      val canForward = nameLower != AuthorizationLower || ! hasCredentials
+
+      if (! canForward)
+        debug("not forwarding Authorization header because credentials are present")
+
+      canForward
+    }
+
+    for {
+      nameLower ← forwardHeaderNamesLower.to[List]
+      values    ← getHeader(nameLower)
+      if canForwardHeader(nameLower)
+    } yield {
+      debug("forwarding header", Seq("name" → nameLower, "value" → (values mkString " ")))
+      nameLower → values
+    }
+  }
+
+  def getHeaderFromRequest(request: ExternalContext.Request): String ⇒ Option[List[String]] =
+    Option(request) match {
+        case Some(request) ⇒ name ⇒ request.getHeaderValuesMap.asScala.get(name) map (_.to[List])
+        case None          ⇒ _    ⇒ None
+      }
+
   /**
    * Build connection headers to send given:
    *
@@ -487,7 +529,8 @@ object Connection extends Logging {
     hasCredentials   : Boolean,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
-    cookiesToForward : List[String])(implicit
+    cookiesToForward : List[String],
+    getHeader        : String ⇒ Option[List[String]])(implicit
     logger           : IndentedLogger
   ): Map[String, List[String]] = {
 
@@ -495,35 +538,7 @@ object Connection extends Logging {
 
     // 1. Caller-specified list of headers to forward based on a space-separated list of header names
     val headersToForwardLower =
-      Option(externalContext.getRequest) match {
-        case Some(request) ⇒
-
-          val forwardHeaderNamesLower = headersToForward map (_.toLowerCase)
-
-          // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ session cookies
-          val requestHeaderValuesMap = request.getHeaderValuesMap.asScala
-
-          def canForwardHeader(nameLower: String) = {
-            // Only forward Authorization header if there is no credentials provided
-            val canForward = nameLower != AuthorizationLower || ! hasCredentials
-
-            if (! canForward)
-              debug("not forwarding Authorization header because credentials are present")
-
-            canForward
-          }
-
-          for {
-            nameLower ← forwardHeaderNamesLower.toList
-            values    ← requestHeaderValuesMap.get(nameLower)
-            if canForwardHeader(nameLower)
-          } yield {
-            debug("forwarding header", Seq("name" → nameLower, "value" → (values mkString " ")))
-            nameLower → values.toList
-          }
-        case None ⇒
-          Nil
-      }
+      getHeadersToForward(hasCredentials, headersToForward, getHeader)
 
     // 2. Explicit caller-specified header name/values
     val explicitHeadersLower = customHeaders map { case (k, v) ⇒ k.toLowerCase → v }

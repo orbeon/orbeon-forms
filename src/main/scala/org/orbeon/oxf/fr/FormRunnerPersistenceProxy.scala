@@ -118,8 +118,9 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         scheme           = outgoingURL.getScheme,
         hasCredentials   = false,
         customHeaders    = persistenceHeaders ++ proxiedHeaders,
-        headersToForward = Set(),                                  // handled by proxyAndCapitalizeHeaders()
-        cookiesToForward = Connection.cookiesToForwardFromProperty // NOT handled by proxyAndCapitalizeHeaders()
+        headersToForward = Set(),                                   // handled by proxyAndCapitalizeHeaders()
+        cookiesToForward = Connection.cookiesToForwardFromProperty, // NOT handled by proxyAndCapitalizeHeaders()
+        getHeader        = Connection.getHeaderFromRequest(request)
       )
 
     val method = request.getMethod

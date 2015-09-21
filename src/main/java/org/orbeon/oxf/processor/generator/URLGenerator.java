@@ -950,6 +950,7 @@ public class URLGenerator extends ProcessorImpl {
                         credentials != null,
                         newHeaders,
                         config.getForwardHeaders(),
+                        Connection.getHeaderFromRequest(NetUtils.getExternalContext().getRequest()),
                         indentedLogger
                     );
 

@@ -62,7 +62,7 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
     # Returns the value of an XForms control.
     # @param {String | HTMLElement} control
     # @param {HTMLElement} form
-    getValue: (controlIdOrElement, form) ->
+    getValue: (controlIdOrElem, form) ->
         Controls.getCurrentValue(Document._findControl(controlIdOrElem, form))
 
     # Set the value of an XForms control.

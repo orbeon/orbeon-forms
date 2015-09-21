@@ -355,4 +355,8 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Remove built-in XBL components which older versions of Orbeon Forms might inline by mistake (pre-4.0?). When
+         that happened, only simple bindings were supported. See https://github.com/orbeon/orbeon-forms/issues/2395 -->
+    <xsl:template match="/xh:html/xh:head/xbl:xbl/xbl:binding[starts-with(@element, 'fr|')]"/>
+
 </xsl:stylesheet>

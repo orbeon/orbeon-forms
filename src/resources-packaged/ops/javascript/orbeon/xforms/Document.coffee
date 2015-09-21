@@ -69,7 +69,7 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
     # @param {String | HTMLElement} control
     # @param {String} newValue
     # @param {HTMLElement} form
-    setValue: (controlIdOrElement, newValue, form) ->
+    setValue: (controlIdOrElem, newValue, form) ->
 
         # Cast to String if caller passes a non-string value "by mistake" (or not, like a Number)
         newValue = newValue.toString()

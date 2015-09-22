@@ -82,6 +82,7 @@
                 <section-name>Section Name</section-name>
                 <yes>Yes</yes>
                 <no>No</no>
+                <other>Other</other>
             </labels>
             <grid>
                 <insert-above>Insert Above</insert-above>
@@ -383,6 +384,7 @@
                 <section-name>Nom de la section</section-name>
                 <yes>Oui</yes>
                 <no>Non</no>
+                <other>Autre</other>
             </labels>
             <grid>
                 <insert-above>Insérer dessus</insert-above>
@@ -688,6 +690,7 @@
                 <section-name>Nombre de Sección</section-name>
                 <yes>Sí</yes>
                 <no>No</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Insertar Arriba</insert-above>
@@ -979,6 +982,7 @@
                 <section-name>Seksjonsnavn</section-name>
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above todo="true">[Insert Above]</insert-above>
@@ -1269,6 +1273,7 @@
                 <section-name>Название раздела</section-name>
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above todo="true">[Insert Above]</insert-above>
@@ -1556,6 +1561,7 @@
                 <section-name>Nome della sezione</section-name>
                 <yes>Sì</yes>
                 <no>No</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Inserisci sopra</insert-above>
@@ -1856,6 +1862,7 @@
                 <section-name>Abschnittsname</section-name>
                 <yes>Ja</yes>
                 <no>Nein</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Darüber einfügen</insert-above>
@@ -2156,6 +2163,7 @@
                 <section-name>Lohkon nimi</section-name>
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Liitä ylle</insert-above>
@@ -2456,6 +2464,7 @@
                 <section-name>Sektionsnamn</section-name>
                 <yes>Ja</yes>
                 <no>Nej</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Infoga ovanför</insert-above>
@@ -2756,6 +2765,7 @@
                 <section-name>Sectienaam</section-name>
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Boven invoegen</insert-above>
@@ -3056,6 +3066,7 @@
                 <section-name>Nome da Secção</section-name>
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
+                <other todo="true">[Other]</other>
             </labels>
             <grid>
                 <insert-above>Insere em Cima</insert-above>

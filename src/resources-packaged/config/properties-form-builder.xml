@@ -54,6 +54,7 @@
         oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
         oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select1-full.xbl
+        oxf:/xbl/orbeon/open-select1/open-select1.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select-full.xbl
         oxf:/xbl/orbeon/box-select/box-select.xbl
         oxf:/xbl/orbeon/yesno-input/yesno-input.xbl

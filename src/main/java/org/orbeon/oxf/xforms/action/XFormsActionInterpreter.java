@@ -370,18 +370,12 @@ public class XFormsActionInterpreter {
     /**
      * Resolve the value of an attribute which may be an AVT.
      *
-     *
      * @param actionElement     action element
      * @param attributeName     QName of the attribute containing the value
      * @return                  resolved attribute value
      */
     public String resolveAVT(Element actionElement, QName attributeName) {
-        // Get raw attribute value
-        final String attributeValue = actionElement.attributeValue(attributeName);
-        if (attributeValue == null)
-            return null;
-
-        return resolveAVTProvideValue(actionElement, attributeValue);
+        return resolveAVTProvideValue(actionElement, actionElement.attributeValue(attributeName));
     }
 
     /**
@@ -481,9 +475,9 @@ public class XFormsActionInterpreter {
     }
 
     public boolean isDeferredUpdates(Element actionElement) {
-        
+
         final BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
-        
+
         final boolean deferredUpdates;
         if (bindingContext.getSingleItem() != null) {
             deferredUpdates = ! "false".equals(resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME));

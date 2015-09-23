@@ -439,7 +439,7 @@
                                                 and count($i/appearances/appearance[normalize-space(value) != '']) = 1"/>
 
                                         <!-- Propose a choice between multiple items -->
-                                        <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) ge 1]" appearance="full">
+                                        <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) gt 1]" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
                                             <xf:itemset ref="$i/appearances/appearance">
                                                 <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->

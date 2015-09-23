@@ -218,6 +218,11 @@ class XFormsRevalidateEvent(target: XFormsEventTarget, properties: PropertyGette
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
+class XFormsRecalculateEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(XFORMS_RECALCULATE, target, properties, bubbles = true, cancelable = true) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XFormsScrollFirstEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_SCROLL_FIRST, target, properties, bubbles = true, cancelable = false) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)

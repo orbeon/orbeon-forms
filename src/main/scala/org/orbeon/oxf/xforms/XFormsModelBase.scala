@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{BindNode, DataModel}
+import org.orbeon.oxf.xforms.model.{BindNode, DataModel, InstanceDataOps}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.StructuredQName
@@ -40,9 +40,11 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
   val deferredActionContext = new DeferredActionContext(container)
 
   // TEMP: implemented in Java subclass until we move everything to Scala
+  def selfModel: XFormsModel
   def resetAndEvaluateVariables(): Unit
   def getBinds: XFormsModelBinds
   def getInstances: ju.List[XFormsInstance]
+  def getInstance(instanceStaticId: String): XFormsInstance
   def mustBindValidate: Boolean
 
   private lazy val _schemaValidator =
@@ -57,6 +59,12 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     else
       null
 
+  def markStructuralChange(instanceOpt: Option[XFormsInstance], defaultsStrategy: DefaultsStrategy): Unit = {
+    deferredActionContext.markStructuralChange(defaultsStrategy, instanceOpt map (_.getId))
+    // NOTE: PathMapXPathDependencies doesn't yet make use of the `instance` parameter.
+    containingDocument.getXPathDependencies.markStructuralChange(selfModel, instanceOpt)
+  }
+
   def doRebuild(): Unit = {
     if (deferredActionContext.rebuild) {
       try {
@@ -69,15 +77,16 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
           // TODO: Handle XPathDependencies
           container.requireRefresh()
         }
-      } finally
-        deferredActionContext.rebuild = false
+      } finally {
+        deferredActionContext.resetRebuild()
+      }
     }
     containingDocument.getXPathDependencies.rebuildDone(staticModel)
   }
 
   // Recalculate and revalidate are a combined operation
   // See https://github.com/orbeon/orbeon-forms/issues/1650
-  def doRecalculateRevalidate(applyDefaults: Boolean): Unit = {
+  def doRecalculateRevalidate(): Unit = {
 
     val instances = getInstances.asScala
 
@@ -86,22 +95,30 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     def recalculateRevalidate: Option[collection.Set[String]] =
       if (deferredActionContext.recalculateRevalidate) {
         try {
-          doRecalculate(applyDefaults)
+
+          doRecalculate(deferredActionContext.defaultsStrategy)
           containingDocument.getXPathDependencies.recalculateDone(staticModel)
 
           // Validate only if needed, including checking the flags, because if validation state is clean, validation
           // being idempotent, revalidating is not needed.
           val mustRevalidate = instances.nonEmpty && (mustBindValidate || hasSchema)
 
-          if (mustRevalidate) {
+          mustRevalidate option {
             val invalidInstances = doRevalidate()
             containingDocument.getXPathDependencies.revalidateDone(staticModel)
+            invalidInstances
+          }
+        } finally {
 
-            Some(invalidInstances)
-          } else
-            None
-        } finally
-          deferredActionContext.recalculateRevalidate = false
+          for {
+            instanceId ← deferredActionContext.flaggedInstances
+            doc        ← getInstance(instanceId).underlyingDocumentOpt
+          } locally {
+            InstanceDataOps.clearRequireDefaultValueRecursively(doc)
+          }
+
+          deferredActionContext.resetRecalculateRevalidate()
+        }
       } else
         None
 
@@ -138,7 +155,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
       Dispatch.dispatchEvent(event)
   }
 
-  private def doRecalculate(applyDefaults: Boolean): Unit =
+  private def doRecalculate(defaultsStrategy: DefaultsStrategy): Unit =
     withDebug("performing recalculate", List("model" → effectiveId)) {
 
       val hasVariables = staticModel.variablesSeq.nonEmpty
@@ -149,7 +166,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
       // Apply calculate binds
       if (hasInstancesAndBinds)
-        getBinds.applyCalculateBinds(applyDefaults)
+        getBinds.applyDefaultAndCalculateBinds(defaultsStrategy)
     }
 
   private def doRevalidate(): collection.Set[String] =
@@ -225,20 +242,61 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
       }
 }
 
+sealed trait DefaultsStrategy
+sealed trait SomeDefaultsStrategy
+object NoDefaultsStrategy      extends DefaultsStrategy
+object FlaggedDefaultsStrategy extends DefaultsStrategy with SomeDefaultsStrategy
+object AllDefaultsStrategy     extends DefaultsStrategy with SomeDefaultsStrategy
+
 class DeferredActionContext(container: XBLContainer) {
 
-  var rebuild = false
-  var recalculateRevalidate = false
+  private def winningStrategy(st1: DefaultsStrategy, st2: DefaultsStrategy) =
+    if (st1 == AllDefaultsStrategy || st2 == AllDefaultsStrategy)
+      AllDefaultsStrategy
+    else if (st1 == FlaggedDefaultsStrategy || st2 == FlaggedDefaultsStrategy)
+      FlaggedDefaultsStrategy
+    else
+      NoDefaultsStrategy
 
-  def markRebuild()               = rebuild = true
-  def markRecalculateRevalidate() = recalculateRevalidate = true
+  private var _rebuild = false
+  def rebuild = _rebuild
 
-  def markStructuralChange(): Unit = {
+  private var _recalculateRevalidate = false
+  def recalculateRevalidate = _recalculateRevalidate
+
+  private var _defaultsStrategy: DefaultsStrategy = NoDefaultsStrategy
+  def defaultsStrategy = _defaultsStrategy
+
+  private var _flaggedInstances = Set.empty[String]
+  def flaggedInstances = _flaggedInstances
+
+  def markRebuild()  = _rebuild = true
+  def resetRebuild() = _rebuild = false
+
+  def markRecalculateRevalidate(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]) = {
+    _recalculateRevalidate = true
+    _defaultsStrategy      = winningStrategy(_defaultsStrategy, defaultsStrategy)
+
+    if (defaultsStrategy == FlaggedDefaultsStrategy)
+      _flaggedInstances ++= instanceIdOpt
+  }
+
+  def resetRecalculateRevalidate() = {
+    _recalculateRevalidate = false
+    _defaultsStrategy      = NoDefaultsStrategy
+    _flaggedInstances      = Set.empty
+  }
+
+  def jMarkStructuralChange() =
+      markStructuralChange(NoDefaultsStrategy, None)
+
+  def markStructuralChange(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]): Unit = {
     // "XForms Actions that change the tree structure of instance data result in setting all four deferred update
     // flags to true for the model over which they operate"
 
-    rebuild = true
-    recalculateRevalidate = true
+    markRebuild()
+    markRecalculateRevalidate(defaultsStrategy, instanceIdOpt)
+
     container.requireRefresh()
   }
 
@@ -248,7 +306,7 @@ class DeferredActionContext(container: XBLContainer) {
 
     // Only set recalculate when we are not currently performing a recalculate (avoid infinite loop)
     if (! isCalculate)
-      recalculateRevalidate = true
+      markRecalculateRevalidate(NoDefaultsStrategy, None)
 
     container.requireRefresh()
   }

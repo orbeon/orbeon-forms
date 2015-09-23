@@ -486,6 +486,9 @@
                 <alert>Incorrect value</alert>
                 <hint>Positive number or XPath expression</hint>
             </max>
+            <apply-defaults>
+                <label>Apply Initial Value Formulas when Adding Iterations</label>
+            </apply-defaults>
             <other>Other</other>
             <one>One repetition</one>
             <unlimited>Unlimited</unlimited>
@@ -1365,6 +1368,9 @@
                 <alert>Valeur incorrecte</alert>
                 <hint>Nombre positif ou expression XPath</hint>
             </max>
+            <apply-defaults>
+                <label>Applique les valeurs initiales pour les nouvelles itérations</label>
+            </apply-defaults>
             <other>Autre</other>
             <one>Une répétition</one>
             <unlimited>Illimité</unlimited>
@@ -2247,6 +2253,9 @@
                 <alert todo="true">[Incorrect value]</alert>
                 <hint todo="true">[Positive number or XPath expression]</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
             <unlimited todo="true">[Unlimited]</unlimited>
@@ -3127,6 +3136,9 @@
                 <alert>Некорректное значение</alert>
                 <hint todo="true">Положительное число [or XPath expression]</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
             <unlimited todo="true">[Unlimited]</unlimited>
@@ -4008,6 +4020,9 @@
                 <alert>Valore invalido</alert>
                 <hint>Numero positivo o espressione XPath</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other>Altro</other>
             <one>Una ripetizione</one>
             <unlimited>Illimitato</unlimited>
@@ -4881,6 +4896,9 @@
                 <alert>Ungültiger Wert</alert>
                 <hint>Positive Zahl oder XPath-Ausdruck</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other>Anderes</other>
             <one>Eine Wiederholung</one>
             <unlimited>Unbeschränkt</unlimited>
@@ -5757,6 +5775,9 @@
                 <alert>Virheellinen arvo</alert>
                 <hint>Positiivinen numero tai XPath-lauseke</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other>Muu</other>
             <one>Yksi toisto</one>
             <unlimited>Rajaton</unlimited>
@@ -6631,6 +6652,9 @@
                 <alert>Valor Incorrecto</alert>
                 <hint>Número positivo o expresión XPath</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other>Otro</other>
             <one>Una Repetición</one>
             <unlimited>Sin Límite</unlimited>
@@ -7512,6 +7536,9 @@
                 <alert>Valor incorrecto</alert>
                 <hint>Número positivo</hint>
             </max>
+            <apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other>Outros</other>
             <one>Uma repetição</one>
             <unlimited>Ilimitado</unlimited>
@@ -8391,7 +8418,9 @@
                 <label>Maximalt antal upprepningar</label>
                 <alert>Felaktigt värde</alert>
                 <hint>Ett positivt heltal eller ett XPath-uttryck</hint>
-            </max>
+            </max><apply-defaults>
+                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+            </apply-defaults>
             <other>Specificera</other>
             <one>En upprepning</one>
             <unlimited>Obegränsat</unlimited>

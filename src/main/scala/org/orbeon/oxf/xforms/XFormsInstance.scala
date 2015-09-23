@@ -13,24 +13,25 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis.model.Instance
-import model.DataModel
+import javax.xml.transform.stream.StreamResult
+
 import org.dom4j.{XPath ⇒ _, _}
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
+import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xml.{XMLReceiver, TransformerUtils}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import javax.xml.transform.stream.StreamResult
-import collection.JavaConverters._
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
-import org.orbeon.saxon.om.{NodeInfo, VirtualNode, DocumentInfo}
-import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.InstanceState
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+
+import scala.collection.JavaConverters._
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
@@ -92,7 +93,7 @@ class XFormsInstance(
   private var _readonly       : Boolean,                  // whether instance is readonly (can change upon submission)
   private var _modified       : Boolean,                  // whether instance was modified
   var valid                   : Boolean                   // whether instance was valid as of the last revalidation
-)   extends ListenersTrait
+) extends ListenersTrait
   with XFormsInstanceIndex
   with XFormsEventObserver
   with Logging {
@@ -109,7 +110,6 @@ class XFormsInstance(
   def readonly = _readonly
   def modified = _modified
 
-
   // Mark the instance as modified
   // This is used so we can optimize serialization: if an instance is inline and not modified, we don't need to
   // serialize its content
@@ -118,8 +118,8 @@ class XFormsInstance(
   // Update the instance upon submission with instance replacement
   def update(instanceCaching: Option[InstanceCaching], documentInfo: DocumentInfo, readonly: Boolean): Unit = {
     _instanceCaching = instanceCaching
-    _documentInfo = documentInfo
-    _readonly = readonly
+    _documentInfo    = documentInfo
+    _readonly        = readonly
 
     requireNewIndex()
 
@@ -150,10 +150,10 @@ class XFormsInstance(
   def container = model.container
 
   def getLocationData =
-    if (_documentInfo.isInstanceOf[DocumentWrapper])
-      XFormsUtils.getNodeLocationData(underlyingDocumentOrNull.getRootElement)
-    else
-      new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
+    underlyingDocumentOpt match {
+      case Some(doc) ⇒ XFormsUtils.getNodeLocationData(doc.getRootElement)
+      case None      ⇒ new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
+    }
 
   def parentEventObserver: XFormsEventObserver = model
 
@@ -243,16 +243,16 @@ class XFormsInstance(
   }
 
   // Return the instance document as a dom4j Document
-  // If the instance is readonly, this returns null. Callers should use instanceRoot() whenever possible.
-  def underlyingDocumentOrNull: Document =
+  // If the instance is readonly, this returns `None`. Callers should use root() whenever possible.
+  def underlyingDocumentOpt: Option[Document] =
     _documentInfo match {
-      case virtualNode: VirtualNode ⇒ virtualNode.getUnderlyingNode.asInstanceOf[Document]
-      case _ ⇒ null
+      case virtualNode: VirtualNode ⇒ Some(virtualNode.getUnderlyingNode.asInstanceOf[Document])
+      case _                        ⇒ None
     }
 
   // LATER: Measure performance of Dom4jUtils.domToString(instance.getDocument)
   def contentAsString =
-    Option(underlyingDocumentOrNull) map
+    underlyingDocumentOpt map
       (TransformerUtils.dom4jToString(_, false)) getOrElse
         TransformerUtils.tinyTreeToString(_documentInfo)
 
@@ -283,7 +283,7 @@ class XFormsInstance(
   // Log the current MIP values applied to this instance
   def debugLogMIPs() = {
     val result = Dom4jUtils.createDocument
-    underlyingDocumentOrNull.accept(new VisitorSupport {
+    underlyingDocumentOpt.get.accept(new VisitorSupport {
       final override def visit(element: Element) = {
         currentElement = rootElement.addElement("element")
         currentElement.addAttribute("qname", element.getQualifiedName)
@@ -320,7 +320,8 @@ class XFormsInstance(
     newDocumentInfo : DocumentInfo,
     dispatch        : Boolean = true,
     instanceCaching : Option[InstanceCaching] = instanceCaching,
-    isReadonly      : Boolean = readonly
+    isReadonly      : Boolean = readonly,
+    applyDefaults   : Boolean = false
   ): Unit = {
 
     val formerRoot = rootElement
@@ -333,7 +334,7 @@ class XFormsInstance(
     )
 
     // Call this directly, since we are not using insert/delete here
-    model.markStructuralChange(this)
+    model.markStructuralChange(Some(this), if (applyDefaults) FlaggedDefaultsStrategy else NoDefaultsStrategy)
 
     val currentRoot = rootElement
 
@@ -387,8 +388,9 @@ trait XFormsInstanceIndex {
   self: XFormsInstance ⇒
 
   import org.orbeon.scaxon.XML._
-  import collection.{mutable ⇒ m}
   import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
+
+  import collection.{mutable ⇒ m}
 
   private var idIndex: m.Map[String, List[Element]] = _
 

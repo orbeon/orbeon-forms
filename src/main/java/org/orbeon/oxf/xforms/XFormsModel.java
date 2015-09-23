@@ -189,6 +189,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         return container;
     }
 
+    public XFormsModel selfModel() { return this; }
+
     public Model getStaticModel() {
         return staticModel;
     }
@@ -341,11 +343,11 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
         // TODO: We used to not redo recalculations upon state restore. Does this cause a problem? Shouldn't
         // recalculations not depend on the number of times they run anyway?
-        deferredActionContext().markStructuralChange();
+        deferredActionContext().jMarkStructuralChange();
 
         if (! deferRRR) {
             doRebuild();
-            doRecalculateRevalidate(false);
+            doRecalculateRevalidate();
         }
     }
 
@@ -397,14 +399,15 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         } else if (XFormsEvents.XFORMS_RECALCULATE.equals(eventName)) {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            final XFormsRecalculateEvent recalculateEvent = (XFormsRecalculateEvent) event;
-            doRecalculateRevalidate(recalculateEvent.applyDefaults());
+            // Recalculate and revalidate are unified
+            // See https://github.com/orbeon/orbeon-forms/issues/1650
+            doRecalculateRevalidate();
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // Recalculate and revalidate are unified
             // See https://github.com/orbeon/orbeon-forms/issues/1650
-            doRecalculateRevalidate(false);
+            doRecalculateRevalidate();
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
@@ -498,11 +501,11 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         // TODO: a, b, c
 
         // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-        deferredActionContext().markStructuralChange();
+        deferredActionContext().jMarkStructuralChange();
 
         if (rrr) {
             doRebuild();
-            doRecalculateRevalidate(false);
+            doRecalculateRevalidate();
         }
     }
 
@@ -701,14 +704,6 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 //        if (nodeInfo != null)
 //            containingDocument.getXPathDependencies().markMipChanged(this, nodeInfo);
 //    }
-
-    public void markStructuralChange(XFormsInstance instance) {
-        // Set the flags
-        deferredActionContext().markStructuralChange();
-
-        // Notify dependencies of the change
-        containingDocument().getXPathDependencies().markStructuralChange(this, instance);
-    }
 
     public void startOutermostActionHandler() {
         // NOP now that deferredActionContext is always created

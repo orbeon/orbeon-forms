@@ -99,6 +99,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     private String avtXXFormsPreemptiveAuth;
     private String avtXXFormsDomain;
     private String avtXXFormsReadonly;
+    private String avtXXFormsDefaults;
     private String avtXXFormsShared;
     private String avtXXFormsCache;
     private String avtXXFormsTarget;
@@ -227,6 +228,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             avtXXFormsDomain = submissionElement.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME);
 
             avtXXFormsReadonly = submissionElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
+            avtXXFormsDefaults = submissionElement.attributeValue(XFormsConstants.XXFORMS_DEFAULTS_QNAME);
             avtXXFormsShared = submissionElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
             avtXXFormsCache = submissionElement.attributeValue(XFormsConstants.XXFORMS_CACHE_QNAME);
 
@@ -357,7 +359,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                         }
                         if (p.resolvedRelevant || p.resolvedXXFormsCalculate) {
                             // Recalculate impacts relevance and calculated values
-                            modelForInstance.doRecalculateRevalidate(false);
+                            modelForInstance.doRecalculateRevalidate();
                         }
                     }
                 } else {
@@ -892,6 +894,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         final Boolean standalone;
         final Credentials credentials;
         final boolean isReadonly;
+        final boolean applyDefaults;
         final boolean isCache;
         final long timeToLive;
         final boolean isHandleXInclude;
@@ -945,6 +948,11 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
                 isReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
+            }
+
+            {
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsDefaults);
+                applyDefaults = (temp != null) ? Boolean.valueOf(temp) : false;
             }
 
             if (avtXXFormsCache != null) {
@@ -1002,6 +1010,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             this.mode = isAsynchronous ? "asynchronous" : "synchronous";
             this.isAsynchronous = isAsynchronous;
             this.isReadonly = isReadonly;
+            this.applyDefaults = other.applyDefaults;
         }
 
         public SecondPassParameters amend(boolean isAsynchronous, boolean isReadonly){
@@ -1210,7 +1219,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         // can impact serializations that use type information, for example multipart. But in that case, here we decide
         // the optimization is worth it anyway.
         if (resolvedValidate && modelForInstance != null)
-            modelForInstance.doRecalculateRevalidate(false);
+            modelForInstance.doRecalculateRevalidate();
 
         // Get selected nodes (re-root and prune)
         documentToSubmit = prepareXML(containingDocument, currentNodeInfo, resolvedRelevant, resolvedAnnotate);

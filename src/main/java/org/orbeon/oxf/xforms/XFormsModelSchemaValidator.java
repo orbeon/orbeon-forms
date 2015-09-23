@@ -638,12 +638,12 @@ public class XFormsModelSchemaValidator {
             boolean isValid = true;
             if (instance.instance().isLaxValidation()) {
                 // Lax validation
-                final Element instanceRootElement = instance.underlyingDocumentOrNull().getRootElement();
+                final Element instanceRootElement = instance.underlyingDocumentOpt().get().getRootElement();
                 isValid &= validateElementLax(instanceRootElement);
             } else if (instance.instance().isStrictValidation()) {
                 // Strict validation
                 final Acceptor acceptor = documentDeclaration.createAcceptor();
-                final Element instanceRootElement = instance.underlyingDocumentOrNull().getRootElement();
+                final Element instanceRootElement = instance.underlyingDocumentOpt().get().getRootElement();
                 final IDConstraintChecker idConstraintChecker = new IDConstraintChecker();
 
                 isValid &= validateElement(instanceRootElement, acceptor, idConstraintChecker, true);

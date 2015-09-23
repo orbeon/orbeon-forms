@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsReplaceEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
+import org.orbeon.oxf.xforms.model.InstanceDataOps;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -53,6 +54,9 @@ public class XFormsInsertAction extends XFormsAction {
 
         // Extension: allow position to be an AVT
         final String resolvedPositionAttribute = actionInterpreter.resolveAVT(actionElement, "position");
+
+        // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
+        final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME));
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
@@ -169,14 +173,68 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(containingDocument, indentedLogger, normalizedPosition, collectionToBeUpdated,
-                (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
+        doInsert(
+            containingDocument,
+            indentedLogger,
+            normalizedPosition,
+            collectionToBeUpdated,
+            (NodeInfo) insertContextItem,
+            originObjects,
+            insertionIndex,
+            true,
+            true,
+            setRequireDefaultValues
+        );
     }
 
-    public static List<NodeInfo> doInsert(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
-                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List<Item> originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
+    public static List<NodeInfo> doInsert(
+        XFormsContainingDocument containingDocument,
+        IndentedLogger indentedLogger,
+        String positionAttribute,
+        List collectionToBeUpdated,
+        NodeInfo insertContextNodeInfo,
+        List<Item> originItems,
+        int insertionIndex,
+        boolean doClone,
+        boolean doDispatch,
+        boolean requireDefaultValues
+    ) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
+
+        final NodeInfo insertLocationNodeInfo;
+        if (isEmptyNodesetBinding) {
+            // Insert INTO a node
+
+            // "If the Node Set Binding node-set is not specified or empty, the insert location node is the insert
+            // context node."
+
+            // "a. If the Node Set Binding node-set is not specified or empty, the target location depends on the
+            // node type of the cloned node. If the cloned node is an attribute, then the target location is before
+            // the first attribute of the insert location node. If the cloned node is not an attribute, then the
+            // target location is before the first child of the insert location node."
+
+            insertLocationNodeInfo = insertContextNodeInfo;
+        } else {
+            // Insert BEFORE or AFTER a node
+            insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
+        }
+
+        // Identify the instance that actually changes
+        final XFormsInstance modifiedInstanceOrNull =
+            (containingDocument != null) ? containingDocument.getInstanceForNode(insertLocationNodeInfo) : null;
+
+        // NOTE: The check on `hasAnyCalculationBind` is not optimal: we should check whether specifically there are any xxf:default which can touch this
+        // instance, ideally.
+        // NOTE: We do this test here so that we don't unnecessarily annotate nodes.
+        final boolean applyDefaults =
+            requireDefaultValues                                             &&
+            modifiedInstanceOrNull != null                                     &&
+            modifiedInstanceOrNull.model().staticModel().hasDefaultValueBind() &&
+            containingDocument.getXPathDependencies().hasAnyCalculationBind(
+                modifiedInstanceOrNull.model().staticModel(),
+                modifiedInstanceOrNull.getPrefixedId()
+            );
 
         // "3. The origin node-set is determined."
         // "5. Each node in the origin node-set is cloned in the order it appears in the origin node-set."
@@ -251,11 +309,17 @@ public class XFormsInsertAction extends XFormsAction {
 
                 if (clonedNodeTemp instanceof Element) {
                     // Element node
-                    InstanceData.remove(clonedNodeTemp);
+                    if (applyDefaults)
+                        InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTemp);
+                    else
+                        InstanceDataOps.removeRecursively(clonedNodeTemp);
                     clonedNodeTemp.detach();
                 } else if (clonedNodeTemp instanceof Attribute) {
                     // Attribute node
-                    InstanceData.remove(clonedNodeTemp);
+                    if (applyDefaults)
+                        InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTemp);
+                    else
+                        InstanceDataOps.removeRecursively(clonedNodeTemp);
                     clonedNodeTemp.detach();
                 } else if (clonedNodeTemp instanceof Document) {
                     // Document node
@@ -265,7 +329,10 @@ public class XFormsInsertAction extends XFormsAction {
                         // Can be null in rare cases of documents without root element
                         clonedNodesTemp.set(i, null); // we support having a null node further below, so set this to null
                     } else {
-                        InstanceData.remove(clonedNodeTempRootElement);
+                        if (applyDefaults)
+                            InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTempRootElement);
+                        else
+                            InstanceDataOps.removeRecursively(clonedNodeTempRootElement);
                         // We can never really insert a document into anything at this point, but we assume that this means the root element
                         clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
                     }
@@ -281,30 +348,17 @@ public class XFormsInsertAction extends XFormsAction {
         // "7. The cloned node or nodes are inserted in the order they were cloned at their target location
         // depending on their node type."
 
-        // Identify the instance that actually changes
-        final XFormsInstance modifiedInstance;
         // Find actual insertion point and insert
-        final NodeInfo insertLocationNodeInfo;
         final int insertLocationIndexWithinParentBeforeUpdate;
         final List<Node> insertedNodes;
         final String beforeAfterInto;
         if (isEmptyNodesetBinding) {
             // Insert INTO a node
 
-            // "If the Node Set Binding node-set is not specified or empty, the insert location node is the insert
-            // context node."
-
-            // "a. If the Node Set Binding node-set is not specified or empty, the target location depends on the
-            // node type of the cloned node. If the cloned node is an attribute, then the target location is before
-            // the first attribute of the insert location node. If the cloned node is not an attribute, then the
-            // target location is before the first child of the insert location node."
-
-            modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertContextNodeInfo) : null;
-            insertLocationNodeInfo = insertContextNodeInfo;
             insertLocationIndexWithinParentBeforeUpdate = findNodeIndexRewrapIfNeeded(insertLocationNodeInfo);
 
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
-            insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstance, doDispatch);
+            insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstanceOrNull, doDispatch);
             beforeAfterInto = "into";
 
             // Normalize text nodes if needed to respect XPath 1.0 constraint
@@ -318,13 +372,10 @@ public class XFormsInsertAction extends XFormsAction {
             }
         } else {
             // Insert BEFORE or AFTER a node
-            insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
-
-            final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
-            modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertLocationNodeInfo) : null;
 
             insertLocationIndexWithinParentBeforeUpdate = findNodeIndexRewrapIfNeeded(insertLocationNodeInfo);
 
+            final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             final Document insertLocationNodeDocument = insertLocationNode.getDocument();
             if (insertLocationNodeDocument != null && insertLocationNodeDocument.getRootElement() == insertLocationNode) {
 
@@ -332,7 +383,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // location is the target location. If there is more than one cloned node to insert, only the
                 // first node that does not cause a conflict is considered."
 
-                insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes, modifiedInstance, doDispatch);
+                insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes, modifiedInstanceOrNull, doDispatch);
                 beforeAfterInto = positionAttribute; // TODO: ideally normalize to "into document node"?
 
                 // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
@@ -349,7 +400,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // insertion strategy.
 
                     // TODO: Don't think we should even do this now in XForms 1.1
-                    insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes, modifiedInstance, doDispatch);
+                    insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes, modifiedInstanceOrNull, doDispatch);
 
                 } else {
                     // Other node types
@@ -385,10 +436,10 @@ public class XFormsInsertAction extends XFormsAction {
                                 // We never insert attributes or namespace nodes as siblings
                                 if (indentedLogger != null && indentedLogger.isDebugEnabled())
                                     indentedLogger.logDebug("xf:insert", "skipping insertion of node as sibling in element content",
-                                                    "type", clonedNode.getNodeTypeName(),
-                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
-                                            );
-                            }
+                                        "type", clonedNode.getNodeTypeName(),
+                                        "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
+                                    );
+                    }
                         }
                     }
 
@@ -409,23 +460,26 @@ public class XFormsInsertAction extends XFormsAction {
             if (didInsertNodes)
                 indentedLogger.logDebug("xf:insert", "inserted nodes",
                         "count", Integer.toString(insertedNodes.size()), "instance",
-                                (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
+                                (modifiedInstanceOrNull != null) ? modifiedInstanceOrNull.getEffectiveId() : null);
             else
                 indentedLogger.logDebug("xf:insert", "no node inserted");
         }
 
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-        if (didInsertNodes && modifiedInstance != null) {
+        if (didInsertNodes && modifiedInstanceOrNull != null) {
             // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
-            modifiedInstance.markModified();
-            modifiedInstance.model().markStructuralChange(modifiedInstance);
+            modifiedInstanceOrNull.markModified();
+            modifiedInstanceOrNull.model().markStructuralChange(
+                scala.Option.<XFormsInstance>apply(modifiedInstanceOrNull),
+                FlaggedDefaultsStrategy$.MODULE$
+            );
         }
 
         // Gather list of modified nodes
         final List<NodeInfo> insertedNodeInfos;
-        if (didInsertNodes && modifiedInstance != null) {
+        if (didInsertNodes && modifiedInstanceOrNull != null) {
             // Instance can be null if document into which delete is performed is not in an instance, e.g. in a variable
-            final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.documentInfo();
+            final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstanceOrNull.documentInfo();
             insertedNodeInfos = new ArrayList<NodeInfo>(insertedNodes.size());
             for (Object insertedNode : insertedNodes)
                 insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
@@ -434,8 +488,8 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."
-        // XFormsInstance handles index and repeat items updates 
-        if (doDispatch && didInsertNodes && modifiedInstance != null) {
+        // XFormsInstance handles index and repeat items updates
+        if (doDispatch && didInsertNodes && modifiedInstanceOrNull != null) {
 
             // Adjust insert location node and before/after/into in case the root element was replaced
             final NodeInfo adjustedInsertLocationNodeInfo;
@@ -453,7 +507,7 @@ public class XFormsInsertAction extends XFormsAction {
 
             Dispatch.dispatchEvent(
                 new XFormsInsertEvent(
-                    modifiedInstance,
+                    modifiedInstanceOrNull,
                     insertedNodeInfos,
                     originItems,
                     adjustedInsertLocationNodeInfo,

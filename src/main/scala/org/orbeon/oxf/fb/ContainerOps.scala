@@ -207,7 +207,8 @@ trait ContainerOps extends ControlOps {
     repeat               : Boolean,
     min                  : String,
     max                  : String,
-    iterationNameOrEmpty : String
+    iterationNameOrEmpty : String,
+    applyDefaults        : Boolean
   ): Unit =
     findControlByName(inDoc, controlName) foreach { control ⇒
 
@@ -219,10 +220,11 @@ trait ContainerOps extends ControlOps {
       // Update control attributes first
       // A missing or invalid min/max value is taken as the default value: 0 for min, none for max. In both cases, we
       // don't set the attribute value. This means that in the end we only set positive integer values.
-      toggleAttribute(control, "repeat",   RepeatContentToken,                              repeat)
-      toggleAttribute(control, "min",      minOpt.get,                                      repeat && minOpt.isDefined)
-      toggleAttribute(control, "max",      maxOpt.get,                                      repeat && maxOpt.isDefined)
-      toggleAttribute(control, "template", makeInstanceExpression(templateId(controlName)), repeat)
+      toggleAttribute(control, "repeat",         RepeatContentToken,                              repeat)
+      toggleAttribute(control, "min",            minOpt.get,                                      repeat && minOpt.isDefined)
+      toggleAttribute(control, "max",            maxOpt.get,                                      repeat && maxOpt.isDefined)
+      toggleAttribute(control, "template",       makeInstanceExpression(templateId(controlName)), repeat)
+      toggleAttribute(control, "apply-defaults", "true",                                          repeat && applyDefaults)
 
       if (! wasRepeat && repeat) {
         // Insert new bind and template

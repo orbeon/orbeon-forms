@@ -13,26 +13,26 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xforms.state.ControlState
-import org.orbeon.oxf.xml.SaxonUtils
-
-import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
-import org.orbeon.oxf.xforms.control.controls.{XXFormsComponentRootControl, InstanceMirror}
-import org.orbeon.oxf.xforms.event.events.{XFormsReadyEvent, XFormsModelConstructDoneEvent, XFormsModelConstructEvent}
-import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent, Dispatch}
-import Dispatch.EventListener
+import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl}
+import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsInstance, BindingContext}
+import org.orbeon.oxf.xforms.{AllDefaultsStrategy, BindingContext, XFormsInstance}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.XML.unwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xforms.analysis.model.Instance
+
+import scala.collection.JavaConverters._
 
 // A component control with native support for a value
 class XFormsValueComponentControl(
@@ -195,15 +195,18 @@ class XFormsComponentControl(
   private def initializeModels(): Unit = {
 
     // xforms-model-construct, without RRR
-    for (model ← nestedContainer.models)
+    for (model ← nestedContainer.models) {
       Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
+      // NOTE: xforms-model-construct already does a `markStructuralChange()` but without `AllDefaultsStrategy`
+      model.markStructuralChange(None, AllDefaultsStrategy)
+    }
 
     initializeMirrorListenerIfNeeded(dispatch = false)
 
     // Do RRR as xforms-model-construct didn't do it
     for (model ← nestedContainer.models) {
       model.doRebuild()
-      model.doRecalculateRevalidate(applyDefaults = true)
+      model.doRecalculateRevalidate()
     }
 
     // xforms-model-construct-done
@@ -217,7 +220,7 @@ class XFormsComponentControl(
     // Do RRR as isRestoringDynamicState() didn't do it
     for (model ← nestedContainer.models) {
       model.doRebuild()
-      model.doRecalculateRevalidate(applyDefaults = false)
+      model.doRecalculateRevalidate()
     }
   }
 

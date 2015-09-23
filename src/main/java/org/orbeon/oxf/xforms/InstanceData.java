@@ -47,6 +47,9 @@ public class InstanceData {// rename to DataNodeProperties once done
     // Schema validity: only set by schema
     private boolean schemaInvalid;
 
+    // Whether to evaluate the default value
+    public boolean requireDefaultValue;
+
     // Annotations (used only for multipart submission as of 2010-12)
     private Map<String, String> transientAnnotations;
 
@@ -151,23 +154,10 @@ public class InstanceData {// rename to DataNodeProperties once done
         return Model.DEFAULT_VALID();
     }
 
-    public boolean getTypeValid() {
-
-        if (schemaInvalid)
-            return false;
-
-        if (bindNodes != null && bindNodes.size() > 0)
-            for (final BindNode bindNode : bindNodes)
-                if (! bindNode.typeValid())
-                    return ! Model.DEFAULT_VALID();
-
-        return Model.DEFAULT_VALID();
-    }
-
     public scala.collection.immutable.Map<String, String> collectAllCustomMIPs() {
         return BindNode.collectAllCustomMIPs(bindNodes);
     }
-    
+
     public QName getSchemaOrBindType() {
 
         if (schemaType != null)
@@ -278,11 +268,6 @@ public class InstanceData {// rename to DataNodeProperties once done
         return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getValid();
     }
 
-    public static boolean getTypeValid(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getTypeValid();
-    }
-
     public static void setBindType(NodeInfo nodeInfo, QName type) {
         getOrCreateInstanceData(nodeInfo, true).bindType = type;
     }
@@ -362,6 +347,30 @@ public class InstanceData {// rename to DataNodeProperties once done
         return (existingInstanceData == null) ? null : existingInstanceData.getInvalidBindIds();
     }
 
+    public static void setRequireDefaultValue(Node node) {
+        final InstanceData instanceData = getOrCreateInstanceData(node);
+        instanceData.requireDefaultValue = true;
+    }
+
+    public static void clearRequireDefaultValue(Node node) {
+        final InstanceData instanceData = getLocalInstanceData(node);
+        if (instanceData != null)
+            instanceData.requireDefaultValue = false;
+    }
+
+    public static boolean getRequireDefaultValue(NodeInfo nodeInfo) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        return existingInstanceData.requireDefaultValue;
+    }
+
+    public static void removeInstanceData(Node node) {
+        if (node instanceof Element) {
+             ((Element) node).setData(null);
+        } else if (node instanceof Attribute) {
+            ((Attribute) node).setData(null);
+        }
+    }
+
     public static void addSchemaError(Node node) {
 
         // Get or create InstanceData
@@ -371,7 +380,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         instanceData.schemaInvalid = true;
     }
 
-    public static void clearState(NodeInfo nodeInfo) {
+    public static void clearStateForRebuild(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData =
             getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
         if (existingInstanceData != null) {
@@ -380,6 +389,7 @@ public class InstanceData {// rename to DataNodeProperties once done
             existingInstanceData.schemaType = null;
             existingInstanceData.schemaInvalid = false;
             existingInstanceData.transientAnnotations = null;
+            // NOTE: Do not clear requireInitialData which must survive a rebuild
         }
     }
 
@@ -435,39 +445,6 @@ public class InstanceData {// rename to DataNodeProperties once done
             return (InstanceData) instanceData;
         else
             return null;
-    }
-
-    public static <A extends Node> A remove(A node) {
-
-        // We can't store data on the Document object. Use root element instead.
-        Node adjustedNode = node;
-        if (node instanceof Document)
-            adjustedNode = ((Document) node).getRootElement();
-
-        if (adjustedNode instanceof Element) {
-            final Element element = (Element) adjustedNode;
-
-            // Handle current element
-            element.setData(null);
-
-            // Handle attributes
-            for (Object o: element.attributes()) {
-                final Attribute attribute = (Attribute) o;
-                remove(attribute);
-            }
-            // Handle children elements
-            for (Object o: element.elements()) {
-                final Element childElement = (Element) o;
-                remove(childElement);
-            }
-
-        } else if (adjustedNode instanceof Attribute) {
-            ((Attribute) adjustedNode).setData(null);
-        } else {
-            // TODO: other node types once we update to handling text nodes correctly. But it looks like Text does not support data.
-        }
-
-        return node;
     }
 
     private static InstanceData createNewInstanceData(NodeInfo nodeInfo) {

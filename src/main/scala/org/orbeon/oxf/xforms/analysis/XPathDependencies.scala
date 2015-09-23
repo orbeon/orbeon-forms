@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
  */
 trait XPathDependencies {
   def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo)
-  def markStructuralChange(model: XFormsModel, instance: XFormsInstance)
+  def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance])
 
   def rebuildDone(model: Model)
   def recalculateDone(model: Model)

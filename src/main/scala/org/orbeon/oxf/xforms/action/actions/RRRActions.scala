@@ -13,37 +13,37 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsModel
-import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
-import org.orbeon.oxf.xforms.event.events.{XFormsRevalidateEvent, XFormsRecalculateEvent, XFormsRebuildEvent}
 import org.dom4j.QName
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XFormsRevalidateEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
 
 trait RRRFunctions {
   def setFlag(model: XFormsModel, applyDefaults: Boolean)
-  def createEvent(model: XFormsModel, applyDefaults: Boolean): XFormsEvent
+  def createEvent(model: XFormsModel): XFormsEvent
 }
 
 trait XFormsRebuildFunctions extends RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.deferredActionContext.rebuild = true
-  def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRebuildEvent(model)
+  def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.deferredActionContext.markRebuild()
+  def createEvent(model: XFormsModel) = new XFormsRebuildEvent(model)
 }
 
 trait XFormsRecalculateFunctions extends RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean) = {
-    model.deferredActionContext.recalculateRevalidate = true
-    if (applyDefaults)
-      model.getBinds.resetFirstCalculate()
-  }
-  def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRecalculateEvent(model, applyDefaults)
+  def setFlag(model: XFormsModel, applyDefaults: Boolean) =
+    model.deferredActionContext.markRecalculateRevalidate(
+      if (applyDefaults) AllDefaultsStrategy else NoDefaultsStrategy,
+      None
+    )
+  def createEvent(model: XFormsModel) = new XFormsRecalculateEvent(model)
 }
 
 trait XFormsRevalidateFunctions extends RRRFunctions {
   // With recalculate and revalidate unified, make revalidate no longer eager by not setting the flag anymore
   // See https://github.com/orbeon/orbeon-forms/issues/1650
   def setFlag(model: XFormsModel, applyDefaults: Boolean)     = ()
-  def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRevalidateEvent(model)
+  def createEvent(model: XFormsModel) = new XFormsRevalidateEvent(model)
 }
 
 // Concrete action classes
@@ -69,7 +69,7 @@ trait RRRAction extends XFormsAction with RRRFunctions {
   }
 }
 
-object RRRAction{
+object RRRAction {
 
   private def execute(functions: RRRFunctions, model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
     // Set the flag in any case
@@ -79,7 +79,7 @@ object RRRAction{
     // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the
     // purpose of these events is anyway.
     if (! deferred)
-      Dispatch.dispatchEvent(functions.createEvent(model, applyDefaults))
+      Dispatch.dispatchEvent(functions.createEvent(model))
   }
 
   private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions

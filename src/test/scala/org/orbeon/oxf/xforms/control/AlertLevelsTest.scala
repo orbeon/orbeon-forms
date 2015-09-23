@@ -84,7 +84,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
     withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
 
       def copyFormInstance = {
-        val formInstance = instance("fr-form-instance").get.underlyingDocumentOrNull
+        val formInstance = instance("fr-form-instance").get.underlyingDocumentOpt.get
         Dom4jUtils.createDocumentCopyElement(formInstance.getRootElement)
       }
 

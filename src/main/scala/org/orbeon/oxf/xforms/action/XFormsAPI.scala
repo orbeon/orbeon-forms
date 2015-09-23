@@ -101,11 +101,12 @@ object XFormsAPI {
   // xf:insert
   // @return the inserted nodes
   def insert[T <: Item](
-    origin     : Seq[T],
-    into       : Seq[NodeInfo] = Nil,
-    after      : Seq[NodeInfo] = Nil,
-    before     : Seq[NodeInfo] = Nil,
-    doDispatch : Boolean       = true
+    origin               : Seq[T],
+    into                 : Seq[NodeInfo] = Nil,
+    after                : Seq[NodeInfo] = Nil,
+    before               : Seq[NodeInfo] = Nil,
+    doDispatch           : Boolean       = true,
+    requireDefaultValues : Boolean       = false
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
       val action = actionInterpreterDyn.value
@@ -125,7 +126,9 @@ object XFormsAPI {
         origin.asJava.asInstanceOf[JList[Item]], // dirty cast for Java, safe if doInsert() doesn't modify the list
         collectionToUpdate.size,
         true, // doClone
-        doDispatch).asInstanceOf[JList[T]].asScala
+        doDispatch,
+        requireDefaultValues
+      ).asInstanceOf[JList[T]].asScala
     } else
       Nil
 

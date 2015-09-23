@@ -21,7 +21,6 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
-import org.orbeon.oxf.xforms.analysis.model.Model.StringMIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
@@ -33,6 +32,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
+import scala.language.postfixOps
 import scala.util.control.NonFatal
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
@@ -87,13 +87,15 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
           // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to
           // figure out the dependencies.
           // The reason is that clearing this state can take quite some time
-          val instanceMightBeSchemaValidated = model.hasSchema && instance.isSchemaValidation
+          val instanceMightBeSchemaValidated =
+            model.hasSchema && instance.isSchemaValidation
+
           val instanceMightHaveMips =
             dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId) ||
             dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId)
 
           if (instanceMightBeSchemaValidated || instanceMightHaveMips)
-            DataModel.visitElement(instance.rootElement, InstanceData.clearState)
+            DataModel.visitElement(instance.rootElement, InstanceData.clearStateForRebuild)
         }
 
       // Not ideal, but this state is updated when the bind tree is updated below
@@ -313,29 +315,45 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
     }
   }
 
-  def applyDefaultValueBindsIfNeeded(): Unit =
+  def applyDefaultValueBindsIfNeeded(defaultsStrategy: SomeDefaultsStrategy): Unit =
     if (staticModel.hasDefaultValueBind)
-      applyCalculatedBindsUseOrderIfNeeded(Model.Default, staticModel.defaultValueOrder)
+      applyCalculatedBindsUseOrderIfNeeded(Model.Default, staticModel.defaultValueOrder, defaultsStrategy)
 
   def applyCalculateBindsIfNeeded(): Unit =
     if (staticModel.hasCalculateBind)
-      applyCalculatedBindsUseOrderIfNeeded(Model.Calculate, staticModel.recalculateOrder)
+      applyCalculatedBindsUseOrderIfNeeded(Model.Calculate, staticModel.recalculateOrder, AllDefaultsStrategy)
 
-  def applyCalculatedBindsUseOrderIfNeeded(mip: Model.StringMIP, orderOpt: Option[List[StaticBind]]): Unit =
+  // Q: Can bindNode.node ever be null here?
+  private def mustEvaluateNode(node: NodeInfo, defaultsStrategy: SomeDefaultsStrategy) =
+    defaultsStrategy == AllDefaultsStrategy || (node ne null) && InstanceData.getRequireDefaultValue(node)
+
+  def applyCalculatedBindsUseOrderIfNeeded(
+    mip              : Model.StringMIP,
+    orderOpt         : Option[List[StaticBind]],
+    defaultsStrategy : SomeDefaultsStrategy
+  ): Unit = {
     orderOpt match {
       case Some(order) ⇒
-        applyCalculatedBindsFollowDependencies(order, mip)
+        applyCalculatedBindsFollowDependencies(order, mip, defaultsStrategy)
       case None ⇒
         iterateBinds(new XFormsModelBinds.BindRunner() {
           def applyBind(bindNode: BindNode) =
-            if (bindNode.staticBind.hasXPathMIP(mip) &&
-              dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, mip.name, null)) {
+            if (
+              bindNode.staticBind.hasXPathMIP(mip)                                                 &&
+              dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, mip.name, null) &&
+              mustEvaluateNode(bindNode.node, defaultsStrategy)
+            ) {
               evaluateAndSetCalculatedBind(bindNode, mip)
             }
         })
     }
+  }
 
-  def applyCalculatedBindsFollowDependencies(order: List[StaticBind], mip: Model.StringMIP): Unit = {
+  def applyCalculatedBindsFollowDependencies(
+    order            : List[StaticBind],
+    mip              : Model.StringMIP,
+    defaultsStrategy : SomeDefaultsStrategy
+  ): Unit = {
     order foreach { staticBind ⇒
       val logger = DependencyAnalyzer.Logger
       val isDebug = logger.isDebugEnabled
@@ -343,8 +361,12 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
         var evaluationCount = 0
         BindVariableResolver.resolveNotAncestorOrSelf(this, None, staticBind) foreach { runtimeBindIt ⇒
           runtimeBindIt flatMap (_.bindNodes) foreach { bindNode ⇒
-            evaluationCount += 1
-            evaluateAndSetCalculatedBind(bindNode, mip)
+
+            // Skip if we must process only flagged nodes and the node is not flagged
+            if (mustEvaluateNode(bindNode.node, defaultsStrategy)) {
+              evaluationCount += 1
+              evaluateAndSetCalculatedBind(bindNode, mip)
+            }
           }
         }
         if (isDebug) logger.debug(s"run  ${mip.name} for ${staticBind.staticId} ($evaluationCount total)")

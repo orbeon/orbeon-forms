@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.StaticBind;
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels;
 import org.orbeon.oxf.xforms.model.BindNode;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.RuntimeBind;
@@ -89,18 +88,12 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
         this.isFirstCalculate = containingDocument.isInitializing();
     }
 
-    public void resetFirstCalculate() {
-        this.isFirstCalculate = true;
-    }
-
     /**
      * Apply calculate binds.
-     *
-     * @param applyDefaults    whether to apply initial values (@xxf:default="...")
      */
-    public void applyCalculateBinds(boolean applyDefaults) {
+    public void applyDefaultAndCalculateBinds(DefaultsStrategy defaultsStrategy) {
 
-        if (!staticModel.hasCalculateComputedCustomBind()) {
+        if (! staticModel.hasCalculateComputedCustomBind()) {
             // We can skip this
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("model", "skipping bind recalculate", "model id", model.getEffectiveId(), "reason", "no recalculation binds");
@@ -111,10 +104,12 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
                 indentedLogger.startHandleOperation("model", "performing bind recalculate", "model id", model.getEffectiveId());
             {
                 // 1. Evaluate initial values and calculate before the rest
-                if (isFirstCalculate || applyDefaults) {
-                    applyDefaultValueBindsIfNeeded();
-                    isFirstCalculate = false;
-                }
+
+                final DefaultsStrategy effectiveStrategy =
+                    isFirstCalculate ? AllDefaultsStrategy$.MODULE$ : defaultsStrategy;
+
+                if (effectiveStrategy instanceof SomeDefaultsStrategy)
+                    applyDefaultValueBindsIfNeeded((SomeDefaultsStrategy) effectiveStrategy);
 
                 // Handle calculations
                 applyCalculateBindsIfNeeded();
@@ -126,6 +121,8 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.endHandleOperation();
         }
+
+        isFirstCalculate = false;
     }
 
     /**

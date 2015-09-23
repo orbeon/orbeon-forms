@@ -13,31 +13,32 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.w3c.dom.Node.ELEMENT_NODE
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.xml.sax.helpers.AttributesImpl
+import org.dom4j.{XPath ⇒ _, _}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
-import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.control.Controls._
-import event.XFormsEvents._
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.oxf.xml._
-import org.dom4j.{XPath ⇒ _, _}
-import org.orbeon.scaxon.XML._
-import collection.mutable.Buffer
-import XXFormsDynamicControl._
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
-import org.orbeon.oxf.xforms.event.events.{XXFormsValueChangedEvent, XFormsDeleteEvent, XFormsInsertEvent}
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
-import InstanceMirror._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
+import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
-import org.orbeon.oxf.util.XPath
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.orbeon.scaxon.XML._
+import org.w3c.dom.Node.ELEMENT_NODE
+import org.xml.sax.helpers.AttributesImpl
+
 import scala.collection.generic.Growable
-import org.orbeon.oxf.util.ScalaUtils._
+import scala.collection.mutable.Buffer
 
 /**
  * xxf:dynamic control
@@ -339,7 +340,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       // are within a bindings update, it would be nice if the binds are rebuilt before nested controls are
       // rebuilt below. However, it might not be safe to RRR right here. So for now, we just set the flag.
       val concreteModel = containingDocument.getObjectByEffectiveId(modelPrefixedId).asInstanceOf[XFormsModel]
-      concreteModel.markStructuralChange(null) // NOTE: PathMapXPathDependencies doesn't yet make use of the `instance` parameter
+
+      concreteModel.markStructuralChange(None, NoDefaultsStrategy)
     }
 
     bindChanges.clear()

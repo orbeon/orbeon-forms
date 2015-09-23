@@ -166,10 +166,13 @@ public class XFormsDeleteAction extends XFormsAction {
 
             if (modifiedInstance != null) {
                 // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
-                
+
                 // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
                 modifiedInstance.markModified();
-                modifiedInstance.model().markStructuralChange(modifiedInstance);
+                modifiedInstance.model().markStructuralChange(
+                    scala.Option.<XFormsInstance>apply(modifiedInstance),
+                    NoDefaultsStrategy$.MODULE$
+                );
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)

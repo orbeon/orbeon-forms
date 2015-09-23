@@ -43,6 +43,13 @@ trait XFormsSupport extends MockitoSugar {
       }
     }
 
+  def withAction[T](body: ⇒ T): T = {
+    document.startOutermostActionHandler()
+    val result = withScalaAction(mockActionInterpreter(containingDocument))(body)
+    document.endOutermostActionHandler()
+    result
+  }
+
   private def mockActionInterpreter(doc: XFormsContainingDocument) = {
     val actionInterpreter = mock[XFormsActionInterpreter]
     Mockito when actionInterpreter.containingDocument thenReturn doc

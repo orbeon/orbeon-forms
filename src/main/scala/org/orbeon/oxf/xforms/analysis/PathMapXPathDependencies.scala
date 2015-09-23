@@ -32,7 +32,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     with Logging {
 
   private implicit val logger = containingDocument.indentedLogger
-  
+
   // Represent the state of changes to a model
   private class ModelState(private val modelPrefixedId: String) {
 
@@ -204,7 +204,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     getModelState(model.getPrefixedId).markValueChanged(nodeInfo)
   }
 
-  def markStructuralChange(model: XFormsModel, instance: XFormsInstance): Unit =
+  def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit =
     getModelState(model.getPrefixedId).markStructuralChange()
 
   def rebuildDone(model: Model)     = getModelState(model.prefixedId).rebuildDone()

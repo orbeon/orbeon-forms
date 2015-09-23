@@ -28,8 +28,8 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
       // Enable repeat
       locally {
-        setRepeatProperties(doc, "my-section", repeat = true, "", "", "")
-  
+        setRepeatProperties(doc, "my-section", repeat = true, "", "", "", applyDefaults = false)
+
         val expected =
           elemToDom4j(
             <form>
@@ -48,7 +48,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
               </other-section>
             </form>
           )
-  
+
         assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
       }
 
@@ -82,7 +82,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
       // Custom iteration element name
       locally {
         renameControlIterationIfNeeded(doc, "foo", "", "", "bar")
-        
+
         val expected =
           elemToDom4j(
             <form>
@@ -101,13 +101,13 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
               </other-section>
             </form>
           )
-        
+
         assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
       }
 
       // Change min/max
       locally {
-        setRepeatProperties(doc, "foo", repeat = true, "1", "2", "")
+        setRepeatProperties(doc, "foo", repeat = true, "1", "2", "", applyDefaults = false)
 
         val section = findControlByName(doc, "foo").get
 
@@ -120,7 +120,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
       // Change min/max
       locally {
-        setRepeatProperties(doc, "foo", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "")
+        setRepeatProperties(doc, "foo", repeat = true, "1 + 1", "count(//*[contains(@foo, '{')])", "", applyDefaults = false)
 
         val section = findControlByName(doc, "foo").get
 
@@ -159,7 +159,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
 
       // Disable repeat
       locally {
-        setRepeatProperties(doc, "foo", repeat = false, "", "", "")
+        setRepeatProperties(doc, "foo", repeat = false, "", "", "", applyDefaults = false)
 
         val expected =
           elemToDom4j(
@@ -177,7 +177,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
               </foo>
             </form>
           )
-  
+
         assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
 
         assert("0" === getNormalizedMin(doc, "foo"))

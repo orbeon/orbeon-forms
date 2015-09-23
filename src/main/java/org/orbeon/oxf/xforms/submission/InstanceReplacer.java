@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.dom4j.Node;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.Function1Adapter;
@@ -22,11 +23,13 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.model.InstanceDataOps;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 import scala.Option;
 import org.orbeon.oxf.xforms.model.DataModel;
 
@@ -173,9 +176,23 @@ public class InstanceReplacer extends BaseReplacer {
                     instanceToUpdate.instance().exposeXPathTypes()
                 );
 
+            final boolean applyDefaults = p2.applyDefaults;
+
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
-                instanceToUpdate.replace(newDocumentInfo, true, Option.<InstanceCaching>apply(instanceCaching), p2.isReadonly);
+
+                if (applyDefaults && (newDocumentInfo instanceof VirtualNode))
+                    InstanceDataOps.setRequireDefaultValueRecursively(
+                        (Node) ((VirtualNode) newDocumentInfo).getUnderlyingNode()
+                    );
+
+                instanceToUpdate.replace(
+                    newDocumentInfo,
+                    true,
+                    Option.<InstanceCaching>apply(instanceCaching),
+                    p2.isReadonly,
+                    applyDefaults
+                );
             } else {
                 // Generic insertion
 
@@ -190,9 +207,18 @@ public class InstanceReplacer extends BaseReplacer {
                 // wrt its parent does not change after the target node is removed
                 // This will also mark a structural change
                 // FIXME: Replace logic should use doReplace and xxforms-replace event
-                XFormsInsertAction.doInsert(containingDocument, detailsLogger, "before",
-                        destinationCollection, destinationNodeInfo.getParent(),
-                        Collections.singletonList(newDocumentRootElement), 1, false, true);
+                XFormsInsertAction.doInsert(
+                    containingDocument,
+                    detailsLogger,
+                    "before",
+                    destinationCollection,
+                    destinationNodeInfo.getParent(),
+                    Collections.singletonList(newDocumentRootElement),
+                    1,
+                    false,
+                    true,
+                    applyDefaults
+                );
 
                 // Perform the deletion of the selected node
                 XFormsDeleteAction.doDelete(

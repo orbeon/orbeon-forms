@@ -223,7 +223,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
       Seq(deletedNodeInfo: Item).asJava,
       actualDestinationIndex,
       false,
-      true
+      true,
+      false
     )
 
     // TODO: should dispatch xxforms-move instead of xforms-insert?
@@ -375,10 +376,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                   partialFocusRepeatOption = Some(XFormsRepeatControl.this)
                   Focus.removeFocusPartially(containingDocument, boundary = partialFocusRepeatOption)
                 }
-    
+
                 // Dispatch destruction events
                 currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, true)
-    
+
                 // Indicate to iteration that it is being removed
                 // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
                 movedOrRemovedIteration.iterationRemoved()
@@ -421,7 +422,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             // The index was pointing to a node which is still there, so just move the index
             val newRepeatIndex = newIndexes(oldRepeatIndex - 1) + 1
             if (newRepeatIndex != oldRepeatIndex) {
-              
+
               debug("adjusting index for existing node", Seq(
                 "id"        → getEffectiveId,
                 "old index" → oldRepeatIndex.toString,
@@ -702,9 +703,9 @@ object XFormsRepeatControl {
   def findControlFollowIndexes(control: XFormsControl) = {
     val doc  = control.containingDocument
     val tree = doc.getControls.getCurrentControlTree
-    
+
     val ancestorRepeatsFromRoot = control.staticControl.ancestorRepeatsAcrossParts.reverse
-    
+
     // Find just the indexes we need
     val indexes = findIndexes(tree, ancestorRepeatsFromRoot, _.getIndex)
 
@@ -759,10 +760,10 @@ object XFormsRepeatControl {
           }
         })
     }
-  
+
   private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: Seq[RepeatControl]) =
     repeats map (repeat ⇒ indexes(repeat.prefixedId)) mkString REPEAT_INDEX_SEPARATOR_STRING
-  
+
   private def addSuffix(prefixedId: String, suffix: String) =
     prefixedId + (if (suffix.length > 0) REPEAT_SEPARATOR + suffix else "")
 }

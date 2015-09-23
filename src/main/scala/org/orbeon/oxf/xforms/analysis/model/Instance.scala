@@ -18,6 +18,7 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.{XPath, Logging, NetUtils}
 import org.orbeon.oxf.xforms._
 import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
+import org.orbeon.oxf.xforms.model.InstanceDataOps
 import xbl.Scope
 import XFormsConstants._
 import org.dom4j.{Document, QName, Element}
@@ -222,7 +223,10 @@ object Instance {
       TransformerUtils.dom4jToTinyTree(XPath.GlobalConfiguration, extractDocument, false)
     else
       wrapDocument(
-        if (removeInstanceData) InstanceData.remove(extractDocument) else extractDocument,
+        if (removeInstanceData)
+          InstanceDataOps.removeRecursively(extractDocument)
+        else
+          extractDocument,
         exposeXPathTypes
       )
   }

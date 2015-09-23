@@ -176,7 +176,7 @@ trait InstanceMetadata {
     }
 
   // Don't allow a blank src attribute
-  if (useExternalContent && instanceSource == Some(""))
+  if (useExternalContent && instanceSource.contains(""))
     throw new ValidationException("xf:instance must not specify a blank URL", extendedLocationData)
 }
 

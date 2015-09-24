@@ -28,9 +28,9 @@ import scala.collection.JavaConverters._
  * translation from the source XForms + XHTML.
  */
 class XFormsToXHTML extends XFormsToSomething {
-  
+
   import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
-  
+
   protected def produceOutput(
       pipelineContext      : PipelineContext,
       outputName           : String,
@@ -79,7 +79,7 @@ object XFormsToXHTML {
       val location = nonJavaScriptLoads.head.getResource
       indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
       externalContext.getResponse.sendRedirect(location, false, false)
-      
+
       // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
       SAXUtils.streamNullDocument(xmlReceiver)
     } else {

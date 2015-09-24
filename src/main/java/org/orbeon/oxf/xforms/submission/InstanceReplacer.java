@@ -166,7 +166,12 @@ public class InstanceReplacer extends BaseReplacer {
             // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly.
             final DocumentInfo newDocumentInfo =
-                    wrappedDocumentInfo != null ? wrappedDocumentInfo : XFormsInstance.createDocumentInfo(resultingDocumentOrDocumentInfo, instanceToUpdate.instance().exposeXPathTypes());
+                wrappedDocumentInfo != null
+                ? wrappedDocumentInfo
+                : XFormsInstance.createDocumentInfo(
+                    resultingDocumentOrDocumentInfo,
+                    instanceToUpdate.instance().exposeXPathTypes()
+                );
 
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
@@ -190,12 +195,18 @@ public class InstanceReplacer extends BaseReplacer {
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
                 // Perform the deletion of the selected node
-                XFormsDeleteAction.doDelete(containingDocument, detailsLogger, destinationCollection, 1, true);
+                XFormsDeleteAction.doDelete(
+                    containingDocument,
+                    detailsLogger,
+                    destinationCollection,
+                    1,
+                    true
+                );
 
                 // Update model instance
                 // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:
-                // * doInsert() dispatches an event which might itself change the instance
-                // * doDelete() does as well
+                // - doInsert() dispatches an event which might itself change the instance
+                // - doDelete() does as well
                 // Does this mean that we should check that the node is still where it should be?
             }
 

@@ -20,7 +20,12 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
 
-class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parentIteration: BindIteration, isSingleNodeContext: Boolean) extends XFormsObject {
+class RuntimeBind(
+  val model           : XFormsModel,
+  val staticBind      : StaticBind,
+  val parentIteration : BindIteration,
+  isSingleNodeContext : Boolean
+) extends XFormsObject {
 
   def containingDocument = model.containingDocument
   def getEffectiveId     = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, staticId)
@@ -55,7 +60,7 @@ class RuntimeBind(val model: XFormsModel, val staticBind: StaticBind, val parent
         if (childrenStaticBinds.nonEmpty) {
           // There are children binds (and maybe MIPs)
           val result = new m.ArrayBuffer[BindNode](itemsSize)
-          
+
           val childrenBindsHaveSingleNodeContext = isSingleNodeContext && itemsSize == 1
 
           // Iterate over nodeset and produce child iterations

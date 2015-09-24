@@ -39,8 +39,11 @@ case class InstanceCaching(
   sourceURI      : String,
   requestBodyHash: Option[String]
 ) {
-  
-  require(sourceURI ne null, """Only XForms instances externally loaded through the src attribute may have xxf:cache="true".""")
+
+  require(
+    sourceURI ne null,
+    """Only XForms instances externally loaded through the src attribute may have xxf:cache="true"."""
+  )
 
   def debugPairs = Seq(
     "timeToLive"      → timeToLive.toString,
@@ -48,7 +51,7 @@ case class InstanceCaching(
     "sourceURI"       → sourceURI,
     "requestBodyHash" → requestBodyHash.orNull
   )
-  
+
   def writeAttributes(att: (String, String) ⇒ Unit): Unit = {
     att("cache", "true")
     if (timeToLive >= 0) att("ttl", timeToLive.toString)
@@ -86,9 +89,9 @@ class XFormsInstance(
   val instance                : Instance,                 // static instance
   private var _instanceCaching: Option[InstanceCaching],  // information to restore cached instance content
   private var _documentInfo   : DocumentInfo,             // fully wrapped document
-  private var _readonly       : Boolean,                  // whether the instance is readonly (can change upon submission)
-  private var _modified       : Boolean,                  // whether the instance was modified
-  var valid                   : Boolean                   // whether the instance was valid as of the last revalidation
+  private var _readonly       : Boolean,                  // whether instance is readonly (can change upon submission)
+  private var _modified       : Boolean,                  // whether instance was modified
+  var valid                   : Boolean                   // whether instance was valid as of the last revalidation
 )   extends ListenersTrait
   with XFormsInstanceIndex
   with XFormsEventObserver
@@ -160,29 +163,37 @@ class XFormsInstance(
         implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
         _instanceCaching match {
           case Some(instanceCaching) ⇒
-            XFormsServerSharedInstancesCache.remove(indentedLogger, instanceCaching.sourceURI, null, instanceCaching.handleXInclude)
+            XFormsServerSharedInstancesCache.remove(
+              indentedLogger,
+              instanceCaching.sourceURI,
+              null,
+              instanceCaching.handleXInclude
+            )
           case None ⇒
-            warn("xxforms-instance-invalidate event dispatched to non-cached instance", Seq("instance id" → getEffectiveId))
+            warn(
+              "xxforms-instance-invalidate event dispatched to non-cached instance",
+              Seq("instance id" → getEffectiveId)
+            )
 
         }
       case ev: XXFormsActionErrorEvent ⇒
         XFormsError.handleNonFatalActionError(this, ev.throwable)
-      case _ ⇒ 
+      case _ ⇒
     }
 
   def performTargetAction(event: XFormsEvent) =
     event match {
       case insertEvent: XFormsInsertEvent ⇒
         // New nodes were just inserted
-  
+
         // As per XForms 1.1, this is where repeat indexes must be adjusted, and where new repeat items must be
         // inserted.
-  
+
         // Find affected repeats
         val insertedNodes = insertEvent.insertedNodes
-  
+
         //didInsertNodes = insertedNodes.size() != 0
-        
+
         // Find affected repeats and update their node-sets and indexes
         val controls = container.getContainingDocument.getControls
         updateRepeatNodesets(controls, insertedNodes)
@@ -214,7 +225,7 @@ class XFormsInstance(
     val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls.asScala
     if (repeatControlsMap.nonEmpty) {
       val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
-      
+
       // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
       val repeatControls = repeatControlsMap.values.to[List]
       for {
@@ -305,7 +316,12 @@ class XFormsInstance(
 
   // Replace the instance with the given document
   // This includes marking the structural change as well as dispatching events
-  def replace(newDocumentInfo: DocumentInfo, dispatch: Boolean = true, instanceCaching: Option[InstanceCaching] = instanceCaching, isReadonly: Boolean = readonly): Unit = {
+  def replace(
+    newDocumentInfo : DocumentInfo,
+    dispatch        : Boolean = true,
+    instanceCaching : Option[InstanceCaching] = instanceCaching,
+    isReadonly      : Boolean = readonly
+  ): Unit = {
 
     val formerRoot = rootElement
 
@@ -313,7 +329,8 @@ class XFormsInstance(
     update(
       instanceCaching,
       newDocumentInfo,
-      isReadonly)
+      isReadonly
+    )
 
     // Call this directly, since we are not using insert/delete here
     model.markStructuralChange(this)
@@ -327,7 +344,8 @@ class XFormsInstance(
         new XXFormsReplaceEvent(
           this,
           formerRoot,
-          currentRoot)
+          currentRoot
+        )
       )
 
       // Dispatch xforms-insert event for backward compatibility
@@ -340,7 +358,8 @@ class XFormsInstance(
           null,   // CHECK
           currentRoot.getDocumentRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
-          0)
+          0
+        )
       )
     }
   }
@@ -447,7 +466,8 @@ trait XFormsInstanceIndex {
     else
       start descendantOrSelf * att "id"
 
-  private def mappingsInSubtree(start: NodeInfo) = idsInSubtree(start) map (id ⇒ id.getStringValue → unwrapElement(id.getParent))
+  private def mappingsInSubtree(start: NodeInfo) =
+    idsInSubtree(start) map (id ⇒ id.getStringValue → unwrapElement(id.getParent))
 
   private def removeId(id: String, parentElement: Element) = {
     idIndex.get(id) match {
@@ -507,7 +527,10 @@ object XFormsInstance extends Logging {
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean) = {
-    assert(! documentInfo.isInstanceOf[VirtualNode], "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree")
+    assert(
+      ! documentInfo.isInstanceOf[VirtualNode],
+      "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree"
+    )
 
     // NOTE: We don't honor exposeXPathTypes on readonly instances, anyway they don't support MIPs at this time
 

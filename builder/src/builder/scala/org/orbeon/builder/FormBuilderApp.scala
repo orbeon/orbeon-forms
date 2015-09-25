@@ -20,8 +20,6 @@ object FormBuilderApp extends JSApp {
 
   override def main(): Unit = {
 
-    println("Starting Form Builder...")
-
     def initializeOnDomReady(): Unit = {
       StaticUpload
     }

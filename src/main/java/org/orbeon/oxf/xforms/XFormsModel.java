@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.analysis.model.Submission;
 import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.model.DeferredActionContext;
 import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.model.XFormsModelAction;
 import org.orbeon.oxf.xforms.state.InstanceState;

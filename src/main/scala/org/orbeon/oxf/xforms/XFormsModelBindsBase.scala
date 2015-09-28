@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
-import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, DataModel, RuntimeBind}
+import org.orbeon.oxf.xforms.model._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.dom4j.TypedNodeWrapper
 import org.orbeon.saxon.om.{Item, NodeInfo}

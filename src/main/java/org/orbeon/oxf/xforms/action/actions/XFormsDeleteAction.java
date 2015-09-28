@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
+import org.orbeon.oxf.xforms.model.NoDefaultsStrategy$;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;

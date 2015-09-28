@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, NoDefaultsStrategy}
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}

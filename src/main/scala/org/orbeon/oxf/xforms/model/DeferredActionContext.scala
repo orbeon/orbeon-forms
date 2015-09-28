@@ -21,6 +21,8 @@ object NoDefaultsStrategy      extends DefaultsStrategy
 object FlaggedDefaultsStrategy extends DefaultsStrategy with SomeDefaultsStrategy
 object AllDefaultsStrategy     extends DefaultsStrategy with SomeDefaultsStrategy
 
+// A single instance of this class is associated with each XFormsModel. It keeps track of rebuild and recalculate /
+// revalidate requirements at a very coarse level.
 class DeferredActionContext(container: XBLContainer) {
 
   private def winningStrategy(st1: DefaultsStrategy, st2: DefaultsStrategy) =

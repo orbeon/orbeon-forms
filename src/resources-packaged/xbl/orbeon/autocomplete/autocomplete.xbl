@@ -169,6 +169,10 @@
                         <xf:var name="fr-search-value" xxbl:scope="outer">
                             <xxf:value value="$local/textfield-value" xxbl:scope="inner"/>
                         </xf:var>
+                        <!-- And declare it in inner scope, so it can be used in XPath by users, e.g. to do filtering in XPath -->
+                        <xf:var name="fr-search-value">
+                            <xxf:value value="$local/textfield-value"/>
+                        </xf:var>
                         <!-- Evaluate the resource AVT -->
                         <xsl:if test="exists(@resource)">
                             <xf:var name="resource" xbl:attr="xbl:text=resource" id="resource-variable">

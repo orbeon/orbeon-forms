@@ -149,7 +149,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // Find source information
     val (sourceNodeset, requestedSourceIndex) =
-      (bindingContext.nodeset, dndStart(dndStart.length - 1).toInt)
+      (bindingContext.nodeset.asScala, dndStart(dndStart.length - 1).toInt)
 
     if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size)
       throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData)
@@ -175,15 +175,15 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
     val deletedNodeInfo = {
       // This deletes exactly one node
-      val deleteInfos =
+      val deletionDescriptors =
         XFormsDeleteAction.doDelete(
-          containingDocument,
-          containingDocument.getControls.getIndentedLogger,
-          sourceNodeset,
-          requestedSourceIndex,
-          false
+          containingDocument = containingDocument,
+          collectionToUpdate = sourceNodeset,
+          deleteIndexOpt     = Some(requestedSourceIndex),
+          doDispatch         = false)(
+          indentedLogger     = containingDocument.getControls.getIndentedLogger
         )
-      deleteInfos.get(0).nodeInfo
+      deletionDescriptors.head.nodeInfo
     }
 
     // Adjust destination collection to reflect new state

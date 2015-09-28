@@ -13,26 +13,23 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction.DeleteInfo
-import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction.DeletionDescriptor
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import XFormsEvent._
-import collection.JavaConverters._
 import org.orbeon.saxon.om.NodeInfo
 
 class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_DELETE, target, properties, bubbles = true, cancelable = false)
   with InstanceEvent {
 
-  def this(target: XFormsEventTarget, deleteInfos: JList[DeleteInfo], deleteIndex: Int) = {
-    this(target, Map("deleted-nodes" → Option(deleteInfos.asScala map (_.nodeInfo)), "delete-location" → Option(deleteIndex)))
-    _deleteInfosOpt = Option(deleteInfos.asScala)
+  def this(target: XFormsEventTarget, deletionDescriptors: Seq[DeletionDescriptor], deleteIndexOpt: Option[Int]) = {
+    this(target, Map("deleted-nodes" → Option(deletionDescriptors map (_.nodeInfo)), "delete-location" → deleteIndexOpt))
+    _deletionDescriptorsOpt = Option(deletionDescriptors)
   }
 
-  private var _deleteInfosOpt: Option[Seq[DeleteInfo]] = None
-  def deleteInfos = _deleteInfosOpt.get
+  private var _deletionDescriptorsOpt: Option[Seq[DeletionDescriptor]] = None
+  def deletionDescriptors = _deletionDescriptorsOpt.get
 
   def deletedNodes = property[Seq[NodeInfo]]("deleted-nodes").get
 }

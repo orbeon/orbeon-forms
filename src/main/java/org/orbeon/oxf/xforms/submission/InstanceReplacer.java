@@ -199,8 +199,6 @@ public class InstanceReplacer extends BaseReplacer {
                 instanceToUpdate.markModified();
                 final Item newDocumentRootElement = DataModel.firstChildElement(newDocumentInfo);
 
-                final List<NodeInfo> destinationCollection = Collections.singletonList(destinationNodeInfo);
-
                 // Perform the insertion
 
                 // Insert before the target node, so that the position of the inserted node
@@ -211,7 +209,7 @@ public class InstanceReplacer extends BaseReplacer {
                     containingDocument,
                     detailsLogger,
                     "before",
-                    destinationCollection,
+                    Collections.singletonList(destinationNodeInfo),
                     destinationNodeInfo.getParent(),
                     Collections.singletonList(newDocumentRootElement),
                     1,
@@ -221,12 +219,11 @@ public class InstanceReplacer extends BaseReplacer {
                 );
 
                 // Perform the deletion of the selected node
-                XFormsDeleteAction.doDelete(
+                XFormsDeleteAction.doDeleteOne(
                     containingDocument,
-                    detailsLogger,
-                    destinationCollection,
-                    1,
-                    true
+                    destinationNodeInfo,
+                    true,
+                    detailsLogger
                 );
 
                 // Update model instance

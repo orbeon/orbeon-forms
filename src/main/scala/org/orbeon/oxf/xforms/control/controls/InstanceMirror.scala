@@ -323,17 +323,17 @@ object InstanceMirror {
     case delete: XFormsDeleteEvent ⇒
 
       val successes =
-        delete.deleteInfos map { deleteInfo ⇒ // more than one node might have been removed
+        delete.deletionDescriptors map { deletionDescriptor ⇒ // more than one node might have been removed
 
-          val removedNodeInfo  = deleteInfo.nodeInfo
-          val removedNodeIndex = deleteInfo.index
+          val removedNodeInfo  = deletionDescriptor.nodeInfo
+          val removedNodeIndex = deletionDescriptor.index
 
           // Find the corresponding parent of the removed node and run the body on it. The body returns
           // Some(Node) if that node can be removed.
           def withNewParent(body: Node ⇒ (Option[Node], Boolean)) = {
 
             // If parent is available, find matching node and call body
-            Option(deleteInfo.parent) match {
+            Option(deletionDescriptor.parent) match {
               case Some(removedParentNodeInfo) ⇒
                 findMatchingNode(delete.targetInstance, removedParentNodeInfo, None) match {
                   case Some((matchingInstance, matchingParentNode)) ⇒

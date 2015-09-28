@@ -140,16 +140,16 @@ object XFormsAPI {
     if (ref.nonEmpty) {
       val action = actionInterpreterDyn.value
 
-      val deleteInfos =
+      val deletionDescriptors =
         XFormsDeleteAction.doDelete(
-          action map (_.containingDocument) orNull,
-          action map (_.indentedLogger) orNull,
-          ref.asJava,
-          -1,
-          doDispatch
+          containingDocument = action map (_.containingDocument) orNull,
+          collectionToUpdate = ref,
+          deleteIndexOpt     = None,
+          doDispatch         = doDispatch)(
+          indentedLogger     = action map (_.indentedLogger) orNull
         )
 
-      deleteInfos.asScala map (_.nodeInfo)
+      deletionDescriptors map (_.nodeInfo)
     } else
       Nil
 

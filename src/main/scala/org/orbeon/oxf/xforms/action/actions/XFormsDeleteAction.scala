@@ -37,40 +37,19 @@ class XFormsDeleteAction extends XFormsAction {
 
     implicit val indentedLogger = actionContext.logger
 
-    val atAttributeOpt        = Option(actionContext.element.attributeValue("at"))
-    val contextAttributeOpt   = Option(actionContext.element.attributeValue(XFormsConstants.CONTEXT_QNAME))
+    val atAttributeOpt     = Option(actionContext.element.attributeValue("at"))
+    val collectionToUpdate = actionContext.interpreter.actionXPathContext.getCurrentBindingContext.nodeset.asScala
 
-    val collectionToUpdate    = actionContext.interpreter.actionXPathContext.getCurrentBindingContext.nodeset.asScala
-    val isEmptyNodesetBinding = collectionToUpdate.isEmpty
+    // NOTE: XForms says "Otherwise, the Sequence Binding is not expressed, so the Sequence Binding node-sequence
+    // is set equal to the delete context node with a position and size of 1." We currently don't support this and
+    // require a `ref` or `bind` returning a non-empty sequence.
 
-    // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
-    // Set Binding node-set is empty."
-    if (contextAttributeOpt.isEmpty && isEmptyNodesetBinding) {
-      debug("context is empty, terminating")
-      return
-    }
-
-    // Handle insert context (with @context attribute)
-    // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
-    actionContext.overriddenContext match {
-      case Some(node: NodeInfo) ⇒
-        debug("overridden context is an empty nodeset or not a nodeset, terminating")
-        return
-      case _ ⇒
-    }
-
-    val deleteIndexOpt =
-      if (isEmptyNodesetBinding) {
-        // "If the Node Set Binding node-set empty, then this attribute is ignored"
-        None
-      } else {
+    if (collectionToUpdate.nonEmpty) {
+      val deleteIndexOpt =
         atAttributeOpt match {
           case Some(atAttribute) ⇒
-            // "1. The evaluation context node is the first node in document order from the Node Set Binding
-            // node-set, the context size is the size of the Node Set Binding node-set, and the context
-            // position is 1."
 
-            // "2. The return value is processed according to the rules of the XPath function round()"
+            // "The return value is processed according to the rules of the XPath function round()"
             val insertionIndexString =
               actionContext.interpreter.evaluateAsString(
                 actionContext.element,
@@ -79,30 +58,37 @@ class XFormsDeleteAction extends XFormsAction {
                 "round(" + atAttribute + ")"
               )
 
-            // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
-            // location is equal to the result. If the result is non-positive, then the insert location is
-            // 1. Otherwise, the result is NaN or exceeds the Node Set Binding node-set size, so the insert
-            // location is the Node Set Binding node-set size."
+            // "If the result is in the range 1 to the Sequence Binding node-sequence size, then the delete location is
+            // equal to the result. If the result is non-positive, then the delete location is 1. Otherwise, if the
+            // result is NaN or exceeds the Sequence Binding node-sequence size, the delete location is the Sequence
+            // Binding node-sequence size."
 
-            // Don't think we will get NaN with XPath 2.0...
             val tentativeDeleteIndex =
               if (insertionIndexString == "NaN") collectionToUpdate.size else insertionIndexString.toInt
 
             Some(tentativeDeleteIndex min collectionToUpdate.size max 1)
           case None ⇒
-            // "If there is no delete location, each node in the Node Set Binding node-set is deleted, except
-            // if the node is a readonly node or the root document element of an instance then that particular
-            // node is not deleted."
+            // "If there is no delete location, each node in the Sequence Binding"
             None
         }
-      }
 
-    doDelete(
-      containingDocument = actionContext.containingDocument,
-      collectionToUpdate = collectionToUpdate,
-      deleteIndexOpt     = deleteIndexOpt,
-      doDispatch         = true
-    )
+      doDelete(
+        containingDocument = actionContext.containingDocument,
+        collectionToUpdate = collectionToUpdate,
+        deleteIndexOpt     = deleteIndexOpt,
+        doDispatch         = true
+      )
+    } else {
+      // "The delete action is terminated with no effect if the Sequence Binding is expressed and the Sequence Binding
+      // node-sequence is the empty sequence". Here our execution model always require
+
+      // XForms also says "The delete action is terminated with no effect if the delete context is the empty sequence."
+      // Currently, if the context is empty, we return an empty `nodeset`, so we satisfy that. But in the future we
+      // would like to change this and allow the context to be empty yet support `ref` or `bind` returning a non-empty
+      // sequence.
+
+      debug("nothing to delete, ignoring")
+    }
   }
 }
 

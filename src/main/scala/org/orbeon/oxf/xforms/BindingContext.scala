@@ -24,20 +24,23 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, Item}
 import xbl.Scope
 
+import scala.language.postfixOps
+
 // Represent the XPath binding of an XForms object (control, action, etc.)
 case class BindingContext(
-    parent: BindingContext,
-    model: XFormsModel,
-    bind: RuntimeBind,
-    nodeset: ju.List[Item],
-    position: Int,
-    elementId: String,
-    newBind: Boolean,
-    controlElement: Element,
-    private val _locationData: LocationData,
-    hasOverriddenContext: Boolean,
-    contextItem: Item,
-    scope: Scope) {
+  parent                    : BindingContext,
+  model                     : XFormsModel,
+  bind                      : RuntimeBind,
+  nodeset                   : ju.List[Item],
+  position                  : Int,
+  elementId                 : String,
+  newBind                   : Boolean,
+  controlElement            : Element,
+  private val _locationData : LocationData,
+  hasOverriddenContext      : Boolean,
+  contextItem               : Item,
+  scope                     : Scope
+) {
 
   self ⇒
 
@@ -46,22 +49,36 @@ case class BindingContext(
 
   // Location data associated with the XForms element (typically, a control) associated with the binding. If location
   // data was passed during construction, pass that, otherwise try to get location data from passed element.
-  val locationData = Option(_locationData) orElse (Option(controlElement) map (_.getData.asInstanceOf[LocationData])) orNull
+  val locationData =
+    Option(_locationData) orElse (Option(controlElement) map (_.getData.asInstanceOf[LocationData])) orNull
+
   private var _variable: Option[VariableNameValue] = None
   def variable = _variable
 
   // Constructor for scoping a variable
   def this(
-      parent: BindingContext,
-      base: BindingContext,
-      controlElement: Element,
-      locationData: LocationData,
-      variableName: String,
-      variableValue: ValueRepresentation,
-      scope: Scope) {
-
-    this(parent, base.model, null, base.nodeset, base.position, base.elementId, false,
-       controlElement, locationData, false, base.contextItem, scope)
+    parent         : BindingContext,
+    base           : BindingContext,
+    controlElement : Element,
+    locationData   : LocationData,
+    variableName   : String,
+    variableValue  : ValueRepresentation,
+    scope          : Scope
+  ) = {
+    this(
+      parent               = parent,
+      model                = base.model,
+      bind                 = null,
+      nodeset              = base.nodeset,
+      position             = base.position,
+      elementId            = base.elementId,
+      newBind              = false,
+      controlElement       =  controlElement,
+      _locationData        = locationData,
+      hasOverriddenContext = false,
+      contextItem          = base.contextItem,
+      scope                = scope
+    )
 
     _variable = Some(new VariableNameValue(variableName, variableValue))
   }
@@ -193,23 +210,23 @@ case class BindingContext(
   // parameter containing the id of an enclosing grouping XForms control. For xf:repeat, the context returned is the
   // context of the current iteration.
   def contextForId(contextId: String): Item = {
-    
+
     def matchesContainer(binding: BindingContext) =
       (binding.controlElement ne null) &&
       XFormsControlFactory.isContainerControl(binding.controlElement.getNamespaceURI, binding.controlElement.getName) &&
       binding.elementId == contextId
-    
+
     def matchesRepeat(binding: BindingContext) =
       (binding.controlElement eq null) &&
       binding.isRepeatIterationBindingContext && binding.parent.elementId == contextId
-    
+
     new AncestorIterator(includeSelf = true) collectFirst {
       case binding if matchesContainer(binding) || matchesRepeat(binding) ⇒ binding.getSingleItem
     } getOrElse {
       throw new ValidationException(s"No enclosing container XForms control found for id $contextId", locationData)
     }
   }
-  
+
   def enclosingRepeatIterationBindingContext(repeatId: Option[String]): BindingContext = {
 
     def matches(binding: BindingContext) =

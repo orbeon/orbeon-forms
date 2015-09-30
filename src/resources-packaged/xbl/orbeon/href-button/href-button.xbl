@@ -35,15 +35,15 @@
                 <xxf:script
                     ev:event="xforms-enabled xxforms-iteration-moved"
                     ev:target="#observer">YAHOO.xbl.fr.HrefButton.instance(this);</xxf:script>
-                
+
                 <!-- Only load directly in noscript mode -->
                 <xf:load
-                        ev:event="DOMActivate"
-                        if="property('xxf:noscript')"
-                        xbl:attr="resource=href"
-                        xxf:show-progress="false"
-                        f:url-type="resource"/>
-                
+                    ev:event="DOMActivate"
+                    if="property('xxf:noscript')"
+                    xbl:attr="resource=href"
+                    xxf:show-progress="false"
+                    f:url-type="resource"/>
+
                 <!-- Trigger and its content -->
                 <xf:trigger xbl:attr="appearance">
                     <!-- Handle optional binding -->

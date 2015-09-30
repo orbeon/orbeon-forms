@@ -333,7 +333,10 @@
                             <xf:trigger appearance="minimal">
                                 <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then close else cancel)/label"/>
                                 <!-- Hide this dialog without saving -->
-                                <xxf:hide event="DOMActivate" if="not($is-new-form)" dialog="dialog"/>
+                                <xxf:hide
+                                    event="DOMActivate"
+                                    if="not($is-new-form)"
+                                    dialog="dialog"/>
                                 <!-- Or go back to the summary -->
                                 <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
                                      window.close() in the old home/back button. But it's a bit unclear what's best. -->

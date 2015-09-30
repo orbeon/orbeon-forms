@@ -192,14 +192,36 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.attachment-url">
-        (./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-output' and not(tokenize(@class, '\s+') = 'xforms-disabled')]/
-           img[not(tokenize(@class, '\s+') = ('xforms-help', 'xforms-disabled')) and (tokenize(@class, '\s+') = 'xforms-output-output' or not(@id))]/@src)[1]/
-           string()[. != '/ops/images/xforms/spacer.gif']
+        (
+            ./descendant-or-self::*[
+                tokenize(@class, '\s+') = 'xforms-output' and
+                not(
+                    tokenize(@class, '\s+') = 'xforms-disabled'
+                )
+            ]/img[
+                not(
+                    tokenize(@class, '\s+') = ('xforms-help', 'xforms-disabled')
+                ) and (
+                    tokenize(@class, '\s+') = 'xforms-output-output' or not(@id)
+                )
+            ]/@src
+        )[1]/string()[
+            . != '/ops/images/xforms/spacer.gif'
+        ]
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.attachment-metadata">
-        for $info in (.//*[@class = 'xforms-upload-info'])
-        return string-join($info/*[@class = ('xforms-upload-filename', 'xforms-upload-mediatype', 'xforms-upload-size')]/string()[normalize-space()], ', ')
+        for $info in (.//*[@class = 'xforms-upload-info']) return
+            string-join(
+                $info/*[
+                    @class = (
+                        'xforms-upload-filename',
+                        'xforms-upload-mediatype',
+                        'xforms-upload-size'
+                    )
+                ]/string()[normalize-space()],
+                ', '
+            )
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.fr-number">

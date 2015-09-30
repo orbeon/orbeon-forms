@@ -103,14 +103,28 @@
                 <xf:repeat ref="$buttons-names">
                     <xf:var name="button-name" value="."/>
                     <xf:var name="primary"     value="position() = last()"/>
-                    <xf:var name="class"       value="concat('xforms-trigger-appearance-xxforms-',
-                                                             if ($primary) then 'primary'
-                                                             else 'default')"/>
+
+                    <xf:var
+                        name="class"
+                        value="
+                            concat(
+                                'xforms-trigger-appearance-xxforms-',
+                                if ($primary) then
+                                    'primary'
+                                else
+                                    'default'
+                            )"/>
 
                     <fr:process-button
                         name="{$button-name}"
-                        ref="xxf:instance('fb-triggers-instance')/(if ($button-name = 'publish') then publish else other)"
-                        class="{$class}"/>
+                        class="{$class}"
+                        ref="
+                            xxf:instance('fb-triggers-instance')/(
+                                if ($button-name = 'publish') then
+                                    publish
+                                else
+                                    other
+                            )"/>
 
                 </xf:repeat>
 

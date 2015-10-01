@@ -69,6 +69,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publish</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Yes</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
@@ -360,6 +361,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Tester</test>
             <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publier</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
             <no>&lt;i class="icon-remove"/&gt; Non</no>
@@ -655,6 +657,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testear</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publicar</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
@@ -936,6 +939,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Publiser…</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publiser…</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -1215,6 +1219,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Тестировать</test>
             <publish>&lt;i class="icon-globe"/&gt; Публиковать</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Публиковать</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -1493,6 +1498,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Prova</test>
             <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Pubblica</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Sì</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
@@ -1783,6 +1789,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Test</test>
             <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nein</no>
@@ -2073,6 +2080,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testaa</test>
             <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Julkaise</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -2363,6 +2371,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testa</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicera</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publicera</save-publish>
 
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nej</no>
@@ -2653,6 +2662,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testen</test>
             <publish>&lt;i class="icon-globe"/&gt; Publiceren</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publiceren</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
@@ -2943,6 +2953,7 @@
 
             <test>&lt;i class="icon-cog"/&gt; Testar</test>
             <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
+            <save-publish>&lt;i class="icon-globe"/&gt; Publicar</save-publish>
 
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>

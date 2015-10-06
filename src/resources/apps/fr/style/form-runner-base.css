@@ -397,6 +397,9 @@
 .orbeon .fr-grid .xforms-textarea textarea {
   width: 100%;
 }
+.orbeon .fr-grid .orbeon textarea[rows] {
+  height: auto;
+}
 .orbeon .fr-grid input[type="file"] {
   width: auto;
 }

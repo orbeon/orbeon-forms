@@ -449,6 +449,11 @@
             width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
         }
 
+        // Usually there is no `rows` attribute used, but if there is the
+        .orbeon textarea[rows] {
+            height: auto;
+        }
+
         input[type="file"] {
             width: auto;
         }

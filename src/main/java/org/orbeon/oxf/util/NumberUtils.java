@@ -50,15 +50,6 @@ public class NumberUtils {
         return sb.toString();
     }
 
-    public static double pctChange(Number oldValue, Number newValue) {
-        if (oldValue == null || newValue == null || oldValue.intValue() == 0) {
-            return 0;
-        } else {
-            return (oldValue.doubleValue() > 0 ? 1 : -1) *
-                (newValue.doubleValue() - oldValue.doubleValue())/oldValue.doubleValue();
-        }
-    }
-
     public static int readIntBigEndian(byte[] bytes, int first) {
         return ((((int) bytes[first + 0]) & 0xff) << 24)
                 + ((((int) bytes[first + 1]) & 0xff) << 16)

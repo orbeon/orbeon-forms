@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import XFormsEvent._
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
 
 /**
  * Base class for all DOM events.
@@ -45,15 +45,16 @@ import org.orbeon.scaxon.XML._
  * - whenever possible, all aspects of an event are represented as properties
  * - in some cases, events store special values natively (e.g. Throwable, ConnectionResult, etc.)
  *
- * Possible improvement: we might be able to use reflection for standard properties. This would simply the implementation
- * of XFormsEvent, XFormsUIEvent, and derived events which have more complex properties.
+ * Possible improvement: we might be able to use reflection for standard properties. This would simply the
+ * implementation of XFormsEvent, XFormsUIEvent, and derived events which have more complex properties.
  */
 abstract class XFormsEvent(
-    val name: String,
-    val targetObject: XFormsEventTarget,
-    properties: PropertyGetter,
-    val bubbles: Boolean,
-    val cancelable: Boolean) {
+  val name         : String,
+  val targetObject : XFormsEventTarget,
+  properties       : PropertyGetter,
+  val bubbles      : Boolean,
+  val cancelable   : Boolean
+) {
 
   require(targetObject ne null)
   require(containingDocument ne null)
@@ -150,30 +151,30 @@ object XFormsEvent {
   def itemIterator   (i: Item)      = if (i ne null)  makeIterator(i)            else emptyIterator
   def listIterator   (s: Seq[Item]) = if (s.nonEmpty) new ListIterator(s.asJava) else emptyIterator
 
-  def xxformsName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
-  
+  def xxfName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
+
   private val Deprecated = Map(
     "target"         → "xxf:targetid",
     "event"          → "xxf:type",
     "repeat-indexes" → "xxf:repeat-indexes"
   )
-  
+
   private val Getters = Map[String, XFormsEvent ⇒ Option[Any]](
-    "target"                            → (e ⇒ Option(e.targetObject.getId)),
-    xxformsName("target")               → (e ⇒ Option(e.targetObject.getId)),
-    xxformsName("targetid")             → (e ⇒ Option(e.targetObject.getId)),
-    xxformsName("absolute-targetid")    → (e ⇒ Option(XFormsUtils.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
-    "event"                             → (e ⇒ Option(e.name)),
-    xxformsName("type")                 → (e ⇒ Option(e.name)),
-    xxformsName("bubbles")              → (e ⇒ Option(e.bubbles)),
-    xxformsName("cancelable")           → (e ⇒ Option(e.cancelable)),
-    xxformsName("phase")                → (e ⇒ Option(e.currentPhase.name)),
-    xxformsName("observerid")           → (e ⇒ Option(e.currentObserver.getId)),
-    xxformsName("absolute-observerid")  → (e ⇒ Option(XFormsUtils.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
-    "repeat-indexes"                    → repeatIndexes,
-    xxformsName("repeat-indexes")       → repeatIndexes,
-    xxformsName("repeat-ancestors")     → repeatAncestors,
-    xxformsName("target-prefixes")      → targetPrefixes
+    "target"                       → (e ⇒ Option(e.targetObject.getId)),
+    xxfName("target")              → (e ⇒ Option(e.targetObject.getId)),
+    xxfName("targetid")            → (e ⇒ Option(e.targetObject.getId)),
+    xxfName("absolute-targetid")   → (e ⇒ Option(effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
+    "event"                        → (e ⇒ Option(e.name)),
+    xxfName("type")                → (e ⇒ Option(e.name)),
+    xxfName("bubbles")             → (e ⇒ Option(e.bubbles)),
+    xxfName("cancelable")          → (e ⇒ Option(e.cancelable)),
+    xxfName("phase")               → (e ⇒ Option(e.currentPhase.name)),
+    xxfName("observerid")          → (e ⇒ Option(e.currentObserver.getId)),
+    xxfName("absolute-observerid") → (e ⇒ Option(effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
+    "repeat-indexes"               → repeatIndexes,
+    xxfName("repeat-indexes")      → repeatIndexes,
+    xxfName("repeat-ancestors")    → repeatAncestors,
+    xxfName("target-prefixes")     → targetPrefixes
   )
 
   // NOTE: should ideally be Option[Seq[Int]]. At this time XForms callers assume Option[Seq[String]].
@@ -185,7 +186,9 @@ object XFormsEvent {
   private def repeatAncestors(e: XFormsEvent): Option[Seq[String]] =
     if (hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
       // There is a suffix so compute
-      val ancestorRepeats = e.containingDocument.getStaticOps.getAncestorRepeatIds(getPrefixedId(e.targetObject.getEffectiveId))
+      val ancestorRepeats =
+        e.containingDocument.getStaticOps.getAncestorRepeatIds(getPrefixedId(e.targetObject.getEffectiveId))
+
       Some(ancestorRepeats map getStaticIdFromId)
     } else
       // No suffix

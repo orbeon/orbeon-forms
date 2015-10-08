@@ -21,16 +21,20 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 class XXFormsIndexChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XXFORMS_INDEX_CHANGED, target.asInstanceOf[XFormsControl], properties) {
 
-  import XXFormsIndexChangedEvent._
-
   def this(target: XFormsControl, oldIndex: Int, newIndex: Int) =
-    this(target, Map(XXFormsIndexChangedEvent.OldIndexProperty → Option(oldIndex), XXFormsIndexChangedEvent.NewIndexProperty → Option(newIndex)))
+    this(
+      target,
+      Map(
+        XXFormsIndexChangedEvent.OldIndexProperty → Option(oldIndex),
+        XXFormsIndexChangedEvent.NewIndexProperty → Option(newIndex)
+      )
+    )
 }
 
-object XXFormsIndexChangedEvent {
+private object XXFormsIndexChangedEvent {
 
   import XFormsEvent._
 
-  val OldIndexProperty = xxformsName("old-index")
-  val NewIndexProperty = xxformsName("new-index")
+  val OldIndexProperty = xxfName("old-index")
+  val NewIndexProperty = xxfName("new-index")
 }

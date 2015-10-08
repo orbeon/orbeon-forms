@@ -53,8 +53,8 @@ private object XFormsSubmitSerializeEvent {
   }
 
   val Getters = Map[String, XFormsSubmitSerializeEvent ⇒ Option[Any]] (
-    xxformsName("binding")       → (_.bindingOpt),
-    xxformsName("serialization") → (_.requestedSerializationOpt),
-    "submission-body"            → (e ⇒ Option(createSubmissionBodyElement(e.containingDocument)))
+    xxfName("binding")       → (_.bindingOpt),
+    xxfName("serialization") → (_.requestedSerializationOpt),
+    "submission-body"        → (e ⇒ Option(createSubmissionBodyElement(e.containingDocument)))
   )
 }

@@ -113,7 +113,7 @@ class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGett
 
 private object XFormsValueChangeEvent {
 
-  val XXFValue = xxformsName("value")
+  val XXFValue = xxfName("value")
 
   def properties(target: XFormsEventTarget): PropertyGetter = {
     case XXFValue ⇒ Option(target) collect { case v: XFormsValueControl ⇒ v.getValue }

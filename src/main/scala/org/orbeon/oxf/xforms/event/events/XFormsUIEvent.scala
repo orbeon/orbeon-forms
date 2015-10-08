@@ -21,17 +21,18 @@ import XFormsEvent._
  * Base class for UI events, that is events only dispatched to controls.
  */
 abstract class XFormsUIEvent(
-    eventName: String,
-    val targetControl: XFormsControl,
-    properties: PropertyGetter,
-    bubbles: Boolean,
-    cancelable: Boolean)
-  extends XFormsEvent(
-    eventName,
-    targetControl,
-    properties,
-    bubbles,
-    cancelable) {
+  eventName         : String,
+  val targetControl : XFormsControl,
+  properties        : PropertyGetter,
+  bubbles           : Boolean,
+  cancelable        : Boolean
+) extends XFormsEvent(
+  eventName,
+  targetControl,
+  properties,
+  bubbles,
+  cancelable
+) {
 
   def this(eventName: String, target: XFormsControl, properties: PropertyGetter) =
     this(eventName, target, properties, bubbles = true, cancelable = false)
@@ -43,7 +44,7 @@ abstract class XFormsUIEvent(
 }
 
 private object XFormsUIEvent {
-  
+
   val Deprecated = Map(
     "target-ref" → "xxf:binding",
     "alert"      → "xxf:alert",
@@ -51,19 +52,19 @@ private object XFormsUIEvent {
     "hint"       → "xxf:hint",
     "help"       → "xxf:help"
   )
-  
+
   val Getters = Map[String, XFormsUIEvent ⇒ Option[Any]](
-    "target-ref"                    → binding,
-    xxformsName("binding")          → binding,
-    xxformsName("control-position") → controlPosition,
-    "label"                         → label,
-    xxformsName("label")            → label,
-    "help"                          → help,
-    xxformsName("help")             → help,
-    "hint"                          → hint,
-    xxformsName("hint")             → hint,
-    "alert"                         → alert,
-    xxformsName("alert")            → alert
+    "target-ref"                → binding,
+    xxfName("binding")          → binding,
+    xxfName("control-position") → controlPosition,
+    "label"                     → label,
+    xxfName("label")            → label,
+    "help"                      → help,
+    xxfName("help")             → help,
+    "hint"                      → hint,
+    xxfName("hint")             → hint,
+    "alert"                     → alert,
+    xxfName("alert")            → alert
   )
 
   def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)

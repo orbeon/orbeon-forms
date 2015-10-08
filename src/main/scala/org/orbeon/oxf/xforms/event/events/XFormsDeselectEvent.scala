@@ -34,5 +34,5 @@ private object XFormsDeselectEvent {
 
   import XFormsEvent._
 
-  val ItemValueProperty = xxformsName("item-value")
+  val ItemValueProperty = xxfName("item-value")
 }

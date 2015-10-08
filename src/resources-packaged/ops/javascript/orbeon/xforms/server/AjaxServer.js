@@ -478,7 +478,7 @@
                                 // sent in a sub-element, so both a value and properties can be sent for the same event)
                                 requestDocumentString.push('\n');
                                 _.each(_.keys(event.properties), function(name) {
-                                    var value = event.properties[name];
+                                    var value = String(event.properties[name]); // support number and boolean
                                     var propertyParts = [
                                         indent + indent + indent,
                                         '<xxf:property name="' + StringUtils.escapeForMarkup(name) + '">',

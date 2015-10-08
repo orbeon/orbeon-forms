@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import Names._
 
 trait ContainerOps extends ControlOps {
 
@@ -41,6 +42,9 @@ trait ContainerOps extends ControlOps {
     element parent * child * filter
       (_.name == siblingName) filterNot
       (_ == element)
+
+  def getInitialIterationsAttribute(controlElem: NodeInfo) =
+    controlElem attValueOpt InitialIterations flatMap nonEmptyOrNone
 
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
@@ -208,23 +212,28 @@ trait ContainerOps extends ControlOps {
     min                  : String,
     max                  : String,
     iterationNameOrEmpty : String,
-    applyDefaults        : Boolean
+    applyDefaults        : Boolean,
+    initialIterations    : String
   ): Unit =
     findControlByName(inDoc, controlName) foreach { control ⇒
 
       val wasRepeat = isRepeat(control)
+      val oldInitialIterationsAttribute = getInitialIterationsAttribute(control)
 
       val minOpt = minMaxForAttribute(min)
       val maxOpt = minMaxForAttribute(max)
 
+      val initialIterationsOpt = nonEmptyOrNone(initialIterations)
+
       // Update control attributes first
       // A missing or invalid min/max value is taken as the default value: 0 for min, none for max. In both cases, we
       // don't set the attribute value. This means that in the end we only set positive integer values.
-      toggleAttribute(control, "repeat",         RepeatContentToken,                              repeat)
-      toggleAttribute(control, "min",            minOpt.get,                                      repeat && minOpt.isDefined)
-      toggleAttribute(control, "max",            maxOpt.get,                                      repeat && maxOpt.isDefined)
-      toggleAttribute(control, "template",       makeInstanceExpression(templateId(controlName)), repeat)
-      toggleAttribute(control, "apply-defaults", "true",                                          repeat && applyDefaults)
+      toggleAttribute(control, "repeat",          RepeatContentToken,                              repeat)
+      toggleAttribute(control, "min",             minOpt.get,                                      repeat && minOpt.isDefined)
+      toggleAttribute(control, "max",             maxOpt.get,                                      repeat && maxOpt.isDefined)
+      toggleAttribute(control, "template",        makeInstanceExpression(templateId(controlName)), repeat)
+      toggleAttribute(control, "apply-defaults",  "true",                                          repeat && applyDefaults)
+      toggleAttribute(control, InitialIterations, initialIterationsOpt.get,                        repeat && initialIterationsOpt.isDefined)
 
       if (! wasRepeat && repeat) {
         // Insert new bind and template
@@ -284,6 +293,12 @@ trait ContainerOps extends ControlOps {
       } else if (repeat) {
         // Template should already exists an should have already been renamed if needed
         // MAYBE: Ensure template just in case.
+
+        val newInitialIterationsAttribute = getInitialIterationsAttribute(control)
+
+        if (oldInitialIterationsAttribute != newInitialIterationsAttribute)
+          updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control, includeSelf = true).to[Set])
+
       } else if (! repeat) {
         // Template should not exist
         // MAYBE: Delete template just in case.
@@ -335,11 +350,12 @@ trait ContainerOps extends ControlOps {
 
     def holderForBind(bind: NodeInfo): NodeInfo = {
 
-      val controlName = getBindNameOrEmpty(bind)
+      val controlName    = getBindNameOrEmpty(bind)
+      val controlElemOpt = findControlByName(inDoc, controlName)
 
       def fromBinding =
         for {
-          controlElem ← findControlByName(inDoc, controlName)
+          controlElem ← controlElemOpt
           appearances = controlElem attTokens APPEARANCE_QNAME
           descriptor  ← findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
           binding     ← descriptor.binding
@@ -349,9 +365,50 @@ trait ContainerOps extends ControlOps {
       def fromPlainControlName =
         elementInfo(controlName)
 
-      val elem = fromBinding getOrElse fromPlainControlName
-      insert(into = elem, origin = bind / "*:bind" map holderForBind)
-      elem
+      val elementTemplate = fromBinding getOrElse fromPlainControlName
+
+      val iterationCount = {
+
+        // If the current control is a repeated fr:grid or fr:section with the attribute set, find the first occurrence
+        // in the data of this  repeat, and use its concrete initial number of iterations to update the template. We
+        // can imagine other values for the attribute in the future, maybe an integer value (`0`, `1`, ...) setting
+        // the initial number of iterations.
+        // See https://github.com/orbeon/orbeon-forms/issues/2379
+        def useInitialIterations(controlElem: NodeInfo) =
+          isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
+
+        controlElemOpt match {
+          case Some(controlElem) if useInitialIterations(controlElem) ⇒
+
+            val firstDataHolder   = findDataHolders(inDoc, controlName) take 1
+            val iterationsHolders = firstDataHolder / *
+
+            iterationsHolders.size
+
+          case _ ⇒
+            1
+        }
+      }
+
+      // Recursively insert elements in the template
+      if (iterationCount > 0) {
+
+        // If iterationCount > 1, we just duplicate the children `iterationCount` times. In practice, this means
+        // multiple iteration elements:
+        //
+        // <repeated-section-2-iteration>
+        //   ...
+        // </repeated-section-2-iteration>
+        // <repeated-section-2-iteration>
+        //   ...
+        // </repeated-section-2-iteration>
+        val nested         = bind / "*:bind" map holderForBind
+        val repeatedNested = (1 to iterationCount) flatMap (_ ⇒ nested)
+
+        insert(into = elementTemplate, origin = repeatedNested)
+      }
+
+      elementTemplate
     }
 
     holderForBind(bind)
@@ -377,4 +434,16 @@ trait ContainerOps extends ControlOps {
     } locally {
       ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
     }
+
+  // This is called when the user adds/removes an iteration, as we want to update the templates in this case in order
+  // to adjust the default number of iterations. See https://github.com/orbeon/orbeon-forms/issues/2379
+  def updateTemplatesFromDynamicIterationChange(controlName: String): Unit = {
+
+    val inDoc = getFormDoc
+
+    findControlByName(inDoc, controlNameFromId(controlName)) foreach { controlElem ⇒
+      assert(isRepeat(controlElem))
+      updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(controlElem).to[Set])
+    }
+  }
 }

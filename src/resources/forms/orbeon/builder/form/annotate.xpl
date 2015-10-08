@@ -141,6 +141,15 @@
                             </xf:action>
                         </xf:action>
 
+                        <!-- Listen to changes to grid iterations -->
+                        <xf:action
+                            event="fr-iteration-added fr-iteration-removed"
+                            class="fb-annotation"
+                            type="xpath"
+                            xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+                            fbf:updateTemplatesFromDynamicIterationChange(event('target'))
+                        </xf:action>
+
                     </xf:group>
                 </xsl:template>
 

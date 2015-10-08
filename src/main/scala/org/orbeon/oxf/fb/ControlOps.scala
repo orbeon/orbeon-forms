@@ -39,7 +39,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  val FB = "http://orbeon.org/oxf/xml/form-builder"
+  val FB = Names.FB
 
   private val MIPsToRewrite = AllMIPs - Type - Required
   private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → toQName(FB → ("fb:" + mip.name))) toMap

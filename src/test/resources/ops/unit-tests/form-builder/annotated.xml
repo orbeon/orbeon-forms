@@ -189,6 +189,11 @@
                         <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
                     </xf:action>
                 </xf:action>
+                <xf:action
+                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                    event="fr-iteration-added fr-iteration-removed"
+                    class="fb-annotation"
+                    type="xpath">fbf:updateTemplatesFromDynamicIterationChange(event('target'))</xf:action>
             </xf:group>
             <xf:group class="fr-buttons" ref="()">Custom buttons here</xf:group>
         </fr:view>

@@ -489,6 +489,9 @@
             <apply-defaults>
                 <label>Apply Initial Value Formulas when Adding Iterations</label>
             </apply-defaults>
+            <initial-iterations>
+                <label>Initial Number of Iterations Uses Template</label>
+            </initial-iterations>
             <other>Other</other>
             <one>One repetition</one>
             <unlimited>Unlimited</unlimited>
@@ -1371,6 +1374,9 @@
             <apply-defaults>
                 <label>Applique les valeurs initiales pour les nouvelles itérations</label>
             </apply-defaults>
+            <initial-iterations>
+                <label>Nombre initial d'itérations selon le modèle</label>
+            </initial-iterations>
             <other>Autre</other>
             <one>Une répétition</one>
             <unlimited>Illimité</unlimited>
@@ -2256,6 +2262,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
             <unlimited todo="true">[Unlimited]</unlimited>
@@ -3139,6 +3148,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other todo="true">[Other]</other>
             <one todo="true">[One repetition]</one>
             <unlimited todo="true">[Unlimited]</unlimited>
@@ -4023,6 +4035,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other>Altro</other>
             <one>Una ripetizione</one>
             <unlimited>Illimitato</unlimited>
@@ -4899,6 +4914,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other>Anderes</other>
             <one>Eine Wiederholung</one>
             <unlimited>Unbeschränkt</unlimited>
@@ -5778,6 +5796,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other>Muu</other>
             <one>Yksi toisto</one>
             <unlimited>Rajaton</unlimited>
@@ -6655,6 +6676,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other>Otro</other>
             <one>Una Repetición</one>
             <unlimited>Sin Límite</unlimited>
@@ -7539,6 +7563,9 @@
             <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other>Outros</other>
             <one>Uma repetição</one>
             <unlimited>Ilimitado</unlimited>
@@ -8418,9 +8445,13 @@
                 <label>Maximalt antal upprepningar</label>
                 <alert>Felaktigt värde</alert>
                 <hint>Ett positivt heltal eller ett XPath-uttryck</hint>
-            </max><apply-defaults>
+            </max>
+            <apply-defaults>
                 <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
             </apply-defaults>
+            <initial-iterations>
+                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+            </initial-iterations>
             <other>Specificera</other>
             <one>En upprepning</one>
             <unlimited>Obegränsat</unlimited>

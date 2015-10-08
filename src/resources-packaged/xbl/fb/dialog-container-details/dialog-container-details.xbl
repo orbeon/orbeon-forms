@@ -63,6 +63,7 @@
                 <xf:setvalue ref="$i/custom-classes"                 value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <xf:setvalue ref="$i/apply-defaults"                 value="$control/@apply-defaults = 'true'"/>
+                <xf:setvalue ref="$i/initial-iterations"             value="$control/@fb:initial-iterations = 'first'"/>
 
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
@@ -85,18 +86,28 @@
                 <xf:var name="remains-repeat" value="$i/was-repeat = true() and $i/is-repeat = true()"/>
 
                 <xf:action type="xpath">
-                    if ($remains-repeat)
-                        then fbf:renameControlIterationIfNeeded($form, $old-name, $new-name, $i/original-custom-iteration-name/string(), $i/custom-iteration-name/string())
-                        else (),
+                    if ($remains-repeat) then
+                        fbf:renameControlIterationIfNeeded(
+                            $form,
+                            $old-name,
+                            $new-name,
+                            $i/original-custom-iteration-name/string(),
+                            $i/custom-iteration-name/string()
+                        )
+                    else
+                        (),
                     fbf:renameControlIfNeeded($form, $old-name, $new-name),
                     fbf:updateMipAsAttributeOnly($form, $new-name, 'relevant', $i/relevant),
                     fbf:updateMipAsAttributeOnly($form, $new-name, 'readonly', $i/readonly),
-                    fbf:setRepeatProperties($form, $new-name,
-                                            $i/is-repeat = true(),
-                                            $i/min-repeat,
-                                            $i/max-repeat,
-                                            $i/custom-iteration-name/string(),
-                                            $i/apply-defaults = true())
+                    fbf:setRepeatProperties(
+                        $form, $new-name,
+                        $i/is-repeat = true(),
+                        $i/min-repeat,
+                        $i/max-repeat,
+                        $i/custom-iteration-name/string(),
+                        $i/apply-defaults = true(),
+                        if ($i/initial-iterations = true()) then 'first' else ''
+                    )
                 </xf:action>
 
                 <!-- Write classes -->
@@ -150,6 +161,7 @@
                         <custom-iteration-name/>
 
                         <apply-defaults/>
+                        <initial-iterations/>
 
                         <min-repeat/>            <!-- Minimum number of repetitions -->
                         <max-repeat/>            <!-- Maximum number of repetitions -->
@@ -172,7 +184,7 @@
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
 
                 <xf:bind
-                    ref="was-repeat | is-repeat | was-custom-iteration-name | is-custom-iteration-name | apply-defaults"
+                    ref="was-repeat | is-repeat | was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
                     type="xs:boolean"
                     xxf:default="false()"/>
 
@@ -218,7 +230,7 @@
                 <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
                 <!-- Actual dialog -->
-                <xxf:dialog id="dialog" appearance="full" level="modal">
+                <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-dialog-container-details">
                     <xf:label ref="$resources/dialog-container-details/label"/>
 
                     <fr:tabbable id="tabs">
@@ -291,6 +303,7 @@
                                                 <xf:setvalue ref="$i/min-repeat"               value="1"/>
                                                 <xf:setvalue ref="$i/max-repeat"               value="''"/>
                                                 <xf:setvalue ref="$i/apply-defaults"           value="true()"/>
+                                                <xf:setvalue ref="$i/initial-iterations"       value="true()"/>
                                             </xf:action>
 
                                         </xf:input>
@@ -298,9 +311,14 @@
                                 </xh:tr>
                                 <xf:group ref=".[is-repeat = true()]">
                                     <xh:tr>
-                                        <xh:td colspan="2">
+                                        <xh:td colspan="1">
                                             <xf:input ref="apply-defaults">
                                                 <xf:label ref="$resources/dialog-container-details/apply-defaults/label"/>
+                                            </xf:input>
+                                        </xh:td>
+                                        <xh:td colspan="1">
+                                            <xf:input ref="initial-iterations">
+                                                <xf:label ref="$resources/dialog-container-details/initial-iterations/label"/>
                                             </xf:input>
                                         </xh:td>
                                     </xh:tr>

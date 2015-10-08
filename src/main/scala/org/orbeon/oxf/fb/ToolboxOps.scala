@@ -18,7 +18,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
-import org.orbeon.oxf.fr.{Names, FormRunner}
+import org.orbeon.oxf.fr.FormRunner
 
 /*
  * Form Builder: toolbox operations.
@@ -335,7 +335,8 @@ object ToolboxOps {
       min                  = "1",
       max                  = "",
       iterationNameOrEmpty = "",
-      applyDefaults        = true
+      applyDefaults        = true,
+      initialIterations    = "first"
     )
 
     // Select new td
@@ -465,8 +466,6 @@ object ToolboxOps {
             requestedName
         }
 
-        import Names._
-
         // Insert control and holders
         val newControlElement = insert(into = gridTd, origin = control).head
         insertHolders(
@@ -481,6 +480,8 @@ object ToolboxOps {
         (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
           insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
         }
+
+        import org.orbeon.oxf.fr.Names._
 
         // Rename nested element ids and alert ids
         val nestedElemsWithId =

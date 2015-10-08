@@ -121,6 +121,17 @@
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
                                                     <fr:repeater ref="*" xbl:attr="template origin min max remove-constraint">
+                                                        <!-- Forward iteration events -->
+                                                        <xf:action
+                                                            event="fr-iteration-added fr-iteration-removed"
+                                                            target="#observer"
+                                                            propagate="stop">
+                                                            <xf:dispatch
+                                                                xxbl:scope="inner"
+                                                                targetid="fr-section"
+                                                                name="{{event('xxf:type')}}"/>
+                                                        </xf:action>
+
                                                         <xsl:if test="not($readonly)">
                                                             <xh:div xxf:control="true" ref=".[not($view-mode)]" class="fr-repeat-menu dropdown">
                                                                 <xh:button

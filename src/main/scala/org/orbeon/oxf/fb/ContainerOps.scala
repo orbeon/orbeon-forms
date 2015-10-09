@@ -39,8 +39,8 @@ trait ContainerOps extends ControlOps {
   // Find all siblings of the given element with the given name, excepting the given element
   def findSiblingsWithName(element: NodeInfo, siblingName: String) =
     element parent * child * filter
-        (_.name == siblingName) filterNot
-        (_ == element)
+      (_.name == siblingName) filterNot
+      (_ == element)
 
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
@@ -314,12 +314,13 @@ trait ContainerOps extends ControlOps {
       case None ⇒
         // Insert template instance if not present
         val template: NodeInfo =
-          <xf:instance xmlns:xf="http://www.w3.org/2002/xforms"
-                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                 id={templateInstanceId}
-                 fb:readonly="true"
-                 xxf:exclude-result-prefixes="#all">{nodeInfoToElem(content)}</xf:instance>
+          <xf:instance
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            id={templateInstanceId}
+            fb:readonly="true"
+            xxf:exclude-result-prefixes="#all">{nodeInfoToElem(content)}</xf:instance>
 
         insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
     }

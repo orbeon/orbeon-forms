@@ -34,7 +34,7 @@ trait FormBuilderSupport extends XFormsSupport {
   private def formBuilderContainingDocument(url: String) =
     setupDocument(formBuilderDoc(url))
 
-  def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: DocumentWrapper ⇒ T): T = {
+  def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: DocumentWrapper ⇒ T): T =
     withActionAndDoc(doc) {
       body(
         doc.models
@@ -44,7 +44,6 @@ trait FormBuilderSupport extends XFormsSupport {
         orNull
       )
     }
-  }
 
   def prettyPrintElem(elem: NodeInfo): Unit =
     println(Dom4jUtils.domToPrettyString(TransformerUtils.tinyTreeToDom4j(elem)))
@@ -126,5 +125,6 @@ trait FormBuilderSupport extends XFormsSupport {
         </xh:head>
         <xh:body>
         </xh:body>
-      </xh:html>)
+      </xh:html>
+    )
 }

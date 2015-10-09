@@ -107,16 +107,16 @@
             </xf:instance>
             <xf:action fb:event="xforms-ready"/>
             <xf:action fb:event="xforms-model-construct-done"/>
-            <xf:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
+            <xf:action event="xforms-model-construct" target="#observer" class="fb-annotation">
                 <xf:dispatch name="fb-xforms-model-construct" targetid="|fr-form-model|"/>
             </xf:action>
-            <xf:action ev:event="xforms-recalculate" ev:target="#observer" class="fb-annotation">
+            <xf:action event="xforms-recalculate" target="#observer" class="fb-annotation">
                 <xf:dispatch name="fb-xforms-recalculate" targetid="|fr-form-model|"/>
             </xf:action>
-            <xf:action ev:event="xforms-revalidate" ev:target="#observer" class="fb-annotation">
+            <xf:action event="xforms-revalidate" target="#observer" class="fb-annotation">
                 <xf:dispatch name="fb-xforms-revalidate" targetid="|fr-form-model|"/>
             </xf:action>
-            <xf:action ev:event="xxforms-xpath-error" ev:target="#observer" class="fb-annotation" ev:defaultAction="cancel">
+            <xf:action event="xxforms-xpath-error" target="#observer" class="fb-annotation" defaultAction="cancel">
                 <xf:dispatch name="fb-xxforms-xpath-error" targetid="|fr-form-model|"/>
             </xf:action>
             <xf:var xmlns:ev="http://www.w3.org/2001/xml-events" name="fr-roles" value="''" class="fb-annotation"/>
@@ -181,7 +181,7 @@
                         </xh:tr>
                     </fr:grid>
                 </fr:section>
-                <xf:action ev:event="DOMActivate" xxf:phantom="true" class="fb-annotation">
+                <xf:action event="DOMActivate" xxf:phantom="true" class="fb-annotation">
                     <xf:var name="control-element" value="xxf:control-element(event('xxf:absolute-targetid'))"/>
                     <xf:action if="xxf:split($control-element/@class) = 'xforms-activable'">
                         <xf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxf:element = 'xh:th']) + 1"/>

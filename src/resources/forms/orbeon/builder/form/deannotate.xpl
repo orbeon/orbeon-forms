@@ -26,7 +26,6 @@
                             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                             xmlns:xh="http://www.w3.org/1999/xhtml"
                             xmlns:xf="http://www.w3.org/2002/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events"
                             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
                             xmlns:xbl="http://www.w3.org/ns/xbl">
 
@@ -61,7 +60,7 @@
 
                 <!-- Restore event handlers -->
                 <xsl:template match="@fb:event">
-                    <xsl:attribute name="ev:{local-name()}" select="."/>
+                    <xsl:attribute name="{local-name()}" select="."/>
                 </xsl:template>
 
                 <xsl:template match="xf:group[@id = 'fb-body']">
@@ -107,7 +106,7 @@
                         <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:element>
                 </xsl:template>
-                
+
                 <!-- Restore xxf:custom-mips if we had added it -->
                 <xsl:template match="
                     xh:head/xf:model[
@@ -118,7 +117,7 @@
                     xh:head/xf:model[
                         @id = 'fr-form-model'
                     ]/@fb:added-empty-custom-mips"/>
-                
+
                 <!-- Remove model actions -->
                 <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']/*[p:has-class('fb-annotation')]"/>
 

@@ -130,7 +130,7 @@
                         <xsl:apply-templates select="node()" mode="within-body"/>
 
                         <!-- Listen to activations on grid cells -->
-                        <xf:action ev:event="DOMActivate" xxf:phantom="true" class="fb-annotation">
+                        <xf:action event="DOMActivate" xxf:phantom="true" class="fb-annotation">
                             <xf:var name="control-element" value="xxf:control-element(event('xxf:absolute-targetid'))"/>
                             <xf:action if="xxf:split($control-element/@class) = 'xforms-activable'">
                                 <xf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxf:element = 'xh:th']) + 1"/>
@@ -205,11 +205,11 @@
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
                         <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">
-                            <xf:action ev:event="{.}" ev:target="#observer" class="fb-annotation">
+                            <xf:action event="{.}" target="#observer" class="fb-annotation">
                                 <!-- Upon MIP XPath error cancel the default error behavior (which otherwise can open an
                                      error dialog at inopportune times.) -->
                                 <xsl:if test=". = 'xxforms-xpath-error'">
-                                    <xsl:attribute name="ev:defaultAction">cancel</xsl:attribute>
+                                    <xsl:attribute name="defaultAction">cancel</xsl:attribute>
                                 </xsl:if>
                                 <!-- Dispatch custom event to FB model -->
                                 <!-- USE OF ABSOLUTE ID -->

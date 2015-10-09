@@ -105,8 +105,8 @@
                     <control-10/>
                 </section-9-iteration>
             </xf:instance>
-            <xf:action ev:event="xforms-ready" xmlns:ev="http://www.w3.org/2001/xml-events"/>
-            <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
+            <xf:action event="xforms-ready"/>
+            <xf:action event="xforms-model-construct-done"/>
         </xf:model>
     </xh:head>
     <xh:body>

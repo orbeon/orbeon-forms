@@ -284,7 +284,7 @@ object XML {
     isElement(nodeInfo) && ! hasChildElement(nodeInfo)
 
   private def hasNonEmptyChildNode(nodeInfo: NodeInfo) =
-    nodeInfo child Text filter (_.stringValue.nonEmpty) nonEmpty
+    nodeInfo child Text exists (_.stringValue.nonEmpty)
 
   // TODO: Should be on NodeInfoOps!
   def isAttribute(nodeInfo: NodeInfo)          = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
@@ -568,10 +568,10 @@ object XML {
   }
 
   // Other implicits
-  implicit def itemToItemSeq(item: Item) = Seq(item)
-  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo) = if (node ne null) Seq(node) else Seq()// TODO: don't take null
+  implicit def itemToItemSeq(item: Item): Seq[Item] = Seq(item)
+  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = if (node ne null) Seq(node) else Seq()// TODO: don't take null
 
-  implicit def instanceToNodeInfo(instance: XFormsInstance) = instance.rootElement
+  implicit def instanceToNodeInfo(instance: XFormsInstance): NodeInfo = instance.rootElement
 
   implicit def itemSeqToString(items: Seq[Item]): String = itemSeqToStringOption(items).orNull // TODO: don't return null
   implicit def itemSeqToItemOption(items: Seq[Item]): Option[Item] = items.headOption
@@ -616,8 +616,8 @@ object XML {
 
   implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
 
-  implicit def stringToQName(s: String) = QName.get(s ensuring ! s.contains(':'))
-  implicit def tupleToQName(name: (String, String)) = QName.get(name._2, "", name._1)
+  implicit def stringToQName(s: String): QName = QName.get(s ensuring ! s.contains(':'))
+  implicit def tupleToQName(name: (String, String)): QName = QName.get(name._2, "", name._1)
   def stringToStringValue(s: String) = StringValue.makeStringValue(s)
 
   implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()

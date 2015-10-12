@@ -37,7 +37,7 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
 
         [controlId, resolvedControl] =
             if _.isString(controlIdOrElem)
-                controlId = controlIdOrElem
+                givenControlId = controlIdOrElem
 
                 formId =
                     if _.isElement(formElem)
@@ -47,7 +47,16 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
 
                 ns = ORBEON.xforms.Globals.ns[formId]
 
-                [controlId, document.getElementById(ns + controlId)]
+                # For backward compatibility, handle the case where the id is already prefixed.
+                # This is not great as we don't know for sure whether the control starts with a namespace, e.g. `o0`,
+                # `o1`, etc. It might be safer to disable the short namespaces feature because of this.
+                namespacedControlId =
+                    if (givenControlId.indexOf(ns) == 0)
+                        givenControlId
+                    else
+                        ns + givenControlId
+
+                [givenControlId, document.getElementById(namespacedControlId)]
             else
                 [controlIdOrElem.id, controlIdOrElem]
 

@@ -253,7 +253,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 !(appearanceTrait != null && appearanceTrait.isFull())
             );
 
-        containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items"); // to help with styling
+        // To help with styling
+        containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items");
+
+        // For accessibility, label the group, since the control label doesn't apply to a single input
+        final String role = isMultiple ? "group" : "radiogroup";
+        containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, role);
+        final String labelId = getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.LABEL));
+        containerAttributes.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, labelId);
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";
@@ -596,8 +603,20 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     @Override
     protected void handleLabel() throws SAXException {
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
-        if (isStaticReadonly(currentControlOrNull()) || !(appearanceTrait != null && appearanceTrait.isFull()) || !handlerContext.isNoScript()) {
-            // In noscript mode for full items, this is handled by fieldset/legend
+        final boolean isFull = appearanceTrait != null && appearanceTrait.isFull();
+        if (!isStaticReadonly(currentControlOrNull()) && handlerContext.isNoScript() && isFull) {
+            // NOP: in noscript mode for full items, this is handled by fieldset/legend
+        } else if (isFull) {
+            // For radio and checkboxes, produce span with an id
+            handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.LABEL),
+                                     getEffectiveId(),
+                                     null,
+                                     LHHAC.LABEL,
+                                     "span",                   // Make element name a span, as a label would need a `for`
+                                     currentControlOrNull(),
+                                     isTemplate(),
+                                     true);                    // Pretend we're "external", so the element gets an id
+        } else {
             super.handleLabel();
         }
     }

@@ -56,64 +56,64 @@
 
         <!-- HTTP client configuration -->
         <init-param>
-            <param-name>oxf.http.stale-checking-enabled</param-name>
-            <param-value>true</param-value>
+            <name>oxf.http.stale-checking-enabled</name>
+            <value>true</value>
         </init-param>
         <init-param>
-            <param-name>oxf.http.so-timeout</param-name>
-            <param-value>0</param-value>
+            <name>oxf.http.so-timeout</name>
+            <value>0</value>
         </init-param>
         <init-param>
-            <param-name>oxf.http.chunk-requests</param-name>
-            <param-value>false</param-value>
+            <name>oxf.http.chunk-requests</name>
+            <value>false</value>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.host</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.host</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.port</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.port</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.exclude</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.exclude</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.ssl.hostname-verifier</param-name>
-            <param-value>strict</param-value>
+            <name>oxf.http.ssl.hostname-verifier</name>
+            <value>strict</value>
         </init-param>
         <init-param>
-            <param-name>oxf.http.ssl.keystore.uri</param-name>
-            <param-value/>
+            <name>oxf.http.ssl.keystore.uri</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.ssl.keystore.password</param-name>
-            <param-value/>
+            <name>oxf.http.ssl.keystore.password</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.ssl.keystore.type</param-name>
-            <param-value/>
+            <name>oxf.http.ssl.keystore.type</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.use-ssl</param-name>
-            <param-value>false</param-value>
+            <name>oxf.http.proxy.use-ssl</name>
+            <value>false</value>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.username</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.username</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.password</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.password</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.ntlm.host</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.ntlm.host</name>
+            <value/>
         </init-param>
         <init-param>
-            <param-name>oxf.http.proxy.ntlm.domain</param-name>
-            <param-value/>
+            <name>oxf.http.proxy.ntlm.domain</name>
+            <value/>
         </init-param>
 
         <supports>

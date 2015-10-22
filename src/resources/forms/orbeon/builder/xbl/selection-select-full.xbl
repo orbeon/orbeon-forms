@@ -1,0 +1,52 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xbl:binding id="fb-input-select-full" element="xf|select[appearance ~= full]">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Checkboxes</display-name>
+            <display-name lang="es">Casillas de Verificación</display-name>
+            <display-name lang="fi">Valintaruudut</display-name>
+            <display-name lang="fr">Cases à cocher</display-name>
+            <display-name lang="ru">Галочки</display-name>
+            <display-name lang="de">Mehrfachauswahl</display-name>
+            <display-name lang="it">Scelta multipla</display-name>
+            <display-name lang="nl">Selectievakjes</display-name>
+            <display-name lang="sv">Multival</display-name>
+            <display-name lang="pt">Caixas de Verificação</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <view>
+                    <xf:select id="" appearance="full" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select>
+                </view>
+            </templates>
+        </metadata>
+    </xbl:binding>
+
+</xbl:xbl>

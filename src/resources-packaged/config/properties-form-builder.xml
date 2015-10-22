@@ -16,30 +16,42 @@
 
     <!-- Toolbox -->
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">
-        oxf:/forms/orbeon/builder/xbl/text-controls.xbl
-        oxf:/xbl/orbeon/tinymce/tinymce.xbl
         oxf:/xbl/orbeon/explanation/explanation.xbl
+        oxf:/forms/orbeon/builder/xbl/text-controls.xbl
+        oxf:/forms/orbeon/builder/xbl/text-input.xbl
+        oxf:/forms/orbeon/builder/xbl/text-textarea.xbl
+        oxf:/forms/orbeon/builder/xbl/text-textarea-autosize.xbl
+        oxf:/xbl/orbeon/tinymce/tinymce.xbl
+        oxf:/forms/orbeon/builder/xbl/text-output.xbl
+        oxf:/forms/orbeon/builder/xbl/text-secret.xbl
         oxf:/xbl/orbeon/character-counter/character-counter.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
-        oxf:/xbl/orbeon/us-phone/us-phone.xbl
         oxf:/xbl/orbeon/number/number.xbl
+        oxf:/forms/orbeon/builder/xbl/typed-email.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
+        oxf:/xbl/orbeon/us-phone/us-phone.xbl
         oxf:/xbl/orbeon/us-state/us-state.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
+        oxf:/forms/orbeon/builder/xbl/date-time-date.xbl
+        oxf:/forms/orbeon/builder/xbl/date-time-time.xbl
+        oxf:/forms/orbeon/builder/xbl/date-time-date-time.xbl
         oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
         oxf:/xbl/orbeon/fields-date/fields-date.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*">
-        oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
         oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
+        oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
+        oxf:/forms/orbeon/builder/xbl/selection-select1-full.xbl
+        oxf:/forms/orbeon/builder/xbl/selection-select-full.xbl
         oxf:/xbl/orbeon/box-select/box-select.xbl
+        oxf:/forms/orbeon/builder/xbl/selection-input-boolean.xbl
         oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
         oxf:/xbl/orbeon/autocomplete/autocomplete.xbl
     </property>
@@ -54,6 +66,8 @@
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.button.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/button-controls.xbl
+        oxf:/forms/orbeon/builder/xbl/button-trigger.xbl
+        oxf:/forms/orbeon/builder/xbl/button-trigger-minimal.xbl
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb">

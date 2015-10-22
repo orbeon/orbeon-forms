@@ -170,7 +170,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
 
         // Add new control to the form
         val addedControl = {
-          val selectionControls = TransformerUtils.urlToTinyTree("oxf:/forms/orbeon/builder/xbl/selection-controls.xbl")
+          val selectionControls = TransformerUtils.urlToTinyTree("oxf:/forms/orbeon/builder/xbl/selection-select1-full.xbl")
           val selectionBindings = selectionControls.rootElement.child("binding")
           val radioBinding = selectionBindings.find(_.id == "fb-input-select1-full").get
           ToolboxOps.insertNewControl(doc, radioBinding)

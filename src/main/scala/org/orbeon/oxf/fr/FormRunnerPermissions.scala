@@ -43,28 +43,36 @@ trait FormRunnerPermissions {
   //@XPathFunction
   def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
     if (permissionsElement eq null)
-      Seq("*")                                                         // No permissions defined for this form, authorize any operation
+      Seq("*")                                            // No permissions defined for this form, authorize any operation
     else
       (permissionsElement \ "permission")
           .filter(p ⇒
-          (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
-          (p \ * forall (_.localname == "user-role")))             // … or with only `user-role` constraints
+          (p \ * isEmpty) ||                              // Only consider permissions with no constraints (unnecessary line for clarity)
+          (p \ * forall (_.localname == "user-role")))    // … or with only `user-role` constraints
           .filter(p ⇒
-          p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
-            ScalaUtils.split((r \@ "any-of").stringValue)        // Constraint is satisfied if user has at least one of the roles
-            .map(_.replace("%20", " "))                          // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
+          p \ "user-role" forall (r ⇒                     // If we have user-role constraints, they must all pass
+            ScalaUtils.split((r \@ "any-of").stringValue) // Constraint is satisfied if user has at least one of the roles
+            .map(_.replace("%20", " "))                   // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
               .intersect(orbeonRoles.toSeq).nonEmpty))
-        .flatMap(permissionOperations)                               // For the permissions that passed, return the list operations
-        .distinct                                                    // Remove duplicate operations
+        .flatMap(permissionOperations)                    // For the permissions that passed, return the list operations
+        .distinct                                         // Remove duplicate operations
   }
 
   //@XPathFunction
-  def xpathAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
+  def xpathAllAuthorizedOperations(
+    permissionsElement : NodeInfo,
+    dataUsername       : String,
+    dataGroupname      : String
+  ): Seq[String] = {
     def toOption(s: String) = if (s == null || s == "") None else Some(s)
     allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname))
   }
 
-  def allAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: Option[String], dataGroupname: Option[String]): Seq[String] = {
+  def allAuthorizedOperations(
+    permissionsElement : NodeInfo,
+    dataUsername       : Option[String],
+    dataGroupname      : Option[String]
+  ): Seq[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
     assert(dataUsername  != null)
@@ -72,25 +80,35 @@ trait FormRunnerPermissions {
     assert(dataUsername .map(_ != "").getOrElse(true))
     assert(dataGroupname.map(_ != "").getOrElse(true))
 
-    def operations(headerWithUsernameOrGroupname: String, maybeDataUsernameOrGroupname: Option[String], condition: String): Seq[String] = {
+    def operations(
+      headerWithUsernameOrGroupname : String,
+      maybeDataUsernameOrGroupname  : Option[String],
+      condition                     : String
+    ): Seq[String] = {
       val request = NetUtils.getExternalContext.getRequest
-      val maybeCurrentUsernameOrGroupname = request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).toSeq.flatten.headOption
+
+      val maybeCurrentUsernameOrGroupname =
+        request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).toSeq.flatten.headOption
+
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
           if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
-            val allPermissions = permissionsElement \ "permission"
+            val allPermissions                   = permissionsElement \ "permission"
             val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
+
             permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
         case _ ⇒ Nil
       }
     }
 
     val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
+
     rolesOperations match {
       case Seq("*") ⇒ Seq("*")
       case _ ⇒
         val ownerOperations       = operations(OrbeonUsernameHeaderName, dataUsername,  "owner")
         val groupMemberOperations = operations(OrbeonGroupHeaderName   , dataGroupname, "group-member")
+
         (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }

@@ -31,7 +31,7 @@ trait FormRunnerPermissions {
    * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
    * the operations attribute.
    */
-  private def permissionOperations(permissionElement: NodeInfo): Seq[String] =
+  private def permissionOperations(permissionElement: NodeInfo): List[String] =
     permissionElement attTokens "operations" toList
 
   /**
@@ -43,7 +43,7 @@ trait FormRunnerPermissions {
   //@XPathFunction
   def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
     if (permissionsElement eq null)
-      Seq("*")                                            // No permissions defined for this form, authorize any operation
+      List("*")                                            // No permissions defined for this form, authorize any operation
     else
       (permissionsElement \ "permission")
           .filter(p ⇒
@@ -68,6 +68,8 @@ trait FormRunnerPermissions {
     allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname))
   }
 
+  // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and
+  // allAuthorizedOperationsAssumingOwnerGroupMember
   def allAuthorizedOperations(
     permissionsElement : NodeInfo,
     dataUsername       : Option[String],
@@ -75,12 +77,12 @@ trait FormRunnerPermissions {
   ): Seq[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
-    assert(dataUsername  != null)
-    assert(dataGroupname != null)
-    assert(dataUsername .map(_ != "").getOrElse(true))
-    assert(dataGroupname.map(_ != "").getOrElse(true))
+    require(dataUsername  ne null)
+    require(dataGroupname ne null)
+    require(dataUsername .map(_ != "").getOrElse(true))
+    require(dataGroupname.map(_ != "").getOrElse(true))
 
-    def operations(
+    def ownerGroupMemberOperations(
       headerWithUsernameOrGroupname : String,
       maybeDataUsernameOrGroupname  : Option[String],
       condition                     : String
@@ -88,7 +90,7 @@ trait FormRunnerPermissions {
       val request = NetUtils.getExternalContext.getRequest
 
       val maybeCurrentUsernameOrGroupname =
-        request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).toSeq.flatten.headOption
+        request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).to[List].flatten.headOption
 
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
@@ -104,10 +106,10 @@ trait FormRunnerPermissions {
     val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
 
     rolesOperations match {
-      case Seq("*") ⇒ Seq("*")
+      case Seq("*") ⇒ List("*")
       case _ ⇒
-        val ownerOperations       = operations(OrbeonUsernameHeaderName, dataUsername,  "owner")
-        val groupMemberOperations = operations(OrbeonGroupHeaderName   , dataGroupname, "group-member")
+        val ownerOperations       = ownerGroupMemberOperations(OrbeonUsernameHeaderName, dataUsername,  "owner")
+        val groupMemberOperations = ownerGroupMemberOperations(OrbeonGroupHeaderName   , dataGroupname, "group-member")
 
         (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
@@ -168,17 +170,22 @@ trait FormRunnerPermissions {
       }
 
       // Is this form metadata returned by the API?
-      val keepForm = isAdmin ||                             // Admins can see everything, otherwise:
-        ! (   formName == "library"                       // Filter libraries
-           || operations.isEmpty                          // Filter forms on which user can't possibly do anything
-           || formEl.elemValue("available") == "false")   // Filter forms marked as not available
+      val keepForm =
+        isAdmin ||                                 // admins can see everything, otherwise:
+        ! (
+          formName == "library" ||                 // filter libraries
+          operations.isEmpty    ||                 // filter forms on which user can't possibly do anything
+          formEl.elemValue("available") == "false" // filter forms marked as not available
+        )
 
       // If kept, rewrite <form> to add operations="…" attribute
       keepForm list {
-        val newFormEl = wrapper.wrap(element("form"))
+        val newFormEl      = wrapper.wrap(element("form"))
         val operationsAttr = attributeInfo("operations", operations mkString " ")
         val newFormContent = operationsAttr +: formEl.child(*)
+
         insert(into = Seq(newFormEl), origin = newFormContent)
+
         newFormEl
       }
     }

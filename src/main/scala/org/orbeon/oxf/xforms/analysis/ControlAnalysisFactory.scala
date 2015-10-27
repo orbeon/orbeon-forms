@@ -39,8 +39,8 @@ object ControlAnalysisFactory {
   abstract class ValueControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
      with ValueTrait
@@ -51,8 +51,8 @@ object ControlAnalysisFactory {
   class InputValueControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends ValueControl(staticStateContext, element, parent, preceding, scope)
      with RequiredSingleNode {
@@ -63,8 +63,8 @@ object ControlAnalysisFactory {
   class SelectionControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
      with SelectionControlTrait {
@@ -74,8 +74,8 @@ object ControlAnalysisFactory {
   class TriggerControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
      with OptionalSingleNode
@@ -89,8 +89,8 @@ object ControlAnalysisFactory {
   class UploadControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
 
@@ -103,8 +103,8 @@ object ControlAnalysisFactory {
   class InputControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
@@ -113,8 +113,8 @@ object ControlAnalysisFactory {
   class SecretControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
@@ -123,8 +123,8 @@ object ControlAnalysisFactory {
   class TextareaControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
@@ -165,10 +165,10 @@ object ControlAnalysisFactory {
 
       val literal =
         XPath.evaluateAsLiteralIfPossible(
-          xpathString      = XPath.makeStringExpression(valueExpr), 
-          namespaceMapping = namespaceMapping, 
-          locationData     = locationData, 
-          functionLibrary  = XFormsFunctionLibrary, 
+          xpathString      = XPath.makeStringExpression(valueExpr),
+          namespaceMapping = namespaceMapping,
+          locationData     = locationData,
+          functionLibrary  = XFormsFunctionLibrary,
           avt              = false
         )
 
@@ -185,8 +185,8 @@ object ControlAnalysisFactory {
   class GroupControl(
     staticStateContext : StaticStateContext,
     element            : Element,
-    parent             : Option[ElementAnalysis], 
-    preceding          : Option[ElementAnalysis], 
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
      with OptionalSingleNode

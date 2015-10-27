@@ -81,7 +81,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
       select1Handler.init(uri, localname, qName, attributes, elementAnalysis)
       select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
     } else {
-      
+
       val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
       // Create xh:input
@@ -89,7 +89,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
         // Regular read-write mode
 
         val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
-        
+
         // Main input field
         {
           val inputIdName = getFirstInputEffectiveId(effectiveId)

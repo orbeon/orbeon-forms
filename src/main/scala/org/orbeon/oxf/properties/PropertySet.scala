@@ -51,7 +51,7 @@ private class PropertyNode {
  * TODO: Make this effectively immutable and remove `setProperty`.
  */
 class PropertySet {
-  
+
   private var exactProperties = Map[String, Property]()
   private val wildcardProperties = new PropertyNode
 
@@ -66,19 +66,19 @@ class PropertySet {
   def setProperty(element: Element, name: String, typ: QName, stringValue: String): Unit = {
     val value = PropertyStore.getObjectFromStringValue(stringValue, typ, element)
     val property = Property(typ, value, Dom4jUtils.getNamespaceContext(element).asScala.toMap)
-    
+
     // Store exact property name anyway
     exactProperties += name → property
-    
+
     // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
     var currentNode = wildcardProperties
     for (currentToken ← split[List](name, ".")) {
       if (currentNode.children eq null)
         currentNode.children = mutable.LinkedHashMap[String, PropertyNode]()
-      
+
       currentNode = currentNode.children.getOrElseUpdate(currentToken, new PropertyNode)
     }
-    
+
     // Store value
     currentNode.property = property
   }
@@ -90,26 +90,26 @@ class PropertySet {
    * an unmodifiable Map<String, Boolean> of all Boolean properties.
    */
   def getBooleanProperties: JMap[String, JBoolean] = {
-    val tuples = 
+    val tuples =
       for {
         key ← exactProperties.keys
         o = getObject(key)
         if o.isInstanceOf[JBoolean]
       } yield
         key → o.asInstanceOf[JBoolean]
-    
+
     tuples.toMap.asJava
   }
 
   // Return all the properties starting with the given name
   def propertiesStartsWith(name: String, matchWildcards: Boolean = true): List[String] = {
-    
+
     val result = mutable.Buffer[String]()
-    
+
     def processNode(propertyNode: PropertyNode, consumed: String, tokens: List[String], currentTokenPosition: Int): Unit = {
-      
+
       def appendToConsumed(s: String) = if (consumed.length == 0) s else consumed + "." + s
-      
+
       tokens.lift(currentTokenPosition) match {
         case x @ (Some("*") | None) ⇒
 
@@ -137,9 +137,9 @@ class PropertySet {
           }
       }
     }
-    
+
     processNode(wildcardProperties, "", split[List](name, "."), 0)
-    
+
     result.toList
   }
 
@@ -154,7 +154,7 @@ class PropertySet {
    * @         property object if found
    */
   private def getProperty(name: String, typ: QName): Property = {
-    
+
     def getPropertyWorker(propertyNode: PropertyNode, tokens: List[String], currentTokenPosition: Int): Property = {
       if (propertyNode eq null) {
         // Dead end
@@ -166,9 +166,9 @@ class PropertySet {
         // Dead end
         if (propertyNode.children eq null)
           return null
-        
+
         val currentToken = tokens(currentTokenPosition)
-        
+
         // Look for value with actual token
         var newNode = propertyNode.children.get(currentToken).orNull
         val result = getPropertyWorker(newNode, tokens, currentTokenPosition + 1)
@@ -179,20 +179,20 @@ class PropertySet {
         getPropertyWorker(newNode, tokens, currentTokenPosition + 1)
       }
     }
-    
+
     def getExact = exactProperties.get(name)
-    
+
     def getWildcard = Option(getPropertyWorker(wildcardProperties, split[List](name, "."), 0))
-    
-    def checkType(p: Property) = 
+
+    def checkType(p: Property) =
       if ((typ ne null) && typ != p.typ)
         throw new OXFException("Invalid attribute type requested for property '" + name + "': expected " + typ.getQualifiedName + ", found " + p.typ.getQualifiedName)
       else
         p
-    
+
     getExact orElse getWildcard map checkType orNull
   }
-  
+
   /* All getters */
 
   private def getPropertyValue(name: String, typ: QName): AnyRef =

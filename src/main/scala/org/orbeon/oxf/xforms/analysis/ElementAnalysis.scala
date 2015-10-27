@@ -79,7 +79,7 @@ abstract class ElementAnalysis(
   // Scope and model
   val scope: Scope
   val model: Option[Model]
-  
+
   // In-scope variables (for XPath analysis)
   val inScopeVariables: Map[String, VariableTrait]
 
@@ -194,7 +194,7 @@ abstract class ElementAnalysis(
     "value"             → self.isInstanceOf[ValueTrait].toString,
     "name"              → element.attributeValue("name")
   )
-  
+
   def toXMLContent(helper: XMLReceiverHelper): Unit = {
     // Control binding and value analysis
     if (_bindingAnalyzed)
@@ -215,7 +215,7 @@ abstract class ElementAnalysis(
         case _ ⇒ // NOP
       }
   }
-  
+
   final def toXML(helper: XMLReceiverHelper): Unit = {
     helper.startElement(localName, toXMLAttributes flatMap (t ⇒ Seq(t._1, t._2)) toArray)
     toXMLContent(helper)
@@ -277,7 +277,7 @@ trait ElementEventHandlers {
     handlersForObserver(observer) exists (_.isPhantom)
 
   // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-  // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug. 
+  // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
   private[analysis] def relevantObservers: List[ElementAnalysis] = {
 
     def observersInAncestorParts =
@@ -495,13 +495,13 @@ object ElementAnalysis {
           new ExtendedLocationData(data, "gathering static information", element)
         case _ ⇒ null
       }
-  
+
   /**
    * Get the value of an attribute containing a space-separated list of tokens as a set.
    */
   def attSet(element: Element, qName: QName) =
     stringOptionToSet(Option(element.attributeValue(qName)))
-  
+
   def attSet(element: Element, name: String) =
     stringOptionToSet(Option(element.attributeValue(name)))
 

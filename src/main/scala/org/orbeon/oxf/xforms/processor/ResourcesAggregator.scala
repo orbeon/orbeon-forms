@@ -155,7 +155,7 @@ class ResourcesAggregator extends ProcessorImpl {
                 e.text foreach helper.text
                 helper.endElement()
               }
-              
+
               def outputScriptCSSAsJSON() = {
 
                 // NOTE: oxf:xhtml-rewrite usually takes care of URL rewriting, but not in JSON content.
@@ -164,7 +164,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
                 def appendJS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
                 def appendCSS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
-                
+
                 def appendPreservedElement(e: HeadElement) =
                   e match {
                     case ref: ReferenceElement ⇒
@@ -181,14 +181,14 @@ class ResourcesAggregator extends ProcessorImpl {
                   (aggregate(baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
                     aggregate(supplementalJS -- baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
                       (preservedJS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
-                
+
                 builder append """],"styles":["""
 
                 builder append
                   (aggregate(baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
                     aggregate(supplementalCSS -- baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
                       (preservedCSS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
-                
+
                 builder append """]}"""
 
                 helper.startElement(xhtmlPrefix, uri, "div", Array("class", "orbeon-portlet-resources"))

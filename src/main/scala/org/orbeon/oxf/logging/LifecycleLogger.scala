@@ -83,7 +83,7 @@ object LifecycleLogger {
       req.getAttributesMap.put(LoggerName + ".request-id", requestId)
       requestId → false
     }
-  
+
   private def findSessionId(req: Request): Option[String] =
     Option(req.getSession(false)) map (_.getId)
 

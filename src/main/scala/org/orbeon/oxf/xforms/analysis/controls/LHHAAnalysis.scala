@@ -26,9 +26,9 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 
 class LHHAAnalysis(
-  staticStateContext : StaticStateContext, 
-  element            : Element, 
-  parent             : Option[ElementAnalysis], 
+  staticStateContext : StaticStateContext,
+  element            : Element,
+  parent             : Option[ElementAnalysis],
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
@@ -136,10 +136,10 @@ class LHHAAnalysis(
               // Add dependencies
               val outputAnalysis =
                 new SimpleElementAnalysis(
-                  staticStateContext = staticStateContext, 
-                  element            = element, 
-                  parent             = Some(delegateAnalysis), 
-                  preceding          = None, 
+                  staticStateContext = staticStateContext,
+                  element            = element,
+                  parent             = Some(delegateAnalysis),
+                  preceding          = None,
                   scope              = delegateAnalysis.getChildElementScope(element)
                 ) with ValueTrait with OptionalSingleNode with ViewTrait
               outputAnalysis.analyzeXPath()
@@ -174,7 +174,7 @@ object LHHAAnalysis {
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
   private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
-    
+
     val SearchExpression =
       """
         not(
@@ -184,11 +184,11 @@ object LHHAAnalysis {
         )
         )
       """
-    
+
     XPathCache.evaluateSingle(
       contextItem        = new DocumentWrapper(
         lhhaElement.getDocument,
-        null, 
+        null,
         XPath.GlobalConfiguration
       ).wrap(lhhaElement),
       xpathString        = SearchExpression,

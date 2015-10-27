@@ -286,7 +286,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // Add attributes
     val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
-    
+
     def outputElement() =
       if (doOutputElement)
         ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)

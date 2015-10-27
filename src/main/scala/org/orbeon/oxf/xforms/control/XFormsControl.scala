@@ -138,7 +138,7 @@ class XFormsControl(
     // Unlike ElementAnalysis we don't store a `preceding` pointer so we have to search for it
     val siblingsOrSelf = parent.asInstanceOf[XFormsContainerControl].children
     val index          = siblingsOrSelf indexWhere (this eq)
-    
+
     index > 0 option siblingsOrSelf(index - 1)
   }
 

@@ -23,12 +23,12 @@ import org.orbeon.saxon.om._
  * xxf:invalid-binds()
  */
 class XXFormsInvalidBinds extends XFormsFunction with FunctionSupport {// don't extend XFormsMIPFunction as addToPathMap returns something different
-  
+
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
-    
+
     // First item or context node if any
     val item = argument.lift(0) map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
-    
+
     item match {
       case Some(nodeInfo: NodeInfo) ⇒
         Option(InstanceData.getInvalidBindIds(nodeInfo)) match {

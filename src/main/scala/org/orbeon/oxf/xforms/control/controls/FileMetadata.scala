@@ -99,7 +99,7 @@ trait FileMetadata extends XFormsValueControl {
 
   def setFileSize(size: String): Unit =
     setInfoValue(sizeElement, size)
-  
+
   def addFileMetadataAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: FileMetadata): Boolean = {
     val uploadControl1 = other
     val uploadControl2 = self

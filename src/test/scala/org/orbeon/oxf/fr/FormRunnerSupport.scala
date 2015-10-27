@@ -33,7 +33,7 @@ trait FormRunnerSupport {
   sealed trait CacheEvent
   case class DigestAndTemplate(digestIfFound: Option[String]) extends CacheEvent
   case class StaticState(found: Boolean, digest: String)      extends CacheEvent
-  
+
   val DummyDocument: NodeInfo = <dummy/>
 
   // Simulate a call to Form Runner by running the FR PFC
@@ -144,7 +144,7 @@ trait FormRunnerSupport {
       (serializer.runGetTinyTree(pipelineContext), events.toList)
     }
   }
-  
+
   def newFRRequest(path: String, noscript: Boolean): NodeInfo =
     <request>
       <container-type>servlet</container-type>

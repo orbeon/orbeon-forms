@@ -34,14 +34,14 @@ case class ConnectionResult(
   hasContent        : Boolean,
   dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
 ) extends Logging {
-  
+
   import ConnectionResult._
 
   val lastModified     = HttpHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
   def lastModifiedJava = lastModified map (_.asInstanceOf[JLong]) orNull
-    
+
   def close() = content.close()
-    
+
   val mediatype =
     content.contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeMediaType(ct)))
 
@@ -88,9 +88,9 @@ case class ConnectionResult(
         NetUtils.readStreamAsString(reader)
       }
     case mediatype if XMLUtils.isTextOrJSONContentType(mediatype) ⇒
-      readStreamAsText(content.inputStream, charset) 
+      readStreamAsText(content.inputStream, charset)
   }
-  
+
   private var _didLogResponseDetails = false
 
   // See https://github.com/orbeon/orbeon-forms/issues/1900
@@ -118,7 +118,7 @@ case class ConnectionResult(
 }
 
 object ConnectionResult {
-  
+
   def apply(
     url               : String,
     statusCode        : Int,
@@ -126,25 +126,25 @@ object ConnectionResult {
     content           : StreamedContent,
     dontHandleResponse: Boolean = false // TODO: Should be outside of ConnectionResult.
   ): ConnectionResult = {
-    
+
     val (hasContent, resetInputStream) = {
-  
+
       val bis =
         if (content.inputStream.markSupported)
           content.inputStream
         else
           new BufferedInputStream(content.inputStream)
-  
+
       def hasContent(bis: InputStream) = {
         bis.mark(1)
         val result = bis.read != -1
         bis.reset()
         result
       }
-  
+
       (hasContent(bis), bis)
     }
-    
+
     ConnectionResult(
       url                = url,
       statusCode         = statusCode,

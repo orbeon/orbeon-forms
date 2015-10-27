@@ -30,7 +30,7 @@ private case class FilterSettings(context: ServletContext, orbeonContextPathOpt:
 
 // This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
 class OrbeonXFormsFilter extends Filter {
-  
+
   import org.orbeon.oxf.servlet.OrbeonXFormsFilter._
 
   private var settingsOpt: Option[FilterSettings] = None
@@ -78,7 +78,7 @@ class OrbeonXFormsFilter extends Filter {
           RendererDeploymentAttributeName,
           if (orbeonContext eq servletContext) "integrated" else "separate"
         )
-        
+
         requestPath match {
           case settings.OrbeonResourceRegex(subRequestPath) ⇒
             // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
@@ -90,7 +90,7 @@ class OrbeonXFormsFilter extends Filter {
             if (subRequestPath.startsWith("/xforms-server"))
               httpRequest.getSession(false) ensuring
               (_ ne null, "Session has expired. Unable to process incoming request.")
-            
+
             getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse)
           case _ ⇒
             // Forward the request to the Orbeon Forms renderer
@@ -168,7 +168,7 @@ class OrbeonXFormsFilter extends Filter {
 }
 
 object OrbeonXFormsFilter {
-  
+
   val RendererDeploymentAttributeName      = "oxf.xforms.renderer.deployment"
   val RendererBaseUriAttributeName         = "oxf.xforms.renderer.base-uri"
   val RendererDocumentAttributeName        = "oxf.xforms.renderer.document"

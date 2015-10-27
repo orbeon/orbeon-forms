@@ -227,11 +227,11 @@ object Controls {
     sourceEffectiveId : String,
     targetPrefixedId  : String
   ): String = {
-    
+
     // Don't do anything if there are no controls
     if (tree.getChildren.isEmpty)
       return null
-    
+
     // NOTE: The implementation tries to do a maximum using the static state. One reason is that the source
     // control's effective id might not yet have an associated control during construction. E.g.:
     //
@@ -244,12 +244,12 @@ object Controls {
     // We trust the caller to pass a valid source effective id. That value is always internal, i.e. not created by a
     // form author. On the other hand, the target id cannot be trusted as it is typically specified by the form
     // author.
-    
+
     // 1: Check preconditions
     require(sourceEffectiveId ne null, "Source effective id is required.")
-    
+
     // 3: Implement XForms 1.1 "4.7.1 References to Elements within a repeat Element" algorithm
-    
+
     // Find closest common ancestor repeat
 
     val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
@@ -337,13 +337,13 @@ object Controls {
 
     private var _visitedCount = 0
     def visitedCount = _visitedCount
-    
+
     private var _updatedCount = 0
     def updatedCount = _updatedCount
-    
+
     private var _optimizedCount = 0
     def optimizedCount = _optimizedCount
-    
+
     var _partialFocusRepeatOption: Option[XFormsRepeatControl] = None
     def partialFocusRepeat = _partialFocusRepeatOption
 

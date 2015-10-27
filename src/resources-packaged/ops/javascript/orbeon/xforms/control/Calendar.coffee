@@ -128,6 +128,8 @@ Event.onDOMReady ->
                     yuiOverlay = new YAHOO.widget.Overlay calendarDiv, {constraintoviewport: true}
                     yuiOverlay.setBody ""
                     yuiOverlay.render()
+                    # Add our class for styling
+                    $(calendarDiv).addClass('xforms-calendar-div')
                     # Create YUI calendar
                     hasTwoMonths = Properties.datePickerTwoMonths.get()
                     bd = (YD.getElementsByClassName "bd", null, calendarDiv)[0]

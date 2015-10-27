@@ -301,13 +301,13 @@
 .orbeon .xforms-submit button span {
   vertical-align: middle;
 }
-.orbeon #orbeon-calendar-div .yui-calendar .calheader {
+.orbeon .xforms-calendar-div .yui-calendar .calheader {
   padding-top: .3em;
 }
-.orbeon #orbeon-calendar-div .yui-calendar .calnavleft {
+.orbeon .xforms-calendar-div .yui-calendar .calnavleft {
   top: 7px;
 }
-.orbeon #orbeon-calendar-div .yui-calendar .calyearleft {
+.orbeon .xforms-calendar-div .yui-calendar .calyearleft {
   overflow: hidden;
   position: absolute;
   text-indent: -10000em;
@@ -321,10 +321,10 @@
   top: -7px;
   width: 25px;
 }
-.orbeon #orbeon-calendar-div .yui-calendar .calnavright {
+.orbeon .xforms-calendar-div .yui-calendar .calnavright {
   top: 7px;
 }
-.orbeon #orbeon-calendar-div .yui-calendar .calyearright {
+.orbeon .xforms-calendar-div .yui-calendar .calyearright {
   overflow: hidden;
   position: absolute;
   text-indent: -10000em;

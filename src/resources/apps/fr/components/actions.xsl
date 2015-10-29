@@ -51,7 +51,7 @@
                     generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')
                 ]/
                 xf:action[
-                    p:split(@ev:event) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')
+                    p:split((@event, @ev:event)[1]) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')
                 ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>

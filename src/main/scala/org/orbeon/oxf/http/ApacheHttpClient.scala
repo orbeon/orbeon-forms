@@ -30,7 +30,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory
 import org.apache.http.entity.{ContentType, InputStreamEntity}
 import org.apache.http.impl.auth.{BasicScheme, NTLMEngine, NTLMEngineException, NTLMScheme}
 import org.apache.http.impl.client.{BasicCredentialsProvider, DefaultHttpClient}
-import org.apache.http.impl.conn.PoolingClientConnectionManager
+import org.apache.http.impl.conn.{PoolingHttpClientConnectionManager, PoolingClientConnectionManager}
 import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
@@ -263,8 +263,8 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
       // Pooling connection manager with limits removed
       new PoolingClientConnectionManager(schemeRegistry) |!>
-          (_.setMaxTotal(Integer.MAX_VALUE))         |!>
-          (_.setDefaultMaxPerRoute(Integer.MAX_VALUE))
+        (_.setMaxTotal(Integer.MAX_VALUE))               |!>
+        (_.setDefaultMaxPerRoute(Integer.MAX_VALUE))
     }
 
 

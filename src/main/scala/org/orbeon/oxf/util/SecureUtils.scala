@@ -175,7 +175,7 @@ object SecureUtils {
   private def withEncoding(bytes: Array[Byte], encoding: String) = encoding match {
     case "base64" ⇒ Base64.encode(bytes, false)
     case "hex"    ⇒ byteArrayToHex(bytes)
-    case _        ⇒ throw new IllegalArgumentException("Invalid digest encoding (must be one of 'base64' or 'hex'): " + encoding)
+    case _        ⇒ throw new IllegalArgumentException(s"Invalid digest encoding (must be one of `base64` or `hex`): `$encoding`")
   }
 
   // Convert to a lowercase hexadecimal value

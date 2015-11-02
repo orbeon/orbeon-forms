@@ -120,7 +120,7 @@
                                         <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
-                                                    <fr:repeater ref="*" xbl:attr="template origin min max remove-constraint">
+                                                    <fr:repeater ref="*" xbl:attr="template origin min max remove-constraint apply-defaults">
                                                         <!-- Forward iteration events -->
                                                         <xf:action
                                                             event="fr-iteration-added fr-iteration-removed"

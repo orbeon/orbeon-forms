@@ -29,6 +29,7 @@ import scala.xml.Elem
 
 trait FormRunnerMetadata {
 
+  //noinspection MapFlatten
   //@XPathFunction
   def createFormMetadataDocument(data: NodeInfo): NodeInfo = {
 
@@ -105,7 +106,8 @@ trait FormRunnerMetadata {
         staticControl     ← collectByErasedType[StaticLHHASupport](control.staticControl)
         resourcesInstance ← resourcesInstance(control)
         controlName       ← Option(FormRunner.controlNameFromId(control.getId))
-        dataHash          = SubmissionUtils.dataNodeHash(control.boundNode.get)
+        boundNode         ← control.boundNode
+        dataHash          = SubmissionUtils.dataNodeHash(boundNode)
       } yield
         dataHash →
           <control

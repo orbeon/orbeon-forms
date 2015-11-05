@@ -68,7 +68,8 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
      with SelectionControlTrait {
-    override protected val allowedExtensionAttributes = ! isMultiple && isFull set XXFORMS_GROUP_QNAME
+    override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) ++
+                                                        Set(XXFORMS_TITLE_QNAME)
   }
 
   class TriggerControl(
@@ -97,7 +98,7 @@ object ControlAnalysisFactory {
     override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
     override val externalEvents = externalEventsDef
 
-    override protected val allowedExtensionAttributes = Set(ACCEPT_QNAME, MEDIATYPE_QNAME)
+    override protected val allowedExtensionAttributes = Set(ACCEPT_QNAME, MEDIATYPE_QNAME, XXFORMS_TITLE_QNAME)
   }
 
   class InputControl(
@@ -107,7 +108,7 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
-    override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
+    override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_TITLE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
   }
 
   class SecretControl(

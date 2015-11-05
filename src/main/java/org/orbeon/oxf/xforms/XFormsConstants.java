@@ -212,6 +212,7 @@ public class XFormsConstants {
     public static final QName XFORMS_FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);
     public static final QName XFORMS_MEDIATYPE_QNAME = new QName("mediatype", XFORMS_NAMESPACE);
     public static final QName XXFORMS_SIZE_QNAME = new QName("size", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_TITLE_QNAME = new QName("title", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MAXLENGTH_QNAME = new QName("maxlength", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_COLS_QNAME = new QName("cols", XXFORMS_NAMESPACE);

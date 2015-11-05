@@ -124,13 +124,20 @@
 
             <xf:group class="fr-component-group">
 
+                <!-- Don't show fields at all in static readonly mode -->
                 <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
-                    <!-- Don't show fields at all in static readonly mode -->
-                    <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
+
                     <xf:var name="month-first" value="starts-with(xxf:property('oxf.xforms.format.input.date'), '[M]')"/>
-                    <xf:input ref="if ($month-first) then month else day"   class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input"/>
-                    <xf:input ref="if ($month-first) then day   else month" class="fr-width-2digits"/>
-                    <xf:input ref="year"  class="fr-width-4digits"/>
+                    <xf:var name="ref-1"       value="if ($month-first) then month else day  "/>
+                    <xf:var name="ref-2"       value="if ($month-first) then day   else month"/>
+                    <xf:var name="title-1"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'month' else 'day'  ), '|fr-fr-resources|')"/>
+                    <xf:var name="title-2"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'day'   else 'month'), '|fr-fr-resources|')"/>
+                    <xf:var name="title-3"     value="xxf:r('components.date-time.year', '|fr-fr-resources|')"/>
+                    
+                    <!-- navindex is copied to first field, but need one for second field too! -->
+                    <xf:input ref="$ref-1" xxf:title="{$title-1}" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input"/>
+                    <xf:input ref="$ref-2" xxf:title="{$title-2}" class="fr-width-2digits"/>
+                    <xf:input ref="year"   xxf:title="{$title-3}" class="fr-width-4digits"/>
                 </xf:group>
 
                 <!-- React to update to local values -->

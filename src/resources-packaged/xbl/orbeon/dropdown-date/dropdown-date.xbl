@@ -101,56 +101,6 @@
                     <days/>
                 </xf:instance>
 
-                <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
-                        <resource xml:lang="en">
-                            <year>Year</year>
-                            <month>Month</month>
-                            <day>Day</day>
-                        </resource>
-                        <resource xml:lang="es">
-                            <year>Año</year>
-                            <month>Mes</month>
-                            <day>Día</day>
-                        </resource>
-                        <resource xml:lang="fi">
-                            <year>Vuosi</year>
-                            <month>Kuukausi</month>
-                            <day>Päivä</day>
-                        </resource>
-                        <resource xml:lang="fr">
-                            <year>Année</year>
-                            <month>Mois</month>
-                            <day>Jour</day>
-                        </resource>
-                        <resource xml:lang="it">
-                            <year>Anno</year>
-                            <month>Mese</month>
-                            <day>Giorno</day>
-                        </resource>
-                        <resource xml:lang="de">
-                            <year>Jahr</year>
-                            <month>Monat</month>
-                            <day>Tag</day>
-                        </resource>
-                        <resource xml:lang="sv">
-                            <year>År</year>
-                            <month>Månad</month>
-                            <day>Dag</day>
-                        </resource>
-                        <resource xml:lang="nl">
-                            <year>Jaar</year>
-                            <month>Maand</month>
-                            <day>Dag</day>
-                        </resource>
-                        <resource xml:lang="pt">
-                            <year>Ano</year>
-                            <month>Mês</month>
-                            <day>Dia</day>
-                        </resource>
-                    </resources>
-                </xf:instance>
-
                 <!-- Initialize itemsets upon initialization -->
                 <xf:action ev:event="xforms-model-construct-done">
                     <xf:var name="start-year" value="saxon:evaluate(xxf:property('oxf.xforms.xbl.fr.dropdown-date.start-year'))" as="xs:integer"/>
@@ -210,9 +160,15 @@
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
                     <xf:var name="month-first" value="starts-with(xxf:property('oxf.xforms.format.input.date'), '[M]')"/>
-                    <xf:select1 ref="if ($month-first) then month else day" id="select1">
+                    <xf:var name="ref-1"       value="if ($month-first) then month else day  "/>
+                    <xf:var name="ref-2"       value="if ($month-first) then day   else month"/>
+                    <xf:var name="label-1"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'month' else 'day'  ), '|fr-fr-resources|')"/>
+                    <xf:var name="label-2"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'day'   else 'month'), '|fr-fr-resources|')"/>
+                    <xf:var name="label-3"     value="xxf:r('components.date-time.year', '|fr-fr-resources|')"/>
+
+                    <xf:select1 ref="$ref-1" id="select1" xxf:title="{$label-1}">
                         <xf:item>
-                            <xf:label value="if ($month-first) then xxf:r('month') else xxf:r('day')"/>
+                            <xf:label value="$label-1"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="if ($month-first) then instance('months-itemset')/month else instance('days-itemset')/day">
@@ -220,9 +176,9 @@
                             <xf:value ref="."/>
                         </xf:itemset>
                     </xf:select1>
-                    <xf:select1 ref="if ($month-first) then day else month">
+                    <xf:select1 ref="$ref-2" xxf:title="{$label-2}">
                         <xf:item>
-                            <xf:label value="if ($month-first) then xxf:r('day') else xxf:r('month')"/>
+                            <xf:label value="$label-2"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="if ($month-first) then instance('days-itemset')/day else instance('months-itemset')/month">
@@ -230,9 +186,9 @@
                             <xf:value ref="."/>
                         </xf:itemset>
                     </xf:select1>
-                    <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
+                    <xf:select1 ref="year" xxf:title="{$label-3}" xbl:attr="navindex navindex=tabindex">
                         <xf:item>
-                            <xf:label value="xxf:r('year')"/>
+                            <xf:label value="$label-3"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="instance('years-itemset')/year">

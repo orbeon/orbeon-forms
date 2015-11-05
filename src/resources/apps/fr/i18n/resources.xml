@@ -89,6 +89,11 @@
                 <remove>Remove</remove>
                 <menu>Menu</menu>
             </grid>
+            <date-time>
+                <year>Year</year>
+                <month>Month</month>
+                <day>Day</day>
+            </date-time>
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
@@ -381,6 +386,11 @@
                 <remove>Supprimer</remove>
                 <menu>Menu</menu>
             </grid>
+            <date-time>
+                <year>Année</year>
+                <month>Mois</month>
+                <day>Jour</day>
+            </date-time>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
@@ -677,6 +687,11 @@
                 <remove>Remover</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year>Año</year>
+                <month>Mes</month>
+                <day>Día</day>
+            </date-time>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
@@ -959,6 +974,11 @@
                 <remove todo="true">[Remove]</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year todo="true">Year</year>
+                <month todo="true">Month</month>
+                <day todo="true">Day</day>
+            </date-time>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -1240,6 +1260,11 @@
                 <remove todo="true">[Remove]</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year todo="true">Year</year>
+                <month todo="true">Month</month>
+                <day todo="true">Day</day>
+            </date-time>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -1518,6 +1543,11 @@
                 <remove>Rimuovi</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year>Anno</year>
+                <month>Mese</month>
+                <day>Giorno</day>
+            </date-time>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
         <errors>
@@ -1809,6 +1839,11 @@
                 <remove>Löschen</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year>Jahr</year>
+                <month>Monat</month>
+                <day>Tag</day>
+            </date-time>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
@@ -2100,6 +2135,11 @@
                 <remove>Poista</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year>Vuosi</year>
+                <month>Kuukausi</month>
+                <day>Päivä</day>
+            </date-time>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
         <errors>
@@ -2391,6 +2431,11 @@
                 <remove>Ta bort</remove>
                 <menu>Meny</menu>
             </grid>
+            <date-time>
+                <year>År</year>
+                <month>Månad</month>
+                <day>Dag</day>
+            </date-time>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
         <errors>
@@ -2682,6 +2727,11 @@
                 <remove>Verwijderen</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year>Jaar</year>
+                <month>Maand</month>
+                <day>Dag</day>
+            </date-time>
         </components>
         <untitled-form>Naamloos form</untitled-form>
         <errors>
@@ -2973,6 +3023,11 @@
                 <remove>Remove</remove>
                 <menu todo="true">Menu</menu>
             </grid>
+            <date-time>
+                <year>Ano</year>
+                <month>Mês</month>
+                <day>Dia</day>
+            </date-time>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
         <errors>

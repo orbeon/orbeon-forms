@@ -35,7 +35,18 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
   // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
   override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
 
-  override protected val allowedExtensionAttributes = appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) set XXFORMS_TARGET_QNAME
+  override protected val allowedExtensionAttributes = {
+    val altSet = {
+      val mediatype = element.attributeValue("mediatype")
+      val isImage = mediatype != null && mediatype.startsWith("image/")
+      isImage set XXFORMS_ALT_QNAME
+    }
+    val targetSet = {
+      val isDownload = appearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)
+      isDownload set XXFORMS_TARGET_QNAME
+    }
+    altSet ++ targetSet
+  }
 
   override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
   override val externalEvents              = externalEventsDef

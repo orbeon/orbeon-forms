@@ -138,6 +138,8 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
     containerAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, if (srcValue ne null) srcValue else XFormsConstants.DUMMY_IMAGE_URI)
 
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+    if (control != null)
+      control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     element(xhtmlPrefix, XHTML_NAMESPACE_URI, "img", containerAttributes)
   }

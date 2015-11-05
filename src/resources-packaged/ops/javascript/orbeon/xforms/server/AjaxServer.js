@@ -1204,6 +1204,7 @@
                                     var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                     var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
                                     var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
+                                    var alt = ORBEON.util.Dom.getAttribute(controlElement, "alt");
                                     var newLevel = ORBEON.util.Dom.getAttribute(controlElement, "level");
                                     var progressState = ORBEON.util.Dom.getAttribute(controlElement, "progress-state");
                                     var progressReceived = ORBEON.util.Dom.getAttribute(controlElement, "progress-received");
@@ -1493,6 +1494,10 @@
                                                 ORBEON.util.Dom.getAttribute(controlElement, "accept"));
                                         } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-output")
                                                     || YAHOO.util.Dom.hasClass(documentElement, "xforms-static")) {
+                                            if ($(documentElement).is('.xforms-mediatype-image') && alt != null) {
+                                                var img = $(documentElement).children('img').first();
+                                                img.attr('alt', alt);
+                                            }
                                             // Output-only control, just set the value
                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                         } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-trigger")

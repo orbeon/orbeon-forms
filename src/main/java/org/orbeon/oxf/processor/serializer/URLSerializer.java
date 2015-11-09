@@ -76,8 +76,7 @@ public class URLSerializer extends ProcessorImpl {
                 }
             } else {
                 // Open the URL
-                // NOTE: Could use PropertiesApacheHttpClient directly so we can remove support for POST/PUT in
-                // ApacheHttpUrlConnection.
+                // TODO: Use PropertiesApacheHttpClient directly so we can remove support for POST/PUT in ApacheHttpUrlConnection.
                 final URLConnection conn = url.openConnection();
                 try {
                     conn.setDoOutput(true);

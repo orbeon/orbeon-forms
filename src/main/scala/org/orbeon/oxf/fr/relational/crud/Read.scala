@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.relational.crud
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.relational.Version._
-import org.orbeon.oxf.fr.relational.{Next, Unspecified, RelationalUtils}
+import org.orbeon.oxf.fr.relational.{Specific, Next, Unspecified, RelationalUtils}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
@@ -32,8 +32,13 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
     RelationalUtils.withConnection { connection ⇒
 
       val badVersion =
-        // For data, version must be left unspecified
-        (req.forData && req.version != Unspecified) ||
+        // For data, we don't need a version number, so accept we either accept no version being specified,
+        // or if a form version if specified we'll later check that it matches the version number in the database.
+        (req.forData && (req.version match {
+                case Unspecified ⇒ false
+                case Specific(_) ⇒ false
+                case           _ ⇒ true
+        }))  ||
         // For form definition, everything is valid except Next
         (req.forForm && req.version == Next)
       if (badVersion) throw HttpStatusCodeException(400)
@@ -86,6 +91,15 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         if (deleted)
           throw new HttpStatusCodeException(410)
 
+        // Check version if specified
+        val dbFormVersion = resultSet.getInt("form_version")
+        req.version match {
+          case Specific(reqFormVersion) ⇒
+            if (dbFormVersion != reqFormVersion)
+              throw HttpStatusCodeException(400)
+          case _ ⇒ // NOP; we're all good
+        }
+
         // Check user can read and set Orbeon-Operations header
         formMetadataForDataRequestOpt foreach { formMetadata ⇒
           val dataUserGroup = {
@@ -100,10 +114,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         }
 
         // Set form version header
-        locally {
-          val formVersion = resultSet.getInt("form_version")
-          httpResponse.setHeader(OrbeonFormDefinitionVersion, formVersion.toString)
-        }
+        httpResponse.setHeader(OrbeonFormDefinitionVersion, dbFormVersion.toString)
 
         // Write content (XML / file)
         if (req.forAttachment) {

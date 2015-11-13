@@ -64,6 +64,9 @@
                                                 <attribute name="label"/>
                                             </optional>
                                             <optional>
+                                                <attribute name="title"/>
+                                            </optional>
+                                            <optional>
                                                 <attribute name="alt"/>
                                             </optional>
                                             <optional>

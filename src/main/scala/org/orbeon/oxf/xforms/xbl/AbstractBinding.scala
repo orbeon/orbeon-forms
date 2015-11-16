@@ -20,7 +20,7 @@ import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_FOCUS
+import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_FOCUS, XXFORMS_BLUR}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.util.ScalaUtils._
@@ -87,7 +87,7 @@ case class AbstractBinding(
     attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
   val allowedExternalEvents =
-    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (modeFocus set XFORMS_FOCUS)
+    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (if (modeFocus) List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil)
 
   // Constant instance DocumentInfo by model and instance index
   // We use the indexes because at this time, no id annotation has taken place yet

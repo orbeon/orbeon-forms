@@ -109,6 +109,7 @@ trait FormRunnerLang {
   // The requested language, trying a few things in order (given parameter, request, session, default)
   // Public for unit tests
   def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
+
     val request = NetUtils.getExternalContext.getRequest
 
     def fromHeader  = request.getFirstHeader       (LiferayLanguageHeader) map cleanLanguage
@@ -116,9 +117,9 @@ trait FormRunnerLang {
     def fromSession = stringFromSession(request, LanguageParam)
 
     nonEmptyOrNone(requestedLang) orElse
-      fromHeader                orElse
-      fromRequest               orElse
-      fromSession               orElse
+      fromHeader                  orElse
+      fromRequest                 orElse
+      fromSession                 orElse
       Some(getDefaultLang(appForm))
   }
 
@@ -128,6 +129,7 @@ trait FormRunnerLang {
     split[List](lang, "-_").head
 
   private def selectLangUseDefault(appForm: Option[AppForm], requestedLang: Option[String], availableLangs: List[String]) = {
+
     def matchingLanguage = availableLangs intersect requestedLang.toList headOption
     def defaultLanguage  = availableLangs intersect List(getDefaultLang(appForm)) headOption
     def firstLanguage    = availableLangs headOption

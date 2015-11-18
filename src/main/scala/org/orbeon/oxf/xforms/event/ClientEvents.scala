@@ -64,7 +64,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       Dom4j.elements(actionElement, XXFORMS_EVENT_QNAME) map (LocalEvent(_, trusted = false)) toList
     else
       Nil
-  
+
   def extractServerEventsElements(rootElement: Element) =
     Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME) toList
 
@@ -254,8 +254,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Whether an external event name is explicitly allowed by the configuration.
       def isExplicitlyAllowedExternalEvent = {
-        val externalEventsMap = doc.getStaticState.allowedExternalEvents
-        ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsMap(event.name)
+        val externalEventsSet = doc.getStaticState.allowedExternalEvents
+        ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsSet(event.name)
       }
 
       // This is also a security measure that also ensures that somebody is not able to change values in an instance

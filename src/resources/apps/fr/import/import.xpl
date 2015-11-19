@@ -88,7 +88,7 @@
                                     <xf:var name="raw-header" value="normalize-space($headers[$p])"/>
 
                                     <!-- Only set value if header name is not blank -->
-                                    <xf:setvalue ref="$new//*[not(*) and $raw-header != '' and name() = utils:makeNCName($raw-header)]" value="$v"/>
+                                    <xf:setvalue ref="$new//*[not(*) and $raw-header != '' and name() = utils:makeNCName($raw-header, false())]" value="$v"/>
                                 </xf:action>
 
                                 <!-- Set filled data -->
@@ -105,7 +105,7 @@
                                     xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded)
                                 </xf:action>
                             </xf:action>
-                            
+
                             <xf:setvalue ref="instance('fr-import-stats')/processed" value="xs:integer(.) + 1"/>
                             <xf:action type="xpath">
                                 xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed)

@@ -83,7 +83,7 @@
                                 <xf:var name="raw-header" value="normalize-space($headers[$p])"/>
 
                                 <!-- Only set value if header name is not blank -->
-                                <xf:setvalue ref="$new//*[not(*) and $raw-header != '' and name() = utils:makeNCName($raw-header)]" value="$v"/>
+                                <xf:setvalue ref="$new//*[not(*) and $raw-header != '' and name() = utils:makeNCName($raw-header, false())]" value="$v"/>
                             </xf:action>
 
                             <!-- Set filled data -->

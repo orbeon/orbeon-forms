@@ -43,6 +43,10 @@ public class DeferredXMLReceiverImpl extends ForwardingXMLReceiver implements De
         this.attributes = new AttributesImpl(attributes);
     }
 
+    public void addAttribute(String localname, String value) {
+        addAttribute("", localname, localname, value);
+    }
+
     public void addAttribute(String uri, String localname, String qName, String value) {
         if (!storedElement)
             throw new OXFException("addAttribute called within no element.");

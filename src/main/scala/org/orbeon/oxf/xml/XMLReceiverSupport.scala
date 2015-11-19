@@ -75,3 +75,5 @@ trait XMLReceiverSupport {
     saxAtts
   }
 }
+
+object XMLReceiverSupport extends XMLReceiverSupport

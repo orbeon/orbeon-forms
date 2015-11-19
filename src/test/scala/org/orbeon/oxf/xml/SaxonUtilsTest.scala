@@ -21,16 +21,17 @@ class SaxonUtilsTest extends AssertionsForJUnit {
   @Test def makeNCName(): Unit = {
 
     intercept[IllegalArgumentException] {
-      SaxonUtils.makeNCName("")
+      SaxonUtils.makeNCName("", keepFirstIfPossible = true)
     }
 
     intercept[IllegalArgumentException] {
-      SaxonUtils.makeNCName("  ")
+      SaxonUtils.makeNCName("  ", keepFirstIfPossible = true)
     }
 
-    assert("foo"      === SaxonUtils.makeNCName("foo"))
-    assert("_foo_"    === SaxonUtils.makeNCName(" foo "))
-    assert("_2foos"   === SaxonUtils.makeNCName("42foos"))
-    assert("foo_bar_" === SaxonUtils.makeNCName("foo(bar)"))
+    assert("foo"      === SaxonUtils.makeNCName("foo",      keepFirstIfPossible = true))
+    assert("_foo_"    === SaxonUtils.makeNCName(" foo ",    keepFirstIfPossible = true))
+    assert("_42foos"  === SaxonUtils.makeNCName("42foos",   keepFirstIfPossible = true))
+    assert("_2foos"   === SaxonUtils.makeNCName("42foos",   keepFirstIfPossible = false))
+    assert("foo_bar_" === SaxonUtils.makeNCName("foo(bar)", keepFirstIfPossible = true))
   }
 }

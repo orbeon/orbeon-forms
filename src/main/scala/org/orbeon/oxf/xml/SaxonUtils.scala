@@ -22,14 +22,16 @@ import org.orbeon.scaxon.XML
 import scala.collection.JavaConverters._
 
 object SaxonUtils {
-  
+
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
     Iterator(e) ++
       (e.iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] flatMap iterateExpressionTree)
 
   // Make an NCName out of a non-blank string
-  // Any characters that do not belong in an NCName are converted to '_'.
-  def makeNCName(name: String): String = {
+  // Any characters that do not belong in an NCName are converted to `_`.
+  // If `keepFirstIfPossible == true`, prepend `_` if first character is allowed within NCName and keep first character.
+  //@XPathFunction
+  def makeNCName(name: String, keepFirstIfPossible: Boolean): String = {
 
     require(StringUtils.isNotBlank(name), "name must not be blank or empty")
 
@@ -40,7 +42,14 @@ object SaxonUtils {
       val sb = new StringBuilder
       val start = name.charAt(0)
 
-      sb.append(if (name10Checker.isNCNameStartChar(start)) start else '_')
+      if (name10Checker.isNCNameStartChar(start))
+        sb.append(start)
+      else if (keepFirstIfPossible && name10Checker.isNCNameChar(start)) {
+        sb.append('_')
+        sb.append(start)
+      } else
+        sb.append('_')
+
       for (i ← 1 until name.length) {
         val ch = name.charAt(i)
         sb.append(if (name10Checker.isNCNameChar(ch)) ch else '_')
@@ -61,14 +70,14 @@ object SaxonUtils {
       // Saxon type hierarchy is closed (ValueRepresentation = NodeInfo | Value)
       case _                                   ⇒ throw new IllegalStateException
     }
-  
+
   def compareValues(value1: Value, value2: Value): Boolean = {
     val iter1 = XML.asScalaIterator(value1.iterate)
     val iter2 = XML.asScalaIterator(value2.iterate)
 
     iter1.zipAll(iter2, null, null) forall (compareItems _).tupled
   }
-  
+
   // Whether two sequences contain identical items
   def compareItemSeqs(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean =
     nodeset1.size == nodeset2.size &&

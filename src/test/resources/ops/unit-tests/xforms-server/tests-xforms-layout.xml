@@ -1319,8 +1319,8 @@
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xh:label class="xforms-label">My label</xh:label>
-                    <xh:span class="xforms-items">
+                    <xh:span class="xforms-label" id="my-new-select1≡≡l⊙1">My label</xh:span>
+                    <xh:span class="xforms-items" role="radiogroup" aria-labelledby="my-new-select1≡≡l⊙1">
                         <xh:span class="xforms-selected">
                             <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0⊙1" type="radio" name="my-new-select1⊙1" value="apple" checked="checked"/>
@@ -1356,8 +1356,8 @@
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-repeat-template">
-                    <xh:label class="xforms-label"/>
-                    <xh:span class="xforms-items">
+                    <xh:span class="xforms-label" id="my-new-select1≡≡l"/>
+                    <xh:span class="xforms-items" role="radiogroup" aria-labelledby="my-new-select1≡≡l">
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0" type="radio" name="my-new-select1" value="apple"/>

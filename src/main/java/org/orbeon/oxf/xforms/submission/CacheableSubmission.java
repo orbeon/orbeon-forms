@@ -161,7 +161,7 @@ public class CacheableSubmission extends BaseSubmission {
                                                 // There was no throwable
                                                 // We know that RegularSubmission returns a Replacer with an instance document
                                                 final Object documentOrDocumentInfo =
-                                                        ((InstanceReplacer) submissionResult.getReplacer()).getResultingDocumentOrDocumentInfo();
+                                                        ((InstanceReplacer) submissionResult.getReplacer()).resultingDocumentOrDocumentInfo();
 
                                                 // Update status
                                                 status[1] = true;

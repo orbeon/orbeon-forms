@@ -24,7 +24,8 @@ import org.orbeon.saxon.om.NodeInfo
 /**
  * Handle replace="text".
  */
-class TextReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument) extends BaseReplacer(submission, containingDocument) {
+class TextReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
+  extends BaseReplacer(submission, containingDocument) {
 
   private var responseBody: String = _
 

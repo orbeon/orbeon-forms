@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * ContentHandler with an additional method allowing for adding attributes.
+ * Receiver with an additional method allowing for adding attributes.
  */
 public class DeferredXMLReceiverImpl extends ForwardingXMLReceiver implements DeferredXMLReceiver {
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2015 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,11 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xml;
+package org.orbeon.oxf.xml
 
 /**
- * ContentHandler with an additional method allowing for adding attributes.
- */
-public interface DeferredXMLReceiver extends XMLReceiver {
-    public void addAttribute(String uri, String localname, String qName, String value);
+  * Receiver with an additional method allowing for adding attributes.
+  */
+trait DeferredXMLReceiver extends XMLReceiver {
+  def addAttribute(uri: String, localname: String, qName: String, value: String)
 }

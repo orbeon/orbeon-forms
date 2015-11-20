@@ -48,7 +48,7 @@ public class LocalPortletSubmission extends BaseSubmission {
      * Check whether submission is allowed.
      */
     public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
-                           XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+                           XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
 
         final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
@@ -102,7 +102,7 @@ public class LocalPortletSubmission extends BaseSubmission {
     }
 
     public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
-                                    final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
+                                    final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
 
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -138,8 +138,8 @@ public class LocalPortletSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openLocalConnection(newExternalContext.getRequest(), response,
-                        detailsLogger, resolvedURI.toString(), p, sp.actualRequestMediatype, p2.encoding, sp.messageBody,
-                        sp.queryString, customHeaderNameValues, new SubmissionProcess() {
+                        detailsLogger, resolvedURI.toString(), p, sp.actualRequestMediatype(), p2.encoding, sp.messageBody()    ,
+                        sp.queryString(), customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
                                 currentPortlet.processorService().service(new PipelineContext(), new ExternalContextWrapper(newExternalContext) {

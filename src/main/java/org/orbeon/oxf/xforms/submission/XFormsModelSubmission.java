@@ -14,10 +14,8 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
-import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -37,11 +35,7 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -443,7 +437,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 }
 
                 // Serialize
-                final SerializationParameters sp = new SerializationParameters(p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData);
+                final SerializationParameters sp =
+                    SerializationParameters.apply(this, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData);
 
                 /* ***** Submission connection ************************************************************************** */
 
@@ -1015,145 +1010,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
         public SecondPassParameters amend(boolean isAsynchronous, boolean isReadonly){
             return new SecondPassParameters(this, isAsynchronous, isReadonly);
-        }
-    }
-
-    public class SerializationParameters {
-        final byte[] messageBody;// TODO: provide option for body to be a stream
-        final String queryString;
-        final String actualRequestMediatype;
-
-        public SerializationParameters(SubmissionParameters p, SecondPassParameters p2, String requestedSerialization, Document documentToSubmit, String overriddenSerializedData) throws Exception {
-            if (p.serialize) {
-                final String defaultMediatypeForSerialization;
-                if (overriddenSerializedData != null && !overriddenSerializedData.equals("")) {
-                    // Form author set data to serialize
-                    if (Connection.requiresRequestBody(p.actualHttpMethod)) {
-                        queryString = null;
-                        messageBody = overriddenSerializedData.getBytes("UTF-8");
-                        defaultMediatypeForSerialization = "application/xml";
-                    } else {
-                        queryString = URLEncoder.encode(overriddenSerializedData, "UTF-8");
-                        messageBody = null;
-                        defaultMediatypeForSerialization = null;
-                    }
-                } else if (requestedSerialization.equals("application/x-www-form-urlencoded")) {
-                    // Perform "application/x-www-form-urlencoded" serialization
-                    if (Connection.requiresRequestBody(p.actualHttpMethod)) {
-                        queryString = null;
-                        messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes("UTF-8");// the resulting string is already ASCII in fact
-                        defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
-                    } else {
-                        queryString = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator);
-                        messageBody = null;
-                        defaultMediatypeForSerialization = null;
-                    }
-                } else if (requestedSerialization.equals("application/xml")) {
-                    // Serialize XML to a stream of bytes
-                    try {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        TransformerUtils.applyOutputProperties(identity,
-                                "xml", p2.version, null, null, p2.encoding, p2.omitxmldeclaration, p2.standalone, p2.indent, 4);
-
-                        // TODO: use cdata-section-elements
-
-                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                        messageBody = os.toByteArray();
-                    } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xf:submission: exception while serializing instance to XML.", "serializing instance");
-                    }
-                    defaultMediatypeForSerialization = "application/xml";
-                    queryString = null;
-                } else if (requestedSerialization.equals("multipart/related")) {
-                    // TODO
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
-                } else if (requestedSerialization.equals("multipart/form-data")) {
-                    // Build multipart/form-data body
-
-                    // Create and set body
-                    final MultipartEntity multipartFormData = XFormsSubmissionUtils.createMultipartFormData(documentToSubmit);
-
-                    final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    multipartFormData.writeTo(os);
-
-                    messageBody = os.toByteArray();
-                    queryString = null;
-
-                    // The mediatype also contains the boundary
-                    defaultMediatypeForSerialization = multipartFormData.getContentType().getValue();
-
-                } else if (requestedSerialization.equals("application/octet-stream")) {
-                    // Binary serialization
-                    final QName nodeType = InstanceData.getType(documentToSubmit.getRootElement());
-
-                    if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
-                        // TODO
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: binary serialization with base64Binary type is not yet implemented.", "serializing instance");
-                    } else {
-                        // Default to anyURI
-                        // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
-
-                        // NOTE: We support a relative path, in which case the path is resolved as a service URL
-                        final String resolvedURI =
-                            XFormsUtils.resolveServiceURL(
-                                containingDocument,
-                                    getSubmissionElement(),
-                                    documentToSubmit.getRootElement().getStringValue(),
-                                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-
-                        try {
-                            messageBody = SubmissionUtils.readByteArray(model, resolvedURI);
-                        } catch(Exception e) {
-                            throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: binary serialization with anyURI type failed reading URL.", "serializing instance");
-                        }
-                    }
-                    defaultMediatypeForSerialization = "application/octet-stream";
-                    queryString = null;
-                } else if (requestedSerialization.equals("text/html") || requestedSerialization.equals("application/xhtml+xml")) {
-                    // HTML or XHTML serialization
-                    try {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        TransformerUtils.applyOutputProperties(identity,
-                                requestedSerialization.equals("text/html") ? "html" : "xhtml", p2.version, null, null,
-                                p2.encoding, p2.omitxmldeclaration, p2.standalone, p2.indent, 4);
-
-                        // TODO: use cdata-section-elements
-
-                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                        messageBody = os.toByteArray();
-                    } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xf:submission: exception while serializing instance to HTML or XHTML.", "serializing instance");
-                    }
-                    defaultMediatypeForSerialization = requestedSerialization;
-                    queryString = null;
-                } else if (XMLUtils.isTextOrJSONContentType(requestedSerialization)) {
-                    // Text serialization
-                    try {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        TransformerUtils.applyOutputProperties(identity,
-                                "text", null, null, null, p2.encoding, true, false, false, 0);
-
-                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                        messageBody = os.toByteArray();
-                    } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xf:submission: exception while serializing instance to text.", "serializing instance");
-                    }
-                    defaultMediatypeForSerialization = requestedSerialization;
-                    queryString = null;
-                } else {
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: invalid submission serialization requested: " + requestedSerialization, "serializing instance");
-                }
-
-                // Actual request mediatype: the one specified by @mediatype, or the default mediatype for the serialization otherwise
-                actualRequestMediatype = (p.resolvedMediatype == null) ? defaultMediatypeForSerialization : p.resolvedMediatype;
-            } else {
-                queryString = null;
-                messageBody = null;
-                actualRequestMediatype = null;
-            }
         }
     }
 

@@ -34,15 +34,15 @@ public class RegularSubmission extends BaseSubmission {
     }
 
     public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
-                           XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+                           XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
         return true;
     }
 
     public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
-                                    final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
+                                    final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
 
         final URI absoluteResolvedURL =
-            new URI(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission().isURLNorewrite()));
+            new URI(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString(), submission().isURLNorewrite()));
 
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -55,7 +55,7 @@ public class RegularSubmission extends BaseSubmission {
                 absoluteResolvedURL.getScheme(),
                 p.actualHttpMethod,
                 p2.credentials != null,
-                sp.actualRequestMediatype,
+                sp.actualRequestMediatype(),
                 p2.encoding,
                 customHeaderNameValues,
                 Connection.headersToForwardFromProperty(),
@@ -68,7 +68,7 @@ public class RegularSubmission extends BaseSubmission {
         // Prepare Connection in this thread as async submission can't access the request object
         final Connection connection =
             Connection.jApply(p.actualHttpMethod, absoluteResolvedURL,
-                p2.credentials, sp.messageBody, headers, true, isLogBody(), detailsLogger);
+                p2.credentials, sp.messageBody(), headers, true, isLogBody(), detailsLogger);
 
         // Pack external call into a Callable so it can be run:
         // - now and synchronously

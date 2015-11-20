@@ -30,7 +30,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
   def isMatch(
     p : XFormsModelSubmission#SubmissionParameters,
     p2: XFormsModelSubmission#SecondPassParameters,
-    sp: XFormsModelSubmission#SerializationParameters
+    sp: SerializationParameters
   ) =
     (p.isReplaceInstance || p.isReplaceNone || p.isReplaceAll) &&
       (p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:"))
@@ -38,7 +38,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
   def connect(
     p : XFormsModelSubmission#SubmissionParameters,
     p2: XFormsModelSubmission#SecondPassParameters,
-    sp: XFormsModelSubmission#SerializationParameters
+    sp: SerializationParameters
   ) = {
 
     if (sp.messageBody == null) {

@@ -19,13 +19,17 @@ package org.orbeon.oxf.xforms.submission;
  */
 public interface Submission {
 
-    public String getType();
+    String getType();
 
-    boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
-                    XFormsModelSubmission.SecondPassParameters p2,
-                    XFormsModelSubmission.SerializationParameters sp);
+    boolean isMatch(
+        XFormsModelSubmission.SubmissionParameters p,
+        XFormsModelSubmission.SecondPassParameters p2,
+        SerializationParameters sp
+    );
 
-    SubmissionResult connect(XFormsModelSubmission.SubmissionParameters p,
-                             XFormsModelSubmission.SecondPassParameters p2,
-                             XFormsModelSubmission.SerializationParameters sp) throws Exception;
+    SubmissionResult connect(
+        XFormsModelSubmission.SubmissionParameters p,
+        XFormsModelSubmission.SecondPassParameters p2,
+        SerializationParameters sp
+    ) throws Exception;
 }

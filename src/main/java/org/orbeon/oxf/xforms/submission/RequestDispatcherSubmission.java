@@ -30,7 +30,7 @@ import java.util.concurrent.Callable;
  * Submission which doesn't issue HTTP requests but goes through a Servlet or Portlet API's RequestDispatcher.
  */
 public class RequestDispatcherSubmission extends BaseSubmission {
-    
+
     private static final String SKIPPING_SUBMISSION_DEBUG_MESSAGE = "skipping request dispatcher servlet submission";
 
     public RequestDispatcherSubmission(XFormsModelSubmission submission) {
@@ -45,7 +45,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
      * Check whether submission is allowed.
      */
     public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
-                           XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
+                           XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
 
         final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
         final IndentedLogger indentedLogger   = getDetailsLogger(p, p2);
@@ -131,7 +131,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     }
 
     public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
-                                    final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
+                                    final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
 
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -168,8 +168,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
                         containingDocument(), detailsLogger, resolvedURI.toString(), p,
-                        submission().isURLNorewrite(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
-                        sp.queryString, customHeaderNameValues);
+                        submission().isURLNorewrite(), sp.actualRequestMediatype(), p2.encoding, sp.messageBody(),
+                        sp.queryString(), customHeaderNameValues);
 
                     // Update status
                     status[0] = true;

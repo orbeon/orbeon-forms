@@ -15,7 +15,6 @@ package org.orbeon.oxf.json
 
 import org.junit.Test
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.scalatest.junit.AssertionsForJUnit
 import spray.json._
@@ -136,18 +135,15 @@ class JSONTest extends AssertionsForJUnit with XMLSupport {
       val store = new SAXStore
       JSON.jsonStringToXML(json, store)
       val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
-      println(Dom4jUtils.domToPrettyString(resultXML))
+
       assertXMLDocumentsIgnoreNamespacesInScope(elemToDom4j(xml), resultXML)
     }
   }
 
   @Test def testXmlToJson(): Unit = {
     for ((json, xml) ← ExpectedJsonToXml) {
-
       val expectedJson = json.parseJson
-
-      println(s"processing ${expectedJson.toString}")
-      val actualJson = JSON.xmlToJson(xml, strict = true)
+      val actualJson   = JSON.xmlToJson(xml, strict = true)
 
       assert(expectedJson === actualJson)
     }

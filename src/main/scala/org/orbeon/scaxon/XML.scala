@@ -290,6 +290,7 @@ object XML {
   def isAttribute(nodeInfo: NodeInfo)          = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
   def isElement(nodeInfo: NodeInfo)            = nodeInfo.getNodeKind.toShort == Type.ELEMENT
   def isElementOrAttribute(nodeInfo: NodeInfo) = ElementOrAttribute(nodeInfo.getNodeKind.toShort)
+  def isDocument(nodeInfo: NodeInfo)           = nodeInfo.getNodeKind.toShort == Type.DOCUMENT
 
   // Whether the given node has at least one child element
   // TODO: Should be on NodeInfoOps!

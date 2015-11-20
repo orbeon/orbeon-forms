@@ -34,6 +34,19 @@ object JSON {
 
     def processValue(jsValue: JsValue): Unit =
       jsValue match {
+        case JsString(v) ⇒
+          // TODO: Escaped characters are transformed as necessary; characters and escapes that have no
+          // equivalent XML character [...]
+          rcv.addAttribute(Symbols.Type, Symbols.String)
+          text(v)
+        case JsNumber(v) ⇒
+          rcv.addAttribute(Symbols.Type, Symbols.Number)
+          text(v.toString)
+        case JsBoolean(v) ⇒
+          rcv.addAttribute(Symbols.Type, Symbols.Boolean)
+          text(v.toString)
+        case JsNull ⇒
+          rcv.addAttribute(Symbols.Type, Symbols.Null)
         case JsObject(fields) ⇒
           rcv.addAttribute(Symbols.Object, Symbols.True)
           fields foreach { case (name, value) ⇒
@@ -66,19 +79,6 @@ object JSON {
               processValue(arrayValue)
             }
           }
-        case JsString(v) ⇒
-          // TODO: Escaped characters are transformed as necessary; characters and escapes that have no
-          // equivalent XML character [...]
-          rcv.addAttribute(Symbols.Type, Symbols.String)
-          text(v)
-        case JsNumber(v) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Number)
-          text(v.toString)
-        case JsBoolean(v) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Boolean)
-          text(v.toString)
-        case JsNull ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Null)
       }
 
     withDocument {
@@ -89,11 +89,11 @@ object JSON {
   }
 
   // Convert an XML tree to a JSON String
-  def xmlToJsonString(rootElem: NodeInfo, strict: Boolean): String =
-    xmlToJson(rootElem, strict).toString
+  def xmlToJsonString(root: NodeInfo, strict: Boolean): String =
+    xmlToJson(root, strict).toString
 
   // Convert an XML tree to a JSON AST
-  def xmlToJson(rootElem: NodeInfo, strict: Boolean): JsValue = {
+  def xmlToJson(root: NodeInfo, strict: Boolean): JsValue = {
 
     import org.orbeon.scaxon.XML._
 
@@ -167,7 +167,14 @@ object JSON {
           }
       }
 
-    processElement(rootElem)
+    processElement(
+      if (isDocument(root))
+        root.rootElement
+      else if (isElement(root))
+        root
+      else
+        throw new IllegalArgumentException("node must be an element or document")
+    )
   }
 
   private object Symbols {

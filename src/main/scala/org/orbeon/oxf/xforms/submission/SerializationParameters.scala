@@ -20,9 +20,11 @@ import javax.xml.transform.stream.StreamResult
 import org.dom4j.Document
 import org.dom4j.io.DocumentSource
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.util.Connection
+import org.orbeon.oxf.json.JSON
+import org.orbeon.oxf.util.{Connection, XPath}
 import org.orbeon.oxf.xforms.{InstanceData, XFormsUtils}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants, XMLUtils}
+import org.orbeon.saxon.dom4j.DocumentWrapper
 
 case class SerializationParameters(
   messageBody            : Array[Byte],
@@ -42,8 +44,8 @@ object SerializationParameters {
   ): SerializationParameters = {
 
     // Actual request mediatype: the one specified by @mediatype, or the default mediatype for the serialization otherwise
-    def actualRequestMediatype(defaultMediatypeForSerialization: String) =
-      Option(p.resolvedMediatype) getOrElse defaultMediatypeForSerialization
+    def actualRequestMediatype(default: String) =
+      Option(p.resolvedMediatype) getOrElse default
 
     if (p.serialize) {
       requestedSerialization match {
@@ -111,6 +113,19 @@ object SerializationParameters {
                 "serializing instance"
               )
           }
+        case serialization @ "application/json" ⇒
+
+          val result = JSON.xmlToJsonString(
+            root   = new DocumentWrapper(documentToSubmit, null, XPath.GlobalConfiguration),
+            strict = true
+          )
+
+          SerializationParameters(
+              messageBody            = result.getBytes(p2.encoding),
+              queryString            = null,
+              actualRequestMediatype = actualRequestMediatype(serialization)
+            )
+
         case serialization @ "multipart/related" ⇒
           // TODO
           throw new XFormsSubmissionException(

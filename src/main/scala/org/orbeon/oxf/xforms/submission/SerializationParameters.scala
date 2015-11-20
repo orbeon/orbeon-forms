@@ -20,7 +20,7 @@ import javax.xml.transform.stream.StreamResult
 import org.dom4j.Document
 import org.dom4j.io.DocumentSource
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.json.JSON
+import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{Connection, XPath}
 import org.orbeon.oxf.xforms.{InstanceData, XFormsUtils}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants, XMLUtils}
@@ -115,7 +115,7 @@ object SerializationParameters {
           }
         case serialization @ "application/json" ⇒
 
-          val result = JSON.xmlToJsonString(
+          val result = Converter.xmlToJsonString(
             root   = new DocumentWrapper(documentToSubmit, null, XPath.GlobalConfiguration),
             strict = true
           )

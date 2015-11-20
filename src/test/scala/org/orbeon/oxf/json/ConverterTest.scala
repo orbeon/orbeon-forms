@@ -21,7 +21,7 @@ import spray.json._
 
 import scala.xml.Elem
 
-class JSONTest extends AssertionsForJUnit with XMLSupport {
+class ConverterTest extends AssertionsForJUnit with XMLSupport {
 
   import org.orbeon.scaxon.XML.{Test ⇒ _, _}
 
@@ -133,7 +133,7 @@ class JSONTest extends AssertionsForJUnit with XMLSupport {
   @Test def testJsonToXml(): Unit = {
     for ((json, xml) ← ExpectedJsonToXml) {
       val store = new SAXStore
-      JSON.jsonStringToXML(json, store)
+      Converter.jsonStringToXML(json, store)
       val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
 
       assertXMLDocumentsIgnoreNamespacesInScope(elemToDom4j(xml), resultXML)
@@ -143,7 +143,7 @@ class JSONTest extends AssertionsForJUnit with XMLSupport {
   @Test def testXmlToJson(): Unit = {
     for ((json, xml) ← ExpectedJsonToXml) {
       val expectedJson = json.parseJson
-      val actualJson   = JSON.xmlToJson(xml, strict = true)
+      val actualJson   = Converter.xmlToJson(xml, strict = true)
 
       assert(expectedJson === actualJson)
     }

@@ -18,8 +18,19 @@ import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om.NodeInfo
 import spray.json._
 
-// XForms 2.0 JSON/XML mapping
-object JSON {
+//
+// Functions to convert JSON to XML and back following the XForms 2.0 specification.
+//
+// The conversion follows the following principles:
+//
+// - Any JSON document is convertible to XML.
+// - However, the opposite is not true, and only XML documents following a very specific pattern
+//   can be converted to JSON. In other words the purpose of the conversion rules is to expose JSON
+//   to XML processing and not the other way around.
+// - XPath expressions which apply to the resulting XML document feel as natural as possible in most
+//   cases and can be written just by looking at the original JSON.
+//
+object Converter {
 
   // Convert a JSON String to a stream of XML events
   def jsonStringToXML(source: String, receiver: XMLReceiver): Unit =
@@ -50,6 +61,7 @@ object JSON {
         case JsObject(fields) ⇒
           rcv.addAttribute(Symbols.Object, Symbols.True)
           fields foreach { case (name, value) ⇒
+
             val ncName  = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
             val nameAtt = ncName != name list (Symbols.Name → name)
 
@@ -106,7 +118,7 @@ object JSON {
       throw new IllegalArgumentException(s)
 
     def isEmptyArray(elem: NodeInfo) =
-      typeOpt(elem).isEmpty && ! isObject(elem) && ! hasChildElement(elem) //  && tail.isEmpty
+      typeOpt(elem).isEmpty && ! isObject(elem) && ! hasChildElement(elem)
 
     def processElement(elem: NodeInfo): JsValue =
       (typeOpt(elem), isObject(elem)) match {

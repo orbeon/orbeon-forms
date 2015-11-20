@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.util.Collections
 
 import org.dom4j.{Document, Node}
-import org.orbeon.oxf.json.JSON
+import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.{ConnectionResult, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
@@ -101,7 +101,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           Left(
             if (isJSON) {
               val receiver = new LocationSAXContentHandler
-              JSON.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
+              Converter.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
               receiver.getDocument
             } else {
               TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
@@ -116,7 +116,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           Right(
             if (isJSON) {
               val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
-              JSON.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
+              Converter.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
               builder.getCurrentRoot.asInstanceOf[DocumentInfo]
             } else {
               TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)

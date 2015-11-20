@@ -31,6 +31,7 @@ import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import scala.Tuple2;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
@@ -397,6 +398,12 @@ public class TransformerUtils {
         }
         return dom4jResult.getDocument();
 
+    }
+    public static Tuple2<TinyBuilder, XMLReceiver> createTinyBuilder(Configuration configuration) {
+        final TinyBuilder treeBuilder = new TinyBuilder();
+        final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
+        identityHandler.setResult(treeBuilder);
+        return new Tuple2<TinyBuilder, XMLReceiver>(treeBuilder, identityHandler);
     }
 
     /**

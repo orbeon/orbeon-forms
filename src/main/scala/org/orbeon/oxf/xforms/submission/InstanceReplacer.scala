@@ -15,13 +15,15 @@ package org.orbeon.oxf.xforms.submission
 
 import java.util.Collections
 
-import org.dom4j.Node
+import org.dom4j.{Document, Node}
+import org.orbeon.oxf.json.JSON
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.{ConnectionResult, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceDataOps}
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
 import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
 
@@ -32,8 +34,8 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   extends BaseReplacer(submission, containingDocument) {
 
   // Unwrapped document set by `deserialize()`
-  private var _resultingDocumentOrDocumentInfo: Option[AnyRef] = None
-  def resultingDocumentOrDocumentInfo = _resultingDocumentOrDocumentInfo.orNull
+  private var _resultingDocumentOpt: Option[Document Either DocumentInfo] = None
+  def resultingDocumentOrDocumentInfo = _resultingDocumentOpt map (_.merge) orNull
 
   // For CacheableSubmission
   private var wrappedDocumentInfo: Option[DocumentInfo] = None
@@ -52,9 +54,17 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   ): Unit = {
     // Deserialize here so it can run in parallel
     val mediatype = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE)
-    if (XMLUtils.isXMLMediatype(mediatype)) {
+    val isJSON = XMLUtils.isJSONContentType(mediatype)
+    if (XMLUtils.isXMLMediatype(mediatype) || isJSON) {
       implicit val detailsLogger = getDetailsLogger(p, p2)
-      _resultingDocumentOrDocumentInfo = Some(deserializeInstance(p2.isReadonly, p2.isHandleXInclude, connectionResult))
+      _resultingDocumentOpt = Some(
+        deserializeInstance(
+          isReadonly       = p2.isReadonly,
+          isHandleXInclude = p2.isHandleXInclude,
+          isJSON           = isJSON,
+          connectionResult = connectionResult
+        )
+      )
     } else {
       // Other media type is not allowed
       throw new XFormsSubmissionException(
@@ -73,25 +83,45 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   private def deserializeInstance(
     isReadonly       : Boolean,
     isHandleXInclude : Boolean,
+    isJSON           : Boolean,
     connectionResult : ConnectionResult)(implicit
     logger           : IndentedLogger
-  ): AnyRef = {
+  ): Document Either DocumentInfo = {
     // Create resulting instance whether entire instance is replaced or not, because this:
     // 1. Wraps a Document within a DocumentInfo if needed
     // 2. Performs text nodes adjustments if needed
     try {
       ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is ⇒
+
         if (! isReadonly) {
           if (logger.isDebugEnabled)
             logger.logDebug("", "deserializing to mutable instance")
           // Q: What about configuring validation? And what default to choose?
-          TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
+
+          Left(
+            if (isJSON) {
+              val receiver = new LocationSAXContentHandler
+              JSON.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
+              receiver.getDocument
+            } else {
+              TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
+            }
+          )
         } else {
           if (logger.isDebugEnabled)
             logger.logDebug("", "deserializing to read-only instance")
           // Q: What about configuring validation? And what default to choose?
           // NOTE: isApplicationSharedHint is always false when get get here. `isApplicationSharedHint="true"` is handled above.
-          TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
+
+          Right(
+            if (isJSON) {
+              val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
+              JSON.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
+              builder.getCurrentRoot.asInstanceOf[DocumentInfo]
+            } else {
+              TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
+            }
+          )
         }
       }
     } catch {
@@ -115,8 +145,6 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     p                : XFormsModelSubmission#SubmissionParameters,
     p2               : XFormsModelSubmission#SecondPassParameters
   ): Runnable = {
-
-    assert(_resultingDocumentOrDocumentInfo.isDefined)
 
     // Set new instance document to replace the one submitted
 
@@ -225,7 +253,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       val newDocumentInfo =
         wrappedDocumentInfo getOrElse
           XFormsInstance.createDocumentInfo(
-            _resultingDocumentOrDocumentInfo.get,
+            _resultingDocumentOpt.get,
             instanceToUpdate.instance.exposeXPathTypes
           )
 

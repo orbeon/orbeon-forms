@@ -515,7 +515,12 @@ object XFormsInstance extends Logging {
       true
     )
 
-  def createDocumentInfo(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean) = documentOrDocumentInfo match {
+  def createDocumentInfo(doc: Document Either DocumentInfo, exposeXPathTypes: Boolean) = doc match {
+    case Left(dom4jDocument) ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
+    case Right(documentInfo) ⇒ documentInfo
+  }
+
+  def createDocumentInfoJava(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean) = documentOrDocumentInfo match {
     case dom4jDocument: Document    ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
     case documentInfo: DocumentInfo ⇒ documentInfo
     case _ ⇒ throw new OXFException("Invalid type for instance document: " + documentOrDocumentInfo.getClass.getName)

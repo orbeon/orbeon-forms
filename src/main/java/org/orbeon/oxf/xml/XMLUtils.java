@@ -153,6 +153,10 @@ public class XMLUtils {
         return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
     }
 
+    public static boolean isJSONContentType(String contentType) {
+        return contentType != null && contentType.startsWith( "application/json");
+    }
+
     /**
      * Return whether the given content type is considered as text or JSON.
      *
@@ -164,6 +168,6 @@ public class XMLUtils {
      * @return              true if not null and a text or JSON content type, false otherwise
      */
     public static boolean isTextOrJSONContentType(String contentType) {
-        return contentType != null && (isTextContentType(contentType) || contentType.startsWith( "application/json"));
+        return contentType != null && (isTextContentType(contentType) || isJSONContentType(contentType));
     }
 }

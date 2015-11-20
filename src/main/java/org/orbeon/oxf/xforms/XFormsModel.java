@@ -683,7 +683,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        final DocumentInfo documentInfo = XFormsInstance.createDocumentInfo(instanceDocument, instance.exposeXPathTypes());
+        final DocumentInfo documentInfo = XFormsInstance.createDocumentInfoJava(instanceDocument, instance.exposeXPathTypes());
         indexInstance(XFormsInstance.apply(this, instance, documentInfo));
     }
 

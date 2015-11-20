@@ -36,53 +36,53 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
 
   // Examples from the XForms 2.0 spec
   val XFormsJsonToXml = List[(String, Elem)](
-    """{"given": "Mark", "family": "Smith"}""" →
+    """ {"given": "Mark", "family": "Smith"} """ →
       <json object="true">
           <given type="string">Mark</given>
           <family type="string">Smith</family>
       </json>,
-    """{"name": "Mark", "age": 21}""" →
+    """ {"name": "Mark", "age": 21} """ →
       <json object="true"><name type="string">Mark</name><age type="number">21</age></json>,
-    """{"selected": true}""" →
+    """ {"selected": true} """ →
       <json object="true"><selected type="boolean">true</selected></json>,
-    """{"cities": ["Amsterdam", "Paris", "London"]}""" →
+    """ {"cities": ["Amsterdam", "Paris", "London"]} """ →
       <json object="true">
         <cities array="true" type="string">Amsterdam</cities>
         <cities array="true" type="string">Paris</cities>
         <cities array="true" type="string">London</cities>
       </json>,
-    """{"load": [0.31, 0.33, 0.32]}""" →
+    """ {"load": [0.31, 0.33, 0.32]} """ →
       <json object="true">
         <load array="true" type="number">0.31</load>
         <load array="true" type="number">0.33</load>
         <load array="true" type="number">0.32</load>
       </json>,
-    """{"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}}""" →
+    """ {"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}} """ →
       <json object="true">
         <father object="true"><given type="string">Mark</given><family type="string">Smith</family></father>
         <mother object="true"><given type="string">Mary</given><family type="string">Smith</family></mother>
       </json>,
-    """{"p": null}""" →
+    """ {"p": null} """ →
       <json object="true"><p type="null"/></json>,
-    """{"p": ""}""" →
+    """ {"p": ""} """ →
       <json object="true"><p type="string"/></json>,
-    """{"p": []}""" →
+    """ {"p": []} """ →
       <json object="true"><p array="true"/></json>,
-    """{"$v": 0}""" →
+    """ {"$v": 0} """ →
       <json object="true"><_v name="$v" type="number">0</_v></json>,
-    """{"1": "one"}""" →
+    """ {"1": "one"} """ →
       <json object="true"><_1 name="1" type="string">one</_1></json>,
-    """3""" →
+    """ 3 """ →
       <json type="number">3</json>,
-    """"Disconnected"""" →
+    """ "Disconnected" """ →
       <json type="string">Disconnected</json>,
-    """["red", "green", "blue"]""" →
+    """ ["red", "green", "blue"] """ →
       <json>
         <_ name="" array="true" type="string">red</_>
         <_ name="" array="true" type="string">green</_>
         <_ name="" array="true" type="string">blue</_>
       </json>,
-    """{"g": [["a", "b", "c"], ["d", "e"]]}""" →
+    """ {"g": [["a", "b", "c"], ["d", "e"]]} """ →
       <json object="true">
         <g array="true">
           <_ name="" array="true" type="string">a</_>
@@ -94,28 +94,28 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
           <_ name="" array="true" type="string">e</_>
         </g>
       </json>,
-    """{}""" →
+    """ {} """ →
       <json object="true"/>,
-    """[]""" →
+    """ [] """ →
       <json>
         <_ name="" array="true"/>
       </json>,
-    """""""" →
+    """ "" """ →
       <json type="string"/>
   )
 
   val AdditionalJsonToXml = List[(String, Elem)](
-    """{"p": [{}]}""" →
+    """ {"p": [{}]} """ →
       <json object="true">
         <p array="true" object="true"/>
       </json>,
-    """{"p": [[]]}""" →
+    """ {"p": [[]]} """ →
       <json object="true">
         <p array="true">
           <_ name="" array="true"/>
         </p>
       </json>,
-    """{"p": [[[]]]}""" →
+    """ {"p": [[[]]]} """ →
       <json object="true">
         <p array="true">
           <_ name="" array="true">

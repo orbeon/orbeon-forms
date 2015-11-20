@@ -39,6 +39,12 @@ import spray.json._
 // - XPath expressions which apply to the resulting XML document feel as natural as possible in most
 //   cases and can be written just by looking at the original JSON.
 //
+// Remaining tasks:
+//
+// - handle escaped characters for JSON strings ("Escaped characters are transformed as necessary")
+// - `strict = true`: validate more cases
+// - `strict = false`: make sure fallbacks are in place and that any XML can be thrown in without error
+//
 object Converter {
 
   // Convert a JSON String to a stream of XML events
@@ -55,8 +61,6 @@ object Converter {
     def processValue(jsValue: JsValue): Unit =
       jsValue match {
         case JsString(v) ⇒
-          // TODO: Escaped characters are transformed as necessary; characters and escapes that have no
-          // equivalent XML character [...]
           rcv.addAttribute(Symbols.Type, Symbols.String)
           text(v)
         case JsNumber(v) ⇒
@@ -194,7 +198,7 @@ object Converter {
       else if (isElement(root))
         root
       else
-        throw new IllegalArgumentException("node must be an element or document")
+        throwError("node must be an element or document")
     )
   }
 

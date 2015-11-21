@@ -156,6 +156,7 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.js.uri.*.*">
+        /ops/javascript/fastclick/fastclick.js
         /apps/fr/script/form-runner.js
     </property>
 

@@ -550,6 +550,9 @@
   min-height: 28px;
   height: auto;
 }
+.orbeon label > * {
+  pointer-events: none;
+}
 @media print {
   .orbeon #xforms-form .fr-status-icons,
   .orbeon #xforms-form .xforms-loading-loading,

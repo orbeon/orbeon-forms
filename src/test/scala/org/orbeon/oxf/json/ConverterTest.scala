@@ -134,6 +134,15 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
         <_ name="" array="true">
           <_ name="" array="true"/>
         </_>
+      </json>,
+    """ { "< <": [[ "1 2 3" ], { "_" : 6 } ]} """ →
+      <json object="true">
+        <___ array="true" name="&lt; &lt;">
+          <_ name="" array="true" type="string">1 2 3</_>
+        </___>
+        <___ array="true" name="&lt; &lt;" object="true">
+          <_ type="number">6</_>
+        </___>
       </json>
   )
 

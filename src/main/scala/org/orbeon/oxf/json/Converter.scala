@@ -23,8 +23,9 @@
 package org.orbeon.oxf.json
 
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import spray.json._
 
 //
@@ -46,6 +47,13 @@ import spray.json._
 // - `strict = false`: make sure fallbacks are in place and that any XML can be thrown in without error
 //
 object Converter {
+
+  // Convert a JSON String to a readonly DocumentInfo
+  def jsonStringToXML(source: String): DocumentInfo = {
+    val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
+    jsonStringToXML(source, receiver)
+    builder.getCurrentRoot.asInstanceOf[DocumentInfo]
+  }
 
   // Convert a JSON String to a stream of XML events
   def jsonStringToXML(source: String, receiver: XMLReceiver): Unit =

@@ -115,9 +115,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
           Right(
             if (isJSON) {
-              val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
-              Converter.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
-              builder.getCurrentRoot.asInstanceOf[DocumentInfo]
+              Converter.jsonStringToXML(connectionResult.readTextResponseBody.get)
             } else {
               TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
             }

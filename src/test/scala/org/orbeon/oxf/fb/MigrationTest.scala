@@ -68,7 +68,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
         assert(MigrationJSON.asJson === result.asJson)
     }
 
-    val Data47: NodeInfo =
+  val DataOrbeonForms47: NodeInfo =
         <form>
             <section-1>
                 <control-1/>
@@ -98,6 +98,9 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
                         <control-7/>
                     </grid-4>
                 </section-3-iteration>
+        <section-3-iteration>
+          <control-6/>
+        </section-3-iteration>
             </section-3>
             <section-13>
                 <grid-6>
@@ -160,7 +163,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
             </section-23>
         </form>
 
-    val Data48: NodeInfo =
+  val DataOrbeonForms48: NodeInfo =
         <form>
             <section-1>
                 <control-1/>
@@ -194,6 +197,10 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
                         </grid-4-iteration>
                     </grid-4>
                 </section-3-iteration>
+        <section-3-iteration>
+          <control-6/>
+          <grid-4/>
+        </section-3-iteration>
             </section-3>
             <section-13>
                 <grid-6>
@@ -263,24 +270,87 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
                 </grid-3>
             </section-23>
         </form>
+
+  val DataOrbeonForms47EmptyIterations: NodeInfo =
+    <form>
+      <section-1>
+        <control-1/>
+      </section-1>
+      <section-3>
+        <section-3-iteration>
+          <control-6/>
+        </section-3-iteration>
+      </section-3>
+      <section-13/>
+      <section-8>
+        <control-1/>
+      </section-8>
+      <section-23>
+        <control-1/>
+      </section-23>
+    </form>
+
+  val DataOrbeonForms48EmptyIterations: NodeInfo =
+    <form>
+      <section-1>
+        <control-1/>
+      </section-1>
+      <section-3>
+        <section-3-iteration>
+          <control-6/>
+          <grid-4/>
+        </section-3-iteration>
+      </section-3>
+      <section-13>
+        <grid-6/>
+        <grid-14/>
+      </section-13>
+      <section-8>
+        <control-1/>
+        <grid-3/>
+      </section-8>
+      <section-23>
+        <control-1/>
+        <grid-3/>
+      </section-23>
+    </form>
 
     @Test def migrateDataTo(): Unit =
+    for {
+      (from, to) ← List(
+        DataOrbeonForms47                → DataOrbeonForms48,
+        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      )
+    } locally {
         assertXMLDocumentsIgnoreNamespacesInScope(
-            Data48.root,
-            DataMigration.migrateDataTo(Data47.root, MigrationJSON)
+        to.root,
+        DataMigration.migrateDataTo(from.root, MigrationJSON)
         )
+    }
 
     @Test def migrateDataFrom(): Unit =
+    for {
+      (from, to) ← List(
+        DataOrbeonForms47                → DataOrbeonForms48,
+        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      )
+    } locally {
         assertXMLDocumentsIgnoreNamespacesInScope(
-            Data47.root,
-            DataMigration.migrateDataFrom(Data48.root, MigrationJSON)
+        from.root,
+        DataMigration.migrateDataFrom(to.root, MigrationJSON)
         )
+    }
 
     @Test def roundTripData(): Unit =
+    for {
+      (from, to) ← List(
+        DataOrbeonForms47                → DataOrbeonForms48,
+        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      )
+    } locally {
         assertXMLDocumentsIgnoreNamespacesInScope(
-            Data47.root,
-            DataMigration.migrateDataFrom(DataMigration.migrateDataTo(Data47.root, MigrationJSON), MigrationJSON)
+        from.root,
+        DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON)
         )
-
-    // TODO: annotate.xpl migrations
+    }
 }

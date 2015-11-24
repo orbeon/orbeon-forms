@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML
@@ -48,24 +48,39 @@ object DataMigration {
         names.flatten.toList
     }
 
+  private val TrimPathElementRE = """\s*\(?([^)]+)\)?\s*""".r
+
     private def partitionNodes(
         mutableData : NodeInfo,
         migration   : List[(String, String)]
-    ): List[(List[NodeInfo], String)] =
+  ): List[(NodeInfo, List[NodeInfo], String, String)] =
         migration flatMap {
             case (path, iterationName) ⇒
 
+        val (pathToParentNodes, pathToChildNodes) = {
+          // NOTE: The format of the path is like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
+          // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
+          // the migration data. As long as we know that there are no `/` within the parentheses we are fine.
+          val parts                          = split[List](path, "/")
+          val TrimPathElementRE(trimmedLast) = parts.last
+
+          (parts.init mkString "/", trimmedLast)
+        }
+
                 // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
-                val nodes = XML.eval(mutableData.rootElement, path) collect {
+        val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes) collect {
+          case node: NodeInfo ⇒ node
+        }
+
+        parentNodes map { parentNode ⇒
+
+          val nodes = XML.eval(parentNode, pathToChildNodes) collect {
                     case node: NodeInfo ⇒ node
                 }
 
                 // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which
                 // in no namespaces, and if they were in a namespace, the prefixes would likely be unique.
-                val firsts = nodes filter (node ⇒ node.precedingSibling(node.name).isEmpty)
-
-                firsts map { first ⇒
-                    (first :: first.followingSibling(first.name).toList, iterationName)
+          (parentNode, nodes.to[List], pathToChildNodes, iterationName)
                 }
         }
 
@@ -96,8 +111,25 @@ object DataMigration {
         val mutableData = TransformerUtils.extractAsMutableDocument(data)
 
         partitionNodes(mutableData, decodeMigrationsFromJSON(jsonMigrationMap)) foreach {
-            case (iterations, iterationName) ⇒
+      case (parentNode, iterations, repeatName, iterationName) ⇒
 
+        iterations match {
+          case Nil ⇒
+            // Issue: we don't know, based just on the migration map, where to insert container elements to
+            // follow bind order. This is not a new problem as we don't enforce order, see:
+            //
+            //     https://github.com/orbeon/orbeon-forms/issues/443.
+            //
+            // For now we choose to add after the last element.
+            //
+            // BTW at runtime `fr:grid[@repeat = 'true']` inserts iterations before the first element.
+            insert(
+              into       = parentNode,
+              after      = parentNode / *,
+              origin     = elementInfo(repeatName, Nil),
+              doDispatch = false
+            )
+          case _ ⇒
                 val iterationContent = iterations map (_ / Node toList) // force
 
                 delete(iterations.head / Node, doDispatch = false)
@@ -109,6 +141,7 @@ object DataMigration {
                     doDispatch = false
                 )
         }
+    }
 
         mutableData
     }
@@ -118,7 +151,7 @@ object DataMigration {
         val mutableData = TransformerUtils.extractAsMutableDocument(data)
 
         partitionNodes(mutableData, decodeMigrationsFromJSON(jsonMigrationMap)) foreach {
-            case (iterations, iterationName) ⇒
+      case (_, iterations, _, _) ⇒
 
                 assert(iterations.tail.isEmpty)
                 val container = iterations.head

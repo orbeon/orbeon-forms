@@ -26,6 +26,17 @@
                             <control-10/>
                         </section-9-iteration>
                     </section-9>
+                    <section-11>
+                        <grid-12>
+                            <grid-12-iteration>
+                                <control-13/>
+                            </grid-12-iteration>
+                            <grid-12-iteration>
+                                <control-13/>
+                            </grid-12-iteration>
+                        </grid-12>
+                        <grid-14/>
+                    </section-11>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -36,7 +47,6 @@
                         <xf:constraint value="string-length() ge 10" id="validation-2-validation"/>
                         <xf:type id="validation-3-validation">xf:string</xf:type>
                         <xf:required value="true()" id="validation-4-validation"/>
-
                         <xxf:default value="43"/>
                         <xf:constraint value="string-length() le 100" id="validation-5-validation"/>
                         <xf:constraint value="string-length() ge 10" id="validation-6-validation"/>
@@ -57,6 +67,18 @@
                 <xf:bind id="section-9-bind" ref="section-9" name="section-9">
                     <xf:bind id="section-9-iteration-bind" ref="section-9-iteration" name="section-9-iteration">
                         <xf:bind id="control-10-bind" ref="control-10" name="control-10"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-11-bind" ref="section-11" name="section-11">
+                    <xf:bind id="grid-12-bind" ref="grid-12" name="grid-12">
+                        <xf:bind id="grid-12-iteration-bind" ref="grid-12-iteration" name="grid-12-iteration">
+                            <xf:bind id="control-13-bind" ref="control-13" name="control-13"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="grid-14-bind" ref="grid-14" name="grid-14">
+                        <xf:bind id="grid-14-iteration-bind" ref="grid-14-iteration" name="grid-14-iteration">
+                            <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
+                        </xf:bind>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -87,6 +109,18 @@
                             <label/>
                             <help/>
                         </section-9>
+                        <section-11>
+                            <label/>
+                            <help/>
+                        </section-11>
+                        <control-13>
+                            <label/>
+                            <hint/>
+                        </control-13>
+                        <control-15>
+                            <label/>
+                            <hint/>
+                        </control-15>
                     </resource>
                 </resources>
             </xf:instance>
@@ -105,8 +139,18 @@
                     <control-10/>
                 </section-9-iteration>
             </xf:instance>
-            <xf:action ev:event="xforms-ready" xmlns:ev="http://www.w3.org/2001/xml-events"/>
-            <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-12-template">
+                <grid-12-iteration>
+                    <control-13/>
+                </grid-12-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-14-template">
+                <grid-14-iteration>
+                    <control-15/>
+                </grid-14-iteration>
+            </xf:instance>
+            <xf:action ev:event="xforms-ready"/>
+            <xf:action ev:event="xforms-model-construct-done"/>
         </xf:model>
     </xh:head>
     <xh:body>
@@ -157,6 +201,31 @@
                                 <xf:input id="control-10-control" bind="control-10-bind">
                                     <xf:label ref="$form-resources/control-10/label"/>
                                     <xf:hint ref="$form-resources/control-10/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-11-control" bind="section-11-bind">
+                    <xf:label ref="$form-resources/section-11/label"/>
+                    <fr:grid id="grid-12-grid" bind="grid-12-bind" repeat="content" template="instance('grid-12-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-13-control" bind="control-13-bind">
+                                    <xf:label ref="$form-resources/control-13/label"/>
+                                    <xf:hint ref="$form-resources/control-13/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid-14-grid" bind="grid-14-bind" repeat="content" template="instance('grid-14-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-15-control" bind="control-15-bind">
+                                    <xf:label ref="$form-resources/control-15/label"/>
+                                    <xf:hint ref="$form-resources/control-15/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>

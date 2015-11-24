@@ -27,6 +27,17 @@
                             <control-10/>
                         </section-9-iteration>
                     </section-9>
+                    <section-11>
+                        <grid-12>
+                            <grid-12-iteration>
+                                <control-13/>
+                            </grid-12-iteration>
+                            <grid-12-iteration>
+                                <control-13/>
+                            </grid-12-iteration>
+                        </grid-12>
+                        <grid-14/>
+                    </section-11>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
@@ -59,6 +70,18 @@
                         <xf:bind id="control-10-bind" ref="control-10" name="control-10"/>
                     </xf:bind>
                 </xf:bind>
+                <xf:bind id="section-11-bind" ref="section-11" name="section-11">
+                    <xf:bind id="grid-12-bind" ref="grid-12" name="grid-12">
+                        <xf:bind id="grid-12-iteration-bind" ref="grid-12-iteration" name="grid-12-iteration">
+                            <xf:bind id="control-13-bind" ref="control-13" name="control-13"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="grid-14-bind" ref="grid-14" name="grid-14">
+                        <xf:bind id="grid-14-iteration-bind" ref="grid-14-iteration" name="grid-14-iteration">
+                            <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
             </xf:bind>
             <xf:instance id="fr-form-resources" xxf:readonly="false">
                 <resources>
@@ -87,6 +110,18 @@
                             <label/>
                             <help/>
                         </section-9>
+                        <section-11>
+                            <label/>
+                            <help/>
+                        </section-11>
+                        <control-13>
+                            <label/>
+                            <hint/>
+                        </control-13>
+                        <control-15>
+                            <label/>
+                            <hint/>
+                        </control-15>
                     </resource>
                 </resources>
             </xf:instance>
@@ -104,6 +139,16 @@
                 <section-9-iteration>
                     <control-10/>
                 </section-9-iteration>
+            </xf:instance>
+            <xf:instance xxf:exclude-result-prefixes="#all" fb:readonly="true" id="grid-12-template">
+                <grid-12-iteration>
+                    <control-13/>
+                </grid-12-iteration>
+            </xf:instance>
+            <xf:instance xxf:exclude-result-prefixes="#all" fb:readonly="true" id="grid-14-template">
+                <grid-14-iteration>
+                    <control-15/>
+                </grid-14-iteration>
             </xf:instance>
             <xf:action fb:event="xforms-ready"/>
             <xf:action fb:event="xforms-model-construct-done"/>
@@ -175,6 +220,31 @@
                                 <xf:input id="control-10-control" bind="control-10-bind">
                                     <xf:label ref="$form-resources/control-10/label"/>
                                     <xf:hint ref="$form-resources/control-10/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section edit-ref="" xxf:update="full" id="section-11-control" bind="section-11-bind">
+                    <xf:label ref="$form-resources/section-11/label"/>
+                    <fr:grid edit-ref="" id="grid-12-grid" bind="grid-12-bind" repeat="content" template="instance('grid-12-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-13-control" bind="control-13-bind">
+                                    <xf:label ref="$form-resources/control-13/label"/>
+                                    <xf:hint ref="$form-resources/control-13/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid edit-ref="" id="grid-14-grid" bind="grid-14-bind" repeat="content" template="instance('grid-14-template')">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-15-control" bind="control-15-bind">
+                                    <xf:label ref="$form-resources/control-15/label"/>
+                                    <xf:hint ref="$form-resources/control-15/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>

@@ -426,9 +426,19 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Ensure xxf:exclude-result-prefixes attribute on repeat templates -->
-                <xsl:template match="xf:model/xf:instance[ends-with(@id, '-template')]"
-                              mode="within-model">
+                <!--
+                    Ensure xxf:exclude-result-prefixes attribute on repeat templates, see:
+
+                        https://github.com/orbeon/orbeon-forms/issues/2278
+
+                    Run this with lower priority, see:
+
+                        https://github.com/orbeon/orbeon-forms/issues/2440
+                -->
+                <xsl:template
+                    match="xf:model/xf:instance[ends-with(@id, '-template')]"
+                    mode="within-model"
+                    priority="-100">
                     <xsl:copy>
                         <xsl:attribute name="xxf:exclude-result-prefixes" select="'#all'"/>
                         <xsl:apply-templates select="@* | node()" mode="#current"/>

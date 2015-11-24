@@ -27,29 +27,29 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
 
   val MigrationJSON =
     """
-      |[
-      |  {
-      |    "path": "(section-3)/(section-3-iteration)/(grid-4)",
-      |    "iteration-name": "grid-4-iteration"
-      |  },
-      |  {
-      |    "path": "(section-13)/(grid-6)",
-      |    "iteration-name": "grid-6-iteration"
-      |  },
-      |  {
-      |    "path": "(section-13)/(grid-14)",
-      |    "iteration-name": "grid-14-iteration"
-      |  },
-      |  {
-      |    "path": "(section-8)/(grid-3)",
-      |    "iteration-name": "my-custom-grid-3-iteration"
-      |  },
-      |  {
-      |    "path": "(section-23)/(grid-3)",
-      |    "iteration-name": "my-custom-grid-3-iteration"
-      |  }
-      |]
-    """.stripMargin
+      [
+        {
+          "path": "(section-3)/(section-3-iteration)/(grid-4)",
+          "iteration-name": "grid-4-iteration"
+        },
+        {
+          "path": "(section-13)/(grid-6)",
+          "iteration-name": "grid-6-iteration"
+        },
+        {
+          "path": "(section-13)/(grid-14)",
+          "iteration-name": "grid-14-iteration"
+        },
+        {
+          "path": "(section-8)/(grid-3)",
+          "iteration-name": "my-custom-grid-3-iteration"
+        },
+        {
+          "path": "(section-23)/(grid-3)",
+          "iteration-name": "my-custom-grid-3-iteration"
+        }
+      ]
+    """
 
   @Test def buildGridMigrationMap(): Unit = {
 
@@ -63,7 +63,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
     assert(MigrationJSON.parseJson === result.parseJson)
   }
 
-  val Data47: NodeInfo =
+  val DataOrbeonForms47: NodeInfo =
     <form>
       <section-1>
         <control-1/>
@@ -92,6 +92,9 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
           <grid-4>
             <control-7/>
           </grid-4>
+        </section-3-iteration>
+        <section-3-iteration>
+          <control-6/>
         </section-3-iteration>
       </section-3>
       <section-13>
@@ -155,7 +158,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
       </section-23>
     </form>
 
-  val Data48: NodeInfo =
+  val DataOrbeonForms48: NodeInfo =
     <form>
       <section-1>
         <control-1/>
@@ -188,6 +191,10 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
               <control-7/>
             </grid-4-iteration>
           </grid-4>
+        </section-3-iteration>
+        <section-3-iteration>
+          <control-6/>
+          <grid-4/>
         </section-3-iteration>
       </section-3>
       <section-13>
@@ -256,24 +263,89 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
             <control-9/>
           </my-custom-grid-3-iteration>
         </grid-3>
+      </section-23>
+    </form>
+
+  val DataOrbeonForms47EmptyIterations: NodeInfo =
+    <form>
+      <section-1>
+        <control-1/>
+      </section-1>
+      <section-3>
+        <section-3-iteration>
+          <control-6/>
+        </section-3-iteration>
+      </section-3>
+      <section-13/>
+      <section-8>
+        <control-1/>
+      </section-8>
+      <section-23>
+        <control-1/>
+      </section-23>
+    </form>
+
+  val DataOrbeonForms48EmptyIterations: NodeInfo =
+    <form>
+      <section-1>
+        <control-1/>
+      </section-1>
+      <section-3>
+        <section-3-iteration>
+          <control-6/>
+          <grid-4/>
+        </section-3-iteration>
+      </section-3>
+      <section-13>
+        <grid-6/>
+        <grid-14/>
+      </section-13>
+      <section-8>
+        <control-1/>
+        <grid-3/>
+      </section-8>
+      <section-23>
+        <control-1/>
+        <grid-3/>
       </section-23>
     </form>
 
   @Test def migrateDataTo(): Unit =
-    assertXMLDocumentsIgnoreNamespacesInScope(
-      Data48.root,
-      DataMigration.migrateDataTo(Data47.root, MigrationJSON)
-    )
+    for {
+      (from, to) ← List(
+        DataOrbeonForms47                → DataOrbeonForms48,
+        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      )
+    } locally {
+      assertXMLDocumentsIgnoreNamespacesInScope(
+        to.root,
+        DataMigration.migrateDataTo(from.root, MigrationJSON)
+      )
+    }
 
   @Test def migrateDataFrom(): Unit =
-    assertXMLDocumentsIgnoreNamespacesInScope(
-      Data47.root,
-      DataMigration.migrateDataFrom(Data48.root, MigrationJSON)
-    )
+    for {
+      (from, to) ← List(
+        DataOrbeonForms47                → DataOrbeonForms48,
+        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      )
+    } locally {
+      assertXMLDocumentsIgnoreNamespacesInScope(
+        from.root,
+        DataMigration.migrateDataFrom(to.root, MigrationJSON)
+      )
+    }
 
   @Test def roundTripData(): Unit =
-    assertXMLDocumentsIgnoreNamespacesInScope(
-      Data47.root,
-      DataMigration.migrateDataFrom(DataMigration.migrateDataTo(Data47.root, MigrationJSON), MigrationJSON)
-    )
+    for {
+      (from, to) ← List(
+        DataOrbeonForms47                → DataOrbeonForms48,
+        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      )
+    } locally {
+      assertXMLDocumentsIgnoreNamespacesInScope(
+        from.root,
+        DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON)
+      )
+    }
 }

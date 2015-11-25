@@ -129,7 +129,7 @@
                 <!-- Message in case the canvas is not supported
                      - completely static, so it is shown even without JavaScript
                      - this canvas is removed by JS, once it determines canvas is supported -->
-                <xh:canvas class="fr-wpaint-no-canvas"><xf:output value="xxf:r('canvas-not-supported')"/></xh:canvas>
+                <xh:canvas class="fr-wpaint-no-canvas"><xf:output value="xxf:r('errors.canvas-not-supported', '|fr-fr-resources|')"/></xh:canvas>
 
                 <!-- Block in which wPaint renders its canvas -->
                 <xh:div class="fr-wpaint-container-a">

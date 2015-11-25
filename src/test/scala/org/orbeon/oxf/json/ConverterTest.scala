@@ -37,111 +37,117 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
   // Examples from the XForms 2.0 spec
   val XFormsJsonToXml = List[(String, Elem)](
     """ {"given": "Mark", "family": "Smith"} """ →
-      <json object="true">
+      <json type="object">
           <given type="string">Mark</given>
           <family type="string">Smith</family>
       </json>,
     """ {"name": "Mark", "age": 21} """ →
-      <json object="true"><name type="string">Mark</name><age type="number">21</age></json>,
+      <json type="object"><name type="string">Mark</name><age type="number">21</age></json>,
     """ {"selected": true} """ →
-      <json object="true"><selected type="boolean">true</selected></json>,
+      <json type="object"><selected type="boolean">true</selected></json>,
     """ {"cities": ["Amsterdam", "Paris", "London"]} """ →
-      <json object="true">
-        <cities array="true" type="string">Amsterdam</cities>
-        <cities array="true" type="string">Paris</cities>
-        <cities array="true" type="string">London</cities>
+      <json type="object">
+        <cities type="array">
+          <_ type="string">Amsterdam</_>
+          <_ type="string">Paris</_>
+          <_ type="string">London</_>
+        </cities>
       </json>,
     """ {"load": [0.31, 0.33, 0.32]} """ →
-      <json object="true">
-        <load array="true" type="number">0.31</load>
-        <load array="true" type="number">0.33</load>
-        <load array="true" type="number">0.32</load>
+      <json type="object">
+        <load type="array">
+          <_ type="number">0.31</_>
+          <_ type="number">0.33</_>
+          <_ type="number">0.32</_>
+        </load>
       </json>,
     """ {"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}} """ →
-      <json object="true">
-        <father object="true"><given type="string">Mark</given><family type="string">Smith</family></father>
-        <mother object="true"><given type="string">Mary</given><family type="string">Smith</family></mother>
+      <json type="object">
+        <father type="object"><given type="string">Mark</given><family type="string">Smith</family></father>
+        <mother type="object"><given type="string">Mary</given><family type="string">Smith</family></mother>
       </json>,
     """ {"p": null} """ →
-      <json object="true"><p type="null"/></json>,
+      <json type="object"><p type="null"/></json>,
     """ {"p": ""} """ →
-      <json object="true"><p type="string"/></json>,
+      <json type="object"><p type="string"/></json>,
     """ {"p": []} """ →
-      <json object="true"><p array="true"/></json>,
+      <json type="object"><p type="array"/></json>,
     """ {"$v": 0} """ →
-      <json object="true"><_v name="$v" type="number">0</_v></json>,
+      <json type="object"><_v name="$v" type="number">0</_v></json>,
     """ {"1": "one"} """ →
-      <json object="true"><_1 name="1" type="string">one</_1></json>,
+      <json type="object"><_1 name="1" type="string">one</_1></json>,
     """ 3 """ →
       <json type="number">3</json>,
     """ "Disconnected" """ →
       <json type="string">Disconnected</json>,
     """ ["red", "green", "blue"] """ →
-      <json>
-        <_ name="" array="true" type="string">red</_>
-        <_ name="" array="true" type="string">green</_>
-        <_ name="" array="true" type="string">blue</_>
+      <json type="array">
+        <_ type="string">red</_>
+        <_ type="string">green</_>
+        <_ type="string">blue</_>
       </json>,
     """ {"g": [["a", "b", "c"], ["d", "e"]]} """ →
-      <json object="true">
-        <g array="true">
-          <_ name="" array="true" type="string">a</_>
-          <_ name="" array="true" type="string">b</_>
-          <_ name="" array="true" type="string">c</_>
-        </g>
-        <g array="true">
-          <_ name="" array="true" type="string">d</_>
-          <_ name="" array="true" type="string">e</_>
+      <json type="object">
+        <g type="array">
+          <_ type="array">
+            <_ type="string">a</_>
+            <_ type="string">b</_>
+            <_ type="string">c</_>
+          </_>
+          <_ type="array">
+            <_ type="string">d</_>
+            <_ type="string">e</_>
+          </_>
         </g>
       </json>,
     """ {} """ →
-      <json object="true"/>,
+      <json type="object"/>,
     """ [] """ →
-      <json>
-        <_ name="" array="true"/>
-      </json>,
+      <json type="array"/>,
     """ "" """ →
       <json type="string"/>
   )
 
   val AdditionalJsonToXml = List[(String, Elem)](
     """ {"p": [{}]} """ →
-      <json object="true">
-        <p array="true" object="true"/>
+      <json type="object">
+        <p type="array">
+            <_ type="object"/>
+        </p>
       </json>,
     """ {"p": [[]]} """ →
-      <json object="true">
-        <p array="true">
-          <_ name="" array="true"/>
+      <json type="object">
+        <p type="array">
+          <_ type="array"/>
         </p>
       </json>,
     """ {"p": [[[]]]} """ →
-      <json object="true">
-        <p array="true">
-          <_ name="" array="true">
-            <_ name="" array="true"/>
+      <json type="object">
+        <p type="array">
+          <_ type="array">
+            <_ type="array"/>
           </_>
         </p>
       </json>,
     """ ["red", 42, true, { "foo": "bar"}, []] """ →
-      <json>
-        <_ name="" array="true" type="string">red</_>
-        <_ name="" array="true" type="number">42</_>
-        <_ name="" array="true" type="boolean">true</_>
-        <_ name="" array="true" object="true">
+      <json type="array">
+        <_ type="string">red</_>
+        <_ type="number">42</_>
+        <_ type="boolean">true</_>
+        <_ type="object">
           <foo type="string">bar</foo>
         </_>
-        <_ name="" array="true">
-          <_ name="" array="true"/>
-        </_>
+        <_ type="array"/>
       </json>,
     """ { "< <": [[ "1 2 3" ], { "_" : 6 } ]} """ →
-      <json object="true">
-        <___ array="true" name="&lt; &lt;">
-          <_ name="" array="true" type="string">1 2 3</_>
-        </___>
-        <___ array="true" name="&lt; &lt;" object="true">
-          <_ type="number">6</_>
+      <json type="object">
+        <___ name="&lt; &lt;" type="array">
+          <_ type="array">
+            <_ type="string">1 2 3</_>
+          </_>
+          <_ type="object">
+            <_ type="number">6</_>
+          </_>
         </___>
       </json>
   )

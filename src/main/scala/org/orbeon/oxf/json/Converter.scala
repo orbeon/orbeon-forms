@@ -80,35 +80,20 @@ object Converter {
         case JsNull ⇒
           rcv.addAttribute(Symbols.Type, Symbols.Null)
         case JsObject(fields) ⇒
-          rcv.addAttribute(Symbols.Object, Symbols.True)
+          rcv.addAttribute(Symbols.Type, Symbols.Object)
           fields foreach { case (name, value) ⇒
 
             val ncName  = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
             val nameAtt = ncName != name list (Symbols.Name → name)
 
-            def attsForArray = (Symbols.Array → Symbols.True) :: nameAtt
-
-            value match {
-              case JsArray(arrayValues) if arrayValues.isEmpty ⇒
-                element(ncName, attsForArray)
-              case JsArray(arrayValues) ⇒
-                val atts = attsForArray
-                arrayValues foreach { arrayValue ⇒
-                  withElement(ncName, atts) {
-                    processValue(arrayValue)
-                  }
-                }
-              case _ ⇒
-                withElement(ncName, nameAtt) {
-                  processValue(value)
-                }
+            withElement(ncName, nameAtt) {
+              processValue(value)
             }
           }
-        case JsArray(arrayValues) if arrayValues.isEmpty ⇒
-          element(Symbols.Anonymous, List(Symbols.Name → "", Symbols.Array → Symbols.True))
         case JsArray(arrayValues) ⇒
+          rcv.addAttribute(Symbols.Type, Symbols.Array)
           arrayValues foreach { arrayValue ⇒
-            withElement(Symbols.Anonymous, List(Symbols.Name → "", Symbols.Array → Symbols.True)) {
+            withElement(Symbols.Anonymous) {
               processValue(arrayValue)
             }
           }
@@ -130,74 +115,24 @@ object Converter {
 
     import org.orbeon.scaxon.XML._
 
-    def isArray (elem: NodeInfo) = (elem attValue    Symbols.Array)  == Symbols.True
-    def isObject(elem: NodeInfo) = (elem attValue    Symbols.Object) == Symbols.True
     def typeOpt (elem: NodeInfo) =  elem attValueOpt Symbols.Type
     def elemName(elem: NodeInfo) =  elem attValueOpt Symbols.Name getOrElse elem.localname
 
     def throwError(s: String) =
       throw new IllegalArgumentException(s)
 
-    def isEmptyArray(elem: NodeInfo) =
-      typeOpt(elem).isEmpty && ! isObject(elem) && ! hasChildElement(elem)
-
     def processElement(elem: NodeInfo): JsValue =
-      (typeOpt(elem), isObject(elem)) match {
-        case (Some(Symbols.String) , _) ⇒ JsString(elem.stringValue)
-        case (Some(Symbols.Number) , _) ⇒ JsNumber(elem.stringValue)
-        case (Some(Symbols.Boolean), _) ⇒ JsBoolean(elem.stringValue.toBoolean)
-        case (Some(Symbols.Null)   , _) ⇒ JsNull
-        case (Some(other)          , _) ⇒ // invalid `type` attribute
+      typeOpt(elem) match {
+        case Some(Symbols.String) | None ⇒ JsString(elem.stringValue)
+        case Some(Symbols.Number)        ⇒ JsNumber(elem.stringValue)
+        case Some(Symbols.Boolean)       ⇒ JsBoolean(elem.stringValue.toBoolean)
+        case Some(Symbols.Null)          ⇒ JsNull
+        case Some(Symbols.Object)        ⇒ JsObject(elem / * map (elem ⇒ elemName(elem) → processElement(elem)) toMap)
+        case Some(Symbols.Array)         ⇒ JsArray(elem / * map processElement toVector)
+        case Some(other)                 ⇒
           if (strict)
             throwError(s"""unknown datatype `type="$other"`""")
           JsNull
-        case (None, true) ⇒ // `object="true"`
-
-          val childrenGroupedByName = elem / * groupByKeepOrder elemName
-
-          val fields =
-            childrenGroupedByName map { case (name, elems @ head +: tail) ⇒
-              name → {
-                if (isArray(head)) {
-                  if (strict && ! (elems forall isArray))
-                    throwError(s"""all array elements with name $name must have `array="true"`""")
-
-                  if (isEmptyArray(head))
-                    JsArray()
-                  else
-                    JsArray(elems map processElement toVector)
-                } else {
-                  if (strict && tail.nonEmpty)
-                    throwError(s"""only one element with name $name is allowed when there is no `array="true"`""")
-                  processElement(head)
-                }
-              }
-            }
-
-          JsObject(fields.toMap)
-
-        case (None, false) ⇒ // must be an anonymous array
-
-          val childrenGroupedByName = elem / * groupByKeepOrder elemName
-
-          childrenGroupedByName.headOption match {
-            case Some((name, elems @ head +: tail)) ⇒
-
-              if (strict && name != "")
-                throwError("""anonymous array elements must have `name=""`""")
-              if (strict && ! (elems forall isArray))
-                throwError("""all anonymous array elements must have `array="true"`""")
-
-              if (isEmptyArray(head))
-                JsArray()
-              else
-                JsArray(elems map processElement toVector)
-
-            case None ⇒
-              if (strict)
-                throwError("""anonymous array is missing child element with `array="true"`""")
-              JsNull
-          }
       }
 
     processElement(

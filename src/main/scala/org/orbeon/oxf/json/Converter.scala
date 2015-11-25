@@ -22,30 +22,31 @@
  */
 package org.orbeon.oxf.json
 
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.XML._
+import org.xml.sax.helpers.AttributesImpl
 import spray.json._
 
 //
-// Functions to convert JSON to XML and back following the XForms 2.0 specification.
+// Concrete functions to convert JSON to XML and back following the XForms 2.0 specification.
 //
-// The conversion follows the following principles:
-//
-// - Any JSON document is convertible to XML.
-// - However, the opposite is not true, and only XML documents following a very specific pattern
-//   can be converted to JSON. In other words the purpose of the conversion rules is to expose JSON
-//   to XML processing and not the other way around.
-// - XPath expressions which apply to the resulting XML document feel as natural as possible in most
-//   cases and can be written just by looking at the original JSON.
-//
-// Remaining tasks:
-//
-// - `strict = true`: validate more cases
-// - `strict = false`: make sure fallbacks are in place and that any XML can be thrown in without error
-//
-object Converter {
+object Converter extends ConverterTrait {
+
+  type XMLElem = NodeInfo
+
+  def localname(elem: XMLElem)                    = elem.localname
+  def stringValue(elem: XMLElem)                  = elem.stringValue
+  def attValueOpt(elem: XMLElem, attName: String) = elem attValueOpt attName
+  def childrenElem(elem: XMLElem)                 = elem / * iterator
+
+  type XMLStream = DeferredXMLReceiver
+
+  def startElem(rcv: XMLStream, name: String)                   = rcv.startElement("", name, name, new AttributesImpl)
+  def endElem(rcv: XMLStream, name: String)                     = rcv.endElement("", name, name)
+  def addAttribute(rcv: XMLStream, name: String, value: String) = rcv.addAttribute("", name, name, value)
+  def text(rcv: XMLStream, value: String)                       = { val a = value.toCharArray; rcv.characters(a, 0, a.length) }
 
   // Convert a JSON String to a readonly DocumentInfo
   def jsonStringToXML(source: String): DocumentInfo = {
@@ -67,117 +68,24 @@ object Converter {
 
   // Convert a JSON AST to a stream of XML events
   def jsonToXML(ast: JsValue, receiver: XMLReceiver): Unit = {
-
-    import XMLReceiverSupport._
-
-    implicit val rcv = new DeferredXMLReceiverImpl(receiver)
-
-    def escapeString(s: String) =
-      s.iterateCodePoints map { cp ⇒
-        if (cp <= 0x1F || cp == 0x7F)
-          cp + 0xE000
-        else
-          cp
-      } codePointsToString
-
-    def processValue(jsValue: JsValue): Unit =
-      jsValue match {
-        case JsString(v) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.String)
-          text(escapeString(v))
-        case JsNumber(v) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Number)
-          text(v.toString)
-        case JsBoolean(v) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Boolean)
-          text(v.toString)
-        case JsNull ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Null)
-        case JsObject(fields) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Object)
-          fields foreach { case (name, value) ⇒
-
-            val ncName  = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
-            val nameAtt = ncName != name list (Symbols.Name → escapeString(name))
-
-            withElement(ncName, nameAtt) {
-              processValue(value)
-            }
-          }
-        case JsArray(arrayValues) ⇒
-          rcv.addAttribute(Symbols.Type, Symbols.Array)
-          arrayValues foreach { arrayValue ⇒
-            withElement(Symbols.Anonymous) {
-              processValue(arrayValue)
-            }
-          }
-      }
-
-    withDocument {
-      withElement(Symbols.JSON) {
-        processValue(ast)
-      }
-    }
+    receiver.startDocument()
+    jsonToXMLImpl(ast, new DeferredXMLReceiverImpl(receiver))
+    receiver.endDocument()
   }
 
   // Convert an XML tree to a JSON String
-  def xmlToJsonString(root: NodeInfo, strict: Boolean): String =
+  def xmlToJsonString(root: XMLElem, strict: Boolean): String =
     xmlToJson(root, strict).toString
 
   // Convert an XML tree to a JSON AST
-  def xmlToJson(root: NodeInfo, strict: Boolean): JsValue = {
-
-    import org.orbeon.scaxon.XML._
-
-    def unescapeString(s: String) =
-      s.iterateCodePoints map { cp ⇒
-        if (cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F)
-          cp - 0xE000
-        else
-          cp
-      } codePointsToString
-
-    def typeOpt (elem: NodeInfo) =  elem attValueOpt Symbols.Type
-    def elemName(elem: NodeInfo) =  elem attValueOpt Symbols.Name map unescapeString getOrElse elem.localname
-
-    def throwError(s: String) =
-      throw new IllegalArgumentException(s)
-
-    def processElement(elem: NodeInfo): JsValue =
-      typeOpt(elem) match {
-        case Some(Symbols.String) | None ⇒ JsString(unescapeString(elem.stringValue))
-        case Some(Symbols.Number)        ⇒ JsNumber(elem.stringValue)
-        case Some(Symbols.Boolean)       ⇒ JsBoolean(elem.stringValue.toBoolean)
-        case Some(Symbols.Null)          ⇒ JsNull
-        case Some(Symbols.Object)        ⇒ JsObject(elem / * map (elem ⇒ elemName(elem) → processElement(elem)) toMap)
-        case Some(Symbols.Array)         ⇒ JsArray(elem / * map processElement toVector)
-        case Some(other)                 ⇒
-          if (strict)
-            throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")
-          JsNull
-      }
-
-    processElement(
+  def xmlToJson(root: XMLElem, strict: Boolean): JsValue =
+    xmlToJsonImpl(
       if (isDocument(root))
         root.rootElement
       else if (isElement(root))
         root
       else
-        throwError("node must be an element or document")
+        throw new IllegalArgumentException("node must be an element or document"),
+      strict
     )
-  }
-
-  private object Symbols {
-    val String    = "string"
-    val Number    = "number"
-    val Boolean   = "boolean"
-    val Null      = "null"
-    val Object    = "object"
-    val Array     = "array"
-
-    val Type      = "type"
-    val Name      = "name"
-    val JSON      = "json"
-    val Anonymous = "_"
-  }
 }

@@ -42,7 +42,6 @@ import spray.json._
 //
 // Remaining tasks:
 //
-// - handle escaped characters for JSON strings ("Escaped characters are transformed as necessary")
 // - `strict = true`: validate more cases
 // - `strict = false`: make sure fallbacks are in place and that any XML can be thrown in without error
 //
@@ -52,6 +51,13 @@ object Converter {
   def jsonStringToXML(source: String): DocumentInfo = {
     val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
     jsonStringToXML(source, receiver)
+    builder.getCurrentRoot.asInstanceOf[DocumentInfo]
+  }
+
+  // Convert a JSON String to a readonly DocumentInfo
+  def jsonToXML(ast: JsValue): DocumentInfo = {
+    val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
+    jsonToXML(ast, receiver)
     builder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }
 
@@ -66,11 +72,24 @@ object Converter {
 
     implicit val rcv = new DeferredXMLReceiverImpl(receiver)
 
+    def escapeString(s: String) = {
+
+      val updatedCodePoints =
+        s.iterateCodePoints map { cp ⇒
+          if (cp <= 0x1F || cp == 0x7F)
+            cp + 0xE000
+          else
+            cp
+        } toArray
+
+      new String(updatedCodePoints, 0, updatedCodePoints.length)
+    }
+
     def processValue(jsValue: JsValue): Unit =
       jsValue match {
         case JsString(v) ⇒
           rcv.addAttribute(Symbols.Type, Symbols.String)
-          text(v)
+          text(escapeString(v))
         case JsNumber(v) ⇒
           rcv.addAttribute(Symbols.Type, Symbols.Number)
           text(v.toString)
@@ -84,7 +103,7 @@ object Converter {
           fields foreach { case (name, value) ⇒
 
             val ncName  = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
-            val nameAtt = ncName != name list (Symbols.Name → name)
+            val nameAtt = ncName != name list (Symbols.Name → escapeString(name))
 
             withElement(ncName, nameAtt) {
               processValue(value)
@@ -115,15 +134,28 @@ object Converter {
 
     import org.orbeon.scaxon.XML._
 
+    def unescapeString(s: String) = {
+
+      val updatedCodePoints =
+        s.iterateCodePoints map { cp ⇒
+          if (cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F)
+            cp - 0xE000
+          else
+            cp
+        } toArray
+
+      new String(updatedCodePoints, 0, updatedCodePoints.length)
+    }
+
     def typeOpt (elem: NodeInfo) =  elem attValueOpt Symbols.Type
-    def elemName(elem: NodeInfo) =  elem attValueOpt Symbols.Name getOrElse elem.localname
+    def elemName(elem: NodeInfo) =  elem attValueOpt Symbols.Name map unescapeString getOrElse elem.localname
 
     def throwError(s: String) =
       throw new IllegalArgumentException(s)
 
     def processElement(elem: NodeInfo): JsValue =
       typeOpt(elem) match {
-        case Some(Symbols.String) | None ⇒ JsString(elem.stringValue)
+        case Some(Symbols.String) | None ⇒ JsString(unescapeString(elem.stringValue))
         case Some(Symbols.Number)        ⇒ JsNumber(elem.stringValue)
         case Some(Symbols.Boolean)       ⇒ JsBoolean(elem.stringValue.toBoolean)
         case Some(Symbols.Null)          ⇒ JsNull
@@ -146,14 +178,13 @@ object Converter {
   }
 
   private object Symbols {
-    val Object    = "object"
-    val Array     = "array"
     val String    = "string"
     val Number    = "number"
     val Boolean   = "boolean"
     val Null      = "null"
+    val Object    = "object"
+    val Array     = "array"
 
-    val True      = "true"
     val Type      = "type"
     val Name      = "name"
     val JSON      = "json"

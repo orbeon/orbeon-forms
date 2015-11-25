@@ -304,4 +304,19 @@ object ScalaUtils extends PathOps {
     def collect[B](pf: PartialFunction[A, B]): Option[B] =
       pf.isDefinedAt(a) option pf(a)
   }
+  implicit class CodePointsOps(val s: String) extends AnyVal {
+    def iterateCodePoints: Iterator[Int] = new CodePointsIterator(s)
+  }
+
+  private class CodePointsIterator(val s: String) extends Iterator[Int] {
+    private var nextIndex = 0
+
+    def hasNext = nextIndex < s.length
+
+    def next() = {
+      val result = s.codePointAt(nextIndex)
+      nextIndex += Character.charCount(result)
+      result
+    }
+  }
 }

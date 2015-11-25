@@ -23,8 +23,10 @@
 package org.orbeon.oxf.json
 
 import org.junit.Test
+import org.orbeon.builder.Utils
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
+import org.orbeon.scaxon.XML
 import org.scalatest.junit.AssertionsForJUnit
 import spray.json._
 
@@ -171,5 +173,39 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
 
       assert(expectedJson === actualJson)
     }
+  }
+
+  @Test def testEscaping(): Unit = {
+
+    import XML._
+
+    val codePointsToEscape           = (0 to 0x1F) :+ 0x7F toArray
+    val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
+    val codePointsTranslated         = codePointsToEscape map (_ + 0xE000)
+    val unicodeEscapedString         = codePointsToEscape map (c ⇒ s"\\u00${Utils.toHexString(Array(c.toByte))}") mkString
+    val translatedString             = new String(codePointsTranslated, 0, codePointsTranslated.length)
+
+    // String containing both a property name and a string value with characters to escape
+    val jsonString = """ { "foo""" + unicodeEscapedString + """": "bar""" + unicodeEscapedString + """" } """
+    val json       = jsonString.parseJson
+
+    val xml           = Converter.jsonToXML(json)
+    val firstElem     = xml.rootElement / * head
+    val firstElemName = firstElem attValueOpt "name" getOrElse firstElem.localname
+    val firstValue    = firstElem.stringValue
+
+    assert("foo" + translatedString === firstElemName)
+    assert("bar" + translatedString === firstValue)
+
+    val backToJson = Converter.xmlToJson(xml, strict = true)
+
+    assert(json === backToJson)
+
+    // We'll get `MatchError` during deconstruction if types don't match and the test will fail
+    val JsObject(fields) = backToJson
+    val (name, JsString(value)) = fields.head
+
+    assert("bar" + stringWithCodePointsToEscape === value)
+    assert("foo" + stringWithCodePointsToEscape === name)
   }
 }

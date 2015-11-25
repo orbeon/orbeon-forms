@@ -72,18 +72,13 @@ object Converter {
 
     implicit val rcv = new DeferredXMLReceiverImpl(receiver)
 
-    def escapeString(s: String) = {
-
-      val updatedCodePoints =
-        s.iterateCodePoints map { cp ⇒
-          if (cp <= 0x1F || cp == 0x7F)
-            cp + 0xE000
-          else
-            cp
-        } toArray
-
-      new String(updatedCodePoints, 0, updatedCodePoints.length)
-    }
+    def escapeString(s: String) =
+      s.iterateCodePoints map { cp ⇒
+        if (cp <= 0x1F || cp == 0x7F)
+          cp + 0xE000
+        else
+          cp
+      } codePointsToString
 
     def processValue(jsValue: JsValue): Unit =
       jsValue match {
@@ -134,18 +129,13 @@ object Converter {
 
     import org.orbeon.scaxon.XML._
 
-    def unescapeString(s: String) = {
-
-      val updatedCodePoints =
-        s.iterateCodePoints map { cp ⇒
-          if (cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F)
-            cp - 0xE000
-          else
-            cp
-        } toArray
-
-      new String(updatedCodePoints, 0, updatedCodePoints.length)
-    }
+    def unescapeString(s: String) =
+      s.iterateCodePoints map { cp ⇒
+        if (cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F)
+          cp - 0xE000
+        else
+          cp
+      } codePointsToString
 
     def typeOpt (elem: NodeInfo) =  elem attValueOpt Symbols.Type
     def elemName(elem: NodeInfo) =  elem attValueOpt Symbols.Name map unescapeString getOrElse elem.localname
@@ -163,7 +153,7 @@ object Converter {
         case Some(Symbols.Array)         ⇒ JsArray(elem / * map processElement toVector)
         case Some(other)                 ⇒
           if (strict)
-            throwError(s"""unknown datatype `type="$other"`""")
+            throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")
           JsNull
       }
 

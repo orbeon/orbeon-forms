@@ -101,7 +101,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           Left(
             if (isJSON) {
               val receiver = new LocationSAXContentHandler
-              Converter.jsonStringToXML(connectionResult.readTextResponseBody.get, receiver)
+              Converter.jsonStringToXml(connectionResult.readTextResponseBody.get, receiver)
               receiver.getDocument
             } else {
               TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
@@ -115,7 +115,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
           Right(
             if (isJSON) {
-              Converter.jsonStringToXML(connectionResult.readTextResponseBody.get)
+              Converter.jsonStringToXml(connectionResult.readTextResponseBody.get)
             } else {
               TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
             }

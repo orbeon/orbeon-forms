@@ -32,53 +32,62 @@ import spray.json._
 //
 // Concrete functions to convert JSON to XML and back following the XForms 2.0 specification.
 //
-object Converter extends ConverterTrait {
+// The conversion follows the following principles:
+//
+// - Any JSON document is convertible to XML.
+// - However, the opposite is not true, and only XML documents following a very specific pattern
+//   can be converted to JSON. In other words the purpose of the conversion rules is to expose JSON
+//   to XML processing and not the other way around.
+// - XPath expressions which apply to the resulting XML document feel as natural as possible in most
+//   cases and can be written just by looking at the original JSON.
+//
+object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
 
-  type XMLElem = NodeInfo
+  type XmlElem = NodeInfo
 
-  def localname(elem: XMLElem)                    = elem.localname
-  def stringValue(elem: XMLElem)                  = elem.stringValue
-  def attValueOpt(elem: XMLElem, attName: String) = elem attValueOpt attName
-  def childrenElem(elem: XMLElem)                 = elem / * iterator
+  def localname(elem: XmlElem)                    = elem.localname
+  def stringValue(elem: XmlElem)                  = elem.stringValue
+  def attValueOpt(elem: XmlElem, attName: String) = elem attValueOpt attName
+  def childrenElem(elem: XmlElem)                 = elem / * iterator
 
-  type XMLStream = DeferredXMLReceiver
+  type XmlStream = DeferredXMLReceiver
 
-  def startElem(rcv: XMLStream, name: String)                   = rcv.startElement("", name, name, new AttributesImpl)
-  def endElem(rcv: XMLStream, name: String)                     = rcv.endElement("", name, name)
-  def addAttribute(rcv: XMLStream, name: String, value: String) = rcv.addAttribute("", name, name, value)
-  def text(rcv: XMLStream, value: String)                       = { val a = value.toCharArray; rcv.characters(a, 0, a.length) }
+  def startElem(rcv: XmlStream, name: String)                   = rcv.startElement("", name, name, new AttributesImpl)
+  def endElem(rcv: XmlStream, name: String)                     = rcv.endElement("", name, name)
+  def addAttribute(rcv: XmlStream, name: String, value: String) = rcv.addAttribute("", name, name, value)
+  def text(rcv: XmlStream, value: String)                       = { val a = value.toCharArray; rcv.characters(a, 0, a.length) }
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonStringToXML(source: String): DocumentInfo = {
+  def jsonStringToXml(source: String): DocumentInfo = {
     val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
-    jsonStringToXML(source, receiver)
+    jsonStringToXml(source, receiver)
     builder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonToXML(ast: JsValue): DocumentInfo = {
+  def jsonToXml(ast: JsValue): DocumentInfo = {
     val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
-    jsonToXML(ast, receiver)
+    jsonToXml(ast, receiver)
     builder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }
 
   // Convert a JSON String to a stream of XML events
-  def jsonStringToXML(source: String, receiver: XMLReceiver): Unit =
-    jsonToXML(source.parseJson, receiver)
+  def jsonStringToXml(source: String, receiver: XMLReceiver): Unit =
+    jsonToXml(source.parseJson, receiver)
 
   // Convert a JSON AST to a stream of XML events
-  def jsonToXML(ast: JsValue, receiver: XMLReceiver): Unit = {
+  def jsonToXml(ast: JsValue, receiver: XMLReceiver): Unit = {
     receiver.startDocument()
-    jsonToXMLImpl(ast, new DeferredXMLReceiverImpl(receiver))
+    jsonToXmlImpl(ast, new DeferredXMLReceiverImpl(receiver))
     receiver.endDocument()
   }
 
   // Convert an XML tree to a JSON String
-  def xmlToJsonString(root: XMLElem, strict: Boolean): String =
+  def xmlToJsonString(root: XmlElem, strict: Boolean): String =
     xmlToJson(root, strict).toString
 
   // Convert an XML tree to a JSON AST
-  def xmlToJson(root: XMLElem, strict: Boolean): JsValue =
+  def xmlToJson(root: XmlElem, strict: Boolean): JsValue =
     xmlToJsonImpl(
       if (isDocument(root))
         root.rootElement

@@ -27,40 +27,19 @@ import org.orbeon.oxf.xml.SaxonUtils
 import spray.json._
 
 //
-// Functions to convert JSON to XML and back following the XForms 2.0 specification.
+// Functions to convert JSON to XML following the XForms 2.0 specification.
 //
-// The conversion follows the following principles:
-//
-// - Any JSON document is convertible to XML.
-// - However, the opposite is not true, and only XML documents following a very specific pattern
-//   can be converted to JSON. In other words the purpose of the conversion rules is to expose JSON
-//   to XML processing and not the other way around.
-// - XPath expressions which apply to the resulting XML document feel as natural as possible in most
-//   cases and can be written just by looking at the original JSON.
-//
-// Remaining tasks:
-//
-// - `strict = true`: validate more cases
-// - `strict = false`: make sure fallbacks are in place and that any XML can be thrown in without error
-//
-trait ConverterTrait {
+protected trait JsonToXmlAlgorithm {
 
-  type XMLElem
+  type XmlStream
 
-  def localname(elem: XMLElem): String
-  def stringValue(elem: XMLElem): String
-  def attValueOpt(elem: XMLElem, attName: String): Option[String]
-  def childrenElem(elem: XMLElem): Iterator[XMLElem]
-
-  type XMLStream
-
-  def startElem(rcv: XMLStream, name: String): Unit
-  def endElem(rcv: XMLStream, name: String): Unit
-  def addAttribute(rcv: XMLStream, name: String, value: String)
-  def text(rcv: XMLStream, value: String)
+  def startElem(rcv: XmlStream, name: String): Unit
+  def endElem(rcv: XmlStream, name: String): Unit
+  def addAttribute(rcv: XmlStream, name: String, value: String): Unit
+  def text(rcv: XmlStream, value: String): Unit
 
   // Convert a JSON AST to a stream of XML events
-  protected def jsonToXMLImpl(ast: JsValue, rcv: XMLStream): Unit = {
+  def jsonToXmlImpl(ast: JsValue, rcv: XmlStream): Unit = {
 
     def escapeString(s: String) =
       s.iterateCodePoints map { cp ⇒
@@ -114,53 +93,5 @@ trait ConverterTrait {
     withElement(Symbols.JSON) {
       processValue(ast)
     }
-  }
-
-  // Convert an XML tree to a JSON AST
-  protected def xmlToJsonImpl(root: XMLElem, strict: Boolean): JsValue = {
-
-    def unescapeString(s: String) =
-      s.iterateCodePoints map { cp ⇒
-        if (cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F)
-          cp - 0xE000
-        else
-          cp
-      } codePointsToString
-
-    def typeOpt (elem: XMLElem) =  attValueOpt(elem, Symbols.Type)
-    def elemName(elem: XMLElem) =  attValueOpt(elem, Symbols.Name) map unescapeString getOrElse localname(elem)
-
-    def throwError(s: String) =
-      throw new IllegalArgumentException(s)
-
-    def processElement(elem: XMLElem): JsValue =
-      typeOpt(elem) match {
-        case Some(Symbols.String) | None ⇒ JsString(unescapeString(stringValue(elem)))
-        case Some(Symbols.Number)        ⇒ JsNumber(stringValue(elem))
-        case Some(Symbols.Boolean)       ⇒ JsBoolean(stringValue(elem).toBoolean)
-        case Some(Symbols.Null)          ⇒ JsNull
-        case Some(Symbols.Object)        ⇒ JsObject(childrenElem(elem) map (elem ⇒ elemName(elem) → processElement(elem)) toMap)
-        case Some(Symbols.Array)         ⇒ JsArray(childrenElem(elem) map processElement toVector)
-        case Some(other)                 ⇒
-          if (strict)
-            throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")
-          JsNull
-      }
-
-    processElement(root)
-  }
-
-  private object Symbols {
-    val String    = "string"
-    val Number    = "number"
-    val Boolean   = "boolean"
-    val Null      = "null"
-    val Object    = "object"
-    val Array     = "array"
-
-    val Type      = "type"
-    val Name      = "name"
-    val JSON      = "json"
-    val Anonymous = "_"
   }
 }

@@ -30,6 +30,7 @@ import org.orbeon.scaxon.XML
 import org.scalatest.junit.AssertionsForJUnit
 import spray.json._
 
+import scala.language.postfixOps
 import scala.xml.Elem
 
 class ConverterTest extends AssertionsForJUnit with XMLSupport {

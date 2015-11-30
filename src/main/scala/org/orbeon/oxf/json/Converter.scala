@@ -29,6 +29,8 @@ import org.orbeon.scaxon.XML._
 import org.xml.sax.helpers.AttributesImpl
 import spray.json._
 
+import scala.language.postfixOps
+
 //
 // Concrete functions to convert JSON to XML and back following the XForms 2.0 specification.
 //

@@ -25,6 +25,8 @@ package org.orbeon.oxf.json
 import org.orbeon.oxf.util.ScalaUtils._
 import spray.json._
 
+import scala.language.postfixOps
+
 //
 // Functions to convert XML to JSON following the XForms 2.0 specification.
 //
@@ -35,11 +37,12 @@ import spray.json._
 //
 protected trait XmlToJsonAlgorithm {
 
+  // Abstract members to keep the XML APIs completely separate
   type XmlElem
 
-  def localname(elem: XmlElem): String
-  def stringValue(elem: XmlElem): String
-  def attValueOpt(elem: XmlElem, attName: String): Option[String]
+  def localname   (elem: XmlElem): String
+  def stringValue (elem: XmlElem): String
+  def attValueOpt (elem: XmlElem, attName: String): Option[String]
   def childrenElem(elem: XmlElem): Iterator[XmlElem]
 
   // Convert an XML tree to a JSON AST

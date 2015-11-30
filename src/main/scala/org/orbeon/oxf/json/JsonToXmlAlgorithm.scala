@@ -26,17 +26,20 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.SaxonUtils
 import spray.json._
 
+import scala.language.postfixOps
+
 //
 // Functions to convert JSON to XML following the XForms 2.0 specification.
 //
 protected trait JsonToXmlAlgorithm {
 
+  // Abstract members to keep the XML APIs completely separate
   type XmlStream
 
-  def startElem(rcv: XmlStream, name: String): Unit
-  def endElem(rcv: XmlStream, name: String): Unit
+  def startElem   (rcv: XmlStream, name: String): Unit
+  def endElem     (rcv: XmlStream, name: String): Unit
   def addAttribute(rcv: XmlStream, name: String, value: String): Unit
-  def text(rcv: XmlStream, value: String): Unit
+  def text        (rcv: XmlStream, value: String): Unit
 
   // Convert a JSON AST to a stream of XML events
   def jsonToXmlImpl(ast: JsValue, rcv: XmlStream): Unit = {

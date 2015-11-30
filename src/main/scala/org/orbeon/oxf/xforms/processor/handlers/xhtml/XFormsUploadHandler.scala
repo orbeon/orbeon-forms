@@ -15,12 +15,13 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang ⇒ jl}
 
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml._
 import org.xml.sax._
 
@@ -60,7 +61,14 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
         reusableAttributes.addAttribute("", "unselectable", "unselectable", XMLReceiverHelper.CDATA, "on")
         // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
-        uploadControl.foreach(_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
+        // @accept
+        uploadControl       flatMap
+          (_.acceptValue)   map
+          mediatypeToAccept foreach
+          (accept ⇒ reusableAttributes.addAttribute("", "accept", "accept", XMLReceiverHelper.CDATA, accept))
+
+        uploadControl foreach
+          (_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
 
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
         element(xhtmlPrefix, XHTML_NAMESPACE_URI, "input", reusableAttributes)

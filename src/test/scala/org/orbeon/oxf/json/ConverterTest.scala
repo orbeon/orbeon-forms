@@ -23,8 +23,8 @@
 package org.orbeon.oxf.json
 
 import org.junit.Test
-import org.orbeon.builder.Utils
 import org.orbeon.oxf.test.XMLSupport
+import org.orbeon.oxf.util.NumberUtils._
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.scaxon.XML
 import org.scalatest.junit.AssertionsForJUnit
@@ -183,7 +183,7 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
     val codePointsToEscape           = (0 to 0x1F) :+ 0x7F toArray
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
     val codePointsTranslated         = codePointsToEscape map (_ + 0xE000)
-    val unicodeEscapedString         = codePointsToEscape map (c ⇒ s"\\u00${Utils.toHexString(Array(c.toByte))}") mkString
+    val unicodeEscapedString         = codePointsToEscape map (c ⇒ s"\\u00${toHexString(Array(c.toByte))}") mkString
     val translatedString             = new String(codePointsTranslated, 0, codePointsTranslated.length)
 
     // String containing both a property name and a string value with characters to escape

@@ -25,7 +25,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Handle xf:textarea.
- * 
+ *
  * TODO: Subclasses per appearance.
  */
 public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
@@ -40,31 +40,31 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final boolean isConcreteControl = textareaControl != null;
 
-        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true);
+        final AttributesImpl htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true);
 
         // Create xhtml:textarea
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (!isStaticReadonly(textareaControl)) {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
-                containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);
+                htmlTextareaAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(attributes, containerAttributes);
+                handleAccessibilityAttributes(attributes, htmlTextareaAttributes);
 
                 // Output all extension attributes
                 if (isConcreteControl) {
                     // Output xxf:* extension attributes
-                    textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
                 if (isHTMLDisabled(textareaControl))
-                    outputDisabledAttribute(reusableAttributes);
+                    outputDisabledAttribute(htmlTextareaAttributes);
 
                 if (isConcreteControl)
-                    handleAriaAttributes(textareaControl.isRequired(), textareaControl.isValid(), containerAttributes);
+                    handleAriaAttributes(textareaControl.isRequired(), textareaControl.isValid(), htmlTextareaAttributes);
 
-                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
+                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, htmlTextareaAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue();
                     if (value != null)
@@ -82,7 +82,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 final String containerName = isHTMLMediaType ? "span" : "pre";
                 final String containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName);
 
-                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, containerAttributes);
+                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, htmlTextareaAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue();
                     if (value != null) {

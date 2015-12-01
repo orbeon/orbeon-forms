@@ -14,11 +14,13 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param type="input" name="data"/>
+    <p:param type="input"  name="data"/>
+    <p:param type="input"  name="bindings"/>
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#data"/>
+        <p:input name="data"     href="#data"/>
+        <p:input name="bindings" href="#bindings"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -32,9 +34,13 @@
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-                <xsl:variable name="model"    select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
-                <xsl:variable name="instance" select="$model/xf:instance[@id  = 'fr-form-instance']"/>
-                <xsl:variable name="xbl-ids"  select="/*/xh:head/xbl:xbl/generate-id()"/>
+                <xsl:variable name="model"        select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xsl:variable name="instance"     select="$model/xf:instance[@id  = 'fr-form-instance']"/>
+                <xsl:variable name="templates"    select="$model/xf:instance[ends-with(@id, '-template')]"/>
+                <xsl:variable name="template-ids" select="$templates/generate-id()"/>
+                <xsl:variable name="xbl-ids"      select="/*/xh:head/xbl:xbl/generate-id()"/>
+
+                <xsl:variable name="bindings"     select="doc('input:bindings')/*/xbl:xbl/xbl:binding"/>
 
                 <!-- Whether we have "many" controls -->
                 <xsl:variable name="many-controls"
@@ -379,19 +385,47 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Update template -->
-                <xsl:template match="xf:model/xf:instance[generate-id() = $legacy-grid-binds-templates]"
+                <!--
+                    Update all templates:
+
+                    - Templates for grids which need migration are wrapped into an element with the default iteration name. We can't
+                      just run `createTemplateContentFromName()` because the binds in the input form have not been upgraded yet.
+                    - Templates for grids which don't need migration just run `createTemplateContentFromName()`.
+
+                    We recreate all templates because some form definitions might have been migrated with incorrect templates, see:
+
+                        https://github.com/orbeon/orbeon-forms/issues/2440
+
+                    Also ensure `xxf:exclude-result-prefixes` attribute on repeat templates, see:
+
+                        https://github.com/orbeon/orbeon-forms/issues/2278
+
+                    NOTE: In the future, we could have annotate.xpl create all templates, and deannotate.xpl remove all of them.
+                -->
+                <xsl:template match="xf:model/xf:instance[generate-id() = $template-ids]"
                               mode="within-model">
                     <xsl:copy>
                         <xsl:attribute name="xxf:exclude-result-prefixes" select="'#all'"/>
                         <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:variable
-                            name="iteration-name"
-                            select="fbf:defaultIterationName(fbf:controlNameFromId(@id))"
-                            xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
-                        <xsl:element name="{$iteration-name}">
-                            <xsl:apply-templates select="*/(@* | node())" mode="#current"/>
-                        </xsl:element>
+
+                        <xsl:choose>
+                            <xsl:when test="generate-id() = $legacy-grid-binds-templates">
+                                <xsl:variable
+                                    name="iteration-name"
+                                    select="fbf:defaultIterationName(fbf:controlNameFromId(@id))"
+                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+                                <xsl:element name="{$iteration-name}">
+                                    <xsl:copy-of
+                                        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                                        select="fbf:createTemplateContentFromNameXPath(/, fbf:controlNameFromId(@id), $bindings)"/>
+                                </xsl:element>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:copy-of
+                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+                                    select="fbf:createTemplateContentFromNameXPath(/, fbf:controlNameFromId(@id), $bindings)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:copy>
                 </xsl:template>
 
@@ -423,25 +457,6 @@
                                 <xsl:apply-templates select="node()" mode="#current"/>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </xsl:copy>
-                </xsl:template>
-
-                <!--
-                    Ensure xxf:exclude-result-prefixes attribute on repeat templates, see:
-
-                        https://github.com/orbeon/orbeon-forms/issues/2278
-
-                    Run this with lower priority, see:
-
-                        https://github.com/orbeon/orbeon-forms/issues/2440
-                -->
-                <xsl:template
-                    match="xf:model/xf:instance[ends-with(@id, '-template')]"
-                    mode="within-model"
-                    priority="-100">
-                    <xsl:copy>
-                        <xsl:attribute name="xxf:exclude-result-prefixes" select="'#all'"/>
-                        <xsl:apply-templates select="@* | node()" mode="#current"/>
                     </xsl:copy>
                 </xsl:template>
 

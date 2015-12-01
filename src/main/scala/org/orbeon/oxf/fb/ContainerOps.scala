@@ -163,7 +163,7 @@ trait ContainerOps extends ControlOps {
         }
 
         // Moving sections can impact templates
-        updateTemplates(doc)
+        updateTemplates(doc, None)
 
       case _ ⇒
     }
@@ -266,7 +266,7 @@ trait ContainerOps extends ControlOps {
         updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(control).to[Set])
 
         // Ensure new template rooted at iteration
-        ensureTemplateReplaceContent(inDoc, controlName, createTemplateContentFromBind(iterationBind.head))
+        ensureTemplateReplaceContent(inDoc, controlName, createTemplateContentFromBind(iterationBind.head, componentBindings))
 
       } else if (wasRepeat && ! repeat) {
         // Remove bind, holders and template
@@ -341,12 +341,22 @@ trait ContainerOps extends ControlOps {
     }
   }
 
+  // Create template content from a bind name
+  //@XPathFunction
+  // FIXME: Saxon can pass null as `bindings`.
+  def createTemplateContentFromNameXPath(inDoc: NodeInfo, name: String, bindings: List[NodeInfo]): Option[NodeInfo] =
+    createTemplateContentFromName(inDoc, name, Option(bindings) getOrElse Nil)
+
+  def createTemplateContentFromName(inDoc: NodeInfo, name: String, bindings: Seq[NodeInfo]): Option[NodeInfo] =
+    findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name) map
+      (createTemplateContentFromBind(_, bindings))
+
   // Create an instance template based on a hierarchy of binds rooted at the given bind
   // This checks each control binding in case the control specifies a custom data holder.
-  def createTemplateContentFromBind(bind: NodeInfo): NodeInfo = {
+  def createTemplateContentFromBind(bind: NodeInfo, bindings: Seq[NodeInfo]): NodeInfo = {
 
     val inDoc       = bind.getDocumentRoot
-    val descriptors = getAllRelevantDescriptors(componentBindings)
+    val descriptors = getAllRelevantDescriptors(bindings)
 
     def holderForBind(bind: NodeInfo): NodeInfo = {
 
@@ -415,28 +425,23 @@ trait ContainerOps extends ControlOps {
   }
 
   // Make sure all template instances reflect the current bind structure
-  def updateTemplates(inDoc: NodeInfo): Unit =
+  def updateTemplates(inDoc: NodeInfo, ancestorContainerNames: Option[Set[String]]): Unit =
     for {
       templateInstance ← templateInstanceElements(inDoc)
       name             = controlNameFromId(templateInstance.id)
-      bind             ← findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name)
+      if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(name))
+      template         ← createTemplateContentFromName(inDoc, name, componentBindings)
     } locally {
-      ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
+      ensureTemplateReplaceContent(inDoc, name, template)
     }
 
   // Update templates but only those which might contain one of specified names
   def updateTemplatesCheckContainers(inDoc: NodeInfo, ancestorContainerNames: Set[String]): Unit =
-    for {
-      templateInstance ← templateInstanceElements(inDoc)
-      name             = controlNameFromId(templateInstance.id)
-      if ancestorContainerNames(name)
-      bind             ← findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name)
-    } locally {
-      ensureTemplateReplaceContent(inDoc, name, createTemplateContentFromBind(bind))
-    }
+    updateTemplates(inDoc, Some(ancestorContainerNames))
 
   // This is called when the user adds/removes an iteration, as we want to update the templates in this case in order
   // to adjust the default number of iterations. See https://github.com/orbeon/orbeon-forms/issues/2379
+  //@XPathFunction
   def updateTemplatesFromDynamicIterationChange(controlName: String): Unit = {
 
     val inDoc = getFormDoc

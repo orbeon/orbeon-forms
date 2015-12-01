@@ -84,8 +84,9 @@ trait FormBuilderSupport extends XFormsSupport {
 
             <xf:action ev:event="xforms-model-construct-done">
               <!-- Load components -->
-              <xf:insert context="instance('fb-components-instance')"
-                     origin="xxf:call-xpl('oxf:/org/orbeon/oxf/fb/simple-toolbox.xpl', (), (), 'data')"/>
+              <xf:insert
+                context="instance('fb-components-instance')"
+                origin="xxf:call-xpl('oxf:/org/orbeon/oxf/fb/simple-toolbox.xpl', (), (), 'data')"/>
 
               <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
               <xf:var name="temp" value="xxf:create-document()"/>
@@ -95,18 +96,24 @@ trait FormBuilderSupport extends XFormsSupport {
                 origin="
                   xxf:call-xpl(
                     'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                    'data',
-                    xxf:call-xpl(
-                      'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                      (
-                        'data',
-                        'bindings'
+                    (
+                      'data',
+                      'bindings'
+                    ),
+                    (
+                      xxf:call-xpl(
+                        'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                        (
+                          'data',
+                          'bindings'
+                        ),
+                        (
+                          instance('fr-form-instance'),
+                          instance('fb-components-instance')
+                        ),
+                        'data'
                       ),
-                      (
-                        instance('fr-form-instance'),
-                        instance('fb-components-instance')
-                      ),
-                      'data'
+                      instance('fb-components-instance')
                     ),
                     'data'
                   )"

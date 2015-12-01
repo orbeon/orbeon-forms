@@ -76,18 +76,24 @@
             origin="
                 xxf:call-xpl(
                     'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                    'data',
-                    xxf:call-xpl(
-                        'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                        (
-                            'data',
-                            'bindings'
+                    (
+                        'data',
+                        'bindings'
+                    ),
+                    (
+                        xxf:call-xpl(
+                            'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                            (
+                                'data',
+                                'bindings'
+                            ),
+                            (
+                                event('data'),
+                                instance('fb-components-instance')
+                            ),
+                            'data'
                         ),
-                        (
-                            event('data'),
-                            instance('fb-components-instance')
-                        ),
-                        'data'
+                        instance('fb-components-instance')
                     ),
                     'data'
                 )"

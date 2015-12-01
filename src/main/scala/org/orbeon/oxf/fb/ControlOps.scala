@@ -224,7 +224,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       if (oldName != newName) {
         findDataHolders(inDoc, oldName) foreach (rename(_, newName))
         renameBinds(inDoc, oldName, newName)
-        updateTemplates(inDoc)
+        updateTemplates(inDoc, None)
       }
     }
 

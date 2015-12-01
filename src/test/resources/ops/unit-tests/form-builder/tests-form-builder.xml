@@ -11,12 +11,28 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<group description="Form Builder" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<group description="Form Builder" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <test description="Annotate" name="oxf:pipeline">
-        <input name="config" href="/forms/orbeon/builder/form/annotate.xpl"/>
-        <input name="data" href="template.xml"/>
-        <input name="bindings"><dummy/></input>
+        <input name="config">
+            <p:config>
+
+                <p:param name="data" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="/org/orbeon/oxf/fb/simple-toolbox.xpl"/>
+                    <p:output name="data" id="toolbox"/>
+                </p:processor>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="/forms/orbeon/builder/form/annotate.xpl"/>
+                    <p:input name="data" href="template.xml"/>
+                    <p:input name="bindings" href="#toolbox"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+
+            </p:config>
+        </input>
         <output name="data" href="annotated.xml"/>
     </test>
 

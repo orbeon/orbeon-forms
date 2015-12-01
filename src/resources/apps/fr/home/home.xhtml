@@ -375,12 +375,18 @@
                                                     (
                                                        xxf:call-xpl(
                                                             'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                                                            'data',
-                                                            xxf:call-xpl(
-                                                                'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                            (
                                                                 'data',
-                                                                instance('fr-form'),
-                                                                'data'
+                                                                'bindings'
+                                                            ),
+                                                            (
+                                                                xxf:call-xpl(
+                                                                    'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                                    'data',
+                                                                    instance('fr-form'),
+                                                                    'data'
+                                                                ),
+                                                                instance('fr-components')
                                                             ),
                                                             'data`'
                                                         ),

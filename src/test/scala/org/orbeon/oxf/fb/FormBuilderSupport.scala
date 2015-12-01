@@ -85,7 +85,8 @@ trait FormBuilderSupport extends XFormsSupport {
 
                         <xf:action ev:event="xforms-model-construct-done">
                             <!-- Load components -->
-                            <xf:insert context="instance('fb-components-instance')"
+              <xf:insert
+                context="instance('fb-components-instance')"
                                        origin="xxf:call-xpl('oxf:/org/orbeon/oxf/fb/simple-toolbox.xpl', (), (), 'data')"/>
 
                             <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
@@ -96,7 +97,11 @@ trait FormBuilderSupport extends XFormsSupport {
                                 origin="
                                     xxf:call-xpl(
                                         'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                    (
                                         'data',
+                      'bindings'
+                    ),
+                    (
                                         xxf:call-xpl(
                                             'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
                                             (
@@ -109,6 +114,8 @@ trait FormBuilderSupport extends XFormsSupport {
                                             ),
                                             'data'
                                         ),
+                      instance('fb-components-instance')
+                    ),
                                         'data'
                                     )"
                             />

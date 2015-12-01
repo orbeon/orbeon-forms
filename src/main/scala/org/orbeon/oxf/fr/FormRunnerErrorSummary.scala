@@ -167,7 +167,7 @@ trait FormRunnerErrorSummary {
 
     val resultString = Array.ofDim[String](result.length)
 
-    for (i ← 0 to result.length - 1)
+    for (i ← result.indices)
       resultString(i) = padWithZeros(result(i))
 
     resultString mkString "-"

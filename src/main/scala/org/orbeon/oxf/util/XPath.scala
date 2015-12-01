@@ -135,13 +135,13 @@ object XPath {
     }
 
     def getJPConverter(targetClass: Class[_]) =
-      if (SupportedScalaToSaxonClasses exists(_.isAssignableFrom(targetClass)))
+      if (SupportedScalaToSaxonClasses exists (_.isAssignableFrom(targetClass)))
         ScalaToSaxonConverter
       else
         null
 
     def getPJConverter(targetClass: Class[_]) =
-      if (SupportedSaxonToScalaClasses exists(_.isAssignableFrom(targetClass)))
+      if (SupportedSaxonToScalaClasses exists (_.isAssignableFrom(targetClass)))
         SaxonToScalaConverter
       else
         null

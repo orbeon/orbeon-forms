@@ -19,7 +19,7 @@
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#data"/>
+        <p:input name="data"      href="#data"/>
         <p:input name="bindings" href="#bindings"/>
         <p:input name="config">
             <xsl:stylesheet

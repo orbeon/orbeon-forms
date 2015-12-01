@@ -68,8 +68,7 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
      with SelectionControlTrait {
-    override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) ++
-                                                        Set(XXFORMS_TITLE_QNAME)
+    override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) + XXFORMS_TITLE_QNAME
   }
 
   class TriggerControl(
@@ -85,6 +84,8 @@ object ControlAnalysisFactory {
      with ChildrenLHHAAndActionsTrait {
     override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
     override val externalEvents              = externalEventsDef
+
+    override protected val allowedExtensionAttributes = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) set XXFORMS_TITLE_QNAME
   }
 
   class UploadControl(

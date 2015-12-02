@@ -357,7 +357,7 @@ trait ContainerOps extends ControlOps {
     val inDoc       = bind.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
 
-    def holderForBind(bind: NodeInfo): NodeInfo = {
+    def holderForBind(bind: NodeInfo, topLevel: Boolean): NodeInfo = {
 
       val controlName    = getBindNameOrEmpty(bind)
       val controlElemOpt = findControlByName(inDoc, controlName)
@@ -384,7 +384,7 @@ trait ContainerOps extends ControlOps {
         // the initial number of iterations.
         // See https://github.com/orbeon/orbeon-forms/issues/2379
         def useInitialIterations(controlElem: NodeInfo) =
-          isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
+          ! topLevel && isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
 
         controlElemOpt match {
           case Some(controlElem) if useInitialIterations(controlElem) ⇒
@@ -411,7 +411,7 @@ trait ContainerOps extends ControlOps {
         // <repeated-section-2-iteration>
         //   ...
         // </repeated-section-2-iteration>
-        val nested         = bind / "*:bind" map holderForBind
+        val nested         = bind / "*:bind" map (holderForBind(_, topLevel = false))
         val repeatedNested = (1 to iterationCount) flatMap (_ ⇒ nested)
 
         insert(into = elementTemplate, origin = repeatedNested)
@@ -420,7 +420,7 @@ trait ContainerOps extends ControlOps {
       elementTemplate
     }
 
-    holderForBind(bind)
+    holderForBind(bind, topLevel = true)
   }
 
   // Make sure all template instances reflect the current bind structure

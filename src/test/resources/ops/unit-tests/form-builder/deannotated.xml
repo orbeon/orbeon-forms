@@ -13,11 +13,13 @@
                         <grid-3>
                             <grid-3-iteration>
                                 <control-5/>
+                                <control-16 filename="" mediatype="" size=""/>
                             </grid-3-iteration>
                         </grid-3>
                         <grid-6>
                             <grid-6-iteration>
                                 <control-8/>
+                                <control-17 filename="" mediatype="" size=""/>
                             </grid-6-iteration>
                         </grid-6>
                     </section-1>
@@ -56,11 +58,13 @@
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind id="grid-3-iteration-bind" ref="grid-3-iteration" name="grid-3-iteration">
                             <xf:bind id="control-5-bind" ref="control-5" name="control-5"/>
+                            <xf:bind id="control-16-bind" ref="control-16" name="control-16" type="xf:anyURI"/>
                         </xf:bind>
                     </xf:bind>
                     <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
                         <xf:bind id="grid-6-iteration-bind" ref="grid-6-iteration" name="grid-6-iteration">
                             <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
+                            <xf:bind id="control-17-bind" ref="control-17" name="control-17" type="xf:anyURI"/>
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
@@ -97,10 +101,18 @@
                             <label/>
                             <hint/>
                         </control-5>
+                        <control-16>
+                            <label/>
+                            <hint/>
+                        </control-16>
                         <control-8>
                             <label/>
                             <hint/>
                         </control-8>
+                        <control-17>
+                            <label/>
+                            <hint/>
+                        </control-17>
                         <control-10>
                             <label/>
                             <hint/>
@@ -127,11 +139,13 @@
             <xf:instance xxf:exclude-result-prefixes="#all" xxf:readonly="true" id="grid-3-template">
                 <grid-3-iteration>
                     <control-5/>
+                    <control-16 filename="" mediatype="" size=""/>
                 </grid-3-iteration>
             </xf:instance>
             <xf:instance xxf:exclude-result-prefixes="#all" xxf:readonly="true" id="grid-6-template">
                 <grid-6-iteration>
                     <control-8/>
+                    <control-17 filename="" mediatype="" size=""/>
                 </grid-6-iteration>
             </xf:instance>
             <xf:instance xxf:exclude-result-prefixes="#all" xxf:readonly="true" id="section-9-template">
@@ -179,6 +193,16 @@
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>
+                            <xh:td>
+                                <fr:attachment id="control-16-control" bind="control-16-bind" class="fr-attachment">
+                                    <xf:label ref="$form-resources/control-16/label"/>
+                                    <xf:hint ref="$form-resources/control-16/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:attachment>
+                            </xh:td>
                         </xh:tr>
                     </fr:grid>
                     <fr:grid id="grid-6-grid" bind="grid-6-bind" repeat="content" min="1" template="instance('grid-6-template')">
@@ -189,6 +213,16 @@
                                     <xf:hint ref="$form-resources/control-8/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <fr:image-attachment id="control-17-control" bind="control-17-bind" class="fr-attachment">
+                                    <xf:label ref="$form-resources/control-17/label"/>
+                                    <xf:hint ref="$form-resources/control-17/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:image-attachment>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>

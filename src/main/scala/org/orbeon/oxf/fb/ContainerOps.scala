@@ -326,12 +326,11 @@ trait ContainerOps extends ControlOps {
   // Create template content from a bind name
   //@XPathFunction
   // FIXME: Saxon can pass null as `bindings`.
-  def createTemplateContentFromNameXPath(inDoc: NodeInfo, name: String, bindings: List[NodeInfo]): Option[NodeInfo] =
-    createTemplateContentFromName(inDoc, name, Option(bindings) getOrElse Nil)
+  def createTemplateContentFromBindNameXPath(inDoc: NodeInfo, name: String, bindings: List[NodeInfo]): Option[NodeInfo] =
+    createTemplateContentFromBindName(inDoc, name, Option(bindings) getOrElse Nil)
 
-  def createTemplateContentFromName(inDoc: NodeInfo, name: String, bindings: Seq[NodeInfo]): Option[NodeInfo] =
-    findBindByName(inDoc, findRepeatIterationName(inDoc, name) getOrElse name) map
-      (createTemplateContentFromBind(_, bindings))
+  def createTemplateContentFromBindName(inDoc: NodeInfo, bindName: String, bindings: Seq[NodeInfo]): Option[NodeInfo] =
+    findBindByName(inDoc, bindName) map (createTemplateContentFromBind(_, bindings))
 
     // Create an instance template based on a hierarchy of binds rooted at the given bind
     // This checks each control binding in case the control specifies a custom data holder.
@@ -368,11 +367,12 @@ trait ContainerOps extends ControlOps {
   def updateTemplates(inDoc: NodeInfo, ancestorContainerNames: Option[Set[String]]): Unit =
         for {
             templateInstance ← templateInstanceElements(inDoc)
-            name             = controlNameFromId(templateInstance.id)
-      if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(name))
-      template         ← createTemplateContentFromName(inDoc, name, componentBindings)
+      repeatName       = controlNameFromId(templateInstance.id)
+      if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
+      iterationName    ← findRepeatIterationName(inDoc, repeatName)
+      template         ← createTemplateContentFromBindName(inDoc, iterationName, componentBindings)
         } locally {
-      ensureTemplateReplaceContent(inDoc, name, template)
+      ensureTemplateReplaceContent(inDoc, repeatName, template)
         }
 
     // Update templates but only those which might contain one of specified names

@@ -400,13 +400,13 @@
                         <xsl:element name="{$iteration-name}">
                                     <xsl:copy-of
                                         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                                        select="fbf:createTemplateContentFromNameXPath(/, fbf:controlNameFromId(@id), $bindings)"/>
+                                        select="fbf:createTemplateContentFromBindNameXPath(/, fbf:controlNameFromId(@id), $bindings)/*"/>
                         </xsl:element>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:copy-of
                                     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                                    select="fbf:createTemplateContentFromNameXPath(/, fbf:controlNameFromId(@id), $bindings)"/>
+                                    select="fbf:createTemplateContentFromBindNameXPath(/, fbf:controlNameFromId(@id), $bindings)/*[1]"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:copy>

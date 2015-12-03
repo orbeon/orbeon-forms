@@ -137,6 +137,7 @@
         <lifecycle>RESOURCE_PHASE</lifecycle>
         <lifecycle>EVENT_PHASE</lifecycle>
     </filter>
+    
     <filter-mapping>
         <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
